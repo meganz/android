@@ -1036,6 +1036,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
+		log("aB.setHomeAsUpIndicator_1");
         aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -1681,11 +1682,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
         							log("aB.setTitle3");
         							aB.setTitle(getString(R.string.section_rubbish_bin));
+        							log("aB.setHomeAsUpIndicator_2");
         							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         							firstNavigationLevel = true;
         						}
         						else{
         							aB.setTitle(parentNode.getName());
+        							log("aB.setHomeAsUpIndicator_3");
         							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         							firstNavigationLevel = false;
         						}
@@ -1694,6 +1697,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
         						parentNode = megaApi.getRootNode();
         						aB.setTitle(getString(R.string.section_rubbish_bin));
+        						log("aB.setHomeAsUpIndicator_4");
         						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         						firstNavigationLevel = true;
         					}
@@ -1706,11 +1710,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
         							log("aB.setTitle3");
         							aB.setTitle(getString(R.string.section_cloud_drive));
+        							log("aB.setHomeAsUpIndicator_5");
         							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         							firstNavigationLevel = true;
         						}
         						else{
         							aB.setTitle(parentNode.getName());
+        							log("aB.setHomeAsUpIndicator_6");
         							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         							firstNavigationLevel = false;
         						}
@@ -1720,6 +1726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						parentNode = megaApi.getRootNode();
         						log("aB.setTitle4");
         						aB.setTitle(getString(R.string.section_cloud_drive));
+        						log("aB.setHomeAsUpIndicator_7");
         						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         						firstNavigationLevel = true;
         					}
@@ -1733,11 +1740,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
     							log("aB.setTitle3");
     							aB.setTitle(getString(R.string.section_cloud_drive));
+    							log("aB.setHomeAsUpIndicator_8");
     							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     							firstNavigationLevel = true;
     						}
     						else{
     							aB.setTitle(parentNode.getName());
+    							log("aB.setHomeAsUpIndicator_9");
     							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
     							firstNavigationLevel = false;
     						}
@@ -1747,6 +1756,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     						parentNode = megaApi.getRootNode();
     						log("aB.setTitle4");
     						aB.setTitle(getString(R.string.section_cloud_drive));
+    						log("aB.setHomeAsUpIndicator_10");
     						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     						firstNavigationLevel = true;
     					}
@@ -1772,6 +1782,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 				if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
                 					log("aB.setTitle2");
                 					aB.setTitle(getResources().getString(R.string.section_cloud_drive));
+                					log("aB.setHomeAsUpIndicator_11");
                 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
                 					fbFLol.setNodes(megaApi.getChildren(megaApi.getRootNode(), orderGetChildren));
                 					firstNavigationLevel = true;
@@ -1779,6 +1790,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 				else {
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleBrowser);
 	            					aB.setTitle(node.getName());
+	            					log("aB.setHomeAsUpIndicator_12");
 	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 	            					fbFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
 	            					firstNavigationLevel = false;
@@ -1796,6 +1808,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         		log("parentHandleRubbish: "+ parentHandleRubbish);
                         		if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
                         			aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+                        			log("aB.setHomeAsUpIndicator_13");
                         			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
                         			rbFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren));
                     				firstNavigationLevel = true;
@@ -1803,6 +1816,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         		else{                        			
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
                 					aB.setTitle(node.getName());
+                					log("aB.setHomeAsUpIndicator_14");
                 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
                 					rbFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
                 					firstNavigationLevel = false;
@@ -2215,6 +2229,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			log("aB.setTitle SHARED_ITEMS");
     			aB.setTitle(getString(R.string.section_shared_items));
+    			log("aB.setHomeAsUpIndicator_75");
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
@@ -2298,12 +2314,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					if (node != null){
         						inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
         						aB.setTitle(node.getName());
+        						log("aB.setHomeAsUpIndicator_15");
             					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             					firstNavigationLevel = false;
         					}
         					else{
         						inSFLol.refresh();
         						aB.setTitle(getResources().getString(R.string.section_shared_items));
+        						log("aB.setHomeAsUpIndicator_16");
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
             					firstNavigationLevel = true;
         					}
@@ -2318,12 +2336,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					if (node != null){
         						outSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
         						aB.setTitle(node.getName());
+        						log("aB.setHomeAsUpIndicator_17");
             					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             					firstNavigationLevel = false;
         					}
         					else{
         						outSFLol.refresh();
         						aB.setTitle(getResources().getString(R.string.section_shared_items));
+        						log("aB.setHomeAsUpIndicator_18");
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
             					firstNavigationLevel = true;
         					}
@@ -2350,12 +2370,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					if(parentHandleOutgoing!=-1){
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
 	            					aB.setTitle(node.getName());
+	            					log("aB.setHomeAsUpIndicator_19");
 	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 	            					firstNavigationLevel = false;
 	            					outSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
             					}
                 				else{
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					log("aB.setHomeAsUpIndicator_20");
                 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
                 					firstNavigationLevel = true;
                 				}
@@ -2376,12 +2398,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					if(parentHandleIncoming!=-1){
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
                 					aB.setTitle(node.getName());	
+                					log("aB.setHomeAsUpIndicator_21");
                 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 	            					firstNavigationLevel = false;
 	            					inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
             					}
                 				else{
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					log("aB.setHomeAsUpIndicator_22");
                 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
                 					firstNavigationLevel = true;
                 				}
@@ -2538,6 +2562,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				aB = getSupportActionBar();
     			}
     			aB.setTitle(getString(R.string.section_contacts));
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    			firstNavigationLevel = true;
     			
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
@@ -9625,6 +9651,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     							rbFLol.setNodes(nodes);
     							rbFLol.getRecyclerView().invalidate();
     							aB.setTitle(getString(R.string.section_rubbish_bin));	
+    							log("aB.setHomeAsUpIndicator_23");
     							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     							this.firstNavigationLevel = true;
     						}
@@ -9993,7 +10020,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (isClearRubbishBin){
 					isClearRubbishBin = false;
 					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					aB.setTitle(getString(R.string.section_rubbish_bin));
+					log("aB.setHomeAsUpIndicator_24");
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					this.firstNavigationLevel = true;
 
@@ -10036,12 +10064,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (node != null){
 						outSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
 						aB.setTitle(node.getName());
+						log("aB.setHomeAsUpIndicator_25");
     					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
     					firstNavigationLevel = false;
 					}
 					else{
 						outSFLol.refresh();
 						aB.setTitle(getResources().getString(R.string.section_shared_items));
+						log("aB.setHomeAsUpIndicator_26");
     					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     					firstNavigationLevel = true;
 					}				
@@ -10057,12 +10087,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (node != null){
 						inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
 						aB.setTitle(node.getName());
+						log("aB.setHomeAsUpIndicator_27");
     					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
     					firstNavigationLevel = false;
 					}
 					else{
 						inSFLol.refresh();
 						aB.setTitle(getResources().getString(R.string.section_shared_items));
+						log("aB.setHomeAsUpIndicator_28");
     					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     					firstNavigationLevel = true;
 					}		

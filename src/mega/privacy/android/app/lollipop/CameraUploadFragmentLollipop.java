@@ -398,6 +398,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    	aB.setTitle(getString(R.string.section_photo_sync));
 	    }
 			
+	    log("aB.setHomeAsUpIndicator_74");
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();

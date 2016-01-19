@@ -268,9 +268,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 				
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//				log("aB.setHomeAsUpIndicator_43");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}
 		}
 		else{
@@ -287,16 +288,18 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (parentNode != null){
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				}
-				else{
-					aB.setTitle(parentNode.getName());
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
+//					log("aB.setHomeAsUpIndicator_44");
+//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//				}
+//				else{
+//					aB.setTitle(parentNode.getName());
+//					log("aB.setHomeAsUpIndicator_45");
+//					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+//				}
+//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}			
 		}
 		
@@ -840,6 +843,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				MegaNode n = nodes.get(position);
 				
 				aB.setTitle(n.getName());
+				log("aB.setHomeAsUpIndicator_46");
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1012,12 +1016,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-//					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					log("aB.setHomeAsUpIndicator_47");
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				}
 				else{
 					aB.setTitle(parentNode.getName());
+					log("aB.setHomeAsUpIndicator_48");
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				}

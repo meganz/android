@@ -408,10 +408,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					sortByNameAscending();
 				}
 				
-				aB.setTitle(getString(R.string.section_shared_items));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//				aB.setTitle(getString(R.string.section_shared_items));
+//				log("aB.setHomeAsUpIndicator_55");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				adapter.parentHandle=-1;
 			}
@@ -428,10 +429,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //					sortByNameAscending();
 //				}
 				
-				aB.setTitle(parentNode.getName());
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//				aB.setTitle(parentNode.getName());
+//				log("aB.setHomeAsUpIndicator_56");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}	
 
 //			if (deepBrowserTree == 0){
@@ -646,10 +648,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					sortByNameAscending();
 				}
 				
-				aB.setTitle(getString(R.string.section_shared_items));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//				aB.setTitle(getString(R.string.section_shared_items));
+//				log("aB.setHomeAsUpIndicator_57");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				adapter.parentHandle=-1;
 			}
@@ -666,10 +669,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //					sortByNameAscending();
 //				}
 				
-				aB.setTitle(parentNode.getName());
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//				aB.setTitle(parentNode.getName());
+//				log("aB.setHomeAsUpIndicator_58");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}	
 
 			if (deepBrowserTree == 0){
@@ -680,9 +684,10 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				else{					
 					contentText.setText(getInfoNode());
 				}
-				aB.setTitle(getString(R.string.section_shared_items));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//				aB.setTitle(getString(R.string.section_shared_items));
+//				log("aB.setHomeAsUpIndicator_59");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
@@ -842,6 +847,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 		aB.setTitle(n.getName());
+		log("aB.setHomeAsUpIndicator_60");
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1291,6 +1297,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				MegaNode n = nodes.get(position);
 				
 				aB.setTitle(n.getName());
+				log("aB.setHomeAsUpIndicator_61");
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1564,6 +1571,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			fabButton.setVisibility(View.GONE);
 			parentHandle=-1;
 			aB.setTitle(getString(R.string.section_shared_items));	
+			log("aB.setHomeAsUpIndicator_62");
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			findNodes();
@@ -1606,6 +1614,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				emptyTextView.setVisibility(View.GONE);
 
 				aB.setTitle(parentNode.getName());	
+				log("aB.setHomeAsUpIndicator_63");
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1641,7 +1650,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		else{
 			log("ELSE deepTree");
-			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
+//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);

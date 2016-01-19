@@ -303,6 +303,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 			
 			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
+			log("aB.setHomeAsUpIndicator_49");
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -310,7 +311,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		else{
 			MegaNode n = megaApi.getNodeByHandle(parentHandle);
 					
-			aB.setTitle(n.getName());					
+			aB.setTitle(n.getName());	
+			log("aB.setHomeAsUpIndicator_50");
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			
@@ -835,6 +837,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				contentText.setText(getInfoFolder(n));
 				
 				aB.setTitle(n.getName());
+				log("aB.setHomeAsUpIndicator_51");
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1075,10 +1078,12 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 						aB.setTitle(getString(R.string.section_cloud_drive));	
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						log("aB.setHomeAsUpIndicator_52");
 						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 					}
 					else{
-						aB.setTitle(parentNode.getName());					
+						aB.setTitle(parentNode.getName());	
+						log("aB.setHomeAsUpIndicator_53");
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					}
@@ -1144,6 +1149,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				adapter.setParentHandle(parentHandle);
 				levels--;
 				aB.setTitle(getString(R.string.action_search)+": "+searchQuery);	
+				log("aB.setHomeAsUpIndicator_54");
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();

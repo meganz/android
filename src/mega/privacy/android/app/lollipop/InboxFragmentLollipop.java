@@ -297,6 +297,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		}
 		
 		aB.setTitle(getString(R.string.section_inbox));	
+		log("aB.setHomeAsUpIndicator_64");
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();

@@ -391,10 +391,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 			log("aB.setTitle fbF 1");
-			aB.setTitle(getString(R.string.section_cloud_drive));	
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//			aB.setTitle(getString(R.string.section_cloud_drive));	
+//			log("aB.setHomeAsUpIndicator_66");
+//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
@@ -402,18 +403,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-				log("aB.setTitle fbF 2");
-				aB.setTitle(getString(R.string.section_cloud_drive));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			}
-			else{
-				aB.setTitle(parentNode.getName());					
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-			}
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+//			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+//				log("aB.setTitle fbF 2");
+//				aB.setTitle(getString(R.string.section_cloud_drive));
+//				log("aB.setHomeAsUpIndicator_67");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//			}
+//			else{
+//				aB.setTitle(parentNode.getName());	
+//				log("aB.setHomeAsUpIndicator_68");
+//				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+//			}
+//			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}	
 		
 		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
@@ -1343,6 +1346,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					
 					aB.setTitle(n.getName());
+					log("aB.setHomeAsUpIndicator_69");
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1640,11 +1644,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							log("aB.setTitle fbF 5");
 							aB.setTitle(getString(R.string.section_cloud_drive));	
+							log("aB.setHomeAsUpIndicator_70");
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 						}
 						else{
 							aB.setTitle(parentNode.getName());
+							log("aB.setHomeAsUpIndicator_71");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						}
@@ -1708,11 +1714,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							log("aB.setTitle fbF 6");
 							aB.setTitle(getString(R.string.section_cloud_drive));	
+							log("aB.setHomeAsUpIndicator_72");
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 						}
 						else{
 							aB.setTitle(parentNode.getName());
+							log("aB.setHomeAsUpIndicator_73");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						}

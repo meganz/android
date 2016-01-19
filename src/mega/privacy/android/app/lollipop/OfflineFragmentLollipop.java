@@ -482,6 +482,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
 		if (context instanceof ManagerActivityLollipop){
+			log("aB.setHomeAsUpIndicator_30");
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1394,6 +1395,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				
 				if (context instanceof ManagerActivityLollipop){
+					log("aB.setHomeAsUpIndicator_31");
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1637,6 +1639,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					
 					if (pathNavigation.equals("/")){
 						aB.setTitle(getString(R.string.section_saved_for_offline));
+						log("aB.setHomeAsUpIndicator_32");
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1648,6 +1651,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						index=title.lastIndexOf("/");				
 						title=title.substring(index+1,title.length());			
 						aB.setTitle(title);
+						log("aB.setHomeAsUpIndicator_33");
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
