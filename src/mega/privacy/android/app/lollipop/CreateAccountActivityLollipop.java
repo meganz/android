@@ -142,14 +142,14 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		
 		bRegister = (TextView) findViewById(R.id.button_create_account_create);
 		bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsbLogin = bRegister.getLayoutParams();		
-		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-		paramsbLogin.width = Util.scaleWidthPx(144, outMetrics);
-		bRegister.setLayoutParams(paramsbLogin);
+		android.view.ViewGroup.LayoutParams paramsbRegister = bRegister.getLayoutParams();		
+		paramsbRegister.height = Util.scaleHeightPx(48, outMetrics);
+		/*paramsbLogin.width = Util.scaleWidthPx(144, outMetrics);*/
+		bRegister.setLayoutParams(paramsbRegister);
 		//Margin
-		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, Util.scaleHeightPx(15, outMetrics)); 
-		bRegister.setLayoutParams(textParamsLogin);
+		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
+		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, Util.scaleHeightPx(15, outMetrics)); 
+		bRegister.setLayoutParams(textParamsRegister);
 		bRegister.setOnClickListener(this);		
 		
 		textAlreadyAccount = (TextView) findViewById(R.id.text_already_account);
@@ -163,14 +163,14 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		bLogin.setOnClickListener(this);
 		
 		bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb2 = bLogin.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb2.width = Util.scaleWidthPx(63, outMetrics);
-		bLogin.setLayoutParams(paramsb2);
+		android.view.ViewGroup.LayoutParams paramsbLogin = bLogin.getLayoutParams();		
+		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
+		/*paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);*/
+		bLogin.setLayoutParams(paramsbLogin);
 		//Margin
-		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
-		bLogin.setLayoutParams(textParamsRegister);
+		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
+		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
+		bLogin.setLayoutParams(textParamsLogin);
 		
 
 		creatingAccountLayout = (LinearLayout) findViewById(R.id.create_account_creating_layout);

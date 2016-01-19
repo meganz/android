@@ -240,7 +240,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
 		android.view.ViewGroup.LayoutParams paramsbLogin = bLogin.getLayoutParams();		
 		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
+		/*paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);*/
 		bLogin.setLayoutParams(paramsbLogin);
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();

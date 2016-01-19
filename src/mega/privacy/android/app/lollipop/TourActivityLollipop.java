@@ -34,7 +34,10 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	
 	private TourImageAdapter adapter;
 	private LoopViewPager viewPager;
-	private ImageView bar;
+	private LinearLayout bar1;
+	private LinearLayout bar2;
+	private LinearLayout bar3;
+	private LinearLayout bar4;
 	private TextView bRegister;
 	private TextView bLogin;
 	TextView tourText1;
@@ -55,11 +58,14 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 		
 		setContentView(R.layout.activity_tour);		
 		viewPager = (LoopViewPager) findViewById(R.id.pager);
-		bar = (ImageView) findViewById(R.id.barTour);		
+		bar1 = (LinearLayout) findViewById(R.id.bar_tour_layout_1);
+		bar2 = (LinearLayout) findViewById(R.id.bar_tour_layout_2);
+		bar3 = (LinearLayout) findViewById(R.id.bar_tour_layout_3);
+		bar4 = (LinearLayout) findViewById(R.id.bar_tour_layout_4);
 		tourLoginCreate = (LinearLayout) findViewById(R.id.tour_login_create);
 		
 		tourText1 = (TextView) findViewById(R.id.tour_text_1);
-		tourText1.setPadding(Util.scaleHeightPx(16, metrics), 0, 0, 0);
+		tourText1.setPadding(Util.scaleWidthPx(16, metrics), 0, 0, 0);
 		tourText1.setGravity(Gravity.CENTER_VERTICAL);
 		android.view.ViewGroup.LayoutParams params = tourText1.getLayoutParams();
 		
@@ -67,7 +73,7 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 		tourText1.setLayoutParams(params);
 
 		tourText2 = (TextView) findViewById(R.id.tour_text_2);
-		tourText2.setPadding(Util.scaleHeightPx(16, metrics), 0, 0, 0);
+		tourText2.setPadding(Util.scaleWidthPx(16, metrics), 0, 0, 0);
 		tourText2.setGravity(Gravity.CENTER_VERTICAL);
 		params = tourText2.getLayoutParams();
 		params.height = Util.scaleHeightPx(68, metrics);
@@ -100,18 +106,18 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 		bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
 		android.view.ViewGroup.LayoutParams paramsb2 = bLogin.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, metrics);
-		paramsb2.width = Util.scaleWidthPx(63, metrics);
+		/*paramsb2.width = Util.scaleWidthPx(63, metrics);*/
 		bLogin.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		textParamsLogin.setMargins(Util.scaleWidthPx(16, metrics), 0, Util.scaleWidthPx(15, metrics), 0); 
 		bLogin.setLayoutParams(textParamsLogin);
 		
 		bRegister = (TextView) findViewById(R.id.button_register_tour);
 		bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
 		android.view.ViewGroup.LayoutParams paramsb1 = bRegister.getLayoutParams();		
 		paramsb1.height = Util.scaleHeightPx(48, metrics);
-		paramsb1.width = Util.scaleWidthPx(144, metrics);
+		/*paramsb1.width = Util.scaleWidthPx(144, metrics);*/
 //		bRegister.setGravity(Gravity.CENTER);
 		bRegister.setLayoutParams(paramsb1);
 		
@@ -124,6 +130,11 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 		adapter = new TourImageAdapter(this);
 		viewPager.setAdapter(adapter);
 		viewPager.setCurrentItem(0);
+		
+		bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
+		bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+		bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+		bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
 	    
 	    viewPager.getLayoutParams().height = metrics.widthPixels;
 
@@ -131,13 +142,6 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 													
 													@Override
 													public void onPageSelected (int position){
-														int[] barImages = new int[] {
-														        R.drawable.tour01_bar,
-														        R.drawable.tour02_bar,
-														        R.drawable.tour03_bar,
-														        R.drawable.tour04_bar
-														    };
-														
 														int[] barTitles = new int[] {
 															R.string.tour_space_title,
 															R.string.tour_speed_title,
@@ -154,7 +158,36 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 														
 														tourText1.setText(barTitles[position]);
 														tourText2.setText(barTexts[position]);
-														bar.setImageResource(barImages[position]);
+														switch(position){
+															case 0:{
+																bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
+																bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																break;
+															}
+															case 1:{
+																bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
+																bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																break;
+															}
+															case 2:{
+																bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
+																bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																break;
+															}
+															case 3:{
+																bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+																bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
+																break;
+															}
+														}
 													}
 												});
 	    
