@@ -1446,7 +1446,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	
 	public void showRenameDialog(){
 		
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
+		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setText(node.getName());
