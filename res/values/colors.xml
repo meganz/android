@@ -79,5 +79,8 @@
     <color name="filePropertiesToolBar">#2284b1</color>
     
     <color name="text_tab_selected">#FFFFFF</color>    
-	<color name="text_tab_unselected">#B9B9B9</color> 
+	<color name="text_tab_unselected">#B9B9B9</color>
+	
+	<color name="tour_bar_grey">#dddddd</color>
+	<color name="tour_bar_red">#cc0000</color>
 </resources>
