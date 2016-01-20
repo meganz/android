@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -366,11 +367,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			mTabsAdapterExplorer= new TabsAdapter(this, mTabHostExplorer, viewPagerExplorer);   	
 			
 			TabHost.TabSpec tabSpec3 = mTabHostExplorer.newTabSpec("cloudExplorerFragment");
-			tabSpec3.setIndicator(getTabIndicator(mTabHostExplorer.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+			tabSpec3.setIndicator(getTabIndicator(mTabHostExplorer.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 	        //tabSpec.setContent(contentID);
 	        //mTabHostContacts.addTab(tabSpec);
 	        TabHost.TabSpec tabSpec4 = mTabHostExplorer.newTabSpec("incomingExplorerFragment");
-	        tabSpec4.setIndicator(getTabIndicator(mTabHostExplorer.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+	        tabSpec4.setIndicator(getTabIndicator(mTabHostExplorer.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 	                	          				
 	        Bundle b1 = new Bundle();
 	        b1.putInt("MODE", mode);

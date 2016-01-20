@@ -388,7 +388,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 //			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			aB.setDisplayHomeAsUpEnabled(true);
 			aB.setDisplayShowHomeEnabled(true);
-			aB.setTitle(getString(R.string.file_properties_shared_folder_list_shares));
+			aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
 			
 			container = (RelativeLayout) findViewById(R.id.file_contact_list);
 			imageView = (ImageView) findViewById(R.id.file_properties_icon);
@@ -745,7 +745,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				if (parentHandle == -1){
-					aB.setTitle(getString(R.string.file_properties_shared_folder_list_shares));
+					aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
 					aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 					supportInvalidateOptionsMenu();
 					adapter.setShareList(listContacts);

@@ -478,12 +478,6 @@
             android:screenOrientation="portrait" >
         </activity>
         
-        <activity
-            android:name="PdfFileViewerActivity"
-            android:label="@string/pdf_file_viewer_activity"
-            android:screenOrientation="portrait" >
-        </activity>
-        
         <service
             android:name="CameraSyncService"
             android:exported="false" >

@@ -130,7 +130,7 @@
                             android:layout_centerVertical="true"
                             android:layout_gravity="left|center_vertical"
                             android:layout_toRightOf="@id/file_properties_shared_image"
-                            android:text="@string/file_properties_shared_folder_list_shares"
+                            android:text="@string/file_properties_shared_folder_select_contact"
                             android:textStyle="bold" />
 
                         <TextView

@@ -18,13 +18,11 @@
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Crear</string>
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Subir Archivo</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
-    <string name="general_download_here" context="Item menu option upon right click on one or multiple files.">Descargar Aquí</string>
     <string name="general_add" context="button">Añadir</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Vaciar</string>
     <string name="general_loading" context="state previous to import a file">Cargando&#8230;</string>
     <string name="general_importing" context="state while importing the file">Importando&#8230;</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importar</string>
-    <string name="general_updating" context="state while upgrading the account">Actualizando&#8230;</string>  
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Ancho de Banda</string>
     <string name="general_error_word" context="It will be followed by the error message">Error</string> 
@@ -57,8 +55,6 @@
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
         
-    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Entrantes</string>
-    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Salientes</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
     <string name="action_add" context="Menu item">Subir&#8230;</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
@@ -132,7 +128,6 @@
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">¿Nuevo en MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Crear cuenta</string>
-	<string name="login_logging_in" context="label when logging in to MEGA">Iniciando sesión</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Por favor, escribe tu correo electrónico</string>
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Correo electrónico no valido</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Por favor, introduzca su contraseña</string>
@@ -184,9 +179,8 @@
 	<string name="section_shared_items" context="title of the screen that shows all the shared items">Carpetas compartidas</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papelera</string>
 	<string name="section_contacts" context="Title of the contact list">Contactos</string>
-	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTOS</string>
-	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">SOLICITUDES ENVIADAS</string>
-	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">SOLICITUDES RECIBIDAS</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Solicitudes enviadas</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Solicitudes recibidas</string>
 	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No ha enviado solicitudes</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No ha recibido solicitudes</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferencias</string>
@@ -194,12 +188,10 @@
 	<string name="section_account" context="button to the settings of the user\'s account">Mi Cuenta</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s de %2$s</string>
-	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">ENTRANTES</string>
-	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">SALIENTES</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Entrantes</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Salientes</string>
 	
-	<string name="tab_cloud_drive_explorer" context="Capital letters. Incoming shared folders. The title of a tab">DISCO</string>
-	<string name="tab_incoming_shares_explorer" context="Capital letters. Outgoing shared folders. The title of a tab">ENTRANTES</string>
-	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab InCOMING">Compartidas contigo</string>
+	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Compartidas contigo</string>
 	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Elige carpeta</string>
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No hay archivos en tu Cloud Drive</string>
@@ -228,7 +220,6 @@
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Permisos</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Cambiar permisos</string>
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida</string>
-	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Compartido con</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propietario</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvitar</string>
@@ -556,7 +547,6 @@
     <string name="november">Noviembre</string>
     <string name="december">Diciembre</string>
     
-    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">Visor de PDF MEGA</string>
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Navegador ZIP</string>
     
     <string name="new_account" context="in login screen to create a new account">Crea una cuenta ahora!</string>
