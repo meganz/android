@@ -2249,7 +2249,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				mTabHostShares.getTabWidget().setDividerDrawable(null);
     				
         			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
-        			String titleTab3 = getString(R.string.tab_incoming_shares);
+        			String titleTab3 = getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault());
         			tabSpec3.setIndicator(getTabIndicator(mTabHostShares.getContext(), titleTab3.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout  			
          			
         	        TabHost.TabSpec tabSpec4 = mTabHostShares.newTabSpec("outgoingSharesFragment");
@@ -2581,14 +2581,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				mTabsAdapterContacts = new TabsAdapter(this, mTabHostContacts, viewPagerContacts);   	
     				
         			TabHost.TabSpec tabSpec1 = mTabHostContacts.newTabSpec("contactsFragment");
-        	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
+        	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.section_contacts).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
         	        //tabSpec.setContent(contentID);
         	        //mTabHostContacts.addTab(tabSpec);
         	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
-        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
+        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
        	        
         	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
-        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
+        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
     				
     				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragmentLollipop.class, null);
     				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragmentLollipop.class, null);

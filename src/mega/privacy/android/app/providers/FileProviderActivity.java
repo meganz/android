@@ -334,11 +334,11 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
 
 					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 					//tabSpec.setContent(contentID);
 					//mTabHostContacts.addTab(tabSpec);
 					TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 
 					mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
 					mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
@@ -675,11 +675,11 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
 					
 					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 			        //tabSpec.setContent(contentID);
 			        //mTabHostContacts.addTab(tabSpec);
 			        TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-			        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+			        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 			                	          				
 					mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
 					mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
@@ -1405,11 +1405,11 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
 
 						TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 						//tabSpec.setContent(contentID);
 						//mTabHostContacts.addTab(tabSpec);
 						TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 
 						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
 						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
@@ -1461,11 +1461,11 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
 
 						TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 						//tabSpec.setContent(contentID);
 						//mTabHostContacts.addTab(tabSpec);
 						TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 
 						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
 						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
