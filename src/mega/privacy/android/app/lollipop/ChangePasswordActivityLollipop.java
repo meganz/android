@@ -78,7 +78,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 		aB.setDisplayShowTitleEnabled(false);
-		aB.setTitle(getString(R.string.my_account_change_password_title));
+		aB.setTitle(getString(R.string.my_account_change_password));
 		
         fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_change_pass);
 		

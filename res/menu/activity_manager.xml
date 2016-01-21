@@ -177,7 +177,7 @@
 	<item
 	    android:id="@+id/action_menu_change_pass"
 	    android:orderInCategory="110"
-	    android:title="@string/my_account_change_password_title"
+	    android:title="@string/my_account_change_password"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	

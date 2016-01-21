@@ -410,7 +410,7 @@
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade!</string>
-    <string name="my_account_change_password" context="menu item">Change</string>
+    <string name="my_account_change_password" context="menu item">Change password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">You can be a PRO user!\n Do you want to upgrade your account?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
@@ -420,7 +420,6 @@
     <string name="my_account_last_session" context="when did the last session happen">Last session:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections:</string>
     
-    <string name="my_account_change_password_title" context="title of the screen to change the password">Change password</string>   
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Changing password</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Current password</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">New password</string>
