@@ -5,7 +5,7 @@
     <string name="app_version" context="Not translate">3.0.beta_3</string>
     <string name="sdk_version" context="Not translate">459bd73</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
@@ -59,7 +59,7 @@
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave a folder, you will not be able to see it again. Do you want to continue?</string>
     
-    <string name="confirmation_alert" context="confirmation message before removing a file">Confirmation alert</string>
+    <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload&#8230;</string>
@@ -79,13 +79,13 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export MasterKey</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove MasterKey</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export Master Key</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove Master Key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The MasterKey has been removed</string>
-    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been canceled correctly</string>
-    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">The subscription has not been canceled correctly. Please contact support\@mega.co.nz to cancel your subscription</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The Master Key has been exported into: </string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The Master Key file has been removed</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been canceled successfully</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">The subscription has not been canceled successfully. Please contact support\@mega.nz to cancel your subscription</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Logout from all devices</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been successfully closed</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
@@ -148,7 +148,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please, loggin in before sharing with MEGA.</string>
-    <string name="session_problem">A user session problem exists</string>
+    <string name="session_problem" context="if a link to a folder cannot be fetched">Problem retrieving files from the folder</string>
     
     <string name="tour_space_title">Mega Space</string>
     <string name="tour_speed_title">Mega Speed</string>
@@ -294,7 +294,7 @@
     <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
-    <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Delete for Offline</string>
+    <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Remove from Offline</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
     <string name="context_send_file" context="menu item">Send file</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
@@ -310,7 +310,7 @@
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
     <string name="context_invitacion_reply" context="success message when adding a contact">Reply to the invitation sent</string>
-    <string name="context_contact_removed" context="success message when removing a contact">Contact correctly removed</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Contact successfully removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
     <string name="context_permissions_not_changed" context="error message">Error. Permissions did not change</string>
@@ -318,49 +318,49 @@
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">is already a contact</string>
     <string name="context_send_no_permission" context="message when trying to send a file without full access">No permissions to send this file</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
-    <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">Successfully renamed</string>
     <string name="context_no_renamed" context="error message">Error. Not renamed</string>
-    <string name="context_correctly_copied" context="success message when copying a node">Correctly copied</string>
-    <string name="context_correctly_sent" context="success message when sending a file">File correctly sent</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Successfully copied</string>
+    <string name="context_correctly_sent" context="success message when sending a file">File successfully sent</string>
     <string name="context_no_sent" context="error message when sending a file">Error. File not sent</string>
     <string name="context_no_copied" context="error message">Error. Not copied</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">A destination folder has to be chosen</string>
-    <string name="context_correctly_moved" context="success message when moving a node">Correctly moved</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d items correctly moved</string>
-    <string name="number_incorrectly_moved" context="success message when moving a node">, %d items not correctly moved</string>
-    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Correctly sent to Rubbish Bin</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items correctly sent to Rubbish Bin</string>
-    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">, %d items not correctly sent</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Successfully moved</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d items successfully moved.</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">%d items not successfully moved</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Successfully sent to Rubbish Bin</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items successfully sent to Rubbish Bin.</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d items not successfully sent</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
-    <string name="context_correctly_shared" context="success message when sharing a folder">Correctly shared</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Successfully shared</string>
     <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process of sharing not completed</string>
-    <string name="context_correctly_shared_removed" context="success message when sharing a folder">Correctly remove shares</string>
+    <string name="context_correctly_shared_removed" context="success message when sharing a folder">Successfully remove shares</string>
     <string name="context_no_shared_number_removed" context="error message when sharing a folder">Error. %d process of removing shares not completed</string>
     <string name="context_no_shared" context="error message">Error. Not shared</string>
     <string name="context_no_removed_shared" context="error message">Error. Shared not removed</string>
     <string name="context_remove_sharing" context="success message when removing a sharing">Folder sharing removed</string>
     <string name="context_no_link" context="error message">Impossible to get the link</string>
-    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correctly removed from MEGA</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Successfully removed from MEGA</string>
     <string name="context_no_removed" context="error message">Error. Not removed from MEGA</string>
-    <string name="number_correctly_removed" context="success message when moving a node">%d items correctly removed from MEGA</string>
-    <string name="number_no_removed" context="error message when moving a node">, %d items not correctly removed</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d folders correctly leaved</string>
-    <string name="number_no_leaved" context="error message when moving a node">, %d folders not correctly leaved</string>
-    <string name="number_correctly_sent" context="success message when sending multiple files">File correctly sent to %d contacts</string>
-    <string name="number_no_sent" context="error message when sending multiple files">, not sent to %d contacts</string>
-    <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d files correctly sent</string>
-    <string name="number_no_sent_multifile" context="error message when sending multiple files">, %d files not sent</string>
-    <string name="number_correctly_copied" context="success message when sending multiple files">%d items correctly copied</string>
-    <string name="number_no_copied" context="error message when sending multiple files">, %d items not copied</string>
-    <string name="number_contact_removed" context="success message when removing several contacts">%d contacts correctly removed</string>
-    <string name="number_contact_not_removed" context="error message when removing several contacts">, %d contacts not removed</string>
-    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">Folder correctly shared with %d contacts</string>
-    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">, with %d contacts not shared</string>
-    <string name="number_correctly_shared" context="success message when sharing multiple files">%d folders correctly shared</string>
-    <string name="number_no_shared" context="error message when sharing multiple files">, %d folders not shared</string>
-    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
+    <string name="number_correctly_removed" context="success message when moving a node">%d items successfully removed from MEGA.</string>
+    <string name="number_no_removed" context="error message when moving a node">%d items not successfully removed</string>
+    <string name="number_correctly_leaved" context="success message when moving a node">%d folders successfully leaved.</string>
+    <string name="number_no_leaved" context="error message when moving a node">%d folders not successfully leaved</string>
+    <string name="number_correctly_sent" context="success message when sending multiple files">File successfully sent to %d contacts.</string>
+    <string name="number_no_sent" context="error message when sending multiple files">File not sent to %d contacts</string>
+    <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d files successfully sent.</string>
+    <string name="number_no_sent_multifile" context="error message when sending multiple files">%d files not sent</string>
+    <string name="number_correctly_copied" context="success message when sending multiple files">%d items successfully copied.</string>
+    <string name="number_no_copied" context="error message when sending multiple files">%d items not copied</string>
+    <string name="number_contact_removed" context="success message when removing several contacts">%d contacts successfully removed.</string>
+    <string name="number_contact_not_removed" context="error message when removing several contacts">%d contacts not removed</string>
+    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">Folder successfully shared with %d contacts.</string>
+    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">Folder not shared with %d contacts</string>
+    <string name="number_correctly_shared" context="success message when sharing multiple files">%d folders successfully shared.</string>
+    <string name="number_no_shared" context="error message when sharing multiple files">%d folders not shared</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Successfully sent to:</string>
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">The folder is no longer shared</string>
-    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, the folder is still shared with any contact</string>
+    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, the folder is still shared with your contact</string>
     <string name="context_select_one_file" context="option available for just one file">Select just one file.</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your Mega subscription. Please let us know, if there is anything we can do to help change your mind.</string>
@@ -372,7 +372,7 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been canceled. Please, provide a reason to cancel.</string>
     
     <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share correctly removed</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share successfully removed</string>
   
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">New folder</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Add contact</string>
@@ -428,7 +428,7 @@
     <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password or the new passwords you provided do not match. Please try again.</string>
     <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password. Please try again.</string>
     <string name="my_account_change_password_OK" context="Success text">Password changed successfully</string>
-    <string name="my_account_change_password_dont_match" context="title of the screen to change the password">Password doesn\'t match</string> 
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Passwords don\'t match</string> 
     
     <string name="upgrade_activity" context="title of the Upgrade screen">Pro Membership</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Select membership</string>
@@ -452,7 +452,7 @@
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait.</string>
     
-    <string name="import_correct" context="success message after import a file">Imported correctly</string>
+    <string name="import_correct" context="success message after import a file">Imported successfully</string>
     
     <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">No active transfers</string>
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">All transfers are paused</string>
@@ -526,7 +526,7 @@
     <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string> 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Reset lock screen</string> 
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Reset PIN code</string> 
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
     
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
@@ -613,7 +613,7 @@
     <string name="proceed_cc" context="Text of the button which proceeds the payment">Proceed</string>
     
     <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account successfully upgraded!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation has not finished correctly. The credit card will not be charged.</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation has not finished successfully. The credit card will not be charged.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">The credit card information is not correct. The credit card will not be charged.</string>
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.co.nz to upgrade your account</string>
+    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
 </resources>
