@@ -509,7 +509,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		ArrayList<String> menuOptions = new ArrayList<String>();
 		
 		menuOptions.add(getString(R.string.action_kill_all_sessions));
-		menuOptions.add(getString(R.string.my_account_change_password_title));
+		menuOptions.add(getString(R.string.my_account_change_password));
 		
 		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 		log("Export in: "+path);
@@ -916,7 +916,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (itemText.compareTo(getString(R.string.action_kill_all_sessions)) == 0){
 			megaApi.killSession(-1, this);
 		}
-		else if (itemText.compareTo(getString(R.string.my_account_change_password_title)) == 0){
+		else if (itemText.compareTo(getString(R.string.my_account_change_password)) == 0){
 			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
 			startActivity(intent);
 		}
