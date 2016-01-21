@@ -5250,7 +5250,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
-						Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+						Toast.makeText(this, getString(R.string.context_contact_already_exists, request.getEmail()), Toast.LENGTH_LONG).show();
 					}
 					else{
 						Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();

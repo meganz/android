@@ -9366,7 +9366,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists), Snackbar.LENGTH_LONG).show();	
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists, request.getEmail()), Snackbar.LENGTH_LONG).show();	
 					}
 					else{
 						Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_LONG).show();	

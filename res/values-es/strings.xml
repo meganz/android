@@ -308,7 +308,7 @@
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permisos modificados</string>
     <string name="context_permissions_not_changed" context="error message">Error. No se pudo cambiar</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">La carpeta ya existe</string>
-    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">ya es un contacto existente</string>
+    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s ya es un contacto existente</string>
     <string name="context_send_no_permission" context="message when trying to send a file without full access">No tiene permisos para enviar este fichero</string>
     <string name="context_folder_created" context="success message when creating a folder">Carpeta creada</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Renombrado correctamente</string>
