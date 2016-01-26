@@ -46,7 +46,8 @@
         android:layout_height="30dp"
         android:layout_toRightOf="@id/contact_list_relative_layout_avatar"
         android:paddingLeft="5dp"
-        android:paddingTop="7dp" />  
+        android:paddingTop="7dp"
+        android:textColor="@color/file_list_first_row" />  
     
     <TextView
         android:id="@+id/contact_list_content"
