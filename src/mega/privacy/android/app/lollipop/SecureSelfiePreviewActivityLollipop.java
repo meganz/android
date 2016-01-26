@@ -8,7 +8,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.UploadHereDialog;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
@@ -69,7 +68,6 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
     private RelativeLayout topLayout;
     
     private TouchImageView secureSelfieImage;
-	public UploadHereDialog uploadDialog;
     
     String filePath;
 	File imgFile;
