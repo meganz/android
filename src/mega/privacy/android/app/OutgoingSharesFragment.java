@@ -372,6 +372,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(getString(R.string.section_shared_items));	
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -384,6 +385,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(parentNode.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -461,7 +463,8 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
-					aB.setTitle(getString(R.string.section_shared_items));	
+					aB.setTitle(getString(R.string.section_shared_items));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -473,6 +476,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(parentNode.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -510,6 +514,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		}
 		
 		aB.setTitle(n.getName());
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 
@@ -673,6 +678,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 					MegaNode n = nodes.get(position);
 										
 					aB.setTitle(n.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
@@ -1034,6 +1040,7 @@ public void sortByNameDescending(){
 				parentHandle=-1;
 				log("Shared With Me");
 				aB.setTitle(getString(R.string.section_shared_items));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1062,7 +1069,8 @@ public void sortByNameDescending(){
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 					
-					aB.setTitle(parentNode.getName());					
+					aB.setTitle(parentNode.getName());	
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);				
 					
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -1109,7 +1117,8 @@ public void sortByNameDescending(){
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 					
-					aB.setTitle(parentNode.getName());					
+					aB.setTitle(parentNode.getName());		
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);					
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					

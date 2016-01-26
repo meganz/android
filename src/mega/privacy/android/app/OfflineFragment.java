@@ -407,6 +407,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		}
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		if (context instanceof ManagerActivity && ((ManagerActivity)context).getmDrawerToggle() != null){
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -977,6 +978,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				MegaOffline currentNode = mOffList.get(position);
 				
 				aB.setTitle(currentNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				if (context instanceof ManagerActivity){
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
@@ -1261,6 +1263,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						
 						if (pathNavigation.equals("/")){
 							aB.setTitle(getString(R.string.section_saved_for_offline));
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 							((ManagerActivity)context).supportInvalidateOptionsMenu();
 						}
@@ -1271,6 +1274,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							index=title.lastIndexOf("/");				
 							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 							((ManagerActivity)context).supportInvalidateOptionsMenu();
 						}
@@ -1280,6 +1284,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						
 						if (pathNavigation.equals("/")){
 							aB.setTitle(getString(R.string.section_saved_for_offline));
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((OfflineActivity)context).supportInvalidateOptionsMenu();
 						}
 						else{
@@ -1290,6 +1295,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							index=title.lastIndexOf("/");				
 							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);	
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((OfflineActivity)context).supportInvalidateOptionsMenu();
 						}
 					}

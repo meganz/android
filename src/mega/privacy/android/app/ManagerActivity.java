@@ -60,6 +60,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -1063,9 +1064,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
        
 	        mDrawerList.setOnItemClickListener(this);
 	        
-	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
-	        getSupportActionBar().setHomeButtonEnabled(true);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	        if (aB == null){
+	        	aB = getSupportActionBar();
+	        }
+	        aB.setIcon(R.drawable.ic_launcher);
+	        aB.setHomeButtonEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			aB.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lollipop_primary_color)));
 	        
 	        mDrawerToggle = new ActionBarDrawerToggle(
 	                this,                  /* host Activity */
@@ -1831,6 +1837,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	log("selectDrawerItem");
     	switch (item){
     		case CLOUD_DRIVE:{
+    			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
 //    			
 //    			megaApi.getPricing(this);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
@@ -1839,9 +1849,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (parentHandleBrowser == -1){
 						fbF.setParentHandle(megaApi.getRootNode().getHandle());
 						parentHandleBrowser = megaApi.getRootNode().getHandle();
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					}
 					else{
 						fbF.setParentHandle(parentHandleBrowser);
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					}
 					fbF.setIsList(isListCloudDrive);
 					fbF.setOrder(orderGetChildren);
@@ -1855,6 +1867,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					fbF.setOrder(orderGetChildren);
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
 					fbF.setNodes(nodes);
+					if ((parentHandleBrowser == megaApi.getRootNode().getHandle()) || (parentHandleBrowser == -1)){
+						parentHandleBrowser = megaApi.getRootNode().getHandle();
+						fbF.setParentHandle(parentHandleBrowser);
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					}
+					else{
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					}
 				}
 								
 				mTabHostContacts.setVisibility(View.GONE);    			
@@ -1907,6 +1927,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case INBOX:{
    			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (iF == null){
@@ -1925,6 +1949,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
     				iF.setNodes(nodes);
     			}
+    			
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			    			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
@@ -1981,6 +2007,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				getmDrawerToggle().setDrawerIndicatorEnabled(true);
     				supportInvalidateOptionsMenu();
     			}
+    			
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
@@ -2069,6 +2097,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case RUBBISH_BIN:{
     			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (rbF == null){
@@ -2079,6 +2111,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				rbF.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
     				rbF.setNodes(nodes);
+    				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			}
     			else{
     				rbF.setIsList(isListRubbishBin);
@@ -2086,6 +2119,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				rbF.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
     				rbF.setNodes(nodes);
+    				
+    				if ((parentHandleRubbish == megaApi.getRubbishNode().getHandle()) || (parentHandleRubbish == -1)){
+    					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+    					rbF.setParentHandle(parentHandleRubbish);
+    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    				}
+    				else{
+    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+    				}
     			}
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -2139,6 +2181,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				aB = getSupportActionBar();
     			}
     			aB.setTitle(getString(R.string.section_shared_items));
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			
     			if (getmDrawerToggle() != null){
     				getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -2183,9 +2226,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                 				if(parentHandleOutgoing!=-1){
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
 	            					aB.setTitle(node.getName());
+	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             					}
                 				else{
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
                 					outSF.refresh(); 
                 				}            					   				
                 			}
@@ -2196,10 +2241,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                         			
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
                 					aB.setTitle(node.getName());	
+                					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             					}
                 				else{
                 					
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
                 					inSF.refresh(); 
                 				}   				
                 			}                           	
@@ -2277,6 +2324,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					nDA.setPositionClicked(-1);
 				}
     			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    			
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
@@ -2341,6 +2393,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case TRANSFERS:{
     			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (tF == null){
@@ -2398,16 +2455,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SAVED_FOR_OFFLINE:{
     			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (oF == null){
     				oF = new OfflineFragment();
     				oF.setIsList(isListOffline);
     				oF.setPathNavigation("/");
+    				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			}
     			else{
     				oF.setPathNavigation("/");
     				oF.setIsList(isListOffline);
+    				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			}
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -2451,6 +2515,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case SEARCH:{
+    			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
@@ -2499,6 +2567,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case CAMERA_UPLOADS:{
+    			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
