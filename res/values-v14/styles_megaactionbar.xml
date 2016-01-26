@@ -19,7 +19,7 @@
 
 <resources>
 
-    <style name="Theme.Megaactionbar" parent="@style/Theme.AppCompat.Light">
+    <style name="Theme.Megaactionbar" parent="@style/Theme.AppCompat">
         <item name="android:actionBarItemBackground">@drawable/selectable_background_megaactionbar</item>
         <item name="android:popupMenuStyle">@style/PopupMenu.Megaactionbar</item>
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Megaactionbar</item>

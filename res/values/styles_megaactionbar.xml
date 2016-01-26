@@ -19,7 +19,7 @@
 
 <resources>
 
-    <style name="Theme.Megaactionbar" parent="@style/Theme.AppCompat.Light">
+    <style name="Theme.Megaactionbar" parent="@style/Theme.AppCompat">
         <item name="actionBarItemBackground">@drawable/selectable_background_megaactionbar</item>
         <item name="popupMenuStyle">@style/PopupMenu.Megaactionbar</item>
         <item name="dropDownListViewStyle">@style/DropDownListView.Megaactionbar</item>
