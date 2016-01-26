@@ -318,6 +318,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			if(((ManagerActivity)context).getmDrawerToggle() != null)
 			{
 				aB.setTitle(getString(R.string.section_cloud_drive));	
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
 			}
@@ -331,11 +332,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			if(((ManagerActivity)context).getmDrawerToggle() != null)
 			{
 				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-					aB.setTitle(getString(R.string.section_cloud_drive));	
+					aB.setTitle(getString(R.string.section_cloud_drive));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				}
 				else{
 					aB.setTitle(parentNode.getName());					
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 				}
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -356,8 +359,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 	        
 	        listView = (ListView) v.findViewById(R.id.file_list_view_browser);
-//			listView.setOnItemClickListener(this);
-//			listView.setOnItemLongClickListener(this);
+			listView.setOnItemClickListener(this);
+			listView.setOnItemLongClickListener(this);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			
@@ -440,11 +443,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(getString(R.string.section_cloud_drive));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(infoNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			}						
 			
 			adapterList.setPositionClicked(-1);
@@ -585,11 +590,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(getString(R.string.section_cloud_drive));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			}
 			else{
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			}
 			
 			adapterGrid.setPositionClicked(-1);
@@ -733,6 +740,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					}
 					
 					aB.setTitle(n.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
@@ -1010,10 +1018,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 						rightUploadButton.setVisibility(View.GONE);
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));	
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 						}
 						else{
 							aB.setTitle(parentNode.getName());					
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 						}
 						
@@ -1071,10 +1081,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 						rightUploadButton.setVisibility(View.GONE);
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));	
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 						}
 						else{
 							aB.setTitle(parentNode.getName());					
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 						}
 						
@@ -1294,6 +1306,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(getString(R.string.section_cloud_drive));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			}
 		}
 		else{
@@ -1301,6 +1314,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(infoNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			}
 		}
 	}
