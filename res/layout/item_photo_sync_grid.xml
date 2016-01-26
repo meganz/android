@@ -11,21 +11,17 @@
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/cell_photosync_grid_month_layout" 
-	    android:background="@color/photo_sync_month_layout"
-	    android:layout_marginLeft="0dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="0dp" >
+	    android:background="@color/photo_sync_month_layout" 
+	    android:layout_marginLeft="72dp" >
 	    
     	<TextView
 	        android:id="@+id/cell_photosync_grid_month_name"
-	        android:layout_width="225dp"
-	        android:layout_height="30dp"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
 	        android:singleLine="false" 
-	        android:textColor="@color/white"
-	        android:textSize="18sp"/>
+	        android:textColor="@color/photo_sync_month_text"
+	        android:textSize="14sp"
+	        android:textStyle="bold"/>
     
 	</RelativeLayout>
 </LinearLayout>
