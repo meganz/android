@@ -19,6 +19,7 @@
         style="@style/dialogText"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/standard_margin"
+        android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>
