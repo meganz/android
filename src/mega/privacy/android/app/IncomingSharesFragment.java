@@ -364,6 +364,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(getString(R.string.section_shared_items));	
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -385,6 +386,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(parentNode.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -395,6 +397,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(getString(R.string.section_shared_items));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				}
 			}
@@ -402,6 +405,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(infoNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			}						
 			
 			adapterList.setPositionClicked(-1);
@@ -427,6 +431,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				aB.setTitle(getInfoNode());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				contentText.setVisibility(View.VISIBLE);
 			}	
 //			setNodes(nodes);	
@@ -488,6 +493,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				aB.setTitle(getInfoNode());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				contentText.setVisibility(View.VISIBLE);
 			}	
 					
@@ -519,6 +525,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		}
 		
 		aB.setTitle(n.getName());
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		
@@ -657,6 +664,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					MegaNode n = nodes.get(position);
 					
 					aB.setTitle(n.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
@@ -931,6 +939,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				((ManagerActivity)context).setParentHandleIncoming(-1);
 				parentHandle=-1;
 				aB.setTitle(getString(R.string.section_shared_items));	
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -961,7 +970,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 
-						aB.setTitle(parentNode.getName());					
+						aB.setTitle(parentNode.getName());		
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -1008,7 +1018,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 					
-					aB.setTitle(parentNode.getName());					
+					aB.setTitle(parentNode.getName());		
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);					
 					
 					((ManagerActivity)context).supportInvalidateOptionsMenu();

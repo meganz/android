@@ -6,7 +6,7 @@
     android:versionName="3.0.beta" >
 
     <uses-sdk
-        android:minSdkVersion="21"
+        android:minSdkVersion="9"
         android:targetSdkVersion="22" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />

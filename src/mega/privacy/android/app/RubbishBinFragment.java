@@ -272,6 +272,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -295,10 +296,12 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 				{
 					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 						aB.setTitle(getString(R.string.section_rubbish_bin));	
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					}
 					else{
-						aB.setTitle(parentNode.getName());					
+						aB.setTitle(parentNode.getName());
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					}
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -377,11 +380,13 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				MegaNode infoNode = megaApi.getRubbishNode();
 				contentText.setText(getInfoFolder(infoNode));
 			}
 			else{
 				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(getInfoFolder(infoNode));
 			}
@@ -484,11 +489,13 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				MegaNode infoNode = megaApi.getRubbishNode();
 				contentText.setText(getInfoFolder(infoNode));
 			}
 			else{
 				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(getInfoFolder(infoNode));
 			}
@@ -556,6 +563,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					MegaNode n = nodes.get(position);
 					
 					aB.setTitle(n.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
@@ -721,11 +729,13 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-						aB.setTitle(getString(R.string.section_rubbish_bin));	
+						aB.setTitle(getString(R.string.section_rubbish_bin));
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					}
 					else{
-						aB.setTitle(parentNode.getName());					
+						aB.setTitle(parentNode.getName());	
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					}
 					
@@ -783,10 +793,12 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					emptyTextView.setVisibility(View.GONE);
 					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 						aB.setTitle(getString(R.string.section_rubbish_bin));	
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					}
 					else{
-						aB.setTitle(parentNode.getName());					
+						aB.setTitle(parentNode.getName());	
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					}
 					
@@ -856,6 +868,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(getString(R.string.section_rubbish_bin));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			}
 		}
 		else{
@@ -863,6 +876,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(infoNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			}
 		}
 	}
