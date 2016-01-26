@@ -236,6 +236,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem cancelSubscription;
+	private MenuItem cancelAllTransfers;
 	private MenuItem killAllSessions;
 	
 	public int accountFragment;
@@ -2948,6 +2949,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		cancelSubscription.setVisible(false);
+		
+		cancelAllTransfers = menu.findItem(R.id.action_menu_cancel_all_transfers);
+		cancelAllTransfers.setVisible(false);
 		
 		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
 		killAllSessions.setVisible(false);

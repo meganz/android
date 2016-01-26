@@ -7,7 +7,6 @@ import java.util.Stack;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadHereDialog;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
@@ -105,9 +104,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-	
-	public UploadHereDialog uploadDialog;
-	
+		
 	private List<ShareInfo> filePreparedInfos;
 	
 	MegaPreferences prefs = null;

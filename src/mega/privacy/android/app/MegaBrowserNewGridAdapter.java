@@ -417,6 +417,27 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					((ManagerActivity) context).showMove(handleList);
 					break;
 				}
+				case R.id.cab_menu_send_file:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						((ManagerActivity) context).sentToInbox(documents.get(0));
+					}										
+					break;
+				}
+				case R.id.cab_menu_share:{
+					//Check that all the selected options are folders
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						if(documents.get(i).isFolder()){
+							handleList.add(documents.get(i).getHandle());
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).shareFolder(handleList);					
+					break;
+				}
 				case R.id.cab_menu_share_link:{
 					clearSelections();
 					hideMultipleSelect();
@@ -473,6 +494,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
+			boolean showShare = true;
+			boolean showSendFile = false;
 			
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -482,6 +505,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				showLink = true;
+			}
+			
+			if ((selected.size() == 1) && (selected.get(0).isFile())){
+				showSendFile = true;
 			}
 			
 			if (selected.size() != 0) {
@@ -495,6 +522,12 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 						showTrash = false;
 						showMove = false;
 						break;
+					}
+					
+					if(showShare){
+						if(selected.get(i).isFile()){
+							showShare = false;
+						}
 					}
 				}
 				
@@ -527,6 +560,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
+			menu.findItem(R.id.cab_menu_send_file).setVisible(showSendFile);
 			
 			return false;
 		}
@@ -977,10 +1012,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 
 			String [] optionsString = null;
 			if (n.isFolder()){
-				optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)}; 
+				optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_get_link_menu), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)}; 
 			}
 			else{
-				optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
+				optionsString = new String[] {context.getString(R.string.context_get_link_menu), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_file_inbox)};
 			}
 			
 			final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
@@ -1002,16 +1037,16 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 						}
 						case 1:{
 							setPositionClicked(-1);
-							notifyDataSetChanged();
-							((ManagerActivity) context).showRenameDialog(n, n.getName());
+							notifyDataSetChanged();	
+							if ((type == ManagerActivity.FILE_BROWSER_ADAPTER) || (type == ManagerActivity.SEARCH_ADAPTER)) {
+								((ManagerActivity) context).getPublicLinkAndShareIt(n);
+							}
 							break;
 						}
 						case 2:{
 							setPositionClicked(-1);
 							notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(n.getHandle());									
-							((ManagerActivity) context).showMove(handleList);
+							((ManagerActivity) context).showRenameDialog(n, n.getName());
 							break;
 						}
 						case 3:{
@@ -1019,7 +1054,21 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 							notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(n.getHandle());									
+							((ManagerActivity) context).showMove(handleList);
+							break;
+						}
+						case 4:{
+							setPositionClicked(-1);
+							notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(n.getHandle());									
 							((ManagerActivity) context).showCopy(handleList);
+							break;
+						}
+						case 5:{
+							setPositionClicked(-1);
+							notifyDataSetChanged();
+							((ManagerActivity) context).sentToInbox(n);
 							break;
 						}
 //						case 4:{

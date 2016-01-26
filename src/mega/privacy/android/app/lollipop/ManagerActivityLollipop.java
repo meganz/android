@@ -31,7 +31,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SortByDialogActivity;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UpgradeAccountFragment;
-import mega.privacy.android.app.UploadHereDialog;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.ZipBrowserActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
@@ -375,7 +374,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	ProgressDialog statusDialog;
 	
-	public UploadHereDialog uploadDialog;	
 	private AlertDialog renameDialog;
 	private AlertDialog newFolderDialog;
 	private AlertDialog addContactDialog;
@@ -6911,8 +6909,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void uploadFile(){
-//		uploadDialog = new UploadHereDialog();
-//		uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
 		fbFLol.showUploadPanel();
 	}
 	
@@ -9034,7 +9030,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onRequestUpdate: " + request.getRequestString());
 	}
 
-	@Override
+	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
