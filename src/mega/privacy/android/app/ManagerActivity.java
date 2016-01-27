@@ -3656,7 +3656,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
-	        			}        			
+	        			}   
+	        			return true;
 	        		}
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
@@ -3690,6 +3691,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        			}
 	        			}
 	        		}
+	        		return true;
 	        	}
 	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 	        		if (oF != null){ 	        		
@@ -3703,6 +3705,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        				unSelectMenuItem.setVisible(true);
 	        			}
 	        		}
+	        		return true;
     			}
 	        	if (drawerItem == DrawerItem.INBOX){
 	        		if (iF != null){	        		
@@ -3716,6 +3719,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        				unSelectMenuItem.setVisible(true);
 	        			}
 	        		}
+	        		return true;
     			}
 	        	if (psF != null){
 	        		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -3728,6 +3732,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
 	        			}
+	        			return true;
 	        		}
 	        	} 	        	
 	        	if (drawerItem == DrawerItem.RUBBISH_BIN){
