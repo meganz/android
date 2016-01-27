@@ -138,6 +138,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 							holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
 							holder.name= false;
 							holder.firstName = false;
+							String firstLetter = fullName.charAt(0) + "";
+							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+							holder.contactInitialLetter.setText(firstLetter);
+							if (adapterType == ITEM_VIEW_TYPE_LIST){							
+								holder.contactInitialLetter.setTextSize(32);
+							}
+							else if (adapterType == ITEM_VIEW_TYPE_GRID){
+								holder.contactInitialLetter.setTextSize(64);
+							}
+							holder.contactInitialLetter.setTextColor(Color.WHITE);
 						}
 					}
 					
@@ -540,7 +550,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 			    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
 			    	holder.contactInitialLetter.setText(firstLetter);
-			    	holder.contactInitialLetter.setTextSize(32);
+			    	if (adapterType == ITEM_VIEW_TYPE_LIST){							
+						holder.contactInitialLetter.setTextSize(32);
+					}
+					else if (adapterType == ITEM_VIEW_TYPE_GRID){
+						holder.contactInitialLetter.setTextSize(64);
+					}
 			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
 			    }
 		    }
@@ -569,7 +584,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 			    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
 			    	holder.contactInitialLetter.setText(firstLetter);
-			    	holder.contactInitialLetter.setTextSize(32);
+			    	if (adapterType == ITEM_VIEW_TYPE_LIST){							
+						holder.contactInitialLetter.setTextSize(32);
+					}
+					else if (adapterType == ITEM_VIEW_TYPE_GRID){
+						holder.contactInitialLetter.setTextSize(64);
+					}
 			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
 			    }
 		    }
