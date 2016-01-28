@@ -426,7 +426,8 @@
         <activity
             android:name="ChangePasswordActivity"
             android:label="@string/my_account_change_password" 
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Megaactionbar.Light">
         </activity>
         
         <activity
