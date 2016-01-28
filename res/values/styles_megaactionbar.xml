@@ -32,6 +32,20 @@
 
         
     </style>
+    
+    <style name="Theme.Megaactionbar.Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarItemBackground">@drawable/selectable_background_megaactionbar</item>
+        <item name="popupMenuStyle">@style/PopupMenu.Megaactionbar</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Megaactionbar</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Megaactionbar</item>
+        <item name="actionDropDownStyle">@style/DropDownNav.Megaactionbar</item>
+        <item name="actionBarStyle">@style/ActionBar.Solid.Megaactionbar</item>
+        <item name="actionModeBackground">@drawable/cab_background_top_megaactionbar</item>
+        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_megaactionbar</item>
+        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Megaactionbar</item>
+
+        
+    </style>
 
     <style name="ActionBar.Solid.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="background">@drawable/ab_solid_megaactionbar</item>
