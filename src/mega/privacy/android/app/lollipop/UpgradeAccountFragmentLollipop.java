@@ -41,10 +41,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	
 	public ArrayList<Product> accounts;
 	
-	public static int MY_ACCOUNT_FRAGMENT = 5000;
-	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
-	public static int PAYMENT_FRAGMENT = 5002;
-	
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	
@@ -86,7 +82,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	private TextView pro3BandwidthInteger;
 	private TextView pro3BandwidthTb;
 	
-	private Fragment selectMembership;
 	Context context;
 	MegaUser myUser;
 	
@@ -223,25 +218,21 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		switch(accountType){		
 			case 1:{
 				hideProLite();
-				hideProI();
 				break;
 			}	
 			case 2:{
 				hideProLite();
 				hideProI();
-				hideProII();
 				break;
 			}	
 			case 3:{
 				hideProLite();
 				hideProI();
 				hideProII();
-				hideProIII();
 				break;
 			}
 			
 			case 4:{
-				hideProLite();
 				break;
 			}
 		}
@@ -417,25 +408,21 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	
 					case 1:{
 						hideProLite();
-						hideProI();
 						break;
 					}	
 					case 2:{
 						hideProLite();
 						hideProI();
-						hideProII();
 						break;
 					}	
 					case 3:{
 						hideProLite();
 						hideProI();
 						hideProII();
-						hideProIII();
 						break;
 					}
 					
 					case 4:{
-						hideProLite();
 						break;
 					}
 				}
@@ -528,31 +515,5 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 				break;
 			}
 		}
-//		switch (v.getId()){
-//			case R.id.lite_month_button:{
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-//				break;
-//			}
-//			case R.id.lite_year_button:{
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
-//				break;
-//			}
-//			case R.id.pro_i_month_button:{
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
-//				break;
-//			}
-//			case R.id.pro_i_year_button:{
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
-//				break;
-//			}
-//			case R.id.pro_ii_month_button:{
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
-//				break;
-//			}
-//			case R.id.pro_iii_month_button:{
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
-//				break;
-//			}
-//		}
 	}
 }

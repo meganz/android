@@ -152,6 +152,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int OVERQUOTA_ALERT = 5003;
 	final public static int CC_FRAGMENT = 5004;
 	final public static int FORTUMO_FRAGMENT = 5005;
+	final public static int MONTHLY_YEARLY_FRAGMENT = 5006;
+	final public static int CENTILI_FRAGMENT = 5007;	
 	
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -293,9 +295,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private CameraUploadFragment psF;
     private UpgradeAccountFragment upAF;
     private PaymentFragment pF;
+    MonthlyAnnualyFragment myF;
     private InboxFragment iF;
     private CreditCardFragment ccF;
     private FortumoFragment fF;
+    private CentiliFragment ctF;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -2210,7 +2214,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         	        //tabSpec.setContent(contentID);
         	        //mTabHostContacts.addTab(tabSpec);
         	        TabHost.TabSpec tabSpec4 = mTabHostShares.newTabSpec("outgoingSharesFragment");
-        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_outgoing_shares))); // new function to inject our own tab layout
+        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_outgoing_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
         	                	          				
     				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragment.class, null);
     				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragment.class, null);
@@ -2768,67 +2772,73 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
     		switch(accountFragment){
 
-    		case MY_ACCOUNT_FRAGMENT:{
-    			if (maF != null){						
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-
-    				}					
-    			}
-    			return;
-    		}
-    		case UPGRADE_ACCOUNT_FRAGMENT:{
-    			if (upAF != null){						
-    				drawerItem = DrawerItem.ACCOUNT;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(-1);
-
-    				}					
-    			}
-    			return;
-    		}
-    		case PAYMENT_FRAGMENT:{
-    			if (pF != null){
-    				pF.onBackPressed();
-    			}
-    			return;					
-    		}
-    		case CC_FRAGMENT:{
-    			if (ccF != null){
-    				int parameterType = ccF.getParameterType();
-    				ArrayList<Product> accounts = ccF.getAccounts();
-    				BitSet paymentBitSet = ccF.getPaymentBitSet();
-    				showpF(parameterType, accounts, paymentBitSet);
-    			}
-    			else{
-    				showUpAF(null);
-    			}
-    			return;
-    		}
-    		case OVERQUOTA_ALERT:{
-    			if (upAF != null){						
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-
-    				}					
-    			}
-    			return;
-    		}
-    		default:{
-    			if (fbF != null){						
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-
-    				}					
-    			}
-    		}
+	    		case MY_ACCOUNT_FRAGMENT:{
+	    			if (maF != null){						
+	    				drawerItem = DrawerItem.CLOUD_DRIVE;
+	    				selectDrawerItem(drawerItem);
+	    				if(nDA!=null){
+	    					nDA.setPositionClicked(0);
+	
+	    				}					
+	    			}
+	    			return;
+	    		}
+	    		case UPGRADE_ACCOUNT_FRAGMENT:{
+	    			if (upAF != null){						
+	    				drawerItem = DrawerItem.ACCOUNT;
+	    				selectDrawerItem(drawerItem);
+	    				if(nDA!=null){
+	    					nDA.setPositionClicked(-1);
+	
+	    				}					
+	    			}
+	    			return;
+	    		}
+	    		case PAYMENT_FRAGMENT:{
+	    			if (pF != null){
+	    				pF.onBackPressed();
+	    			}
+	    			return;					
+	    		}
+	    		case CC_FRAGMENT:{
+	    			if (ccF != null){
+	    				int parameterType = ccF.getParameterType();
+	    				ArrayList<Product> accounts = ccF.getAccounts();
+	    				BitSet paymentBitSet = ccF.getPaymentBitSet();
+	    				showpF(parameterType, accounts, paymentBitSet);
+	    			}
+	    			else{
+	    				showUpAF(null);
+	    			}
+	    			return;
+	    		}
+	    		case OVERQUOTA_ALERT:{
+	    			if (upAF != null){						
+	    				drawerItem = DrawerItem.CLOUD_DRIVE;
+	    				selectDrawerItem(drawerItem);
+	    				if(nDA!=null){
+	    					nDA.setPositionClicked(0);
+	
+	    				}					
+	    			}
+	    			return;
+	    		}
+	    		case MONTHLY_YEARLY_FRAGMENT:{
+	    			if (myF != null){
+	    				myF.onBackPressed();
+	    			}
+	    			return;
+	    		}
+	    		default:{
+	    			if (fbF != null){						
+	    				drawerItem = DrawerItem.CLOUD_DRIVE;
+	    				selectDrawerItem(drawerItem);
+	    				if(nDA!=null){
+	    					nDA.setPositionClicked(0);
+	
+	    				}					
+	    			}
+	    		}
     		}
     	}
     	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -8299,6 +8309,36 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public void showmyF(int paymentMethod, int type, ArrayList<Product> accounts, BitSet paymentBitSet){
+		log("showmyF");
+		
+		if (paymentBitSet == null){
+			if (this.paymentBitSet != null){
+				paymentBitSet = this.paymentBitSet;
+			}
+		}
+		
+		accountFragment = MONTHLY_YEARLY_FRAGMENT;
+		
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		viewPagerShares.setVisibility(View.GONE);
+		
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (myF == null){
+			myF = new MonthlyAnnualyFragment();
+			myF.setInfo(paymentMethod, type, accounts, paymentBitSet);
+			ft.replace(R.id.fragment_container, myF, "myF");
+			ft.commit();
+		}
+		else{
+			myF.setInfo(paymentMethod, type, accounts, paymentBitSet);
+			ft.replace(R.id.fragment_container, myF, "myF");
+			ft.commit();
+		}
+	}
+	
 	public void onUpgrade1Click(View view) {
 		if (upAF != null){
 			showpF(1, upAF.getAccounts(), upAF.getPaymentBitSet());
@@ -8406,6 +8446,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else{
 			ft.replace(R.id.fragment_container, fF, "fF");
+			ft.commit();
+		}
+	}
+	
+	public void showCentili(){
+		accountFragment = CENTILI_FRAGMENT;
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (ctF == null){
+			ctF = new CentiliFragment();
+			ft.replace(R.id.fragment_container,  ctF, "ctF");
+			ft.commit();
+		}
+		else{
+			ft.replace(R.id.fragment_container, ctF, "ctF");
 			ft.commit();
 		}
 	}
