@@ -103,7 +103,8 @@
                 android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
                 android:text="@string/prolite_account"
-                android:layout_below="@id/prolite_image"/>
+                android:layout_below="@id/prolite_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/prolite_storage_title"
@@ -113,7 +114,8 @@
                 android:text="@string/settings_storage"
                 android:layout_alignTop="@id/prolite_image"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/prolite_image"/>
+                android:layout_toRightOf="@id/prolite_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/prolite_bandwidth_title"
@@ -123,7 +125,8 @@
                 android:text="@string/general_bandwidth"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/prolite_image"
-                android:layout_below="@id/prolite_storage_title"/>
+                android:layout_below="@id/prolite_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/prolite_storage"
@@ -132,7 +135,8 @@
                 android:layout_alignTop="@id/prolite_image"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/prolite_storage_title"/>
+                android:layout_toRightOf="@id/prolite_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/prolite_bandwidth"
@@ -141,7 +145,8 @@
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/prolite_bandwidth_title"
-                android:layout_below="@id/prolite_storage"/>
+                android:layout_below="@id/prolite_storage"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/princinglite_from"
@@ -180,7 +185,8 @@
                 android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
                 android:text="@string/pro1_account"
-                android:layout_below="@id/pro1_image"/>
+                android:layout_below="@id/pro1_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro1_storage_title"
@@ -190,7 +196,8 @@
                 android:text="@string/settings_storage"
                 android:layout_alignTop="@id/pro1_image"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_image"/>
+                android:layout_toRightOf="@id/pro1_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro1_bandwidth_title"
@@ -200,7 +207,8 @@
                 android:text="@string/general_bandwidth"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro1_image"
-                android:layout_below="@id/pro1_storage_title"/>
+                android:layout_below="@id/pro1_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro1_storage"
@@ -209,7 +217,8 @@
                 android:layout_alignTop="@id/pro1_image"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_storage_title"/>
+                android:layout_toRightOf="@id/pro1_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro1_bandwidth"
@@ -218,7 +227,8 @@
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro1_bandwidth_title"
-                android:layout_below="@id/pro1_storage"/>
+                android:layout_below="@id/pro1_storage"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pricing1_from"
@@ -257,7 +267,8 @@
                 android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
                 android:text="@string/pro2_account"
-                android:layout_below="@id/pro2_image"/>
+                android:layout_below="@id/pro2_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro2_storage_title"
@@ -267,7 +278,8 @@
                 android:text="@string/settings_storage"
                 android:layout_alignTop="@id/pro2_image"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_image"/>
+                android:layout_toRightOf="@id/pro2_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro2_bandwidth_title"
@@ -277,7 +289,8 @@
                 android:text="@string/general_bandwidth"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro2_image"
-                android:layout_below="@id/pro2_storage_title"/>
+                android:layout_below="@id/pro2_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro2_storage"
@@ -286,7 +299,8 @@
                 android:textSize="20sp"
                 android:layout_alignTop="@id/pro2_image"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_storage_title"/>
+                android:layout_toRightOf="@id/pro2_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro2_bandwidth"
@@ -295,7 +309,8 @@
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro2_bandwidth_title"
-                android:layout_below="@id/pro2_storage"/>
+                android:layout_below="@id/pro2_storage"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pricing2_from"
@@ -333,7 +348,8 @@
                 android:textSize="20sp"
                 android:layout_marginLeft="35dp"                
                 android:text="@string/pro3_account"
-                android:layout_below="@id/pro3_image"/>
+                android:layout_below="@id/pro3_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro3_storage_title"
@@ -343,7 +359,8 @@
                 android:layout_alignTop="@id/pro3_image"
                 android:text="@string/settings_storage"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_image"/>
+                android:layout_toRightOf="@id/pro3_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro3_bandwidth_title"
@@ -353,7 +370,8 @@
                 android:text="@string/general_bandwidth"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro3_image"
-                android:layout_below="@id/pro3_storage_title"/>
+                android:layout_below="@id/pro3_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro3_storage"
@@ -362,7 +380,8 @@
                 android:textSize="20sp"
                 android:layout_alignTop="@id/pro3_image"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_storage_title"/>
+                android:layout_toRightOf="@id/pro3_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro3_bandwidth"
@@ -371,7 +390,8 @@
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro3_bandwidth_title"
-                android:layout_below="@id/pro3_storage"/>
+                android:layout_below="@id/pro3_storage"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pricing3_from"

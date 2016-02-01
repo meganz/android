@@ -28,7 +28,8 @@
                 android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
                 android:text="@string/pro1_account"
-                android:layout_below="@id/pro_image"/>
+                android:layout_below="@id/pro_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro_storage_title"
@@ -38,7 +39,8 @@
                 android:text="@string/settings_storage"
                 android:layout_alignTop="@id/pro_image"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro_image"/>
+                android:layout_toRightOf="@id/pro_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro_bandwidth_title"
@@ -48,7 +50,8 @@
                 android:text="@string/general_bandwidth"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro_image"
-                android:layout_below="@id/pro_storage_title"/>
+                android:layout_below="@id/pro_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro_storage"
@@ -57,7 +60,8 @@
                 android:layout_alignTop="@id/pro_image"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro_storage_title"/>
+                android:layout_toRightOf="@id/pro_storage_title"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pro_bandwidth"
@@ -66,7 +70,8 @@
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro_bandwidth_title"
-                android:layout_below="@id/pro_storage"/>
+                android:layout_below="@id/pro_storage"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/pricing_from"
@@ -130,8 +135,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:layout_marginRight="20dp"
-            android:background="#ffffff"
-            android:onClick="onMonthlyClick">
+            android:background="#ffffff">
             
             <ImageView 
                 android:id="@+id/save_image_invisible"
@@ -152,7 +156,8 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/save_image_invisible"/>
+                android:layout_toRightOf="@id/save_image_invisible"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/per_month_price"
@@ -162,7 +167,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:layout_alignParentRight="true"/>
+                android:layout_alignParentRight="true"
+                android:textColor="@color/mega"/>
             
             
         </RelativeLayout>
@@ -191,7 +197,8 @@
                 android:text="@string/payment_method_credit_card"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/credit_card_icon"
-                android:layout_marginLeft="20dp"/>
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black"/>
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
@@ -203,8 +210,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:layout_weight="2"
-            android:background="#ffffff"
-            android:onClick="onYearlyClick">
+            android:background="#ffffff">
             
              <ImageView 
                 android:id="@+id/save_image"
@@ -224,7 +230,8 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/save_image"/>
+                android:layout_toRightOf="@id/save_image"
+                android:textColor="@color/black"/>
             
             <TextView
                 android:id="@+id/per_year_price"
@@ -234,53 +241,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:layout_alignParentRight="true"/>
-        </RelativeLayout>
-        
-        <RelativeLayout
-            android:id="@+id/payment_fortumo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:layout_marginRight="20dp"
-            android:background="#ffffff">
-            
-            <ImageView 
-                android:id="@+id/fortumo_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/fortumo_ic"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"/>
-            
-            <TextView
-                android:id="@+id/fortumo_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/payment_method_fortumo"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/fortumo_icon"
-                android:layout_marginLeft="20dp"/>
-        </RelativeLayout>
-        
-        <include layout="@layout/delimiter" />
-        
-        <!-- Comment -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_weight="2"
-            android:background="#ffffff"
-            android:id="@+id/payment_upgrade_comment">
-            <TextView
-                android:id="@+id/comment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:text="@string/upgrade_comment" />
-            
+                android:layout_alignParentRight="true"
+                android:textColor="@color/mega"/>
         </RelativeLayout>
         
         <RelativeLayout
@@ -307,8 +269,86 @@
                 android:text="@string/payment_method_google_wallet"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/google_wallet_icon"
-                android:layout_marginLeft="20dp"/>
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black"/>
         </RelativeLayout>
         
+        <include layout="@layout/delimiter" />
+        
+        <RelativeLayout
+            android:id="@+id/payment_fortumo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginRight="20dp"
+            android:background="#ffffff">
+            
+            <ImageView 
+                android:id="@+id/fortumo_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/fortumo_ic"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"/>
+            
+            <TextView
+                android:id="@+id/fortumo_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/payment_method_fortumo"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/fortumo_icon"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black"/>
+        </RelativeLayout>
+        
+        <include layout="@layout/delimiter" />
+        
+        <RelativeLayout
+            android:id="@+id/payment_centili"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginRight="20dp"
+            android:background="#ffffff">
+            
+            <ImageView 
+                android:id="@+id/centili_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/centili_ic"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"/>
+            
+            <TextView
+                android:id="@+id/centili_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/payment_method_centili"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/centili_icon"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black"/>
+        </RelativeLayout>
+        
+        <!-- Comment -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_weight="2"
+            android:background="#ffffff"
+            android:id="@+id/payment_upgrade_comment">
+            <TextView
+                android:id="@+id/comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="@string/upgrade_comment" />
+            
+        </RelativeLayout>
+        
+        
     </LinearLayout>
-

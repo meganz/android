@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -14,15 +13,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -33,16 +25,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
-public class PaymentFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
+public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
 	
 	public enum AccountType {
 		
@@ -88,6 +75,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
 	public static int PAYMENT_FRAGMENT = 5002;
 	
+	public static int PAYMENT_CC_MONTH = 1;
+	public static int PAYMENT_CC_YEAR = 0;
+	
 	private ActionBar aB;
 	private AccountType accountType;
 	private ImageView packageIcon;
@@ -97,7 +87,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	private TextView perMonth;
 	private TextView perYear;
 	private TextView pricingFrom;
-	private ArrayList<Long> handleUrl;
 	private TextView storageTitle;
 	private TextView bandwithTitle;
 	private TextView selectMemberShip;
@@ -117,9 +106,17 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	MegaApiAndroid megaApi;
 	Context context;
 	ArrayList<Product> accounts;
-	PaymentFragment paymentFragment = this;
+	MonthlyAnnualyFragment paymentFragment = this;
 	int paymentMonth = -1;
 	BitSet paymentBitSet = null;
+	int paymentMethod = -1;
+	
+	public void setInfo (int _paymentMethod, int _type, ArrayList<Product> _accounts, BitSet paymentBitSet){
+		this.paymentMethod = _paymentMethod;
+		this.accounts = _accounts;
+		this.parameterType = _type;
+		this.paymentBitSet = paymentBitSet;
+	}
 	
 	@Override
 	public void onDestroy(){
@@ -137,8 +134,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		handleUrl=new ArrayList<Long>();
-
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -157,10 +152,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
-		if (paymentBitSet == null){
-			megaApi.getPaymentMethods(this);
-		}
-
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -214,7 +205,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 		googlePlaySubscription = (TextView) v.findViewById(R.id.google_play_subscription);
 		googlePlaySubscription.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
-		googlePlaySubscription.setVisibility(View.VISIBLE);
+		googlePlaySubscription.setVisibility(View.GONE);
 
 		perMonth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 		perMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
@@ -231,6 +222,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		paymentPerMonth.setVisibility(View.VISIBLE);
 		paymentPerYear.setVisibility(View.VISIBLE);		
 		paymentUpgradeComment.setVisibility(View.VISIBLE);
+		paymentPerMonth.setOnClickListener(this);
+		paymentPerYear.setOnClickListener(this);
 		
 		paymentCreditCard = (RelativeLayout) v.findViewById(R.id.payment_credit_card);
 		paymentCreditCard.setVisibility(View.GONE);
@@ -251,38 +244,25 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		paymentMonth=-1;
 		
+		if (paymentBitSet == null){
+			megaApi.getPaymentMethods(this);
+		}
+		
 		if(accounts == null){
 			megaApi.getPricing(this);
-			selectRecurring.setVisibility(View.GONE);
-			paymentCreditCard.setVisibility(View.GONE);
-			paymentFortumo.setVisibility(View.GONE);
-			paymentCentili.setVisibility(View.GONE);
-			googlePlaySubscription.setVisibility(View.GONE);
-			
-			paymentPerMonth.setVisibility(View.GONE);
-			paymentPerYear.setVisibility(View.GONE);				
-			paymentUpgradeComment.setVisibility(View.GONE);
 		}
-		else{
-			selectMemberShip.setText(getString(R.string.select_payment_method));
-			selectRecurring.setVisibility(View.GONE);
-			googlePlaySubscription.setVisibility(View.GONE);
-			
-			paymentPerMonth.setVisibility(View.GONE);
-			paymentPerYear.setVisibility(View.GONE);				
-			paymentUpgradeComment.setVisibility(View.GONE);
-			
+		else{	
 			switch(parameterType){
 				case 1:{
 					
+					
 					for (int i=0;i<accounts.size();i++){
-		
 						Product account = accounts.get(i);
 		
 						if(account.getLevel()==1){
 							aB.setTitle(getString(R.string.pro1_account));
 		
-							storage.setText(account.getStorage()+"GB");		            
+							storage.setText(account.getStorage()+"GB");	
 							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							
 							if(account.getMonths()==12){
@@ -290,12 +270,14 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -304,36 +286,35 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.VISIBLE);
+					
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							break;
 						}
-						paymentFortumo.setVisibility(View.GONE);
-						paymentCentili.setVisibility(View.GONE);
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							break;
 						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							break;
 						}
 					}
 		
 					break;
 				}
 				case 2:{
-
+	
 					for (int i=0;i<accounts.size();i++){
-		
 						Product account = accounts.get(i);
 		
 						if(account.getLevel()==2){
 							aB.setTitle(getString(R.string.pro2_account));
 		
-							storage.setText(account.getStorage()/1024+"TB");	
+							storage.setText(account.getStorage()/1024+"TB");
 							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		
 							if(account.getMonths()==12){
@@ -341,12 +322,14 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -355,21 +338,21 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.GONE);
+					
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							break;
 						}
-						paymentFortumo.setVisibility(View.GONE);
-						paymentCentili.setVisibility(View.GONE);
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							break;
 						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							break;
 						}
 					}
 		
@@ -384,20 +367,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						if(account.getLevel()==3){
 							aB.setTitle(getString(R.string.pro3_account));
 		
-							storage.setText(account.getStorage()/1024+"TB");        
+							storage.setText(account.getStorage()/1024+"TB");            
 							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-		
+							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -406,23 +391,24 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.GONE);
+					
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							break;
 						}
-						paymentFortumo.setVisibility(View.GONE);
-						paymentCentili.setVisibility(View.GONE);
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							break;
 						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							break;
 						}
 					}
+					
 					break;
 				}
 				case 4:{
@@ -441,12 +427,14 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -455,31 +443,33 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.GONE);
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.GONE);
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-							paymentFortumo.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.VISIBLE);
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-							paymentCentili.setVisibility(View.VISIBLE);
-						}
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
-						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.VISIBLE);
+							break;
 						}
 					}
+					
 					break;
 				}
 			}
-		}	
+		}
 
 		return v;
 	}	
@@ -491,57 +481,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true, paymentBitSet);
 		paymentMonth = -1;
-		
-//		switch(parameterType){
-//		
-//			case 1:{
-//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
-////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
-////				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==1&&account.getMonths()==12){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//			}
-//			case 2:{
-//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==2&&account.getMonths()==12){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//			}
-//			case 3:{
-//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==3&&account.getMonths()==12){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//			}			
-//			case 4:{
-//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
-////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
-//				break;
-//			}
-//			
-//		}
 	}
 	
 	public void payMonth() {
@@ -551,103 +490,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true, paymentBitSet);
 		paymentMonth = -1;
-
-//		switch(parameterType){
-//		
-//			case 1:{
-//				
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
-//				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==1&&account.getMonths()==1){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//
-//			}
-//			case 2:{
-//				
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
-//				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==2&&account.getMonths()==1){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//
-//			}
-//			case 3:{
-//				
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
-//				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==3&&account.getMonths()==1){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//			}	
-//			case 4:{
-//				Toast.makeText(context, "PAY MONTH", Toast.LENGTH_LONG).show();
-//				
-//				AlertDialog paymentDialog;
-//				
-////				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
-//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Google Play", "Fortumo"});
-//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-////				builder.setTitle(getString(R.string.section_photo_sync));
-//				builder.setTitle("Payment method");
-//				
-//				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//					
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						switch (which){
-//							case 0:{
-//								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-//								break;
-//							}
-//							case 1:{
-//								Toast.makeText(context, "FORTUMOOOOO", Toast.LENGTH_SHORT).show();
-//								Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
-//								startActivity(intent);
-//								break;
-//							}
-//					}
-//						dialog.dismiss();
-//					}
-//				});
-//				
-//				builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-//					
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				});
-//				
-//				paymentDialog = builder.create();
-//				paymentDialog.show();
-//				Util.brandAlertDialog(paymentDialog);
-//
-////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-//				break;
-//			}
-//		}
 	}
 	
 	public void setInfo (int _type, ArrayList<Product> _accounts, BitSet paymentBitSet){
@@ -677,35 +519,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
 
 			paymentBitSet = Util.convertToBitSet(request.getNumber()); 
-			
-			if(paymentBitSet!=null){
-				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-					paymentGoogleWallet.setVisibility(View.VISIBLE);
-				}
-				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-					paymentCreditCard.setVisibility(View.VISIBLE);
-				}
-				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-					if (parameterType == 4){
-						paymentFortumo.setVisibility(View.VISIBLE);
-					}
-				}
-				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-					if (parameterType == 4){
-						paymentCentili.setVisibility(View.VISIBLE);
-					}
-				}
-				if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-					selectMemberShip.setText(getString(R.string.no_available_payment_method));
-				}
-				else{
-					selectMemberShip.setText(getString(R.string.select_payment_method));
-				}
-			}
-		}		
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT ID: " + request.getLink());
-		}
+		}	
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 			MegaPricing p = request.getPricing();
 			DecimalFormat df = new DecimalFormat("#.##"); 
@@ -717,21 +531,13 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 				accounts.add(account);				
-			}    
+			} 
 			
-			switch (parameterType) {
+			switch(parameterType){
 				case 1:{
 					
-					selectMemberShip.setText(getString(R.string.select_payment_method));
-					selectRecurring.setVisibility(View.GONE);
-					googlePlaySubscription.setVisibility(View.GONE);
-					
-					paymentPerMonth.setVisibility(View.GONE);
-					paymentPerYear.setVisibility(View.GONE);				
-					paymentUpgradeComment.setVisibility(View.GONE);
 					
 					for (int i=0;i<accounts.size();i++){
-		
 						Product account = accounts.get(i);
 		
 						if(account.getLevel()==1){
@@ -745,12 +551,14 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -759,57 +567,50 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.VISIBLE);
+					
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							break;
 						}
-						paymentFortumo.setVisibility(View.GONE);
-						paymentCentili.setVisibility(View.GONE);
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							break;
 						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							break;
 						}
 					}
 		
 					break;
 				}
 				case 2:{
-					
-					selectMemberShip.setText(getString(R.string.select_payment_method));
-					selectRecurring.setVisibility(View.GONE);
-					googlePlaySubscription.setVisibility(View.GONE);
-					
-					paymentPerMonth.setVisibility(View.GONE);
-					paymentPerYear.setVisibility(View.GONE);				
-					paymentUpgradeComment.setVisibility(View.GONE);
-		
+	
 					for (int i=0;i<accounts.size();i++){
-		
 						Product account = accounts.get(i);
 		
 						if(account.getLevel()==2){
 							aB.setTitle(getString(R.string.pro2_account));
 		
-							storage.setText(account.getStorage()/1024+"TB");		            
+							storage.setText(account.getStorage()/1024+"TB");
 							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							
+		
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -818,35 +619,27 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.GONE);
+					
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							break;
 						}
-						paymentFortumo.setVisibility(View.GONE);
-						paymentCentili.setVisibility(View.GONE);
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							break;
 						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							break;
 						}
 					}
 		
 					break;
 				}
 				case 3:{
-					
-					selectMemberShip.setText(getString(R.string.select_payment_method));
-					selectRecurring.setVisibility(View.GONE);
-					googlePlaySubscription.setVisibility(View.GONE);
-					
-					paymentPerMonth.setVisibility(View.GONE);
-					paymentPerYear.setVisibility(View.GONE);				
-					paymentUpgradeComment.setVisibility(View.GONE);
 					
 					for (int i=0;i<accounts.size();i++){
 		
@@ -855,20 +648,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						if(account.getLevel()==3){
 							aB.setTitle(getString(R.string.pro3_account));
 		
-							storage.setText(account.getStorage()/1024+"TB");     
+							storage.setText(account.getStorage()/1024+"TB");            
 							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-		
+							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -877,43 +672,35 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.GONE);
+					
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							break;
 						}
-						paymentFortumo.setVisibility(View.GONE);
-						paymentCentili.setVisibility(View.GONE);
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							break;
 						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							break;
 						}
 					}
+					
 					break;
-				}			
+				}
 				case 4:{
-		
-					selectMemberShip.setText(getString(R.string.select_payment_method));
-					selectRecurring.setVisibility(View.GONE);
-					googlePlaySubscription.setVisibility(View.GONE);
-					
-					paymentPerMonth.setVisibility(View.GONE);
-					paymentPerYear.setVisibility(View.GONE);				
-					paymentUpgradeComment.setVisibility(View.GONE);
-					
 					for (int i=0;i<accounts.size();i++){
-		
+						
 						Product account = accounts.get(i);
 		
 						if(account.getLevel()==4){
 							aB.setTitle(getString(R.string.prolite_account));
 		
-							storage.setText(account.getStorage()+"GB");		
+							storage.setText(account.getStorage()+"GB");	
 							storage.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 		
 							if(account.getMonths()==12){
@@ -921,12 +708,14 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
+								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
+								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
 								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
@@ -935,39 +724,41 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 					
-					if (paymentBitSet != null){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+					switch (paymentMethod){
+						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.GONE);
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-							paymentCreditCard.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.GONE);
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-							paymentFortumo.setVisibility(View.VISIBLE);
+						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.VISIBLE);
+							break;
 						}
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-							paymentCentili.setVisibility(View.VISIBLE);
-						}
-						
-						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
-							selectMemberShip.setText(getString(R.string.no_available_payment_method));
-						}
-						else{
-							selectMemberShip.setText(getString(R.string.select_payment_method));
+						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							paymentPerMonth.setVisibility(View.VISIBLE);
+							paymentPerYear.setVisibility(View.VISIBLE);
+							break;
 						}
 					}
+					
 					break;
 				}
 			}
-			
-//			/*RESULTS
-//	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
-//        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
-//        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
-//        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
-//        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
-//        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
 		}
+			
+////			/*RESULTS
+////	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
+////        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
+////        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
+////        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
+////        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
+////        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
 	}
 	
 	public String sizeTranslation(long size, int type) {
@@ -994,14 +785,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	}
 	
 	public int onBackPressed(){
-//		if (paymentMonth == -1){
-//			paymentCreditCard.setVisibility(View.GONE);
-			((ManagerActivity)context).showUpAF(paymentBitSet);
-//		}
-//		else{
-			paymentMonth = -1;
-//			((ManagerActivity)context).showpF(parameterType, accounts, true);
-//		}
+		((ManagerActivity)context).showpF(parameterType, accounts, paymentBitSet);
+		
 		return 3;
 	}
 	
@@ -1013,93 +798,175 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	}
 	
 	public static void log(String message) {
-		Util.log("PaymentFragment", message);
+		Util.log("MonthlyAnnualyFragment", message);
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.payment_google_wallet:{
-				((ManagerActivity)context).showmyF(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET, parameterType, accounts, paymentBitSet);
-				break;
-			}
-			case R.id.payment_credit_card:{
-				((ManagerActivity)context).showmyF(MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD, parameterType, accounts, paymentBitSet);
-				break;
-			}
-			case R.id.payment_fortumo:{
-				((ManagerActivity)context).showmyF(MegaApiAndroid.PAYMENT_METHOD_FORTUMO, parameterType, accounts, paymentBitSet);
-				break;
-			}
-			case R.id.payment_centili:{
-				((ManagerActivity)context).showmyF(MegaApiAndroid.PAYMENT_METHOD_CENTILI, parameterType, accounts, paymentBitSet);
-				break;
-			}
 		
-//			case R.id.payment_google_wallet:{
-//				switch(parameterType){
-//					case 1:{
-//						if (paymentMonth == 1){
-//							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
-//						}
-//						else if (paymentMonth == 0){
-//							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
-//						}
-//						break;
-//					}
-//					case 2:{
-//						if (paymentMonth == 1){
-//							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
-//						}
-//					}
-//					case 3:{
-//						if (paymentMonth == 1){
-//							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
-//						}
-//					}
-//					case 4:{
-//						if (paymentMonth == 1){
-//							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-//						}
-//						else if (paymentMonth == 0){
-//							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
-//						}
-//					}
-//				}
-//				paymentMonth = -1;
-//				break;
-//			}
-//			case R.id.payment_fortumo:{
-////				if (parameterType == 4 && paymentMonth == 1){
-//					((ManagerActivity)context).showFortumo();
-////					Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
-////					startActivity(intent);
-////				}
-//				paymentMonth = -1;
-//				break;
-//			}
-//			case R.id.payment_centili:{
-////				if (parameterType == 4 && paymentMonth == 1){
-//					((ManagerActivity)context).showCentili();
-////					Intent intent = new Intent(((ManagerActivity)context), CentiliPayment.class);
-////					startActivity(intent);
-////				}
-//				paymentMonth = -1;
-//				break;
-//			}
-//			case R.id.payment_credit_card:{
-//				paymentPerMonth.setVisibility(View.VISIBLE);
-//				paymentPerYear.setVisibility(View.VISIBLE);
-//				selectRecurring.setVisibility(View.VISIBLE);
-//				paymentUpgradeComment.setVisibility(View.VISIBLE);
-//				paymentCreditCard.setVisibility(View.GONE);
-//				paymentFortumo.setVisibility(View.GONE);
-//				paymentCentili.setVisibility(View.GONE);
-//				
-////				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
-////				paymentMonth = -1;
-//				break;
-//			}
+			case R.id.payment_per_month:{
+				switch(parameterType){
+					case 1:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+					case 2:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+					case 3:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+					case 4:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								((ManagerActivity)context).showFortumo();
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								((ManagerActivity)context).showCentili();
+								break;
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
+			case R.id.payment_per_year:{
+				switch(parameterType){
+					case 1:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+					case 2:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+					case 3:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+					case 4:{
+						switch (paymentMethod){
+							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+								((ManagerActivity)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+								break;
+							}
+							case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+								break;
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
 		}
 	}
 }

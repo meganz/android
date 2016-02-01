@@ -195,9 +195,13 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		proStorage3 = (TextView) v.findViewById(R.id.pro3_storage_title);
 		
 		storageLite = (TextView) v.findViewById(R.id.prolite_storage);
+		storageLite.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 		storage1 = (TextView) v.findViewById(R.id.pro1_storage);
+		storage1.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		storage2 = (TextView) v.findViewById(R.id.pro2_storage);
+		storage2.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		storage3 = (TextView) v.findViewById(R.id.pro3_storage);
+		storage3.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		
 		proBandwithLite = (TextView) v.findViewById(R.id.prolite_bandwidth_title);
 		proBandwith1 = (TextView) v.findViewById(R.id.pro1_bandwidth_title);
@@ -205,9 +209,13 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		proBandwith3 = (TextView) v.findViewById(R.id.pro3_bandwidth_title);
 		
 		bandwidthLite = (TextView) v.findViewById(R.id.prolite_bandwidth);
+		bandwidthLite.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 		bandwidth1 = (TextView) v.findViewById(R.id.pro1_bandwidth);
+		bandwidth1.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		bandwidth2 = (TextView) v.findViewById(R.id.pro2_bandwidth);
+		bandwidth2.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		bandwidth3 = (TextView) v.findViewById(R.id.pro3_bandwidth);
+		bandwidth3.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 		
 		pricingPerMonthLite = (TextView) v.findViewById(R.id.princinglite_from);
 		pricingPerMonth1 = (TextView) v.findViewById(R.id.pricing1_from);
@@ -240,6 +248,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		bandwidth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
 		pricingPerMonthLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		pricingPerMonthLite.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 		pricingPerMonth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
@@ -295,25 +304,21 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		switch(accountType){		
 			case 1:{
 				hideProLite();
-				hideProI();
 				break;
 			}	
 			case 2:{
 				hideProLite();
 				hideProI();
-				hideProII();
 				break;
 			}	
 			case 3:{
 				hideProLite();
 				hideProI();
 				hideProII();
-				hideProIII();
 				break;
 			}
 			
 			case 4:{
-				hideProLite();
 				break;
 			}
 		}
@@ -438,25 +443,21 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	
 					case 1:{
 						hideProLite();
-						hideProI();
 						break;
 					}	
 					case 2:{
 						hideProLite();
 						hideProI();
-						hideProII();
 						break;
 					}	
 					case 3:{
 						hideProLite();
 						hideProI();
 						hideProII();
-						hideProIII();
 						break;
 					}
 					
 					case 4:{
-						hideProLite();
 						break;
 					}
 				}
