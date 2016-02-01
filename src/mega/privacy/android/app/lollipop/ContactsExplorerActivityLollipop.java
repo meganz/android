@@ -204,8 +204,14 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		for (int i=0;i<contacts.size();i++){
 			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
 			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				log("VISIBLECONTACTS: " + contacts.get(i).getEmail());
 				visibleContacts.add(contacts.get(i));
 			}
+		}
+		
+		if (visibleContacts.size() == 0){
+			Toast.makeText(this, getString(R.string.no_contacts), Toast.LENGTH_SHORT).show();
+			finish();
 		}
 		
 		if (adapter == null){

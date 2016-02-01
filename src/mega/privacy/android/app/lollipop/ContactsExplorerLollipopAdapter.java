@@ -160,8 +160,8 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		if (contactsFromMEGA == null) {
 			return 0;
 		}
-		int size = contactsFromMEGA.size();
-		return size == 0 ? 1 : size;
+		
+		return contactsFromMEGA.size();
 		
 	}
 
