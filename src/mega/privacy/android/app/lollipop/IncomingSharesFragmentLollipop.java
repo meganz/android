@@ -408,6 +408,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					sortByNameAscending();
 				}
 				
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
 //				aB.setTitle(getString(R.string.section_shared_items));
 //				log("aB.setHomeAsUpIndicator_55");
 //				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -422,6 +424,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
 //				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 //					sortByNameDescending();
 //				}
@@ -648,6 +653,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					sortByNameAscending();
 				}
 				
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
 //				aB.setTitle(getString(R.string.section_shared_items));
 //				log("aB.setHomeAsUpIndicator_57");
 //				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -662,6 +669,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
 //				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 //					sortByNameDescending();
 //				}

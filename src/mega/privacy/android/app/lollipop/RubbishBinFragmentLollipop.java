@@ -268,6 +268,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 				
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
 //				log("aB.setHomeAsUpIndicator_43");
 //				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 //				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -288,6 +290,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (parentNode != null){
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
 //				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 //					log("aB.setHomeAsUpIndicator_44");
 //					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);

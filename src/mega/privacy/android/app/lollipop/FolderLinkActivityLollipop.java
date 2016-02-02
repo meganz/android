@@ -941,6 +941,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				MegaNode n = nodes.get(position);
 				
 				aB.setTitle(n.getName());
+				supportInvalidateOptionsMenu();
 //				((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 //				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				
