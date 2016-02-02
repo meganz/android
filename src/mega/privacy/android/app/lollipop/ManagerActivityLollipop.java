@@ -1846,110 +1846,215 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			
     			viewPagerContacts.setVisibility(View.GONE);
     			
-    			//OncreateOptionsMenu
     			int index = viewPagerCDrive.getCurrentItem();
-    			log("Fragment Index: " + index);
-    			if(index == 1){
+    			log("----------------------------------------INDEX: "+index);
+    			if(index==1){
+    				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
     				if (rbFLol != null){	
-    					if (createFolderMenuItem != null){
-	    					//Show				
-	    	    			sortByMenuItem.setVisible(true);
-	    	    			selectMenuItem.setVisible(true);
-	    	    			thumbViewMenuItem.setVisible(true);
-	    	    			clearRubbishBinMenuitem.setVisible(true);
-	    	    			searchMenuItem.setVisible(true);
-	    	    			
-	    					//Hide
-	    	    			refreshMenuItem.setVisible(false);
-	    					pauseTransfersMenuIcon.setVisible(false);
-	    					playTransfersMenuIcon.setVisible(false);
-	    					createFolderMenuItem.setVisible(false);
-	    	    			addMenuItem.setVisible(false);
-	    	    			addContactMenuItem.setVisible(false);
-	    	    			upgradeAccountMenuItem.setVisible(false);
-	    	    			unSelectMenuItem.setVisible(false);
-	    	    			addMenuItem.setEnabled(false);
-	    	    			changePass.setVisible(false); 
-	    	    			importLinkMenuItem.setVisible(false);
-	    	    			takePicture.setVisible(false);
-	    	    			refreshMenuItem.setVisible(false);
-	    					helpMenuItem.setVisible(false);
-	    					settingsMenuItem.setVisible(false);
-	    					gridSmallLargeMenuItem.setVisible(false);
-	    					cancelAllTransfersMenuItem.setVisible(false);
-	    	    			
-	    	    			if (isList){	
-	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-	    					}
-	    					else{
-	    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    	    			}
-	
-	    					rbFLol.setIsList(isList);	        			
-	    					rbFLol.setParentHandle(parentHandleRubbish);
-	    					
-	    					if(rbFLol.getItemCount()>0){
-	    						selectMenuItem.setVisible(true);
-	    						clearRubbishBinMenuitem.setVisible(true);
-	    					}
-	    					else{
-	    						selectMenuItem.setVisible(false);
-	    						clearRubbishBinMenuitem.setVisible(false);
-	    					}        			
-	    	   			
-	    	    			rubbishBinMenuItem.setVisible(false);
-	    	    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));    			
-	    				}
+    					//Show				
+    	    			sortByMenuItem.setVisible(true);
+    	    			selectMenuItem.setVisible(true);
+    	    			thumbViewMenuItem.setVisible(true);
+    	    			clearRubbishBinMenuitem.setVisible(true);
+    	    			searchMenuItem.setVisible(true);
+    	    			
+    					//Hide
+    	    			refreshMenuItem.setVisible(false);
+    					pauseTransfersMenuIcon.setVisible(false);
+    					playTransfersMenuIcon.setVisible(false);
+    					log("createFolderMenuItem.setVisible_1");
+    					createFolderMenuItem.setVisible(false);
+    	    			addMenuItem.setVisible(false);
+    	    			addContactMenuItem.setVisible(false);
+    	    			upgradeAccountMenuItem.setVisible(false);
+    	    			unSelectMenuItem.setVisible(false);
+    	    			addMenuItem.setEnabled(false);
+    	    			changePass.setVisible(false); 
+    	    			importLinkMenuItem.setVisible(false);
+    	    			takePicture.setVisible(false);
+    	    			refreshMenuItem.setVisible(false);
+    					helpMenuItem.setVisible(false);
+    					settingsMenuItem.setVisible(false);
+    	    			
+    	    			if (isList){	
+    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+    					}
+    					else{
+    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+    	    			}
+
+    					rbFLol.setIsList(isList);	        			
+    					rbFLol.setParentHandle(parentHandleRubbish);
+    					
+    					if(rbFLol.getItemCount()>0){
+    						selectMenuItem.setVisible(true);
+    						clearRubbishBinMenuitem.setVisible(true);
+    					}
+    					else{
+    						selectMenuItem.setVisible(false);
+    						clearRubbishBinMenuitem.setVisible(false);
+    					}        			
+    	   			
+    	    			rubbishBinMenuItem.setVisible(false);
+    	    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));  
+    	    			gridSmallLargeMenuItem.setVisible(false);
     				}
-    			}
+    			}			
     			else{
+    				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
     				if (fbFLol!=null){
-    					if (createFolderMenuItem != null){
     					//Cloud Drive
     					//Show
-	    					addMenuItem.setEnabled(true);
-	    					addMenuItem.setVisible(true);
-	    					createFolderMenuItem.setVisible(true);				
-	    					sortByMenuItem.setVisible(true);
-	    					thumbViewMenuItem.setVisible(true);
-	    					rubbishBinMenuItem.setVisible(false);				
-	    	    			upgradeAccountMenuItem.setVisible(false);    			
-	    	    			importLinkMenuItem.setVisible(true);
-	    	    			takePicture.setVisible(true);
-	    	    			selectMenuItem.setVisible(true);
-	    	    			searchMenuItem.setVisible(true);
-	    	    			
-	    					//Hide
-	    					pauseTransfersMenuIcon.setVisible(false);
-	    					playTransfersMenuIcon.setVisible(false);
-	    	    			addContactMenuItem.setVisible(false);    			
-	    	    			unSelectMenuItem.setVisible(false); 
-	    	    			clearRubbishBinMenuitem.setVisible(false); 
-	    	    			changePass.setVisible(false); 
-	    	    			refreshMenuItem.setVisible(false);
-	    					helpMenuItem.setVisible(false);
-	    					settingsMenuItem.setVisible(false);
-	    					killAllSessions.setVisible(false);		
-	    					gridSmallLargeMenuItem.setVisible(false);
-	    					cancelAllTransfersMenuItem.setVisible(false);
-	
-	    					if(fbFLol.getItemCount()>0){
-	    						selectMenuItem.setVisible(true);
-	    					}
-	    					else{
-	    						selectMenuItem.setVisible(true);
-	    					}
-	    	    			
-	    	    			if (isList){	
-	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-	    					}
-	    					else{
-	    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    	    			}   	    			
-	
-	    				}
+    					addMenuItem.setEnabled(true);
+    					addMenuItem.setVisible(true);
+    					log("createFolderMenuItem.setVisible_2");
+    					createFolderMenuItem.setVisible(true);				
+    					sortByMenuItem.setVisible(true);
+    					thumbViewMenuItem.setVisible(true);
+    					rubbishBinMenuItem.setVisible(false);				
+    	    			upgradeAccountMenuItem.setVisible(false);    			
+    	    			importLinkMenuItem.setVisible(true);
+    	    			takePicture.setVisible(true);
+    	    			selectMenuItem.setVisible(true);
+    	    			searchMenuItem.setVisible(true);
+    	    			
+    					//Hide
+    					pauseTransfersMenuIcon.setVisible(false);
+    					playTransfersMenuIcon.setVisible(false);
+    	    			addContactMenuItem.setVisible(false);    			
+    	    			unSelectMenuItem.setVisible(false); 
+    	    			clearRubbishBinMenuitem.setVisible(false); 
+    	    			changePass.setVisible(false); 
+    	    			refreshMenuItem.setVisible(false);
+    					helpMenuItem.setVisible(false);
+    					settingsMenuItem.setVisible(false);
+    					killAllSessions.setVisible(false);					
+
+    					if(fbFLol.getItemCount()>0){
+    						selectMenuItem.setVisible(true);
+    					}
+    					else{
+    						selectMenuItem.setVisible(false);
+    					}
+    	    			
+    	    			if (isList){	
+    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+    					}
+    					else{
+    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+    	    			}
+    	    			gridSmallLargeMenuItem.setVisible(false);
     				}
     			}
+    			
+    			
+    			
+//    			//OncreateOptionsMenu
+//    			int index = viewPagerCDrive.getCurrentItem();
+//    			log("Fragment Index: " + index);
+//    			if(index == 1){
+//    				if (rbFLol != null){	
+//    					if (createFolderMenuItem != null){
+//	    					//Show				
+//	    	    			sortByMenuItem.setVisible(true);
+//	    	    			selectMenuItem.setVisible(true);
+//	    	    			thumbViewMenuItem.setVisible(true);
+//	    	    			clearRubbishBinMenuitem.setVisible(true);
+//	    	    			searchMenuItem.setVisible(true);
+//	    	    			
+//	    					//Hide
+//	    	    			refreshMenuItem.setVisible(false);
+//	    					pauseTransfersMenuIcon.setVisible(false);
+//	    					playTransfersMenuIcon.setVisible(false);
+//	    					createFolderMenuItem.setVisible(false);
+//	    	    			addMenuItem.setVisible(false);
+//	    	    			addContactMenuItem.setVisible(false);
+//	    	    			upgradeAccountMenuItem.setVisible(false);
+//	    	    			unSelectMenuItem.setVisible(false);
+//	    	    			addMenuItem.setEnabled(false);
+//	    	    			changePass.setVisible(false); 
+//	    	    			importLinkMenuItem.setVisible(false);
+//	    	    			takePicture.setVisible(false);
+//	    	    			refreshMenuItem.setVisible(false);
+//	    					helpMenuItem.setVisible(false);
+//	    					settingsMenuItem.setVisible(false);
+//	    					gridSmallLargeMenuItem.setVisible(false);
+//	    					cancelAllTransfersMenuItem.setVisible(false);
+//	    	    			
+//	    	    			if (isList){	
+//	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//	    					}
+//	    					else{
+//	    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//	    	    			}
+//	
+//	    					rbFLol.setIsList(isList);	        			
+//	    					rbFLol.setParentHandle(parentHandleRubbish);
+//	    					
+//	    					if(rbFLol.getItemCount()>0){
+//	    						selectMenuItem.setVisible(true);
+//	    						clearRubbishBinMenuitem.setVisible(true);
+//	    					}
+//	    					else{
+//	    						selectMenuItem.setVisible(false);
+//	    						clearRubbishBinMenuitem.setVisible(false);
+//	    					}        			
+//	    	   			
+//	    	    			rubbishBinMenuItem.setVisible(false);
+//	    	    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));    			
+//	    				}
+//    				}
+//    			}
+//    			else{
+//    				if (fbFLol!=null){
+//    					if (createFolderMenuItem != null){
+//    					//Cloud Drive
+//    					//Show
+//	    					addMenuItem.setEnabled(true);
+//	    					addMenuItem.setVisible(true);
+//	    					createFolderMenuItem.setVisible(true);				
+//	    					sortByMenuItem.setVisible(true);
+//	    					thumbViewMenuItem.setVisible(true);
+//	    					rubbishBinMenuItem.setVisible(false);				
+//	    	    			upgradeAccountMenuItem.setVisible(false);    			
+//	    	    			importLinkMenuItem.setVisible(true);
+//	    	    			takePicture.setVisible(true);
+//	    	    			selectMenuItem.setVisible(true);
+//	    	    			searchMenuItem.setVisible(true);
+//	    	    			
+//	    					//Hide
+//	    					pauseTransfersMenuIcon.setVisible(false);
+//	    					playTransfersMenuIcon.setVisible(false);
+//	    	    			addContactMenuItem.setVisible(false);    			
+//	    	    			unSelectMenuItem.setVisible(false); 
+//	    	    			clearRubbishBinMenuitem.setVisible(false); 
+//	    	    			changePass.setVisible(false); 
+//	    	    			refreshMenuItem.setVisible(false);
+//	    					helpMenuItem.setVisible(false);
+//	    					settingsMenuItem.setVisible(false);
+//	    					killAllSessions.setVisible(false);		
+//	    					gridSmallLargeMenuItem.setVisible(false);
+//	    					cancelAllTransfersMenuItem.setVisible(false);
+//	
+//	    					if(fbFLol.getItemCount()>0){
+//	    						selectMenuItem.setVisible(true);
+//	    					}
+//	    					else{
+//	    						selectMenuItem.setVisible(true);
+//	    					}
+//	    	    			
+//	    	    			if (isList){	
+//	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//	    					}
+//	    					else{
+//	    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//	    	    			}   	    			
+//	
+//	    				}
+//    				}
+//    			}
     			
     			break;
     		}
@@ -1980,6 +2085,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerLayout.closeDrawer(Gravity.LEFT);    			
 
     			if (createFolderMenuItem != null){
+    				log("createFolderMenuItem.setVisible_3");
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
@@ -2041,6 +2147,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
+    				log("createFolderMenuItem.setVisible_4");
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
@@ -2104,6 +2211,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
+    				log("createFolderMenuItem.setVisible_5");
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
@@ -2191,6 +2299,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			refreshMenuItem.setVisible(false);
         			pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_6");
     				createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
         			addContactMenuItem.setVisible(false);        			
@@ -2459,11 +2568,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					//Hide
     					pauseTransfersMenuIcon.setVisible(false);
     					playTransfersMenuIcon.setVisible(false);
+    					log("createFolderMenuItem.setVisible_7");
     					createFolderMenuItem.setVisible(false);
     					addContactMenuItem.setVisible(false);
     					unSelectMenuItem.setVisible(false);  				
-    					rubbishBinMenuItem.setVisible(false);
-    					createFolderMenuItem.setVisible(false);
     					rubbishBinMenuItem.setVisible(false);
     					clearRubbishBinMenuitem.setVisible(false);
     					changePass.setVisible(false); 
@@ -2512,11 +2620,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					upgradeAccountMenuItem.setVisible(false);
     					pauseTransfersMenuIcon.setVisible(false);
     					playTransfersMenuIcon.setVisible(false);
+    					log("createFolderMenuItem.setVisible_8");
     					createFolderMenuItem.setVisible(false);
     					addContactMenuItem.setVisible(false);
     					unSelectMenuItem.setVisible(false);  				
-    					rubbishBinMenuItem.setVisible(false);
-    					createFolderMenuItem.setVisible(false);
     					rubbishBinMenuItem.setVisible(false);
     					clearRubbishBinMenuitem.setVisible(false);
     					changePass.setVisible(false); 
@@ -2698,6 +2805,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			if (createFolderMenuItem != null){
     				changePass.setVisible(false); 
+    				log("createFolderMenuItem.setVisible_9");
     				createFolderMenuItem.setVisible(false);
     				addContactMenuItem.setVisible(true);
 	    			addMenuItem.setVisible(false);
@@ -2794,6 +2902,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			
     			if (createFolderMenuItem != null){
     				searchMenuItem.setVisible(true);
+    				log("createFolderMenuItem.setVisible_10");
         			createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
         			sortByMenuItem.setVisible(false);
@@ -2845,6 +2954,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
+    				log("createFolderMenuItem.setVisible_11");
     				createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			refreshMenuItem.setVisible(true);
@@ -2909,6 +3019,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			//Options menu
     				searchMenuItem.setVisible(false);				
     				//Hide
+    				log("createFolderMenuItem.setVisible_12");
     				createFolderMenuItem.setVisible(false);
     				addContactMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
@@ -3420,6 +3531,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_13");
 					createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			addContactMenuItem.setVisible(false);
@@ -3465,6 +3577,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//Show
 					addMenuItem.setEnabled(true);
 					addMenuItem.setVisible(true);
+					log("createFolderMenuItem.setVisible_14");
 					createFolderMenuItem.setVisible(true);				
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
@@ -3525,6 +3638,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				refreshMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_15");
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
@@ -3561,6 +3675,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Hide
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_16");
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
@@ -3607,6 +3722,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Hide
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_17");
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
@@ -3669,6 +3785,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			refreshMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_18");
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
@@ -3739,11 +3856,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//Hide
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_19");
 					createFolderMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);  				
-					rubbishBinMenuItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
 					changePass.setVisible(false); 
@@ -3791,11 +3907,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					upgradeAccountMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_20");
 					createFolderMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);  				
-					rubbishBinMenuItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
 					changePass.setVisible(false); 
@@ -3833,6 +3948,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			//Hide	
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_21");
 					createFolderMenuItem.setVisible(false);				
 	    			addMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);    			
@@ -3868,6 +3984,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				thumbViewMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_22");
 				createFolderMenuItem.setVisible(false);				
     			addMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);    			
@@ -3893,6 +4010,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					cancelAllTransfersMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_23");
 	    			createFolderMenuItem.setVisible(false);
 	    			addContactMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
@@ -3937,6 +4055,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Hide
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_24");
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
@@ -3967,6 +4086,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (tFLol != null){
 				searchMenuItem.setVisible(false);				
 				//Hide
+				log("createFolderMenuItem.setVisible_25");
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);

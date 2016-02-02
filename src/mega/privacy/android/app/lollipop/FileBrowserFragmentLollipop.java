@@ -391,6 +391,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 			log("aB.setTitle fbF 1");
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 //			aB.setTitle(getString(R.string.section_cloud_drive));	
 //			log("aB.setHomeAsUpIndicator_66");
 //			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -402,6 +403,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			
 //			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 //				log("aB.setTitle fbF 2");
