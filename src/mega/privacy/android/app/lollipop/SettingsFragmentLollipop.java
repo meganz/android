@@ -28,6 +28,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.SwitchPreference;
 import android.support.design.widget.Snackbar;
+import android.widget.Toast;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
@@ -536,7 +537,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
 					log("secondary ON: invalid localSecondaryFolderPath");
 					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-					Snackbar.make(getView(), getString(R.string.secondary_media_service_error_local_folder), Snackbar.LENGTH_LONG).show();		
+					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 				}
 				else
 				{
@@ -545,7 +546,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						log("secondary ON: the local folder does not exist");
 						dbH.setSecondaryFolderPath("-1");
 						//If the secondary folder does not exist
-						Snackbar.make(getView(), getString(R.string.secondary_media_service_error_local_folder), Snackbar.LENGTH_LONG).show();
+						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 						localSecondaryFolderPath = getString(R.string.settings_empty_folder);					
 
 					}
@@ -770,7 +771,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				if(!checkSecondaryFile.exists()){					
 					dbH.setSecondaryFolderPath("-1");
 					//If the secondary folder does not exist any more
-					Snackbar.make(getView(), getString(R.string.secondary_media_service_error_local_folder), Snackbar.LENGTH_LONG).show();
+					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 					prefs = dbH.getPreferences();
 					localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 					log("Secondary folder in database: "+localSecondaryFolderPath);
@@ -808,7 +809,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			advancedDevices = !advancedDevices;
 			if(advancedDevices){
 				if(Util.getExternalCardPath()==null){
-					Snackbar.make(getView(), getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_LONG).show();
+					Toast.makeText(context, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_SHORT).show();
 					storageAdvancedDevices.setChecked(false);
 					advancedDevices = !advancedDevices;
 				}
