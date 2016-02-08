@@ -378,7 +378,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);			
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_shared);			
+			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
@@ -622,8 +622,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
-			
+			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
@@ -783,9 +782,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
