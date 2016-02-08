@@ -73,7 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
-        sothree:umanoPanelHeight="100dp"
+        sothree:umanoPanelHeight="120dp"
         sothree:umanoShadowHeight="4dp"
         sothree:umanoParalaxOffset="100dp"
         sothree:umanoDragView="@+id/dragView"
@@ -105,7 +105,7 @@
             android:layout_width="match_parent"
         	android:layout_height="wrap_content"
         	android:padding="0dp"
-        	android:background="@color/adapters_background"
+        	android:background="@color/white"
         	android:orientation="vertical">                  	
            
 			<LinearLayout
@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
 		            android:paddingTop="2dp"
 		            android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 	        </LinearLayout>    
@@ -158,7 +158,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/general_move_to"
                      android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		      </LinearLayout>
@@ -174,7 +174,7 @@
 		            android:id="@+id/rubbishbin_grid_option_remove"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ic_remove"
 		            style="@style/dialogActionButton"
 		            android:paddingTop="2dp"
 		            android:paddingBottom="2dp"/>
@@ -185,7 +185,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/context_delete"
                      android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		      </LinearLayout>

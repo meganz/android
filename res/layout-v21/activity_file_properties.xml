@@ -426,7 +426,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="0dp"
                 android:layout_toLeftOf="@id/file_properties_toolbar_overflow"
-                android:src="@drawable/ic_download" />
+                android:src="@drawable/ic_download_white" />
 
             <ImageView
                 android:id="@+id/file_properties_toolbar_rubbish_bin"
@@ -436,7 +436,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="0dp"
                 android:layout_toLeftOf="@id/file_properties_toolbar_download"
-                android:src="@drawable/ic_rubbish_bin" />
+                android:src="@drawable/ic_rubbish_bin_white" />
         </RelativeLayout>
     </RelativeLayout>
 

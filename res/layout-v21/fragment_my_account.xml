@@ -95,7 +95,7 @@
 			            style="@style/dialogActionButton"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share" />
+			            android:src="@drawable/ic_email_grey" />
 			
 			        <LinearLayout
 			            android:id="@+id/my_account_email_text_layout"
@@ -132,8 +132,9 @@
 			            style="@style/dialogActionButton"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share"
-			            android:layout_alignParentLeft="true" />
+			            android:src="@drawable/ic_email_grey"
+			            android:layout_alignParentLeft="true" 
+			            android:visibility="invisible"/>
 			
 			        <LinearLayout 
 			            android:id="@+id/my_account_account_type_account_type_layout"
@@ -185,7 +186,8 @@
 			            style="@style/dialogActionButton"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share" />
+			            android:src="@drawable/ic_email_grey"
+			            android:visibility="invisible" />
 			
 			        <LinearLayout
 			            android:id="@+id/my_account_expiration_text_layout"
@@ -224,7 +226,8 @@
 			            style="@style/dialogActionButton"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share" />
+			            android:src="@drawable/ic_email_grey"
+			            android:visibility="invisible" />
 			
 			        <LinearLayout
 			            android:id="@+id/my_account_used_space_text_layout"
@@ -263,7 +266,8 @@
 			            style="@style/dialogActionButton"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share" />
+			            android:src="@drawable/ic_email_grey"
+			            android:visibility="invisible" />
 			
 			        <LinearLayout
 			            android:id="@+id/my_account_last_session_text_layout"
@@ -302,7 +306,8 @@
 			            style="@style/dialogActionButton"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share" />
+			            android:src="@drawable/ic_email_grey"
+			            android:visibility="invisible" />
 			
 			        <LinearLayout
 			            android:id="@+id/my_account_connections_text_layout"

@@ -112,7 +112,7 @@
         android:gravity="bottom"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="100dp"
+        sothree:umanoPanelHeight="120dp"
         sothree:umanoParalaxOffset="100dp"
         sothree:umanoShadowHeight="4dp" >
 
@@ -270,7 +270,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/permissions_ic" />
+                    android:src="@drawable/ic_shared_with" />
 
                 <TextView
                     android:id="@+id/file_grid_option_permissions_text"
@@ -297,7 +297,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_clear_shares" />
+                    android:src="@drawable/ic_remove_share" />
 
                 <TextView
                     android:id="@+id/file_grid_option_clear_share_text"
@@ -351,7 +351,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/leave_share_ic" />
+                    android:src="@drawable/ic_ignore" />
 
                 <TextView
                     android:id="@+id/file_grid_option_leave_share_text"
@@ -378,7 +378,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/leave_share_ic" />
+                    android:src="@drawable/ic_send_file" />
 
                 <TextView
                     android:id="@+id/file_grid_option_send_inbox_text"
@@ -511,7 +511,7 @@
         android:visibility="gone"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="100dp"
+        sothree:umanoPanelHeight="120dp"
         sothree:umanoParalaxOffset="100dp"
         sothree:umanoShadowHeight="4dp" >
 
