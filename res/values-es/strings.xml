@@ -14,7 +14,7 @@
     <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Importar a</string>
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Seleccionar</string>
     <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">Seleccionar ficheros</string>
-        <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">Seleccionar carpeta</string>
+    <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">Seleccionar carpeta</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Crear</string>
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Subir Archivo</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
@@ -29,10 +29,12 @@
     <string name="general_error_file_not_found" context="Message shown when a file don't exist">Enlace de fichero no existente</string>
     <string name="general_error_folder_not_found" context="Message shown when a folder don't exist">Enlace de carpeta no existente</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Todavía no implementado</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Suscribir</string>
+    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continuar</string> 
     <string name="error_no_selection" context="when any file or folder is selected">Ningún fichero o carpeta ha sido seleccionada.</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Descargado anteriormente</string>
-     <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">Subido anteriormente</string>
-     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">Subido anteriormente</string>
+    <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     
@@ -83,6 +85,7 @@
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar todas las sesiones</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">El resto de sesiones se han cerrado con éxito</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error al cerrar las sesiones abiertas</string> 
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">El fichero con la Clave Maestra fue eliminado</string>
     
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">archivo</item>
@@ -132,7 +135,7 @@
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Correo electrónico no valido</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Por favor, introduzca su contraseña</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Hay un problema de conexión. Por favor, inténtelo de nuevo más tarde</string>
-    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Tu sesión ha sido cerrada desde otro dispositivo</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Se ha cerrado la sesión de este dispositivo desde otra ubicación</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculando las claves de encriptación</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Conectando al servidor</string>
     <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Correo electrónico o contraseña incorrectos. ¿Has confirmado tu cuenta?</string>    
@@ -232,7 +235,7 @@
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Añadir nuevos contactos usando el botón inferior.</string>		
 	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">No hay contactos en la cuenta. Añádelos en la pantalla de Contactos</string>
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
-	<string name="session_problem">Existe un problema con la sesión de usuario</string>
+	<string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string>
 	
 	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link sin clave de cifrado</string>
@@ -241,7 +244,7 @@
 	<string name="download_failed" context="Error message">Descarga fallida</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">descargado</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Descargando</string>
-		<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transfiriendo&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transfiriendo&#8230;</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Preparando archivos</string>
     <string name="download_began" context="message when the download starts">La descarga ha comenzado</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">¿Desea cancelar la descarga?</string>
@@ -271,7 +274,7 @@
     <string name="context_moving" context="while moving a file or folder">Moviendo</string>
     <string name="context_sharing" context="while sharing a folder">Compartiendo carpeta</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copiar</string>
-        <string name="context_upload" context="Item menu option upon right click on one or multiple files.">Subir</string>
+    <string name="context_upload" context="Item menu option upon right click on one or multiple files.">Subir</string>
     <string name="context_copying" context="while copying a file or folder">Copiando</string>
     <string name="context_creating_link" context="status text">Creando enlace</string>
     <string name="context_moving_to_trash" context="status text">Moviendo a la Papelera</string>
@@ -284,7 +287,7 @@
     <string name="context_download_to" context="Menu item">Guardar en</string>
     <string name="context_clear_rubbish" context="Menu option">Vaciar la Papelera</string>    
     <string name="context_send_link" context="get the link and send it">Enviar enlace</string>
-        <string name="context_send" context="get the link and send it">Enviar</string>
+    <string name="context_send" context="get the link and send it">Enviar</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Enviar al buzón</string>
     <string name="context_copy_link" context="get the link and copy it">Copiar enlace</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Eliminar</string>
@@ -322,6 +325,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d ficheros movidos correctamente</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">, %d ficheros no se han movido</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Enviado correctamente a la Papelera</string>
+    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Elija la carpeta de destino</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d ficheros enviados a la Papelera correctamente</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">, %d ficheros no se han enviado correctamente</string>
     <string name="context_no_moved" context="error message">Error. No se pudo mover</string>
@@ -335,6 +339,8 @@
     <string name="context_no_link" context="error message">Imposible obtener el enlace</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Borrado correctamente de MEGA</string>
     <string name="context_no_removed" context="error message">Error. No se pudo borrar de MEGA</string>
+    <string name="number_correctly_shared" context="success message when sharing multiple files">%d carpetas compartidas correctamente.</string>
+    <string name="number_no_shared" context="error message when sharing multiple files">%d carpetas no compartidas</string>
     <string name="number_correctly_removed" context="success message when deleting a node">%d ficheros borrados de MEGA</string>
     <string name="number_no_removed" context="success message when deleting a node">, %d so se han podido borrar</string>
     <string name="number_correctly_leaved" context="success message when moving a node">%d carpetas se han abandonado correctamente</string>
@@ -404,8 +410,8 @@
     <string name="my_account_change_password" context="menu item">Cambiar contraseña</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Te estás quedando sin espacio libre.\n ¿Quieres mejorar tu cuenta?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Podrías ser un usuario PRO.\n ¿Quieres mejorar tu cuenta?</string>
-    <string name="overquota_alert_title" context="Title dialog overquota error">Alerta!Superada la cuota de almacenamiento!</string>
-    <string name="overquota_alert_text" context="Dialod text overquota error">Operación no permitida, excederá el límite de almacenamiento de su cuenta. Desea mejorar su tipo de cuenta?</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">¡Alerta! ¡Superada la cuota de almacenamiento!</string>
+    <string name="overquota_alert_text" context="Dialod text overquota error">Operación no permitida, excederá el límite de almacenamiento de su cuenta. ¿Desea mejorar su tipo de cuenta?</string>
     
     <string name="op_not_allowed" context="Dialod text overquota error">Operación no permitida</string>
     <string name="my_account_last_session" context="when did the last session happen">Última sesión:</string>
@@ -429,6 +435,7 @@
     <string name="no_available_payment_method" context="choose the payment method option when no method is available">En este momento, no hay disponible ningún método de pago para este plan</string>
     <string name="payment_method_credit_card" context="one of the payment methods">Tarjeta de crédito (subscripción)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">Factura Telefónica (puntual)</string>
+    <string name="payment_method_centili" context="one of the payment methods">Factura Telefónica (puntual)</string>
     <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Mensual*</string>
@@ -527,6 +534,7 @@
      <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introduce tu nuevo código</string>
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu nuevo código</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">Se van a borrar todos tus datos locales y tu sesión será inválida en 5 segundos.</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Los ficheros locales serán eliminados y se cerrará la sesión tras 10 intentos fallidos</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>    
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>
@@ -602,4 +610,6 @@
     <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">El pago se ha realizado correctamente</string>
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">La operación no finalizó correctamente. No se realizará el pago.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">La información de la tarjeta de crédito no es correcta. No se realizará el pago.</string>
+    
+    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Tu cuenta no se puede mejorar desde la aplicación. Por favor, contacta con support@mega.nz para mejorar tu cuenta.</string>
 </resources>

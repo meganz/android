@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGAv3</string>
-    <string name="app_version" context="Not translate">3.0.beta_5</string>
-    <string name="sdk_version" context="Not translate">cc4a718</string>
+    <string name="app_version" context="Not translate">3.0.beta</string>
+    <string name="sdk_version" context="Not translate">b6b16a4</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -263,7 +263,7 @@
     <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Manage link</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
     <string name="alert_leave_share" context="Title alert before leaving a share.">Leave share</string>
-    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Not share</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove share</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
