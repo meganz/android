@@ -382,7 +382,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
+			emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);			
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
@@ -597,8 +597,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_shared);			
-			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+			emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);
 						
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
 			fabButton.setOnClickListener(this);
@@ -719,6 +719,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);		
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
 			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);
+			optionLeaveShare.setVisibility(View.GONE);
 
 			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_grid_option_public_link_layout);
 			optionPublicLink.setVisibility(View.GONE);

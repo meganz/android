@@ -130,7 +130,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 						
 			if (adapterList.getItemCount() == 0){				
 				log("adapterList.getCount() == 0");
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyImageView.setImageResource(R.drawable.received_requests_empty);
 				emptyTextView.setText(R.string.received_requests_empty);
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
@@ -275,7 +275,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 		
 		if (adapterList.getItemCount() == 0){				
 			log("adapterList.getCount() == 0");
-			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyImageView.setImageResource(R.drawable.received_requests_empty);
 			emptyTextView.setText(R.string.received_requests_empty);
 			listView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
@@ -334,8 +334,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
     		
     		if (adapterList.getItemCount() == 0){				
 				log("adapterList.getCount() == 0");
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.sent_requests_empty);
+				emptyImageView.setImageResource(R.drawable.received_requests_empty);
+				emptyTextView.setText(R.string.received_requests_empty);
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
