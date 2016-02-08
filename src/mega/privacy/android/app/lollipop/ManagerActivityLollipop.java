@@ -4200,6 +4200,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				return true;
 		    			}
 		    		}
+		    		if (drawerItem == DrawerItem.TRANSFERS){
+		    			if (tFLol != null){    		
+		        			if (tFLol.onBackPressed() == 0){
+		        				drawerItem = DrawerItem.CLOUD_DRIVE;
+		    					if (nV != null){
+		    						Menu nVMenu = nV.getMenu();
+		    						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+		    						resetNavigationViewMenu(nVMenu);
+		    						cloudDrive.setChecked(true);
+		    						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+		    					}
+		        				selectDrawerItemLollipop(drawerItem);
+		        				return true;
+		        			}
+		        		}
+		    		}
 				}
 		    	return true;
 		    }
