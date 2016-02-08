@@ -390,7 +390,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		mTabHostExplorer.setOnTabChangedListener(new OnTabChangeListener(){
             @Override
             public void onTabChanged(String tabId) {
-            	invalidateOptionsMenu();
+            	supportInvalidateOptionsMenu();
             	log("TabId :"+ tabId);
                 if(tabId.equals("cloudExplorerFragment")){                     	
 
@@ -1002,6 +1002,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	private void createFolder(String title) {
 	
+		log("createFolder");
 		if (!Util.isOnline(this)){
 			Snackbar.make(fragmentContainer,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
@@ -1039,6 +1040,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		
 		if (parentNode != null){
+			log("parentNode != null: " + parentNode.getName());
 			boolean exists = false;
 			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 			for (int i=0;i<nL.size();i++){
