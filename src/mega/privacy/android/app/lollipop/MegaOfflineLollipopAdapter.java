@@ -249,9 +249,20 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
 		if (fragment.getPathNavigation().equals("/")){
-			if (mOffList != null && !mOffList.isEmpty()) {
-				MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-				if(!(lastItem.getHandle().equals("0"))){
+			if (mOffList != null){
+				if(!mOffList.isEmpty()) {
+					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
+					if(!(lastItem.getHandle().equals("0"))){
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						log("Export in: "+path);
+						File file= new File(path);
+						if(file.exists()){
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+							mOffList.add(masterKeyFile);
+						}
+					}	
+				}
+				else{
 					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 					log("Export in: "+path);
 					File file= new File(path);
@@ -259,7 +270,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
 						mOffList.add(masterKeyFile);
 					}
-				}	
+				}
 			}						
 		}
 

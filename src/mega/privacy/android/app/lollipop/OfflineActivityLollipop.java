@@ -101,6 +101,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		switch(id){
 			case android.R.id.home:{
 				onBackPressed();
+				break;
 			}
 			case R.id.action_grid:{	
 		    	log("action_grid selected");
@@ -128,6 +129,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 					fragTransaction.commit();
 					
 				}
+				break;
 			}
 		}
 		return true;
