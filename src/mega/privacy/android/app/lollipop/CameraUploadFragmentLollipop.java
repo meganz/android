@@ -1249,48 +1249,81 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public long getPhotoSyncHandle(){
 
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-		MegaPreferences prefs = dbH.getPreferences();
-		if (prefs == null){
-			photosyncHandle = -1;
-		}
-		else{
-			//The "PhotoSync" folder exists?
-			if (prefs.getCamSyncHandle() == null){
+		if (type == TYPE_CAMERA){
+			DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+			MegaPreferences prefs = dbH.getPreferences();
+			if (prefs == null){
 				photosyncHandle = -1;
 			}
 			else{
-				photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-				if (megaApi.getNodeByHandle(photosyncHandle) == null){
+				//The "PhotoSync" folder exists?
+				if (prefs.getCamSyncHandle() == null){
 					photosyncHandle = -1;
 				}
-			}
-		}
-		
-		if (photosyncHandle == -1){
-			ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-			for (int i=0;i<nl.size();i++){
-				if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-					photosyncHandle = nl.get(i).getHandle();
-					dbH.setCamSyncHandle(photosyncHandle);
-					if (listView != null){
-						listView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
+				else{
+					photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+					if (megaApi.getNodeByHandle(photosyncHandle) == null){
+						photosyncHandle = -1;
 					}
-					break;
 				}
 			}
-		}
-		
-		if (isList){
-			if (adapterList != null){
-				adapterList.setPhotoSyncHandle(photosyncHandle);
+			
+			if (photosyncHandle == -1){
+				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+				for (int i=0;i<nl.size();i++){
+					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+						photosyncHandle = nl.get(i).getHandle();
+						dbH.setCamSyncHandle(photosyncHandle);
+						if (listView != null){
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+						}
+						break;
+					}
+				}
 			}
+			
+			if (isList){
+				if (adapterList != null){
+					adapterList.setPhotoSyncHandle(photosyncHandle);
+				}
+			}
+			else{
+				if (adapterGrid != null){
+					adapterGrid.setPhotoSyncHandle(photosyncHandle);
+				}
+			}
+			
+			return photosyncHandle;
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setPhotoSyncHandle(photosyncHandle);
+		else if (type == TYPE_MEDIA){
+			
+			if (prefs == null){
+				photosyncHandle = -1;
+			}
+			else{
+				//The "PhotoSync" folder exists?
+				if (prefs.getCamSyncHandle() == null){
+					photosyncHandle = -1;
+				}
+				else{
+					photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+					if (megaApi.getNodeByHandle(photosyncHandle) == null){
+						photosyncHandle = -1;
+					}
+				}
+			}
+		
+			if (isList){
+				if (adapterList != null){
+					adapterList.setPhotoSyncHandle(photosyncHandle);
+				}
+			}
+			else{
+				if (adapterGrid != null){
+					adapterGrid.setPhotoSyncHandle(photosyncHandle);
+				}
 			}
 		}
 		
