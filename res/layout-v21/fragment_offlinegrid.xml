@@ -58,7 +58,7 @@
         android:gravity="bottom"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="100dp"
+        sothree:umanoPanelHeight="120dp"
         sothree:umanoParalaxOffset="100dp"
         sothree:umanoShadowHeight="4dp" >
 
@@ -188,7 +188,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_delete" />
+                    android:src="@drawable/ic_remove" />
 
                 <TextView
                     android:id="@+id/offline_grid_option_delete_text"

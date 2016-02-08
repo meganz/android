@@ -51,7 +51,7 @@
         android:gravity="bottom"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="100dp"
+        sothree:umanoPanelHeight="120dp"
         sothree:umanoParalaxOffset="100dp"
         sothree:umanoShadowHeight="4dp" >
 
@@ -126,7 +126,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/send_file_ic" />
+                    android:src="@drawable/ic_send_file" />
 
                 <TextView
                     android:id="@+id/contacts_list_option_send_file_text"
@@ -182,7 +182,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_delete" />
+                    android:src="@drawable/ic_remove" />
 
                 <TextView
                     android:id="@+id/contacts_list_option_remove_text"
