@@ -103,7 +103,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 							
 		if (adapterList.getItemCount() == 0){				
 			log("adapterList.getItemCount() == 0");
-			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 			emptyTextView.setText(R.string.sent_requests_empty);
 			listView.setVisibility(View.GONE);
 
@@ -158,6 +158,9 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);	
 			
+			emptyImageView.setImageResource(R.drawable.sent_requests_empty);
+			emptyTextView.setText(R.string.sent_requests_empty);
+			
 			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
 			fabButton.setOnClickListener(this);
 
@@ -173,7 +176,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 						
 			if (adapterList.getItemCount() == 0){				
 				log("adapterList.getItemCount() == 0");
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				emptyTextView.setText(R.string.sent_requests_empty);
 				listView.setVisibility(View.GONE);
 
@@ -305,7 +308,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
     		
     		if (adapterList.getItemCount() == 0){				
 				log("adapterList.getItemCount() == 0");
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				emptyTextView.setText(R.string.sent_requests_empty);
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);

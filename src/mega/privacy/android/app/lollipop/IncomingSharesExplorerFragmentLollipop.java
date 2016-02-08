@@ -148,6 +148,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
+		emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
+		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+		
 		if (adapter == null){
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
 			

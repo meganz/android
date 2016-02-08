@@ -323,7 +323,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
-			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+			emptyImageView.setImageResource(R.drawable.inbox_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.inbox_list_download_progress_bar);
@@ -460,7 +460,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 	        emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_grid_empty_text);
-			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+			emptyImageView.setImageResource(R.drawable.inbox_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.inbox_grid_download_progress_bar);
@@ -529,9 +529,9 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -890,7 +890,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyImageView.setImageResource(R.drawable.inbox_empty);
 				emptyTextView.setText(R.string.file_browser_empty_folder);					
 			}
 			else{

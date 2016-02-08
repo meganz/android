@@ -561,9 +561,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -867,7 +867,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
@@ -1137,7 +1137,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRubbishNode().getHandle()==parentHandle) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
