@@ -7,13 +7,12 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.FileStorageActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.FileStorageActivity.Mode;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -488,10 +487,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		if (askMe){
 			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.setClass(this, FileStorageActivity.class);
-			intent.putExtra(FileStorageActivity.EXTRA_URL, url);
-			intent.putExtra(FileStorageActivity.EXTRA_SIZE, document.getSize());
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+			intent.setClass(this, FileStorageActivityLollipop.class);
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
 			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);	
 		}
 		else{
@@ -522,10 +521,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
+			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
 			
 			downloadTo (parentPath, url, size, hashes);
