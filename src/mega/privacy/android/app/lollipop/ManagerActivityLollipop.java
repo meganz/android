@@ -3180,14 +3180,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				managerActivity = null;
 			}
 			else{
-//				Intent intent = new Intent (context, TourActivityLollipop.class);
-//				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-//		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//				context.startActivity(intent);
-//				if (context instanceof Activity){
-//					((Activity)context).finish();
-//				}
-//				context = null;
+				Intent intent = new Intent (context, TourActivityLollipop.class);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				context.startActivity(intent);
+				if (context instanceof Activity){
+					((Activity)context).finish();
+				}
+				context = null;
 			}
 		}
 		else{
