@@ -38,7 +38,8 @@
 		        android:hint="@string/email_text"
 		        android:imeOptions="actionNext"
 		        android:layout_gravity="center" 
-		        style="@style/InputField" />		
+		        style="@style/InputField"
+		        android:textColor="@color/black" />		
 		    
 		    <EditText
 		        android:id="@+id/login_password_text"
@@ -48,7 +49,8 @@
 		        android:hint="@string/password_text"
 		        android:imeOptions="actionDone"
 		        android:layout_gravity="center"
-		        style="@style/InputField" />
+		        style="@style/InputField"
+		        android:textColor="@color/black" />
 		           
 		    <TableLayout       		
        		    android:layout_width="wrap_content"

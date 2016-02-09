@@ -82,7 +82,7 @@
     </Button>
  -->
 <TabHost
-        android:id="@+id/tabhost_explorer"
+        android:id="@+id/tabhost_provider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/file_explorer_divider_top">
@@ -106,7 +106,7 @@
                 android:layout_weight="0"/>
 
             <android.support.v4.view.ViewPager
-                android:id="@+id/explorer_tabs_pager"
+                android:id="@+id/provider_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
