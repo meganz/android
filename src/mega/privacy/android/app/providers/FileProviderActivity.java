@@ -83,7 +83,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class FileProviderActivity extends AppCompatActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
+@SuppressLint("NewApi") public class FileProviderActivity extends AppCompatActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
 	
 //	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 //	
@@ -169,7 +169,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	
 	private Handler handler;
 	
-	private int tabShown = CLOUD_TAB;
+	private int tabShown = -1;
 	
 	private CloudDriveProviderFragment cDriveProvider;
 	private IncomingSharesProviderFragment iSharesProvider;
@@ -309,6 +309,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 			}
 			else{
 				setContentView(R.layout.activity_file_provider);
+				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
 				handler = new Handler();				
@@ -432,7 +433,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 		}
 		
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+//		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		try{
 			app = (MegaApplication) getApplication();
@@ -607,6 +608,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 			}
 			else{
 				setContentView(R.layout.activity_file_provider);
+				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 			
 		
@@ -904,8 +906,10 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
     }
 	
 	public void changeTitle (String title){
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
-			aB.setTitle(title);
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+			if (aB != null){
+				aB.setTitle(title);
+			}
 		}
 		else
 		{
@@ -1388,6 +1392,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 			}
 			else{
 				setContentView(R.layout.activity_file_provider);
+				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
 				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
@@ -1532,14 +1537,20 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				}
 
 				newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
-				newFolderButton.setVisibility(View.GONE);
+				if (newFolderButton != null){
+					newFolderButton.setVisibility(View.GONE);
+				}
 				//		newFolderButton.setOnClickListener(this);
 
 				windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-				actionBarTitle = getString(R.string.section_cloud_drive);
-				windowTitle.setText(actionBarTitle);
-
-
+				if (windowTitle != null){
+					windowTitle.setText(actionBarTitle);
+				}
+				
+				if (actionBarTitle != null){
+					actionBarTitle = getString(R.string.section_cloud_drive);
+				}
+				
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}
