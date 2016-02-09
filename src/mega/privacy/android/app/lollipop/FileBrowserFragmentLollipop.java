@@ -1917,18 +1917,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public void setContentText(){
 		
-		if (parentHandle == megaApi.getRootNode().getHandle()){
-			MegaNode infoNode = megaApi.getRootNode();
-			if (infoNode !=  null){
-				contentText.setText(getInfoFolder(infoNode));
-//				aB.setTitle(getString(R.string.section_cloud_drive));
+		if (megaApi.getRootNode() != null){
+			if (parentHandle == megaApi.getRootNode().getHandle()){
+				MegaNode infoNode = megaApi.getRootNode();
+				if (infoNode !=  null){
+					contentText.setText(getInfoFolder(infoNode));
+	//				aB.setTitle(getString(R.string.section_cloud_drive));
+				}
 			}
-		}
-		else{
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			if (infoNode !=  null){
-				contentText.setText(getInfoFolder(infoNode));
-//				aB.setTitle(infoNode.getName());
+			else{
+				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				if (infoNode !=  null){
+					contentText.setText(getInfoFolder(infoNode));
+	//				aB.setTitle(infoNode.getName());
+				}
 			}
 		}
 	}
