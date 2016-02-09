@@ -289,7 +289,8 @@
     <string name="context_creating_folder" context="status dialog when performing the action. Keep the &#8230; symbol">Creating folder&#8230;</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     <string name="context_download_to" context="Menu item">Save to</string>
-    <string name="context_clear_rubbish" context="Menu option">Clear Rubbish Bin</string>
+    <string name="context_clear_rubbish" context="Menu option title">Clear Rubbish Bin</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All the elements of the Rubbish Bin will be removed</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_send" context="get the link and send it">Send</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>

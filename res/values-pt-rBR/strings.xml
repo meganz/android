@@ -285,6 +285,7 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adicionando contato</string>
     <string name="context_download_to" context="Menu item">Salvar em</string>
     <string name="context_clear_rubbish" context="Menu option">Limpar lixeira</string>
+    <string name="clear_rubbish_confirmation" context="Menu option">Confirmar limpar lixeira</string>
     <string name="context_send_link" context="get the link and send it">Enviar link</string>
     <string name="context_send" context="get the link and send it">Enviar</string>
     <string name="context_send_file_inbox" context="send the file to inbox">enviado para caixa de entrada</string>

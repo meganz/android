@@ -6989,8 +6989,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle("Clear Rubbbish Bin?");
-		builder.setMessage(getString(R.string.context_clear_rubbish));
+		builder.setTitle(getString(R.string.context_clear_rubbish));
+		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 		builder.setPositiveButton(getString(R.string.general_empty),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
