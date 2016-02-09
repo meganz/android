@@ -2860,10 +2860,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
     			ft.commit();
     			
-//    			drawerItem = lastDrawerItem;
-//    			selectDrawerItemLollipop(drawerItem);
-    			
-    			break;
+				if (sttFLol != null){
+					searchMenuItem.setVisible(false);				
+					//Hide
+					log("createFolderMenuItem.setVisible_settings");
+					createFolderMenuItem.setVisible(false);
+					addContactMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(false);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(false);
+	    			addMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setVisible(false);
+	    			clearRubbishBinMenuitem.setVisible(false);
+	    			importLinkMenuItem.setVisible(false);
+	    			takePicture.setVisible(false);
+					settingsMenuItem.setVisible(false);
+					refreshMenuItem.setVisible(false);
+					helpMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(false);
+					changePass.setVisible(false);
+					cancelSubscription.setVisible(false);				
+					killAllSessions.setVisible(false);
+					
+					cancelAllTransfersMenuItem.setVisible(false);
+					
+					playTransfersMenuIcon.setVisible(false);
+					pauseTransfersMenuIcon.setVisible(false);
+				}
+				break;
     		}
     		case SEARCH:{
     			
@@ -4119,6 +4146,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					pauseTransfersMenuIcon.setVisible(false);
 				}
 
+			}
+	    }
+	    
+	    else if (drawerItem == DrawerItem.SETTINGS){
+	    	log("in Settings Section");
+			if (sttFLol != null){
+				searchMenuItem.setVisible(false);				
+				//Hide
+				log("createFolderMenuItem.setVisible_settings");
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			sortByMenuItem.setVisible(false);
+    			selectMenuItem.setVisible(false);
+    			unSelectMenuItem.setVisible(false);
+    			thumbViewMenuItem.setVisible(false);
+    			addMenuItem.setEnabled(false);
+    			createFolderMenuItem.setEnabled(false);
+    			rubbishBinMenuItem.setVisible(false);
+    			clearRubbishBinMenuitem.setVisible(false);
+    			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
+				settingsMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(false);
+				changePass.setVisible(false);
+				cancelSubscription.setVisible(false);				
+				killAllSessions.setVisible(false);
+				
+				cancelAllTransfersMenuItem.setVisible(false);
+				
+				playTransfersMenuIcon.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
 			}
 	    }
 	    
