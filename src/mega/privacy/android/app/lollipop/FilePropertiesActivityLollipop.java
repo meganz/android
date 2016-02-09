@@ -1601,7 +1601,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			                    	String keyString="";
 			    					String [] s = link.split("!");
 			    					if (s.length == 3){
-			    						keyString = "!"+s[2];
+			    						keyString = s[2];
 			    					}
 			                    	input.setText(keyString);
 			                        break;
