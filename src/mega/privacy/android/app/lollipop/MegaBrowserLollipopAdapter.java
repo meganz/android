@@ -365,6 +365,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.currentPosition = position;
 	
 		MegaNode node = (MegaNode) getItem(position);
+		if (node == null){
+			return;
+		}
+		
 		holder.document = node.getHandle();
 		Bitmap thumb = null;
 		
@@ -913,7 +917,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public int getItemCount() {
 		// TODO Auto-generated method stub
-		return nodes.size();
+		if (nodes != null){		
+			return nodes.size();
+		}
+		else{
+			return 0;
+		}
 	}
 	
 	@Override
@@ -922,7 +931,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	}
 	
 	public Object getItem(int position) {
-		return nodes.get(position);
+		if (nodes != null){
+			return nodes.get(position);
+		}
+		
+		return null;
 	}
 
 	@Override
