@@ -338,6 +338,6 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	}
 
 	public static void log(String message) {
-		Util.log("TourActivity", message);
+		Util.log("TourActivityLollipop", message);
 	}
 }

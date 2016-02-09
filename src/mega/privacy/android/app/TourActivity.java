@@ -1,12 +1,15 @@
 package mega.privacy.android.app;
 
 import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.TourActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -40,6 +43,14 @@ public class TourActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			log("Lollipop Version");
+			Intent intent = new Intent(this, TourActivityLollipop.class);
+			startActivity(intent);
+			finish();	
+		}
+		
 		setContentView(R.layout.activity_tour);
 		viewPager = (LoopViewPager) findViewById(R.id.pager);
 		bar = (ImageView) findViewById(R.id.barTour);
