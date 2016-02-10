@@ -91,13 +91,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
-		DisplayMetrics metrics = new DisplayMetrics();
-		display.getMetrics(metrics);
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
 		
 		float density  = getResources().getDisplayMetrics().density;
 		
-	    float scaleW = Util.getScaleW(metrics, density);
-	    float scaleH = Util.getScaleH(metrics, density);
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
 	    float scaleText;
 	    if (scaleH < scaleW){
 	    	scaleText = scaleH;
@@ -115,26 +115,22 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		optionText = (TextView) v.findViewById(R.id.action_text);
 		optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 		optionText.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = optionText.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, metrics);
-		paramsb2.width = Util.scaleWidthPx(73, metrics);
-		optionText.setLayoutParams(paramsb2);
+		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)optionText.getLayoutParams();
+		params.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
+		optionText.setLayoutParams(params);		
+		
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		optionTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(20, outMetrics));
 		optionText.setLayoutParams(optionTextParams);		
 		
 		cancelText = (TextView) v.findViewById(R.id.cancel_text);
 		cancelText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 		cancelText.setOnClickListener(this);		
 		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = cancelText.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, metrics);
-		paramsb1.width = Util.scaleWidthPx(73, metrics);
-		cancelText.setLayoutParams(paramsb1);
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(20, outMetrics));
 		cancelText.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
@@ -166,6 +162,17 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			adapter.setParentHandle(parentHandle);
 			adapter.setNodes(nodes);
 			adapter.setSelectFile(selectFile);
+		}
+		
+		if (nodes != null){
+			if (nodes.size() == 0){
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
+			else{
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			}
 		}
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
