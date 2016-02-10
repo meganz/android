@@ -247,10 +247,10 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			adapter.selectAll();
 		}
 		else{
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			
 			adapter.setMultipleSelect(true);
 			adapter.selectAll();
+			
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 		
 		updateActionModeTitle();
