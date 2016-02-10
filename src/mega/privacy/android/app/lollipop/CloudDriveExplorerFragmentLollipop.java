@@ -115,26 +115,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		optionsBar = (LinearLayout) v.findViewById(R.id.options_explorer_layout);
 		optionText = (TextView) v.findViewById(R.id.action_text);
 		optionText.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = optionText.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, metrics);
-		paramsb2.width = Util.scaleWidthPx(73, metrics);
-		optionText.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		optionTextParams.setMargins(Util.scaleWidthPx(10, metrics), Util.scaleHeightPx(20, metrics), Util.scaleWidthPx(10, metrics), Util.scaleWidthPx(20, metrics));
 		optionText.setLayoutParams(optionTextParams);
 		
 		cancelText = (TextView) v.findViewById(R.id.cancel_text);
 		cancelText.setOnClickListener(this);		
 		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = cancelText.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, metrics);
-		paramsb1.width = Util.scaleWidthPx(73, metrics);
-		cancelText.setLayoutParams(paramsb1);
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
-		cancelText.setLayoutParams(cancelTextParams);		
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), Util.scaleHeightPx(20, metrics), Util.scaleWidthPx(10, metrics), Util.scaleWidthPx(20, metrics));
+		cancelText.setLayoutParams(cancelTextParams);				
 				
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));

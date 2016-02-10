@@ -156,10 +156,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		changePasswordButton = (TextView) findViewById(R.id.change_password_password);
 		
 		changePasswordButton.setText(getString(R.string.my_account_change_password).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsbLogin = changePasswordButton.getLayoutParams();		
-		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
-		changePasswordButton.setLayoutParams(paramsbLogin);
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)changePasswordButton.getLayoutParams();
 		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
