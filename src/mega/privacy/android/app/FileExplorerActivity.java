@@ -204,8 +204,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				for (long n : moveFromHandles){
 					list.add(n);
 				}
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if(cDriveExplorer!=null){
 					cDriveExplorer.setDisableNodes(list);
@@ -220,8 +220,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 //					log("Disabled nodes to copy: "+n);
 					list.add(n);
 				}
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if(cDriveExplorer!=null){
 					cDriveExplorer.setDisableNodes(list);
@@ -250,9 +250,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			}
 		}
 		
-		mTabHostExplorer = (TabHost)findViewById(R.id.tabhost_explorer);
+		mTabHostExplorer = (TabHost)findViewById(R.id.tabhost_provider);
 		mTabHostExplorer.setup();
-        viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+        viewPagerExplorer = (ViewPager) findViewById(R.id.provider_tabs_pager);  
         
         //Create tabs
         mTabHostExplorer.getTabWidget().setBackgroundColor(Color.BLACK);
@@ -291,8 +291,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
                 if(tabId.equals("cloudExplorerFragment")){                     	
 
      				tabShown=CLOUD_TAB;
-    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-    				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+    				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+    				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
     				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 
     				if(cDriveExplorer!=null){
@@ -310,8 +310,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 
             		tabShown=INCOMING_TAB;
             		
-            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-            		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+            		String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+            		gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
     				iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
     		
     				if(iSharesExplorer!=null){
@@ -425,8 +425,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		log("onBackPressed: "+tabShown);		
 		
 		if(tabShown==CLOUD_TAB){
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+			gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 			cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 	
 			if(cDriveExplorer!=null){
@@ -437,8 +437,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			}
 		}
 		else if(tabShown==INCOMING_TAB){
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+			gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 			iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		
 			if(iSharesExplorer!=null){
@@ -827,7 +827,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				parentHandle = cDriveExplorer.getParentHandle();
 			}
 			else{
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
@@ -839,7 +839,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				parentHandle = iSharesExplorer.getParentHandle();
 			}
 			else{
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 				iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (iSharesExplorer != null){
 					parentHandle = iSharesExplorer.getParentHandle();
@@ -926,7 +926,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 						}					
 					}
 					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+						gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 						cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
 						if (cDriveExplorer != null){
 							parentHandle = cDriveExplorer.getParentHandle();
