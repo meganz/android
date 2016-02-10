@@ -436,10 +436,10 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			adapter.selectAll();
 		}
 		else{
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			
 			adapter.setMultipleSelect(true);
 			adapter.selectAll();
+			
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 		
 		updateActionModeTitle();
