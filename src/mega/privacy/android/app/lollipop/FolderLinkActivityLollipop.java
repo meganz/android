@@ -809,27 +809,56 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES)
 		{		
-			MegaNode rootNode = megaApiFolder.getRootNode();
-			if (rootNode != null){
-				parentHandle = rootNode.getHandle();
-				nodes = megaApiFolder.getChildren(rootNode);
-				aB.setTitle(megaApiFolder.getRootNode().getName());
-				supportInvalidateOptionsMenu();
-				
-				if (adapterList == null){
-					adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, ManagerActivityLollipop.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			if (e.getErrorCode() == MegaError.API_OK) {
+				MegaNode rootNode = megaApiFolder.getRootNode();
+				if (rootNode != null){
+					parentHandle = rootNode.getHandle();
+					nodes = megaApiFolder.getChildren(rootNode);
+					aB.setTitle(megaApiFolder.getRootNode().getName());
+					supportInvalidateOptionsMenu();
+					
+					if (adapterList == null){
+						adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, ManagerActivityLollipop.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+					}
+					else{
+						adapterList.setParentHandle(parentHandle);
+						adapterList.setNodes(nodes);
+					}
+					
+					adapterList.setPositionClicked(-1);
+					adapterList.setMultipleSelect(false);
+					
+					listView.setAdapter(adapterList);
 				}
 				else{
-					adapterList.setParentHandle(parentHandle);
-					adapterList.setNodes(nodes);
+					try{ 
+						AlertDialog.Builder builder = new AlertDialog.Builder(this);					
+			            builder.setMessage(getString(R.string.general_error_folder_not_found));
+						builder.setTitle(getString(R.string.general_error_word));
+						
+						builder.setPositiveButton(
+							getString(android.R.string.ok),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+					    			startActivity(backIntent);
+					    			finish();
+								}
+							});
+										
+						AlertDialog dialog = builder.create();
+						dialog.show(); 
+					}
+					catch(Exception ex){
+						Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+		    			finish();
+					}
 				}
-				
-				adapterList.setPositionClicked(-1);
-				adapterList.setMultipleSelect(false);
-				
-				listView.setAdapter(adapterList);
 			}
 			else{
+				//TODO: Links without keys (APIE_INCOMPLETE) Ask for key
 				try{ 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);					
 		            builder.setMessage(getString(R.string.general_error_folder_not_found));
