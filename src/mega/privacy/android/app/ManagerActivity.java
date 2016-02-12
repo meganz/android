@@ -5002,6 +5002,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			Util.deleteFolderAndSubfolders(context, cacheDir);
 		} catch (IOException e) {}
 		
+		final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		final File fMK = new File(pathMK);
+    	if (fMK.exists()){
+    		fMK.delete();	
+    	}
+		
 		PackageManager m = context.getPackageManager();
 		String s = context.getPackageName();
 		try {
