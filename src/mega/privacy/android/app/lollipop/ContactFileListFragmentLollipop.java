@@ -1064,19 +1064,19 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	}
 
 	public void selectAll(){
-
-		if(adapter.isMultipleSelect()){
-			adapter.selectAll();
-		}
-		else{
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		if (adapter != null){
+			if(adapter.isMultipleSelect()){
+				adapter.selectAll();
+			}
+			else{
+				adapter.setMultipleSelect(true);
+				adapter.selectAll();
+				
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
 			
-			adapter.setMultipleSelect(true);
-			adapter.selectAll();
+			updateActionModeTitle();
 		}
-		
-		updateActionModeTitle();
-
 	}
 	
 	/*

@@ -610,16 +610,18 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 	
 	public void selectAll(){
-
-		if(adapter.isMultipleSelect()){
-			adapter.selectAll();
+		if (adapter != null){
+			if(adapter.isMultipleSelect()){
+				adapter.selectAll();
+			}
+			else{						
+				adapter.setMultipleSelect(true);
+				adapter.selectAll();
+				
+				actionMode = startSupportActionMode(new ActionBarCallBack());
+			}		
+			updateActionModeTitle();		
 		}
-		else{						
-			adapter.setMultipleSelect(true);
-			actionMode = startSupportActionMode(new ActionBarCallBack());
-			adapter.selectAll();
-		}		
-		updateActionModeTitle();		
 	}
 	
 	public boolean showSelectMenuItem(){

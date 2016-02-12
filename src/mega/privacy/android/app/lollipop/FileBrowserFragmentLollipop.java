@@ -1491,7 +1491,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public void selectAll(){
-		if (isList){
+		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
 			}
@@ -1503,11 +1503,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			
 			updateActionModeTitle();
-		}
-		else{
-			if (adapter != null){
-				adapter.selectAll();
-			}
 		}
 	}
 	

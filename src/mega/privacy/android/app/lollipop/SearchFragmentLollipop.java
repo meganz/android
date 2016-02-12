@@ -991,7 +991,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	
 	public void selectAll(){
 		log("selectAll");
-//		if (isList){
+		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
 			}
@@ -1004,12 +1004,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			}
 			
 			updateActionModeTitle();
-//		}
-//		else{
-//			if (adapterGrid != null){
-//				adapterGrid.selectAll();
-//			}
-//		}
+		}
 	}
 	
 	public boolean showSelectMenuItem(){
