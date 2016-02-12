@@ -247,16 +247,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	public void selectAll(){
 		log("selectAll");
-		if(adapter.isMultipleSelect()){
-			adapter.selectAll();
+		if (adapter != null){
+			if(adapter.isMultipleSelect()){
+				adapter.selectAll();
+			}
+			else{			
+				adapter.setMultipleSelect(true);
+				adapter.selectAll();
+				
+				actionMode = startSupportActionMode(new ActionBarCallBack());
+			}
+			
+			updateActionModeTitle();
 		}
-		else{			
-			adapter.setMultipleSelect(true);
-			adapter.selectAll();
-			actionMode = startSupportActionMode(new ActionBarCallBack());
-		}
-		
-		updateActionModeTitle();
 	}
 	
 	@Override

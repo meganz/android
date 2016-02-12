@@ -1372,17 +1372,19 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	}
 	
 	public void selectAll(){
-		if(adapter.isMultipleSelect()){
-			adapter.selectAll();
-		}
-		else{
-			adapter.setMultipleSelect(true);
-			adapter.selectAll();
+		if (adapter != null){
+			if(adapter.isMultipleSelect()){
+				adapter.selectAll();
+			}
+			else{
+				adapter.setMultipleSelect(true);
+				adapter.selectAll();
+				
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
 			
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			updateActionModeTitle();
 		}
-		
-		updateActionModeTitle();
 	}
 	
 	public boolean showSelectMenuItem(){

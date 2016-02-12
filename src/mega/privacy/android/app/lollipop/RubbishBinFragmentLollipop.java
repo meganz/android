@@ -229,17 +229,19 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public void selectAll(){
-		if(adapter.isMultipleSelect()){
-			adapter.selectAll();
-		}
-		else{
-			adapter.setMultipleSelect(true);
-			adapter.selectAll();
+		if (adapter != null){
+			if(adapter.isMultipleSelect()){
+				adapter.selectAll();
+			}
+			else{
+				adapter.setMultipleSelect(true);
+				adapter.selectAll();
+				
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
 			
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			updateActionModeTitle();
 		}
-		
-		updateActionModeTitle();
 	}
 	
 	@Override

@@ -432,17 +432,19 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	public void selectAll(){
 		log("selectAll");
-		if(adapter.isMultipleSelect()){
-			adapter.selectAll();
-		}
-		else{
-			adapter.setMultipleSelect(true);
-			adapter.selectAll();
+		if (adapter != null){
+			if(adapter.isMultipleSelect()){
+				adapter.selectAll();
+			}
+			else{
+				adapter.setMultipleSelect(true);
+				adapter.selectAll();
+				
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
 			
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			updateActionModeTitle();
 		}
-		
-		updateActionModeTitle();
 	}
 	
 	public boolean showSelectMenuItem(){

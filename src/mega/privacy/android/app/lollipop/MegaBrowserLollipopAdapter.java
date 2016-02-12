@@ -1090,8 +1090,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();
 		}
-		if(this.multipleSelect)
-		{
+		if(this.multipleSelect){
 			selectedItems = new SparseBooleanArray();
 		}
 	}
