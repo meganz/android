@@ -796,7 +796,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				totalDownloaded++;
 				currentTransfers.remove(transfer.getTag());
 				transfersOK.put(transfer.getTag(), transfer);
-				long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
+				long currentSizeDownloaded = 0;
+				if (transfersDownloadedSize.get(transfer.getTag()) != null){
+					currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());	
+				}
+				
 				totalSizeDownloaded += (transfer.getTotalBytes()-currentSizeDownloaded);
 				transfersDownloadedSize.put(transfer.getTag(), transfer.getTotalBytes());
 				

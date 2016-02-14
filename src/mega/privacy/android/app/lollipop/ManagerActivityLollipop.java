@@ -10480,7 +10480,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 		
 		if (e.getErrorCode() == MegaError.API_OK) {
-			long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
+			long currentSizeDownloaded = 0;
+			if (transfersDownloadedSize.get(transfer.getTag()) != null){
+				currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());	
+			}
+			
 			totalSizeDownloaded += (transfer.getTotalBytes()-currentSizeDownloaded);
 			transfersDownloadedSize.put(transfer.getTag(), transfer.getTotalBytes());
 			
