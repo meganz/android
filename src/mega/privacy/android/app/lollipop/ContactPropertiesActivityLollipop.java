@@ -14,7 +14,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.ZipBrowserActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.FixedCenterCrop;
@@ -151,20 +150,20 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 		if (intent != null) { 
 			if (intent.getAction() != null){ 
-				if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){  
-
-					String pathZip=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_ZIP);    				
-
-					log("Path: "+pathZip);
-
-					//Lanzar nueva activity ZipBrowserActivity
-
-					Intent intentZip = new Intent(this, ZipBrowserActivity.class);    				
-					intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-					startActivity(intentZip);
-
-
-				}
+//				if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){  
+//
+//					String pathZip=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_ZIP);    				
+//
+//					log("Path: "+pathZip);
+//
+//					//Lanzar nueva activity ZipBrowserActivity
+//
+//					Intent intentZip = new Intent(this, ZipBrowserActivityLollipop.class);    				
+//					intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
+//					startActivity(intentZip);
+//
+//
+//				}
 //				else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){ 
 //					String pathPdf=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_PDF);
 //
@@ -439,19 +438,19 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 //
 //						}
 //						else 
-						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-
-							File zipFile = new File(localPath);
-
-							Intent intentZip = new Intent();
-							intentZip.setClass(this, ZipBrowserActivity.class);
-							intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-							intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-
-							this.startActivity(intentZip);
-
-						}
-						else{
+//						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
+//
+//							File zipFile = new File(localPath);
+//
+//							Intent intentZip = new Intent();
+//							intentZip.setClass(this, ZipBrowserActivityLollipop.class);
+//							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+//							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
+//
+//							this.startActivity(intentZip);
+//
+//						}
+//						else{
 
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)),
@@ -467,7 +466,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 							}
-						}
+//						}
 						return;
 					}
 				}
