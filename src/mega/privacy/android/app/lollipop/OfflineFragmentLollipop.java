@@ -114,6 +114,14 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	    public void onLongPress(MotionEvent e) {
 	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
 	        int position = recyclerView.getChildPosition(view);
+	        MegaOffline currentNode = (MegaOffline) adapter.getItem(position);
+	        if(currentNode.getHandle().equals("0")){
+	        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				File file= new File(path);
+				if(file.exists()){
+					return;
+				}
+	        }
 
 	        // handle long press
 			if (!adapter.isMultipleSelect()){
@@ -1186,6 +1194,28 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		this.selectedNode = sNode;
 		
+		//Check if the node is the Master Key file
+        if(selectedNode.getHandle().equals("0")){
+        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			File file= new File(path);
+			if(file.exists()){
+				optionShare.setVisibility(View.GONE);			
+				optionDownload.setVisibility(View.GONE);
+				optionProperties.setVisibility(View.GONE);				
+				optionDelete.setVisibility(View.VISIBLE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionMoveTo.setVisibility(View.GONE);
+				optionCopyTo.setVisibility(View.GONE);
+				
+				slidingOptionsPanel.setVisibility(View.VISIBLE);
+				slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
+				log("Show the slidingPanel");
+				
+				return;
+			}
+        }
+		
 		//Check connection or not connection
 		
 		if (Util.isOnline(context)){
@@ -1326,12 +1356,112 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				log("Delete Offline");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();		
-									
-				deleteOffline(context, selectedNode);								
-				refreshPaths(selectedNode);				
-				break;
+				
+				if(selectedNode.getHandle().equals("0")){
+		        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					File file= new File(path);
+					if(file.exists()){
+						file.delete();	
+						
+						mOffList=dbH.findByPath(pathNavigation);
+						
+						log("Number of elements: "+mOffList.size());
+												
+						for(int i=0; i<mOffList.size();i++){
+							
+							MegaOffline checkOffline = mOffList.get(i);
+							
+							if(!checkOffline.isIncoming()){				
+								log("NOT isIncomingOffline");
+								File offlineDirectory = null;
+								if (Environment.getExternalStorageDirectory() != null){
+									offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+								}
+								else{
+									offlineDirectory = context.getFilesDir();
+								}	
+								
+								if (!offlineDirectory.exists()){
+									log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+									//dbH.removeById(mOffList.get(i).getId());
+									mOffList.remove(i);		
+									i--;
+								}	
+							}
+							else{
+								log("isIncomingOffline");
+								File offlineDirectory = null;
+								if (Environment.getExternalStorageDirectory() != null){
+									offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+									log("offlineDirectory: "+offlineDirectory);
+								}
+								else{
+									offlineDirectory = context.getFilesDir();
+								}	
+								
+								if (!offlineDirectory.exists()){
+									log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+									//dbH.removeById(mOffList.get(i).getId());
+									mOffList.remove(i);
+									i--;
+								}	
+								
+							}
+						}
+						
+						if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+							sortByNameDescending();
+						}
+						else{
+							sortByNameAscending();
+						}
+						
+						
+						if (adapter.getItemCount() == 0){
+							recyclerView.setVisibility(View.GONE);
+							emptyImageView.setVisibility(View.VISIBLE);
+							emptyTextView.setVisibility(View.VISIBLE);
+							contentText.setVisibility(View.GONE);
+							emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+							emptyTextView.setText(R.string.file_browser_empty_folder);
+						}
+						else{
+							recyclerView.setVisibility(View.VISIBLE);
+							contentText.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+						}
+						contentText.setText(getInfoFolder(mOffList));
+						
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						break;
+					}
+		        }
+				else{
+					deleteOffline(context, selectedNode);								
+					refreshPaths(selectedNode);
+					
+					if (adapter.getItemCount() == 0){
+						recyclerView.setVisibility(View.GONE);
+						emptyImageView.setVisibility(View.VISIBLE);
+						emptyTextView.setVisibility(View.VISIBLE);
+						contentText.setVisibility(View.GONE);
+						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+						emptyTextView.setText(R.string.file_browser_empty_folder);
+					}
+					else{
+						recyclerView.setVisibility(View.VISIBLE);
+						contentText.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+					}
+					contentText.setText(getInfoFolder(mOffList));
+					
+					setPositionClicked(-1);
+					notifyDataSetChanged();
+					break;
+				}
 			}
 			case R.id.offline_list_option_share_layout: 
 			case R.id.offline_grid_option_share_layout: {
@@ -1454,6 +1584,20 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					sortByNameAscending();
 				}
 				
+				if (adapter.getItemCount() == 0){
+					recyclerView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					contentText.setVisibility(View.GONE);
+					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+				else{
+					recyclerView.setVisibility(View.VISIBLE);
+					contentText.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}
 				contentText.setText(getInfoFolder(mOffList));
 				adapter.setPositionClicked(-1);
 				
@@ -1792,7 +1936,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 //		setNodes(mOffList);
 		pathNavigation=pNav;
-		recyclerView.invalidate();
 	}
 	
 	public int getItemCount(){
