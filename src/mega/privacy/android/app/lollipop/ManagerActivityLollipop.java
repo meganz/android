@@ -32,7 +32,6 @@ import mega.privacy.android.app.SortByDialogActivity;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UpgradeAccountFragment;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.ZipBrowserActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
@@ -1378,15 +1377,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		if (intent.getAction() != null){ 
     			log("intent action");
     			
-    			if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){  
-
-    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
-    				
-    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);    				
-    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-    			    startActivity(intentZip);   				
-    				
-    			}
+//    			if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){  
+//
+//    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
+//    				
+//    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);    				
+//    				intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
+//    			    startActivity(intentZip);   				
+//    				
+//    			}
 //    			else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){    				
 //
 //    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
@@ -1400,7 +1399,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //    				this.startActivity(intentPdf);	
 //    				
 //    			}    			
-    			else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+    			if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
@@ -6151,19 +6150,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						}
 //						else						
 						
-						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-							log("MimeTypeList ZIP");
-		    			    File zipFile = new File(localPath);
-		    			    
-		    			    Intent intentZip = new Intent();
-		    			    intentZip.setClass(this, ZipBrowserActivity.class);
-		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-
-		    				this.startActivity(intentZip);
-							
-						}
-						else{		
+//						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
+//							log("MimeTypeList ZIP");
+//		    			    File zipFile = new File(localPath);
+//		    			    
+//		    			    Intent intentZip = new Intent();
+//		    			    intentZip.setClass(this, ZipBrowserActivityLollipop.class);
+//		    			    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+//		    			    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
+//
+//		    				this.startActivity(intentZip);
+//							
+//						}
+//						else{		
 							log("MimeTypeList other file");
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -6181,7 +6180,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}									
 								Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
 							}								
-						}
+//						}
 						return;
 					}
 				}

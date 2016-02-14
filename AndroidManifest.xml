@@ -472,6 +472,12 @@
             android:screenOrientation="portrait" >
         </activity>
         
+        <activity
+            android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
+            android:label="@string/zip_browser_activity"
+            android:screenOrientation="portrait" >
+        </activity>
+        
         <service
             android:name="CameraSyncService"
             android:exported="false" >
