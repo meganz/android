@@ -169,6 +169,18 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     
     public void toggleSelection(int pos) {
 		log("toggleSelection");
+		
+		//Check if it's the Master Key file
+		MegaOffline currentNode = (MegaOffline) getItem(pos);
+        if(currentNode.getHandle().equals("0")){
+        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			File file= new File(path);
+			if(file.exists()){
+				notifyItemChanged(pos);
+				return;
+			}
+        }
+		
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
 			selectedItems.delete(pos);
@@ -423,7 +435,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}			
 			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			return;
 		}
 		
@@ -573,7 +585,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}			
 			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			holder.imageButtonThreeDots.setTag(holder);
+			holder.imageButtonThreeDots.setOnClickListener(this);
 			return;
 		}
 		
