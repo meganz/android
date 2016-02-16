@@ -1078,9 +1078,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("click upload audio");
 				hideUploadPanel();
 				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				intent.setType("audio/*");
+				intent.setType("*/*");
 				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
 				break;
 			}
@@ -1090,9 +1091,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("click upload video");
 				hideUploadPanel();
 				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				intent.setType("video/*");
+				intent.setType("*/*");
 				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
 				break;
 			}
@@ -1102,9 +1104,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("click upload image");
 				hideUploadPanel();
 				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				intent.setType("image/*");
+				intent.setType("*/*");
 				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
 				break;
 			}
