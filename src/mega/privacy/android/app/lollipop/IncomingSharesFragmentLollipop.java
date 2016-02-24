@@ -225,6 +225,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_leave_multiple_share: {
@@ -1295,8 +1296,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
     	
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+				adapter.notifyDataSetChanged();
+			}
+			else{
+				hideMultipleSelect();
+			}
 		}
 		else{
 			if (nodes.get(position).isFolder()){
