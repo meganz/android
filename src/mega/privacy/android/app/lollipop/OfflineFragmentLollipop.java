@@ -256,6 +256,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}				
 			}
@@ -1497,8 +1498,14 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
+			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+				adapter.notifyDataSetChanged();
+			}
+			else{
+				hideMultipleSelect();
+			}
 		}
 		else{
 			MegaOffline currentNode = mOffList.get(position);

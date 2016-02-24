@@ -426,6 +426,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 			}
@@ -704,9 +705,15 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			}
 			else{
 				checkedItems.append(positionInNodes, false);
-			}				
-			updateActionModeTitle();
-			notifyDataSetChanged();
+			}		
+			List<MegaNode> selectedNodes = getSelectedDocuments();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+				notifyDataSetChanged();
+			}
+			else{
+				hideMultipleSelect();
+			}
 		}
 	}
 	

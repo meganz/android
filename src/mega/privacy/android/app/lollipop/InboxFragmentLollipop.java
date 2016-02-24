@@ -189,6 +189,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 			}
@@ -755,8 +756,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
+			List<MegaNode> selectedDocuments = adapter.getSelectedNodes();
+			if (selectedDocuments.size() > 0){
+				updateActionModeTitle();
+				adapter.notifyDataSetChanged();
+			}
+			else{
+				hideMultipleSelect();
+			}
 		}
 		else{
 

@@ -25,6 +25,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -250,6 +251,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 			}
@@ -1292,8 +1294,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		/*if (isList){*/
 			if (adapter.isMultipleSelect()){
 				adapter.toggleSelection(position);
-				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
+				List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+				if (selectedNodes.size() > 0){
+					updateActionModeTitle();
+					adapter.notifyDataSetChanged();
+				}
+				else{
+					hideMultipleSelect();
+				}
 //				adapterList.notifyDataSetChanged();
 			}
 			else{

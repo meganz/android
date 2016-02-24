@@ -180,6 +180,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					actionMode.invalidate();
 					break;
 				}				
@@ -277,7 +278,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		Resources res = getResources();
 		String format = "%d %s";
 		
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())+ " selected"));
+		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_contacts, users.size())));
 
 		try {
 			actionMode.invalidate();
@@ -628,8 +629,14 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 					
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
+			List<MegaUser> users = adapter.getSelectedUsers();
+			if (users.size() > 0){
+				updateActionModeTitle();
+				adapter.notifyDataSetChanged();
+			}
+			else{
+				hideMultipleSelect();
+			}
 		}
 		else{
 	

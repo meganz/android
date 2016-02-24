@@ -249,6 +249,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}				
 			}
@@ -1102,8 +1103,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (isList){
 			if (adapterList.isMultipleSelect()){
 				adapterList.toggleSelection(position);
-				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
+				List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
+				if (documents.size() > 0){
+					updateActionModeTitle();
+					adapterList.notifyDataSetChanged();
+				}
+				else{
+					hideMultipleSelect();
+				}					
 			}
 			else{
 				if (psHPosition.isNode){
