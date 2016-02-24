@@ -59,9 +59,9 @@
 	        android:src="@drawable/ic_dots_vertical_grey"
 	        android:layout_below="@id/contact_grid_separator"
 			android:background="@null" 
-	        android:layout_marginLeft="2dp"
-	        android:layout_marginRight="8dp"
-	        android:layout_marginTop="22dp"
+	        android:paddingLeft="2dp"
+	        android:paddingRight="8dp"
+	        android:paddingTop="22dp"
 	        android:layout_alignParentRight="true"/>
         
         <TextView

@@ -55,6 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:background="@null"
+        android:paddingLeft="10dp"
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
 
