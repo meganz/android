@@ -56,7 +56,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/thread/posixthread.cpp \
     sdk/src/logging.cpp
     
-C_SOURCES = sqlite3.c sdk/third_party/glob/glob.c
+C_SOURCES = sdk/third_party/glob/glob.c
 
 HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/account.h \
