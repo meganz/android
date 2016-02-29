@@ -30,3 +30,5 @@ include/Makefile.in
 include/mega/config.h.in
 include/mega/stamp-h1
 
+/sdk
+
