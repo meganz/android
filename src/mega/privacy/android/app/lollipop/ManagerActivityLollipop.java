@@ -470,6 +470,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			counter--;
 			error++;
 			log("Counter on onRequestTemporaryError: "+counter);
+//			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+//			if(node!=null){
+//				log("onRequestTemporaryError: "+node.getName());
+//			}
 		}
 		
 		@Override
@@ -492,6 +496,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			int requestType = request.getType();
 			log("Counter on RequestFinish: "+counter);
 			log("Error on RequestFinish: "+error);
+//			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+//			if(node!=null){
+//				log("onRequestTemporaryError: "+node.getName());
+//			}
 			if(counter==0){	
 				switch (requestType) {
 					case  MegaRequest.TYPE_MOVE:{
@@ -7078,7 +7086,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	/*
 	 * Background task to emptying the Rubbish Bin
 	 */
-	private class ClearRubbisBinTask extends AsyncTask<String, Void, Void> {
+	private class ClearRubbisBinTask extends AsyncTask<String, Void, String> {
 		Context context;
 		MultipleRequestListener moveMultipleListener = null;
 		
@@ -7087,7 +7095,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		
 		@Override
-		protected Void doInBackground(String... params) {
+		protected String doInBackground(String... params) {
 			log("doInBackground-Async Task ClearRubbisBinTask");
 			
 			if (rbFLol != null){
@@ -7108,6 +7116,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}					
 			return null;
 		}		
+		
+		@Override
+        protected void onPostExecute(String result) {
+			log("onPostExecute -Async Task ClearRubbisBinTask");
+			//update the content label of the Rubbish Bin Fragment
+			if(rbFLol!=null){
+					rbFLol.setContentText();
+			}			
+        }
 	}
 	
 	public void uploadFile(){
