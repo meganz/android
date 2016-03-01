@@ -202,7 +202,8 @@
 	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No files in your Cloud Drive</string>
-	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
+	<string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
+	<string name="empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
@@ -330,7 +331,7 @@
     <string name="context_correctly_moved" context="success message when moving a node">Moved successfully</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d items moved successfully</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d items are not moved successfully</string>
-    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">moved to the Rubbish Bin successfully</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the Rubbish Bin successfully</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the Rubbish Bin successfully</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d items are not sent successfully</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>

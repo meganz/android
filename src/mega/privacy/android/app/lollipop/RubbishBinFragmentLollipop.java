@@ -1147,10 +1147,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRubbishNode().getHandle()==parentHandle) {
 					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-					emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
+					emptyTextView.setText(R.string.empty_rubbish_bin);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextView.setText(R.string.empty_rubbish_bin);
 				}
 			}
 			else{
