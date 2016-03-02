@@ -1710,6 +1710,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					rbFLol.setNodes(nodes);
             			}
             			else{
+            				//Cloud Drive TAB
             				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
         					if (parentNode != null){
         						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
@@ -6022,7 +6023,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		long[] hashes = new long[handleList.size()];
 		for (int i=0;i<handleList.size();i++){
 			hashes[i] = handleList.get(i);
-			size += megaApi.getNodeByHandle(hashes[i]).getSize();
+			MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
+			if(nodeTemp!=null){
+				size += nodeTemp.getSize();
+			}			
 		}
 		log("Number of files: "+hashes.length);
 		
