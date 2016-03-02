@@ -41,6 +41,7 @@ import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -165,6 +166,15 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					onFileClick(handleList);
 					break;
 				}
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 			}
 			
 			return false;
@@ -173,7 +183,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_browser_action, menu);
+			inflater.inflate(R.menu.folder_link_action, menu);
 			return true;
 		}
 
@@ -187,22 +197,26 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapterList.getSelectedNodes();
 			boolean showDownload = false;
-			boolean showRename = false;
-			boolean showCopy = false;
-			boolean showMove = false;
-			boolean showLink = false;
-			boolean showTrash = false;
 			
-			if (selected.size() > 0) {
-				showDownload = true;
+			if (selected.size() != 0) {
+				if (selected.size() > 0) {
+					showDownload = true;
+				}
+				if(selected.size()==adapterList.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
 			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}			
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			
 			return false;
 		}
@@ -907,6 +921,22 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 	}
 	
+	public void selectAll(){
+		if (adapterList != null){
+			if(adapterList.isMultipleSelect()){
+				adapterList.selectAll();
+			}
+			else{				
+				adapterList.setMultipleSelect(true);
+				adapterList.selectAll();
+				
+				actionMode = ((AppCompatActivity)this).startSupportActionMode(new ActionBarCallBack());
+			}
+			
+			updateActionModeTitle();
+		}
+	}
+	
 	/*
 	 * Clear all selected items
 	 */
@@ -1203,8 +1233,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		switch(v.getId()){
 			case R.id.folder_link_button_download:{
-	        	MegaNode rootNode = megaApiFolder.getRootNode();	        	
-	        	onFolderClick(rootNode.getHandle(),rootNode.getSize());	
+				MegaNode rootNode = null;	  
+				if(megaApiFolder.getRootNode()!=null){
+					rootNode = megaApiFolder.getRootNode();
+				}
+	        	if(rootNode!=null){
+	        		onFolderClick(rootNode.getHandle(),rootNode.getSize());	
+	        	}
+	        	else{
+	        		log("rootNode null!!");
+	        	}
 				break;		
 			}
 			case R.id.folder_link_list_out_options:{
