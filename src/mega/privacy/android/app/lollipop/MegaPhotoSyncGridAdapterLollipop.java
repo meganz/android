@@ -599,7 +599,6 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	
 	public void selectAll(){
-		actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		this.multipleSelect = true;
 		if (nodes != null){
@@ -783,7 +782,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	/*
 	 * Get list of all selected documents
 	 */
-	private List<MegaNode> getSelectedDocuments() {
+	public List<MegaNode> getSelectedDocuments() {
 		log("getSelectedDocuments");
 		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
 		for (int i = 0; i < checkedItems.size(); i++) {
