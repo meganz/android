@@ -1736,7 +1736,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         						firstNavigationLevel = true;
         					}
-        					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+        					ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+        					nodes =	megaApi.getChildren(parentNode, orderGetChildren);
         					fbFLol.setNodes(nodes);
             			}
     				}
