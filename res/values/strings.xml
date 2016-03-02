@@ -52,7 +52,7 @@
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options&#8230;</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
-    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the rubbish bin?</string>
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
     <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">Are you sure you want to delete these items permanently?</string>
@@ -282,16 +282,16 @@
     <string name="context_upload" context="Item menu option upon right click on one or multiple files.">Upload</string>
     <string name="context_copying" context="while copying a file or folder">Copying</string>
     <string name="context_creating_link" context="status text">Creating link</string>
-    <string name="context_moving_to_trash" context="status text">Moving to rubbish bin</string>
-    <string name="context_move_to_trash" context="menu item">Move to rubbish bin</string>
+    <string name="context_moving_to_trash" context="status text">Moving to Rubbish Bin</string>
+    <string name="context_move_to_trash" context="menu item">Move to Rubbish rin</string>
     <string name="context_delete_from_mega" context="menu item">Delete from MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Folder Name</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Contact email</string>
     <string name="context_creating_folder" context="status dialog when performing the action. Keep the &#8230; symbol">Creating folder&#8230;</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     <string name="context_download_to" context="Menu item">Save to</string>
-    <string name="context_clear_rubbish" context="Menu option title">Empty rubbish bin</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All the elements of the rubbish bin will be removed</string>
+    <string name="context_clear_rubbish" context="Menu option title">Empty Rubbish Bin</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All the elements of the Rubbish Bin will be removed</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_send" context="get the link and send it">Send</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>

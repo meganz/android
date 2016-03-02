@@ -16,7 +16,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.LoopViewPager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.utils.Util;
@@ -27,25 +26,20 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -53,10 +47,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -64,16 +58,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
-import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,7 +68,6 @@ import android.widget.ListAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -171,6 +157,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public void onLongPress(MotionEvent e) {
 			log("onLongPress");
 			if (isList){
+				log("onLongPress:isList");
 		        View view = listView.findChildViewUnder(e.getX(), e.getY());
 		        int position = listView.getChildPosition(view);
 	
@@ -184,6 +171,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			        super.onLongPress(e);
 		        }
 			}
+			else{
+				log("onLongPress:isGrid");
+			}
 	    }
 	}
 	
@@ -191,14 +181,32 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
+			
+			List<PhotoSyncHolder> documentsList = null;
+			List<MegaNode> documentsGrid = null;
+			
+			if(adapterList!=null){
+				documentsList = adapterList.getSelectedDocuments();
+			}
+			else if(adapterGrid != null){
+				documentsGrid = adapterGrid.getSelectedDocuments();
+			}
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).handle);
+					
+					if(adapterList!=null){
+						for (int i=0;i<documentsList.size();i++){
+							handleList.add(documentsList.get(i).handle);
+						}
 					}
+					else if(adapterGrid != null){
+						for (int i=0;i<documentsGrid.size();i++){
+							handleList.add(documentsGrid.get(i).getHandle());
+						}
+					}					
+					
 					clearSelections();
 					hideMultipleSelect();
 					((ManagerActivityLollipop) context).onFileClick(handleList);
@@ -206,8 +214,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 				case R.id.cab_menu_copy:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).handle);
+
+					if(adapterList!=null){
+						for (int i=0;i<documentsList.size();i++){
+							handleList.add(documentsList.get(i).handle);
+						}
+					}
+					else if(adapterGrid != null){
+						for (int i=0;i<documentsGrid.size();i++){
+							handleList.add(documentsGrid.get(i).getHandle());
+						}
 					}
 					clearSelections();
 					hideMultipleSelect();
@@ -216,9 +232,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}	
 				case R.id.cab_menu_move:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).handle);
+					
+					if(adapterList!=null){
+						for (int i=0;i<documentsList.size();i++){
+							handleList.add(documentsList.get(i).handle);
+						}
 					}
+					else if(adapterGrid != null){
+						for (int i=0;i<documentsGrid.size();i++){
+							handleList.add(documentsGrid.get(i).getHandle());
+						}
+					}
+					
 					clearSelections();
 					hideMultipleSelect();
 					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
@@ -227,16 +252,33 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				case R.id.cab_menu_share_link:{
 					clearSelections();
 					hideMultipleSelect();
-					if (documents.size()==1){
-						MegaNode n = megaApi.getNodeByHandle(documents.get(0).handle);
-						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+					if(adapterList!=null){
+						if (documentsList.size()==1){
+							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
+							((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+						}
 					}
+					else if(adapterGrid != null){
+						if (documentsGrid.size()==1){
+							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
+							((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+						}
+					}
+					
 					break;
 				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).handle);
+
+					if(adapterList!=null){
+						for (int i=0;i<documentsList.size();i++){
+							handleList.add(documentsList.get(i).handle);
+						}
+					}
+					else if(adapterGrid != null){
+						for (int i=0;i<documentsGrid.size();i++){
+							handleList.add(documentsGrid.get(i).getHandle());
+						}
 					}
 					clearSelections();
 					hideMultipleSelect();
@@ -265,13 +307,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			adapterList.setMultipleSelect(false);
+			if(isList){
+				if(adapterList!=null){
+					adapterList.setMultipleSelect(false);
+				}
+			}
+			else{
+				if(adapterGrid!=null){
+					adapterGrid.setMultipleSelect(false);
+				}
+			}			
 			clearSelections();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<PhotoSyncHolder> selected = adapterList.getSelectedDocuments();
+			log("onPrepareActionMode");
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -279,37 +330,82 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			boolean showLink = false;
 			boolean showTrash = false;
 			
-			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).handle), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				showLink = true;
-			}
 			
-			if (selected.size() > 0) {
-				showDownload = true;
-				showTrash = true;
-				showMove = true;
-				showCopy = true;
-				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).handle), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-						showTrash = false;
-						showMove = false;
-						break;
-					}
+			if(adapterList!=null){
+				log("LIST onPrepareActionMode");
+				List<PhotoSyncHolder> selected = adapterList.getSelectedDocuments();
+				
+				selected = adapterList.getSelectedDocuments();
+				
+				// Link
+				if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).handle), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+					showLink = true;
 				}
 				
-				if(selected.size() == nodes.size()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				if (selected.size() > 0) {
+					showDownload = true;
+					showTrash = true;
+					showMove = true;
+					showCopy = true;
+					for(int i=0; i<selected.size();i++)	{
+						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).handle), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+							showTrash = false;
+							showMove = false;
+							break;
+						}
+					}
+					
+					if(selected.size() == nodes.size()){
+						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					}
+					else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+					}
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
 			}
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			}
+			else if(adapterGrid!=null){
+				log("GRID onPrepareActionMode");
+				List<MegaNode> selected = adapterGrid.getSelectedDocuments();
+				
+				// Link
+				if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).getHandle()), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+					showLink = true;
+				}
+				
+				if (selected.size() > 0) {
+					showDownload = true;
+					showTrash = true;
+					showMove = true;
+					showCopy = true;
+					for(int i=0; i<selected.size();i++)	{
+						if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).getHandle()), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+							showTrash = false;
+							showMove = false;
+							break;
+						}
+					}
+					
+					if(selected.size() == nodes.size()){
+						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					}
+					else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+					}
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				}
+
+			}				
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
@@ -1101,6 +1197,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
 		
 		if (isList){
+			log("isList");
 			if (adapterList.isMultipleSelect()){
 				adapterList.toggleSelection(position);
 				List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
@@ -1175,16 +1272,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			}
 		}
+		else{
+			log("isGrid");
+		}
 	}
 	
 	/*
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		log("clearSelections");
 		if (isList){
 			if (adapterList != null){
 				if(adapterList.isMultipleSelect()){
 					adapterList.clearSelections();
+				}
+				updateActionModeTitle();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				if(adapterGrid.isMultipleSelect()){
+					adapterGrid.clearSelections();
 				}
 				updateActionModeTitle();
 			}
@@ -1195,19 +1304,39 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
-		List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
+		
 		int files = 0;
 		int folders = 0;
-		for (PhotoSyncHolder document : documents) {
-			MegaNode n = megaApi.getNodeByHandle(document.handle);
-			if (n != null){
-				if (n.isFile()) {
-					files++;
-				} else if (n.isFolder()) {
-					folders++;
+		
+		if(adapterList!=null){
+			List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
+			
+			for (PhotoSyncHolder document : documents) {
+				MegaNode n = megaApi.getNodeByHandle(document.handle);
+				if (n != null){
+					if (n.isFile()) {
+						files++;
+					} else if (n.isFolder()) {
+						folders++;
+					}
 				}
 			}
 		}
+		else if(adapterGrid!=null){
+			List<MegaNode> documents = adapterGrid.getSelectedDocuments();
+			
+			for (MegaNode document : documents) {
+				MegaNode n = megaApi.getNodeByHandle(document.getHandle());
+				if (n != null){
+					if (n.isFile()) {
+						files++;
+					} else if (n.isFolder()) {
+						folders++;
+					}
+				}
+			}
+		}
+		
 		Resources res = getActivity().getResources();
 		String format = "%d %s";
 		String filesStr = String.format(format, files,
@@ -1239,7 +1368,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	 */
 	void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapterList.setMultipleSelect(false);
+		if (isList){
+			if (adapterList != null){
+				adapterList.setMultipleSelect(false);
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.setMultipleSelect(false);
+			}
+		}
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
