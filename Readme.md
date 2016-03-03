@@ -3,7 +3,7 @@ MEGA Android Client
 
 A fully-featured client to access your Cloud Storage provided by MEGA.
 
-This document will guide you to build the application on a Linux machine.
+This document will guide you to build the application on a Linux machine with Eclipse ADT.
 
 ### Setup development environment
 
