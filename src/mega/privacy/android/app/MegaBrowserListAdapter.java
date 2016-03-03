@@ -1137,6 +1137,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		final MegaNode n = (MegaNode) getItem(currentPosition);
@@ -1207,13 +1208,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case R.id.file_list_option_clear_share_layout: {
+			log("file_list_option_clear_share_layout");
 			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
 				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
 				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
-				//break;
 			}
+			break;
 		}
 		case R.id.file_list_option_remove_layout: {
+			log("file_list_option_remove_layout");
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(n.getHandle());
 			setPositionClicked(-1);
@@ -1223,11 +1226,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
 				//break;
 			}
-			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
+			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
+				log("type != ManagerActivity.CONTACT_FILE_ADAPTER");
 				((ContactPropertiesMainActivity) context).moveToTrash(handleList);				
 				//break;
 			} 
 			else {
+				log("type ELSE");
 				((ManagerActivity) context).moveToTrash(handleList);
 				//break;
 			}
