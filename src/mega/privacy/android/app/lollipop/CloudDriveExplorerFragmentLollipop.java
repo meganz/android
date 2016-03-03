@@ -168,8 +168,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		{
 			log("chosenNode is NULL");
 		
-			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(megaApi.getRootNode());
+			if(megaApi.getRootNode()!=null){
+				parentHandle = megaApi.getRootNode().getHandle();
+				nodes = megaApi.getChildren(megaApi.getRootNode());
+			}
+			
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 		}
 		else if(chosenNode.getType() == MegaNode.TYPE_ROOT)

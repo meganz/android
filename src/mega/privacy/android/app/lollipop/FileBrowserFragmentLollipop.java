@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.android.gms.internal.db;
+
 import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -1307,14 +1309,24 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				if (nodes.get(position).isFolder()){
 					MegaNode n = nodes.get(position);
-					
+					String cameraSyncHandle = null;
 //					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
 //						((ManagerActivityLollipop)context).cameraUploadsClicked();
 //						return;
 //					}
 					//Check if the item is the Camera Uploads folder
-					prefs = dbH.getPreferences();
-					String cameraSyncHandle = prefs.getCamSyncHandle();
+					if(dbH.getPreferences()!=null){
+						prefs = dbH.getPreferences();
+						if(prefs.getCamSyncHandle()!=null){
+							cameraSyncHandle = prefs.getCamSyncHandle();
+						}
+						else{
+							cameraSyncHandle = null;
+						}
+					}
+					else{
+						prefs=null;						
+					}
 					
 					if(cameraSyncHandle!=null){
 						if(!(cameraSyncHandle.equals("")))
@@ -1337,7 +1349,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					//Check if the item is the Media Uploads folder
 					
-					String secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
+					String secondaryMediaHandle = null;
+					
+					if(prefs!=null){						
+						if(prefs.getMegaHandleSecondaryFolder()!=null){
+							secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
+						}
+						else{
+							secondaryMediaHandle = null;
+						}
+					}
 					
 					if(secondaryMediaHandle!=null){
 						if(!(secondaryMediaHandle.equals("")))
