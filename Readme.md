@@ -7,7 +7,7 @@ This document will guide you to build the application on a Linux machine.
 
 ### Setup development environment
 
-* Android Developer Tools or [Eclipse](https://www.eclipse.org/downloads/) with [ADT plugin](https://marketplace.eclipse.org/content/android-development-tools-eclipse) (Android Studio is not supported yet)
+* Android Developer Tools or [Eclipse](https://www.eclipse.org/downloads/) with [ADT plugin](https://marketplace.eclipse.org/content/android-development-tools-eclipse)
 
 * [Android SDK Tools](http://developer.android.com/intl/es/sdk/index.html#Other)
 
