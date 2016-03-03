@@ -357,15 +357,16 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	public int deleteOffline(Context context,MegaOffline node){
 		
-		log("deleteOffline");
+		log("deleteOffline: "+node.getName());
+		boolean deleteIncomingParent=false;
 
 //		dbH = new DatabaseHandler(context);
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
 		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
-		MegaOffline parentNode = null;	
-		
+		MegaOffline parentNode = null;
+	
 		//Delete children
 		mOffListChildren=dbH.findByParentId(node.getId());
 		if(mOffListChildren.size()>0){
@@ -374,35 +375,68 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		int parentId = node.getParentId();
+		String parentHandle = "-1";
+		parentNode = dbH.findById(parentId);
+		if(parentNode != null){
+			log("Recursive parent: "+parentNode.getName());
+			parentHandle = parentNode.getHandle();
+			log("Recursive parentHandle: "+parentHandle);
+		}
+		
 		log("Finding parents...");
 		//Delete parents
 		if(parentId!=-1){
+			log("The parentId is NOT -1");
 			mOffListParent=dbH.findByParentId(parentId);
 			
-			log("Same Parent?:" +mOffListParent.size());
+			log("Same Parent if parentId!=-1?:" +mOffListParent.size());
 			
-			if(mOffListParent.size()<1){
-				//No more node with the same parent, keep deleting				
-
-				parentNode = dbH.findById(parentId);
-				log("Recursive parent: "+parentNode.getName());
+			if(mOffListParent.size()==1){
+				//No more node with the same parent, keep deleting	
+				
 				if(parentNode != null){
-					deleteOffline(context, parentNode);	
-						
+//					log("parentNode is null then deleteOffline: "+node.getName());
+//					deleteIncomingParent=true;
+					deleteOffline(context, parentNode);							
 				}	
 			}			
-		}	
+		}
 		
 		log("Remove the node physically");
-		//Remove the node physically
-		File destination = null;								
-
-		if (Environment.getExternalStorageDirectory() != null){
-			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
+		//Remove the node physically	
+		
+		
+		File destination = null;		
+		
+		//Check if the node is incoming
+		if(node.isIncoming()){
+			if(parentHandle.equals("-1")){
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandle() + node.getPath());
+					deleteIncomingParent=true;
+//					pathNavigation="/";
+				}
+				else{
+					destination = context.getFilesDir();
+				}
+			}
+			else{
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentHandle + node.getPath());
+				}
+				else{
+					destination = context.getFilesDir();
+				}
+			}			
 		}
 		else{
-			destination = context.getFilesDir();
-		}	
+			if (Environment.getExternalStorageDirectory() != null){
+				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
+			}
+			else{
+				destination = context.getFilesDir();
+			}
+		}
 
 		try{
 			File offlineFile = new File(destination, node.getName());	
@@ -410,10 +444,22 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			Util.deleteFolderAndSubfolders(context, offlineFile);
 		}
 		catch(Exception e){
-			log("EXCEPTION: deleteOffline - adapter");
-		};		
+			log("EXCEPTION: deleteOffline: "+node.getName());
+		};	
 		
-		dbH.removeById(node.getId());		
+		dbH.removeById(node.getId());	
+		
+		if(deleteIncomingParent){
+			File parentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandle());
+//			deleteParentIncoming(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandle());
+			try{
+				parentFile.delete();
+			}
+			catch(Exception e){
+				log("EXCEPTION: deleteParentOffline: "+node.getName());
+			};
+			
+		}
 		
 		return 1;		
 	}
@@ -437,6 +483,19 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			int lines = dbH.removeById(mOffDelete.getId());		
 			log("Borradas; "+lines);
 		}		
+	}
+	
+	public void deleteParentIncoming(String destination){
+		log("deleteParentIncoming: "+destination);
+		
+		try{
+			File offlineFile = new File(destination);	
+			log("Delete in phone: "+destination);
+			Util.deleteFolderAndSubfolders(context, offlineFile);
+		}
+		catch(Exception e){
+			log("EXCEPTION: deleteParentIncoming: "+destination);
+		};	
 	}
 	
 	public void selectAll(){
@@ -486,7 +545,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		log("onCreateView: "+pathNavigation);
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
@@ -1909,7 +1968,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
-		log("refreshPaths(MegaOffline mOff");
+		log("refreshPaths(MegaOffline mOff)");
 		int index=0;
 		MegaOffline retFindPath = null;
 		
@@ -1930,8 +1989,23 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			mOffList=dbH.findByPath("/");
 		}
 		else{
-			retFindPath=findPath(pNav);	
-			mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");
+			log("----------------The path is: "+pNav);
+			if(pNav.length()==1){
+				mOffList=dbH.findByPath("/");
+			}
+			else{
+				retFindPath=findPath(pNav);	
+				if(retFindPath!=null){
+					log("retFindPath NOT NULL: "+retFindPath.getName());
+					mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");
+					pathNavigation=pNav;
+				}
+				else{
+					pathNavigation="/";
+					log("retFindPath is NULL");
+					mOffList=dbH.findByPath("/");
+				}
+			}			
 		}
 				
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1942,7 +2016,12 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 //		setNodes(mOffList);
-		pathNavigation=pNav;
+		
+		log("pathNavigation= "+pathNavigation);
+		if(pathNavigation.equals("/")){
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			aB.setTitle(getString(R.string.section_saved_for_offline));
+		}
 	}
 	
 	public int getItemCount(){
@@ -1954,7 +2033,11 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	private MegaOffline findPath (String pNav){
 		
-		log("Path Navigation" + pNav);
+		log("findPath: " + pNav);
+		if(pNav.equals("/")){
+			log("the paath is already /");
+			return null;
+		}
 		
 		MegaOffline nodeToShow = null;
 		int index=pNav.lastIndexOf("/");	
@@ -1970,8 +2053,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			return nodeToShow;
 		}
-		else{
-			findPath (pathToShow);
+		else{						
+			findPath(pathToShow);					
 		}
 		
 		return nodeToShow;		
