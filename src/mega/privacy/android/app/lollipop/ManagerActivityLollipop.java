@@ -9738,6 +9738,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}	
 			}
+			else{
+				log("MOVE ERROR "+e.getErrorString());
+			}
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved_to_rubbish), Snackbar.LENGTH_LONG).show();	

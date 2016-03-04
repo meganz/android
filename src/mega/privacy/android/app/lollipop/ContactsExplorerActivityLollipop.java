@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.ContactsExplorerAdapter.OnItemCheckClickListener;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -17,13 +18,17 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
@@ -32,12 +37,23 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.view.Window;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.TextView.OnEditorActionListener;
 
 
 public class ContactsExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
@@ -52,9 +68,16 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	public static String EXTRA_PHONE = "extra_phone";
 	
 	MegaApiAndroid megaApi;
+	Handler handler;
 	
 	ActionBar aB;
 	Toolbar tB;
+	
+	MenuItem addContactMenuItem;
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	int multipleSelectIntent;
 	int sendToInbox;
@@ -182,6 +205,12 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		
+		display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		handler = new Handler();
+		
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey(EXTRA_NODE_HANDLE)) {				
 				if(multipleSelectIntent==0){
@@ -246,6 +275,161 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	}
 	
 	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+		
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.contacts_explorer_action, menu);
+	    
+	    addContactMenuItem = menu.findItem(R.id.cab_menu_add_contact);	    
+  
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		// Respond to the action bar's Up/Home button
+			case android.R.id.home: {
+				finish();
+				
+			}
+			case R.id.cab_menu_add_contact:{
+				showNewContactDialog(); 
+        		break;
+			}
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	@SuppressLint("NewApi")
+	public void showNewContactDialog(){
+		log("showNewContactDialog");		
+		
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		
+		final EditText input = new EditText(this);
+	    layout.addView(input, params);
+	    
+//		input.setId(1);
+		input.setSingleLine();
+		input.setHint(getString(R.string.context_new_contact_name));
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = input.getText().toString().trim();
+					String emailError = getEmailError(value);
+					if (emailError != null) {
+						input.setError(emailError);
+						input.requestFocus();
+					} else {						
+						ArrayList<String> emails = new ArrayList<String>();
+						emails.add(value);
+						setResultContacts(emails, true);
+						addContactDialog.dismiss();
+					}				
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.menu_add_contact));
+		builder.setPositiveButton(getString(R.string.general_add),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+														
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		addContactDialog = builder.create();
+		addContactDialog.show();
+		addContactDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String value = input.getText().toString().trim();
+				String emailError = getEmailError(value);
+				if (emailError != null) {
+					input.setError(emailError);
+				} else {
+					ArrayList<String> emails = new ArrayList<String>();
+					emails.add(value);
+					setResultContacts(emails, true);
+					addContactDialog.dismiss();
+				}
+			}
+		});
+	}
+	
+	/*
+	 * Validate email
+	 */
+	private String getEmailError(String value) {
+		log("getEmailError");
+		if (value.length() == 0) {
+			return getString(R.string.error_enter_email);
+		}
+		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+			return getString(R.string.error_invalid_email);
+		}
+		return null;
+	}
+	
+	/*
+	 * Display keyboard
+	 */
+	private void showKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+//				if (fbFLol != null){
+//					if (!(drawerItem == DrawerItem.CLOUD_DRIVE)){
+//						return;
+//					}
+//				}
+//				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+//				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+//				if (cFLol != null){
+//					if (drawerItem == DrawerItem.CONTACTS){
+//						return;
+//					}
+//				}
+//				if (inSFLol != null){
+//					if (drawerItem == DrawerItem.SHARED_ITEMS){
+//						return;
+//					}
+//				}
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
+	
+	@Override
     protected void onDestroy(){
     	super.onDestroy();
     	
@@ -276,18 +460,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 //			}
 //		}		
 	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		// Respond to the action bar's Up/Home button
-			case android.R.id.home: {
-				finish();
-				
-			}
-		}
-		return super.onOptionsItemSelected(item);
-	}
+
 	@Override
 	public void onItemCheckClick(int position) {
 //		boolean isChecked = listView.isItemChecked(position);
@@ -382,21 +555,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		setResult(RESULT_OK, intent);
 		finish();
 	}
-	
-	/*
-	 * Count all selected items
-	 */
-	private int getCheckedItemCount() {
-		int count = 0;
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				count++;
-//			}
-//		}
-		return count;
-	}
-	
+
 	/*
 	 * Add contact - remove (now with invitation)
 	 */
