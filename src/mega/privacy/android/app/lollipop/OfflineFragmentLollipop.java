@@ -357,16 +357,15 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	public int deleteOffline(Context context,MegaOffline node){
 		
-		log("deleteOffline: "+node.getName());
-		boolean deleteIncomingParent=false;
+		log("deleteOffline");
 
 //		dbH = new DatabaseHandler(context);
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
 		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
-		MegaOffline parentNode = null;
-	
+		MegaOffline parentNode = null;	
+		
 		//Delete children
 		mOffListChildren=dbH.findByParentId(node.getId());
 		if(mOffListChildren.size()>0){
@@ -374,60 +373,17 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			deleteChildrenDB(mOffListChildren);			
 		}
 		
-		int parentId = node.getParentId();
-		String parentHandle = "-1";
-		parentNode = dbH.findById(parentId);
-		if(parentNode != null){
-			log("Recursive parent: "+parentNode.getName());
-			parentHandle = parentNode.getHandle();
-			log("Recursive parentHandle: "+parentHandle);
-		}
-		
-		log("Finding parents...");
-		//Delete parents
-		if(parentId!=-1){
-			log("The parentId is NOT -1");
-			mOffListParent=dbH.findByParentId(parentId);
-			
-			log("Same Parent if parentId!=-1?:" +mOffListParent.size());
-			
-			if(mOffListParent.size()==1){
-				//No more node with the same parent, keep deleting	
-				
-				if(parentNode != null){
-//					log("parentNode is null then deleteOffline: "+node.getName());
-//					deleteIncomingParent=true;
-					deleteOffline(context, parentNode);							
-				}	
-			}			
-		}
-		
 		log("Remove the node physically");
-		//Remove the node physically	
-		
-		
-		File destination = null;		
-		
+		//Remove the node physically
+		File destination = null;								
 		//Check if the node is incoming
 		if(node.isIncoming()){
-			if(parentHandle.equals("-1")){
-				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandle() + node.getPath());
-					deleteIncomingParent=true;
-//					pathNavigation="/";
-				}
-				else{
-					destination = context.getFilesDir();
-				}
+			if (Environment.getExternalStorageDirectory() != null){
+				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandleIncoming() + node.getPath());
 			}
 			else{
-				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentHandle + node.getPath());
-				}
-				else{
-					destination = context.getFilesDir();
-				}
-			}			
+				destination = context.getFilesDir();
+			}						
 		}
 		else{
 			if (Environment.getExternalStorageDirectory() != null){
@@ -444,26 +400,92 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			Util.deleteFolderAndSubfolders(context, offlineFile);
 		}
 		catch(Exception e){
-			log("EXCEPTION: deleteOffline: "+node.getName());
-		};	
+			log("EXCEPTION: deleteOffline - adapter");
+		};		
 		
-		dbH.removeById(node.getId());	
+		dbH.removeById(node.getId());
 		
-		if(deleteIncomingParent){
-			File parentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandle());
-//			deleteParentIncoming(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandle());
-			try{
-				parentFile.delete();
-			}
-			catch(Exception e){
-				log("EXCEPTION: deleteParentOffline: "+node.getName());
-			};
-			
-		}
+		//Check if the parent has to be deleted
+		
+		int parentId = node.getParentId();
+		parentNode = dbH.findById(parentId);
+		log("Parent to check: "+parentNode.getName());
+		if(parentNode != null){
+			checkParentDeletion(parentNode);
+				
+		}	
 		
 		return 1;		
 	}
 	
+	public void checkParentDeletion (MegaOffline parentToDelete){
+		log("checkParentDeletion: "+parentToDelete.getName());
+		
+		ArrayList<MegaOffline> mOffListChildren=dbH.findByParentId(parentToDelete.getId());
+		File destination = null;	
+		if(mOffListChildren.size()<=0){
+			log("The parent has NO children");
+			//The node have NO childrens, delete it
+			
+			dbH.removeById(parentToDelete.getId());
+			if(parentToDelete.isIncoming()){
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming() + parentToDelete.getPath());
+				}
+				else{
+					destination = context.getFilesDir();
+				}						
+			}
+			else{
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + parentToDelete.getPath());
+				}
+				else{
+					destination = context.getFilesDir();
+				}
+			}
+			
+			try{
+				File offlineFile = new File(destination, parentToDelete.getName());	
+				log("Delete in phone: "+parentToDelete.getName());
+				Util.deleteFolderAndSubfolders(context, offlineFile);
+			}
+			catch(Exception e){
+				log("EXCEPTION: deleteOffline - adapter");
+			};				
+	
+			int parentId = parentToDelete.getParentId();
+			if(parentId==-1){
+				File rootIncomingFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming());
+				
+				if(rootIncomingFile.list().length==0){
+					try{
+						rootIncomingFile.delete();
+					}
+					catch(Exception e){
+						log("EXCEPTION: deleteParentIncoming: "+destination);
+					};
+				}				
+			}
+			else{
+				//Check if the parent has to be deleted	
+				
+				parentToDelete = dbH.findById(parentId);			
+				if(parentToDelete != null){
+					log("Parent to check: "+parentToDelete.getName());
+					checkParentDeletion(parentToDelete);
+						
+				}
+			}
+
+		}
+		else{
+			log("The parent has children!!! RETURN!!");
+			return;
+		}
+		
+	}
+
 	public void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
 
 		log("deleteChildenDB: "+mOffListChildren.size());
@@ -483,19 +505,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			int lines = dbH.removeById(mOffDelete.getId());		
 			log("Borradas; "+lines);
 		}		
-	}
-	
-	public void deleteParentIncoming(String destination){
-		log("deleteParentIncoming: "+destination);
-		
-		try{
-			File offlineFile = new File(destination);	
-			log("Delete in phone: "+destination);
-			Util.deleteFolderAndSubfolders(context, offlineFile);
-		}
-		catch(Exception e){
-			log("EXCEPTION: deleteParentIncoming: "+destination);
-		};	
 	}
 	
 	public void selectAll(){
@@ -545,7 +554,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView: "+pathNavigation);
+		log("onCreateView");
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
@@ -649,6 +658,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
+				contentText.setText(getInfoFolder(mOffList));
 				adapter.setNodes(mOffList);
 				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -836,6 +846,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
+				contentText.setText(getInfoFolder(mOffList));
 				adapter.setNodes(mOffList);
 				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -1016,6 +1027,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 
+		contentText.setText(getInfoFolder(mOffList));
 		adapter.setNodes(mOffList);
 	}
 
@@ -1062,7 +1074,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
-
+		contentText.setText(getInfoFolder(mOffList));
 		adapter.setNodes(mOffList);
 	}
 	
@@ -1640,7 +1652,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						}			
 					}
 				}
-
+				contentText.setText(getInfoFolder(mOffList));
 				adapter.setNodes(mOffList);
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1664,7 +1676,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
-				contentText.setText(getInfoFolder(mOffList));
+				
 				adapter.setPositionClicked(-1);
 				
 				notifyDataSetChanged();
@@ -1970,7 +1982,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public void refreshPaths(MegaOffline mOff){
 		log("refreshPaths(MegaOffline mOff)");
 		int index=0;
-		MegaOffline retFindPath = null;
+//		MegaOffline retFindPath = null;
 		
 		//Find in the tree, the last existing node
 		String pNav= mOff.getPath();
@@ -1987,25 +1999,10 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 		if(pNav.length()==0){
 			mOffList=dbH.findByPath("/");
+			pNav="/";
 		}
 		else{
-			log("----------------The path is: "+pNav);
-			if(pNav.length()==1){
-				mOffList=dbH.findByPath("/");
-			}
-			else{
-				retFindPath=findPath(pNav);	
-				if(retFindPath!=null){
-					log("retFindPath NOT NULL: "+retFindPath.getName());
-					mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");
-					pathNavigation=pNav;
-				}
-				else{
-					pathNavigation="/";
-					log("retFindPath is NULL");
-					mOffList=dbH.findByPath("/");
-				}
-			}			
+			findPath(pNav);			
 		}
 				
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -2016,12 +2013,29 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 //		setNodes(mOffList);
+//		pathNavigation=pNav;
 		
-		log("pathNavigation= "+pathNavigation);
 		if(pathNavigation.equals("/")){
+			mOffList=dbH.findByPath("/");
+			aB.setTitle(getString(R.string.section_saved_for_offline));	
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			aB.setTitle(getString(R.string.section_saved_for_offline));
+			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		}
+		else{
+			log("-------refreshPaths: "+pathNavigation);
+			mOffList=dbH.findByPath(pathNavigation);
+			index=pathNavigation.lastIndexOf("/");	
+			String title = pathNavigation;
+			index=title.lastIndexOf("/");				
+			title=title.substring(0,index);
+			index=title.lastIndexOf("/");				
+			title=title.substring(index+1,title.length());			
+			aB.setTitle(title);			
+		}		
+		
+		log("At the end of refreshPaths the path is: "+pathNavigation);
+		contentText.setText(getInfoFolder(mOffList));
+		setNodes(mOffList);
 	}
 	
 	public int getItemCount(){
@@ -2031,39 +2045,53 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		return 0;
 	}
 	
-	private MegaOffline findPath (String pNav){
+	private void findPath (String pNav){
 		
-		log("findPath: " + pNav);
-		if(pNav.equals("/")){
-			log("the paath is already /");
-			return null;
-		}
-		
+		log("findPath:" + pNav);	
+
 		MegaOffline nodeToShow = null;
-		int index=pNav.lastIndexOf("/");	
-		String pathToShow = pNav.substring(0, index+1);
-		log("Path: "+ pathToShow);
-		String nameToShow = pNav.substring(index+1, pNav.length());
-		log("Name: "+ nameToShow);
 		
-		nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
-		if(nodeToShow!=null){
-			//Show the node
-			log("NOde: "+ nodeToShow.getName());
+		if(!pNav.equals("/")){
 			
-			return nodeToShow;
+			if (pNav.endsWith("/")) {
+				pNav = pNav.substring(0, pNav.length() - 1);
+				log("NEW findPath:" + pNav);		
+			}
+			
+			int index=pNav.lastIndexOf("/");	
+			String pathToShow = pNav.substring(0, index+1);
+			log("Path: "+ pathToShow);
+			String nameToShow = pNav.substring(index+1, pNav.length());
+			log("Name: "+ nameToShow);
+			
+			nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
+			if(nodeToShow!=null){
+				//Show the node
+				log("findPath:Node: "+ nodeToShow.getName());
+				pathNavigation=pathToShow+nodeToShow.getName()+"/";
+				log("findPath:pathNavigation: "+pathNavigation);
+				return;
+			}
+			else{
+				if(pathNavigation.equals("/")){
+					log("Return Path /");
+					return;
+				}
+				else{
+					findPath(pathToShow);
+				}				
+			}
 		}
-		else{						
-			findPath(pathToShow);					
-		}
-		
-		return nodeToShow;		
+		else{
+			pathNavigation="/";
+		}		
 	}	
 	
 	public void setPathNavigation(String _pathNavigation){
 		log("setPathNavigation");
 		this.pathNavigation = _pathNavigation;
 		if (adapter != null){	
+//			contentText.setText(getInfoFolder(mOffList));
 			adapter.setNodes(dbH.findByPath(_pathNavigation));
 		}
 	}
