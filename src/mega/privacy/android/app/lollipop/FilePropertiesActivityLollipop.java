@@ -1226,8 +1226,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);		
 		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
-		builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-	    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	public void showCopy(){
@@ -1379,15 +1379,15 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getResources().getString(R.string.confirmation_alert));
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
-			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+			builder.setMessage(message).setPositiveButton(R.string.general_move_to, dialogClickListener)
+		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getResources().getString(R.string.confirmation_alert));
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
-			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 	}
 	

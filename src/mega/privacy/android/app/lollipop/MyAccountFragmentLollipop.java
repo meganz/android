@@ -972,8 +972,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				builder = new AlertDialog.Builder(context);
 			}
 			builder.setTitle(getString(R.string.confirmation_alert));
-			builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
-			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+			builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_export, dialogClickListener)
+			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
 			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -1003,8 +1003,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
 			builder.setTitle(getString(R.string.confirmation_alert));
-			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
-			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
+			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else if (itemText.compareTo(getString(R.string.action_help)) == 0){
 			Intent intent = new Intent();
