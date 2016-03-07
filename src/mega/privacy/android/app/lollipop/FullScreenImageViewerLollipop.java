@@ -1088,15 +1088,15 @@ log("moveToTrash");
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
-			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
+		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
-			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 	}
 	

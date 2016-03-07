@@ -427,7 +427,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.alert_decryption_key));
 		builder.setMessage(getString(R.string.message_decryption_key));
-		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+		builder.setPositiveButton(getString(R.string.general_decryp),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();
@@ -760,9 +760,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		            builder.setMessage(getString(R.string.general_error_folder_not_found));
 					builder.setTitle(getString(R.string.general_error_word));					
 					
-					builder.setPositiveButton(
-						getString(android.R.string.ok),
-						new DialogInterface.OnClickListener() {
+					builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.dismiss();

@@ -402,7 +402,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 				.getCustomAlertBuilder(this,
 						getString(R.string.create_account_confirm_title),
 						getString(R.string.create_account_confirm), null)
-				.setPositiveButton(getString(android.R.string.ok), listener)
+				.setPositiveButton(getString(R.string.general_confirm), listener)
 				.setCancelable(false);
 		alert.show();
 	}

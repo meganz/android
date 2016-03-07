@@ -164,8 +164,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 						};
 			
 						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-						builder.setMessage(getResources().getString(R.string.confirmation_remove_multiple_contacts)).setPositiveButton(R.string.general_yes, dialogClickListener)
-						    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+						builder.setMessage(getResources().getString(R.string.confirmation_remove_multiple_contacts)).setPositiveButton(R.string.general_remove, dialogClickListener)
+						    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 						
 					}	
 					//TODO remove contact

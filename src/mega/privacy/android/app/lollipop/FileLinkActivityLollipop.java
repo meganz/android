@@ -333,8 +333,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 					dialogBuilder.setTitle(getString(R.string.general_error_word));
 					dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
-					dialogBuilder.setPositiveButton(
-						getString(android.R.string.ok),
+					dialogBuilder.setPositiveButton(getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {

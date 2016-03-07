@@ -23,6 +23,13 @@
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="general_add" context="button">Add</string>
+    <string name="general_move" context="button">Move</string>
+    <string name="general_remove" context="button">Remove</string>
+    <string name="general_share" context="button">Share</string>
+   	<string name="general_confirm" context="button">Confirm</string>
+   	<string name="general_leave" context="button">Leave</string>
+   	<string name="general_decryp" context="button">Decrypt</string>
+   	<string name="general_export" context="button">Export</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     <string name="general_loading" context="state previous to import a file">Loading&#8230;</string>
     <string name="general_importing" context="state while importing the file">Importing&#8230;</string>
@@ -50,7 +57,7 @@
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options&#8230;</string> 
-    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact</string>    
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
@@ -379,6 +386,7 @@
   
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">New folder</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Add contact</string>
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Add contact and share</string>
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
