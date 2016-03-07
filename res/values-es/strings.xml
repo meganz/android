@@ -129,6 +129,7 @@
         <item quantity="other" context="used for example when a folder is shared with 2 or more users">usuarios</item>
     </plurals>
     
+    <string name="confirmation_required" context="Alert before download">Confirmación necesaria</string>
     
     <string name="login_text" context="Login button">Iniciar sesión</string>
     <string name="email_text" context="email label">Correo electrónico</string>
