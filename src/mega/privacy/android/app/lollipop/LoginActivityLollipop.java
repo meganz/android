@@ -1084,7 +1084,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	private void handleConfirmationIntent(Intent intent) {
 		confirmLink = intent.getStringExtra(EXTRA_CONFIRMATION);
 		loginTitle.setText(R.string.login_confirm_account);
-		bLogin.setText(R.string.login_confirm_account);
+		bLogin.setText(getString(R.string.login_confirm_account).toUpperCase(Locale.getDefault()));
 		updateConfirmEmail(confirmLink);
 	}
 	

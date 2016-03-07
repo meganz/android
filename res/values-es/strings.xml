@@ -132,7 +132,7 @@
     
     <string name="login_text" context="Login button">Iniciar sesión</string>
     <string name="email_text" context="email label">Correo electrónico</string>
-    <string name="password_text" context="password label">contraseña</string>
+    <string name="password_text" context="password label">Contraseña</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirmar contraseña</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
@@ -163,7 +163,7 @@
     <string name="tour_access_text">Consigue acceso totalmente encriptado en cualquier sitio, a cualquier hora</string>
     
     <string name="create_account_text" context="button that allows the user to create an account">Crear cuenta</string>
-    <string name="name_text" context="Name of the user">nombre</string>
+    <string name="name_text" context="Name of the user">Nombre</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Estoy de acuerdo con los Términos del Servicio de MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">¿Ya tienes una cuenta?</string>
     

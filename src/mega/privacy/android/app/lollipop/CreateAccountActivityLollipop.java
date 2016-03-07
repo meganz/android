@@ -12,6 +12,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -387,6 +388,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		onRegister();
 	}
 	
+	@SuppressLint("NewApi")
 	private void onRegister() {
 		android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
 			@Override
@@ -397,14 +399,13 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 				finish();
 			}
 		};
-
-		AlertDialog.Builder alert = Util
-				.getCustomAlertBuilder(this,
-						getString(R.string.create_account_confirm_title),
-						getString(R.string.create_account_confirm), null)
-				.setPositiveButton(getString(R.string.general_confirm), listener)
-				.setCancelable(false);
-		alert.show();
+	
+        AlertDialog.Builder alert = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        alert.setMessage(getString(R.string.create_account_confirm));
+        alert.setTitle(getString(R.string.create_account_confirm_title));
+        alert.setPositiveButton(getString(R.string.cam_sync_ok), listener);
+        alert.setCancelable(false);
+		alert.create().show();
 	}
 
 	@Override
