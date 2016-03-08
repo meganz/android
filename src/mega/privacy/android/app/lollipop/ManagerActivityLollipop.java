@@ -6302,42 +6302,58 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}			
 		}
 
-		//Check size to download
-		//100MB=104857600
-		//10MB=10485760
-		if(size>10485760){
-			log("Show size confirmacion: "+size);
-			//Show alert
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			LinearLayout confirmationLayout = new LinearLayout(this);
-			confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-		    
-		    CheckBox dontShowAgain =new CheckBox(this);
-		    dontShowAgain.setText("Ok please do not show again.");
-		    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
-			
-			confirmationLayout.addView(dontShowAgain, params);				
-	
-	        builder.setView(confirmationLayout);
-	        
-			builder.setTitle(getString(R.string.confirmation_required));
-			
-			builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(size)));
-			builder.setPositiveButton(getString(R.string.general_download),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							proceedToDownload(parentPathC, urlC, sizeC, hashesC);							
-						}
-					});
-			builder.setNegativeButton(getString(android.R.string.cancel), null);
-
-			downloadConfirmationDialog = builder.create();
-			downloadConfirmationDialog.show();
-		}			
+		String ask=dbH.getAttributes().getAskSizeDownload();
+		
+		if(ask==null){
+			ask="false";
+		}
+		
+		if(ask.equals("false")){
+			log("SIZE: Do not ask before downloading");
+			proceedToDownload(parentPathC, urlC, sizeC, hashesC);	
+		}
 		else{
-			proceedToDownload(parentPathC, urlC, sizeC, hashesC);			
+			log("SIZE: Ask before downloading");
+			//Check size to download
+			//100MB=104857600
+			//10MB=10485760
+			if(size>10485760){
+				log("Show size confirmacion: "+size);
+				//Show alert
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				LinearLayout confirmationLayout = new LinearLayout(this);
+				confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+			    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+			    
+			    final CheckBox dontShowAgain =new CheckBox(this);
+			    dontShowAgain.setText("Ok please do not show again.");
+			    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+				
+				confirmationLayout.addView(dontShowAgain, params);				
+		
+		        builder.setView(confirmationLayout);
+		        
+				builder.setTitle(getString(R.string.confirmation_required));
+				
+				builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(size)));
+				builder.setPositiveButton(getString(R.string.general_download),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								if(dontShowAgain.isChecked()){
+									dbH.setAttrAskSizeDownload("false");
+								}
+								proceedToDownload(parentPathC, urlC, sizeC, hashesC);							
+							}
+						});
+				builder.setNegativeButton(getString(android.R.string.cancel), null);
+
+				downloadConfirmationDialog = builder.create();
+				downloadConfirmationDialog.show();
+			}			
+			else{
+				proceedToDownload(parentPathC, urlC, sizeC, hashesC);			
+			}
 		}
 	}
 	

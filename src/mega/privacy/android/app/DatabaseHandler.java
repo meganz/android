@@ -17,7 +17,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 16; 
+	private static final int DATABASE_VERSION = 17; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -46,6 +46,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_LAST_CLOUD_FOLDER_HANDLE = "lastcloudfolder";
     private static final String KEY_ATTR_ONLINE = "online";
     private static final String KEY_ATTR_INTENTS = "intents";
+    private static final String KEY_ATTR_ASK_SIZE_DOWNLOAD = "asksizedownload";
+    private static final String KEY_ATTR_ASK_NOAPP_DOWNLOAD = "asknoappdownload";
     private static final String KEY_OFF_HANDLE = "handle";
     private static final String KEY_OFF_PATH = "path";
     private static final String KEY_OFF_NAME = "name";
@@ -108,7 +110,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT" + ")";
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
+        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN"+")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
   
 	}
@@ -221,6 +224,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST + " = '" + encrypt("true") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST_CAMERA + " = '" + encrypt("false") + "';");
+		}
+		
+		if (oldVersion <=16){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_ATTR_ASK_SIZE_DOWNLOAD + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_SIZE_DOWNLOAD + " = '" + encrypt("true") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_ATTR_ASK_NOAPP_DOWNLOAD + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_NOAPP_DOWNLOAD + " = '" + encrypt("true") + "';");
 		}
 	} 
 	
@@ -363,6 +373,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
         values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
+        values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
+        values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
         db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -375,11 +387,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			int id = Integer.parseInt(cursor.getString(0));
 			String online = decrypt(cursor.getString(1));
 			String intents =  decrypt(cursor.getString(2));
+			String askSizeDownload = decrypt(cursor.getString(3));
+			String askNoAppDownload = decrypt(cursor.getString(4));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents));
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload);
 			}
 			else{
-				attr = new MegaAttributes(online, 0);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload);
 			}
 		}
 		cursor.close();
@@ -1125,6 +1139,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_ATTR_ONLINE, encrypt(online + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setAttrAskSizeDownload (String askSizeDownload){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_SIZE_DOWNLOAD + "='" + encrypt(askSizeDownload) + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_ATTR_ONLINE, encrypt(askSizeDownload));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();
