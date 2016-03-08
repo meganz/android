@@ -132,6 +132,7 @@
     <string name="confirmation_required" context="Alert before download">Confirmación necesaria</string>
     <string name="alert_larger_file" context="Alert text before download">Se van a descargar %s. Desear continuar?</string>
     <string name="alert_no_app" context="Alert text before download"> No existe ninguna app instalada para abrir el fichero %s. ¿Desea continuar con la descarga?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">No mostrar más</string>
     
     <string name="login_text" context="Login button">Iniciar sesión</string>
     <string name="email_text" context="email label">Correo electrónico</string>

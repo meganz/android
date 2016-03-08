@@ -6209,66 +6209,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		final String urlC = url;
 		final long sizeC = size;
 		final long [] hashesC = hashes;
-				
-		if (hashes != null){
-			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				log("Node: "+ node.getName());
-				
-				Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
-				log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
-				
-				checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
-				
-				try{
-					if (!isIntentAvailable(this, checkIntent)){
+		
+		String ask=dbH.getAttributes().getAskNoAppDownload();
+		
+		if(ask==null){
+			log("ask==null");
+			ask="true";
+		}
+		
+		if(ask.equals("false")){
+			log("INSTALLED APP: Do not ask before downloading");
+			download(parentPathC, urlC, sizeC, hashesC);	
+		}
+		else{
+			log("INSTALLED APP: Ask before downloading");
+			if (hashes != null){
+				for (long hash : hashes) {
+					MegaNode node = megaApi.getNodeByHandle(hash);
+					log("Node: "+ node.getName());
+					
+					Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
+					log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
+					
+					checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
+					
+					try{
+						if (!isIntentAvailable(this, checkIntent)){
+							confirmationToDownload = true;
+							nodeToDownload=node.getName();
+							break;
+						}					
+					}catch(Exception e){
+						log("isIntent EXCEPTION");
 						confirmationToDownload = true;
 						nodeToDownload=node.getName();
 						break;
-					}					
-				}catch(Exception e){
-					log("isIntent EXCEPTION");
-					confirmationToDownload = true;
-					nodeToDownload=node.getName();
-					break;
-				}	
-				
-			}			
-		}	
-		
-		//Check if show the alert message
-		if(confirmationToDownload){
-			//Show message
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			LinearLayout confirmationLayout = new LinearLayout(this);
-			confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-		    
-		    CheckBox dontShowAgain =new CheckBox(this);
-		    dontShowAgain.setText("Ok please do not show again.");
-		    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+					}	
+					
+				}			
+			}	
 			
-			confirmationLayout.addView(dontShowAgain, params);				
+			//Check if show the alert message
+			if(confirmationToDownload){
+				//Show message
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				LinearLayout confirmationLayout = new LinearLayout(this);
+				confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+			    
+			    final CheckBox dontShowAgain =new CheckBox(this);
+			    dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+			    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+				
+				confirmationLayout.addView(dontShowAgain, params);				
 
-	        builder.setView(confirmationLayout);
-	        
-			builder.setTitle(getString(R.string.confirmation_required));
-			builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-			builder.setPositiveButton(getString(R.string.general_download),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							download(parentPathC, urlC, sizeC, hashesC);										
-						}
-					});
-			builder.setNegativeButton(getString(android.R.string.cancel), null);
-
-			downloadConfirmationDialog = builder.create();
-			downloadConfirmationDialog.show();
-		}
-		else{
-			download(parentPathC, urlC, sizeC, hashesC);
-		}
+		        builder.setView(confirmationLayout);
+		        
+				builder.setTitle(getString(R.string.confirmation_required));
+				builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
+				builder.setPositiveButton(getString(R.string.general_download),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								if(dontShowAgain.isChecked()){
+									dbH.setAttrAskNoAppDownload("false");
+								}
+								download(parentPathC, urlC, sizeC, hashesC);										
+							}
+						});
+				builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if(dontShowAgain.isChecked()){
+							dbH.setAttrAskNoAppDownload("false");
+						}															
+					}
+				});
+				downloadConfirmationDialog = builder.create();
+				downloadConfirmationDialog.show();
+			}
+			else{
+				download(parentPathC, urlC, sizeC, hashesC);
+			}
+		}		
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
@@ -6305,7 +6327,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String ask=dbH.getAttributes().getAskSizeDownload();
 		
 		if(ask==null){
-			ask="false";
+			ask="true";
 		}
 		
 		if(ask.equals("false")){
@@ -6317,7 +6339,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Check size to download
 			//100MB=104857600
 			//10MB=10485760
-			if(size>10485760){
+			if(size>104857600){
 				log("Show size confirmacion: "+size);
 				//Show alert
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -6327,7 +6349,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 			    
 			    final CheckBox dontShowAgain =new CheckBox(this);
-			    dontShowAgain.setText("Ok please do not show again.");
+			    dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
 			    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
 				
 				confirmationLayout.addView(dontShowAgain, params);				
@@ -6346,7 +6368,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								proceedToDownload(parentPathC, urlC, sizeC, hashesC);							
 							}
 						});
-				builder.setNegativeButton(getString(android.R.string.cancel), null);
+				builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if(dontShowAgain.isChecked()){
+							dbH.setAttrAskSizeDownload("false");
+						}												
+					}
+				});
 
 				downloadConfirmationDialog = builder.create();
 				downloadConfirmationDialog.show();
