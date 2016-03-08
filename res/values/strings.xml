@@ -136,6 +136,7 @@
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     <string name="alert_larger_file" context="Alert text before download"> %s will donwloaded. Are you sure?</string>
     <string name="alert_no_app" context="Alert text before download"> There is no app to open the file %s. Do you want to continue with the download?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show again</string>
      
     <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">E-mail</string>

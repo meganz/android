@@ -1154,7 +1154,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
-			values.put(KEY_ATTR_ONLINE, encrypt(askSizeDownload));
+			values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(askSizeDownload));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setAttrAskNoAppDownload (String askNoAppDownload){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_NOAPP_DOWNLOAD + "='" + encrypt(askNoAppDownload) + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(askNoAppDownload));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();
