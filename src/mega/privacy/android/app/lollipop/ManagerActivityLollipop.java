@@ -446,8 +446,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
-	boolean proceed=false;
 	boolean confirmationToDownload=false;
+	String nodeToDownload;
     
     //Listener for  multiselect
     private class MultipleRequestListener implements MegaRequestListenerInterface{
@@ -6104,25 +6104,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void download(String parentPath, String url, long size, long [] hashes){
-		log("download");
-		
-		double availableFreeSpace = Double.MAX_VALUE;
-		try{
-			StatFs stat = new StatFs(parentPath);
-			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-		}
-		catch(Exception ex){}		
+		log("download-----------");		
 		
 		if (hashes == null){
 			log("hashes is null");
 			if(url != null) {
-				log("url NOT null");
-				if(availableFreeSpace < size) {
-					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-					log("Not enough space");
-					return;
-				}
-				
+				log("url NOT null");				
 				Intent service = new Intent(this, DownloadService.class);
 				service.putExtra(DownloadService.EXTRA_URL, url);
 				service.putExtra(DownloadService.EXTRA_SIZE, size);
@@ -6149,51 +6136,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						catch(Exception e) {
 							log("Exception!!");
 						}
-												
-//						if(MimeType.typeForName(tempNode.getName()).isPdf()){
-//							
-//		    			    File pdfFile = new File(localPath);
-//		    			    
-//		    			    Intent intentPdf = new Intent();
-//		    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-//		    			    intentPdf.setClass(this, OpenPDFActivity.class);
-//		    			    intentPdf.setAction("android.intent.action.VIEW");
-//		    				this.startActivity(intentPdf);
-//							
-//						}
-//						else						
-						
-//						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-//							log("MimeTypeList ZIP");
-//		    			    File zipFile = new File(localPath);
-//		    			    
-//		    			    Intent intentZip = new Intent();
-//		    			    intentZip.setClass(this, ZipBrowserActivityLollipop.class);
-//		    			    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-//		    			    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-//
-//		    				this.startActivity(intentZip);
-//							
-//						}
-//						else{		
-							log("MimeTypeList other file");
-							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, viewIntent)){
-								log("if isIntentAvailable");
-								startActivity(viewIntent);
-							}								
-							else{
-								log("ELSE isIntentAvailable");
-								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								if (isIntentAvailable(this, intentShare)){
-									log("call to startActivity(intentShare)");
-									startActivity(intentShare);
-								}									
-								Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
-							}								
-//						}
+							
+						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+						if (isIntentAvailable(this, viewIntent)){
+							log("if isIntentAvailable");
+							startActivity(viewIntent);
+						}								
+						else{
+							log("ELSE isIntentAvailable");
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+							if (isIntentAvailable(this, intentShare)){
+								log("call to startActivity(intentShare)");
+								startActivity(intentShare);
+							}									
+							Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
+						}								
 						return;
 					}
 				}
@@ -6217,13 +6176,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						
 						String path = dlFiles.get(document);
 						log("path of the file: "+path);
-						
-						if(availableFreeSpace < document.getSize()){
-							log("Not enough space");
-							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space)+ " (" + new String(document.getName()) + ")", Snackbar.LENGTH_LONG).show();							
-							continue;
-						}
-						
 						log("start service");
 						Intent service = new Intent(this, DownloadService.class);
 						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
@@ -6235,11 +6187,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(url != null) {
 					log("URL NOT null");
-					if(availableFreeSpace < size) {
-						log("Not enough space");
-						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-						continue;
-					}
 					log("start service");
 					Intent service = new Intent(this, DownloadService.class);
 					service.putExtra(DownloadService.EXTRA_HASH, hash);
@@ -6257,53 +6204,71 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	public void proceedToDownload(String parentPath, String url, long size, long [] hashes){
 		log("proceedToDownload");
+		confirmationToDownload = false;
 		final String parentPathC = parentPath;
 		final String urlC = url;
 		final long sizeC = size;
 		final long [] hashesC = hashes;
-		
+				
 		if (hashes != null){
 			for (long hash : hashes) {
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				log("Node: "+ node.getName());
 				
-				Intent checkIntent = new Intent(Intent.ACTION_VIEW);
+				Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
+				log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
+				
 				checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
 				
-				if (!isIntentAvailable(this, checkIntent)){
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-					LinearLayout confirmationLayout = new LinearLayout(this);
-					confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-				    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-				    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-				    
-				    CheckBox dontShowAgain =new CheckBox(this);
-				    dontShowAgain.setText("Ok please do not show again.");
-				    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
-					
-					confirmationLayout.addView(dontShowAgain, params);				
-
-			        builder.setView(confirmationLayout);
-			        
-					builder.setTitle(getString(R.string.confirmation_required));
-					builder.setMessage(getString(R.string.confirmation_required));
-					builder.setPositiveButton(getString(R.string.general_download),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									download(parentPathC, urlC, sizeC, hashesC);						
-								}
-							});
-					builder.setNegativeButton(getString(android.R.string.cancel), null);
-
-					downloadConfirmationDialog = builder.create();
-					downloadConfirmationDialog.show();					
-				}
-				else{
-					log("isIntentAvailable");
-					download(parentPathC, urlC, sizeC, hashesC);
-				}		
+				try{
+					if (!isIntentAvailable(this, checkIntent)){
+						confirmationToDownload = true;
+						nodeToDownload=node.getName();
+						break;
+					}					
+				}catch(Exception e){
+					log("isIntent EXCEPTION");
+					confirmationToDownload = true;
+					nodeToDownload=node.getName();
+					break;
+				}	
+				
 			}			
-		}		
+		}	
+		
+		//Check if show the alert message
+		if(confirmationToDownload){
+			//Show message
+			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			LinearLayout confirmationLayout = new LinearLayout(this);
+			confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		    
+		    CheckBox dontShowAgain =new CheckBox(this);
+		    dontShowAgain.setText("Ok please do not show again.");
+		    dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+			
+			confirmationLayout.addView(dontShowAgain, params);				
+
+	        builder.setView(confirmationLayout);
+	        
+			builder.setTitle(getString(R.string.confirmation_required));
+			builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
+			builder.setPositiveButton(getString(R.string.general_download),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							download(parentPathC, urlC, sizeC, hashesC);										
+						}
+					});
+			builder.setNegativeButton(getString(android.R.string.cancel), null);
+
+			downloadConfirmationDialog = builder.create();
+			downloadConfirmationDialog.show();
+		}
+		else{
+			download(parentPathC, urlC, sizeC, hashesC);
+		}
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
@@ -6315,6 +6280,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		final String urlC = url;
 		final long sizeC = size;
 		final long [] hashesC = hashes;
+		
+		//Chech if there is available space
+		double availableFreeSpace = Double.MAX_VALUE;
+		try{
+			StatFs stat = new StatFs(parentPath);
+			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+		}
+		catch(Exception ex){}		
+		
+		if(availableFreeSpace < size) {
+			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+			log("Not enough space");
+			return;
+		}
 	
 		if (hashes != null){
 			for (long hash : hashes) {
@@ -6344,7 +6323,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        builder.setView(confirmationLayout);
 	        
 			builder.setTitle(getString(R.string.confirmation_required));
-			builder.setMessage(getString(R.string.confirmation_required));
+			
+			builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(size)));
 			builder.setPositiveButton(getString(R.string.general_download),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
@@ -6357,7 +6337,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			downloadConfirmationDialog.show();
 		}			
 		else{
-			proceedToDownload(parentPathC, urlC, sizeC, hashesC);
+			proceedToDownload(parentPathC, urlC, sizeC, hashesC);			
 		}
 	}
 	

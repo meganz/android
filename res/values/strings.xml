@@ -133,7 +133,9 @@
         <item quantity="other" context="used for example when a folder is shared with 2 or more users">users</item>
     </plurals>
     
-    <string name="confirmation_required" context="Alert before download">Confirmation required</string>
+    <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
+    <string name="alert_larger_file" context="Alert text before download"> %s will donwloaded. Are you sure?</string>
+    <string name="alert_no_app" context="Alert text before download"> There is no app to open the file %s. Do you want to continue with the download?</string>
      
     <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">E-mail</string>
