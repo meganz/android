@@ -129,8 +129,8 @@
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one" context="used for example when a folder is shared with 1 user">user</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">users</item>
+        <item quantity="one" context="used for example when a folder is shared with 1 user">contact</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">contacts</item>
     </plurals>
     
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>

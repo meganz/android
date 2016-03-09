@@ -9245,7 +9245,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		android.view.ViewGroup.LayoutParams paramsb2 = rightUpgradeButton.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
 		rightUpgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
-		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
+//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)rightUpgradeButton.getLayoutParams();
 		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
@@ -9278,7 +9278,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		android.view.ViewGroup.LayoutParams paramsb2 = outSpaceButton.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
 		outSpaceButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
-		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
+//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)outSpaceButton.getLayoutParams();
 		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0); 
@@ -9295,7 +9295,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("altura: "+outSpaceLayout.getHeight());
 				
 				TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-				animTop.setDuration(2000);
+				animTop.setDuration(4000);
 				animTop.setFillAfter(true);
 				outSpaceLayout.setAnimation(animTop);
 			
