@@ -125,8 +125,8 @@
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one" context="used for example when a folder is shared with 1 user">usuario</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">usuarios</item>
+        <item quantity="one" context="used for example when a folder is shared with 1 user">contacto</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">contactos</item>
     </plurals>
     
     <string name="confirmation_required" context="Alert before download">Confirmación necesaria</string>
