@@ -234,7 +234,7 @@
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permisos:</string>
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Permisos</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Cambiar permisos</string>
-	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida con</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propietario</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvitar</string>

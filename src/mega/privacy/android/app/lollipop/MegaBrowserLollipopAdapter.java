@@ -428,33 +428,41 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		if (node.isFolder()) {
 			holder.transferProgressBar.setVisibility(View.GONE);		
-			holder.textViewFileSize.setVisibility(View.VISIBLE);
-			
+			holder.textViewFileSize.setVisibility(View.VISIBLE);			
 			holder.textViewFileSize.setText(getInfoFolder(node));
 			
-			ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-			if (sl != null) {
-				if (sl.size() > 0) {
-					if(sl.size() == 1){
-						if(sl.get(0).getUser()==null){
-							//IT is just public link, not shared folder
-							holder.imageView.setImageResource(R.drawable.ic_folder_list);
-						}
-						else{
-							holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
-						}
-					}
-					else{
+			if(type==ManagerActivityLollipop.INCOMING_SHARES_ADAPTER){
+				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+				//Show the owner of the shared folder
+				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+				for(int j=0; j<sharesIncoming.size();j++){
+					MegaShare mS = sharesIncoming.get(j);
+					if(mS.getNodeHandle()==node.getHandle()){
+						holder.textViewFileSize.setText(mS.getUser());	
+					}				
+				}
+			}
+			else if (type==ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER){
+				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+				//Show the number of contacts who shared the folder
+				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
+				if (sl != null) {
+					holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+				}
+			}
+			else{
+				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
+				if (sl != null) {
+					if (sl.size() > 0) {					
 						holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+					} else {
+						holder.imageView.setImageResource(R.drawable.ic_folder_list);
 					}
 				} 
 				else {
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
-				}
-			} 
-			else {
-				holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			}
+				}				
+			}			
 		}
 		else {
 			long nodeSize = node.getSize();
