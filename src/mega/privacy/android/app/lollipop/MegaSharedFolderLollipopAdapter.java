@@ -251,6 +251,12 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.textViewContactName.setSingleLine();
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.shared_folder_contact_three_dots);
+		
+		//Right margin
+		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
+		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);	
+		
 		v.setTag(holder); 
 		
 		return holder;
@@ -268,20 +274,17 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				if (positionClicked == position) {
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
 //					holder.optionsLayout.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));					
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					//				holder.arrowSelection.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					holder.itemLayout.setBackgroundColor(Color.WHITE);					
 				}
 			} 
 			else {
 				//			holder.arrowSelection.setVisibility(View.GONE);
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				holder.itemLayout.setBackgroundColor(Color.WHITE);				
 			}
 		} else {
 			holder.imageButtonThreeDots.setVisibility(View.GONE);		

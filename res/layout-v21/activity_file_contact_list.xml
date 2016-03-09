@@ -137,7 +137,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/permissions_ic" />
+                    android:src="@drawable/ic_shared_with" />
 
                 <TextView
                     android:id="@+id/file_contact_list_option_share_text"
@@ -165,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_clear_shares" />
+                    android:src="@drawable/ic_remove_share" />
 
                 <TextView
                     android:id="@+id/file_contact_list_option_remove_text"

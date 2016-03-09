@@ -466,6 +466,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			optionPermissions = (LinearLayout) findViewById(R.id.file_contact_list_option_share_layout);					
 			optionRemove = (LinearLayout) findViewById(R.id.file_contact_list_option_remove_layout);
 			
+//			slidingOptionsPanel.setPanelHeight(optionPermissions.getHeight()*2);
+			
 			optionRemove.setOnClickListener(this);			
 			optionPermissions.setOnClickListener(this);
 			
@@ -515,7 +517,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 //		fabButton.setVisibility(View.GONE);
 		
-		this.selectedNode = sShare;	
+		this.selectedNode = sShare;
+		slidingOptionsPanel.setPanelHeight(optionPermissions.getHeight()*2);
 		
 		if (selectedNode.getUser() != null){
 			optionPermissions.setVisibility(View.VISIBLE);
@@ -525,8 +528,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			optionPermissions.setVisibility(View.GONE);			
 		}		
 					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
 	}
 	
 	public void hideOptionsPanel(){
@@ -729,6 +732,34 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onBackPressed() {
+		log("onBackPressed");
+		
+		PanelState pS=slidingOptionsPanel.getPanelState();
+		
+		if(pS==null){
+			log("NULLL");
+		}
+		else{
+			if(pS==PanelState.HIDDEN){
+				log("Hidden");
+			}
+			else if(pS==PanelState.COLLAPSED){
+				log("Collapsed");
+			}
+			else{
+				log("ps: "+pS);
+			}
+		}		
+		
+		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
+			log("getPanelState()!=PanelState.HIDDEN");
+			hideOptionsPanel();
+			adapter.setPositionClicked(-1);
+			adapter.notifyDataSetChanged();
+			return;
+		}
+		
+		log("Sliding not shown");
 					
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
@@ -801,6 +832,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				startActivity(i);
 				finish();
 				break;
+			}
+			case R.id.file_contact_list_out_options:{
+				log("Out Panel");
+				hideOptionsPanel();
+				break;				
 			}
 			case R.id.file_contact_list_option_share_layout:{
 				log("En el adapter - change");
