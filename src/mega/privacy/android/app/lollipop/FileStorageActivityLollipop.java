@@ -14,16 +14,21 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
@@ -55,6 +60,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 
 public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
@@ -63,6 +69,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static String EXTRA_SIZE = "filesize";
 	public static String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static String EXTRA_FROM_SETTINGS = "from_settings";
+	public static String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static String EXTRA_PATH = "filepath";
 	public static String EXTRA_FILES = "fileslist";	
@@ -99,6 +106,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private MenuItem newFolderMenuItem;
 	
 	private File path;
+	private String camSyncLocalPath;
 	private File root;
 //	DisplayMetrics outMetrics;
 	private RelativeLayout viewContainer;
@@ -113,6 +121,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	TextView emptyTextView;
 	
 	private Boolean fromSettings;
+	private Boolean cameraFolderSettings;
 	
 	private String url;
 	private long size;
@@ -323,12 +332,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
-	@Override
+	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
-		
 		
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -359,7 +375,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		Intent intent = getIntent();
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
-
+		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
+		
 		mode = Mode.getFromIntent(intent);
 		if (mode == Mode.PICK_FOLDER) {
 			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
@@ -442,13 +459,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
-		root = new File("/");
-		
-//		dbH.setLastUploadFolder("/storage/emulated/0/Pictures");		
-		
+		root = new File(Environment.getExternalStorageDirectory().toString());
+				
 		prefs = dbH.getPreferences();
 		if (prefs == null){
-			path = new File(Environment.getExternalStorageDirectory().toString());
+			path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
 		}
 		else{
 			String lastFolder = prefs.getLastFolderUpload();
@@ -460,13 +475,46 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				}
 			}
 			else{
-				path = new File(Environment.getExternalStorageDirectory().toString());
+				path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+			}
+			if (cameraFolderSettings){
+				camSyncLocalPath = prefs.getCamSyncLocalPath();
 			}
 			
 		}		
 		if (path == null) {
-			path = new File(Environment.getExternalStorageDirectory().toString());
+			path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
 		}
+		
+		if (cameraFolderSettings){
+			if (camSyncLocalPath != null){
+				if (camSyncLocalPath.compareTo("") == 0){
+					if (Environment.getExternalStorageDirectory() != null){
+						path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+					}
+				}
+				else{
+					path = new File(camSyncLocalPath);
+					if (path == null){
+						if (Environment.getExternalStorageDirectory() != null){
+							path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+						}
+					}
+				}
+			}
+			else{
+				if (Environment.getExternalStorageDirectory() != null){
+					path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+				}
+			}
+		}
+		
+		if (path == null){
+			finish();
+			return;
+		}
+		
+		path.mkdirs();
 		changeFolder(path);
 		log("Path to show: "+path);
 	}

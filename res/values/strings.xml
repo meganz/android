@@ -273,7 +273,7 @@
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
-    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Manage link</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
     <string name="alert_leave_share" context="Title alert before leaving a share.">Leave share</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove</string>
@@ -500,6 +500,11 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Default download location</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask for download location</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
+    
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Internal SD card</item>
+        <item context="external SD card option">External SD card</item>
+    </string-array>
     
     <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
     <string name="settings_camera_upload_turn_on" context="settings option">Turn on Camera Uploads</string>

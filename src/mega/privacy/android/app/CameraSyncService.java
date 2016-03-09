@@ -1,8 +1,18 @@
 package mega.privacy.android.app;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,6 +50,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -47,6 +58,7 @@ import android.os.PowerManager.WakeLock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.provider.DocumentFile;
 import android.text.format.Formatter;
 import android.text.format.Time;
 import android.widget.RemoteViews;
@@ -99,9 +111,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private static long lastRun = 0;
 	
 	Queue<Media> cameraFiles = new LinkedList<Media>();
+	ArrayList<DocumentFile> cameraFilesExternalSDCardList = new ArrayList<DocumentFile>();
+	Queue<DocumentFile> cameraFilesExternalSDCardQueue;
 	String localPath = "";
 	MegaNode cameraUploadNode = null;
 	long cameraUploadHandle = -1;
+	boolean isExternalSDCard = false;
 	
 	Intent intentCreate = null;
 	
@@ -255,6 +270,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 								return START_REDELIVER_INTENT;
 							}
 						}
+					}
+					
+					if (prefs.getCameraFolderExternalSDCard() != null){
+						isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
 					}
 					
 					UserCredentials credentials = dbH.getCredentials();
@@ -642,7 +661,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				public void run()
 				{
 					log("Run: initSyn");
-					initSync();
+					try{
+						initSync();
+					}
+					catch (SecurityException ex){
+						retryLater();
+						finish();
+					}
 				}
 			};
 			task.start();
@@ -657,7 +682,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		return START_NOT_STICKY;		
 	}
 	
-	void initSync(){
+	void initSync() throws SecurityException{
 		log("initSync");
 		
 		if(!wl.isHeld()){ 
@@ -669,187 +694,373 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		registerObservers();
 		
-		String projection[] = {	MediaColumns.DATA, 
-				//MediaColumns.MIME_TYPE, 
-				MediaColumns.DATE_ADDED,
-				MediaColumns.DATE_MODIFIED};
-		
-		String selectionCamera = null;
-		String selectionSecondary = null;
-		String[] selectionArgs = null;
-		
-		prefs = dbH.getPreferences();
-		
-		if (prefs != null){
-			if (prefs.getCamSyncTimeStamp() != null){				
-				long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-				selectionCamera = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp + " OR " + "(" + MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
-				log("SELECTION: " + selectionCamera);
-			}
-			if(secondaryEnabled){
-				if (prefs.getSecSyncTimeStamp() != null){
-					long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
-					selectionSecondary = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp;
-					log("SELECTION SECONDARY: " + selectionSecondary);
-				}	
-			}
-		}
-		
-		String order = MediaColumns.DATE_MODIFIED + " ASC";
-				
-		ArrayList<Uri> uris = new ArrayList<Uri>();
-		if (prefs.getCamSyncFileUpload() == null){
-			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-			uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-			uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-		}
-		else{
-			switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-				case MegaPreferences.ONLY_PHOTOS:{
-					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-					break;
-				}
-				case MegaPreferences.ONLY_VIDEOS:{
-					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-					break;
-				}
-				case MegaPreferences.PHOTOS_AND_VIDEOS:{
-					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-					break;
-				}
-			}
-		}		
-		
-		for(int i=0; i<uris.size(); i++){
+		if (!isExternalSDCard){
+			String projection[] = {	MediaColumns.DATA, 
+					//MediaColumns.MIME_TYPE, 
+					MediaColumns.DATE_ADDED,
+					MediaColumns.DATE_MODIFIED};
 			
-			Cursor cursorCamera = app.getContentResolver().query(uris.get(i), projection, selectionCamera, selectionArgs, order);
-			if (cursorCamera != null){
-				
-				int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATA);
-				int timestampColumn = 0;
-				if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
-					timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+			String selectionCamera = null;
+			String selectionSecondary = null;
+			String[] selectionArgs = null;
+			
+			prefs = dbH.getPreferences();
+			
+			if (prefs != null){
+				if (prefs.getCamSyncTimeStamp() != null){				
+					long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
+					selectionCamera = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp + " OR " + "(" + MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
+					log("SELECTION: " + selectionCamera);
 				}
-				else
-				{
-					timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+				if(secondaryEnabled){
+					if (prefs.getSecSyncTimeStamp() != null){
+						long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
+						selectionSecondary = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp;
+						log("SELECTION SECONDARY: " + selectionSecondary);
+					}	
 				}
-		        
-		        while(cursorCamera.moveToNext()){
-   	
-		        	Media media = new Media();
-			        media.filePath = cursorCamera.getString(dataColumn);
-//			        log("Tipo de fichero:--------------------------: "+media.filePath);
-			        media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
-			        
-			        //Check files of the Camera Uploads
-			        if (checkFile(media,localPath)){
-			        	 cameraFiles.add(media);
-					     log("Camera Files added: "+media.filePath);
-			        }				        
-		        }	
 			}
 			
-			//Secondary Media Folder
-			if(secondaryEnabled){				
+			String order = MediaColumns.DATE_MODIFIED + " ASC";
+					
+			ArrayList<Uri> uris = new ArrayList<Uri>();
+			if (prefs.getCamSyncFileUpload() == null){
+				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+				uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+			}
+			else{
+				switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
+					case MegaPreferences.ONLY_PHOTOS:{
+						uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+						uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+						break;
+					}
+					case MegaPreferences.ONLY_VIDEOS:{
+						uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+						uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+						break;
+					}
+					case MegaPreferences.PHOTOS_AND_VIDEOS:{
+						uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+						uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+						uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+						uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+						break;
+					}
+				}
+			}		
+			
+			for(int i=0; i<uris.size(); i++){
 				
-				Cursor cursorSecondary = app.getContentResolver().query(uris.get(i), projection, selectionSecondary, selectionArgs, order);
-				log("SecondaryEnabled en initsync COUNT: "+cursorSecondary.getCount());
-				if (cursorSecondary != null){
-					int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATA);
-			        int timestampColumn = 0;
-			        if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
-			        	timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+				Cursor cursorCamera = app.getContentResolver().query(uris.get(i), projection, selectionCamera, selectionArgs, order);
+				if (cursorCamera != null){
+					
+					int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATA);
+					int timestampColumn = 0;
+					if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
+						timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
 					}
 					else
 					{
-						timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+						timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
 					}
-			        while(cursorSecondary.moveToNext()){
+			        
+			        while(cursorCamera.moveToNext()){
+	   	
 			        	Media media = new Media();
-				        media.filePath = cursorSecondary.getString(dataColumn);
-				        media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;				        
-				        log("Check: "+media.filePath+" in localPath: "+localPathSecondary);
-					    //Check files of Secondary Media Folder
-				        if (checkFile(media,localPathSecondary)){
-				        	 mediaFilesSecondary.add(media);
-						     log("-----SECONDARY MEDIA Files added: "+media.filePath+" in localPath: "+localPathSecondary);
+				        media.filePath = cursorCamera.getString(dataColumn);
+	//			        log("Tipo de fichero:--------------------------: "+media.filePath);
+				        media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
+				        
+				        //Check files of the Camera Uploads
+				        if (checkFile(media,localPath)){
+				        	 cameraFiles.add(media);
+						     log("Camera Files added: "+media.filePath);
+				        }				        
+			        }	
+				}
+				
+				//Secondary Media Folder
+				if(secondaryEnabled){				
+					
+					Cursor cursorSecondary = app.getContentResolver().query(uris.get(i), projection, selectionSecondary, selectionArgs, order);
+					log("SecondaryEnabled en initsync COUNT: "+cursorSecondary.getCount());
+					if (cursorSecondary != null){
+						int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATA);
+				        int timestampColumn = 0;
+				        if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
+				        	timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+						}
+						else
+						{
+							timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+						}
+				        while(cursorSecondary.moveToNext()){
+				        	Media media = new Media();
+					        media.filePath = cursorSecondary.getString(dataColumn);
+					        media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;				        
+					        log("Check: "+media.filePath+" in localPath: "+localPathSecondary);
+						    //Check files of Secondary Media Folder
+					        if (checkFile(media,localPathSecondary)){
+					        	 mediaFilesSecondary.add(media);
+							     log("-----SECONDARY MEDIA Files added: "+media.filePath+" in localPath: "+localPathSecondary);
+					        }
 				        }
-			        }
-				}	
-			}			
+					}	
+				}			
+			}
+			
+			cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+			if(cameraUploadNode == null){
+				log("ERROR: cameraUploadNode == null");
+	//			showSyncError(R.string.settings_camera_notif_error_no_folder);
+				retryLater();
+				finish();
+				return;
+			}
+		
+	//		if(secondaryEnabled){
+	//			if(secondaryUploadHandle==-1){
+	//				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+	//				boolean found = false;
+	//				for (int i=0;i<nl.size();i++){
+	//					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+	//						secondaryUploadHandle = nl.get(i).getHandle();
+	//						dbH.setSecondaryFolderHandle(secondaryUploadHandle);
+	//						found = true;
+	//						break;
+	//					}
+	//				}
+	//				if(!found){
+	//					//Create folder
+	//					secondaryEnabled = false;
+	//					dbH.setSecondaryUploadEnabled(false);
+	//				}
+	//			}
+	//			else{
+	//				secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
+	//			}
+	//		}
+			
+	
+			
+			totalToUpload = cameraFiles.size() + mediaFilesSecondary.size();
+			totalUploaded=0;
+			totalSizeUploaded=0;
+			
+			totalSizeToUpload = 0;
+			Iterator<Media> itCF = cameraFiles.iterator();
+			while (itCF.hasNext()){
+				Media m = itCF.next();
+				File f = new File(m.filePath);
+				totalSizeToUpload = totalSizeToUpload + f.length();
+			}	
+			Iterator<Media> itmFS = mediaFilesSecondary.iterator();
+			while (itmFS.hasNext()){
+				Media m = itmFS.next();
+				File f = new File(m.filePath);
+				totalSizeToUpload = totalSizeToUpload + f.length();
+			}		
+					
+	//		uploadNextImage();
+	//		log("Time for secondary media folder!");
+	//		uploadNextMediaFile();
+			uploadNext();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else{
+			log("isExternalSDCard");
+			DocumentFile pickedDir = null;
+			if (prefs != null){
+				if (prefs.getUriExternalSDCard() != null){
+					String uriString = prefs.getUriExternalSDCard();
+					Uri uri = Uri.parse(uriString);
+					pickedDir = DocumentFile.fromTreeUri(getApplicationContext(), uri);
+					log("PICKEDDIR: " + pickedDir.getName());
+					DocumentFile[] files = pickedDir.listFiles();
+					ArrayList<DocumentFile> auxCameraFilesExternalSDCard = new ArrayList<DocumentFile>();
+					for (int i=0;i<files.length;i++){
+						switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
+							case MegaPreferences.ONLY_PHOTOS:{
+								if (files[i].getType() != null){
+									if (files[i].getType().startsWith("image/")){
+										auxCameraFilesExternalSDCard.add(files[i]);
+									}
+								}
+								break;
+							}
+							case MegaPreferences.ONLY_VIDEOS:{
+								if (files[i].getType() != null){
+									if (files[i].getType().startsWith("video/") || (files[i].getName().endsWith(".mkv"))){
+										auxCameraFilesExternalSDCard.add(files[i]);
+									}
+								}
+								break;
+							}
+							case MegaPreferences.PHOTOS_AND_VIDEOS:{
+								if (files[i].getType() != null){
+									if (files[i].getType().startsWith("image/") || files[i].getType().startsWith("video/") || (files[i].getName().endsWith(".mkv"))){
+										auxCameraFilesExternalSDCard.add(files[i]);	
+									}
+								}
+								break;
+							}
+						}
+					}
+					
+					int j=0;
+					for (int i=0;i<auxCameraFilesExternalSDCard.size();i++){
+						if (cameraUploadNode == null){
+							cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+						}
+						if (cameraUploadNode != null){
+							if (megaApi.getChildNode(cameraUploadNode, auxCameraFilesExternalSDCard.get(i).getName()) == null){
+								cameraFilesExternalSDCardList.add(j, auxCameraFilesExternalSDCard.get(i));
+								log("FILE ADDED: " + auxCameraFilesExternalSDCard.get(i).getName());
+								j++;
+							}
+						}
+					}
+					
+					
+//					Collections.sort(auxCameraFilesExternalSDCard, new MediaComparator());
+					 
+//					for (int i=0;i<auxCameraFilesExternalSDCard.size();i++){
+//						long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
+//						log("CAMSYNCTIMESTAMP: " + camSyncTimeStamp + "___" + auxCameraFilesExternalSDCard.get(i).lastModified());
+//						if (auxCameraFilesExternalSDCard.get(i).lastModified() > camSyncTimeStamp){
+//							int j = 0;
+//							for ( ; j<cameraFilesExternalSDCardList.size(); j++){
+//								if (auxCameraFilesExternalSDCard.get(i).lastModified() < cameraFilesExternalSDCardList.get(j).lastModified()){
+//									break;
+//								}
+//							}
+//							cameraFilesExternalSDCardList.add(j, auxCameraFilesExternalSDCard.get(i));
+//						}
+////						if (cameraFilesExternalSDCardList.size() == 25){
+////							break;
+////						}
+//						log("NAME: " + auxCameraFilesExternalSDCard.get(i).getName() + "_LAST_ " + auxCameraFilesExternalSDCard.get(i).lastModified());
+//					}
+					
+					for (int i=0;i<cameraFilesExternalSDCardList.size();i++){
+						log("ORD_NAME: " + cameraFilesExternalSDCardList.get(i).getName() + "____" + cameraFilesExternalSDCardList.get(i).lastModified());
+					}
+					
+					cameraFilesExternalSDCardQueue = new LinkedList<DocumentFile>(cameraFilesExternalSDCardList);
+					
+					totalToUpload = cameraFilesExternalSDCardQueue.size();
+					totalUploaded=0;
+					totalSizeUploaded=0;
+					
+					totalSizeToUpload = 0;
+					Iterator<DocumentFile> itCF = cameraFilesExternalSDCardQueue.iterator();
+					while (itCF.hasNext()){
+						DocumentFile dF = itCF.next();
+						totalSizeToUpload = totalSizeToUpload + dF.length();
+					}	
+					uploadNextSDCard();
+				}
+				else{
+					finish();
+				}
+			}
+			else{
+				finish();
+			}
+			//TODO: The secondary media folder has to be here implemented also (or separate in two pieces - isExternal !isExternal)
+		}
+	}
+	
+	private class MediaComparator implements Comparator<DocumentFile>{
+
+		@Override
+		public int compare(DocumentFile d1, DocumentFile d2) {
+			if (d1.lastModified() > d2.lastModified()){
+				return 1;
+			}
+			else{
+				return -1;
+			}
 		}
 		
-		cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
-		if(cameraUploadNode == null){
-			log("ERROR: cameraUploadNode == null");
-//			showSyncError(R.string.settings_camera_notif_error_no_folder);
+	}
+	
+	@SuppressLint("NewApi") 
+	public void uploadNextSDCard(){
+		
+		totalUploaded++;
+		
+		isExternalSDCard = true;
+		int result = shouldRun();
+		if (result != 0){
 			retryLater();
-			finish();
+			return;
+		}	
+		
+		if (cameraUploadNode == null){
+			cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+		}
+		
+		if (cameraFilesExternalSDCardQueue == null){
+			retryLater();
 			return;
 		}
-	
-//		if(secondaryEnabled){
-//			if(secondaryUploadHandle==-1){
-//				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-//				boolean found = false;
-//				for (int i=0;i<nl.size();i++){
-//					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-//						secondaryUploadHandle = nl.get(i).getHandle();
-//						dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-//						found = true;
-//						break;
-//					}
-//				}
-//				if(!found){
-//					//Create folder
-//					secondaryEnabled = false;
-//					dbH.setSecondaryUploadEnabled(false);
-//				}
-//			}
-//			else{
-//				secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
-//			}
-//		}
+		if (cameraFilesExternalSDCardQueue.size() > 0){
+			DocumentFile dF = cameraFilesExternalSDCardQueue.poll();
 		
-
-		
-		totalToUpload = cameraFiles.size() + mediaFilesSecondary.size();
-		totalUploaded=0;
-		totalSizeUploaded=0;
-		
-		totalSizeToUpload = 0;
-		Iterator<Media> itCF = cameraFiles.iterator();
-		while (itCF.hasNext()){
-			Media m = itCF.next();
-			File f = new File(m.filePath);
-			totalSizeToUpload = totalSizeToUpload + f.length();
-		}	
-		Iterator<Media> itmFS = mediaFilesSecondary.iterator();
-		while (itmFS.hasNext()){
-			Media m = itmFS.next();
-			File f = new File(m.filePath);
-			totalSizeToUpload = totalSizeToUpload + f.length();
-		}		
-				
-//		uploadNextImage();
-//		log("Time for secondary media folder!");
-//		uploadNextMediaFile();
-		uploadNext();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			File[] fs = getExternalFilesDirs(null);
+			if (fs.length > 1){								
+				fs[1].mkdirs();
+				if (copyFileSDCard(dF, fs[1])){
+					File file = new File(fs[1], dF.getName());
+					if(!file.exists()){
+						uploadNextSDCard();
+					}
+					
+//					String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
+//					
+//					MegaNode nodeExists = null;
+//					nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, cameraUploadNode);
+					
+					final Media media = new Media();
+					media.timestamp = dF.lastModified();
+					media.filePath = file.getAbsolutePath();
+					
+					MegaNode possibleNode = megaApi.getChildNode(cameraUploadNode, dF.getName());
+					if (possibleNode != null){
+						dbH.setCamSyncTimeStamp(media.timestamp);
+						file.delete();
+						uploadNextSDCard();						
+					}
+					else{
+						currentTimeStamp = media.timestamp;
+						megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, media.timestamp/1000, this);
+					}
+				}
+			}
+			else{
+				finish();
+			}
 		}
+		else{
+			finish();
+		}
+		
 	}
 
 	public void uploadNext(){
+		
+		if (cameraUploadNode == null){
+			cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+		}
+		
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
@@ -881,6 +1092,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if (result != 0){
 			retryLater();
 			return;
+		}
+		
+		if (cameraUploadNode == null){
+			cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
 		}
 		
 		if (mediaFilesSecondary.size() > 0){
@@ -1173,6 +1388,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if (result != 0){
 			retryLater();
 			return;
+		}
+		
+		if (cameraUploadNode == null){
+			cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
 		}
 		
 		if (cameraFiles.size() > 0){
@@ -1772,7 +1991,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}					
 					
 					totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
-					uploadNext();					
+					if (cameraFilesExternalSDCardQueue != null){
+						if (cameraFilesExternalSDCardQueue.size() > 0){
+							uploadNextSDCard();
+						}
+						else{
+							uploadNext();					
+						}
+					}
+					else{
+						uploadNext();
+					}
 				}
 			}
 			else{
@@ -1851,6 +2080,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		log("transfer.getNodeHandle:" + transfer.getNodeHandle());
+		if (isExternalSDCard){
+			File fileToDelete = new File(transfer.getPath());
+			if (fileToDelete != null){
+				if (fileToDelete.exists()){
+					fileToDelete.delete();
+				}
+			}
+		}
 		if (canceled) {
 			log("Image sync cancelled: " + transfer.getFileName());
 			if((lock != null) && (lock.isHeld()))
@@ -1866,15 +2103,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("IMAGESYNCFILE: " + transfer.getPath());
 				
 				String tempPath = transfer.getPath();
-				if(tempPath.startsWith(localPath)){
-					log("onTransferFinish: Update Camera Sync TimeStamp");
-					dbH.setCamSyncTimeStamp(currentTimeStamp);
-				}
-				else{
-					log("onTransferFinish: Update SECONDARY Sync TimeStamp");
-					dbH.setSecSyncTimeStamp(currentTimeStamp);
+				if (!isExternalSDCard){
+					if(tempPath.startsWith(localPath)){
+						log("onTransferFinish: Update Camera Sync TimeStamp");
+						dbH.setCamSyncTimeStamp(currentTimeStamp);
+					}
+					else{
+						log("onTransferFinish: Update SECONDARY Sync TimeStamp");
+						dbH.setSecSyncTimeStamp(currentTimeStamp);
+					}
 				}
 				
+				if (isExternalSDCard){
+					dbH.setCamSyncTimeStamp(currentTimeStamp);
+				}
+							
 				File previewDir = PreviewUtils.getPreviewFolder(this);
 				File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
 				File thumbDir = ThumbnailUtils.getThumbFolder(this);
@@ -1887,7 +2130,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //				ArrayList<MegaNode> nLAfter = megaApi.getChildren(megaApi.getNodeByHandle(cameraUploadHandle), MegaApiJava.ORDER_ALPHABETICAL_ASC);
 //				log("SIZEEEEEE: " + nLAfter.size());
 				
-				uploadNext();
+				if (cameraFilesExternalSDCardQueue != null){
+					if (cameraFilesExternalSDCardQueue.size() > 0){
+						uploadNextSDCard();
+					}
+					else{
+						uploadNext();
+					}
+				}
+				else{
+					uploadNext();
+				}
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2095,5 +2348,30 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public boolean copyFileSDCard(final DocumentFile source, final File dir) {
+		
+		InputStream input;
+		try {
+			input = getContentResolver().openInputStream(source.getUri());
+		
+			File target = new File(dir, source.getName());
+			OutputStream outStream = new FileOutputStream(target);
+			byte [] buffer = new byte[4096];
+			int bytesRead = 0;
+			while((bytesRead = input.read(buffer)) != -1) {
+				outStream.write(buffer, 0, bytesRead);
+			}
+			input.close();
+			outStream.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			return false;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			return false;
+		}
+		return true;
 	}
 }

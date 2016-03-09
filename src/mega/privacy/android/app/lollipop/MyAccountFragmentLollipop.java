@@ -23,12 +23,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -41,7 +43,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
@@ -921,6 +925,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			startActivity(intent);
 		}
 		else if (itemText.compareTo(getString(R.string.action_export_master_key)) == 0){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (!hasStoragePermission) {
+					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+				}
+			}
+			
 			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {
@@ -976,6 +989,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (!hasStoragePermission) {
+					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+				}
+			}
+			
 			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {
