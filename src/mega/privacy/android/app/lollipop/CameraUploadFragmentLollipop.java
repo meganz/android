@@ -26,6 +26,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -33,12 +34,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -1076,111 +1081,212 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
     }
 	
 	@SuppressLint("NewApi")
+	private void cameraOnOffFirstTime(){
+		firstTimeCam = false;
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		dbH.setCamSyncEnabled(true);
+		File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+		String localPath = localFile.getAbsolutePath();
+		dbH.setCamSyncLocalPath(localPath);
+		dbH.setCameraFolderExternalSDCard(false);
+		if (camSyncData.isChecked()){
+			dbH.setCamSyncWifi(false);
+		}
+		else{
+			dbH.setCamSyncWifi(true);
+		}
+		dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+		
+		context.startService(new Intent(context, CameraSyncService.class));
+		
+		((ManagerActivityLollipop)context).refreshCameraUpload();
+	}
+	
+	@SuppressLint("NewApi")
+	private void cameraOnOff(){
+		final DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		MegaPreferences prefs = dbH.getPreferences();
+		boolean isEnabled = false;
+		if (prefs != null){
+			if (prefs.getCamSyncEnabled() != null){
+				if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+					isEnabled = true;
+				}
+			}
+		}
+
+		if (isEnabled){
+			dbH.setCamSyncTimeStamp(0);
+			dbH.setCamSyncEnabled(false);
+			
+			Intent stopIntent = null;
+			stopIntent = new Intent(context, CameraSyncService.class);
+			stopIntent.setAction(CameraSyncService.ACTION_STOP);
+			context.startService(stopIntent);
+			
+			((ManagerActivityLollipop)context).refreshCameraUpload();
+		}
+		else{					
+			AlertDialog wifiDialog;
+			
+			final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
+			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+								
+			
+			builder.setTitle(getString(R.string.section_photo_sync));
+			builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					log("onClick AlertDialog");
+					dbH.setCamSyncTimeStamp(0);
+					dbH.setCamSyncEnabled(true);
+					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+					File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+					String localPath = localFile.getAbsolutePath();
+					dbH.setCamSyncLocalPath(localPath);
+					dbH.setCameraFolderExternalSDCard(false);
+					
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable() {
+						
+											@Override
+											public void run() {
+												log("Now I start the service");
+												context.startService(new Intent(context, CameraSyncService.class));		
+											}
+										}, 5 * 1000);
+				
+					((ManagerActivityLollipop)context).refreshCameraUpload();
+					switch (which){
+					case 0:{
+						dbH.setCamSyncWifi(true);
+						break;
+					}
+					case 1:{
+						dbH.setCamSyncWifi(false);
+						break;
+					}
+				}
+					dialog.dismiss();
+				}
+			});
+			
+			builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
+
+			wifiDialog = builder.create();
+			wifiDialog.show();
+		}
+	}
+	
+	@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+	        switch(requestCode){
+//		        case ManagerActivityLollipop.REQUEST_CAMERA:{
+//		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+//		        		if (hasStoragePermission){
+//		        			if (firstTimeCam){ 
+//		        				this.cameraOnOffFirstTime();
+//		        			}
+//		        			else{		        			
+//		        				this.cameraOnOff();
+//		        			}
+//		        		}
+//		        		else{
+//		        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+//					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+//		        		}
+//		        	}
+//		        	break;
+//	        	}	
+		        case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+//		        		if (hasCameraPermission){
+		        			if (firstTimeCam){ 
+		        				this.cameraOnOffFirstTime();
+		        			}
+		        			else{		        			
+		        				this.cameraOnOff();
+		        			}
+//		        		}
+//		        		else{
+//		        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+//					                new String[]{Manifest.permission.CAMERA},
+//					                ManagerActivityLollipop.REQUEST_CAMERA);
+//		        		}
+		        	}
+		        	break;
+	        	}
+	        }
+        }
+	
+	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {
 
 		switch(v.getId()){
 			case R.id.file_grid_browser_camera_upload_on_off:
 			case R.id.file_list_browser_camera_upload_on_off:{
-				final DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-				MegaPreferences prefs = dbH.getPreferences();
-				boolean isEnabled = false;
-				if (prefs != null){
-					if (prefs.getCamSyncEnabled() != null){
-						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-							isEnabled = true;
-						}
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+					}
+					
+//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+//					if (!hasCameraPermission) {
+//						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+//				                new String[]{Manifest.permission.CAMERA},
+//				                ManagerActivityLollipop.REQUEST_CAMERA);
+//					}
+					
+//					if (hasStoragePermission && hasCameraPermission){
+					if (hasStoragePermission){
+						cameraOnOff();
 					}
 				}
-
-				if (isEnabled){
-					dbH.setCamSyncTimeStamp(0);
-					dbH.setCamSyncEnabled(false);
-					
-					Intent stopIntent = null;
-					stopIntent = new Intent(context, CameraSyncService.class);
-					stopIntent.setAction(CameraSyncService.ACTION_STOP);
-					context.startService(stopIntent);
-					
-					((ManagerActivityLollipop)context).refreshCameraUpload();
-				}
-				else{					
-					AlertDialog wifiDialog;
-					
-					final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
-					AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-										
-					
-					builder.setTitle(getString(R.string.section_photo_sync));
-					builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							log("onClick AlertDialog");
-							dbH.setCamSyncTimeStamp(0);
-							dbH.setCamSyncEnabled(true);
-							dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-							File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-							String localPath = localFile.getAbsolutePath();
-							dbH.setCamSyncLocalPath(localPath);
-							
-							Handler handler = new Handler();
-							handler.postDelayed(new Runnable() {
-								
-													@Override
-													public void run() {
-														log("Now I start the service");
-														context.startService(new Intent(context, CameraSyncService.class));		
-													}
-												}, 5 * 1000);
-						
-							((ManagerActivityLollipop)context).refreshCameraUpload();
-							switch (which){
-							case 0:{
-								dbH.setCamSyncWifi(true);
-								break;
-							}
-							case 1:{
-								dbH.setCamSyncWifi(false);
-								break;
-							}
-						}
-							dialog.dismiss();
-						}
-					});
-					
-					builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-
-					wifiDialog = builder.create();
-					wifiDialog.show();
+				else{
+					cameraOnOff();					
 				}
 				break;
 			}
 
 			case R.id.cam_sync_button_ok:{
-				firstTimeCam = false;
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-				dbH.setCamSyncEnabled(true);
-				File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-				String localPath = localFile.getAbsolutePath();
-				dbH.setCamSyncLocalPath(localPath);
-				if (camSyncData.isChecked()){
-					dbH.setCamSyncWifi(false);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+					}
+					
+//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+//					if (!hasCameraPermission) {
+//						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+//				                new String[]{Manifest.permission.CAMERA},
+//				                ManagerActivityLollipop.REQUEST_CAMERA);
+//					}
+					
+//					if (hasStoragePermission && hasCameraPermission){
+					if (hasStoragePermission){
+						cameraOnOffFirstTime();
+					}
 				}
 				else{
-					dbH.setCamSyncWifi(true);
+					cameraOnOffFirstTime();					
 				}
-				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-				
-				context.startService(new Intent(context, CameraSyncService.class));
-				
-				((ManagerActivityLollipop)context).refreshCameraUpload();
 				break;
 			}
 			case R.id.cam_sync_button_skip:{

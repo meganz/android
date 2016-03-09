@@ -51,6 +51,10 @@
 	        android:title="@string/settings_local_camera_upload_folder" />
 		
 		<Preference
+		    android:key="settings_local_camera_upload_folder_sdcard"
+		    android:title="@string/settings_local_camera_upload_folder" />
+		
+		<Preference
 	        android:key="settings_mega_camera_folder"
 	        android:title="@string/settings_mega_camera_upload_folder" />
 		
@@ -79,6 +83,10 @@
         <mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_storage_advanced_devices"
         	android:title="@string/settings_storage_advanced_devices" />
+        
+        <Preference 
+            android:key="settings_storage_download_location_sd_card_preference"
+            android:title="@string/settings_storage_download_location"/>
         
 		<Preference
 	        android:key="settings_storage_download_location"

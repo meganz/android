@@ -33,21 +33,27 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -1033,6 +1039,15 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	
 	public void saveOffline (File destination){
 		log("saveOffline");
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
 
 		destination.mkdirs();
 		
@@ -1280,12 +1295,67 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		}		
 			
 		if (askMe){
-			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-			intent.setClass(this, FileStorageActivityLollipop.class);
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				File[] fs = getExternalFilesDirs(null);
+				if (fs.length > 1){
+					Dialog downloadLocationDialog;
+					String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+			        AlertDialog.Builder b=new AlertDialog.Builder(this);
+
+					b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+					final long sizeFinal = size;
+					final long[] hashesFinal = new long[hashes.length];
+					for (int i=0; i< hashes.length; i++){
+						hashesFinal[i] = hashes[i];
+					}
+					
+					b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switch(which){
+								case 0:{
+									Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
+									intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
+									startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+									break;
+								}
+								case 1:{
+									File[] fs = getExternalFilesDirs(null);
+									if (fs.length > 1){
+										String path = fs[1].getAbsolutePath();
+										File defaultPathF = new File(path);
+										defaultPathF.mkdirs();
+										Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+										downloadTo(path, null, sizeFinal, hashesFinal);
+									}
+									break;
+								}
+							}
+						}
+					});
+					b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
+					downloadLocationDialog = b.create();
+					downloadLocationDialog.show();
+				}
+			}
+			else{
+				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+				intent.setClass(this, FileStorageActivityLollipop.class);
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+			}
 		}
 		else{
 			downloadTo(downloadLocationDefaultPath, null, size, hashes);
@@ -2204,6 +2274,15 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
+		
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);

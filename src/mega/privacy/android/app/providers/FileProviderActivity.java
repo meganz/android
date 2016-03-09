@@ -14,6 +14,7 @@ import mega.privacy.android.app.PinActivity;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.MySwitch;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -29,6 +30,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,6 +38,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -43,6 +46,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -943,6 +948,15 @@ import android.widget.Toast;
 	public void downloadTo(long size, long [] hashes){
 		
 		log("downloadTo");
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
 		
 		ProgressDialog temp = null;
 		try{

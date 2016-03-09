@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
@@ -55,9 +57,11 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -86,8 +90,11 @@ import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -175,6 +182,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
+	public static int REQUEST_CODE_TREE = 1014;
+	
 	private static int WRITE_SD_CARD_REQUEST_CODE = 1011;
 	private static int REQUEST_CODE_SELECT_FILE = 1012;
 	private static int SET_PIN = 1013;
@@ -188,6 +197,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final public static int FORTUMO_FRAGMENT = 5005;
 	final public static int MONTHLY_YEARLY_FRAGMENT = 5006;
 	final public static int CENTILI_FRAGMENT = 5007;
+	
+	public static final int REQUEST_WRITE_STORAGE = 1;
+	public static final int REQUEST_CAMERA = 2;
 	
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
@@ -411,7 +423,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem killAllSessions;
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
-	private MenuItem pauseTransfersMenuIcon;	
+	private MenuItem pauseTransfersMenuIcon;
+	
+	boolean fromTakePicture = false;
 	
 	//Billing
 
@@ -916,8 +930,93 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
         });
 	}
-	
-	@Override
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+	        case REQUEST_CAMERA:{
+//	        	if (firstTimeCam){
+//	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+//		        		if (hasStoragePermission){
+//		        			if (firstTimeCam){ 
+//		        				firstTimeCam = false;
+//		        			}
+//		        		}
+//		        		else{
+//		        			ActivityCompat.requestPermissions(this,
+//					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+//		        		}
+//		        	}
+//	        	}
+	        	
+	        	
+	        	if (fromTakePicture){
+		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+		        		if (!hasStoragePermission){
+		        			ActivityCompat.requestPermissions(this,
+					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+		        		}
+		        		else{
+		        			this.takePicture();
+		        			fromTakePicture = false;
+		        		}
+		        	}
+	        	}
+	        	break;
+	        }
+	        case REQUEST_WRITE_STORAGE:{
+	        	if (firstTimeCam){
+	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+//		        		if (hasCameraPermission){
+		        			if (firstTimeCam){ 
+		        				firstTimeCam = false;
+		        			}
+		        			
+		        			if (fromTakePicture){
+		        				boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+				        		if (!hasCameraPermission){
+				        			ActivityCompat.requestPermissions(this,
+							                new String[]{Manifest.permission.CAMERA},
+							                ManagerActivityLollipop.REQUEST_CAMERA);
+				        		}
+				        		else{
+				        			this.takePicture();
+				        			fromTakePicture = false;
+				        		}
+		        			}
+//		        		}
+//		        		else{
+//		        			ActivityCompat.requestPermissions(this,
+//					                new String[]{Manifest.permission.CAMERA},
+//					                ManagerActivityLollipop.REQUEST_CAMERA);
+//		        		}
+		        	}
+	        	}
+	        	break;
+	        }
+        }
+//        switch (requestCode)
+//        {
+//            case REQUEST_WRITE_STORAGE: {
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+//                {
+//                    //reload my activity with permission granted or use the features what required the permission
+//                } else
+//                {
+//                    Toast.makeText(this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        }
+
+    }
+    
+	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
@@ -2156,8 +2255,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ft.replace(R.id.fragment_container, cuFL, "cuFLol");
     			ft.commit();
     			
-    			
-    			firstTimeCam = false;
+    			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions(this,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+					}
+					
+//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+//					if (!hasCameraPermission) {
+//						ActivityCompat.requestPermissions(this,
+//				                new String[]{Manifest.permission.CAMERA},
+//				                ManagerActivityLollipop.REQUEST_CAMERA);
+//					}
+					
+//					if (hasStoragePermission && hasCameraPermission){
+					if (hasStoragePermission){
+						firstTimeCam = false;
+					}
+				}
+				else{
+					firstTimeCam = false;
+				}
     			
 				drawerLayout.closeDrawer(Gravity.LEFT);
     			
@@ -4209,6 +4329,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
+		fromTakePicture = false;
 		log("onOptionsItemSelectedLollipop");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -4306,8 +4427,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    	return true;
 		    }
 		    case R.id.action_take_picture:{
+		    	fromTakePicture = true;
+		    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions(this,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+					}
+					
+					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+					if (!hasCameraPermission) {
+						ActivityCompat.requestPermissions(this,
+				                new String[]{Manifest.permission.CAMERA},
+				                ManagerActivityLollipop.REQUEST_CAMERA);
+					}
+					
+					if (hasStoragePermission && hasCameraPermission){
+						this.takePicture();
+					}
+				}
+		    	else{
+		    		this.takePicture();
+		    	}
 		    	
-		    	this.takePicture();
 		    	return true;
 		    }
 		    case R.id.action_menu_cancel_all_transfers:{
@@ -4421,6 +4564,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_add:{
+	        	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+	    			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+	    			if (!hasStoragePermission) {
+	    				ActivityCompat.requestPermissions(this,
+	    		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+	    		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+	    			}
+	    		}
 	        	
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
@@ -6024,7 +6175,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return true;
 	}
 	
-	public void onFileClick(ArrayList<Long> handleList){
+	@SuppressLint("NewApi") public void onFileClick(ArrayList<Long> handleList){
 		log("onFileClick: "+handleList.size()+" files to download");
 		long size = 0;
 		long[] hashes = new long[handleList.size()];
@@ -6072,28 +6223,91 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			
 		if (askMe){
 			log("askMe");
-			if(advancedDevices){
-				log("advancedDevices");
-				//Launch Intent to SAF
-				if(hashes.length==1){
-					downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-					this.openAdvancedDevices(hashes[0]);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				File[] fs = getExternalFilesDirs(null);
+				if (fs.length > 1){
+					Dialog downloadLocationDialog;
+					String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+			        AlertDialog.Builder b=new AlertDialog.Builder(this);
+
+					b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+					final long sizeFinal = size;
+					final long[] hashesFinal = new long[hashes.length];
+					for (int i=0; i< hashes.length; i++){
+						hashesFinal[i] = hashes[i];
+					}
+					
+					b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switch(which){
+								case 0:{
+									Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
+									intent.setClass(managerActivity, FileStorageActivityLollipop.class);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
+									startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+									break;
+								}
+								case 1:{
+									File[] fs = getExternalFilesDirs(null);
+									if (fs.length > 1){
+										String path = fs[1].getAbsolutePath();
+										File defaultPathF = new File(path);
+										defaultPathF.mkdirs();
+										Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+										downloadTo(path, null, sizeFinal, hashesFinal);
+									}
+									break;
+								}
+							}
+						}
+					});
+					b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
+					downloadLocationDialog = b.create();
+					downloadLocationDialog.show();
 				}
-				else
-				{
-					//Show error message, just one file
-					Snackbar.make(fragmentContainer, getString(R.string.context_select_one_file), Snackbar.LENGTH_LONG).show();
-				}		    	
+				else{
+					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+					intent.setClass(this, FileStorageActivityLollipop.class);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				}
 			}
 			else{
-				log("NOT advancedDevices");
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivityLollipop.class);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}				
+				if(advancedDevices){
+					log("advancedDevices");
+					//Launch Intent to SAF
+					if(hashes.length==1){
+						downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						this.openAdvancedDevices(hashes[0]);
+					}
+					else
+					{
+						//Show error message, just one file
+						Snackbar.make(fragmentContainer, getString(R.string.context_select_one_file), Snackbar.LENGTH_LONG).show();
+					}		    	
+				}
+				else{
+					log("NOT advancedDevices");
+					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+					intent.setClass(this, FileStorageActivityLollipop.class);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				}				
+			}
 		}
 		else{
 			log("NOT askMe");
@@ -6102,9 +6316,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			downloadTo(downloadLocationDefaultPath, null, size, hashes);
 		}		
 	}
-	
+
 	public void download(String parentPath, String url, long size, long [] hashes){
-		log("download-----------");		
+	log("download-----------");		
+		log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
+		log("files to download: "+hashes.length);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
+		
+		if (hashes != null){
+			for (long hash : hashes) {
+				MegaNode node = megaApi.getNodeByHandle(hash);
+				log("Node: "+ node.getName());
+			}
+		}
+		
+		double availableFreeSpace = Double.MAX_VALUE;
+		try{
+			StatFs stat = new StatFs(parentPath);
+			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+		}
+		catch(Exception ex){}		
 		
 		if (hashes == null){
 			log("hashes is null");
@@ -8263,17 +8501,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 		
-		if (requestCode == REQUEST_CODE_GET){
-			log("resultCode = " + resultCode);
+		if (requestCode == REQUEST_CODE_TREE && resultCode == RESULT_OK){
 			if (intent == null){
-				log("INTENT NULL");
+				log("intent NULL");
+				return;
 			}
-			else{
-				log("URI: " + intent.getData());
-			}
+			
+			Uri treeUri = intent.getData();
+	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
-		
-		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+		else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {			
 				log("Return.....");
 				return;						
@@ -8300,6 +8537,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (!hasStoragePermission) {
+					ActivityCompat.requestPermissions(this,
+			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+				}
+			}
 			
 			Uri treeUri = intent.getData();
 			log("--------------Create the document : "+treeUri);
@@ -8968,6 +9214,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }
+		}
+		else{
+			log("No requestcode");
+			super.onActivityResult(requestCode, resultCode, intent);
 		}
 	}
 	

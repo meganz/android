@@ -21,10 +21,14 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -33,6 +37,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
 import android.support.v7.widget.Toolbar;
@@ -50,6 +56,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -430,7 +437,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}		
 	}
 	
-	void downloadNode(){
+	@SuppressLint("NewApi") void downloadNode(){
 		
 		if (document == null){
 			try{ 
@@ -485,12 +492,67 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 		
 		if (askMe){
-			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.setClass(this, FileStorageActivityLollipop.class);
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				File[] fs = getExternalFilesDirs(null);
+				if (fs.length > 1){
+					Dialog downloadLocationDialog;
+					String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+			        AlertDialog.Builder b=new AlertDialog.Builder(this);
+
+					b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+					final long sizeFinal = size;
+					final long[] hashesFinal = new long[hashes.length];
+					for (int i=0; i< hashes.length; i++){
+						hashesFinal[i] = hashes[i];
+					}
+					
+					b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switch(which){
+								case 0:{
+									Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
+									intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
+									startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+									break;
+								}
+								case 1:{
+									File[] fs = getExternalFilesDirs(null);
+									if (fs.length > 1){
+										String path = fs[1].getAbsolutePath();
+										File defaultPathF = new File(path);
+										defaultPathF.mkdirs();
+										Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+										downloadTo(path, null, sizeFinal, hashesFinal);
+									}
+									break;
+								}
+							}
+						}
+					});
+					b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
+					downloadLocationDialog = b.create();
+					downloadLocationDialog.show();
+				}
+			}
+			else{
+				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+				intent.setClass(this, FileStorageActivityLollipop.class);
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+			}
 		}
 		else{
 			downloadTo(downloadLocationDefaultPath, url, size, hashes);
@@ -559,6 +621,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
+		
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);
