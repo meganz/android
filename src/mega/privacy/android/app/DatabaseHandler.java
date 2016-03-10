@@ -17,12 +17,13 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 17; 
+	private static final int DATABASE_VERSION = 18; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
     private static final String TABLE_ATTRIBUTES = "attributes";
     private static final String TABLE_OFFLINE = "offline";
+    private static final String TABLE_CONTACTS = "contacts";
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_SESSION= "session";
@@ -61,7 +62,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
     private static final String KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard";
     private static final String KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard";
-
+    private static final String KEY_CONTACT_HANDLE = "handle";
+    private static final String KEY_CONTACT_MAIL = "mail";
+    private static final String KEY_CONTACT_NAME = "name";
+    private static final String KEY_CONTACT_LAST_NAME = "lastname";
+    
     private static DatabaseHandler instance;
     
     private static SQLiteDatabase db;
@@ -116,6 +121,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
         		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN"+")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
+        
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CONTACT_HANDLE + " TEXT, " + KEY_CONTACT_MAIL + " TEXT, " + 
+        		KEY_CONTACT_NAME+ " TEXT, "+KEY_CONTACT_LAST_NAME+ " TEXT"+")";
+        db.execSQL(CREATE_CONTACTS_TABLE);
   
 	}
 
@@ -239,6 +249,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_URI_EXTERNAL_SD_CARD + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " = '" + encrypt("false") + "';");
+		}
+		
+		if (oldVersion <=17){
+			String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
+	        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CONTACT_HANDLE + " TEXT, " + KEY_CONTACT_MAIL + " TEXT, " + 
+	        		KEY_CONTACT_NAME+ " TEXT"+KEY_CONTACT_LAST_NAME+ " TEXT"+")";
+	        db.execSQL(CREATE_CONTACTS_TABLE);
 		}
 	} 
 	
@@ -411,6 +428,90 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 		
 		return attr;
+	}
+	
+	public void setContacs (MegaContacts contacts){
+		log("setAttributes");
+        ContentValues values = new ContentValues();
+        values.put(KEY_CONTACT_HANDLE, encrypt(contacts.getHandle()));
+        values.put(KEY_CONTACT_MAIL, encrypt(contacts.getMail()));
+        values.put(KEY_CONTACT_NAME, encrypt(contacts.getName()));
+        values.put(KEY_CONTACT_LAST_NAME, encrypt(contacts.getLastName()));
+//        values.put(KEY_CONTACT_HANDLE, (contacts.getHandle()));
+//        values.put(KEY_CONTACT_MAIL, (contacts.getMail()));
+//        values.put(KEY_CONTACT_NAME, (contacts.getName()));
+//        values.put(KEY_CONTACT_LAST_NAME, (contacts.getLastName()));
+        db.insert(TABLE_CONTACTS, null, values);
+	}
+	
+	public int setContactName (String name, String mail){
+		log("setContactName: "+name+" "+mail);
+		
+		ContentValues values = new ContentValues();
+	    values.put(KEY_CONTACT_NAME, encrypt(name));
+	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
+	}
+	
+	public int setContactLastName (String lastName, String mail){
+		
+		ContentValues values = new ContentValues();
+	    values.put(KEY_CONTACT_LAST_NAME, encrypt(lastName));
+	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
+	}
+	
+	public MegaContacts getContacts(){
+		MegaContacts contacts = null;
+		
+		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			int id = Integer.parseInt(cursor.getString(0));
+			String handle = decrypt(cursor.getString(1));
+			String mail =  decrypt(cursor.getString(2));
+			String name = decrypt(cursor.getString(3));
+			String lastName = decrypt(cursor.getString(4));
+//			String handle = (cursor.getString(1));
+//			String mail =  (cursor.getString(2));
+//			String name = (cursor.getString(3));
+//			String lastName = (cursor.getString(4));
+			
+			contacts=new MegaContacts(handle, mail, name, lastName);			
+		}
+		cursor.close();
+		
+		return contacts;
+	}
+	
+	public MegaContacts findContactByHandle(String handle){
+
+		MegaContacts contacts = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + handle + "'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+
+				int _id = -1;
+				String _handle = null;
+				String _mail = null;
+				String _name = null;
+				String _lastName = null;
+				
+				_id = Integer.parseInt(cursor.getString(0));
+				_handle = cursor.getString(1);
+				_mail = cursor.getString(2);
+				_name = cursor.getString(3);
+				_lastName = cursor.getString(4);
+				
+				contacts = new MegaContacts(handle, _mail, _name, _lastName);
+				cursor.close();
+				return contacts;
+			}
+		}
+		cursor.close();
+		return null;		
 	}
 	
 	public long setOfflineFile (MegaOffline offline){

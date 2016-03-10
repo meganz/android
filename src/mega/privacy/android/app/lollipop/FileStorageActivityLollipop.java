@@ -407,7 +407,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		if(fromSettings){
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-			paramsb2.width = Util.scaleWidthPx(73, outMetrics);
+//			paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 		}
 		else{
 			if (mode == Mode.PICK_FOLDER) {
