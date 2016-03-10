@@ -214,14 +214,12 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		this.mItemClickListener = mItemClickListener;
 	}
 	
-	ViewHolderContactsExplorerLollipop holder = null;
-	
 	public ViewHolderContactsExplorerLollipop onCreateViewHolder(ViewGroup parentView, int viewType) {
 		
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);		
 		
 		View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
-		holder = new ViewHolderContactsExplorerLollipop(rowView);
+		ViewHolderContactsExplorerLollipop holder = new ViewHolderContactsExplorerLollipop(rowView);
 		
 		holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_explorer_name);
 		holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
@@ -235,7 +233,7 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 	}
 
 	@Override
-	public void onBindViewHolder(ViewHolderContactsExplorerLollipop rowView, int position) {
+	public void onBindViewHolder(ViewHolderContactsExplorerLollipop holder, int position) {
 //		boolean isCheckable = mode == Mode.PICK_FILE;
 		
 
