@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.google.android.gms.internal.db;
+
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowserGrid;
 import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowserList;
@@ -62,6 +66,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
+	DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
 	ContactsFragmentLollipop fragment;
 	int adapterType;
@@ -119,48 +124,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 								holder.contactInitialLetter.setVisibility(View.GONE);
 							}
 						}
-					}
-					
-					
-					if(request.getParamType()==1){
-						log("(1)request.getText(): "+request.getText());
-						holder.nameText=request.getText();
-						holder.name=true;
-					}
-					else if(request.getParamType()==2){
-						log("(2)request.getText(): "+request.getText());
-						holder.firstNameText = request.getText();
-						holder.firstName = true;
-					}
-					if(holder.name&&holder.firstName){
-						String fullName = holder.nameText + " " + holder.firstNameText;
-						if (fullName.trim().length() > 0){
-							holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
-							holder.name= false;
-							holder.firstName = false;
-							String firstLetter = fullName.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-							holder.contactInitialLetter.setText(firstLetter);
-							if (adapterType == ITEM_VIEW_TYPE_LIST){							
-								holder.contactInitialLetter.setTextSize(32);
-							}
-							else if (adapterType == ITEM_VIEW_TYPE_GRID){
-								holder.contactInitialLetter.setTextSize(64);
-							}
-							holder.contactInitialLetter.setTextColor(Color.WHITE);
-						}
-					}
-					
-//					if (!avatarExists){
-//						createDefaultAvatar();
-//					}
+					}					
 				}
 			}
-//			else{
-//				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-//					createDefaultAvatar();
-//				}
-//			}
 		}
 
 		@Override
@@ -206,8 +172,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
         RelativeLayout itemLayout;
         int currentPosition;
         String contactMail;
-    	boolean name = false;
-    	boolean firstName = false;
     	String nameText;
     	String firstNameText;
     }
@@ -238,9 +202,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
+    
+	    dbH = DatabaseHandler.getDbHandler(context);
 	    
 	    if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 	   
@@ -260,7 +223,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 			
 		    holderList.itemLayout.setTag(holderList);
-		    holderList.itemLayout.setOnClickListener(this);
+		    holderList.itemLayout.setOnClickListener(this);	    
 		    
 			v.setTag(holderList);
 	
@@ -350,11 +313,18 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
 	
-		holder.textViewContactName.setText(contact.getEmail());
-		holder.name=false;
-		holder.firstName=false;
-		megaApi.getUserAttribute(contact, 1, listener);
-		megaApi.getUserAttribute(contact, 2, listener);
+		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+		if(contactDB!=null){
+			if(!contactDB.getName().equals("")){
+				holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
+			}
+			else{
+				holder.textViewContactName.setText(contact.getEmail());
+			}
+		}
+		else{
+			log("The contactDB is null: ");
+		}		
 		
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
@@ -453,13 +423,17 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		createDefaultAvatar(holder);
 		
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);		
 	
-		holder.textViewContactName.setText(contact.getEmail());
-		holder.name=false;
-		holder.firstName=false;
-		megaApi.getUserAttribute(contact, 1, listener);
-		megaApi.getUserAttribute(contact, 2, listener);
+		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+		if(contactDB!=null){
+			if(!contactDB.getName().equals("")){
+				holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
+			}
+			else{
+				holder.textViewContactName.setText(contact.getEmail());
+			}
+		}		
 		
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){

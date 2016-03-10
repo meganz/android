@@ -21,7 +21,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.MegaContacts;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -7568,8 +7568,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ContactNameListener listener = new ContactNameListener(context);
 						
 			for(int i=0; i<contacts.size(); i++){				
-				MegaContacts megaContact = new MegaContacts(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
-				dbH.setContacs(megaContact);
+				MegaContact megaContact = new MegaContact(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
+				dbH.setContacts(megaContact);
 				megaApi.getUserAttribute(contacts.get(i), 1, listener);
 				megaApi.getUserAttribute(contacts.get(i), 2, listener);
 			}			
