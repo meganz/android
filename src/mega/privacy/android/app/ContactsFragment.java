@@ -56,11 +56,6 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
-	
 	private Button addContactButton;
 	private ActionMode actionMode;
 	
@@ -294,49 +289,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			listView.setOnItemLongClickListener(this);
 			listView.setItemsCanFocus(false);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);		
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_contacts);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_contacts);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_contacts);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
 						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}
-			
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
 			
@@ -400,49 +353,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			listView = (ListView) v.findViewById(R.id.contact_grid_view_browser);
 	        listView.setOnItemClickListener(null);
 	        listView.setItemsCanFocus(false);
-	        
-	        outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid_contacts);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid_contacts);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid_contacts);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}
-	        
+	       	           
 	        emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
 	        

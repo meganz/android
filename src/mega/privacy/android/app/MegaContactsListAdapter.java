@@ -196,9 +196,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-	    
-	   
+	    float scaleH = Util.getScaleH(outMetrics, density);	   
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {

@@ -21,6 +21,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaContacts;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -37,6 +38,9 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.MegaContactsLollipopAdapter.ViewHolderContacts;
+import mega.privacy.android.app.lollipop.MegaContactsLollipopAdapter.ViewHolderContactsGrid;
+import mega.privacy.android.app.lollipop.MegaContactsLollipopAdapter.ViewHolderContactsList;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1955,6 +1959,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			else{
     				drawerLayout.openDrawer(Gravity.LEFT);
+    				//Fill the contacts DB
+    				FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
+    				fillDBContactsTask.execute();
     				firstTime = false;
     			}
     			
@@ -7457,6 +7464,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		clearRubbishBinTask.execute();
 	}
 	
+	private class ContactNameListener implements MegaRequestListenerInterface{
+
+		Context context;
+		
+		public ContactNameListener(Context context) {
+			this.context = context;
+		}
+		
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+			log("ContactNameListener:onRequestFinish()");
+			if (e.getErrorCode() == MegaError.API_OK){
+								
+				if(request.getParamType()==1){
+					log("(ManagerActivityLollipop(1)request.getText(): "+request.getText()+" -- "+request.getEmail());
+					int rows = dbH.setContactName(request.getText(), request.getEmail());
+					log("Rows affected: "+rows);
+				}
+				else if(request.getParamType()==2){
+					log("ManagerActivityLollipop(2)request.getText(): "+request.getText()+" -- "+request.getEmail());
+					int rows = dbH.setContactLastName(request.getText(), request.getEmail());
+					log("Rows affected: "+rows);
+				}
+			}
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+		}
+	}
+	
 	/*
 	 * Background task to emptying the Rubbish Bin
 	 */
@@ -7499,7 +7545,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rbFLol.setContentText();
 			}			
         }
+	}	
+	
+	
+	/*
+	 * Background task to fill the DB with the contact info the first time
+	 */
+	private class FillDBContactsTask extends AsyncTask<String, Void, String> {
+		Context context;
+		MultipleRequestListener moveMultipleListener = null;
+		
+		FillDBContactsTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			log("doInBackground-Async Task FillDBContactsTask");
+			
+			ArrayList<MegaUser> contacts = megaApi.getContacts();
+			
+			ContactNameListener listener = new ContactNameListener(context);
+						
+			for(int i=0; i<contacts.size(); i++){				
+				MegaContacts megaContact = new MegaContacts(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
+				dbH.setContacs(megaContact);
+				megaApi.getUserAttribute(contacts.get(i), 1, listener);
+				megaApi.getUserAttribute(contacts.get(i), 2, listener);
+			}			
+			return null;
+		}
 	}
+	
 	
 	public void uploadFile(){
 		fbFLol.showUploadPanel();
@@ -10874,6 +10951,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			
 			inSFLol.setTransfers(mTHash);
+		}
+		
+		if (tFLol != null){
+			tFLol.setTransfers(tL);			
 		}
 		
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
