@@ -430,7 +430,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return attr;
 	}
 	
-	public void setContacs (MegaContacts contacts){
+	public void setContacts (MegaContact contacts){
 		log("setAttributes");
         ContentValues values = new ContentValues();
         values.put(KEY_CONTACT_HANDLE, encrypt(contacts.getHandle()));
@@ -459,8 +459,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
 	}
 	
-	public MegaContacts getContacts(){
-		MegaContacts contacts = null;
+	public MegaContact getContacts(){
+		MegaContact contacts = null;
 		
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -475,18 +475,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //			String name = (cursor.getString(3));
 //			String lastName = (cursor.getString(4));
 			
-			contacts=new MegaContacts(handle, mail, name, lastName);			
+			contacts=new MegaContact(handle, mail, name, lastName);			
 		}
 		cursor.close();
 		
 		return contacts;
 	}
 	
-	public MegaContacts findContactByHandle(String handle){
+	public MegaContact findContactByHandle(String handle){
+		log("findContactByHandle: "+handle);
+		MegaContact contacts = null;
 
-		MegaContacts contacts = null;
-
-		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + handle + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + encrypt(handle) + "'";
 
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
@@ -500,12 +500,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _lastName = null;
 				
 				_id = Integer.parseInt(cursor.getString(0));
-				_handle = cursor.getString(1);
-				_mail = cursor.getString(2);
-				_name = cursor.getString(3);
-				_lastName = cursor.getString(4);
+				_handle = decrypt(cursor.getString(1));
+				_mail = decrypt(cursor.getString(2));
+				_name = decrypt(cursor.getString(3));
+				_lastName = decrypt(cursor.getString(4));
 				
-				contacts = new MegaContacts(handle, _mail, _name, _lastName);
+				contacts = new MegaContact(handle, _mail, _name, _lastName);
 				cursor.close();
 				return contacts;
 			}

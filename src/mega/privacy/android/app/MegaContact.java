@@ -1,12 +1,12 @@
 package mega.privacy.android.app;
 
-public class MegaContacts {
+public class MegaContact {
 	String handle;
 	String name;
 	String lastName;
 	String mail;
 	
-	public MegaContacts(String handle, String mail, String name, String lastName) {
+	public MegaContact(String handle, String mail, String name, String lastName) {
 		super();
 		this.handle = handle;
 		this.name = name;

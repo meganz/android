@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
@@ -39,6 +41,7 @@ import android.widget.TextView;
 public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<ContactsExplorerLollipopAdapter.ViewHolderContactsExplorerLollipop> implements OnClickListener {
 	
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
+	DatabaseHandler dbH = null;
 	
 	private class UserAvatarListenerExplorer implements MegaRequestListenerInterface{
 
@@ -216,6 +219,8 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 	
 	public ViewHolderContactsExplorerLollipop onCreateViewHolder(ViewGroup parentView, int viewType) {
 		
+	    dbH = DatabaseHandler.getDbHandler(mContext);
+		
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);		
 		
 		View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
@@ -223,7 +228,7 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		
 		holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_explorer_name);
 		holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
-		holder.phoneEmailTextView.setVisibility(View.GONE);
+//		holder.phoneEmailTextView.setVisibility(View.GONE);
 		holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
 		holder.contactImageLayout = (RelativeLayout) rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
 		holder.initialLetter = (TextView) rowView.findViewById(R.id.contact_explorer_initial_letter);
@@ -258,7 +263,22 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		createDefaultAvatar(holder, true);
 		
 		UserAvatarListenerExplorer listener = new UserAvatarListenerExplorer(mContext, holder, this);
-		holder.contactNameTextView.setText(contact.getEmail());
+		
+		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+		if(contactDB!=null){
+			if(!contactDB.getName().equals("")){
+				holder.contactNameTextView.setText(contactDB.getName()+" "+contactDB.getLastName());
+			}
+			else{
+				holder.contactNameTextView.setText(contact.getEmail());
+			}
+		}
+		else{
+			log("The contactDB is null: ");
+		}
+		
+		holder.phoneEmailTextView.setText(holder.contactMail);
+		
 		File avatar = null;
 		if (mContext.getExternalCacheDir() != null){
 			avatar = new File(mContext.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");

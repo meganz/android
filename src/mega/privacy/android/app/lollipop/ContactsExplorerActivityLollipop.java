@@ -294,7 +294,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		// Respond to the action bar's Up/Home button
 			case android.R.id.home: {
 				finish();
-				
+				break;
 			}
 			case R.id.cab_menu_add_contact:{
 				showNewContactDialog(); 
