@@ -1127,6 +1127,40 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			((ManagerActivityLollipop)context).refreshCameraUpload();
 		}
 		else{					
+			
+			prefs = dbH.getPreferences();
+			if (prefs != null){
+				if (prefs.getCamSyncLocalPath() != null){
+					if (prefs.getCamSyncLocalPath().compareTo("") != 0){
+						
+						if (prefs.getCamSyncFileUpload() != null){
+							if (prefs.getCamSyncFileUpload().compareTo("") != 0){
+								if (prefs.getCamSyncWifi() != null){
+									if (prefs.getCamSyncWifi().compareTo("") != 0){
+										dbH.setCamSyncTimeStamp(0);
+										dbH.setCamSyncEnabled(true);
+										
+										Handler handler = new Handler();
+										handler.postDelayed(new Runnable() {
+											
+																@Override
+																public void run() {
+																	log("Now I start the service");
+																	context.startService(new Intent(context, CameraSyncService.class));		
+																}
+															}, 5 * 1000);
+									
+										((ManagerActivityLollipop)context).refreshCameraUpload();
+										
+										return;		
+									}
+								}								
+							}
+						}
+					}
+				}
+			}
+			
 			AlertDialog wifiDialog;
 			
 			final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
