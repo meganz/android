@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA提供安全的雲存儲服務並贈送有50GB 免費空間。與其它雲存儲服務商不同的是，數據的加密和解密始終不經過我們，而只能通過您的設備進行。您可以在任何設備上隨時隨地訪問您的數據，與您的聯系人共享文件夾，並即時查看他們的更新。雲端就在您的口袋！通過您的智能手機或平板電腦訪問和傳輸您的數據。上載並同步您的多媒體文件到雲端。搜索，存儲、下載、傳輸、查看、共享、重命名或刪除您的文件。 一切盡在掌中！更多詳情，請登錄我們的網站： http://mega.nz</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA，時刻保護您的隱私的強大的雲存儲。我們提供 50 GB 的免費空間。</string>
+    
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">大小總計</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">之</string>
+    <string name="general_yes" context="Answer for confirmation dialog.">是的</string>
+    <string name="general_no" context="Answer for confirmation dialog.">不是</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">取消</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">移動至</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">複製到</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">匯入至</string>
+    <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">選擇</string>
+    <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">選擇檔案</string>
+    <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">選擇資料夾</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">建立</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">上傳檔案</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">下載</string>
+    <string name="general_add" context="button">添加</string>
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">清除</string>
+    <string name="general_loading" context="state previous to import a file">載入中</string>
+    <string name="general_importing" context="state while importing the file">正在匯入</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">匯入</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">儲存空間</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">頻寬</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">訂閱</string>
+    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">繼續</string>  
+    <string name="general_error_word" context="It will be followed by the error message">錯誤</string> 
+    <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">未找到檔案連接</string>
+    <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">資料夾連接未找到</string>
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">功能有待實施</string>
+    <string name="error_no_selection" context="when any file or folder is selected">沒有選擇檔案或資料夾</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">已下載</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">已上傳</string>
+    <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">檔案信息</string>
+    <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">資料夾信息</string>
+    <string name="general_menu" context="Title when the left menu is opened">主選單</string>
+ 
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">輔助媒體資料夾不存在，請選擇別的資料夾。</string>   
+    <string name="no_external_SD_card_detected" context="when no external card exists">未檢測到外接SD卡</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">此資料夾是只讀。您沒有上傳權限。</string>
+    
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">您正在移除導出的萬能密鑰檔案</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">安全提示！這是高風險的操作，妳確定要繼續？</string> 
+     
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">更多選項</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">您確定移除聯繫人嗎？</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">您確定移除這些聯繫人嗎？</string>  
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">移動至垃圾箱？</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">您確定要將這些項目都移至垃圾桶嗎？</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">確定從MEGA刪除嗎？</string>
+    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">您確定要永久刪除這些項目嗎？</string>
+    <string name="title_delete_from_mega" context="confirmation message before removing a file">從MEGA刪除</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">如果您離開這個資料夾，您將無法再看到它</string>
+    
+    <string name="confirmation_alert" context="confirmation message before removing a file">請確認</string>
+    
+    <string name="action_logout" context="Button where the user can sign off or logout">登出</string>
+    <string name="action_add" context="Menu item">上傳...</string>
+    <string name="action_create_folder" context="Menu item">創建新文件夾</string>
+    <string name="action_open_link" context="Menu item">打開連接...</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">上傳至</string>
+    <string name="action_settings" context="Menu item">設定</string>
+    <string name="action_search" context="Search button">搜尋</string>
+    <string name="action_play" context="Search button">播放</string>
+    <string name="action_pause" context="Search button">暫停</string>
+    <string name="action_refresh" context="Menu item">刷新</string>
+    <string name="action_sort_by" context="Menu item">排列方式...</string>
+    <string name="action_help" context="Menu item">幫助</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">升級您的帳號</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">正在升級帳戶</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">全選</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">取消全選</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">縮略圖預覽</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">顯示列表</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">導出萬能密鑰</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">移除萬能密鑰</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">取消簽約</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">萬能密鑰已經匯出至：</string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">萬能密鑰檔案已被移除。</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">簽約已經成功取消</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">簽約尚未取消。請聯繫 support@mega.nz 來取消您的簽約</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">關閉所有項目</string>
+    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">剩餘項目已成功關閉</string>
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">關閉項目時發生錯誤</string>    
+    
+     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">文件</item>
+        <item context="Plural of file. 2 files" quantity="other">檔案</item>
+    </plurals>
+    
+     <plurals name="general_num_contacts">
+        <item quantity="one" context="referring to a contact in the contact list of the user">聯絡人</item>
+        <item quantity="other" context="Title of the contact list">聯絡資訊</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one" context="Singular of folder/directory. 1 folder">資料夾</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">資料夾</item>
+    </plurals>
+    
+   <plurals name="general_num_shared_folders">
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">共享的資料夾</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">共享資料夾</item>
+    </plurals>
+    
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">下載</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">下載</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">上傳</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">上傳</item>
+    </plurals>
+    
+     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="one" context="used for example when a folder is shared with 1 user">用戶</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">用戶</item>
+    </plurals>
+    
+    
+    <string name="login_text" context="Login button">登入</string>
+    <string name="email_text" context="email label">郵箱</string>
+    <string name="password_text" context="password label">密碼</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">確認密碼</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">還沒有MEGA帳號？</string>
+    <string name="create_account" context="label and text button when creating the account">建立帳號</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">請輸入您的電子郵件信箱</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">無效電子郵件信箱</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">請輸入您的密碼</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">網路連線問題，請稍後再試。</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">您已從其他地點登出此設備</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">正在計算加密密鑰</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">連接到伺服器</string>
+    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">電子郵件信箱或密碼不正確。請問是否已認證過您的電子郵件信箱?</string>    
+    <string name="download_updating_filelist" context="Status text when updating the file manager">更新檔案清單</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">確認帳號</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">正在檢查有效鏈接</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">啟用帳號</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">正在準備檔案列表</string>
+    <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">請先登入，以使用MEGA分享。</string>
+    <string name="session_problem" context="if a link to a folder cannot be fetched">無法從該資料夾讀取檔案。</string>
+    
+    <string name="tour_space_title">MEGA 存儲空間</string>
+    <string name="tour_speed_title">MEGA 網絡速度</string>
+    <string name="tour_privacy_title">MEGA 隱私保護</string>
+    <string name="tour_access_title">訪問 MEGA </string>
+    <string name="tour_space_text">現在就註冊，獲得50 GB免費空間</string>
+    <string name="tour_speed_text">上傳非常快。快速分享給身邊每一位朋友</string>
+    <string name="tour_privacy_text">使用MEGA的終端至終端加密技術來保存您的檔案</string>
+    <string name="tour_access_text">隨時隨地獲得完全加密訪問</string>
+    
+    <string name="create_account_text" context="button that allows the user to create an account">創建帳號</string>
+    <string name="name_text" context="Name of the user">名字</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">我同意MEGA的服務條款</string>
+    <string name="already_account" context="Does the user already have a MEGA account">已有帳號嗎?</string>
+    
+    <string name="create_account_no_terms" context="warning dialog">您必須接受我們的服務條款。</string>
+	<string name="error_enter_username" context="Warning dialog">請輸入你的名字。</string>
+    <string name="error_short_password" context="when creating the account">密碼太短</string>
+    <string name="error_passwords_dont_match" context="when creating the account">密碼不匹配</string>
+    <string name="error_email_registered" contect="when creating the account">這個電子郵件信箱在MEGA已被註冊。</string>
+    
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">需取得確認信</string>
+    <string name="create_account_confirm" context="">請檢查您的電子郵件信箱，並點選連結登入，以確認您的帳號。</string>
+    <string name="create_account_creating_account">正在連接到服務器：正在創建帳號</string>
+    
+    <string name="cancel_transfer_title">取消傳輸</string>
+    <string name="cancel_transfer_confirmation">此筆傳輸將被取消，您確定要繼續嗎？</string>
+    <string name="cancel_all_transfer_confirmation">所有傳輸將被取消，您確定要繼續嗎？</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">雲端硬碟</string>
+	<string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">媒體上傳</string>
+	<string name="section_inbox" context="title of the screen that show the inbox">收件夾</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">存儲供離線使用</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">分享給我的</string>
+	<string name="section_shared_items" context="title of the screen that shows all the shared items">共享的項目</string>
+	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">垃圾夾</string>
+	<string name="section_contacts" context="Title of the contact list">聯絡人</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">已發送請求</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">收到的請求</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">沒有已發送的連絡人邀請</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">沒有收到請求</string>
+	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">傳輸</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">我的帳號</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">相機上傳</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s 之 %2$s</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">傳入的</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">傳出的</string>
+	
+	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">傳入的分享</string>
+	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">選擇資料夾</string>
+	
+	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">您的雲端硬碟中沒有檔案</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">空的垃圾夾</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">沒有傳入的共享資料夾</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">沒有傳出的共享資料夾</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">空的資料夾</string>
+    
+    <string name="choose_account_activity" context="Title of the activity Choose Account">選擇帳戶</string>
+	
+	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">所有物</string>
+	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">支援離線</string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">開啟</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">離線</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">大小：</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">內容：</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">已新增:</string>
+	<string name="file_properties_info_modified" context="when was the file modified">已變更：</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">沒有公開的連接</string>
+	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">公開連結</string>
+	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">全權使用</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">可讀 &amp; 可編輯</string>
+	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">只能瀏覽</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">分享與</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">權限：</string>
+	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">共享權限</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">更改權限</string>
+	<string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">分享與</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">寄發至</string>
+	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">所有者</string>
+	<string name="contact_reinvite" context="option to reinvite a contact">重新邀請</string>	
+	<string name="contact_ignore" context="option to ignore a contact invitation">忽略</string>
+	<string name="contact_decline" context="option to decline a contact invitation">減弱</string>
+	<string name="contact_accept" context="option to accept a contact invitation">接受</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">聯絡資訊</string>	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">內容</string>	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">資料夾共享與</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">請於下方按鈕新增連絡人</string>	
+	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">帳戶中尚無聯絡人。請於聯絡人視窗中新增聯絡人。</string>
+	
+	<string name="error_not_enough_free_space" context="Error message">免費空間不足</string>
+	
+	<string name="option_full_link" context="Alert Dialog to get link">完整連結</string>
+	<string name="option_link_without_key" context="Alert Dialog to get link">使用無密鑰方式進入(公開檔案)</string>
+	<string name="option_decryption_key" context="Alert Dialog to get link">解密密鑰</string>
+	
+	<string name="download_failed" context="Error message">下載失敗</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">已下載</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">下載中</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">正在傳輸中...</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">正在準備檔案</string>
+    <string name="download_began" context="message when the download starts">已開始下載</string>
+    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">您確定取消下載嗎?</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">點擊即可取消下載</string>
+    <string name="download_touch_to_show" context="Hint how to cancel the download">點此以顯示所有傳輸</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">大部分的裝置無法下載大於4GB的檔案。您的下載可能會失敗。</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">你的設備沒有可用執行這個檔案的app</string>
+	
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">圖像分享自</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享連接</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">取得連結</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">管理連接</string>
+    <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">離開</string>
+    <string name="alert_leave_share" context="Title alert before leaving a share.">離開共享</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">移除</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">移除連結</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">所有人將無法再訪問該連接</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重新命名</string>
+    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">開啟</string>
+    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">打開連接</string>
+    <string name="context_renaming" context="while renaming a file or folder">重新命名中</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">正在準備檔案...</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">下載</string>
+    <string name="download_folder" context="Item menu option upon right click on one or multiple files.">下載資料夾</string>
+    <string name="import_folder" context="Item menu option upon right click on one or multiple files.">導入資料夾</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">移動</string>
+    <string name="context_moving" context="while moving a file or folder">正在移動</string>
+    <string name="context_sharing" context="while sharing a folder">正在共享資料夾</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">複製</string>
+    <string name="context_upload" context="Item menu option upon right click on one or multiple files.">上傳</string>
+    <string name="context_copying" context="while copying a file or folder">正在複製</string>
+    <string name="context_creating_link" context="status text">正在生成連結</string>
+    <string name="context_moving_to_trash" context="status text">正在移至垃圾夾</string>
+    <string name="context_move_to_trash" context="menu item">移到垃圾夾</string>
+    <string name="context_delete_from_mega" context="menu item">從MEGA刪除</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">資料夾名稱</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">聯絡人郵箱</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">正在創建資料夾</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">正在新增連絡人</string>
+    <string name="context_download_to" context="Menu item">儲存至</string>
+    <string name="context_clear_rubbish" context="Menu option title">清除垃圾夾</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">所有垃圾桶中的項目將均被刪除</string>
+    <string name="context_send_link" context="get the link and send it">寄發連接</string>
+    <string name="context_send" context="get the link and send it">送出</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">發送至收件箱</string>
+    <string name="context_copy_link" context="get the link and copy it">複製鏈接</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">移除</string>
+    <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">自離線狀態下移除</string>
+    <string name="context_share_folder" context="menu item">共享資料夾</string>
+    <string name="context_send_file" context="menu item">寄送檔案</string>
+    <string name="context_view_shared_folders" context="open a shared folder">查看共享資料夾</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">分享</string>
+    <string name="remove_all_sharing" context="status text">正在移除所有共享聯繫人</string>
+	<string name="leave_incoming_share" context="status text">正在離開共享資料夾</string>
+    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">相機資料夾</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA聯絡人</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">手機聯絡薄</string>
+    <string name="context_delete" context="menu item">刪除</string>
+    <string name="context_more" context="menu item">更多</string>
+    <string name="context_contact_added" context="success message when adding a contact">聯絡人已添加</string>
+    <string name="context_contact_invitation_deleted" context="success message when removing a contact request">已刪除聯絡人邀請</string>
+    <string name="context_contact_invitation_resent" context="success message when reinvite a contact">重新發送邀請</string>
+    <string name="context_invitacion_reply" context="success message when adding a contact">已送出邀請函回函</string>
+    <string name="context_contact_removed" context="success message when removing a contact">聯絡人已移除</string>
+    <string name="context_contact_not_removed" context="error message">錯誤。聯繫人未移除</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">權限已變更</string>
+    <string name="context_permissions_not_changed" context="error message">錯誤。權限未變更</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">資料夾已存在</string>
+    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s 已經是您的聯絡人。</string>
+    <string name="context_send_no_permission" context="message when trying to send a file without full access">您目前無權發送該檔案。</string>
+    <string name="context_folder_created" context="success message when creating a folder">資料夾已創建</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">重命名成功</string>
+    <string name="context_no_renamed" context="error message">錯誤。未重命名</string>
+    <string name="context_correctly_copied" context="success message when copying a node">複製成功</string>
+    <string name="context_correctly_sent" context="success message when sending a file">檔案已發送</string>
+    <string name="context_no_sent" context="error message when sending a file">錯誤。檔案未發送</string>
+    <string name="context_no_copied" context="error message">錯誤。未複製</string>
+    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">請選擇目標資料夾</string>
+    <string name="context_correctly_moved" context="success message when moving a node">移動成功</string>
+    <string name="number_correctly_moved" context="success message when moving a node">已成功移動 %d 項目</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">%d 項目移動失敗</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">已成功移至垃圾桶。</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">已成功將 %d 項目移至垃圾桶</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d 項目發送失敗</string>
+    <string name="context_no_moved" context="error message">錯誤。未移動</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">已共享</string>
+    <string name="context_no_shared_number" context="error message when sharing a folder">發生錯誤，分享程序未完成。</string>
+    <string name="context_correctly_shared_removed" context="success message when sharing a folder">成功移除分享資料夾</string>
+    <string name="context_no_shared_number_removed" context="error message when sharing a folder">發生錯誤，移除分享之程序未完成。</string>
+    <string name="context_no_shared" context="error message">錯誤。未分享</string>
+    <string name="context_no_removed_shared" context="error message">發生錯誤，移除分享失敗。</string>
+    <string name="context_remove_sharing" context="success message when removing a sharing">已移除資料夾分享</string>
+    <string name="context_no_link" context="error message">如法獲得連接</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">移除成功</string>
+    <string name="context_no_removed" context="error message">錯誤。未從MEGA移除</string>
+    <string name="number_correctly_removed" context="success message when moving a node">已成功移除MEGA中的 %d 項目</string>
+    <string name="number_no_removed" context="error message when moving a node">%d 項目移除失敗。</string>
+    <string name="number_correctly_leaved" context="success message when moving a node">已成功留下 %d 資料夾</string>
+    <string name="number_no_leaved" context="error message when moving a node">%d</string>
+    <string name="number_correctly_sent" context="success message when sending multiple files">已成功發送檔案給 %d 聯絡人。</string>
+    <string name="number_no_sent" context="error message when sending multiple files">檔案尚未被發送給 %d 個聯絡人</string>
+    <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d 檔案發送成功.</string>
+    <string name="number_no_sent_multifile" context="error message when sending multiple files">, %d 檔案傳送失敗</string>
+    <string name="number_correctly_copied" context="success message when sending multiple files">已成功複製 %d 項目.</string>
+    <string name="number_no_copied" context="error message when sending multiple files">%d 項目複製失敗</string>
+    <string name="number_contact_removed" context="success message when removing several contacts">已成功移除 %d 聯絡人</string>
+    <string name="number_contact_not_removed" context="error message when removing several contacts">%d 聯絡人移除失敗</string>
+    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">已成功與 %d 聯絡人分享資料夾</string>
+    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">此檔案無法與 %d 聯絡人分享。</string>
+    <string name="number_correctly_shared" context="success message when sharing multiple files">已成功分享 %d 資料夾.</string>
+    <string name="number_no_shared" context="error message when sharing multiple files">%d 資料夾分享失敗</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">已發送至</string>
+    <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">此資料夾已無共享者</string>
+    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">發生錯誤，此資料夾依然與其他聯絡人共享中</string>
+    <string name="context_select_one_file" context="option available for just one file">儘可選擇一個檔案。</string>
+    
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">您即將取消簽約MEGA，請告訴我們您的想法以便我們做出改善。</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">在此輸入反饋...</string>
+    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">解除</string>
+    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">送出</string>
+    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">取消簽約</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">感謝您的反饋！您確定要取消MEG簽約嗎？</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">您的簽約尚未取消。請告訴我們取消的理由。</string>
+    
+    <string name="context_node_private" context="success message after removing the public link of a folder">該資料夾現在是私人的</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">共享已移除</string>
+  
+    <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">新增資料夾</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">添加聯絡人</string>
+    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">從MEGA連結下載</string>
+    
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">解密金鑰</string>
+    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">請納入此連結之解密密鑰</string>
+        
+    <string name="upload_to_image" context="upload to. Then choose an Image file">圖像</string>
+	<string name="upload_to_audio" context="upload to. Then choose an Audio file">音頻</string>
+	<string name="upload_to_video" context="upload to. Then choose a Video file">影片</string>
+	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">其他檔案</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">從檔案系統中選取</string>
+	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">選擇檔案類型</string>
+	<string name="upload_uploading" context="status text">上傳中</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">點擊即可取消上傳</string>
+	<string name="upload_failed" context="error message">上傳失敗</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">已上傳</string>
+	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">您確定取消上傳嗎?</string>
+	<string name="upload_prepare" context="Status text at the beginning of an upload">檔案處理中</string>
+	<string name="error_temporary_unavaible" context="error message when downloading a file">資料暫時缺失，請稍後再試。</string>
+	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">無法開啟選擇的檔案</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">已開始上傳</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">解壓檔案</string>
+		
+	<string name="error_io_problem" context="error message while browsing the local filesystem">檔案系統問題</string>
+	<string name="general_error" context="error message while browsing the local filesystem">執行操作時發生錯誤</string>
+	
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">圖像瀏覽器</string>
+	
+	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">連結格式不正確</string>
+	
+	<string name="my_account_activity" context="Title of the screen where the user account information is shown">帳號</string>
+    <string name="my_account_total_space" context="Headline for the amount of total storage space">儲存空間</string>
+    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">可用空間</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">已用空間</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">即刻升級！</string>
+    <string name="my_account_change_password" context="menu item">變更密碼</string>
+    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">您的可用空間所剩無幾！您要升級賬戶嗎？</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">您可以升級為PRO用戶！您要現在升級嗎？</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">超過配額警告！</string>
+     <string name="overquota_alert_text" context="Dialod text overquota error">操作被禁，您將超過您的賬戶儲存限額。您要升級賬戶嗎？</string>
+    
+    <string name="op_not_allowed" context="Dialod text overquota error">操作被禁止</string>
+    <string name="my_account_last_session" context="when did the last session happen">上一步</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">連結:</string>
+    
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">正在變更密碼</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">現行密碼</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">新的密碼</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">確認新密碼</string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">現行密碼錯誤或提供的新密碼不符。請再試一次。</string>
+    <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">此密碼不正確，請再試一次。</string>
+    <string name="my_account_change_password_OK" context="Success text">密碼變更完成</string>
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">密碼不正確</string> 
+    
+    <string name="upgrade_activity" context="title of the Upgrade screen">專業版會員</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">選擇會員方案</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">按月或按年度訂閱</string>
+    <string name="select_membership_2" context="button to go to Google Play">使用Google Play簽約</string>
+    
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">選擇付款方式</string>
+    <string name="no_available_payment_method" context="choose the payment method option when no method is available">這個方案暫時無適用的付款方式</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">信用卡（簽約）</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">移動運營商（一次性）</string>
+    <string name="payment_method_centili" context="one of the payment methods">移動運營商（一次性）</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">谷歌錢包</string>
+    
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">月付*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">每年*</string>
+    
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 可以在續訂日期之前任何時間取消定期訂閱。</string>
+    
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">此連結已被複製到剪貼簿</string>
+    <string name="file_properties_remove_link" context="the user can remove the public link">連接被移除</string>
+    
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">預覽還未下載。請稍後</string>
+    
+    <string name="import_correct" context="success message after import a file">成功匯入</string>
+    
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">沒有活躍傳輸</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">所有傳輸已中止</string>
+    <string name="menu_pause_transfers" context="menu item">暫停傳輸</string>
+    <string name="menu_restart_transfers" context="menu item">重新開始傳輸</string>
+    <string name="menu_cancel_all_transfers" context="menu item">取消所有傳輸</string>
+    <string name="menu_take_picture" context="menu item">拍照</string>
+    
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi 或數據方案</string>
+    <string name="cam_sync_ok" context="Answer for confirmation dialog.">好</string>
+    <string name="cam_sync_skip" context="skip the step of camera upload">跳過</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">相機上傳正在進行</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">你確定取消相機上傳？</string>
+    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">無法取得目的地資料夾</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">正在上傳媒體資料夾中的檔案</string>
+    <string name="settings_camera_notif_error" context="notification error">相機上傳問題</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">相機上傳完成</string>
+    
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">儲存空間</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN 鎖定</string>
+    
+    <string name="settings_advanced_features" context="Settings category title for cache and offline files">進階功能</string>
+    <string name="settings_advanced_features_cache" context="Settings preference title for cache">清楚緩存</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">清除離線檔案</string>
+    
+    <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">目前已使用 %s</string>    
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">正在計算中...</string>
+    
+    <string name="settings_storage_download_location" context="title of the setting to set the default download location">預設下載位置</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">每次都詢問下載位置</string>
+    <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">顯示高級設備（外置SD）</string>
+    
+    <string name="settings_camera_upload_on" context="settings option">啟用相機上傳</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">開啟相機上傳功能</string>
+    <string name="settings_camera_upload_off" context="settings option">禁用相機上傳</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">如何上傳</string>
+    
+    <string name="settings_secondary_upload_on" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">啟用輔助媒體上傳</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">禁用輔助媒體上傳</string>
+    
+    <string name="settings_empty_folder" context="settings option">選擇資料夾</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi 或數據方案</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">上傳檔案</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">只有照片</item>
+        <item context="the options of what to upload.">只有影片</item>
+        <item context="the options of what to upload.">照片和影片</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">只在充電狀態下</string>
+    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">以設備中檔案的名稱保存</string>
+    
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">本地相機資料夾</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">MEGA相機上傳資料夾</string>
+    
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">本地輔助資料夾</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">MEGA輔助資料夾</string>
+    
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">只有照片</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">只有影片</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">照片和影片</string>
+    
+    <string name="settings_pin_lock_on" context="settings of the pin lock">啟用PIN 鎖</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">禁用PIN 鎖</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN 碼</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
+    <string name="settings_reset_lock_code" context="settings of the pin lock">重設PIN碼</string> 
+    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN 鎖定</string>
+    
+    <string name="pin_lock_enter" context="Button after the pin code input field">輸入</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">輸入密碼錯誤達十次後，您的本機資料將被刪除，且您將被強迫登出。</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">密碼錯誤</string>
+    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">PIN碼錯誤，請再試一次。您還有%2d次嘗試的機會。</string>
+    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN碼不正確</string>
+    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">請輸入您的PIN碼</string>
+    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">請重新輸入您的PIN碼</string>
+    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">請輸入您的新PIN碼</string>
+    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">請重新輸入您的新PIN碼</string>
+    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">您所有的本機資料將被刪除，您會在％d秒內被強迫登出。</string>
+    
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">關於</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">隱私政策</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">服務條款</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">App 版本</string>
+    <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">MEGA軟件開發包版本</string>
+    
+    <string name="january">一月</string>
+    <string name="february">二月</string>
+    <string name="march">三月</string>
+    <string name="april">四月</string>
+    <string name="may">五月</string>
+    <string name="june">六月</string>
+    <string name="july">七月</string>
+    <string name="august">八月</string>
+    <string name="september">九月</string>
+    <string name="october">十月</string>
+    <string name="november">十一月</string>
+    <string name="december">十二月</string>
+    
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP瀏覽器</string>
+    
+    <string name="new_account" context="in login screen to create a new account">現在就創建新帳戶！</string>
+    
+    <string name="my_account_title" context="title of the My Account screen">帳號類型:</string>
+    <string name="expires_on" context="title of the Expiration Date">到期日</string>
+    <string name="free_account">免費</string>
+    <string name="prolite_account" context="Not translate">Lite</string>
+    <string name="pro1_account" context="Not translate">Pro I</string>
+    <string name="pro2_account" context="Not translate">Pro II</string>
+    <string name="pro3_account" context="Not translate">Pro III</string>
+    
+    <string name="free_storage" context="Not translate">50 GB</string>   
+    <string name="free_bandwidth" context="Free bandwich account details">有限制的</string>
+    
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">照片上傳資料夾已建立</string>
+    
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">將下載zip檔案并解除壓縮</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">zip檔案將被釋放</string>
+    
+    <string name="sortby_name" context="category in sort by action">按名稱</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">升序</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">降序</string>
+    
+    <string name="sortby_date" context="category in sort by action">按日期</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">由新到舊</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">由舊至新</string>
+    
+    <string name="sortby_size" context="category in sort by action">按大小</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">從大到小</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">從小到大</string>
+    
+    <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
+    
+    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">輸入您的帳單資料：</string>
+    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">地址1</string>
+    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">地址2（可選）</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">城市</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">州 / 省</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">國家</string>
+    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">郵編</string>
+    
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">輸入您的付款信息：</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">名</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">姓</string>
+    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">信用卡卡號</string>
+    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">月</string>
+    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">年</string>
+    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">校驗碼</string>
+    
+    <string name="proceed_cc" context="Text of the button which proceeds the payment">繼續</string>
+    
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">帳戶已成功升級！</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">該操作尚未正確地完成。信用卡將不會被扣款。</string>
+    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">信用卡信息不正確。您的信用卡將不會被扣款。</string>
+    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">您的帳戶無法在應用程式內升級，請連絡support@mega.nz 以升級您的帳戶。</string>
+</resources>
