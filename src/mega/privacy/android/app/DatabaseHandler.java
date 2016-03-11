@@ -254,7 +254,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <=17){
 			String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
 	        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CONTACT_HANDLE + " TEXT, " + KEY_CONTACT_MAIL + " TEXT, " + 
-	        		KEY_CONTACT_NAME+ " TEXT"+KEY_CONTACT_LAST_NAME+ " TEXT"+")";
+	        		KEY_CONTACT_NAME+ " TEXT, " + KEY_CONTACT_LAST_NAME + " TEXT"+")";
 	        db.execSQL(CREATE_CONTACTS_TABLE);
 		}
 	} 
@@ -431,7 +431,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void setContacts (MegaContact contacts){
-		log("setAttributes");
+		log("setContacts");
         ContentValues values = new ContentValues();
         values.put(KEY_CONTACT_HANDLE, encrypt(contacts.getHandle()));
         values.put(KEY_CONTACT_MAIL, encrypt(contacts.getMail()));
@@ -459,27 +459,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
 	}
 	
-	public MegaContact getContacts(){
-		MegaContact contacts = null;
-		
+	public int getContactsSize(){
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			int id = Integer.parseInt(cursor.getString(0));
-			String handle = decrypt(cursor.getString(1));
-			String mail =  decrypt(cursor.getString(2));
-			String name = decrypt(cursor.getString(3));
-			String lastName = decrypt(cursor.getString(4));
-//			String handle = (cursor.getString(1));
-//			String mail =  (cursor.getString(2));
-//			String name = (cursor.getString(3));
-//			String lastName = (cursor.getString(4));
-			
-			contacts=new MegaContact(handle, mail, name, lastName);			
+		if (cursor != null){
+			return cursor.getCount();
 		}
-		cursor.close();
-		
-		return contacts;
+		else{
+			return 0;
+		}
 	}
 	
 	public MegaContact findContactByHandle(String handle){
@@ -1356,6 +1344,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void clearAttributes(){
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
+	}
+	
+	public void clearContacts(){		
+		db.execSQL("DELETE FROM " + TABLE_CONTACTS);   
 	}
 	
 	private static void log(String log) {
