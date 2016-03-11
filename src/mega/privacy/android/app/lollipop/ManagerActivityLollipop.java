@@ -1956,6 +1956,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			
     			if (!firstTime){
     				drawerLayout.closeDrawer(Gravity.LEFT);
+    				
+    				if (dbH.getContactsSize() < megaApi.getContacts().size()){
+    					dbH.clearContacts();
+    					FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
+        				fillDBContactsTask.execute();
+    				}
     			}
     			else{
     				drawerLayout.openDrawer(Gravity.LEFT);
@@ -10670,40 +10676,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		log("onUsersUpdateLollipop: "+users.size());
+		log("onUsersUpdateLollipop");
 		
-		for(int i=0; i<users.size();i++){
-			MegaUser user=users.get(i);
-
-			if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
-				log("The user: "+user.getEmail()+"changed his first name");
-				megaApi.getUserAttribute(user, 1, new ContactNameListener(this));				
+		if (users != null){
+			log("users.size(): "+users.size());
+			for(int i=0; i<users.size();i++){
+				MegaUser user=users.get(i);
+	
+				if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
+					log("The user: "+user.getEmail()+"changed his first name");
+					megaApi.getUserAttribute(user, 1, new ContactNameListener(this));				
+				}
+				if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
+					log("The user: "+user.getEmail()+"changed his last name");
+					megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+				}
 			}
-			if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
-				log("The user: "+user.getEmail()+"changed his last name");
-				megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+			
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if (cFLol != null){
+				if (drawerItem == DrawerItem.CONTACTS){					
+					cFLol.updateView();
+				}
 			}
-		}
-		
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cFLol != null){
-			if (drawerItem == DrawerItem.CONTACTS){					
-				cFLol.updateView();
+			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);		
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
+			if (sRFLol != null){
+				if (drawerItem == DrawerItem.CONTACTS){					
+					sRFLol.updateView();
+				}
 			}
-		}
-		String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);		
-		sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
-		if (sRFLol != null){
-			if (drawerItem == DrawerItem.CONTACTS){					
-				sRFLol.updateView();
-			}
-		}
-		String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);		
-		rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
-		if (rRFLol != null){
-			if (drawerItem == DrawerItem.CONTACTS){					
-				rRFLol.updateView();
+			String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);		
+			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
+			if (rRFLol != null){
+				if (drawerItem == DrawerItem.CONTACTS){					
+					rRFLol.updateView();
+				}
 			}
 		}
 	}
