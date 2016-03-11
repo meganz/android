@@ -383,6 +383,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 	
 	public void onBindViewHolderList(ViewHolderContactsList holder, int position){
+		log("onBindViewHolderList");
 		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
@@ -428,6 +429,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
 		if(contactDB!=null){
 			if(!contactDB.getName().equals("")){
+				log("The name is: "+contactDB.getName()+" "+contactDB.getLastName());
 				holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
 			}
 			else{
@@ -782,6 +784,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 	
 	public void setContacts (ArrayList<MegaUser> contacts){
+		log("setContacts");
 		this.contacts = contacts;
 		positionClicked = -1;
 		notifyDataSetChanged();
