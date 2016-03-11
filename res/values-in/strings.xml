@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA adalah layanan cloud storage yang aman yang memberikan anda 50GB gratis. Tidak seperti layanan cloud storage lainnya, data anda di enkripsi dan dekripsi oleh perangkat anda sendiri, bukan oleh kami.Data anda dapat diakses kapanpun dan dimanapun. Bagikan folder dengan kontak anda dan lihat update mereka secara real time.Cloud dalam kantong anda. Akses dan stream file anda lewat smartphone atau tablet. Upload dan sinkronisasi media anda ke cloud.Cari, simpan, download, stream, lihat, bagikan, dan beri nama atau hapus file anda. Semuanya tersedia dalam genggaman anda.Untuk info lebih lanjut, harap lihat website kami: https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA adalah Cloud Storage dengan Privacy yang sangat terjamin. 50GB gratis</string>
+    
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Ukuran total</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">dari</string>
+    <string name="general_yes" context="Answer for confirmation dialog.">Ya</string>
+    <string name="general_no" context="Answer for confirmation dialog.">Tidak</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">Batal</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Pindahkan ke</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copy ke</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Impor ke</string>
+    <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Pilih</string>
+    <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">Pilih file</string>
+    <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">Pilih folder</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Buat</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Unduh</string>
+    <string name="general_add" context="button">Tambah</string>
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Kosongkan</string>
+    <string name="general_loading" context="state previous to import a file">Sedang memuat. . .</string>
+    <string name="general_importing" context="state while importing the file">Sedang mengimpor. . .</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Impor</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Gudang</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandwith</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
+    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Lanjutkan</string>  
+    <string name="general_error_word" context="It will be followed by the error message">Error</string> 
+    <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">Link file tidak ditemukan</string>
+    <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">Link folder tidak ditemukan</string>
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Belum di-implementasi</string>
+    <string name="error_no_selection" context="when any file or folder is selected">Tidak ada file atau folder terpilih.</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Telah di download</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">telah di upload</string>
+    <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info file</string>
+    <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info folder</string>
+    <string name="general_menu" context="Title when the left menu is opened">Pilihan</string>
+ 
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Media folder kedua tidak ada, harap pilih folder yang baru.</string>   
+    <string name="no_external_SD_card_detected" context="when no external card exists">Tidak ada SD card external</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Folder ini read-only. Anda tidak punya izin untuk upload.</string>
+    
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Anda akan menghapus file master key yang telah di-ekspor</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Peringatan keamanan! Ini adalah operasi berisiko tinggi. Apakah Anda ingin melanjutkan?</string> 
+     
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Pilihan lainnya...</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Apakah anda ingin menghapus kontak?</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Apakah anda menginginkan kontak ini?</string>  
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Pindahkan ke Sampah?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Anda yakin ingin memindahkan item ini ke Sampah?</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Hapus dari MEGA?</string>
+    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">Anda yakin ingin menghapus item ini secara permanen?</string>
+    <string name="title_delete_from_mega" context="confirmation message before removing a file">Hapus dari MEGA</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Jika anda meninggalkan folder, anda tidak akan dapat untuk melihatnya kembali</string>
+    
+    <string name="confirmation_alert" context="confirmation message before removing a file">Harap konfirmasi</string>
+    
+    <string name="action_logout" context="Button where the user can sign off or logout">Keluar</string>
+    <string name="action_add" context="Menu item">Upload. . .</string>
+    <string name="action_create_folder" context="Menu item">Buat folder baru</string>
+    <string name="action_open_link" context="Menu item">Buka link...</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload ke</string>
+    <string name="action_settings" context="Menu item">Pengaturan</string>
+    <string name="action_search" context="Search button">Cari</string>
+    <string name="action_play" context="Search button">Mulai</string>
+    <string name="action_pause" context="Search button">Hentikan sementara</string>
+    <string name="action_refresh" context="Menu item">Refresh</string>
+    <string name="action_sort_by" context="Menu item">Urutkan menurut ...</string>
+    <string name="action_help" context="Menu item">Bantuan</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Tingkatkan akun anda</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Meng-upgrade akun</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Pilih Semua</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect Semua</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Ekspor MasterKey</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Hapus MasterKey</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Batalkan Subscription</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">MasterKey telah di-ekspor ke:</string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">File Master Key telah dihapus.</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Subscription berhasil dibatalkan dengan benar</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Subscription belum dibatalkan dengan benar. Harpa kontak support@mega.nz untuk membatalkan subscription anda</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Tutup seluruh sesi</string>
+    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">Sesi yang tersisa telah berhasil ditutup</string>
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error saat menutup sesi yang terbuka</string>    
+    
+     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">file</item>
+        <item context="Plural of file. 2 files" quantity="other">file</item>
+    </plurals>
+    
+     <plurals name="general_num_contacts">
+        <item quantity="one" context="referring to a contact in the contact list of the user">Kontak</item>
+        <item quantity="other" context="Title of the contact list">kontak</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">folder</item>
+    </plurals>
+    
+   <plurals name="general_num_shared_folders">
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">folder berbagi</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">folder berbagi</item>
+    </plurals>
+    
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">upload</item>
+    </plurals>
+    
+     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="one" context="used for example when a folder is shared with 1 user">Pengguna</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">Pengguna</item>
+    </plurals>
+    
+    
+    <string name="login_text" context="Login button">Masuk</string>
+    <string name="email_text" context="email label">e-mail</string>
+    <string name="password_text" context="password label">password</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Konfirmasi password</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Baru di MEGA?</string>
+    <string name="create_account" context="label and text button when creating the account">Buat akun</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Harap masukkan alamat email anda</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Alamat email anda salah</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Harap masukkan password anda</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Koneksi jaringan bermasalah, harap coba kembali beberapa saat lagi</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Anda telah keluar dari perangkat ini dari lokasi lain.</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Menghitung encryption keys</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Menghubungkan ke server</string>
+    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Email atau password anda salah. Apakah anda telah memvalidasi akun email anda?</string>    
+    <string name="download_updating_filelist" context="Status text when updating the file manager">Mengupdate daftar file</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Konfirmasi akun</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Cek validation link</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Mengaktifkan akun</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Mempersiapkan daftar file</string>
+    <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Harap log in untuk berbagi dengan MEGA.</string>
+    <string name="session_problem" context="if a link to a folder cannot be fetched">Terdapat masalah saat mengambil file dari folder.</string>
+    
+    <string name="tour_space_title">MEGA SPACE</string>
+    <string name="tour_speed_title">MEGA SPEED</string>
+    <string name="tour_privacy_title">MEGA PRIVACY</string>
+    <string name="tour_access_title">MEGA ACCESS</string>
+    <string name="tour_space_text">Daftar sekarang dan dapatkan 50 GB space gratis</string>
+    <string name="tour_speed_text">Upload cepat. Bagikan file dengan siapapun</string>
+    <string name="tour_privacy_text">Simpan seluruh file anda dengan aman dengan teknologi enkripsi menyeluruh MEGA</string>
+    <string name="tour_access_text">Dapatkan akses terenkripsi penuh dimanapun, kapanpun</string>
+    
+    <string name="create_account_text" context="button that allows the user to create an account">Buat akun</string>
+    <string name="name_text" context="Name of the user">nama</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Saya setuju dengan Terms of Service MEGA</string>
+    <string name="already_account" context="Does the user already have a MEGA account">Sudah punya akun?</string>
+    
+    <string name="create_account_no_terms" context="warning dialog">Anda harus menyetujui Kebijakan Pelayanan kami</string>
+	<string name="error_enter_username" context="Warning dialog">Harap masukkan nama anda.</string>
+    <string name="error_short_password" context="when creating the account">Password terlalu singkat</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Password berbeda</string>
+    <string name="error_email_registered" contect="when creating the account">Alamat e-mail ini telah terhubung dengan akun MEGA yang lain.</string>
+    
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Konfirmasi dibutuhkan</string>
+    <string name="create_account_confirm" context="">Harap cek e-mail anda dan klik link untuk login dan mengkonfirmasi akun anda</string>
+    <string name="create_account_creating_account">Sedang menghubungi server: membuat akun</string>
+    
+    <string name="cancel_transfer_title">Batalkan pemindahan</string>
+    <string name="cancel_transfer_confirmation">Transfer akan dibatalkan, anda yakin ingin melanjutkan?</string>
+    <string name="cancel_all_transfer_confirmation">Seluruh transfer akan dibatalkan, anda yakin ingin melanjutkan?</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+	<string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Upload</string>
+	<string name="section_inbox" context="title of the screen that show the inbox">Kotak Masuk</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Simpan untuk Offline</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Folder yang dibagikan dengan saya</string>
+	<string name="section_shared_items" context="title of the screen that shows all the shared items">Item berbagi</string>
+	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Sampah</string>
+	<string name="section_contacts" context="Title of the contact list">Daftar Kontak</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">KIRIM REQUEST</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">REQUEST DITERIMA</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">Tidak ada request yang terkirim</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">Tidak ada request yang diterima</string>
+	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Pemindahan</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">Akun Saya</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s dari %2$s</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">KELUAR</string>
+	
+	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
+	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Pilih folder</string>
+	
+	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Tidak ada berkas di Cloud Drive anda</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Kosongkan Sampah</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Tidak ada folder berbagi masuk</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Tidak ada folder berbagi keluar</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Kosongkan Folder</string>
+    
+    <string name="choose_account_activity" context="Title of the activity Choose Account">Pilih Akun</string>
+	
+	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Pengaturan</string>
+	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Tersedia tanpa Internet</string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Ukuran:</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Konten:</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">Telah ditambahkan:</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Diubah:</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Tidak ada link umum</string>
+	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Link / Tautan untuk umum</string>
+	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Akses penuh</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
+	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Hanya dapat dibaca</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Berbagi dengan:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permission:</string>
+	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Izin berbagi</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">Ganti permission</string>
+	<string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Dibagikan bersama</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Kirim ke</string>
+	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Pemilik</string>
+	<string name="contact_reinvite" context="option to reinvite a contact">Undang kembali</string>	
+	<string name="contact_ignore" context="option to ignore a contact invitation">Abaikan</string>
+	<string name="contact_decline" context="option to decline a contact invitation">Tolak</string>
+	<string name="contact_accept" context="option to accept a contact invitation">Terima</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">Kontak info</string>	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Isi</string>	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Bagikan folder dengan:</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Tambah kontak anda dengan tombol dibawah.</string>	
+	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">Tidak ada kontak ditemukan pada akun ini. Harap tambahkan mereka pada halaman Kontak.</string>
+	
+	<string name="error_not_enough_free_space" context="Error message">Tidak ada ruang tersedia</string>
+	
+	<string name="option_full_link" context="Alert Dialog to get link">Link lengkap</string>
+	<string name="option_link_without_key" context="Alert Dialog to get link">Link tanpa key</string>
+	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
+	
+	<string name="download_failed" context="Error message">Download gagal</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">Berhasil di download</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Sedang mengunduh</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Memindahkan...</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Mempersiapkan file</string>
+    <string name="download_began" context="message when the download starts">Download telah dimulai</string>
+    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Apakah anda ingin membatalkan download?</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">Sentuh layar untuk membatalkan download</string>
+    <string name="download_touch_to_show" context="Hint how to cancel the download">Sentuh untuk melihat seluruh transfer</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">Kebanyakan perangkat mobile tidak dapat mengundul file yang lebih besar dari 4GB. Unduhan anda kemungkinan akan gagal</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Tidak ada app tersedia untuk meng-eksekusi file ini pada perangkat anda.</string>
+	
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Bagikan gambar dengan</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Bagikan link</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Dapatkan tautan</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Kelola link</string>
+    <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Tinggalkan</string>
+    <string name="alert_leave_share" context="Title alert before leaving a share.">Tinggalkan pembagian</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Hapus</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Hapus link</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Link ini tidak akan tersedia untuk public lagi</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Beri nama</string>
+    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Buka</string>
+    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Buka link</string>
+    <string name="context_renaming" context="while renaming a file or folder">Mengubah nama</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Menyiapkan file...</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Unduh</string>
+    <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
+    <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Import folder</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Pindahkan</string>
+    <string name="context_moving" context="while moving a file or folder">Sedang memindahkan</string>
+    <string name="context_sharing" context="while sharing a folder">Membagikan folder</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Salin</string>
+    <string name="context_upload" context="Item menu option upon right click on one or multiple files.">Unggah</string>
+    <string name="context_copying" context="while copying a file or folder">Sedang meng-copy</string>
+    <string name="context_creating_link" context="status text">Membuat link</string>
+    <string name="context_moving_to_trash" context="status text">Memindahkan ke sampah</string>
+    <string name="context_move_to_trash" context="menu item">Pindahkan ke Sampah</string>
+    <string name="context_delete_from_mega" context="menu item">Hapus dari MEGA</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Nama Folder</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Kontak email</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Membuat folder...</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">Menambah kontak</string>
+    <string name="context_download_to" context="Menu item">Simpan ke</string>
+    <string name="context_clear_rubbish" context="Menu option title">Hapus Sampah</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Seluruh item pada Sampah akan dihapus</string>
+    <string name="context_send_link" context="get the link and send it">Kirim link</string>
+    <string name="context_send" context="get the link and send it">Kirim</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Kirim ke Inbox</string>
+    <string name="context_copy_link" context="get the link and copy it">Salin tautan</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Hapus</string>
+    <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Hapus dari Offline</string>
+    <string name="context_share_folder" context="menu item">Folder Berbagi</string>
+    <string name="context_send_file" context="menu item">Kirim file</string>
+    <string name="context_view_shared_folders" context="open a shared folder">Lihan folder berbagi</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Berbagi</string>
+    <string name="remove_all_sharing" context="status text">Menghapus seluruh kontak berbagi</string>
+	<string name="leave_incoming_share" context="status text">Meninggalkan folder berbagi</string>
+    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Folder camera</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">Kontak MEGA</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Kontak telepon</string>
+    <string name="context_delete" context="menu item">Hapus</string>
+    <string name="context_more" context="menu item">Selebihnya</string>
+    <string name="context_contact_added" context="success message when adding a contact">Kontak ditambahkan</string>
+    <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request telah dihapus</string>
+    <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request terkirim</string>
+    <string name="context_invitacion_reply" context="success message when adding a contact">Balasan ke undangan terkirim</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Kontak telah dihapus</string>
+    <string name="context_contact_not_removed" context="error message">Error. Kontak belum dihapus</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">Permission telah diubah</string>
+    <string name="context_permissions_not_changed" context="error message">Error. Permission belum diubah</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder sudah ada</string>
+    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s sudah menjadi kontak.</string>
+    <string name="context_send_no_permission" context="message when trying to send a file without full access">Tidak punya izin untuk mengirim file ini.</string>
+    <string name="context_folder_created" context="success message when creating a folder">Folder telah dibuat</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">Berhasil menamakan </string>
+    <string name="context_no_renamed" context="error message">Error. Belum dinamakan kembali</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Berhasil di-copy</string>
+    <string name="context_correctly_sent" context="success message when sending a file">File telah berhasil dikirim</string>
+    <string name="context_no_sent" context="error message when sending a file">Error. File tidak terkirim</string>
+    <string name="context_no_copied" context="error message">Error. Belum ter-copy</string>
+    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Harap pilih folder tujuan.</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Berhasil dipindahkan</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d item berhasil dipindahkan</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">%d item tidak berhasil dipindahkan.</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">berhasil dipindahkan ke Sampah.</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d item berhasil dipindahkan ke Sampah</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d item tidak berhasil dikirim.</string>
+    <string name="context_no_moved" context="error message">Error. Belum dipindahkan</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Telah berhasil membagikan</string>
+    <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process saat berbagi tidak selesai.</string>
+    <string name="context_correctly_shared_removed" context="success message when sharing a folder">Berhasil menghapus berbagi</string>
+    <string name="context_no_shared_number_removed" context="error message when sharing a folder">Error. %d process saat menghapus berbagi tidak selesai.</string>
+    <string name="context_no_shared" context="error message">Error. Belum dibagikan</string>
+    <string name="context_no_removed_shared" context="error message">Error. Gagal menghilangkan berbagi.</string>
+    <string name="context_remove_sharing" context="success message when removing a sharing">Folder berbagi dihapus</string>
+    <string name="context_no_link" context="error message">Tidak dapat mengambil link</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Berhasil dihapus dari MEGA</string>
+    <string name="context_no_removed" context="error message">Error. Belum dipindahkan dari MEGA</string>
+    <string name="number_correctly_removed" context="success message when moving a node">%d item berhasil dihapus dari MEGA</string>
+    <string name="number_no_removed" context="error message when moving a node">%d item tidak berhasil dihapus.</string>
+    <string name="number_correctly_leaved" context="success message when moving a node">%d folder berhasil ditinggalkan</string>
+    <string name="number_no_leaved" context="error message when moving a node">%d folder tidak berhasil ditinggalkan.</string>
+    <string name="number_correctly_sent" context="success message when sending multiple files">File berhasil terkirim ke %d kontak.</string>
+    <string name="number_no_sent" context="error message when sending multiple files">File tidak terkirim ke %d kontak.</string>
+    <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d file berhasil terkirim.</string>
+    <string name="number_no_sent_multifile" context="error message when sending multiple files">, %d file gagal mengirim</string>
+    <string name="number_correctly_copied" context="success message when sending multiple files">%d item berhasil terkopi.</string>
+    <string name="number_no_copied" context="error message when sending multiple files">%d item tidak terkopi.</string>
+    <string name="number_contact_removed" context="success message when removing several contacts">%d kontak berhasil dihapus.</string>
+    <string name="number_contact_not_removed" context="error message when removing several contacts">%d kontak tidak terhapus.</string>
+    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">Folder berhasil dibagikan dengan %d kontak</string>
+    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">File tidak dapat dibagikan dengan %d kontak.</string>
+    <string name="number_correctly_shared" context="success message when sharing multiple files">%d folder berhasil dibagikan.</string>
+    <string name="number_no_shared" context="error message when sharing multiple files">%d folder tidak dibagikan.</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Telah berhasil mengirimkan ke: </string>
+    <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">Folder tidak lagi dibagikan</string>
+    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, folder masih dibagikan dengan kontak lain</string>
+    <string name="context_select_one_file" context="option available for just one file">Pilih hanya satu file.</string>
+    
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Anda sedang akan membatalkan subskripsi MEGA anda. Harap beritahu kami, jika ada yang bisa kami lakukan untuk merubah pikiran anda.</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">Masukan feedback disini...</string>
+    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Hilangkan</string>
+    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Kirim</string>
+    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Batalkan Subscription</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Terima kasih untuk feedback anda! Anda yakin ingin membatalkan subscription MEGA anda?</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Subskripsi anda belum dibatalkan. Harap, berikan alasan pembatalan.</string>
+    
+    <string name="context_node_private" context="success message after removing the public link of a folder">Folder ini sekarang private</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Berbagi telah berhasil dihapus</string>
+  
+    <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Folder Baru</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Tambah kontak </string>
+    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download dari link MEGA</string>
+    
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
+    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Harap masukan decryption key untuk link.</string>
+        
+    <string name="upload_to_image" context="upload to. Then choose an Image file">Gambar</string>
+	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
+	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
+	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">File Lain</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Ambil dari File System</string>
+	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Pilih tipe file</string>
+	<string name="upload_uploading" context="status text">Mengunggah</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Sentuh layar untuk membatalkan upload</string>
+	<string name="upload_failed" context="error message">Upload gagal</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">Berhasil di upload</string>
+	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Apakah anda ingin membatalkan upload?</string>
+	<string name="upload_prepare" context="Status text at the beginning of an upload">Sedang memproses file</string>
+	<string name="error_temporary_unavaible" context="error message when downloading a file">Sumber sementara tidak tersedia, harap coba kembali nanti</string>
+	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Tidak dapat membuka file terpilih</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">Upload telah dimulai</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Meng-unzip file</string>
+		
+	<string name="error_io_problem" context="error message while browsing the local filesystem">Filesystem bermasalah</string>
+	<string name="general_error" context="error message while browsing the local filesystem">Terjadi error saat menjalankan aksi</string>
+	
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Image Viewer</string>
+	
+	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Format link salah</string>
+	
+	<string name="my_account_activity" context="Title of the screen where the user account information is shown">Akun</string>
+    <string name="my_account_total_space" context="Headline for the amount of total storage space">Ruang Tersedia</string>
+    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Ruang Tersedia</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Space Terpakai</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade sekarang!</string>
+    <string name="my_account_change_password" context="menu item">Ubah kata sandi</string>
+    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Anda mulai kehabisan space! Apakah anda ingin meng-upgrade akun anda?</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Anda dapat menjadi pengguna PRO!Apakah anda ingin meng-upgrade akun anda?</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Waspada overquota!</string>
+     <string name="overquota_alert_text" context="Dialod text overquota error">Operasi tidak diizinkan, anda akan melebih batas storage akun anda. Apakah anda ingin upgrade akun anda?</string>
+    
+    <string name="op_not_allowed" context="Dialod text overquota error">Operation tidak diizinkan</string>
+    <string name="my_account_last_session" context="when did the last session happen">Sesi terakhir:</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Koneksi:</string>
+    
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">Mengganti password</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Kata sandi terkini</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">Kata sandi baru</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">Konfirmasi kata sandi baru </string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Password anda salah atau password baru yang anda masukkan tidak sama. Harap coba kembali.</string>
+    <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Password salah. Harap coba kembali.</string>
+    <string name="my_account_change_password_OK" context="Success text">Password telah sukses dirubah</string>
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Password tidak cocok</string> 
+    
+    <string name="upgrade_activity" context="title of the Upgrade screen">Keanggotaan Pro</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Pilih membership</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">Iuran rutin perbulan atau pertahun</string>
+    <string name="select_membership_2" context="button to go to Google Play">Subskripsi Google Play</string>
+    
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Pilih metoda pembayaran</string>
+    <string name="no_available_payment_method" context="choose the payment method option when no method is available">Saat ini, tidak ada metoda pembayaran yang tersedia untuk plan ini</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
+    <string name="payment_method_centili" context="one of the payment methods">Mobile Carrier (one-off)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
+    
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Perbulan*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Per tahun*</string>
+    
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* iuran rutin dapat dibatalkan kapan saja sebelum jatuh tempo untuk pembayaran berikutnya.</string>
+    
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">Link telah disalin ke clipboard</string>
+    <string name="file_properties_remove_link" context="the user can remove the public link">Link telah dihapus</string>
+    
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Preview ini belum di-download. Harap menunggu.</string>
+    
+    <string name="import_correct" context="success message after import a file">Telah berhasil diimpor</string>
+    
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">Tidak terdapat transfer aktif</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Semua transfer diberhentikan sementara</string>
+    <string name="menu_pause_transfers" context="menu item">Hentikan transfer</string>
+    <string name="menu_restart_transfers" context="menu item">Ulangi transfer</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Batalkan seluruh transfer</string>
+    <string name="menu_take_picture" context="menu item">Ambil foto</string>
+    
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Hanya Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi atau data plan</string>
+    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="cam_sync_skip" context="skip the step of camera upload">Lewati</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload sedang berjalan</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Apakah anda ingin membatalkan Camera Uploads?</string>
+    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Folder tujuan tidak tersedia</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Meng-upload file atau folder media</string>
+    <string name="settings_camera_notif_error" context="notification error">Masalah Camera Uploads</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads telah selesai</string>
+    
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Gudang</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
+    
+    <string name="settings_advanced_features" context="Settings category title for cache and offline files">Fitur Lanjutan</string>
+    <string name="settings_advanced_features_cache" context="Settings preference title for cache">Hapus Cache</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Hapus File Offilne</string>
+    
+    <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Sekarang memakai %s</string>    
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Menghitung...</string>
+    
+    <string name="settings_storage_download_location" context="title of the setting to set the default download location">Lokasi download default</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Selalu tanya lokasi download</string>
+    <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Tampilkan advanced devices (external SD)</string>
+    
+    <string name="settings_camera_upload_on" context="settings option">Aktifkan Camera Uploads</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Nyalakan Camera Uploads</string>
+    <string name="settings_camera_upload_off" context="settings option">Non-aktifkan Camera Uploads</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Bagaimana cara upload</string>
+    
+    <string name="settings_secondary_upload_on" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Aktifkan Upload Secondary Media</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Membatalkan Upload Secondary Media</string>
+    
+    <string name="settings_empty_folder" context="settings option">Pilih folder</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi atau data plan</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Hanya Wi-Fi</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Unggah Berkas</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">Hanya foto</item>
+        <item context="the options of what to upload.">Hanya Video</item>
+        <item context="the options of what to upload.">Foto dan Video</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Hanya saat sedang men-cas</string>
+    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Simpan nama file apa adanya seperti pada perangkat</string>
+    
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Folder kamera lokal</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Folder uploads Mega Camera</string>
+    
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Folder secondary lokal</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Folder Secondary Mega</string>
+    
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Hanya foto</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Hanya Video</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto dan Video</string>
+    
+    <string name="settings_pin_lock_on" context="settings of the pin lock">Aktifkan PIN lock</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">Non-aktifkan PIN lock</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">Kode PIN</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Belum diatur</string>
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Reset PIN code</string> 
+    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
+    
+    <string name="pin_lock_enter" context="Button after the pin code input field">Masukkan</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">File lokal anda akan dihapus dan anda akan keluar setelah 10 kali gagal mencoba.</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Kode salah</string>
+    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">PIN code salah, harap coba kembali. Anda mempunyai %2d kesempatan lagi.</string>
+    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Code tidak cocok</string>
+    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Masukan PIN Code anda</string>
+    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Masukan kembali PIN Code anda</string>
+    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Masukan PIN Code baru anda</string>
+    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Masukan kembali PIN Code baru anda</string>
+    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">Seluruh data lokal anda akan dihapus dan anda akan keluar dalam %d detik.</string>
+    
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Perihal</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Kebijakan Privasi</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Peraturan Pelayanan</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versi App</string>
+    <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">Versi MEGA SDK</string>
+    
+    <string name="january">Januari</string>
+    <string name="february">Februari</string>
+    <string name="march">Maret</string>
+    <string name="april">April</string>
+    <string name="may">Mei</string>
+    <string name="june">Juni</string>
+    <string name="july">Juli</string>
+    <string name="august">Agustus</string>
+    <string name="september">September</string>
+    <string name="october">Oktober</string>
+    <string name="november">November</string>
+    <string name="december">Desember</string>
+    
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Penjelajah ZIP</string>
+    
+    <string name="new_account" context="in login screen to create a new account">Buat satu akun sekarang!</string>
+    
+    <string name="my_account_title" context="title of the My Account screen">Tipe Akun: </string>
+    <string name="expires_on" context="title of the Expiration Date">Berakhir pada</string>
+    <string name="free_account">GRATIS</string>
+    <string name="prolite_account" context="Not translate">Lite</string>
+    <string name="pro1_account" context="Not translate">Pro I</string>
+    <string name="pro2_account" context="Not translate">Pro II</string>
+    <string name="pro3_account" context="Not translate">Pro III</string>
+    
+    <string name="free_storage" context="Not translate">50 GB</string>   
+    <string name="free_bandwidth" context="Free bandwich account details">Terbatas</string>
+    
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Folder Camera Uploads telah dibuat</string>
+    
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">Zip file akan di-download dan di-unzip</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">Zip file akan di-unzip</string>
+    
+    <string name="sortby_name" context="category in sort by action">Oleh nama</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">Naik</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">menurun</string>
+    
+    <string name="sortby_date" context="category in sort by action">Oleh tanggal</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">terbaru</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">tertua</string>
+    
+    <string name="sortby_size" context="category in sort by action">Oleh ukuran</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Lebih besar duluan</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">lebih kecil duluan</string>
+    
+    <string name="per_month" context="in payments, for example: 4.99€ per month">per bulan</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">per tahun</string>
+    
+    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Masukan detail billing anda:</string>
+    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Alamat 1</string>
+    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Alamat 2 (optional)</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Kota</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State / Provinsi</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Negara</string>
+    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Kode pos</string>
+    
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Masukan detail pembayaran anda:</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Nama depan</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Nama belakang</string>
+    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Nomor Credit Card</string>
+    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Bulan</string>
+    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Tahun</string>
+    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
+    
+    <string name="proceed_cc" context="Text of the button which proceeds the payment">Lanjut</string>
+    
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Akun telah berhasil di upgrade!</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operasi belum selesai dengan benar. Credit card tidak akan di-cas</string>
+    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Informasi kartu kredit anda tidak benar. Kartu kredit anda tidak akan di-cas</string>
+    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Akun anda tidak dapat di-upgrade dari app. Harap kontak support@mega.nz untuk men-upgrade akun anda.</string>
+</resources>
