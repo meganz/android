@@ -42,6 +42,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 	TextView createAccountTitle;
 	TextView textAlreadyAccount;
 	EditText userName;
+	EditText userLastName;
 	EditText userEmail;
 	EditText userPassword;
 	EditText userPasswordConfirm;
@@ -105,7 +106,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		createAccountTitle = (TextView) findViewById(R.id.create_account_text_view);
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)createAccountTitle.getLayoutParams();
-		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		createAccountTitle.setLayoutParams(textParams);
 		createAccountTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
@@ -116,7 +117,16 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		//Left margin
 		textParams = (LinearLayout.LayoutParams)userName.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
-		userName.setLayoutParams(textParams);				
+		userName.setLayoutParams(textParams);	
+		
+		userLastName = (EditText) findViewById(R.id.create_account_last_name_text);
+		android.view.ViewGroup.LayoutParams paramsb2 = userLastName.getLayoutParams();		
+		paramsb2.width = Util.scaleWidthPx(280, outMetrics);		
+		userLastName.setLayoutParams(paramsb2);
+		//Left margin
+		textParams = (LinearLayout.LayoutParams)userLastName.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
+		userLastName.setLayoutParams(textParams);	
 		
 		userEmail = (EditText) findViewById(R.id.create_account_email_text);
 		userEmail.setLayoutParams(paramsb1);
@@ -149,14 +159,14 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		bRegister.setLayoutParams(paramsbRegister);
 		//Margin
 		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
-		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, Util.scaleHeightPx(15, outMetrics)); 
+		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, 0); 
 		bRegister.setLayoutParams(textParamsRegister);
 		bRegister.setOnClickListener(this);		
 		
 		textAlreadyAccount = (TextView) findViewById(R.id.text_already_account);
 		//Margins (left, top, right, bottom)
 		LinearLayout.LayoutParams textAAccount = (LinearLayout.LayoutParams)textAlreadyAccount.getLayoutParams();
-		textAAccount.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics)); 
+		textAAccount.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(25, outMetrics)); 
 		textAlreadyAccount.setLayoutParams(textAAccount);	
 		textAlreadyAccount.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));			
 		
@@ -171,8 +181,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
 		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
-		bLogin.setLayoutParams(textParamsLogin);
-		
+		bLogin.setLayoutParams(textParamsLogin);		
 
 		creatingAccountLayout = (LinearLayout) findViewById(R.id.create_account_creating_layout);
 		creatingAccountTextView = (TextView) findViewById(R.id.create_account_creating_text);
@@ -352,7 +361,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 		creatingAccountLayout.setVisibility(View.VISIBLE);
 		creatingAccountTextView.setVisibility(View.VISIBLE);
 		createAccountProgressBar.setVisibility(View.VISIBLE);
-		megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), this);
+		megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
 //		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
 	}
 	

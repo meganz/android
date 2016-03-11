@@ -38,6 +38,15 @@
                 android:hint="@string/name_text"
                 android:imeOptions="actionNext"
                 android:inputType="text" />
+            
+             <EditText
+                android:id="@+id/create_account_last_name_text"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="left"
+                android:hint="@string/lastname_text"
+                android:imeOptions="actionNext"
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/create_account_email_text"
@@ -138,7 +147,7 @@
                 android:id="@+id/create_account_mega_logo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="60dp"
                 android:src="@drawable/mega_ic" />
 
             <TextView
