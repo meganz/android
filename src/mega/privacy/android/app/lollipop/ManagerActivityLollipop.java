@@ -7485,11 +7485,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("(ManagerActivityLollipop(1)request.getText(): "+request.getText()+" -- "+request.getEmail());
 					int rows = dbH.setContactName(request.getText(), request.getEmail());
 					log("Rows affected: "+rows);
+					
+					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if (cFLol != null){
+						if (drawerItem == DrawerItem.CONTACTS){					
+							cFLol.updateView();
+						}
+					}					
 				}
 				else if(request.getParamType()==2){
 					log("ManagerActivityLollipop(2)request.getText(): "+request.getText()+" -- "+request.getEmail());
 					int rows = dbH.setContactLastName(request.getText(), request.getEmail());
 					log("Rows affected: "+rows);
+					
+					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if (cFLol != null){
+						if (drawerItem == DrawerItem.CONTACTS){					
+							cFLol.updateView();
+						}
+					}
 				}
 			}
 		}
@@ -10654,7 +10670,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		log("onUsersUpdateLollipop");
+		log("onUsersUpdateLollipop: "+users.size());
+		
+		for(int i=0; i<users.size();i++){
+			MegaUser user=users.get(i);
+
+			if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
+				log("The user: "+user.getEmail()+"changed his first name");
+				megaApi.getUserAttribute(user, 1, new ContactNameListener(this));				
+			}
+			if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
+				log("The user: "+user.getEmail()+"changed his last name");
+				megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+			}
+		}
+		
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cFLol != null){
