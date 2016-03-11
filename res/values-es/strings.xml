@@ -168,6 +168,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Crear cuenta</string>
     <string name="name_text" context="Name of the user">Nombre</string>
+    <string name="lastname_text" context="Last name of the user">Apellido</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Estoy de acuerdo con los Términos del Servicio de MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">¿Ya tienes una cuenta?</string>
     
