@@ -50,6 +50,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,6 +80,8 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	DisplayMetrics outMetrics;
 	Display display;
 	
+	ImageView emptyImageView;
+	TextView emptyTextView;
 	int multipleSelectIntent;
 	int sendToInbox;
 //	private TextView windowTitle;
@@ -227,6 +230,9 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);		
+		
+		emptyImageView = (ImageView) findViewById(R.id.contact_explorer_list_empty_image);
+		emptyTextView = (TextView) findViewById(R.id.contact_explorer_list_empty_text);
 			
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
@@ -260,6 +266,16 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			adapter.setContacts(visibleContacts);
 		}			
 		
+		if (adapter.getItemCount() == 0){				
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
 		
 		Intent intent = getIntent();
 		
