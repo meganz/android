@@ -238,10 +238,10 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			}
 		}
 		
-		if (visibleContacts.size() == 0){
-			Toast.makeText(this, getString(R.string.no_contacts), Toast.LENGTH_SHORT).show();
-			finish();
-		}
+//		if (visibleContacts.size() == 0){
+//			Toast.makeText(this, getString(R.string.no_contacts), Toast.LENGTH_SHORT).show();
+//			finish();
+//		}
 		
 		if (adapter == null){
 			adapter = new ContactsExplorerLollipopAdapter(this, visibleContacts);
@@ -371,15 +371,18 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			@Override
 			public void onClick(View v) {
 				String value = input.getText().toString().trim();
-				String emailError = getEmailError(value);
-				if (emailError != null) {
-					input.setError(emailError);
-				} else {
-					ArrayList<String> emails = new ArrayList<String>();
-					emails.add(value);
-					setResultContacts(emails, true);
-					addContactDialog.dismiss();
-				}
+				if(value!=null){
+					String emailError = getEmailError(value);
+					if (emailError != null) {
+						input.setError(emailError);
+					} else {
+						ArrayList<String> emails = new ArrayList<String>();
+						emails.add(value);
+						log("The user is: "+value);
+						setResultContacts(emails, true);
+						addContactDialog.dismiss();
+					}
+				}				
 			}
 		});
 	}
@@ -528,8 +531,15 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	 * activity
 	 */
 	private void setResultContacts(ArrayList<String> emails, boolean megaContacts) {
+//		log("setResultContacts");
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra(EXTRA_CONTACTS, emails);
+		if(emails!=null){
+			for(int i=0; i<emails.size();i++){
+				log("setResultContacts: "+emails.get(i));
+			}
+		}
+		
 		if(multipleSelectIntent==0){
 			log("multiselectIntent == 0");
 			intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
