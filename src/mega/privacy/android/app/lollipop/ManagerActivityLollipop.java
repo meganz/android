@@ -1845,8 +1845,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         						firstNavigationLevel = true;
         					}
-        					ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
-        					nodes =	megaApi.getChildren(parentNode, orderGetChildren);
+        					ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();        					
+        					if(parentNode!=null){
+        						nodes =	megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+        					}
+        					else{
+        						nodes =	megaApi.getChildren(parentNode, orderGetChildren);
+        					}
         					fbFLol.setNodes(nodes);
             			}
     				}
@@ -2034,45 +2039,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				if (fbFLol!=null){
     					//Cloud Drive
     					//Show
-    					addMenuItem.setEnabled(true);
-    					addMenuItem.setVisible(true);
-    					log("createFolderMenuItem.setVisible_2");
-    					createFolderMenuItem.setVisible(true);				
-    					sortByMenuItem.setVisible(true);
-    					thumbViewMenuItem.setVisible(true);
-    					rubbishBinMenuItem.setVisible(false);				
-    	    			upgradeAccountMenuItem.setVisible(false);    			
-    	    			importLinkMenuItem.setVisible(true);
-    	    			takePicture.setVisible(true);
-    	    			selectMenuItem.setVisible(true);
-    	    			searchMenuItem.setVisible(true);
-    	    			
-    					//Hide
-    					pauseTransfersMenuIcon.setVisible(false);
-    					playTransfersMenuIcon.setVisible(false);
-    	    			addContactMenuItem.setVisible(false);    			
-    	    			unSelectMenuItem.setVisible(false); 
-    	    			clearRubbishBinMenuitem.setVisible(false); 
-    	    			changePass.setVisible(false); 
-    	    			refreshMenuItem.setVisible(false);
-    					helpMenuItem.setVisible(false);
-    					settingsMenuItem.setVisible(false);
-    					killAllSessions.setVisible(false);					
+    					if (addMenuItem != null){
+    						addMenuItem.setEnabled(true);
+        					addMenuItem.setVisible(true);
+        					log("createFolderMenuItem.setVisible_2");
+        					createFolderMenuItem.setVisible(true);				
+        					sortByMenuItem.setVisible(true);
+        					thumbViewMenuItem.setVisible(true);
+        					rubbishBinMenuItem.setVisible(false);				
+        	    			upgradeAccountMenuItem.setVisible(false);    			
+        	    			importLinkMenuItem.setVisible(true);
+        	    			takePicture.setVisible(true);
+        	    			selectMenuItem.setVisible(true);
+        	    			searchMenuItem.setVisible(true);
+        	    			
+        					//Hide
+        					pauseTransfersMenuIcon.setVisible(false);
+        					playTransfersMenuIcon.setVisible(false);
+        	    			addContactMenuItem.setVisible(false);    			
+        	    			unSelectMenuItem.setVisible(false); 
+        	    			clearRubbishBinMenuitem.setVisible(false); 
+        	    			changePass.setVisible(false); 
+        	    			refreshMenuItem.setVisible(false);
+        					helpMenuItem.setVisible(false);
+        					settingsMenuItem.setVisible(false);
+        					killAllSessions.setVisible(false);					
 
-    					if(fbFLol.getItemCount()>0){
-    						selectMenuItem.setVisible(true);
-    					}
-    					else{
-    						selectMenuItem.setVisible(false);
-    					}
-    	    			
-    	    			if (isList){	
-    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-    					}
-    					else{
-    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    	    			}
-    	    			gridSmallLargeMenuItem.setVisible(false);
+        					if(fbFLol.getItemCount()>0){
+        						selectMenuItem.setVisible(true);
+        					}
+        					else{
+        						selectMenuItem.setVisible(false);
+        					}
+        	    			
+        	    			if (isList){	
+        	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+        					}
+        					else{
+        						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+        	    			}
+        	    			gridSmallLargeMenuItem.setVisible(false);
+    					}    					
     				}
     			}
     			
@@ -8810,6 +8817,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}	
 		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+			log("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
 			
 			if (intent == null) {			
 				log("Return.....");
@@ -8821,7 +8829,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);			
+			contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);		
+			if(contactsData!=null){
+				for(int i=0; i<contactsData.size();i++){
+					log("setResultContacts: "+contactsData.get(i));
+				}
+			}
+			else{
+				log("contactsData is NULL");
+			}
+			
 			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 			
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
@@ -8847,24 +8864,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								switch(item) {
 				                    case 0:{
 				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));		
-				                    		log("Node: "+node.getName());
-				                    		log("User: "+u.getEmail());
-				                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+				                    		if(u!=null){
+				                    			log("Node: "+node.getName());
+					                    		log("User: "+u.getEmail());
+					                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
+				                    		}
+				                    		else{
+				                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+				                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, managerActivity);
+				                    		}
+				                    		
 				                    	}
 				                    	break;
 				                    }
 				                    case 1:{
 				                    	for (int i=0;i<contactsData.size();i++){
 				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-				                    	}
+					                    	if(u!=null){
+					                    		log("User: "+u.getEmail());
+					                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+				                    		}
+				                    		else{
+				                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+				                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, managerActivity);
+				                    		}
+				                    	}       	
 				                        break;
 				                    }
 				                    case 2:{
 				                    	for (int i=0;i<contactsData.size();i++){
 				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+				                    		if(u!=null){
+					                    		log("User: "+u.getEmail());
+					                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+				                    		}
+				                    		else{
+				                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+				                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, managerActivity);
+				                    		}
 				                    	}		                    	
 				                        break;
 				                    }
@@ -10667,7 +10705,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}				
 			}
 			else{
-				log("ERROR MegaRequest.TYPE_SHARE");
+				log("ERROR MegaRequest.TYPE_SHARE: "+request.getEmail()+" : "+request.getName());
 				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_removed_shared), Snackbar.LENGTH_LONG).show();
 				}
