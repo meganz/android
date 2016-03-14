@@ -6355,14 +6355,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				log("Node: "+ node.getName());
 			}
-		}
-		
-		double availableFreeSpace = Double.MAX_VALUE;
-		try{
-			StatFs stat = new StatFs(parentPath);
-			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-		}
-		catch(Exception ex){}		
+		}		
 		
 		if (hashes == null){
 			log("hashes is null");
@@ -6486,24 +6479,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					MegaNode node = megaApi.getNodeByHandle(hash);
 					log("Node: "+ node.getName());
 					
-					Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
-					log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
-					
-					checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
-					
-					try{
-						if (!isIntentAvailable(this, checkIntent)){
+					if(node.isFile()){
+						Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
+						log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
+						
+						checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
+						
+						try{
+							if (!isIntentAvailable(this, checkIntent)){
+								confirmationToDownload = true;
+								nodeToDownload=node.getName();
+								break;
+							}					
+						}catch(Exception e){
+							log("isIntent EXCEPTION");
 							confirmationToDownload = true;
 							nodeToDownload=node.getName();
 							break;
-						}					
-					}catch(Exception e){
-						log("isIntent EXCEPTION");
-						confirmationToDownload = true;
-						nodeToDownload=node.getName();
-						break;
-					}	
-					
+						}	
+					}					
 				}			
 			}	
 			
@@ -6552,16 +6546,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
-		log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
+		log("downloadTo, parentPath: "+parentPath+ " url: "+url+" size: "+size);
 		log("files to download: "+hashes.length);
 		log("SIZE to download: "+size);
 		
 		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long sizeC = size;
-		final long [] hashesC = hashes;
+		final String urlC = url;		
+		final long [] hashesC = hashes;		
 		
-		//Chech if there is available space
+		for (long hash : hashes) {
+			MegaNode node = megaApi.getNodeByHandle(hash);	
+			if(node!=null){
+				if(node.isFolder()){
+					size=size+getFolderSize(node);
+				}
+				else{
+					size = size+node.getSize();	
+				}
+			}
+		}		
+			
+		final long sizeC = size;
+		log("the final size is: "+Util.getSizeString(size));
+		
+		//Check if there is available space
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);
@@ -6573,13 +6581,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 			log("Not enough space");
 			return;
-		}
-	
-		if (hashes != null){
-			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				log("Node: "+ node.getName());
-			}			
 		}
 
 		String ask=dbH.getAttributes().getAskSizeDownload();
@@ -6597,6 +6598,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Check size to download
 			//100MB=104857600
 			//10MB=10485760
+			//1MB=1048576
 			if(size>104857600){
 				log("Show size confirmacion: "+size);
 				//Show alert
@@ -6674,6 +6676,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	}
+	
+	private long getFolderSize(MegaNode parent) {
+		log("getFolderSize");
+
+        long size = 0;
+//        File[] files = dir.listFiles();
+        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
+        for (MegaNode node : nodeList) {
+            if (node.isFile()) {
+                size += node.getSize();
+            }
+            else{
+                size += getFolderSize(node);
+            }
+        }
+
+        return size;
+    }
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public void openAdvancedDevices (long handle){
@@ -10949,13 +10969,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onContactRequestsUpdate(MegaApiJava api,ArrayList<MegaContactRequest> requests) {
 		log("---------------------onContactRequestsUpdate");
 		
-		for(int i=0; i<requests.size();i++){
-			MegaContactRequest req = requests.get(i);
-			log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
-			if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
-				addContactDB(req.getTargetEmail());
+		if(requests!=null){
+			for(int i=0; i<requests.size();i++){
+				MegaContactRequest req = requests.get(i);
+				log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+				if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
+					addContactDB(req.getTargetEmail());
+				}
 			}
-		}
+		}		
 		
 		if (drawerItem == DrawerItem.CONTACTS){
 			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
