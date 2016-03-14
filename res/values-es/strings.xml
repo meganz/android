@@ -249,6 +249,7 @@
 	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">No hay contactos en la cuenta. Añádelos en la pantalla de Contactos</string>
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
 	<string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string>
+	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Añade un nuevo contacto para compartir</string>
 	
 	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link sin clave de cifrado</string>
