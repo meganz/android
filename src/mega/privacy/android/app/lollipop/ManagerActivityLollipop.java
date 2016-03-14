@@ -1957,7 +1957,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (!firstTime){
     				drawerLayout.closeDrawer(Gravity.LEFT);
     				
-    				if (dbH.getContactsSize() < megaApi.getContacts().size()){
+    				if (dbH.getContactsSize() != megaApi.getContacts().size()){
     					dbH.clearContacts();
     					FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
         				fillDBContactsTask.execute();
@@ -7591,7 +7591,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						
 			for(int i=0; i<contacts.size(); i++){				
 				MegaContact megaContact = new MegaContact(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
-				dbH.setContacts(megaContact);
+				dbH.setContact(megaContact);
 				megaApi.getUserAttribute(contacts.get(i), 1, listener);
 				megaApi.getUserAttribute(contacts.get(i), 2, listener);
 			}			
@@ -7872,7 +7872,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, this);
 	}
 	
-
+	public void addContactDB(String email){
+		log("addContactDB");
+		
+		MegaUser user = megaApi.getContact(email);
+		if(user!=null){
+			log("User to add: "+user.getEmail());
+			//Check the user is not previously in the DB
+			if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
+				log("The contact NOT exists -> add to DB");
+				MegaContact megaContact = new MegaContact(String.valueOf(user.getHandle()), user.getEmail(), "", "");
+				dbH.setContact(megaContact);
+				megaApi.getUserAttribute(user, 1, new ContactNameListener(this));
+				megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+			}
+			else{
+				log("The contact already exists -> update");
+				megaApi.getUserAttribute(user, 1, new ContactNameListener(this));
+				megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+			}
+		}		
+	}
 	
 	public void removeContact(final MegaUser c){
 		
@@ -10691,14 +10711,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("The user: "+user.getEmail()+"changed his last name");
 					megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
 				}
-			}
-			
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-			if (cFLol != null){
-				if (drawerItem == DrawerItem.CONTACTS){					
-					cFLol.updateView();
+				if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
+					log("The user: "+user.getEmail()+"changed his AVATAR");
+					
+					File avatar = null;
+					if (this.getExternalCacheDir() != null){
+						avatar = new File(this.getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
+					}
+					else{
+						avatar = new File(this.getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
+					}
+					Bitmap bitmap = null;
+					if (avatar.exists()){
+						avatar.delete();								
+					}				
 				}
+			}		
+		}
+		
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cFLol != null){
+			if (drawerItem == DrawerItem.CONTACTS){					
+				cFLol.updateView();
 			}
 			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);		
 			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
@@ -10875,7 +10910,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,ArrayList<MegaContactRequest> requests) {
 		log("---------------------onContactRequestsUpdate");
-		// TODO Auto-generated method stub
+		
+		for(int i=0; i<requests.size();i++){
+			MegaContactRequest req = requests.get(i);
+			log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+			if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
+				addContactDB(req.getTargetEmail());
+			}
+		}
+		
 		if (drawerItem == DrawerItem.CONTACTS){
 			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
 			log("Tag: "+ sRFTag1);

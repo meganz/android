@@ -430,13 +430,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return attr;
 	}
 	
-	public void setContacts (MegaContact contacts){
-		log("setContacts");
+	public void setContact (MegaContact contact){
+		log("setContacts: "+contact.getMail());
         ContentValues values = new ContentValues();
-        values.put(KEY_CONTACT_HANDLE, encrypt(contacts.getHandle()));
-        values.put(KEY_CONTACT_MAIL, encrypt(contacts.getMail()));
-        values.put(KEY_CONTACT_NAME, encrypt(contacts.getName()));
-        values.put(KEY_CONTACT_LAST_NAME, encrypt(contacts.getLastName()));
+        values.put(KEY_CONTACT_HANDLE, encrypt(contact.getHandle()));
+        values.put(KEY_CONTACT_MAIL, encrypt(contact.getMail()));
+        values.put(KEY_CONTACT_NAME, encrypt(contact.getName()));
+        values.put(KEY_CONTACT_LAST_NAME, encrypt(contact.getLastName()));
 //        values.put(KEY_CONTACT_HANDLE, (contacts.getHandle()));
 //        values.put(KEY_CONTACT_MAIL, (contacts.getMail()));
 //        values.put(KEY_CONTACT_NAME, (contacts.getName()));
