@@ -480,6 +480,30 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 			}
+			else{
+				for (int i=0;i<nl.size();i++){
+					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+						secondaryUploadHandle = nl.get(i).getHandle();
+						dbH.setSecondaryFolderHandle(secondaryUploadHandle);
+					}					
+				}
+				
+				//If not "Media Uploads"
+				if (secondaryUploadHandle == -1){
+					log("must create the folder");
+					if (!running){
+						running = true;
+						megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+					}
+					else{
+						if (megaApi != null){
+							megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+							return START_NOT_STICKY;
+						}
+					}
+					return START_NOT_STICKY;
+				}
+			}
 		}
 		else{
 			log("Secondary NOT Enabled");
@@ -1312,6 +1336,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 							}while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
 			
 							currentTimeStamp = mediaSecondary.timestamp;
+							
 							megaApi.copyNode(nodeExists, secondaryUploadNode, photoFinalName, this);
 							log("CHANGED!!!! SecondaryFinalName: " + photoFinalName + "______" + photoIndex);
 						}	
@@ -2005,7 +2030,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 			}
 			else{
-				log("Error renaming");
+				log("Error: "+request.getType()+" : "+request.getRequestString());
+				if(request.getNodeHandle()!=-1){
+					MegaNode nodeError = megaApi.getNodeByHandle(request.getNodeHandle());
+					if(nodeError!=null){
+						log("Node: "+nodeError.getName());
+					}
+				}
+
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 			}
 		}
