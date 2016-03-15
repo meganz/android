@@ -297,7 +297,7 @@
     <string name="context_copying" context="while copying a file or folder">Copying</string>
     <string name="context_creating_link" context="status text">Creating link</string>
     <string name="context_moving_to_trash" context="status text">Moving to Rubbish Bin</string>
-    <string name="context_move_to_trash" context="menu item">Move to Rubbish rin</string>
+    <string name="context_move_to_trash" context="menu item">Move to Rubbish Bin</string>
     <string name="context_delete_from_mega" context="menu item">Delete from MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Folder Name</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Contact email</string>
