@@ -1668,14 +1668,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterList != null){
 				adapterList.setNodes(nodesArray, nodes);
 				if (adapterList.getItemCount() == 0){
-					listView.setVisibility(View.GONE);
+					if (listView != null){
+						listView.setVisibility(View.GONE);
+					}					
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
 				else{
-					listView.setVisibility(View.VISIBLE);
+					if (listView != null){
+						listView.setVisibility(View.VISIBLE);
+					}					
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}			
