@@ -579,6 +579,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 			
 			boolean camEnabled = false;
+			prefs=dbH.getPreferences();
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
@@ -588,6 +589,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 					else{
 						log("SHOW option Turn on Camera Uploads");
+						turnOnOff.setVisibility(View.VISIBLE);
 						camEnabled = false;
 					}
 				}
@@ -766,6 +768,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));			
 			
 			boolean camEnabled = false;
+			prefs=dbH.getPreferences();
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
@@ -774,6 +777,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 					else{
 						camEnabled = false;
+						turnOnOff.setVisibility(View.VISIBLE);
 					}
 				}
 			}
