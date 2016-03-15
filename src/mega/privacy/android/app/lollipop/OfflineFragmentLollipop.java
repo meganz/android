@@ -409,10 +409,10 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		int parentId = node.getParentId();
 		parentNode = dbH.findById(parentId);
-		log("Parent to check: "+parentNode.getName());
+	
 		if(parentNode != null){
-			checkParentDeletion(parentNode);
-				
+			log("Parent to check: "+parentNode.getName());
+			checkParentDeletion(parentNode);			
 		}	
 		
 		return 1;		
