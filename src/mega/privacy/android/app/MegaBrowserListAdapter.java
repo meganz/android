@@ -1221,21 +1221,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			handleList.add(n.getHandle());
 			setPositionClicked(-1);
 			notifyDataSetChanged();
-			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
-				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
-				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
-				//break;
-			}
-			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
-				log("type != ManagerActivity.CONTACT_FILE_ADAPTER");
-				((ContactPropertiesMainActivity) context).moveToTrash(handleList);				
-				//break;
-			} 
-			else {
-				log("type ELSE");
-				((ManagerActivity) context).moveToTrash(handleList);
-				//break;
-			}
+			((ManagerActivity) context).moveToTrash(handleList);
 			break;
 		}
 		case R.id.file_list_option_delete_layout: {
@@ -1248,12 +1234,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
 				//break;
 			}
-			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
-				((ManagerActivity) context).moveToTrash(handleList);
+			else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+				((ContactPropertiesMainActivity) context).moveToTrash(handleList);				
 				//break;
 			} 
 			else {
-				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
+				((ManagerActivity) context).moveToTrash(handleList);
 				//break;
 			}
 			break;

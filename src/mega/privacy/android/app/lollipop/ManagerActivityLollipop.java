@@ -10933,7 +10933,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if(muFLol.isAdded()){
 					long cameraUploadHandle = muFLol.getPhotoSyncHandle();
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-					log("cameraUploadHandle: " + cameraUploadHandle);
+					log("mediaUploadsHandle: " + cameraUploadHandle);
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
