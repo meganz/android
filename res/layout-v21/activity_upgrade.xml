@@ -3,14 +3,14 @@
     xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_secondary"
+    android:background="@color/white"
     android:id="@+id/scroll_view_upgrade" > 
     
     <LinearLayout
         android:layout_width="match_parent"  
     	android:layout_height="wrap_content" 
     	android:orientation="vertical"
-    	android:background="@color/background_secondary">
+    	android:background="@color/white">
     	
         <!-- Pro Lite -->
         <RelativeLayout 
@@ -27,7 +27,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_title"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="142dp"
                 android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
@@ -40,7 +40,7 @@
                     android:textAllCaps="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="20dp"
-                    android:textSize="35sp"/>
+                    android:textSize="30sp"/>
                 
                 <RelativeLayout 
                     android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
 	                    android:textColor="@color/white"
-	                    android:textSize="35sp"/>
+	                    android:textSize="38sp"/>
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_prolite_decimal_text"
@@ -64,17 +64,17 @@
 	                    android:layout_toRightOf="@id/upgrade_prolite_integer_text"
 	                    android:layout_alignBottom="@id/upgrade_prolite_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp" />
+	                    android:textSize="17sp" />
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_prolite_per_month_text"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:textColor="@color/upgrade_white"
+	                    android:textColor="@color/upgrade_orange"
 	                    android:layout_toRightOf="@id/upgrade_prolite_decimal_text"
 	                    android:layout_alignBottom="@id/upgrade_prolite_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp"
+	                    android:textSize="17sp"
 	                    android:layout_marginLeft="5dp" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -82,7 +82,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_values_subscribe"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_prolite_layout_title">
@@ -90,16 +90,15 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_prolite_layout_values"
 	                android:layout_width="match_parent"
-	                android:layout_height="100dp"
-	                android:background="@color/white"
-	                android:gravity="center_vertical" >
+	                android:layout_height="wrap_content"
+	                android:background="@color/white" >
 	                
                     <RelativeLayout 
                         android:id="@+id/upgrade_prolite_storage_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:gravity="bottom">
+                        android:layout_marginTop="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_prolite_storage_value_integer"
@@ -114,7 +113,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_orange"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_prolite_storage_value_integer"
                             android:layout_alignBottom="@id/upgrade_prolite_storage_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -130,7 +129,7 @@
                             android:layout_toRightOf="@id/upgrade_prolite_storage_value_gb"
                             android:layout_alignBottom="@id/upgrade_prolite_storage_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                     
@@ -140,7 +139,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_below="@id/upgrade_prolite_storage_layout"
-                        android:gravity="bottom">
+                        android:layout_marginBottom="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_prolite_bandwidth_value_integer"
@@ -155,7 +154,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_orange"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_prolite_bandwidth_value_integer"
                             android:layout_alignBottom="@id/upgrade_prolite_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -171,7 +170,7 @@
                             android:layout_toRightOf="@id/upgrade_prolite_bandwith_value_tb"
                             android:layout_alignBottom="@id/upgrade_prolite_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                 
@@ -188,7 +187,7 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_prolite_layout_subscribe"
 	                android:layout_width="match_parent"
-	                android:layout_height="50dp"
+	                android:layout_height="52dp"
 	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_prolite_separator"
 	                android:gravity="center">
@@ -200,7 +199,7 @@
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
                     	android:textColor="@color/accentColor"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
@@ -230,7 +229,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_i_layout_title"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="142dp"
                 android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
@@ -243,7 +242,7 @@
                     android:textAllCaps="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="20dp"
-                    android:textSize="35sp"/>
+                    android:textSize="30sp"/>
                 
                 <RelativeLayout 
                     android:layout_width="wrap_content"
@@ -257,7 +256,7 @@
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
 	                    android:textColor="@color/white"
-	                    android:textSize="35sp"/>
+	                    android:textSize="38sp"/>
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_pro_i_decimal_text"
@@ -267,17 +266,17 @@
 	                    android:layout_toRightOf="@id/upgrade_pro_i_integer_text"
 	                    android:layout_alignBottom="@id/upgrade_pro_i_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp" />
+	                    android:textSize="17sp" />
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_pro_i_per_month_text"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:textColor="@color/upgrade_white"
+	                    android:textColor="@color/upgrade_red"
 	                    android:layout_toRightOf="@id/upgrade_pro_i_decimal_text"
 	                    android:layout_alignBottom="@id/upgrade_pro_i_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp"
+	                    android:textSize="17sp"
 	                    android:layout_marginLeft="5dp" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -285,7 +284,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_i_layout_values_subscribe"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_pro_i_layout_title">
@@ -293,16 +292,15 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_pro_i_layout_values"
 	                android:layout_width="match_parent"
-	                android:layout_height="100dp"
-	                android:background="@color/white"
-	                android:gravity="center_vertical" >
+	                android:layout_height="wrap_content"
+	                android:background="@color/white" >
 	                
                     <RelativeLayout 
                         android:id="@+id/upgrade_pro_i_storage_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:gravity="bottom">
+                        android:layout_marginTop="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_pro_i_storage_value_integer"
@@ -317,7 +315,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_red"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_pro_i_storage_value_integer"
                             android:layout_alignBottom="@id/upgrade_pro_i_storage_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -333,7 +331,7 @@
                             android:layout_toRightOf="@id/upgrade_pro_i_storage_value_gb"
                             android:layout_alignBottom="@id/upgrade_pro_i_storage_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                     
@@ -343,7 +341,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_below="@id/upgrade_pro_i_storage_layout"
-                        android:gravity="bottom">
+                        android:layout_marginBottom="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_pro_i_bandwidth_value_integer"
@@ -358,7 +356,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_red"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_pro_i_bandwidth_value_integer"
                             android:layout_alignBottom="@id/upgrade_pro_i_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -374,7 +372,7 @@
                             android:layout_toRightOf="@id/upgrade_pro_i_bandwith_value_tb"
                             android:layout_alignBottom="@id/upgrade_pro_i_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                 
@@ -391,7 +389,7 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_pro_i_layout_subscribe"
 	                android:layout_width="match_parent"
-	                android:layout_height="50dp"
+	                android:layout_height="52dp"
 	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_pro_i_separator"
 	                android:gravity="center">
@@ -403,7 +401,7 @@
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
                         android:textColor="@color/accentColor"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
@@ -432,7 +430,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_ii_layout_title"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="142dp"
                 android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
@@ -445,7 +443,7 @@
                     android:textAllCaps="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="20dp"
-                    android:textSize="35sp"/>
+                    android:textSize="30sp"/>
                 
                 <RelativeLayout 
                     android:layout_width="wrap_content"
@@ -459,7 +457,7 @@
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
 	                    android:textColor="@color/white"
-	                    android:textSize="35sp"/>
+	                    android:textSize="38sp"/>
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_pro_ii_decimal_text"
@@ -469,17 +467,17 @@
 	                    android:layout_toRightOf="@id/upgrade_pro_ii_integer_text"
 	                    android:layout_alignBottom="@id/upgrade_pro_ii_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp" />
+	                    android:textSize="17sp" />
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_pro_ii_per_month_text"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:textColor="@color/upgrade_white"
+	                    android:textColor="@color/upgrade_red"
 	                    android:layout_toRightOf="@id/upgrade_pro_ii_decimal_text"
 	                    android:layout_alignBottom="@id/upgrade_pro_ii_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp"
+	                    android:textSize="17sp"
 	                    android:layout_marginLeft="5dp" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -487,7 +485,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_ii_layout_values_subscribe"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_pro_ii_layout_title">
@@ -495,16 +493,15 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_pro_ii_layout_values"
 	                android:layout_width="match_parent"
-	                android:layout_height="100dp"
-	                android:background="@color/white"
-	                android:gravity="center_vertical" >
+	                android:layout_height="wrap_content"
+	                android:background="@color/white" >
 	                
                     <RelativeLayout 
                         android:id="@+id/upgrade_pro_ii_storage_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:gravity="bottom">
+                        android:layout_marginTop="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_pro_ii_storage_value_integer"
@@ -519,7 +516,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_red"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_pro_ii_storage_value_integer"
                             android:layout_alignBottom="@id/upgrade_pro_ii_storage_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -535,7 +532,7 @@
                             android:layout_toRightOf="@id/upgrade_pro_ii_storage_value_gb"
                             android:layout_alignBottom="@id/upgrade_pro_ii_storage_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                     
@@ -545,7 +542,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_below="@id/upgrade_pro_ii_storage_layout"
-                        android:gravity="bottom">
+                        android:layout_marginBottom="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_pro_ii_bandwidth_value_integer"
@@ -560,7 +557,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_red"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_pro_ii_bandwidth_value_integer"
                             android:layout_alignBottom="@id/upgrade_pro_ii_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -576,7 +573,7 @@
                             android:layout_toRightOf="@id/upgrade_pro_ii_bandwith_value_tb"
                             android:layout_alignBottom="@id/upgrade_pro_ii_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                 
@@ -593,7 +590,7 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_pro_ii_layout_subscribe"
 	                android:layout_width="match_parent"
-	                android:layout_height="50dp"
+	                android:layout_height="52dp"
 	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_pro_ii_separator"
 	                android:gravity="center">
@@ -605,7 +602,7 @@
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
                         android:textColor="@color/accentColor"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
@@ -634,7 +631,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_iii_layout_title"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="142dp"
                 android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
@@ -647,7 +644,7 @@
                     android:textAllCaps="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="20dp"
-                    android:textSize="35sp"/>
+                    android:textSize="30sp"/>
                 
                 <RelativeLayout 
                     android:layout_width="wrap_content"
@@ -661,7 +658,7 @@
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
 	                    android:textColor="@color/white"
-	                    android:textSize="35sp"/>
+	                    android:textSize="38sp"/>
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_pro_iii_decimal_text"
@@ -671,17 +668,17 @@
 	                    android:layout_toRightOf="@id/upgrade_pro_iii_integer_text"
 	                    android:layout_alignBottom="@id/upgrade_pro_iii_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp" />
+	                    android:textSize="17sp" />
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_pro_iii_per_month_text"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:textColor="@color/upgrade_white"
+	                    android:textColor="@color/upgrade_red"
 	                    android:layout_toRightOf="@id/upgrade_pro_iii_decimal_text"
 	                    android:layout_alignBottom="@id/upgrade_pro_iii_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp"
+	                    android:textSize="17sp"
 	                    android:layout_marginLeft="5dp" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -689,7 +686,7 @@
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_iii_layout_values_subscribe"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_pro_iii_layout_title">
@@ -697,16 +694,15 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_pro_iii_layout_values"
 	                android:layout_width="match_parent"
-	                android:layout_height="100dp"
-	                android:background="@color/white"
-	                android:gravity="center_vertical" >
+	                android:layout_height="wrap_content"
+	                android:background="@color/white" >
 	                
                     <RelativeLayout 
                         android:id="@+id/upgrade_pro_iii_storage_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:gravity="bottom">
+                        android:layout_marginTop="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_pro_iii_storage_value_integer"
@@ -721,7 +717,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_red"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_pro_iii_storage_value_integer"
                             android:layout_alignBottom="@id/upgrade_pro_iii_storage_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -737,7 +733,7 @@
                             android:layout_toRightOf="@id/upgrade_pro_iii_storage_value_gb"
                             android:layout_alignBottom="@id/upgrade_pro_iii_storage_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                     
@@ -747,7 +743,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_below="@id/upgrade_pro_iii_storage_layout"
-                        android:gravity="bottom">
+                        android:layout_marginBottom="26dp">
                         
                         <TextView 
                             android:id="@+id/upgrade_pro_iii_bandwidth_value_integer"
@@ -762,7 +758,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_red"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/upgrade_pro_iii_bandwidth_value_integer"
                             android:layout_alignBottom="@id/upgrade_pro_iii_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -778,7 +774,7 @@
                             android:layout_toRightOf="@id/upgrade_pro_iii_bandwith_value_tb"
                             android:layout_alignBottom="@id/upgrade_pro_iii_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                 
@@ -795,7 +791,7 @@
                 <RelativeLayout 
 	                android:id="@+id/upgrade_pro_iii_layout_subscribe"
 	                android:layout_width="match_parent"
-	                android:layout_height="50dp"
+	                android:layout_height="52dp"
 	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_pro_iii_separator"
 	                android:gravity="center">
@@ -807,7 +803,7 @@
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
                         android:textColor="@color/accentColor"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>

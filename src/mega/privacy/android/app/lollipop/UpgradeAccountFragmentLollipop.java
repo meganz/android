@@ -166,13 +166,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		pro3TransparentLayout.setVisibility(View.INVISIBLE);
 		
 		TextView perMonth = (TextView) v.findViewById(R.id.upgrade_prolite_per_month_text);
-		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_i_per_month_text);
-		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_ii_per_month_text);
-		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_iii_per_month_text);
-		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 		
 		proLitePriceInteger = (TextView) v.findViewById(R.id.upgrade_prolite_integer_text);
 		proLitePriceDecimal = (TextView) v.findViewById(R.id.upgrade_prolite_decimal_text);

@@ -248,8 +248,12 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
     static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
     // SKU for our subscription PRO_II monthly
     static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+ // SKU for our subscription PRO_II yearly
+    static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
     // SKU for our subscription PRO_III monthly
     static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+ // SKU for our subscription PRO_III yearly
+    static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
     // SKU for our subscription PRO_LITE monthly
     static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
     // SKU for our subscription PRO_LITE yearly
@@ -260,7 +264,9 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
     Purchase proIMonthly;
     Purchase proIYearly;
     Purchase proIIMonthly;
+    Purchase proIIYearly;
     Purchase proIIIMonthly;
+    Purchase proIIIYearly;
 	
     // (arbitrary) request code for the purchase flow
     public static final int RC_REQUEST = 10001;
@@ -287,7 +293,9 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
             proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
             proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
             proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
+            proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR);
             proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
+            proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
            
             boolean isProLiteMonthly = false;
             if (proLiteMonthly != null){
@@ -339,6 +347,7 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
         });
 	}
 	
+	@SuppressLint("NewApi")
 	void showAlert(String message) {
         AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         bld.setMessage(message);
@@ -382,9 +391,17 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
                 log("PRO II Monthly subscription purchased.");
                 showAlert("Thank you for subscribing to PRO II Monthly!");
             }
+            else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
+                log("PRO II Yearly subscription purchased.");
+                showAlert("Thank you for subscribing to PRO II Yearly!");
+            }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
                 showAlert("Thank you for subscribing to PRO III Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
+                log("PRO III Yearly subscription purchased.");
+                showAlert("Thank you for subscribing to PRO III Yearly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
@@ -459,9 +476,19 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
     				SKU_PRO_II_MONTH, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
+    	else if (productId.compareTo(SKU_PRO_II_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_II_YEAR, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
     	else if (productId.compareTo(SKU_PRO_III_MONTH) == 0){
     		mHelper.launchPurchaseFlow(this,
     				SKU_PRO_III_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_III_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_III_YEAR, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
     	else if (productId.compareTo(SKU_PRO_LITE_MONTH) == 0){

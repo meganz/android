@@ -3,14 +3,14 @@
     xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_secondary"
+    android:background="@color/white"
     android:id="@+id/scroll_view_monthly_annualy" > 
     
     <LinearLayout 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/background_secondary">
+        android:background="@color/white">
         
         <RelativeLayout 
             android:id="@+id/monthly_annualy_layout"
@@ -26,7 +26,7 @@
             <RelativeLayout 
                 android:id="@+id/monthly_annualy_layout_title"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="142dp"
                 android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
@@ -38,7 +38,7 @@
                     android:textAllCaps="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="20dp"
-                    android:textSize="35sp"/>
+                    android:textSize="30sp"/>
                 
                 <RelativeLayout 
                     android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
 	                    android:textColor="@color/white"
-	                    android:textSize="35sp"/>
+	                    android:textSize="38sp"/>
 	                
 	                <TextView 
 	                    android:id="@+id/monthly_annualy_decimal_text"
@@ -62,7 +62,7 @@
 	                    android:layout_toRightOf="@id/monthly_annualy_integer_text"
 	                    android:layout_alignBottom="@id/monthly_annualy_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp" />
+	                    android:textSize="17sp" />
 	                
 	                <TextView 
 	                    android:id="@+id/monthly_annualy_per_month_text"
@@ -72,7 +72,7 @@
 	                    android:layout_toRightOf="@id/monthly_annualy_decimal_text"
 	                    android:layout_alignBottom="@id/monthly_annualy_integer_text"
 	                    android:layout_marginBottom="5dp"
-	                    android:textSize="16sp"
+	                    android:textSize="17sp"
 	                    android:layout_marginLeft="5dp" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -80,7 +80,7 @@
             <RelativeLayout 
                 android:id="@+id/monthly_annualy_layout_values_select"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/monthly_annualy_layout_title">
@@ -88,16 +88,15 @@
                 <RelativeLayout 
 	                android:id="@+id/monthly_annualy_layout_values"
 	                android:layout_width="match_parent"
-	                android:layout_height="100dp"
-	                android:background="@drawable/card_corner"
-	                android:gravity="center_vertical" >
+	                android:layout_height="wrap_content"
+	                android:background="@drawable/card_corner" >
 	                
                     <RelativeLayout 
                         android:id="@+id/monthly_annualy_storage_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:gravity="bottom">
+                        android:layout_marginTop="26dp">
                         
                         <TextView 
                             android:id="@+id/monthly_annualy_storage_value_integer"
@@ -112,7 +111,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_orange"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/monthly_annualy_storage_value_integer"
                             android:layout_alignBottom="@id/monthly_annualy_storage_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -128,7 +127,7 @@
                             android:layout_toRightOf="@id/monthly_annualy_storage_value_gb"
                             android:layout_alignBottom="@id/monthly_annualy_storage_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                     
@@ -137,8 +136,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
-                        android:layout_below="@id/monthly_annualy_storage_layout"
-                        android:gravity="bottom">
+                        android:layout_below="@id/monthly_annualy_storage_layout">
                         
                         <TextView 
                             android:id="@+id/monthly_annualy_bandwidth_value_integer"
@@ -153,7 +151,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/upgrade_orange"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:layout_toRightOf="@id/monthly_annualy_bandwidth_value_integer"
                             android:layout_alignBottom="@id/monthly_annualy_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"/>
@@ -169,30 +167,19 @@
                             android:layout_toRightOf="@id/monthly_annualy_bandwith_value_tb"
                             android:layout_alignBottom="@id/monthly_annualy_bandwidth_value_integer"
                             android:layout_marginBottom="1dp"
-                            android:textSize="16sp"/>
+                            android:textSize="17sp"/>
                         
                     </RelativeLayout>
                 
                 </RelativeLayout>
 			</RelativeLayout>
-        </RelativeLayout>
-        
-        <RelativeLayout 
-            android:id="@+id/monthly_annualy_layout_select"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_corner"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:elevation="2dp">
-        		<RelativeLayout 
+			
+           <RelativeLayout 
 	                android:id="@+id/monthly_annualy_layout_select_inside"
 	                android:layout_width="match_parent"
-	                android:layout_height="100dp"
+	                android:layout_height="wrap_content"
 	                android:background="@drawable/card_corner"
-	                android:gravity="center">
+	                android:layout_below="@id/monthly_annualy_layout_values_select">
 	                
                     <TextView
 	                   android:id="@+id/monthly_annualy_select"
@@ -200,37 +187,33 @@
 	                   android:layout_height="wrap_content"
 	                   android:text="@string/upgrade_select_pricing"
 	                   android:textAllCaps="true"
-	                   android:textSize="16sp" 
+	                   android:textSize="20sp" 
 	                   android:textColor="@color/upgrade_red"
-	                   android:layout_centerHorizontal="true" />
+	                   android:layout_centerHorizontal="true"
+	                   android:layout_marginTop="26dp"
+	                   android:fontFamily="sans-serif-light" />
 	                
                     <TextView
 	                   android:id="@+id/monthly_annualy_select_comment"
 	                   android:layout_width="wrap_content"
 	                   android:layout_height="wrap_content"
 	                   android:text="@string/select_membership_1"
-	                   android:textSize="16sp" 
-	                   android:layout_marginTop="15dp"
+	                   android:textSize="14sp" 
+	                   android:textColor="@color/black"
+	                   android:layout_marginBottom="16dp"
 	                   android:layout_centerHorizontal="true"
-	                   android:layout_below="@id/monthly_annualy_select" />
+	                   android:layout_below="@id/monthly_annualy_select"
+	                   android:fontFamily="sans-serif" />
                     
                 </RelativeLayout>
                 
                 <LinearLayout 
-                    android:id="@+id/monthly_annualy_separator"
-	                android:layout_width="match_parent"
-	                android:layout_height="1dp"
-	                android:background="@color/separator_grey"
-	                android:layout_below="@id/monthly_annualy_layout_select_inside"
-	                android:orientation="vertical"/>
-                
-                <LinearLayout 
                     android:id="@+id/monthly_annualy_buttons_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="134dp"
                     android:orientation="horizontal"
-                    android:background="#e0e0e0"
-                    android:layout_below="@id/monthly_annualy_separator">
+                    android:background="#08000000"
+                    android:layout_below="@id/monthly_annualy_layout_select_inside">
                     
                     <RelativeLayout 
                         android:id="@+id/monthly_annualy_monthly_layout"
@@ -245,7 +228,7 @@
                             android:layout_height="wrap_content"
                             android:textAllCaps="true"
                             android:text="MONTHLY"
-                            android:textSize="20sp"
+                            android:textSize="17sp"
                             android:layout_centerHorizontal="true"
                             android:textColor="@color/upgrade_red"/>
                         
@@ -260,7 +243,8 @@
 			                    android:id="@+id/monthly_annualy_price_monthly_integer_text"
 			                    android:layout_width="wrap_content"
 			                    android:layout_height="wrap_content"
-			                    android:textSize="35sp"/>
+			                    android:textSize="38sp"
+			                    android:textColor="@color/black"/>
 			                
 			                <TextView 
 			                    android:id="@+id/monthly_annualy_price_monthly_decimal_text"
@@ -269,7 +253,8 @@
 			                    android:layout_toRightOf="@id/monthly_annualy_price_monthly_integer_text"
 			                    android:layout_alignBottom="@id/monthly_annualy_price_monthly_integer_text"
 			                    android:layout_marginBottom="5dp"
-			                    android:textSize="16sp" />                    
+			                    android:textSize="17sp"
+			                    android:textColor="@color/black" />                    
 	                    </RelativeLayout>
                     </RelativeLayout>
                     
@@ -293,7 +278,7 @@
                             android:layout_height="wrap_content"
                             android:textAllCaps="true"
                             android:text="ANNUALY"
-                            android:textSize="20sp"
+                            android:textSize="17sp"
                             android:layout_centerHorizontal="true"
                             android:textColor="@color/upgrade_red"/>
                         
@@ -308,7 +293,8 @@
 			                    android:id="@+id/monthly_annualy_price_annualy_integer_text"
 			                    android:layout_width="wrap_content"
 			                    android:layout_height="wrap_content"
-			                    android:textSize="35sp"/>
+			                    android:textSize="38sp"
+			                    android:textColor="@color/black"/>
 			                
 			                <TextView 
 			                    android:id="@+id/monthly_annualy_price_annualy_decimal_text"
@@ -317,7 +303,8 @@
 			                    android:layout_toRightOf="@id/monthly_annualy_price_annualy_integer_text"
 			                    android:layout_alignBottom="@id/monthly_annualy_price_annualy_integer_text"
 			                    android:layout_marginBottom="5dp"
-			                    android:textSize="16sp"/>                    
+			                    android:textColor="@color/black"
+			                    android:textSize="17sp"/>                    
 	                    </RelativeLayout>
                     </RelativeLayout>
                     
@@ -326,7 +313,7 @@
                 <LinearLayout 
                     android:id="@+id/monthly_annualy_subscribe_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="52dp"
                     android:orientation="horizontal"
                     android:background="@drawable/card_corner"
                     android:layout_below="@id/monthly_annualy_buttons_layout">
@@ -383,30 +370,17 @@
                 
                 
         </RelativeLayout>
-        
-        <RelativeLayout 
-            android:id="@+id/monthly_annualy_layout_subscribe_comment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_corner"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:elevation="2dp"
-            android:gravity="center_vertical">
                 
-            <TextView 
-	            android:id="@+id/monthly_annualy_layout_subscribe_comment_text"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:textSize="14sp"
-	            android:layout_centerHorizontal="true"
-	            android:text="@string/upgrade_comment"
-	            android:layout_marginLeft="5dp"
-	            android:layout_marginRight="5dp"/>
-                
-        </RelativeLayout>
+        <TextView 
+         	android:id="@+id/monthly_annualy_layout_subscribe_comment_text"
+         	android:layout_width="wrap_content"
+         	android:layout_height="wrap_content"
+         	android:textSize="14sp"
+         	android:text="@string/upgrade_comment"
+         	android:layout_marginRight="5dp"
+        	android:layout_marginLeft="5dp"
+        	android:layout_marginBottom="8dp"
+         	android:textColor="#8a000000"/>
         
     </LinearLayout>
 
