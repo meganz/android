@@ -27,6 +27,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -509,6 +510,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
 			if (node.hasThumbnail()) {
+			
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
 					if(!multipleSelect){
@@ -703,6 +705,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		if (node.isFolder()) {
+			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.setMargins(0, 0, 0, 0);
+			holder.imageView.setLayoutParams(params);
+			
 			holder.transferProgressBar.setVisibility(View.GONE);		
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
@@ -786,8 +795,21 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}					
 
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.setMargins(0, 0, 0, 0);
+			holder.imageView.setLayoutParams(params);
 
 			if (node.hasThumbnail()) {
+				
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(12, 0, 12, 0);
+				holder.imageView.setLayoutParams(params1);
+				
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
 					if(!multipleSelect){
@@ -823,18 +845,33 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				}
 			} else {
+				
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.setMargins(12, 0, 12, 0);
+					holder.imageView.setLayoutParams(params1);
+					
 					if(!multipleSelect){
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
 						holder.imageView.setImageBitmap(thumb);
 					}
+					
 				} else {
 					thumb = ThumbnailUtils
 							.getThumbnailFromFolder(node, context);
 					if (thumb != null) {
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(12, 0, 12, 0);
+						
+						holder.imageView.setLayoutParams(params1);
+						
 						if(!multipleSelect){
 							holder.imageView.setImageBitmap(thumb);
 						}

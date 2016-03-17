@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
     android:background="@drawable/statelist_item_layout"
     android:id="@+id/file_list_item_layout" >
@@ -11,8 +11,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_cloud_saved_offline"
 		android:background="@null" 
-        android:layout_marginTop="22dp"
-        android:layout_toRightOf="@id/file_list_checkbox"/> 
+        android:layout_centerVertical="true"/> 
         
 <!--       <ImageView
         android:id="@+id/file_list_saved_offline_multiselect"
@@ -25,33 +24,35 @@
      -->
      <ImageView
         android:id="@+id/file_list_thumbnail"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:scaleType="fitCenter"
+        android:layout_centerVertical="true"
         android:layout_toRightOf="@id/file_list_saved_offline" />    
    
     
     <TextView
         android:id="@+id/file_list_filename"
         android:layout_width="225dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/file_list_thumbnail"
-        android:paddingLeft="3dp"
-        android:paddingTop="7dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="8dp"
         android:textColor="@color/file_list_first_row"
         android:ellipsize="end"
-        android:maxLines="2"/>
+        android:textSize="16sp"
+        android:maxLines="1"/>
     
     <TextView
         android:id="@+id/file_list_filesize"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/file_list_thumbnail"
         android:layout_below="@+id/file_list_filename"
-        android:paddingLeft="3dp"
-        android:paddingBottom="7dp"
-        android:textColor="@color/file_list_second_row" 
-        android:textSize="12sp"
+        android:textColor="@color/file_list_second_row"
+        android:layout_marginLeft="8dp"
+        android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="1"/>
 <!--    
