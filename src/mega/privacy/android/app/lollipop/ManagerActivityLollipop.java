@@ -6247,10 +6247,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			hashes[i] = handleList.get(i);
 			MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
 			if (nodeTemp != null){
-				if (nodeTemp.isFile()){
-					size += nodeTemp.getSize();
-				}
-			}			
+				size += nodeTemp.getSize();
+			}		
 		}
 		log("Number of files: "+hashes.length);
 		
