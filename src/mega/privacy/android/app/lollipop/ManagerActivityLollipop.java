@@ -444,8 +444,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
     // SKU for our subscription PRO_II monthly
     static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+ // SKU for our subscription PRO_II yearly
+    static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
     // SKU for our subscription PRO_III monthly
     static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+ // SKU for our subscription PRO_III yearly
+    static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
     // SKU for our subscription PRO_LITE monthly
     static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
     // SKU for our subscription PRO_LITE yearly
@@ -456,7 +460,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     Purchase proIMonthly;
     Purchase proIYearly;
     Purchase proIIMonthly;
+    Purchase proIIYearly;
     Purchase proIIIMonthly;
+    Purchase proIIIYearly;
     Purchase maxP;
     
     int levelInventory = -1;
@@ -700,9 +706,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 log("PRO II Monthly subscription purchased.");
                 showAlert("Thank you for subscribing to PRO II Monthly!");
             }
+            else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
+                log("PRO II Yearly subscription purchased.");
+                showAlert("Thank you for subscribing to PRO II Yearly!");
+            }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
                 showAlert("Thank you for subscribing to PRO III Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
+                log("PRO III Yearly subscription purchased.");
+                showAlert("Thank you for subscribing to PRO III Yearly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
@@ -774,7 +788,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
             proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
             proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
+            proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR); 
             proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
+            proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
            
             if (proLiteMonthly != null){
             	if (megaApi.getMyEmail() != null){
@@ -803,7 +819,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             	}
         	}
             
-            if (proIYearly!= null){
+            if (proIYearly != null){
             	if (megaApi.getMyEmail() != null){
 	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
 	        			levelInventory = 1;
@@ -821,6 +837,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             	}
             }
             
+            if (proIIYearly != null){
+            	if (megaApi.getMyEmail() != null){
+	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 2;
+	        			maxP = proIIYearly;
+	        		}
+            	}
+        	}
+            
             if (proIIIMonthly != null){
             	if (megaApi.getMyEmail() != null){
 	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
@@ -829,6 +854,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		}
             	}
             }
+            
+            if (proIIIYearly != null){
+            	if (megaApi.getMyEmail() != null){
+	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 3;
+	        			maxP = proIIIYearly;
+	        		}
+            	}
+        	}
             
             inventoryFinished = true;
             
@@ -889,9 +923,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				SKU_PRO_II_MONTH, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
+    	else if (productId.compareTo(SKU_PRO_II_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_II_YEAR, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
     	else if (productId.compareTo(SKU_PRO_III_MONTH) == 0){
     		mHelper.launchPurchaseFlow(this,
     				SKU_PRO_III_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_III_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_III_YEAR, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
     	else if (productId.compareTo(SKU_PRO_LITE_MONTH) == 0){
@@ -6202,8 +6246,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		for (int i=0;i<handleList.size();i++){
 			hashes[i] = handleList.get(i);
 			MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
-			if(nodeTemp!=null){
-				size += nodeTemp.getSize();
+			if (nodeTemp != null){
+				if (nodeTemp.isFile()){
+					size += nodeTemp.getSize();
+				}
 			}			
 		}
 		log("Number of files: "+hashes.length);
@@ -9918,15 +9964,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				
 				accountDetailsFinished = true;
 				
-				if (inventoryFinished){
-					if (levelAccountDetails < levelInventory){
-						if (maxP != null){
-							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
-							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
-						}
-					}
-				}
-				
 				long totalStorage = accountInfo.getStorageMax();
 				long usedStorage = accountInfo.getStorageUsed();;
 				boolean totalGb = false;				
@@ -9995,6 +10032,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 				}
+				
+				if (inventoryFinished){
+					if (levelAccountDetails < levelInventory){
+						if (maxP != null){
+							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
+							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
+						}
+					}
+				}
+				
 //				usedPerc=96;	
 				if(usedPerc>=95){
 					showOverquotaPanel();			

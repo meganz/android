@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -52,6 +53,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 	RelativeLayout creditCardLayout;
 	RelativeLayout fortumoLayout;
 	RelativeLayout centiliLayout;
+	
+	LinearLayout googlePlaySeparator;
+	LinearLayout creditCardSeparator;
+	LinearLayout fortumoSeparator;
+	LinearLayout centiliSeparator;
 	
 	
 	private ActionBar aB;
@@ -109,7 +115,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 		
 		title = (TextView) v.findViewById(R.id.payment_title_text);
 		perMonth = (TextView) v.findViewById(R.id.payment_per_month_text);
-		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 		priceInteger = (TextView) v.findViewById(R.id.payment_integer_text);
 		priceDecimal = (TextView) v.findViewById(R.id.payment_decimal_text);
 		storageInteger = (TextView) v.findViewById(R.id.payment_storage_value_integer);
@@ -121,17 +127,26 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 		
 		googlePlayLayout = (RelativeLayout) v.findViewById(R.id.payment_method_google_wallet);
 		googlePlayLayout.setOnClickListener(this);
+		googlePlaySeparator = (LinearLayout) v.findViewById(R.id.payment_separator);
 		creditCardLayout = (RelativeLayout) v.findViewById(R.id.payment_method_credit_card);
 		creditCardLayout.setOnClickListener(this);
+		creditCardSeparator = (LinearLayout) v.findViewById(R.id.payment_separator_1);
 		fortumoLayout = (RelativeLayout) v.findViewById(R.id.payment_method_fortumo);
 		fortumoLayout.setOnClickListener(this);
+		fortumoSeparator = (LinearLayout) v.findViewById(R.id.payment_separator_2);
 		centiliLayout = (RelativeLayout) v.findViewById(R.id.payment_method_centili);
 		centiliLayout.setOnClickListener(this);
+		centiliSeparator = (LinearLayout) v.findViewById(R.id.payment_separator_3);
 		
 		googlePlayLayout.setVisibility(View.GONE);
 		creditCardLayout.setVisibility(View.GONE);
 		fortumoLayout.setVisibility(View.GONE);
 		centiliLayout.setVisibility(View.GONE);
+		
+		googlePlaySeparator.setVisibility(View.GONE);
+		creditCardSeparator.setVisibility(View.GONE);
+		fortumoSeparator.setVisibility(View.GONE);
+		centiliSeparator.setVisibility(View.GONE);
 				
 		if(paymentBitSet == null){
 			megaApi.getPaymentMethods(this);
@@ -173,19 +188,23 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 						}
 					}
 		
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						fortumoLayout.setVisibility(View.GONE);
+						fortumoSeparator.setVisibility(View.GONE);
 						centiliLayout.setVisibility(View.GONE);
+						centiliSeparator.setVisibility(View.GONE);
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
 							selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -228,19 +247,23 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 						}
 					}
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						fortumoLayout.setVisibility(View.GONE);
+						fortumoSeparator.setVisibility(View.GONE);
 						centiliLayout.setVisibility(View.GONE);
+						centiliSeparator.setVisibility(View.GONE);
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
 							selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -283,19 +306,23 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 						}
 					}
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						fortumoLayout.setVisibility(View.GONE);
+						fortumoSeparator.setVisibility(View.GONE);
 						centiliLayout.setVisibility(View.GONE);
+						centiliSeparator.setVisibility(View.GONE);
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
 							selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -337,22 +364,26 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 						}
 					}
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 							fortumoLayout.setVisibility(View.VISIBLE);
+							fortumoSeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
 							centiliLayout.setVisibility(View.VISIBLE);
+							centiliSeparator.setVisibility(View.VISIBLE);
 						}
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
@@ -570,18 +601,22 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 			if(paymentBitSet!=null){
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 					googlePlayLayout.setVisibility(View.VISIBLE);
+					googlePlaySeparator.setVisibility(View.VISIBLE);
 				}
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 					creditCardLayout.setVisibility(View.VISIBLE);
+					creditCardSeparator.setVisibility(View.VISIBLE);
 				}
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 					if (parameterType == 4){
 						fortumoLayout.setVisibility(View.VISIBLE);
+						fortumoSeparator.setVisibility(View.VISIBLE);
 					}
 				}
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
 					if (parameterType == 4){
 						centiliLayout.setVisibility(View.VISIBLE);
+						centiliSeparator.setVisibility(View.VISIBLE);
 					}
 				}
 				if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
@@ -640,19 +675,23 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 						}
 					}
 		
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						fortumoLayout.setVisibility(View.GONE);
+						fortumoSeparator.setVisibility(View.GONE);
 						centiliLayout.setVisibility(View.GONE);
+						centiliSeparator.setVisibility(View.GONE);
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
 							selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -695,19 +734,23 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 						}
 					}
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						fortumoLayout.setVisibility(View.GONE);
+						fortumoSeparator.setVisibility(View.GONE);
 						centiliLayout.setVisibility(View.GONE);
+						centiliSeparator.setVisibility(View.GONE);
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
 							selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -750,19 +793,23 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 						}
 					}
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						fortumoLayout.setVisibility(View.GONE);
+						fortumoSeparator.setVisibility(View.GONE);
 						centiliLayout.setVisibility(View.GONE);
+						centiliSeparator.setVisibility(View.GONE);
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
 							selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -804,22 +851,26 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 						}
 					}
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
 							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							creditCardLayout.setVisibility(View.VISIBLE);
+							creditCardSeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 							fortumoLayout.setVisibility(View.VISIBLE);
+							fortumoSeparator.setVisibility(View.VISIBLE);
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
 							centiliLayout.setVisibility(View.VISIBLE);
+							centiliSeparator.setVisibility(View.VISIBLE);
 						}
 						
 						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
