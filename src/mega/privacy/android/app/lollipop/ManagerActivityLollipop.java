@@ -1642,7 +1642,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					
 					final Intent cancelIntent = tempIntent;
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-					builder.setTitle(title);
+//					builder.setTitle(title);
 		            builder.setMessage(text);    		            
 		            
 					builder.setPositiveButton(getString(R.string.general_yes),
@@ -4534,7 +4534,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				final Intent cancelIntentDownload = tempIntentDownload;
 				final Intent cancelIntentUpload = tempIntentUpload;
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-				builder.setTitle(title);
+//				builder.setTitle(title);
 	            builder.setMessage(text);
 				builder.setPositiveButton(getString(R.string.general_yes),
 						new DialogInterface.OnClickListener() {
@@ -4655,7 +4655,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								log("Not permissions to upload");
 								AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 					            builder.setMessage(getString(R.string.no_permissions_upload));
-								builder.setTitle(R.string.op_not_allowed);
+//								builder.setTitle(R.string.op_not_allowed);
 								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
 							           public void onClick(DialogInterface dialog, int id) {
 							                //do things
@@ -6562,7 +6562,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        builder.setView(confirmationLayout);
 		        
-				builder.setTitle(getString(R.string.confirmation_required));
+//				builder.setTitle(getString(R.string.confirmation_required));
 				builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
 				builder.setPositiveButton(getString(R.string.general_download),
 						new DialogInterface.OnClickListener() {
@@ -6660,7 +6660,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 		        builder.setView(confirmationLayout);
 		        
-				builder.setTitle(getString(R.string.confirmation_required));
+//				builder.setTitle(getString(R.string.confirmation_required));
 				
 				builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(size)));
 				builder.setPositiveButton(getString(R.string.general_download),
@@ -7070,7 +7070,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		};
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
         builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
         builder.setPositiveButton(R.string.general_yes, dialogClickListener);
         builder.setNegativeButton(R.string.general_no, dialogClickListener);
@@ -7159,7 +7159,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (p.getHandle() != megaApi.getRubbishNode().getHandle()){				
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
 				if (handleList.size() > 1){
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
 				}
@@ -7173,7 +7173,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
+//				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 				if (handleList.size() > 1){
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega_plural));
 				}
@@ -7315,7 +7315,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showCancelMessage(){
 		AlertDialog cancelDialog;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.title_cancel_subscriptions));
+//		builder.setTitle(getString(R.string.title_cancel_subscriptions));
 		
 		LayoutInflater inflater = getLayoutInflater();
 		View dialogLayout = inflater.inflate(R.layout.dialog_cancel_subscriptions, null);
@@ -7521,7 +7521,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.context_clear_rubbish));
+//		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 		builder.setPositiveButton(getString(R.string.general_empty),
 				new DialogInterface.OnClickListener() {
@@ -8056,7 +8056,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		};
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);		
-		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();		
@@ -8082,7 +8082,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		};
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);		
-		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();		

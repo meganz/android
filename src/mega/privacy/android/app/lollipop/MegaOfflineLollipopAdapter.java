@@ -159,6 +159,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			log("OfflineThumbnailAsyncTask::onPostExecute");
 			if (thumb != null){
 				if (holder.currentPath.compareTo(currentPath) == 0){
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.setMargins(48, 0, 12, 0);
+					holder.imageView.setLayoutParams(params1);
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);
@@ -618,6 +623,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		int files=0;
 		if (currentFile.isDirectory()){
 			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.setMargins(36, 0, 0, 0);
+			holder.imageView.setLayoutParams(params);
+			
 			File[] fList = currentFile.listFiles();
 			for (File f : fList){
 				
@@ -648,14 +659,25 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 		
 		holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+		params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+		params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+		params.setMargins(36, 0, 0, 0);
+		holder.imageView.setLayoutParams(params);		
+		
 		if (currentFile.isFile()){
 			log("...........................Busco Thumb");
 			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
-								
+																
 				if (currentFile.exists()){
 					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(48, 0, 12, 0);
+						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
@@ -671,6 +693,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 		else{
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
+			RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params2.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params2.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params2.setMargins(36, 0, 0, 0);
+			holder.imageView.setLayoutParams(params2);
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);

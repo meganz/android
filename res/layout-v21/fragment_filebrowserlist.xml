@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/content_text_layout"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
         android:background="@color/content_text_background">
 
         <TextView
@@ -16,6 +16,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"            
             android:textColor="@color/text_secondary"
+            android:layout_centerVertical="true"
             android:textSize="14sp" />   
         
        <ProgressBar

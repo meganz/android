@@ -130,7 +130,7 @@
     </plurals>
     
     <string name="confirmation_required" context="Alert before download">Confirmación necesaria</string>
-    <string name="alert_larger_file" context="Alert text before download">Se van a descargar %s. Desear continuar?</string>
+    <string name="alert_larger_file" context="Alert text before download">Se van a descargar %s. Desea continuar?</string>
     <string name="alert_no_app" context="Alert text before download"> No existe ninguna app instalada para abrir el fichero %s. ¿Desea continuar con la descarga?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">No mostrar más</string>
     
@@ -300,7 +300,7 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Añadiendo contacto</string>
     <string name="context_download_to" context="Menu item">Guardar en</string>
     <string name="context_clear_rubbish" context="Menu option">Vaciar la Papelera</string>    
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Todos los elementos de la papelera se eliminarán</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Todos los elementos de la papelera se eliminarán.</string>
     <string name="context_send_link" context="get the link and send it">Enviar enlace</string>
     <string name="context_send" context="get the link and send it">Enviar</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Enviar al buzón</string>

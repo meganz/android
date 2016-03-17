@@ -381,7 +381,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentText = (TextView) v.findViewById(R.id.content_text);			
 			//Margins
 			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentTextParams.setMargins(Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);			
 			
 			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
