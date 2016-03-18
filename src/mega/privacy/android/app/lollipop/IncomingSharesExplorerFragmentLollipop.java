@@ -115,13 +115,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		optionText = (TextView) v.findViewById(R.id.action_text);
 		optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 		optionText.setOnClickListener(this);
-		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)optionText.getLayoutParams();
-		params.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
-		optionText.setLayoutParams(params);		
-		
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(20, outMetrics));
+		optionTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
 		optionText.setLayoutParams(optionTextParams);		
 		
 		cancelText = (TextView) v.findViewById(R.id.cancel_text);
@@ -130,7 +126,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(20, outMetrics));
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
 		cancelText.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);

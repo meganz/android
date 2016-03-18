@@ -402,8 +402,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		cancelButton = (TextView) findViewById(R.id.file_storage_cancel_button);
 		button = (TextView) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+//		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
+//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
 		
 		if(fromSettings){
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -412,12 +412,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		else{
 			if (mode == Mode.PICK_FOLDER) {
 				button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-				paramsb2.width = Util.scaleWidthPx(95, outMetrics);
+//				paramsb2.width = Util.scaleWidthPx(95, outMetrics);
 				
 			}
 			else{
 				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-				paramsb2.width = Util.scaleWidthPx(73, outMetrics);
+//				paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 			}
 		}		
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
@@ -425,10 +425,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 		emptyTextView.setText(R.string.file_browser_empty_folder);
 		
-		button.setLayoutParams(paramsb2);
+//		button.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)button.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(12, outMetrics), 0); 
 		button.setLayoutParams(optionTextParams);		
 		
 		cancelButton.setOnClickListener(this);		

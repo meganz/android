@@ -1253,7 +1253,7 @@ public class ThumbnailUtilsLollipop {
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				params1.setMargins(12, 0, 12, 0);
+				params1.setMargins(18, 0, 12, 0);
 				holder.imageView.setLayoutParams(params1);
 				
 				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
