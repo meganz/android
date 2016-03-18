@@ -1,25 +1,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/contact_request_list_item_layout" >
 
     <RelativeLayout
 		android:id="@+id/contact_request_list_relative_layout_avatar"
-		android:layout_width="54dp"
-		android:layout_height="54dp"
-		android:layout_marginLeft="5dp" 
-		android:paddingTop="3dp"
-		android:layout_toRightOf="@id/contact_request_list_checkbox" >
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="18dp"
+        android:layout_centerVertical="true" >
          
 	    <mega.privacy.android.app.components.RoundedImageView 
 	         android:id="@+id/contact_request_list_thumbnail"
-	         android:layout_width="54dp"
-	         android:layout_height="54dp" 
+	         android:layout_width="fill_parent"
+	         android:layout_height="fill_parent" 
 	         android:scaleType="fitCenter"         
 	         rounded:corner_radius="27dp" 
 	         rounded:border_width="0dp"
+	         android:layout_centerInParent="true"
 	         rounded:border_color="@color/border_file_properties"/>
 	    
 	    <TextView
@@ -34,10 +34,13 @@
     <TextView
         android:id="@+id/contact_request_list_name"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
-        android:paddingLeft="5dp"
-        android:paddingTop="7dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="13dp"
+        android:ellipsize="end"
+        android:textSize="16sp"
+        android:maxLines="1"
         android:textColor="@color/file_list_first_row" />  
     
     <TextView
@@ -46,8 +49,10 @@
         android:layout_height="30dp"
         android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
         android:layout_below="@id/contact_request_list_name"
-        android:paddingLeft="5dp"
-        android:paddingBottom="7dp"
+        android:layout_marginLeft="13dp"
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/file_list_second_row" />
     
     <ImageButton 

@@ -2,21 +2,21 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/contact_request_list_item_layout"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants" >
 
     <RelativeLayout
         android:id="@+id/contact_request_list_relative_layout_avatar"
-        android:layout_width="54dp"
-        android:layout_height="54dp"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@id/contact_request_list_checkbox"
-        android:paddingTop="3dp" >
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="18dp"
+        android:layout_centerVertical="true">
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/contact_request_list_thumbnail"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
             android:scaleType="fitCenter"
             rounded:border_color="@color/border_file_properties"
             rounded:border_width="0dp"
@@ -33,22 +33,27 @@
     <TextView
         android:id="@+id/contact_request_list_name"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
-        android:paddingLeft="5dp"
-        android:paddingTop="7dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="13dp"
+        android:ellipsize="end"
+        android:textSize="16sp"
+        android:maxLines="1"
         android:textColor="@color/file_list_first_row" />
 
     <TextView
         android:id="@+id/contact_request_list_content"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/contact_request_list_name"
         android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
-        android:paddingBottom="7dp"
-        android:paddingLeft="5dp"
+        android:layout_marginLeft="13dp"
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/file_list_second_row" />
-
+   
     <ImageButton
         android:id="@+id/contact_request_list_three_dots"
         android:layout_width="wrap_content"

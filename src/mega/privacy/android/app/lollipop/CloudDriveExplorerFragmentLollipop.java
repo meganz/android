@@ -117,7 +117,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		optionText.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(10, metrics), Util.scaleHeightPx(20, metrics), Util.scaleWidthPx(10, metrics), Util.scaleWidthPx(20, metrics));
+		optionTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(10, metrics), 0);
 		optionText.setLayoutParams(optionTextParams);
 		
 		cancelText = (TextView) v.findViewById(R.id.cancel_text);
@@ -125,7 +125,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), Util.scaleHeightPx(20, metrics), Util.scaleWidthPx(10, metrics), Util.scaleWidthPx(20, metrics));
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(10, metrics), 0);
 		cancelText.setLayoutParams(cancelTextParams);				
 				
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);

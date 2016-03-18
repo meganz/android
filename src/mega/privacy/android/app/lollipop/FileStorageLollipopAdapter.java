@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +52,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
     	public ImageView imageView;
     	public TextView textViewFileName;
     	public TextView textViewFileSize;
-    	public TextView textViewUpdated;
     	public RelativeLayout itemLayout;
     	public int currentPosition;
     	public FileDocument document;    	
@@ -92,7 +92,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
-		holder.textViewUpdated = (TextView) v.findViewById(R.id.file_explorer_updated);
 			
 		v.setTag(holder);
 		return holder;
@@ -101,8 +100,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	@Override
 	public void onBindViewHolder(ViewHolderFileStorage holder, int position){
 	
-		//NUEVOOO
-		
 		holder.currentPosition = position;
 		FileDocument document = currentFiles.get(position);
 
@@ -133,6 +130,11 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 				}
 			}
+			
+			RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params1.setMargins(36, 0, 0, 0);
+			holder.imageView.setLayoutParams(params1);
+			
 			if (document.isFolder()){	
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			}
@@ -163,13 +165,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			}			
 			
 		}		
-		
-		try {
-			holder.textViewUpdated.setText(DateUtils.getRelativeTimeSpanString(document.getTimestampInMillis()));
-			} 
-		catch(Exception ex)	{
-			holder.textViewUpdated.setText("");
-		}
 	}	
 	
 	// Set new files on folder change

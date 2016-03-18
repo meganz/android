@@ -76,8 +76,8 @@
     <LinearLayout
          android:id="@+id/options_explorer_layout"
          android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:gravity="right"
+         android:layout_height="48dp"
+         android:gravity="right|center_vertical"
          android:layout_alignParentBottom="true"
          android:orientation="horizontal" >
 
