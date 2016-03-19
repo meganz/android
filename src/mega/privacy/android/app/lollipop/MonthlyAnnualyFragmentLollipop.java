@@ -63,6 +63,9 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 	private TextView bandwidthInteger;
 	private TextView bandwidthTb;
 	
+	TextView monthlyLabel;
+	TextView annualyLabel;
+	
 	private TextView selectMonthYear;
 	
 	private ActionBar aB;
@@ -135,6 +138,10 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 		subscribeSeparator = (LinearLayout) v.findViewById(R.id.monthly_annualy_subscribe_separator);
 		subscribeMonthlyLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_subscribe_monthly);
 		subscribeAnnualyLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_subscribe_annualy);
+		monthlyLabel = (TextView) v.findViewById(R.id.monthly_annualy_monthly_text);
+		monthlyLabel.setText(getString(R.string.upgrade_per_month).toUpperCase(Locale.getDefault()));
+		annualyLabel = (TextView) v.findViewById(R.id.monthly_annualy_annualy_text);
+		annualyLabel.setText(getString(R.string.upgrade_per_year).toUpperCase(Locale.getDefault()));
 		priceSeparator.setVisibility(View.VISIBLE);
 		priceAnnualyLayout.setVisibility(View.VISIBLE);
 		subscribeSeparator.setVisibility(View.VISIBLE);
@@ -172,10 +179,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");		
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -203,8 +219,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -241,10 +264,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -272,8 +304,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -310,10 +349,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -341,8 +389,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -378,10 +433,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -409,8 +473,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -507,10 +578,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -538,8 +618,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -576,10 +663,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -607,8 +703,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -645,10 +748,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -676,8 +788,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);
@@ -713,10 +832,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+									priceMonthlyInteger.setText(s1[0]);
+									priceMonthlyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -744,8 +872,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceAnnualyInteger.setText(s1[0]);
+									priceAnnualyDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceAnnualyInteger.setText(s[0]);

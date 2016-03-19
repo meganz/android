@@ -168,8 +168,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -227,8 +234,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -286,8 +300,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -344,8 +365,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -655,8 +683,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -714,8 +749,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -773,8 +815,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
@@ -831,8 +880,15 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							String priceString = df.format(price);
 							String [] s = priceString.split("\\.");
 							if (s.length == 1){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("");
+								String [] s1 = priceString.split(",");
+								if (s1.length == 1){
+									priceInteger.setText(s[0]);
+									priceDecimal.setText("");
+								}
+								else if (s1.length == 2){
+									priceInteger.setText(s[0]);
+									priceDecimal.setText("." + s[1] + " €");
+								}
 							}
 							else if (s.length == 2){
 								priceInteger.setText(s[0]);
