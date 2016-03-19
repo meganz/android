@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">Mega est un hébergeur en ligne sécurisé qui vous met gratuitement à disposition 50Go. Contrairement aux autres hébergeurs en ligne, vos données sont uniquement chiffrées et déchiffrées par les appareils du client et jamais par nous.Vos données sont accessibles quand vous voulez, à partir de n\'importe quel appareil, et où vous voulez. Partagez des dossiers entiers avec vos contacts et voyez leurs apports en temps réel.Le cloud dans votre poche. Accéder et diffuser vos fichiers depuis votre téléphone ou votre tablette. Envoyer et synchroniser vos médias dans le cloud.Cherchez, stockez, diffusez, visionnez, partagez, renommez ou supprimez vos fichiers. Tout est là, dans la paume de votre main.Pour plus d\'information, veuillez vous rendre sur notre site Internet : https://mega.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA est un Service de Cloud Avec une Confidentialité Puissante et Toujours Active. 50Go gratuit</string>
+    
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Taille totale</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">sur</string>
+    <string name="general_yes" context="Answer for confirmation dialog.">Oui</string>
+    <string name="general_no" context="Answer for confirmation dialog.">Non</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">Annuler</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Déplacer vers</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copier vers</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Importer vers</string>
+    <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Sélectionner</string>
+    <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">Sélectionner des fichiers</string>
+    <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">Sélectionner un dossier</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Créer</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Envoyer Fichier</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Télécharger</string>
+    <string name="general_add" context="button">Ajouter</string>
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Vider</string>
+    <string name="general_loading" context="state previous to import a file">Chargement...</string>
+    <string name="general_importing" context="state while importing the file">Importation en cours</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importer</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Stockage</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bande Passante</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Souscrire</string>
+    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continuer</string>  
+    <string name="general_error_word" context="It will be followed by the error message">Erreur</string> 
+    <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">Lien du fichier introuvable</string>
+    <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">Lien du dossier introuvable</string>
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Pas encore disponible</string>
+    <string name="error_no_selection" context="when any file or folder is selected">Aucun fichier ou dossier sélectionné.</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Téléchargement déjà en cours</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">déjà uploadé</string>
+    <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Détails du fichier</string>
+    <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Détails du dossier</string>
+    <string name="general_menu" context="Title when the left menu is opened">Menu</string>
+ 
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Le dossier média secondaire n\'existe pas, veuillez choisir un nouveau dossier.</string>   
+    <string name="no_external_SD_card_detected" context="when no external card exists">Aucune carte externe SD détectée</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Ce dossier est en lecture seul. Vous n\'avez pas la permission pour uploader.</string>
+    
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vous êtes sur le point de supprimer le fichier de la clef-maître exportée.</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Avertissement de sécurité: Ceci est une opération très risquée. Voulez-vous continuer?</string> 
+     
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Plus d\'options...</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Voulez-vous supprimer le contact</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Voulez-vous supprimer ces contacts?</string>  
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Déplacer vers la corbeille?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Êtes-vous certain(e) de bien vouloir déplacer ces éléments vers la Corbeille?</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Supprimer de MEGA?</string>
+    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">Êtes-vous certain(e) de bien vouloir supprimer ces éléments de façon permanente?</string>
+    <string name="title_delete_from_mega" context="confirmation message before removing a file">Supprimer de MEGA</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si vous quittez le dossier, vous ne pourrez plus jamais le revoir</string>
+    
+    <string name="confirmation_alert" context="confirmation message before removing a file">Veuillez confirmer</string>
+    
+    <string name="action_logout" context="Button where the user can sign off or logout">Se Déconnecter</string>
+    <string name="action_add" context="Menu item">Envoyer...</string>
+    <string name="action_create_folder" context="Menu item">Créer un nouveau dossier</string>
+    <string name="action_open_link" context="Menu item">Ouvrir un lien...</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Envoyer vers</string>
+    <string name="action_settings" context="Menu item">Réglages</string>
+    <string name="action_search" context="Search button">Rechercher</string>
+    <string name="action_play" context="Search button">Jouer</string>
+    <string name="action_pause" context="Search button">Mettre en pause</string>
+    <string name="action_refresh" context="Menu item">Rafraîchir</string>
+    <string name="action_sort_by" context="Menu item">Trier par...</string>
+    <string name="action_help" context="Menu item">Aide</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Passez Pro</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Mis-à-jour du compte en cours</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Sélectionner Tous</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Tout déselectionner</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Vue par vignette</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">Vue listée</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exporter la Clef-Maître</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Supprimer la Clef-Maître</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Annuler l\'abonnement</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clef-Maître a été exportée vers :</string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Le fichier de la Clef Maître a été supprimée.</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">L\'abonnement a été annulé</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">L\'abonnement n\'a pas été annulé correctement. Veuillez contacter support@mega.nz pour annuler votre abonnement</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Fermer toutes les sessions</string>
+    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">Les sessions restantes ont été fermées</string>
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Erreur lors de la fermeture des sessions ouvertes</string>    
+    
+     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">fichier</item>
+        <item context="Plural of file. 2 files" quantity="other">fichiers</item>
+    </plurals>
+    
+     <plurals name="general_num_contacts">
+        <item quantity="one" context="referring to a contact in the contact list of the user">contact</item>
+        <item quantity="other" context="Title of the contact list">contacts</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one" context="Singular of folder/directory. 1 folder">dossier</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">dossiers</item>
+    </plurals>
+    
+   <plurals name="general_num_shared_folders">
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">dossier partagé</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">dossiers partagés</item>
+    </plurals>
+    
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">téléchargement</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">téléchargements</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">envoyer</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">envois</item>
+    </plurals>
+    
+     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="one" context="used for example when a folder is shared with 1 user">utilisateur</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">utilisateurs</item>
+    </plurals>
+    
+    
+    <string name="login_text" context="Login button">Connexion</string>
+    <string name="email_text" context="email label">e-mail</string>
+    <string name="password_text" context="password label">Mot de passe</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirmer le mot de passe</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Nouveau sur MEGA?</string>
+    <string name="create_account" context="label and text button when creating the account">Créer un compte</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Veuillez entrer votre adresse email.</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Adresse email invalide.</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Veuillez renseigner votre mot de passe</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Problème de connection réseau, veuillez réessayer.</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Vous avez été déconnecté(e) de cet appareil depuis un autre endroit</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calcul en cours des clefs de chiffrement</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connection au serveur</string>
+    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Email ou mot de passe incorrect. Avez-vous validé votre compte?</string>    
+    <string name="download_updating_filelist" context="Status text when updating the file manager">Mise à jour de la liste des fichiers</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Confirmer le compte</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Validation du lien en cours</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activation du compte</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Préparation de la liste des fichiers</string>
+    <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Veuillez vous authentifier pour partager avec MEGA.</string>
+    <string name="session_problem" context="if a link to a folder cannot be fetched">Problème lors de la récupération des fichiers depuis le dossier.</string>
+    
+    <string name="tour_space_title">ESPACE MEGA</string>
+    <string name="tour_speed_title">VITESSE MEGA</string>
+    <string name="tour_privacy_title">CONFIDENTIALITÉ</string>
+    <string name="tour_access_title">ACCÈS MEGA</string>
+    <string name="tour_space_text">Enregistrez-vous maintenant et recevez 50 Go d\'espace de stockage gratuit</string>
+    <string name="tour_speed_text">Les uploads sont rapide.  Partagez rapidement des fichiers avec tout le monde</string>
+    <string name="tour_privacy_text">Gardez tous vos fichiers en sécurité avec le chiffrement de bout-à-bout de MEGA</string>
+    <string name="tour_access_text">Disposez d\'un accès complètement chiffré où vous voulez</string>
+    
+    <string name="create_account_text" context="button that allows the user to create an account">Créer un compte</string>
+    <string name="name_text" context="Name of the user">nom</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">J\'accepte les Conditions d\'Utilisation de MEGA</string>
+    <string name="already_account" context="Does the user already have a MEGA account">Avez-vous déjà  un compte?</string>
+    
+    <string name="create_account_no_terms" context="warning dialog">Vous devez accepter nos Conditions d\'Utilisation.</string>
+	<string name="error_enter_username" context="Warning dialog">Veuillez insérer votre nom.</string>
+    <string name="error_short_password" context="when creating the account">Le mot de passe est trop court</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Les mots de passes ne correspondent pas</string>
+    <string name="error_email_registered" contect="when creating the account">Cette adresse e-mail a déjà été utilisée pour créer un compte chez MEGA.</string>
+    
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation requise</string>
+    <string name="create_account_confirm" context="">Vérifiez vos emails et cliquez sur le lien pour vous connecter et confirmer votre compte</string>
+    <string name="create_account_creating_account">Connexion au serveur : compte en cours de création</string>
+    
+    <string name="cancel_transfer_title">Annuler le transfert</string>
+    <string name="cancel_transfer_confirmation">Le transfert va être annulé. Êtes-vous certain(e) de bien vouloir poursuivre?</string>
+    <string name="cancel_all_transfer_confirmation">Tous les transferts vont être annuler. Êtes-vous certain(e) de bien vouloir poursuivre?</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Espace de stockage</string>
+	<string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Uploads des Médias</string>
+	<string name="section_inbox" context="title of the screen that show the inbox">Boîte de réception</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Sauvegardé(s) en mode Hors Ligne</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Partagé(s) avec moi</string>
+	<string name="section_shared_items" context="title of the screen that shows all the shared items">Éléments partagés</string>
+	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Corbeille</string>
+	<string name="section_contacts" context="Title of the contact list">Contacts</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">DEMANDES ENVOYÉES</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">DEMANDES REÇUES</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">Aucune demande envoyée</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">Aucune demande reçue</string>
+	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferts</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">Mon compte</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Envoi des Photos de la Caméra</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s sur %2$s</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">ENTRANT</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">SORTANT</string>
+	
+	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Partages Entrants</string>
+	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choisissez un dossier</string>
+	
+	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Aucun fichier dans votre Espace de stockage</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Vider la Corbeille</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Aucun dossier de partage entrant</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Aucun dossier de partage sortant</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Dossier vide</string>
+    
+    <string name="choose_account_activity" context="Title of the activity Choose Account">Choisir Compte</string>
+	
+	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Propriétés</string>
+	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Libres hors ligne</string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">EN LIGNE</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">HORS LIGNE</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Taille :</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Contenu :</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">Ajouté(s) :</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Modifié :</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Aucun lien public</string>
+	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Lien public</string>
+	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Accès complet</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lire et Écrire</string>
+	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Lecture seule</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Partagé avec :</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
+	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Partager les Permissions</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">Changer les permissions</string>
+	<string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Partagé avec</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Envoyer à</string>
+	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propriétaire</string>
+	<string name="contact_reinvite" context="option to reinvite a contact">Ré-inviter</string>	
+	<string name="contact_ignore" context="option to ignore a contact invitation">Ignorer</string>
+	<string name="contact_decline" context="option to decline a contact invitation">Décliner</string>
+	<string name="contact_accept" context="option to accept a contact invitation">Accepter</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">Information du Contact</string>	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Contenu</string>	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Dossier(s) Partagé(s) avec :</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Ajoutez des nouveaux contacts en utilisant le bouton ci-dessous.</string>	
+	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">Il n\'y a pas de contacts pour ce compte. Veuillez les ajouter dans l\'écran Contacts.</string>
+	
+	<string name="error_not_enough_free_space" context="Error message">Espace libre insuffisant</string>
+	
+	<string name="option_full_link" context="Alert Dialog to get link">Lien complet</string>
+	<string name="option_link_without_key" context="Alert Dialog to get link">Lien sans clef</string>
+	<string name="option_decryption_key" context="Alert Dialog to get link">Clef de déchiffrement</string>
+	
+	<string name="download_failed" context="Error message">Échec du téléchargement</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">téléchargé</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Téléchargement en cours</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Transfert en cours...</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Préparation des fichiers</string>
+    <string name="download_began" context="message when the download starts">Le téléchargement a démarré</string>
+    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Voulez-vous annuler le téléchargement?</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">Annuler le téléchargement</string>
+    <string name="download_touch_to_show" context="Hint how to cancel the download">Touchez pour montrer tous les transferts</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">La plupart des appareils ne peuvent pas télécharger des fichiers de plus de 4GB. Votre téléchargement va probablement échouer. </string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Il n\'y a pas d\'application disponible pour exécuter ce fichier sur votre appareil</string>
+	
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Récupérer le lien</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Gérer le lien</string>
+    <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Partir</string>
+    <string name="alert_leave_share" context="Title alert before leaving a share.">Quitter le partage</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Supprimer</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Supprimer le lien</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Ce lien ne sera plus disponible publiquement</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renommer</string>
+    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Ouvrir</string>
+    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Ouvrir lien</string>
+    <string name="context_renaming" context="while renaming a file or folder">Renommer</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Préparation du fichier en cours...</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Télécharger</string>
+    <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Télécharger le dossier</string>
+    <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Importer le dossier</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Déplacer</string>
+    <string name="context_moving" context="while moving a file or folder">Déplacement en cours</string>
+    <string name="context_sharing" context="while sharing a folder">Partage du dossier</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copier</string>
+    <string name="context_upload" context="Item menu option upon right click on one or multiple files.">Upload</string>
+    <string name="context_copying" context="while copying a file or folder">Copie en cours</string>
+    <string name="context_creating_link" context="status text">Création du lien</string>
+    <string name="context_moving_to_trash" context="status text">Déplacement vers la corbeille</string>
+    <string name="context_move_to_trash" context="menu item">Déplacer vers la corbeille</string>
+    <string name="context_delete_from_mega" context="menu item">Supprimer de MEGA</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Nom du dossier</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">E-Mail du Contact</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Création du dossier en cours...</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">Ajout du contact</string>
+    <string name="context_download_to" context="Menu item">Enregistrer sous</string>
+    <string name="context_clear_rubbish" context="Menu option title">Vider la Corbeille</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Tous les éléments de la corbeille vont être supprimés</string>
+    <string name="context_send_link" context="get the link and send it">Envoyez le lien</string>
+    <string name="context_send" context="get the link and send it">Envoyer</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Envoyer à la boîte de réception</string>
+    <string name="context_copy_link" context="get the link and copy it">Copier le lien</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Supprimer</string>
+    <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Retirer du mode Hors-Ligne</string>
+    <string name="context_share_folder" context="menu item">Partager dossier</string>
+    <string name="context_send_file" context="menu item">Envoyer fichier(s)</string>
+    <string name="context_view_shared_folders" context="open a shared folder">Voir les dossiers partagés</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Partage</string>
+    <string name="remove_all_sharing" context="status text">Supprimer tous les contacts avec qui vous partagez</string>
+	<string name="leave_incoming_share" context="status text">Quitter le dossier partager</string>
+    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Dossier des Photos de la Caméra</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">Contacts MEGA</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Contacts du Téléphone</string>
+    <string name="context_delete" context="menu item">Supprimer</string>
+    <string name="context_more" context="menu item">Plus</string>
+    <string name="context_contact_added" context="success message when adding a contact">Contact ajouté</string>
+    <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Demande supprimée</string>
+    <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Demande renvoyée</string>
+    <string name="context_invitacion_reply" context="success message when adding a contact">La réponse à l\'invitation a été envoyée </string>
+    <string name="context_contact_removed" context="success message when removing a contact">Contact supprimé</string>
+    <string name="context_contact_not_removed" context="error message">Erreur. Contact non supprimé</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changées</string>
+    <string name="context_permissions_not_changed" context="error message">Erreur. Permissions inchangées</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Dossier déjà existant</string>
+    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s est déjà un contact.</string>
+    <string name="context_send_no_permission" context="message when trying to send a file without full access">Aucune permission pour envoyer ce fichier.</string>
+    <string name="context_folder_created" context="success message when creating a folder">Dossier créé</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">Renommage réussi</string>
+    <string name="context_no_renamed" context="error message">Erreur. Renommage annulé</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Copie réussie</string>
+    <string name="context_correctly_sent" context="success message when sending a file">Fichier(s) envoyé(s)</string>
+    <string name="context_no_sent" context="error message when sending a file">Erreur. Fichier non envoyé</string>
+    <string name="context_no_copied" context="error message">Erreur. Copie annulée</string>
+    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Veuillez choisir un dossier de destination.</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Déplacement réussi</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d éléments ont été déplacés avec succès</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">%d éléments n\'ont pas été supprimés avec succès.</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">déplacé vers la Corbeille avec succès.</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d éléments déplacés vers la Corbeille avec succès.</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d éléments n\'ont pas été envoyés avec succès</string>
+    <string name="context_no_moved" context="error message">Erreur. Déplacement annulé</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Partage réussi</string>
+    <string name="context_no_shared_number" context="error message when sharing a folder">Erreur. %d du processus du partage n\'a pas pu être complété.</string>
+    <string name="context_correctly_shared_removed" context="success message when sharing a folder">Partages supprimés avec succès</string>
+    <string name="context_no_shared_number_removed" context="error message when sharing a folder">Erreur. %d du processus de la suppression du partage n\'a pas pu être complété.</string>
+    <string name="context_no_shared" context="error message">Erreur. Partage annulé</string>
+    <string name="context_no_removed_shared" context="error message">Erreur. Échec de la suppression du partage</string>
+    <string name="context_remove_sharing" context="success message when removing a sharing">Partage du dossier supprimé</string>
+    <string name="context_no_link" context="error message">Impossible de récupérer le lien</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Suppression de MEGA réussi</string>
+    <string name="context_no_removed" context="error message">Erreur. Suppression de MEGA annulée</string>
+    <string name="number_correctly_removed" context="success message when moving a node">%d éléments supprimés de MEGA avec succès</string>
+    <string name="number_no_removed" context="error message when moving a node">%d éléments n\'ont pas été supprimés avec succès.</string>
+    <string name="number_correctly_leaved" context="success message when moving a node">%d dossiers ont été quittés avec succès</string>
+    <string name="number_no_leaved" context="error message when moving a node">%d dossiers n\'ont pas été quittés avec succès.</string>
+    <string name="number_correctly_sent" context="success message when sending multiple files">Fichier envoyé aux %d contacts avec succès.</string>
+    <string name="number_no_sent" context="error message when sending multiple files">Le fichier n\'a pas été envoyés aux %d contacts.</string>
+    <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d fichiers ont été envoyés avec succès</string>
+    <string name="number_no_sent_multifile" context="error message when sending multiple files">, %d fichiers n\'ont pas été envoyés</string>
+    <string name="number_correctly_copied" context="success message when sending multiple files">%d éléments copiés avec succès</string>
+    <string name="number_no_copied" context="error message when sending multiple files">%d éléments n\'ont pas été copiés.</string>
+    <string name="number_contact_removed" context="success message when removing several contacts">%d contacts ont été supprimés avec succès.</string>
+    <string name="number_contact_not_removed" context="error message when removing several contacts">%d contacts n\'ont pas été supprimés.</string>
+    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">Dossier partagé avec %d contacts avec succès</string>
+    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">Fichier non partageable avec %d contacts.</string>
+    <string name="number_correctly_shared" context="success message when sharing multiple files">%d dossiers ont été partagés avec succès.</string>
+    <string name="number_no_shared" context="error message when sharing multiple files">%d dossiers n\'ont pas été partagés.</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Succès de l\'envoi vers :</string>
+    <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">Le dossier n\'est plus partagé</string>
+    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Erreur, le dossier est toujours partagé avec un autre contact</string>
+    <string name="context_select_one_file" context="option available for just one file">Sélectionner un seul fichier.</string>
+    
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Vous êtes sur le point d\'annuler votre abonnement MEGA. Veuillez nous dire s\'il y a quelque chose que l\'on puisse faire pour changer votre avis.</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">Écrivez votre avis ici...</string>
+    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Cacher</string>
+    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Envoyer</string>
+    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Annuler l\'Abonnement</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Merci pour votre retour ! Êtes-vous certain(e) de bien vouloir annuler votre abonnement MEGA?</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Votre abonnement n\'a pas été annulé. Veuillez fournir une raison pour votre annulation.</string>
+    
+    <string name="context_node_private" context="success message after removing the public link of a folder">Le dossier est maintenant privé</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Annulation du mode Partage réussi</string>
+  
+    <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Nouveau dossier</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Ajouter un contact</string>
+    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Télécharger depuis le lien MEGA</string>
+    
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Clé de déchiffrage</string>
+    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Veuillez inclure la clef de déchiffrement pour la clef.</string>
+        
+    <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
+	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
+	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
+	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Autre(s) Fichier(s)</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Prendre depuis le Système de Fichier</string>
+	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Sélectionner le type de fichier</string>
+	<string name="upload_uploading" context="status text">Envoi en cours</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Annuler l\'upload</string>
+	<string name="upload_failed" context="error message">Échec de l\'upload</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">uploadé</string>
+	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Voulez-vous annuler l\'upload?</string>
+	<string name="upload_prepare" context="Status text at the beginning of an upload">Fichier en cours de traitement</string>
+	<string name="error_temporary_unavaible" context="error message when downloading a file">Ressource temporairement indisponible, veuillez réessayer plus tard.</string>
+	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Impossible d\'ouvrir le fichier sélectionné</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">L\'upload a démarré</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Décompression du fichier en cours</string>
+		
+	<string name="error_io_problem" context="error message while browsing the local filesystem">Problème de système de fichier</string>
+	<string name="general_error" context="error message while browsing the local filesystem">Une erreur s\'est produire durant l\'exécution de l\'action</string>
+	
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Galerie des Photos</string>
+	
+	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Format de lien incorrect</string>
+	
+	<string name="my_account_activity" context="Title of the screen where the user account information is shown">Aide sur le Compte</string>
+    <string name="my_account_total_space" context="Headline for the amount of total storage space">Espace restant</string>
+    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Espace gratuit</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espace Utilisé</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Passer Pro maintenant!</string>
+    <string name="my_account_change_password" context="menu item">Changer de mot de passe</string>
+    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Vous commencez à manquer d\'espace !Souhaitez-vous mettre à jour votre compte?</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Vous pouvez devenir un utilisateur Pro !Souhaitez-vous mettre à jour votre compte?</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Alerte du Dépassement du Quota</string>
+     <string name="overquota_alert_text" context="Dialod text overquota error">Opération refusée. Vous allez dépasser la limite de stockage de votre compte. Voulez-vous mettre à niveau votre compte?</string>
+    
+    <string name="op_not_allowed" context="Dialod text overquota error">Opération non autorisée</string>
+    <string name="my_account_last_session" context="when did the last session happen">Dernière session :</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Contacts :</string>
+    
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">Changer le mot de passe</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Mot de passe actuel</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">Nouveau mot de passe</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">Confirmez le nouveau mot de passe</string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Mot de passe actuel incorrect ou bien les 2 nouveaux mots de passe ne correspondent pas. Veuillez réessayer.</string>
+    <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Le mot de passe actuel est incorrect. Veuillez essayer à nouveau.</string>
+    <string name="my_account_change_password_OK" context="Success text">Mot de passe modifié avec succès.</string>
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Les mots de passe ne correspondent pas</string> 
+    
+    <string name="upgrade_activity" context="title of the Upgrade screen">Adhésion Pro</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Sélectionner le type d\'adhésion</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">Renouvellement mensuel ou annuel</string>
+    <string name="select_membership_2" context="button to go to Google Play">Abonnement via Google Play</string>
+    
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Sélectionnez une solution de paiement</string>
+    <string name="no_available_payment_method" context="choose the payment method option when no method is available">Pour le moment, aucune méthode de paiement est disponible pour ce plan</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">Carte de Crédit (abonnement)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">Opérateur (ponctuel)</string>
+    <string name="payment_method_centili" context="one of the payment methods">Opérateur (ponctuel)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
+    
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Mensuel*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annuellement</string>
+    
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*Les abonnements réguliers peuvent être annulés à tout moment avant la date de renouvellement.</string>
+    
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">Le lien a été copié dans le presse-papier</string>
+    <string name="file_properties_remove_link" context="the user can remove the public link">Le lien a été supprimé</string>
+    
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">L\'aperçu n\'a pas encore été téléchargé. Veuillez attendre.</string>
+    
+    <string name="import_correct" context="success message after import a file">Importation réussi</string>
+    
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">Aucun transfert actuel</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Tous les transferts ont été mis en pause</string>
+    <string name="menu_pause_transfers" context="menu item">Mettre en pause les transferts</string>
+    <string name="menu_restart_transfers" context="menu item">Redémarrer les transferts</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Annuler tous les transferts</string>
+    <string name="menu_take_picture" context="menu item">Prendre une photo</string>
+    
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Uniquement via Wi-FI</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Via Wi-Fi ou Données Cellulaires</string>
+    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="cam_sync_skip" context="skip the step of camera upload">Passer</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Envoi des Photos de la Caméra en cours</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Voulez-vous désactiver l\'Envoie des Photos de la Caméra?</string>
+    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Dossier de destination indisponible</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Upload de fichiers de dossiers médias</string>
+    <string name="settings_camera_notif_error" context="notification error">Problème lors de l\'Envoi des Photos de la Caméra</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">L\'Envoi des Photos de la Caméra a été terminé</string>
+    
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Stockage</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Verrouillage par PIN</string>
+    
+    <string name="settings_advanced_features" context="Settings category title for cache and offline files">Fonctionnalités Avancées</string>
+    <string name="settings_advanced_features_cache" context="Settings preference title for cache">Vider le cache</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Nettoyer les Fichiers Hors-Ligne</string>
+    
+    <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Utilisation actuelle de %s</string>    
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calcul en cours...</string>
+    
+    <string name="settings_storage_download_location" context="title of the setting to set the default download location">Répertoire de téléchargement par défaut</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Toujours demander la destination des téléchargements</string>
+    <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afficher les appareils avancés (carte SD externe)</string>
+    
+    <string name="settings_camera_upload_on" context="settings option">Activer l\'Envoi des Photos de la Caméra</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Activer les Uploads de la Caméra</string>
+    <string name="settings_camera_upload_off" context="settings option">Désactiver l\'Envoi des Photos de la Caméra</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Comment envoyer</string>
+    
+    <string name="settings_secondary_upload_on" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Activer l\'Upload des Médias Secondaires</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Désactiver l\'Upload des Médias Secondaires</string>
+    
+    <string name="settings_empty_folder" context="settings option">Choisissez un dossier</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Via Wi-Fi ou Données Cellulaires</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Uniquement via Wi-FI</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Uploader un Fichier</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">Photos seulement</item>
+        <item context="the options of what to upload.">Videos seulement</item>
+        <item context="the options of what to upload.">Photos et Vidéos</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Seulement pendant le rechargement</string>
+    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Conserver les noms de fichiers comme sur l\'appareil</string>
+    
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Dossier local de la Caméra</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA des Uploads de la Caméra</string>
+    
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Dossier Secondaire local</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Dossier Secondaire de Mega</string>
+    
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos seulement</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos seulement</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos et Vidéos</string>
+    
+    <string name="settings_pin_lock_on" context="settings of the pin lock">Activer le Verrouillage par code PIN</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">Désactiver le Verrouillage par code PIN</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">Code PIN</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Non défini</string>
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Réinitialiser le code PIN</string> 
+    <string name="settings_pin_lock_switch" context="settings of the pin lock">Verrouillage par PIN</string>
+    
+    <string name="pin_lock_enter" context="Button after the pin code input field">Valider</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Vos fichiers locaux seront supprimés et vous serez déconnecté(e) au bout de 10 tentatives échouées.</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Code incorrect</string>
+    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Code PIN incorrect, veuillez essayé à nouveau. Vous avez %2d tentatives restantes.</string>
+    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Les Codes PIN ne correspondent pas</string>
+    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Insérez votre code PIN</string>
+    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Ré-insérer votre Code PIN</string>
+    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Insérer votre nouveau Code PIN</string>
+    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Ré-insérer votre nouveau Code PIN</string>
+    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">Toutes vos données locales seront supprimés et vous serez déconnecté(e) dans %d secondes.</string>
+    
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">À Propos</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Politique de Confidentialité</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Conditions d\'Utilisation</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">Version de l\'Application</string>
+    <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">version du SDK MEGA</string>
+    
+    <string name="january">Janvier</string>
+    <string name="february">Février</string>
+    <string name="march">Mars</string>
+    <string name="april">Avril</string>
+    <string name="may">Mai</string>
+    <string name="june">Juin</string>
+    <string name="july">Juillet</string>
+    <string name="august">Août</string>
+    <string name="september">Septembre</string>
+    <string name="october">Octobre</string>
+    <string name="november">Novembre</string>
+    <string name="december">Décembre</string>
+    
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Explorateur ZIP</string>
+    
+    <string name="new_account" context="in login screen to create a new account">Créez un compte dès maintenant !</string>
+    
+    <string name="my_account_title" context="title of the My Account screen">Type de Compte</string>
+    <string name="expires_on" context="title of the Expiration Date">Expire le</string>
+    <string name="free_account">GRATUIT</string>
+    <string name="prolite_account" context="Not translate">Lite</string>
+    <string name="pro1_account" context="Not translate">Pro I</string>
+    <string name="pro2_account" context="Not translate">Pro II</string>
+    <string name="pro3_account" context="Not translate">Pro III</string>
+    
+    <string name="free_storage" context="Not translate">50 GB</string>   
+    <string name="free_bandwidth" context="Free bandwich account details">Limité</string>
+    
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Dossier  pour l\'Envoir des Photos de la Caméra créé</string>
+    
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">Le fichier ZIP sera téléchargé et décompressé.</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">Le fichier ZIP sera décompressé</string>
+    
+    <string name="sortby_name" context="category in sort by action">Par nom</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascendant</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">descendant</string>
+    
+    <string name="sortby_date" context="category in sort by action">Par date</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">du plus récent</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">du plus ancien</string>
+    
+    <string name="sortby_size" context="category in sort by action">Par taille</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Du plus gros</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">du plus petit</string>
+    
+    <string name="per_month" context="in payments, for example: 4.99€ per month">par mois</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">par an</string>
+    
+    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Renseignez vos données de facture :</string>
+    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adresse 1</string>
+    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Adresse 2 (optionnel)</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Ville</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">État / Province</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Pays</string>
+    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Code Postal</string>
+    
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Renseignez vos données de paiement :</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Prénom</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Nom de famille</string>
+    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Numéro de la Carte de Crédit</string>
+    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Mois</string>
+    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Annle</string>
+    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
+    
+    <string name="proceed_cc" context="Text of the button which proceeds the payment">Continuer</string>
+    
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Mis-à-jour du compte effectué avec succès !</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">L\'opération ne s\'est pas terminée correctement. La carte de crédit ne sera pas facturée.</string>
+    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Les informations de la carte de crédit n\'est pas correcte.  La carte de crédit ne sera pas facturée.</string>
+    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Votre compte ne peut pas être mis-à-jour depuis l\'application. Veuillez contacter support@mega.nz pour mettre votre compte à niveau.</string>
+</resources>
