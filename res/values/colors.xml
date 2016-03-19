@@ -11,6 +11,7 @@
     <color name="mega_transparency">#CCdb0605</color>
     <color name="mega_text">#d90007</color>
     <color name="text_login">#333333</color>
+    <color name="transparency_white">#80FFFFFF</color>
     <color name="used_space_ok">#1fa4e7</color>
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>

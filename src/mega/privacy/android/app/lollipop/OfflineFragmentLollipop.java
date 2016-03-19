@@ -605,7 +605,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
 			//Margins
 			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 
 			mOffList=dbH.findByPath(pathNavigation);
@@ -792,7 +792,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
 			//Margins
 			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 
 			mOffList=dbH.findByPath(pathNavigation);

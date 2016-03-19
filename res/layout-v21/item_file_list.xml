@@ -81,8 +81,9 @@
         android:id="@+id/file_list_public_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_public_link_list"
+        android:src="@drawable/link_ic"
 		android:background="@null" 
+		android:tint="@color/transparency_white"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/file_list_three_dots"/> 
         
