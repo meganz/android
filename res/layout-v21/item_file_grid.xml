@@ -38,7 +38,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@null"
-        android:src="@drawable/ic_public_link_list"  
+        android:src="@drawable/link_ic"  
+        android:tint="@color/transparency_white"
         android:layout_alignParentRight="true"       
         android:layout_marginRight="22dp"
         android:layout_marginTop="10dp"/>
