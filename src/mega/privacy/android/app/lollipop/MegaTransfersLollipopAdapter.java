@@ -156,7 +156,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     	public TextView textViewFileName;
     	public ImageView imageViewCompleted;
     	public TextView textViewCompleted;
-    	public ImageView imageViewOneDot;
     	public TextView textViewRate;
     	public ProgressBar transferProgressBar;
     	public RelativeLayout itemLayout;
@@ -212,7 +211,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
 		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
 		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
-		holder.imageViewOneDot = (ImageView) v.findViewById(R.id.transfers_list_one_dot);
 		holder.textViewRate = (TextView) v.findViewById(R.id.transfers_list_transfer_rate);
 		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar); 
 		holder.optionRemove = (ImageButton) v.findViewById(R.id.transfers_list_option_remove);		
@@ -273,20 +271,44 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			
 			//if node == null --> Public node
 			if (node == null){
-				holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());	
+				holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+				params.setMargins(36, 0, 0, 0);
+				holder.imageView.setLayoutParams(params);
 			}
 			else{
 				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+				params.setMargins(36, 0, 0, 0);
+				holder.imageView.setLayoutParams(params);
 				
 				Bitmap thumb = null;
 				if (node.hasThumbnail()){
+					RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params2.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params2.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params2.setMargins(54, 0, 12, 0);
+					
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null){
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(54, 0, 12, 0);
+						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
 						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null){
+							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.setMargins(54, 0, 12, 0);
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{ 
@@ -327,7 +349,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			
 		long speed = transfer.getSpeed();
 		if (speed == 0){
-			holder.imageViewOneDot.setVisibility(View.GONE);
 			holder.textViewCompleted.setVisibility(View.VISIBLE);
 			holder.imageViewCompleted.setVisibility(View.VISIBLE);
 			holder.textViewCompleted.setText("Queued");
@@ -336,7 +357,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			holder.textViewRate.setVisibility(View.GONE);
 		}
 		else{
-			holder.imageViewOneDot.setVisibility(View.VISIBLE);
 			holder.textViewCompleted.setVisibility(View.GONE);
 			holder.imageViewCompleted.setVisibility(View.GONE);
 			holder.transferProgressBar.setVisibility(View.VISIBLE);
