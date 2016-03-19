@@ -36,6 +36,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -110,7 +111,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView lastSession;
 	TextView connections;
 	
-	TextView upgradeButton;
+	Button upgradeButton;
 	
 	RelativeLayout typeLayout;
 	LinearLayout expirationLayout;
@@ -282,9 +283,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		usedSpaceLayout.setVisibility(View.GONE);
 		lastSessionLayout.setVisibility(View.GONE);
 		
-		upgradeButton = (TextView) v.findViewById(R.id.my_account_account_type_button);
+		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
 		upgradeButton.setOnClickListener(this);
+//		upgradeButton.getBackground().setColorFilter(0xFF00BFA5, PorterDuff.Mode.MULTIPLY);		
 		
 		infoEmail.setText(myEmail);
 		

@@ -160,16 +160,23 @@
 			            
 			        </LinearLayout>
 			
-			        <TextView
+			        <Button
 	                    android:id="@+id/my_account_account_type_button"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
 	                    android:layout_alignParentRight="true"
-	                    android:paddingRight="15dp"
+	                    android:layout_marginRight="15dp"
+	                    android:paddingLeft="20dp"
+	                    android:paddingRight="20dp"
+	                    android:paddingTop="5dp"
+	                    android:paddingBottom="5dp"
+	                    android:textColor="@color/white"
 	                    android:layout_centerVertical="true"
-	                    android:textColor="@color/accentColor"
-	                    android:textStyle="bold" 
-	                    android:text="@string/my_account_upgrade_pro"/>
+	                    android:text="@string/my_account_upgrade_pro"
+	                    android:background="@drawable/ripple_upgrade"
+	                    android:elevation="@dimen/elevation_upgrade_low"
+	                    android:stateListAnimator="@anim/button_upgrade_elevation"
+        				android:tint="@android:color/white" />
 			        
 			    </RelativeLayout>
 			    

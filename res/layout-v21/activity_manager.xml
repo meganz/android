@@ -4,7 +4,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true" >
+    android:fitsSystemWindows="true"
+    android:elevation="16dp" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -192,7 +193,7 @@
                 android:layout_marginBottom="2dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="2dp"/>
 
             <TextView
                 android:id="@+id/navigation_drawer_used_space"
