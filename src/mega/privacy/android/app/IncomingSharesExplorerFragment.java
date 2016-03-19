@@ -208,11 +208,21 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	}
 	
 	public void changeActionBarTitle(String folder){
-		((FileExplorerActivity) context).changeTitle(folder);
+		if (context instanceof FileExplorerActivity){
+			((FileExplorerActivity) context).changeTitle(folder);
+		}
+		else if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity) context).changeTitle(folder);
+		}
 	}
 	
 	public void changeBackVisibility(boolean backVisibility){
-		((FileExplorerActivity) context).changeBackVisibility(backVisibility);
+		if (context instanceof FileExplorerActivity){
+			((FileExplorerActivity) context).changeBackVisibility(backVisibility);
+		}
+		else if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity) context).changeBackVisibility(backVisibility);	
+		}
 	}
 	
 	@Override
@@ -225,7 +235,12 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	public void onClick(View v) {
 		switch(v.getId()){
 			case R.id.file_explorer_button:{
-				((FileExplorerActivity) context).buttonClick(parentHandle);
+				if (context instanceof FileExplorerActivity){
+					((FileExplorerActivity) context).buttonClick(parentHandle);
+				}
+				else if (context instanceof LauncherFileExplorerActivity){
+					((LauncherFileExplorerActivity) context).buttonClick(parentHandle);
+				}
 			}
 		}
 	}
@@ -289,7 +304,12 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 					MegaNode parentFile = megaApi.getParentNode(nFile);
 					if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
 					{
-						((FileExplorerActivity) context).buttonClick(nFile.getHandle());
+						if (context instanceof FileExplorerActivity){
+							((FileExplorerActivity) context).buttonClick(nFile.getHandle());
+						}
+						else if (context instanceof LauncherFileExplorerActivity){
+							((LauncherFileExplorerActivity) context).buttonClick(nFile.getHandle());
+						}
 					}
 					else{
 						Toast.makeText(context, getString(R.string.context_send_no_permission), Toast.LENGTH_LONG).show();
