@@ -164,6 +164,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		if (context instanceof FileExplorerActivity){
 			((FileExplorerActivity)context).setParentHandle(parentHandle);
 		}
+		else if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
+		}
 		
 //		if (modeCloud == FileExplorerActivity.MOVE) {
 //			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
@@ -241,11 +244,21 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	}
 	
 	public void changeActionBarTitle(String folder){
-		((FileExplorerActivity) context).changeTitle(folder);
+		if (context instanceof FileExplorerActivity){
+			((FileExplorerActivity) context).changeTitle(folder);
+		}
+		else if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity) context).changeTitle(folder);
+		}
 	}
 	
 	public void changeBackVisibility(boolean backVisibility){
-		((FileExplorerActivity) context).changeBackVisibility(backVisibility);
+		if (context instanceof FileExplorerActivity){
+			((FileExplorerActivity) context).changeBackVisibility(backVisibility);
+		}
+		else if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity) context).changeBackVisibility(backVisibility);
+		}
 	}
 	
 	@Override
@@ -259,7 +272,12 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		switch(v.getId()){
 			case R.id.file_explorer_button:{				
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
-				((FileExplorerActivity) context).buttonClick(parentHandle);
+				if (context instanceof FileExplorerActivity){
+					((FileExplorerActivity) context).buttonClick(parentHandle);
+				}
+				else if (context instanceof LauncherFileExplorerActivity){
+					((LauncherFileExplorerActivity) context).buttonClick(parentHandle);
+				}
 			}
 		}
 	}
@@ -293,6 +311,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			parentHandle = nodes.get(position).getHandle();
 			if (context instanceof FileExplorerActivity){
 				((FileExplorerActivity)context).setParentHandle(parentHandle);
+			}
+			else if (context instanceof LauncherFileExplorerActivity){
+				((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
 			}
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
@@ -328,7 +349,12 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 				log("Selected node to send: "+n.getName());
 				if(nodes.get(position).isFile()){
 					MegaNode nFile = nodes.get(position);
-					((FileExplorerActivity) context).buttonClick(nFile.getHandle());
+					if (context instanceof FileExplorerActivity){
+						((FileExplorerActivity) context).buttonClick(nFile.getHandle());
+					}
+					else if (context instanceof LauncherFileExplorerActivity){
+						((LauncherFileExplorerActivity) context).buttonClick(nFile.getHandle());
+					}
 				}
 				
 			}
@@ -374,6 +400,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			if (context instanceof FileExplorerActivity){
 				((FileExplorerActivity)context).setParentHandle(parentHandle);
 			}
+			else if (context instanceof LauncherFileExplorerActivity){
+				((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
+			}
 			
 			return 2;
 		}
@@ -405,6 +434,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		
 		if (context instanceof FileExplorerActivity){
 			((FileExplorerActivity)context).setParentHandle(parentHandle);
+		}
+		else if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
 		}
 	}
 	

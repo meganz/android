@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import mega.privacy.android.app.LauncherFileExplorerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.utils.Util;
@@ -55,7 +56,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
-	int deepBrowserTree = 0;
+	public int deepBrowserTree = 0;
 	View separator;
 	TextView optionText;
 	TextView cancelText;
@@ -258,8 +259,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 	
 	public void changeActionBarTitle(String folder){
-		((FileExplorerActivityLollipop) context).changeTitle(folder);
-		((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
+		if (context instanceof LauncherFileExplorerActivity){
+			((LauncherFileExplorerActivity) context).changeTitle(folder);
+			((LauncherFileExplorerActivity)context).supportInvalidateOptionsMenu();
+		}
+		else if (context instanceof FileExplorerActivityLollipop){
+			((FileExplorerActivityLollipop) context).changeTitle(folder);
+			((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
+		}
 	}
 	
 	@Override
@@ -271,11 +278,21 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.action_text:{				
-				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
+			case R.id.action_text:{	
+				if (context instanceof LauncherFileExplorerActivity){
+					((LauncherFileExplorerActivity) context).buttonClick(parentHandle);
+				}
+				else if (context instanceof FileExplorerActivityLollipop){
+					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
+				}
 			}
-			case R.id.cancel_text:{				
-				((FileExplorerActivityLollipop) context).finish();
+			case R.id.cancel_text:{
+				if (context instanceof LauncherFileExplorerActivity){
+					((LauncherFileExplorerActivity) context).finish();
+				}
+				else if (context instanceof FileExplorerActivityLollipop){
+					((FileExplorerActivityLollipop) context).finish();
+				}
 			}
 		}
 	}
@@ -335,7 +352,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					MegaNode parentFile = megaApi.getParentNode(nFile);
 					if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
 					{
-						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
+						if (context instanceof LauncherFileExplorerActivity){
+							((LauncherFileExplorerActivity) context).buttonClick(nFile.getHandle());
+						}
+						else if (context instanceof FileExplorerActivityLollipop){
+							((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
+						}
 					}
 					else{
 						Toast.makeText(context, getString(R.string.context_send_no_permission), Toast.LENGTH_LONG).show();

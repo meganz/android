@@ -1,0 +1,190 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LauncherFileExplorerActivity" >
+
+    <RelativeLayout
+        android:id="@+id/file_explorer_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin" >
+
+        <LinearLayout
+            android:id="@+id/file_explorer_button_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="horizontal" >
+
+<!--             <ImageButton
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/menu_refresh"
+                android:onClick="onRefreshClick"
+                android:src="@drawable/ic_menu_navigation_refresh_dark" />
+-->
+            <ImageButton
+                android:id="@+id/file_explorer_new_folder"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/menu_new_folder"
+                android:src="@drawable/ic_create_new_folder_white" />
+        </LinearLayout>
+
+        <ImageView 
+            android:id="@+id/file_explorer_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_arrow_back_white"/>
+        
+        <TextView
+            android:id="@+id/file_explorer_window_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/file_explorer_back"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textAppearance="@android:style/TextAppearance.Large" />        
+        
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/file_explorer_divider_top"
+        android:layout_width="match_parent"
+        android:layout_height="2dip"
+        android:layout_below="@id/file_explorer_toolbar"
+        android:background="@color/mega" />
+
+    <!--  
+    <Button
+        android:id="@+id/file_explorer_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center" />
+    
+    
+  <Button
+       	android:id="@+id/file_explorer_button"
+       	android:layout_gravity="center"
+       	android:layout_height="55dp"
+       	android:layout_width="fill_parent"
+       	android:layout_alignParentBottom="true"
+       	android:background="@drawable/btn_default_holo_light_without_corners"
+       	android:textColor="@color/button_text">
+    </Button>
+ -->
+<TabHost
+        android:id="@+id/tabhost_provider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/file_explorer_divider_top">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+           <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+       	   </TabWidget>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/provider_tabs_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </TabHost>
+    
+	<LinearLayout
+        android:id="@+id/file_logging_in_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/file_login_mega_logo"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/logo_loading_ic" />
+
+        <TextView
+            android:id="@+id/file_login_query_signup_link_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/login_querying_signup_link" />
+
+        <TextView
+            android:id="@+id/file_login_generating_keys_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/login_generating_key" />
+
+        <TextView
+            android:id="@+id/file_login_confirm_account_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/login_confirming_account" />
+
+        <TextView
+            android:id="@+id/file_login_logging_in_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/login_connecting_to_server" />
+
+        <TextView
+            android:id="@+id/file_login_fetch_nodes_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/download_updating_filelist" />
+
+        <TextView
+            android:id="@+id/file_login_prepare_nodes_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/login_preparing_filelist" />
+
+        <ProgressBar
+            android:id="@+id/file_login_fetching_nodes_bar"
+            style="@style/MEGAProgressBarLogin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp" />
+
+        <ProgressBar
+            android:id="@+id/file_login_progress_bar"
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+
+</RelativeLayout>
