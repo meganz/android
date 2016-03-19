@@ -459,8 +459,15 @@ public class ChooseAccountActivityLollipop extends PinActivityLollipop implement
 					String priceString = df.format(price);
 					String [] s = priceString.split("\\.");
 					if (s.length == 1){
-						pro1PriceInteger.setText(s[0]);
-						pro1PriceDecimal.setText("");
+						String [] s1 = priceString.split(",");
+						if (s1.length == 1){
+							pro1PriceInteger.setText(s1[0]);
+							pro1PriceDecimal.setText("");
+						}
+						else if (s1.length == 2){
+							pro1PriceInteger.setText(s1[0]);
+							pro1PriceDecimal.setText("." + s1[1] + " €");
+						}
 					}
 					else if (s.length == 2){
 						pro1PriceInteger.setText(s[0]);
@@ -480,8 +487,15 @@ public class ChooseAccountActivityLollipop extends PinActivityLollipop implement
 					String priceString = df.format(price);
 					String [] s = priceString.split("\\.");
 					if (s.length == 1){
-						pro2PriceInteger.setText(s[0]);
-						pro2PriceDecimal.setText("");
+						String [] s1 = priceString.split(",");
+						if (s1.length == 1){
+							pro2PriceInteger.setText(s1[0]);
+							pro2PriceDecimal.setText("");
+						}
+						else if (s1.length == 2){
+							pro2PriceInteger.setText(s1[0]);
+							pro2PriceDecimal.setText("." + s1[1] + " €");
+						}
 					}
 					else if (s.length == 2){
 						pro2PriceInteger.setText(s[0]);
@@ -501,8 +515,15 @@ public class ChooseAccountActivityLollipop extends PinActivityLollipop implement
 					String priceString = df.format(price);
 					String [] s = priceString.split("\\.");
 					if (s.length == 1){
-						pro3PriceInteger.setText(s[0]);
-						pro3PriceDecimal.setText("");
+						String [] s1 = priceString.split(",");
+						if (s1.length == 1){
+							pro3PriceInteger.setText(s1[0]);
+							pro3PriceDecimal.setText("");
+						}
+						else if (s1.length == 2){
+							pro3PriceInteger.setText(s1[0]);
+							pro3PriceDecimal.setText("." + s1[1] + " €");
+						}
 					}
 					else if (s.length == 2){
 						pro3PriceInteger.setText(s[0]);
@@ -522,8 +543,15 @@ public class ChooseAccountActivityLollipop extends PinActivityLollipop implement
 					String priceString = df.format(price);
 					String [] s = priceString.split("\\.");
 					if (s.length == 1){
-						proLitePriceInteger.setText(s[0]);
-						proLitePriceDecimal.setText("");
+						String [] s1 = priceString.split(",");
+						if (s1.length == 1){
+							proLitePriceInteger.setText(s1[0]);
+							proLitePriceDecimal.setText("");
+						}
+						else if (s1.length == 2){
+							proLitePriceInteger.setText(s1[0]);
+							proLitePriceDecimal.setText("." + s1[1] + " €");
+						}
 					}
 					else if (s.length == 2){
 						proLitePriceInteger.setText(s[0]);
