@@ -143,7 +143,8 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:orientation="vertical"
-            android:padding="0dp" >
+            android:padding="0dp"
+            android:elevation="16dp" >
 
             <LinearLayout
                 android:id="@+id/file_list_option_download_layout"
@@ -513,7 +514,8 @@
         sothree:umanoOverlay="true"
         sothree:umanoPanelHeight="120dp"
         sothree:umanoParalaxOffset="100dp"
-        sothree:umanoShadowHeight="4dp" >
+        sothree:umanoShadowHeight="4dp"
+        android:elevation="16dp" >
 
         <!-- MAIN CONTENT -->
 
@@ -542,7 +544,7 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:orientation="vertical"
-            android:padding="0dp" >
+            android:padding="0dp">
             
             <LinearLayout
                 android:id="@+id/file_list_upload_title_layout"

@@ -96,8 +96,8 @@
  
     <style name="UsedSpaceProgressBar" parent="android:Widget.Material.Light.ProgressBar.Horizontal">
 		 <item name="android:indeterminateOnly">false</item>
-         <item name="android:minHeight">8dp</item>
-         <item name="android:maxHeight">8dp</item>
+         <item name="android:minHeight">2dp</item>
+         <item name="android:maxHeight">2dp</item>
 	</style>
 	
     <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
