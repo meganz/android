@@ -127,7 +127,7 @@
     <string name="password_text" context="password label">비밀번호</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">비밀번호 확인</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">가나다</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">MEGA에 처음이신가요?</string>
     <string name="create_account" context="label and text button when creating the account">계정 만들기</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">이메일 주소를 입력하세요</string>

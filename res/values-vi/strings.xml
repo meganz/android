@@ -20,8 +20,8 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Tải xuống</string>
     <string name="general_add" context="button">Thêm</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Dọn rác</string>
-    <string name="general_loading" context="state previous to import a file">Đang tải&#8230;</string>
-    <string name="general_importing" context="state while importing the file">Đang nhập&#8230;</string>
+    <string name="general_loading" context="state previous to import a file">Đang tải</string>
+    <string name="general_importing" context="state while importing the file">Đang nhập</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Nhập</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Lưu trữ</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Băng thông</string>
@@ -45,7 +45,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Bạn đang chuẩn bị xóa một mã-khóa masterkey</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Cảnh báo! Thao tác này có rủi ro cao. Bạn có muốn tiếp tục không?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Thêm tùy chọn&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Thêm tùy chọn</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Bạn có muốn xóa tên liên lạc này không?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Bạn có muốn xóa các tên liên lạc này không?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Chuyển đến Thùng Rác?</string>
@@ -58,7 +58,7 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Xin xác nhận</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Đăng xuất</string>
-    <string name="action_add" context="Menu item">Tải lên&#8230;</string>
+    <string name="action_add" context="Menu item">Tải lên</string>
     <string name="action_create_folder" context="Menu item">Tạo thư mục mới</string>
     <string name="action_open_link" context="Menu item">Mở đường liên kết...</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Chọn thư mục để tải lên</string>
@@ -127,7 +127,7 @@
     <string name="password_text" context="password label">mật khẩu</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Xác nhận mật khẩu</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">XEM</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">ẨN</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Mới đến MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Tạo tài khoản</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Xin nhập địa chỉ email</string>
@@ -244,7 +244,7 @@
 	<string name="download_failed" context="Error message">Lỗi tải xuống</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">đã tải xuống</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Đang tải xuống</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Đang truyền tải&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Đang truyền tải</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Đang chuẩn bị cho tệp tin</string>
     <string name="download_began" context="message when the download starts">Đã bắt đầu tải xuống</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Bạn muốn hủy tải xuống không?</string>
@@ -266,7 +266,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Mở</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Mở đường liên kết</string>
     <string name="context_renaming" context="while renaming a file or folder">Đang đổi tên</string>
-    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Đang chuẩn bị tệp tin&#8230;</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Đang chuẩn bị tệp tin</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Tải xuống</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Tải xuống thư mục</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Chuyển nhập thư mục</string>
@@ -282,7 +282,7 @@
     <string name="context_delete_from_mega" context="menu item">Xóa khỏi MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Tên Thư mục</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Email của người này</string>
-    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Đang tạo thư mục&#8230;</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Đang tạo thư mục</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Đang nhập vào danh bạ</string>
     <string name="context_download_to" context="Menu item">Lưu vào</string>
     <string name="context_clear_rubbish" context="Menu option title">Dọn Thùng Rác</string>

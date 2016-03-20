@@ -60,7 +60,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Uitloggen</string>
     <string name="action_add" context="Menu item">Upload...</string>
     <string name="action_create_folder" context="Menu item">Nieuwe map maken</string>
-    <string name="action_open_link" context="Menu item">Open link&#8230;</string>
+    <string name="action_open_link" context="Menu item">Open link</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload naar</string>
     <string name="action_settings" context="Menu item">Instellingen</string>
     <string name="action_search" context="Search button">Zoek</string>

@@ -20,8 +20,8 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descarcă</string>
     <string name="general_add" context="button">Adaugă</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Goleşte</string>
-    <string name="general_loading" context="state previous to import a file">Se încarcă&#8230;</string>
-    <string name="general_importing" context="state while importing the file">Se importă&#8230;</string>
+    <string name="general_loading" context="state previous to import a file">Se încarcă</string>
+    <string name="general_importing" context="state while importing the file">Se importă</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importă</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Spaţiu de stocare</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Lăţime de bandă</string>
@@ -45,7 +45,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Eşti pe cale să elimini fişierul cu cheia principală exportată</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Avertisment de securitate! Aceasta este o operaţiune cu risc ridicat. Doreşti să continui?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mai multe opţiuni&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mai multe opţiuni</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Doreşti să elimini contactul</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Doreşti aceste contacte?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Muţi în coşul de gunoi?</string>
@@ -58,7 +58,7 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Te rugăm să confirmi</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Deconectare</string>
-    <string name="action_add" context="Menu item">Încarcă&#8230;</string>
+    <string name="action_add" context="Menu item">Încarcă</string>
     <string name="action_create_folder" context="Menu item">Creează folder nou</string>
     <string name="action_open_link" context="Menu item">Deschide linkul...</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Încarcă în</string>
@@ -251,7 +251,7 @@
 	<string name="download_failed" context="Error message">Descărcare eşuată</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">descărcat</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Se descarcă</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Se transferă&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Se transferă</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Se pregătesc fişierele</string>
     <string name="download_began" context="message when the download starts">Descărcarea a început</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Doreşti să anulezi descărcarea?</string>
@@ -273,7 +273,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Deschide</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Deschide linkul</string>
     <string name="context_renaming" context="while renaming a file or folder">Se redenumeşte</string>
-    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Se pregăteşte fişierul&#8230;</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Se pregăteşte fişierul</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descarcă</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Descarcă folderul</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Importă folderul</string>
@@ -289,7 +289,7 @@
     <string name="context_delete_from_mega" context="menu item">Şterge din MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Numele folderului</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">E-mail de contact</string>
-    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Se creează folderul&#8230;</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Se creează folderul</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adăugarea contactului</string>
     <string name="context_download_to" context="Menu item">Salvează în</string>
     <string name="context_clear_rubbish" context="Menu option title">Goleşte coşul de gunoi</string>
@@ -484,7 +484,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Curăţă fişierele offline</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">În prezent folosind %s</string>    
-    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Se calculează&#8230;</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Se calculează</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Locaţia de descărcare implicită</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Întreabă mereu locaţia descărcării</string>

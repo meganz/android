@@ -20,8 +20,8 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Завантажити</string>
     <string name="general_add" context="button">Додати</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Спорожнити</string>
-    <string name="general_loading" context="state previous to import a file">Завантаження&#8230;</string>
-    <string name="general_importing" context="state while importing the file">Імпортування&#8230;</string>
+    <string name="general_loading" context="state previous to import a file">Завантаження</string>
+    <string name="general_importing" context="state while importing the file">Імпортування</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Імпорт</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Сховище</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">пропускної здатності</string>
@@ -45,7 +45,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Ви збираєтеся видалити експортований файл майстер-ключа</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Попередження системи безпеки! Це операція з високим ризиком. Ви хочете продовжити?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Більше опцій&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Більше опцій</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Ви бажаєте видалити контакт</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Ви бажаєте видалити цей контакт?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Перенести у кошик для сміття?</string>
@@ -58,16 +58,16 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Підтвердіть, будь-ласка</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Вийти</string>
-    <string name="action_add" context="Menu item">Відвантаження&#8230;</string>
+    <string name="action_add" context="Menu item">Відвантаження</string>
     <string name="action_create_folder" context="Menu item">Створити нову теку</string>
-    <string name="action_open_link" context="Menu item">Відкрити ланку&#8230;</string>
+    <string name="action_open_link" context="Menu item">Відкрити ланку</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Відвантажити до</string>
     <string name="action_settings" context="Menu item">Налаштування</string>
     <string name="action_search" context="Search button">Пошук</string>
     <string name="action_play" context="Search button">Гра</string>
     <string name="action_pause" context="Search button">Пауза</string>
     <string name="action_refresh" context="Menu item">Оновити</string>
-    <string name="action_sort_by" context="Menu item">Сортувати за&#8230;</string>
+    <string name="action_sort_by" context="Menu item">Сортувати за</string>
     <string name="action_help" context="Menu item">Допомога</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Покращити акаунт</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Покращення облікового запису</string>
@@ -141,7 +141,7 @@
     <string name="password_text" context="password label">пароль</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Підтвердити пароль</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">АБВ</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">&#8230;</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Вперше на MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Створити обліковий запис</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Будь ласка, введіть адресу вашої електронної пошти</string>
@@ -258,7 +258,7 @@
 	<string name="download_failed" context="Error message">Завантаження не вдалася</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">завантажено</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Завантаження</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Передача&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Передача</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Підготовка файлів</string>
     <string name="download_began" context="message when the download starts">Завантаження розпочато</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Ви хочете скасувати завантаження?</string>
@@ -280,7 +280,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Відкрити</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Відкрити ланку</string>
     <string name="context_renaming" context="while renaming a file or folder">Перейменування</string>
-    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Підготовка файлу&#8230;</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Підготовка файлу</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Завантажити</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Завантажити теку</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Імпорт теки</string>
@@ -296,7 +296,7 @@
     <string name="context_delete_from_mega" context="menu item">Видалити з MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Назва теки</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Електронна пошта контакту</string>
-    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Створення теки&#8230;</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Створення теки</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Додавання контакту</string>
     <string name="context_download_to" context="Menu item">Зберегти до</string>
     <string name="context_clear_rubbish" context="Menu option title">Очистити кошик</string>
@@ -376,7 +376,7 @@
     <string name="context_select_one_file" context="option available for just one file">Оберіть лише один файл.</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Ви збираєтесь скасувати MEGA підписку. Будь ласка, дайте нам знати, якщо існує щось, що ми можемо вам надати, щоб змінити вашу думку.</string>
-    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">Введіть відгук тут&#8230;</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">Введіть відгук тут</string>
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Відхилити</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Відправити</string>
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Скасувати Підписку</string>
@@ -491,7 +491,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Очистити автономні файли</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Використовується %s</string>    
-    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Розрахунок&#8230;</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Розрахунок</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Типове розташування завантаження</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Завжди запитувати за місце завантаження</string>

@@ -20,8 +20,8 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Transferir</string>
     <string name="general_add" context="button">Adicionar</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Vazio</string>
-    <string name="general_loading" context="state previous to import a file">A carregar&#8230;</string>
-    <string name="general_importing" context="state while importing the file">A importar&#8230;</string>
+    <string name="general_loading" context="state previous to import a file">A carregar</string>
+    <string name="general_importing" context="state while importing the file">A importar</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importar</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Armazenamento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Dados</string>
@@ -45,7 +45,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vais remover o ficheiro exportado da chave mestra</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Aviso de segurança! Esta operação é bastante arriscada. Tens a certeza que queres continuar?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mais opções&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mais opções</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Desejas remover o contacto?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Deseja remover estes contatos?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Mover para o Lixo?</string>
@@ -58,9 +58,9 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Por favor confirme</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Sair</string>
-    <string name="action_add" context="Menu item">Transferir&#8230;</string>
+    <string name="action_add" context="Menu item">Transferir</string>
     <string name="action_create_folder" context="Menu item">Criar nova pasta</string>
-    <string name="action_open_link" context="Menu item">Abrir Endereço#8230;</string>
+    <string name="action_open_link" context="Menu item">Abrir Endereço</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Transferir para</string>
     <string name="action_settings" context="Menu item">Definições</string>
     <string name="action_search" context="Search button">Procurar</string>
@@ -242,8 +242,8 @@
 	
 	<string name="download_failed" context="Error message">O download falhou</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">Descarregado</string>
-	<string name="download_downloading" context="Title header on the download page while the file is downloading.">A transferir&#8230;</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">A transferir&#8230;</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">A transferir</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">A transferir</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">A preparar ficheiros</string>
     <string name="download_began" context="message when the download starts">O download começou</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Pretende cancelar o download?</string>
@@ -265,7 +265,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Abrir endereço eletrónico</string>
     <string name="context_renaming" context="while renaming a file or folder">A renomear</string>
-    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">A preparar o ficheiro&#8230;</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">A preparar o ficheiro</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Transferir</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Fazer download da pasta</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Importar pasta</string>
@@ -281,7 +281,7 @@
     <string name="context_delete_from_mega" context="menu item">Removido do MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Nome da Pasta</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Email do contacto</string>
-    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">A criar pasta&#8230;</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">A criar pasta</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">A adicionar contacto</string>
     <string name="context_download_to" context="Menu item">Guardar para</string>
     <string name="context_clear_rubbish" context="Menu option">Esvaziar o Lixo</string>
@@ -361,7 +361,7 @@
     <string name="context_select_one_file" context="option available for just one file">Selecione apenas um ficheiro</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Está prestes a cancelar a sua subscrição Mega. Por favor, diga-nos se há algo que possamos fazer para o ajudar a mudar de opinião.</string>
-    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">Escreva aqui o seu feedback&#8230;</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">Escreva aqui o seu feedback</string>
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Fechar</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Enviar</string>
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancelar Subscrição</string>
@@ -476,7 +476,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Apagar Ficheiros Offline</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actualmente a usar %s</string>    
-    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">A calcular&#8230;</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">A calcular</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Local de download padrão</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Perguntar sempre a localização das transferências</string>

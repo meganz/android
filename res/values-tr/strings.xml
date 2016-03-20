@@ -21,7 +21,7 @@
     <string name="general_add" context="button">Ekle</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Boşalt</string>
     <string name="general_loading" context="state previous to import a file">Yükleniyor...</string>
-    <string name="general_importing" context="state while importing the file">İçe aktarılıyor&#8230;</string>
+    <string name="general_importing" context="state while importing the file">İçe aktarılıyor</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Hesaba Ekle</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Saklama alanı</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bant genişliği</string>
@@ -45,7 +45,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Dışa aktarılan ana anahtar dosyasını kaldıracaksınız</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Güvenlik uyarısı! Bu yüksek riskli bir işlemdir. Devam etmek istiyor musunuz?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Daha fazla seçenek&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Daha fazla seçenek</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Kişiyi kaldırmak istiyor musun</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Bu kişileri istiyor musun?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Çöp kutusuna taşı?</string>
@@ -58,7 +58,7 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Lütfen onaylayın</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Oturumu Kapat</string>
-    <string name="action_add" context="Menu item">Yükle&#8230;</string>
+    <string name="action_add" context="Menu item">Yükle</string>
     <string name="action_create_folder" context="Menu item">Yeni klasör oluştur</string>
     <string name="action_open_link" context="Menu item">Bağlantıyı aç...</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Şuraya yükle</string>
@@ -282,7 +282,7 @@
     <string name="context_delete_from_mega" context="menu item">MEGA\'dan sil</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Klasör Adı</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Kişi epostası</string>
-    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Klasör oluşturuluyor&#8230;</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Klasör oluşturuluyor</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Kişi ekleniyor</string>
     <string name="context_download_to" context="Menu item">Şuraya kaydet</string>
     <string name="context_clear_rubbish" context="Menu option title">Çöp Kutusunu Boşalt</string>

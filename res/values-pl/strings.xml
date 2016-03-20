@@ -141,7 +141,7 @@
     <string name="password_text" context="password label">hasło</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Potwierdź hasło</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Pierwszy raz na MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Utwórz konto</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Wprowadź swój adres email</string>

@@ -127,7 +127,7 @@
     <string name="password_text" context="password label">密码</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">确认密码</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">MEGA新用户？</string>
     <string name="create_account" context="label and text button when creating the account">创建一个账户。</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">请输入您的电子邮件地址</string>
@@ -244,7 +244,7 @@
 	<string name="download_failed" context="Error message">下载失败</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">已下载</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">下载中</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Transferring&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Transferring</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">正在准备文件</string>
     <string name="download_began" context="message when the download starts">已开始下载</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">您是否要取消相机上传？</string>
@@ -477,7 +477,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>    
-    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">正在计算&#8230;</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">正在计算</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">默认下载位置</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">总是询问下载位置</string>

@@ -21,7 +21,7 @@
     <string name="general_add" context="button">Добавить</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Очистить</string>
     <string name="general_loading" context="state previous to import a file">Загрузка...</string>
-    <string name="general_importing" context="state while importing the file">Импорт&#8230;</string>
+    <string name="general_importing" context="state while importing the file">Импорт</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Импортировать</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">свободного места</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Передача данных</string>
@@ -45,7 +45,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Вы собираетесь удалить экспортированный файл мастер-ключа</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Внимание! Эта операция очень рискованна. Хотите продолжить?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Больше опций&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Больше опций</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Удалить контакт?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Удалить эти контакты?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Отправить в корзину?</string>
@@ -58,9 +58,9 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Пожалуйста, подтвердите</string>
     
     <string name="action_logout" context="Button where the user can sign off or logout">Выход</string>
-    <string name="action_add" context="Menu item">Загрузить&#8230;</string>
+    <string name="action_add" context="Menu item">Загрузить</string>
     <string name="action_create_folder" context="Menu item">Создать новую папку</string>
-    <string name="action_open_link" context="Menu item">Открыть ссылку&#8230;</string>
+    <string name="action_open_link" context="Menu item">Открыть ссылку</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Загрузить файл в</string>
     <string name="action_settings" context="Menu item">Настройки</string>
     <string name="action_search" context="Search button">Поиск</string>
@@ -134,7 +134,7 @@
     <string name="password_text" context="password label">пароль</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Подтвердите пароль</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">АБВ</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">&#8230;</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Впервые на MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Создать учётную запись</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Пожалуйста введите адрес электронной почты</string>
@@ -251,7 +251,7 @@
 	<string name="download_failed" context="Error message">Скачивание не удалось</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">загружено</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Скачивание</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Передача&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Передача</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Подготовка файлов</string>
     <string name="download_began" context="message when the download starts">Загрузка началась</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Отменить скачивание?</string>
@@ -273,7 +273,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Открыть</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Открыть ссылку</string>
     <string name="context_renaming" context="while renaming a file or folder">Переименование</string>
-    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Подготовка файла&#8230;</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">Подготовка файла</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Скачать</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Папка загрузки</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Ипортировать папку</string>
@@ -289,7 +289,7 @@
     <string name="context_delete_from_mega" context="menu item">Удалить с MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Имя папки</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Эл. почта контакта</string>
-    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Создание папки&#8230;</string>
+    <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">Создание папки</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Добавление контакта</string>
     <string name="context_download_to" context="Menu item">Сохранить в</string>
     <string name="context_clear_rubbish" context="Menu option title">Очистить Корзину</string>
@@ -484,7 +484,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Очистка локальных файлов</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Сейчас занимает %s</string>    
-    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Вычисление&#8230;</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Вычисление</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Папка для скачивания по умолчанию</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Всегда запрашивать папку для скачивания</string>
