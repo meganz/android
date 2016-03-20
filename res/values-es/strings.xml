@@ -27,8 +27,8 @@
     <string name="general_decryp" context="button">Desencriptar</string>
     <string name="general_export" context="button">Exportar</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Vaciar</string>
-    <string name="general_loading" context="state previous to import a file">Cargando&#8230;</string>
-    <string name="general_importing" context="state while importing the file">Importando&#8230;</string>
+    <string name="general_loading" context="state previous to import a file">Cargando</string>
+    <string name="general_importing" context="state while importing the file">Importando</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importar</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Ancho de Banda</string>
@@ -52,7 +52,7 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Desea continuar?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones&#8230;</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
@@ -65,9 +65,9 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
         
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
-    <string name="action_add" context="Menu item">Subir&#8230;</string>
+    <string name="action_add" context="Menu item">Subir</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
-    <string name="action_open_link" context="Menu item">Abrir link&#8230;</string>
+    <string name="action_open_link" context="Menu item">Abrir link</string>
     
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Subir a</string>
     <string name="action_settings" context="Menu item">Configuración</string>
@@ -75,7 +75,7 @@
     <string name="action_play" context="Search button">Play</string>
     <string name="action_pause" context="Search button">Pausa</string>
     <string name="action_refresh" context="Menu item">Actualizar</string>
-    <string name="action_sort_by" context="Menu item">Ordenar por&#8230;</string>
+    <string name="action_sort_by" context="Menu item">Ordenar por</string>
     <string name="action_help" context="Menu item">Ayuda</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Ampliar cuenta</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Realizando pago</string>
@@ -139,7 +139,7 @@
     <string name="password_text" context="password label">Contraseña</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirmar contraseña</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">¿Nuevo en MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">Crear cuenta</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Por favor, escribe tu correo electrónico</string>
@@ -258,7 +258,7 @@
 	<string name="download_failed" context="Error message">Descarga fallida</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">descargado</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Descargando</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transfiriendo&#8230;</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transfiriendo</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Preparando archivos</string>
     <string name="download_began" context="message when the download starts">La descarga ha comenzado</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">¿Desea cancelar la descarga?</string>
@@ -492,7 +492,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Limpiar Ficheros Disponibles sin Conexión</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actuamente en uso %s</string>
-    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando&#8230;</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Destino descarga por defecto</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Preguntar siempre la ruta de descarga</string>
