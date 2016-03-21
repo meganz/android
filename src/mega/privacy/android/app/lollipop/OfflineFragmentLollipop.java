@@ -679,17 +679,17 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}
-			contentText.setText(getInfoFolder(mOffList));
+				contentText.setText(getInfoFolder(mOffList));
+			}			
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.offline_list_options);
@@ -867,17 +867,17 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}
-			contentText.setText(getInfoFolder(mOffList));
+				contentText.setText(getInfoFolder(mOffList));
+			}			
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_offline_grid);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.offline_grid_options);
@@ -1235,7 +1235,15 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					log("File do not exist");
 				}		
 			}
-		}		
+		}
+		
+		//Check if the file MarterKey is exported
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		log("Export in: "+path);
+		File file= new File(path);
+		if(file.exists()){
+			numFiles++;
+		}
 		
 		if (numFolders > 0) {
 			info = numFolders
@@ -1493,17 +1501,17 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 							recyclerView.setVisibility(View.GONE);
 							emptyImageView.setVisibility(View.VISIBLE);
 							emptyTextView.setVisibility(View.VISIBLE);
-							contentText.setVisibility(View.GONE);
+							contentTextLayout.setVisibility(View.GONE);
 							emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 							emptyTextView.setText(R.string.file_browser_empty_folder);
 						}
 						else{
 							recyclerView.setVisibility(View.VISIBLE);
-							contentText.setVisibility(View.VISIBLE);
+							contentTextLayout.setVisibility(View.VISIBLE);
 							emptyImageView.setVisibility(View.GONE);
 							emptyTextView.setVisibility(View.GONE);
-						}
-						contentText.setText(getInfoFolder(mOffList));
+							contentText.setText(getInfoFolder(mOffList));
+						}					
 						
 						setPositionClicked(-1);
 						notifyDataSetChanged();
@@ -1518,17 +1526,17 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						recyclerView.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
 						emptyTextView.setVisibility(View.VISIBLE);
-						contentText.setVisibility(View.GONE);
+						contentTextLayout.setVisibility(View.GONE);
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 						emptyTextView.setText(R.string.file_browser_empty_folder);
 					}
 					else{
 						recyclerView.setVisibility(View.VISIBLE);
-						contentText.setVisibility(View.VISIBLE);
+						contentTextLayout.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
-					}
-					contentText.setText(getInfoFolder(mOffList));
+						contentText.setText(getInfoFolder(mOffList));
+					}					
 					
 					setPositionClicked(-1);
 					notifyDataSetChanged();
@@ -1666,13 +1674,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					contentText.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentText.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
