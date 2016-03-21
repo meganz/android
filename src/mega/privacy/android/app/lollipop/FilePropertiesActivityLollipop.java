@@ -11,6 +11,7 @@ import com.nirhart.parallaxscroll.views.ParallaxScrollView;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -550,20 +551,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			contentLayout.setVisibility(View.GONE);	
 			
-			if(from==FROM_INCOMING_SHARES){
-				log("from FROM_INCOMING_SHARES");
-				//Show who is the owner
-				owner=false;
-				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-				for(int j=0; j<sharesIncoming.size();j++){
-					MegaShare mS = sharesIncoming.get(j);
-					if(mS.getNodeHandle()==node.getHandle()){
-						ownerInfo.setText(mS.getUser());
-						ownerLayout.setVisibility(View.VISIBLE);
-					}				
-				}
-			}
-			
 			//Choose the button offlineSwitch
 			
 			if(dbH.exists(node.getHandle())){
@@ -673,24 +660,31 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
-				ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
-				boolean found=false;
-				int i=0;
-				while(!found && i<usersIncoming.size()){
-					MegaUser user = usersIncoming.get(i);
-					ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
-										
-					for(int j=0; j<nodesIncoming.size();j++){
-						MegaNode nI = nodesIncoming.get(j);
-
-						if(nI.getName().equals(node.getName())){
-							ownerInfo.setText(user.getEmail());
-							ownerLayout.setVisibility(View.VISIBLE);	
-							found=true;
-							break;
+				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+				for(int j=0; j<sharesIncoming.size();j++){
+					MegaShare mS = sharesIncoming.get(j);
+					if(mS.getNodeHandle()==node.getHandle()){						
+						MegaUser user= megaApi.getContact(mS.getUser());
+						if(user!=null){
+							MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+							if(contactDB!=null){
+								if(!contactDB.getName().equals("")){
+									ownerInfo.setText(contactDB.getName()+" "+contactDB.getLastName());
+								}
+								else{
+									ownerInfo.setText(user.getEmail());
+								}
+							}
+							else{
+								log("The contactDB is null: ");
+								ownerInfo.setText(user.getEmail());
+							}		
 						}
-					}
-					i++;
+						else{
+							ownerInfo.setText(mS.getUser());
+						}
+						ownerLayout.setVisibility(View.VISIBLE);
+					}				
 				}
 			}
 			
