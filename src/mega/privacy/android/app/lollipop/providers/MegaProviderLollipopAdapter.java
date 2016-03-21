@@ -59,7 +59,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		public ImageView imageView;
     	public TextView textViewFileName;
     	public TextView textViewFileSize;
-    	public TextView textViewUpdated;
     	public RelativeLayout itemLayout;
     	public int currentPosition;
     	public long document;
@@ -120,7 +119,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
-		holder.textViewUpdated = (TextView) v.findViewById(R.id.file_explorer_updated);
 			
 		v.setTag(holder);
 
@@ -192,19 +190,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					}
 				}			
 			}
-		}
-		
-		long nodeDate = node.getCreationTime();
-		if (nodeDate != 0){
-			try{ 
-				holder.textViewUpdated.setText(Util.getDateString(nodeDate));
-			}
-			catch(Exception ex) {
-				holder.textViewUpdated.setText(""); 
-			}
-		}
-		else{
-			holder.textViewUpdated.setText("");
 		}
 	}
 	
