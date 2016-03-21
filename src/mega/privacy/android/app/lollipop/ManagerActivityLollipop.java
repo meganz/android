@@ -6587,28 +6587,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+		//Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
 		log("downloadTo, parentPath: "+parentPath+ " url: "+url+" size: "+size);
 		log("files to download: "+hashes.length);
 		log("SIZE to download: "+size);
 		
 		final String parentPathC = parentPath;
 		final String urlC = url;		
-		final long [] hashesC = hashes;		
+		final long [] hashesC = hashes;	
+		long sizeTemp=0;
 		
 		for (long hash : hashes) {
 			MegaNode node = megaApi.getNodeByHandle(hash);	
 			if(node!=null){
 				if(node.isFolder()){
-					size=size+getFolderSize(node);
+					sizeTemp=sizeTemp+getFolderSize(node);
 				}
 				else{
-					size = size+node.getSize();	
+					sizeTemp = sizeTemp+node.getSize();	
 				}
 			}
 		}		
 			
-		final long sizeC = size;
-		log("the final size is: "+Util.getSizeString(size));
+		final long sizeC = sizeTemp;
+		log("the final size is: "+Util.getSizeString(sizeTemp));
 		
 		//Check if there is available space
 		double availableFreeSpace = Double.MAX_VALUE;
