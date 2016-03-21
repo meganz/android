@@ -11,6 +11,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.FileStorageActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
@@ -127,6 +128,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	private ActionMode actionMode;
 	
+	boolean downloadCompleteFolder = false;
+	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 //		@Override
@@ -150,11 +153,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			
 				actionMode = startSupportActionMode(new ActionBarCallBack());			
 
+				optionsBar.setVisibility(View.GONE);
+				separator.setVisibility(View.GONE);
+				
 		        itemClick(position);
 			}  
 	        super.onLongPress(e);
 	    }
 	}
+	
+	FolderLinkActivityLollipop folderLinkActivityLollipop = this;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -164,6 +172,25 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(folderLinkActivityLollipop, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						if (!hasStoragePermission) {
+							ActivityCompat.requestPermissions(folderLinkActivityLollipop,
+					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+							
+							handleListM.clear();
+							for (int i=0;i<documents.size();i++){
+								handleListM.add(documents.get(i).getHandle());
+							}
+							
+							clearSelections();
+							hideMultipleSelect();
+							
+							return false;
+						}
+					}
+					
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
@@ -198,6 +225,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		public void onDestroyActionMode(ActionMode mode) {
 			adapterList.setMultipleSelect(false);
 			clearSelections();
+			optionsBar.setVisibility(View.VISIBLE);
+			separator.setVisibility(View.VISIBLE);
 		}
 
 		@Override
@@ -348,6 +377,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		optionDownload = (LinearLayout) findViewById(R.id.folder_link_list_option_download_layout);
 		optionImport = (LinearLayout) findViewById(R.id.folder_link_list_option_import_layout);
 		
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+		if (dbH != null){
+			if (dbH.getCredentials() != null){
+				optionImport.setVisibility(View.VISIBLE);
+			}
+			else{
+				optionImport.setVisibility(View.INVISIBLE);
+			}
+		}
+		
 		optionDownload.setOnClickListener(this);
 		optionImport.setOnClickListener(this);
 		optionsOutLayout.setOnClickListener(this);
@@ -477,12 +518,22 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		optionDownload.setVisibility(View.VISIBLE);
 		if(sNode.isFolder()){
-			optionImport.setVisibility(View.GONE);
-			slidingOptionsPanel.setPanelHeight(optionDownload.getHeight());
+			optionImport.setVisibility(View.INVISIBLE);
+//			slidingOptionsPanel.setPanelHeight(optionDownload.getHeight());
 		}
 		else{
-			optionImport.setVisibility(View.VISIBLE);			
-			slidingOptionsPanel.setPanelHeight(optionImport.getHeight()*2);
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			}
+			if (dbH != null){
+				if (dbH.getCredentials() != null){
+					optionImport.setVisibility(View.VISIBLE);
+				}
+				else{
+					optionImport.setVisibility(View.INVISIBLE);
+				}
+			}			
+//			slidingOptionsPanel.setPanelHeight(optionImport.getHeight()*2);
 		}				
 					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
@@ -585,7 +636,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							switch(which){
 								case 0:{
 									Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
 									intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
@@ -616,6 +667,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					downloadLocationDialog = b.create();
 					downloadLocationDialog.show();
 				}
+				else{
+					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+					intent.setClass(this, FileStorageActivityLollipop.class);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				}
 			}
 			else{
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
@@ -623,7 +682,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}
 		}
 		else{
@@ -681,7 +740,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							switch(which){
 								case 0:{
 									Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
 									intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
@@ -711,6 +770,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					});
 					downloadLocationDialog = b.create();
 					downloadLocationDialog.show();
+				}
+				else{
+					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+					intent.setClass(this, FileStorageActivityLollipop.class);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -846,14 +913,23 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			
 			MegaNode target = megaApi.getNodeByHandle(toHandle);
 			if(target == null){
-				target = megaApi.getRootNode();
+				if (megaApi.getRootNode() != null){
+					target = megaApi.getRootNode();
+				}
 			}
-			log("Target node: "+target.getName());
+			
 			if(selectedNode!=null){
-				megaApi.copyNode(selectedNode, target, this);
+				if (target != null){
+					log("Target node: "+target.getName());
+					megaApi.copyNode(selectedNode, target, this);
+				}
+				else{
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+				}
 			}
 			else{
 				log("selected Node is NULL");
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 			}
 			
 		}
@@ -1043,6 +1119,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+		optionsBar.setVisibility(View.VISIBLE);
+		separator.setVisibility(View.VISIBLE);
 	}
 	
 	public void selectAll(){
@@ -1111,12 +1189,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		// actionMode.
 	}
+	
+	ArrayList<Long> handleListM = new ArrayList<Long>();
 
 	public void itemClick(int position) {
 		if (adapterList.isMultipleSelect()){
 			adapterList.toggleSelection(position);
-			updateActionModeTitle();
-			adapterList.notifyDataSetChanged();
+			List<MegaNode> documents = adapterList.getSelectedNodes();
+			if(documents.size() > 0){
+				updateActionModeTitle();
+				adapterList.notifyDataSetChanged();
+			}
+			else{
+				hideMultipleSelect();
+			}			
 		}
 		else{
 			if (nodes.get(position).isFolder()){
@@ -1199,6 +1285,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			  		}					
 				}
 				else{
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						if (!hasStoragePermission) {
+							ActivityCompat.requestPermissions(this,
+					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+							
+							handleListM.clear();
+							handleListM.add(nodes.get(position).getHandle());
+							
+							return;
+						}
+					}
+					
 					adapterList.setPositionClicked(-1);
 					adapterList.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1208,6 +1308,35 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 	}
+	
+	@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (hasStoragePermission) {
+					if (downloadCompleteFolder){
+						MegaNode rootNode = null;	  
+						if(megaApiFolder.getRootNode()!=null){
+							rootNode = megaApiFolder.getRootNode();
+						}
+			        	if(rootNode!=null){
+			        		onFolderClick(rootNode.getHandle(),rootNode.getSize());	
+			        	}
+			        	else{
+			        		log("rootNode null!!");
+			        	}
+					}
+					else{
+						onFileClick(handleListM);
+					}
+				}
+				downloadCompleteFolder = false;
+	        	break;
+	        }
+        }
+    }
 	
 	@Override
 	public void onBackPressed() {
@@ -1340,15 +1469,15 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	void importNode(){
 		log("importNode");
-		if (megaApi.getRootNode() == null){
-			log("megaApi bad fetch nodes");
-			Snackbar.make(fragmentContainer, getString(R.string.session_problem), Snackbar.LENGTH_LONG).show();
-		}
-		else{
+//		if (megaApi.getRootNode() == null){
+//			log("megaApi bad fetch nodes");
+//			Snackbar.make(fragmentContainer, getString(R.string.session_problem), Snackbar.LENGTH_LONG).show();
+//		}
+//		else{
 			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
 			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER);	
-		}		
+//		}		
 	}
 
 	@Override
@@ -1357,6 +1486,19 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		switch(v.getId()){
 			case R.id.folder_link_button_download:{
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions(this,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						
+						downloadCompleteFolder = true;
+						
+						return;
+					}
+				}
+				
 				MegaNode rootNode = null;	  
 				if(megaApiFolder.getRootNode()!=null){
 					rootNode = megaApiFolder.getRootNode();
@@ -1380,6 +1522,27 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			case R.id.folder_link_list_option_download_layout: {
 				log("Download option");
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions(this,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						
+						handleListM.clear();
+						handleListM.add(selectedNode.getHandle());
+						
+						slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+						slidingOptionsPanel.setVisibility(View.GONE);
+						adapterList.setPositionClicked(-1);
+						adapterList.notifyDataSetChanged();
+						
+						hideOptionsPanel();
+						
+						return;
+					}
+				}
+				
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
 				adapterList.setPositionClicked(-1);
@@ -1387,6 +1550,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
 				onFileClick(handleList);
+				hideOptionsPanel();
 				break;
 			}
 			case R.id.folder_link_list_option_import_layout: {
@@ -1413,6 +1577,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //				this.startActivity(i);
 
 				importNode();
+				hideOptionsPanel();
 				break;
 			}
 		}			

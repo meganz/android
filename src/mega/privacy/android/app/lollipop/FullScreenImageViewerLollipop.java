@@ -8,6 +8,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.FileStorageActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -132,6 +133,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	MegaPreferences prefs = null;
 	
 	boolean isFolderLink = false;
+	
+	ArrayList<Long> handleListM = new ArrayList<Long>();
 	
 	@Override
 	public void onDestroy(){
@@ -484,11 +487,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			downloadIcon.setOnClickListener(this);
 			
 			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
-			propertiesIcon.setVisibility(View.VISIBLE);
+			if (!isFolderLink){
+				propertiesIcon.setVisibility(View.VISIBLE);
+			}
+			else{
+				propertiesIcon.setVisibility(View.GONE);
+			}
 			propertiesIcon.setOnClickListener(this);
 			
 			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
-			linkIcon.setVisibility(View.VISIBLE);
+			if (!isFolderLink){
+				linkIcon.setVisibility(View.VISIBLE);
+			}
+			else{
+				linkIcon.setVisibility(View.GONE);
+			}
 			linkIcon.setOnClickListener(this);
 			
 			String menuOptions[] = new String[4];
@@ -735,6 +748,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 				case R.id.full_image_viewer_download:{
 					
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						if (!hasStoragePermission) {
+							ActivityCompat.requestPermissions(this,
+					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+							
+							handleListM.add(node.getHandle());
+							
+							return;
+						}
+					}
+					
 					overflowMenuList.setVisibility(View.GONE);
 					overflowVisible = false;
 					adapterMega.setMenuVisible(overflowVisible);
@@ -748,7 +774,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 	
-	@SuppressLint("NewApi") public void downloadNode(ArrayList<Long> handleList){
+	@Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (hasStoragePermission) {
+					downloadNode(handleListM);
+				}
+	        	break;
+	        }
+        }
+    }
+	
+	@SuppressLint("NewApi") 
+	public void downloadNode(ArrayList<Long> handleList){
 		
 		long size = 0;
 		long[] hashes = new long[handleList.size()];
@@ -800,7 +841,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							switch(which){
 								case 0:{
 									Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
 									intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
@@ -831,14 +872,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					downloadLocationDialog = b.create();
 					downloadLocationDialog.show();
 				}
+				else{
+					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+					intent.setClass(this, FileStorageActivityLollipop.class);
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				}
 			}
 			else{
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS,false);
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}
 		}
 		else{

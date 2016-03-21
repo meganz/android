@@ -126,6 +126,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
+			boolean showLeave = false;
 			
 			if (selected.size() > 0) {
 				showDownload = true;
@@ -137,6 +138,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(showLeave);
 			
 			return false;
 		}
