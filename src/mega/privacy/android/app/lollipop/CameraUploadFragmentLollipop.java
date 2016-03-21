@@ -100,7 +100,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	TextView contentText;
+	RelativeLayout contentTextLayout;
 //	Button turnOnOff;
 	
 	DatabaseHandler dbH;
@@ -596,8 +596,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			turnOnOff.setOnClickListener(this);
 	
-			contentText = (TextView) v.findViewById(R.id.content_text);			
-			contentText.setVisibility(View.GONE);
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
+			contentTextLayout.setVisibility(View.GONE);
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_list_browser_camera_upload_on_off);
@@ -609,7 +609,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			emptyImageView.setImageResource(R.drawable.media_empty_image);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
-			emptyImageView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.VISIBLE);			
 			emptyTextView.setVisibility(View.GONE);
 			listView.setVisibility(View.GONE);
 			
@@ -783,8 +783,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			turnOnOff.setOnClickListener(this);
 	
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
-			contentText.setVisibility(View.GONE);
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);		
+			contentTextLayout.setVisibility(View.GONE);
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
