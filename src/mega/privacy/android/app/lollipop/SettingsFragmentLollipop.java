@@ -914,21 +914,28 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				prefs = dbH.getPreferences();
 				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
+				
+				//Check local folder				
 				if(localSecondaryFolderPath!=null){
 					log("Secondary folder in database: "+localSecondaryFolderPath);
+					File checkSecondaryFile = new File(localSecondaryFolderPath);
+					if(!checkSecondaryFile.exists()){					
+						dbH.setSecondaryFolderPath("-1");
+						//If the secondary folder does not exist any more
+						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+						
+						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
+							localSecondaryFolderPath = getString(R.string.settings_empty_folder);						
+						}					
+					}
 				}
-								
-				//Check local folder
-				File checkSecondaryFile = new File(localSecondaryFolderPath);
-				if(!checkSecondaryFile.exists()){					
+				else{
 					dbH.setSecondaryFolderPath("-1");
 					//If the secondary folder does not exist any more
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-					
-					if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-						localSecondaryFolderPath = getString(R.string.settings_empty_folder);						
-					}					
+					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 				}
+
 				localSecondaryFolder.setSummary(localSecondaryFolderPath);
 				
 				cameraUploadCategory.addPreference(localSecondaryFolder);
