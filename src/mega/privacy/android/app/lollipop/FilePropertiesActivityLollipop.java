@@ -2096,6 +2096,10 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		log("onNodesUpdate");
 		
 		boolean thisNode = false;
+		if(nodes==null){
+			return;
+		}
+		
 		Iterator<MegaNode> it = nodes.iterator();
 		while (it.hasNext()){
 			MegaNode n = it.next();

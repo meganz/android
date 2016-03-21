@@ -1867,15 +1867,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
         					if (parentNode != null){
         						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-        							log("aB.setTitle3");
         							aB.setTitle(getString(R.string.section_cloud_drive));
-        							log("aB.setHomeAsUpIndicator_5");
         							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         							firstNavigationLevel = true;
         						}
         						else{
         							aB.setTitle(parentNode.getName());
-        							log("aB.setHomeAsUpIndicator_6");
         							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         							firstNavigationLevel = false;
         						}
@@ -1883,14 +1880,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					else{
         						parentHandleBrowser = megaApi.getRootNode().getHandle();
         						parentNode = megaApi.getRootNode();
-        						log("aB.setTitle4");
         						aB.setTitle(getString(R.string.section_cloud_drive));
-        						log("aB.setHomeAsUpIndicator_7");
         						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         						firstNavigationLevel = true;
         					}
         					ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();        					
-        					if(parentNode!=null){
+        					if(parentNode==null){
         						nodes =	megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
         					}
         					else{
@@ -3060,34 +3055,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			ft.commit();
     			
 				if (sttFLol != null){
-					searchMenuItem.setVisible(false);				
-					//Hide
-					log("createFolderMenuItem.setVisible_settings");
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(false);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-	    			importLinkMenuItem.setVisible(false);
-	    			takePicture.setVisible(false);
-					settingsMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(false);
-					changePass.setVisible(false);
-					cancelSubscription.setVisible(false);				
-					killAllSessions.setVisible(false);
-					
-					cancelAllTransfersMenuItem.setVisible(false);
-					
-					playTransfersMenuIcon.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
+					if (createFolderMenuItem != null){
+						searchMenuItem.setVisible(false);				
+						//Hide
+						log("createFolderMenuItem.setVisible_settings");
+						createFolderMenuItem.setVisible(false);
+						addContactMenuItem.setVisible(false);
+		    			addMenuItem.setVisible(false);
+		    			sortByMenuItem.setVisible(false);
+		    			selectMenuItem.setVisible(false);
+		    			unSelectMenuItem.setVisible(false);
+		    			thumbViewMenuItem.setVisible(false);
+		    			addMenuItem.setEnabled(false);
+		    			createFolderMenuItem.setEnabled(false);
+		    			rubbishBinMenuItem.setVisible(false);
+		    			clearRubbishBinMenuitem.setVisible(false);
+		    			importLinkMenuItem.setVisible(false);
+		    			takePicture.setVisible(false);
+						settingsMenuItem.setVisible(false);
+						refreshMenuItem.setVisible(false);
+						helpMenuItem.setVisible(false);
+						upgradeAccountMenuItem.setVisible(false);
+						changePass.setVisible(false);
+						cancelSubscription.setVisible(false);				
+						killAllSessions.setVisible(false);
+						
+						cancelAllTransfersMenuItem.setVisible(false);
+						
+						playTransfersMenuIcon.setVisible(false);
+						pauseTransfersMenuIcon.setVisible(false);
+					}					
 				}
 				break;
     		}
