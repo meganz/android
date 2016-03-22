@@ -114,7 +114,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 						holder.firstName = true;
 					}
 					if(holder.name&&holder.firstName){
-						holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
+						if(holder.nameText.isEmpty()&&holder.firstNameText.isEmpty()){
+							log("Name and First Name is empty");
+							holder.textViewContactName.setText(holder.contactMail);
+						}
+						else{
+							holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
+						}						
 						holder.name= false;
 						holder.firstName = false;
 					}
