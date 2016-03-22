@@ -8779,14 +8779,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("File to multiple contacts");
 					sendMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_CONTACTS_SEND_INBOX);
 					for (int i=0;i<selectedContacts.length;i++){
-	            		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
-	            		megaApi.sendFileToUser(node, user, sendMultipleListener);
+	            		MegaUser user= megaApi.getContact(selectedContacts[i]);	
+	            		
+	            		if(user!=null){
+							log("Send File to contact: "+user.getEmail());
+							megaApi.sendFileToUser(node, user, sendMultipleListener);
+                		}
+                		else{
+                			log("Send File to a NON contact! ");
+                			megaApi.sendFileToUser(node, selectedContacts[i], sendMultipleListener);
+                		}
 	            	}
 				}
 				else{
 					log("File to a single contact");
-					MegaUser user= megaApi.getContact(selectedContacts[0]);		                    		
-            		megaApi.sendFileToUser(node, user, this);
+					MegaUser user= megaApi.getContact(selectedContacts[0]);						
+					if(user!=null){
+						log("Send File to contact: "+user.getEmail());
+						megaApi.sendFileToUser(node, user, this);
+            		}
+            		else{
+            			log("Send File to a NON contact! ");
+            			megaApi.sendFileToUser(node, selectedContacts[0], this);
+            		}
 				}
 			}			
 		}	
@@ -9005,19 +9020,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					                    	if(nodeHandles.length>1){
 					                    		log("one folder to many contacts");
 					                    		for(int j=0; j<nodeHandles.length;j++){						
-					            					
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
-					        						megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
+					        						
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);					        						
+					        						if(u!=null){
+							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
+							                    		megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
+						                    		}
+						                    		else{
+						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, shareMultipleListener);
+						                    		}
 					                    		}
 					                    	}
 					                    	else{
 					                    		log("many folders to many contacts");
 					                    		for(int j=0; j<nodeHandles.length;j++){					
 					            					
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
-					        						megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);					        						
+					        						if(u!=null){
+							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
+							                    		megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
+						                    		}
+						                    		else{
+						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, shareMultipleListener);
+						                    		}
 					                    		}
 					                    	}			                    		
 				                    	}
@@ -9032,18 +9059,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					                    		log("one folder to many contacts");
 					                    		for(int j=0; j<nodeHandles.length;j++){						
 					            					
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
-					        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);					        						
+					        						if(u!=null){
+							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
+							                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
+						                    		}
+						                    		else{
+						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, shareMultipleListener);
+						                    		} 			
 					                    		}
 					                    	}
 					                    	else{
 					                    		log("many folders to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){					
-					            					
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
-					        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
+					                    		for(int j=0; j<nodeHandles.length;j++){					                    			            			
+					                    			final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+							                    	if(u!=null){
+							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
+							                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
+						                    		}
+						                    		else{
+						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, shareMultipleListener);
+						                    		} 					        						
 					                    		}
 					                    	}			                  
 				                    	}
@@ -9056,19 +9094,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				                    		if(nodeHandles.length>1){
 					                    		log("one folder to many contacts");
 					                    		for(int j=0; j<nodeHandles.length;j++){						
-					            					
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
-					        						megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
+					        						
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);					        						
+					        						if(u!=null){
+							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
+							                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
+						                    		}
+						                    		else{
+						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, shareMultipleListener);
+						                    		}
 					                    		}
 					                    	}
 					                    	else{
 					                    		log("many folders to many contacts");
 					                    		for(int j=0; j<nodeHandles.length;j++){					
 					            					
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
-					        						megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
+					                    			final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);					        						
+					        						if(u!=null){
+							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
+							                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
+						                    		}
+						                    		else{
+						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, shareMultipleListener);
+						                    		}
 					                    		}
 					                    	}			                  
 	//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
@@ -9098,8 +9148,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
 						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
 						MegaUser u = megaApi.getContact(contactsData.get(0));
-						log("Send File to: "+u.getEmail());
-						megaApi.sendFileToUser(node, u, this);
+						if(u!=null){
+							log("Send File to contact: "+u.getEmail());
+							megaApi.sendFileToUser(node, u, this);
+                		}
+                		else{
+                			log("Send File to a NON contact! ");
+                			megaApi.sendFileToUser(node, contactsData.get(0), this);
+                		}
 					}
 					else{
 						//Send multiple files to one contact
@@ -9112,17 +9168,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	                    		for(int j=0; j<nodeHandles.length;j++){						
 	            					
 	        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-	        						log("Send: "+ node.getName() + " to "+ u.getEmail());
-	        						megaApi.sendFileToUser(node, u, sendMultipleListener);
+	        						
+	        						if(u!=null){
+	        							log("Send: "+ node.getName() + " to "+ u.getEmail());
+	        							megaApi.sendFileToUser(node, u, sendMultipleListener);
+	                        		}
+	                        		else{
+	                        			log("Send File to a NON contact! ");
+	                        			megaApi.sendFileToUser(node, contactsData.get(0), sendMultipleListener);
+	                        		}
 	                    		}
 	                    	}
 							else{
 								log("one file to many contacts");					
 	            					
         						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[0]);
-        						log("Send: "+ node.getName() + " to "+ u.getEmail());
-        						megaApi.sendFileToUser(node, u, this);
-
+        						if(u!=null){
+        							log("Send: "+ node.getName() + " to "+ u.getEmail());
+        							megaApi.sendFileToUser(node, u, this);
+                        		}
+                        		else{
+                        			log("Send File to a NON contact! ");
+                        			megaApi.sendFileToUser(node, contactsData.get(0), this);
+                        		}
 							}
 						}						
 					}
@@ -10671,9 +10739,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("TYPE_COPY");
 			if(sendToInbox){
-				log("sendToInbox");
+				log("sendToInbox: "+e.getErrorCode()+" "+e.getErrorString());
 				sendToInbox=false;				
 				if (e.getErrorCode() == MegaError.API_OK){
+					log("Fin 1");
 					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_LONG).show();
 				}
 				else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -10682,6 +10751,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else
 				{
+					log("Fin 2");
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_LONG).show();
 				}								
 			}
