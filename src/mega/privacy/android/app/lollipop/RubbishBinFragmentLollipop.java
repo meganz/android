@@ -1138,7 +1138,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
+		log("setNodes");
 		this.nodes = nodes;
+		
+		if(megaApi.getRubbishNode()==null){
+			log("megaApi.getRubbishNode() is NULL");
+			return;
+		}
+		
 		if (adapter != null){
 			adapter.setNodes(nodes);
 			if (adapter.getItemCount() == 0){
