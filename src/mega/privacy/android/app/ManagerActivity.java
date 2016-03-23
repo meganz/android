@@ -5135,8 +5135,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				accountInfo = request.getMegaAccountDetails();
-				
+				accountInfo = request.getMegaAccountDetails();				
 				
 				accountType = accountInfo.getProLevel();
 				
