@@ -423,10 +423,10 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 				((ManagerActivity)context).showNewContactDialog(null);				
 				break;
 				
-			case R.id.out_space_btn_contacts:
-			case R.id.out_space_btn_grid_contacts:
-				((ManagerActivity)getActivity()).upgradeAccountButton();
-				break;
+//			case R.id.out_space_btn_contacts:
+//			case R.id.out_space_btn_grid_contacts:
+//				((ManagerActivity)getActivity()).upgradeAccountButton();
+//				break;
 		}
 	}
 			
