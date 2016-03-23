@@ -11,6 +11,7 @@ import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -35,6 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+@SuppressLint("NewApi")
 public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener{
 	
 	public static String ACTION_SET_PIN_LOCK = "ACTION_SET";
@@ -147,10 +149,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		logoutButton = (TextView) findViewById(R.id.button_logout);
 		logoutButton.setText(getString(R.string.action_logout).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsbLogin = logoutButton.getLayoutParams();		
-		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
-		logoutButton.setLayoutParams(paramsbLogin);
+//		android.view.ViewGroup.LayoutParams paramsbLogin = logoutButton.getLayoutParams();		
+//		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
+//		logoutButton.setLayoutParams(paramsbLogin);
 		//Margin
 		RelativeLayout.LayoutParams textParamsLogin = (RelativeLayout.LayoutParams)logoutButton.getLayoutParams();
 		textParamsLogin.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, 0); 
