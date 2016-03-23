@@ -232,7 +232,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				storageCategory.removePreference(downloadLocationPreference);
 			}
 			else{
-				storageCategory.removePreference(downloadLocation);
+				if (fs.length > 1){
+					if (fs[1] == null){
+						storageCategory.removePreference(downloadLocationPreference);		
+					}
+					else{
+						storageCategory.removePreference(downloadLocation);
+					}
+				}
 			}			
 		}
 		else{
@@ -578,8 +585,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
 				}
 				else{
-					cameraUploadCategory.removePreference(localCameraUploadFolder);
-					cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+					if (fs.length > 1){
+						if (fs[1] == null){
+							cameraUploadCategory.addPreference(localCameraUploadFolder);
+							cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+						}
+						else{
+							cameraUploadCategory.removePreference(localCameraUploadFolder);
+							cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+						}
+					}
 				}			
 			}
 			else{
@@ -857,14 +872,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						}
 						case 1:{
 							File[] fs = context.getExternalFilesDirs(null);
-							if (fs.length > 1){								
-								String path = fs[1].getAbsolutePath();
-								dbH.setStorageDownloadLocation(path);
-								if (downloadLocation != null){
-									downloadLocation.setSummary(path);
+							if (fs.length > 1){	
+								if (fs[1] != null){
+									String path = fs[1].getAbsolutePath();
+									dbH.setStorageDownloadLocation(path);
+									if (downloadLocation != null){
+										downloadLocation.setSummary(path);
+									}
+									if (downloadLocationPreference != null){
+										downloadLocationPreference.setSummary(path);
+									}
 								}
-								if (downloadLocationPreference != null){
-									downloadLocationPreference.setSummary(path);
+								else{
+									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+									startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 								}
 							}
 							break;
@@ -1096,8 +1119,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
 					}
 					else{
-						cameraUploadCategory.removePreference(localCameraUploadFolder);
-						cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+						if (fs.length > 1){
+							if (fs[1] == null){
+								cameraUploadCategory.addPreference(localCameraUploadFolder);
+								cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+							}
+							else{
+								cameraUploadCategory.removePreference(localCameraUploadFolder);
+								cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+							}
+						}
 					}			
 				}
 				else{
@@ -1209,9 +1240,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						}
 						case 1:{
 							File[] fs = context.getExternalFilesDirs(null);
-							if (fs.length > 1){								
-								Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-								startActivityForResult(intent, REQUEST_CODE_TREE_LOCAL_CAMERA);
+							if (fs.length > 1){		
+								if (fs[1] != null){
+									Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+									startActivityForResult(intent, REQUEST_CODE_TREE_LOCAL_CAMERA);
+								}
+								else{
+									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+									intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER, true);
+									startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
+								}
 							}
 							break;
 						}
