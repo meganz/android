@@ -180,7 +180,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 			
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
 		upgradeButton.setOnClickListener(this); 
-
+		upgradeButton.setVisibility(View.VISIBLE);
+		
 		myEmail=megaApi.getMyEmail();
 		infoEmail.setText(myEmail);
 		
@@ -218,7 +219,6 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		megaApi.getAccountDetails(this);
 		numberOfSubscriptions = ((ManagerActivity)context).getNumberOfSubscriptions();
 
-		upgradeButton.setVisibility(View.INVISIBLE);
 //		if (numberOfSubscriptions > 0){
 //			upgradeButton.setVisibility(View.INVISIBLE);
 //		}

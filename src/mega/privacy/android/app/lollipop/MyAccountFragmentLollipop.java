@@ -286,7 +286,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
 		upgradeButton.setOnClickListener(this);
-//		upgradeButton.getBackground().setColorFilter(0xFF00BFA5, PorterDuff.Mode.MULTIPLY);		
+		upgradeButton.setVisibility(View.VISIBLE);
 		
 		infoEmail.setText(myEmail);
 		
