@@ -830,6 +830,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					holder.transferProgressBar.setVisibility(View.GONE);		
 					holder.textViewFileSize.setVisibility(View.VISIBLE);	
 				}
+				
+				log("mTHash.size()= "+mTHash.size());
 			}					
 
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -839,9 +841,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.setMargins(0, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
+			
+			log("Check the thumb");
 
 			if (node.hasThumbnail()) {
-				
+				log("Node has thumbnail");
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -883,7 +887,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				}
 			} else {
-				
+				log("Node NOT thumbnail");
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
