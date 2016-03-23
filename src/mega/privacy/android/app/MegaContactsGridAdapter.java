@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -226,6 +225,28 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 							}
 						}
 					}
+					
+					if(request.getParamType()==1){
+						log("(1)request.getText(): "+request.getText());
+						holder.namesText.set(numView, request.getText());
+						holder.names.set(numView, Boolean.TRUE);
+					}
+					else if(request.getParamType()==2){
+						log("(2)request.getText(): "+request.getText());
+						holder.firstNamesText.set(numView, request.getText());
+						holder.firstNames.set(numView, Boolean.TRUE);
+					}
+					if(holder.names.get(numView)&&holder.firstNames.get(numView)){
+						if(holder.namesText.get(numView).isEmpty()&&holder.firstNamesText.get(numView).isEmpty()){
+							log("Name and First Name is empty");
+							holder.contactNameViews.get(numView).setText(holder.contactMails.get(numView));
+						}
+						else{
+							holder.contactNameViews.get(numView).setText(holder.namesText.get(numView)+" "+holder.firstNamesText.get(numView));
+						}						
+						holder.names.set(numView, Boolean.FALSE);
+						holder.firstNames.set(numView, Boolean.FALSE);
+					}
 				}
 			}
 		}
@@ -278,6 +299,10 @@ public class MegaContactsGridAdapter extends BaseAdapter{
     	public ArrayList<ImageView> optionsOverflow;
     	
     	public ArrayList<String> contactMails;
+    	public ArrayList<String> namesText;
+    	public ArrayList<String> firstNamesText;
+    	public ArrayList<Boolean> names;
+    	public ArrayList<Boolean> firstNames;
     }
     
     ViewHolderContactsGrid holder = null;
@@ -307,6 +332,11 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 			holder.optionsOverflow = new ArrayList<ImageView>();
 			
 			holder.contactMails = new ArrayList<String>();
+			
+			holder.names = new ArrayList<Boolean>();
+			holder.firstNames = new ArrayList<Boolean>();
+			holder.namesText = new ArrayList<String>();
+			holder.firstNamesText  = new ArrayList<String>();
 			
 			convertView = inflater.inflate(R.layout.item_contact_grid_list, parent, false);
 			
@@ -363,6 +393,10 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				holder.contactContentViews.add(cCV);
 				
 				holder.contactMails.add("");
+				holder.names.add(false);
+				holder.firstNames.add(false);
+				holder.firstNamesText.add("");
+				holder.namesText.add("");
 			}
 			
 			convertView.setTag(holder);
@@ -397,6 +431,14 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				
 				createDefaultAvatar(holder, totalPosition, i);
 				
+				UserAvatarListenerGrid listener = new UserAvatarListenerGrid(context, holder, this, totalPosition, i);
+				
+				holder.names.set(i, Boolean.FALSE);
+				holder.firstNames.set(i, Boolean.FALSE);
+
+				megaApi.getUserAttribute(contact, 1, listener);
+				megaApi.getUserAttribute(contact, 2, listener);
+				
 				if (multipleSelect){
 					if (isChecked(totalPosition)){
 						holder.longClickLayoutsSelected.get(i).setVisibility(View.VISIBLE);
@@ -421,8 +463,6 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				else{
 					holder.menuLayouts.get(i).setVisibility(View.GONE);
 				}
-				
-				UserAvatarListenerGrid listener = new UserAvatarListenerGrid(context, holder, this, totalPosition, i);
 				
 				File avatar = null;
 				if (context.getExternalCacheDir() != null){
