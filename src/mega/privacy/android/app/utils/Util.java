@@ -458,6 +458,10 @@ public class Util {
 	private static long getDirSize(File dir) {
 
         long size = 0;
+        if(dir==null){
+        	return -1;
+        }
+        
         File[] files = dir.listFiles();
 
         for (File file : files) {
