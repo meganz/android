@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.providers;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -18,12 +19,15 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -40,6 +44,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	MegaProviderLollipopAdapter adapter;
 	GestureDetectorCompat detector;
 	public String name;
+	
+	LinearLayout optionsBar;
+	TextView cancelText;
 	
 //	boolean first = false;
 //	private boolean folderSelected = false;
@@ -74,24 +81,33 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	
 		View v = inflater.inflate(R.layout.fragment_clouddriveprovider, container, false);	
 		
-//		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics(metrics);
+		
+		optionsBar = (LinearLayout) v.findViewById(R.id.options_provider_layout);
+		
+		cancelText = (TextView) v.findViewById(R.id.cancel_text);
+		cancelText.setOnClickListener(this);		
+		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+		cancelText.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
-		
+		listView.setItemAnimator(new DefaultItemAnimator()); 		
 		
 		contentText = (TextView) v.findViewById(R.id.provider_content_text);
 		contentText.setVisibility(View.GONE);
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.provider_list_empty_text);
-		
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) listView.getLayoutParams();
-		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
 		
 		if (adapter == null){
 			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView);
@@ -168,9 +184,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-//			case R.id.file_explorer_button:{
-//				((FileProviderActivity) context).buttonClick(parentHandle);
-//			}
+			case R.id.cancel_text:{			
+				((FileProviderActivity) context).finish();
+			}
 		}
 	}
 

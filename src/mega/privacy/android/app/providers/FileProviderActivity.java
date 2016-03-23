@@ -334,7 +334,8 @@ import android.widget.Toast;
 				//Create tabs
 				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
 
-				mTabHostProvider.setVisibility(View.VISIBLE);    			
+				mTabHostProvider.setVisibility(View.VISIBLE);  
+				mTabHostProvider.getTabWidget().setDividerDrawable(null);
 
 				if (mTabsAdapterProvider == null){
 					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
@@ -413,9 +414,8 @@ import android.widget.Toast;
 	
 		int id = item.getItemId();
 		switch(id){
-			case android.R.id.home:{
-				finish();
-			}
+			case android.R.id.home:{				
+				this.onBackPressed();			}
 		}
 	    return super.onOptionsItemSelected(item);
 	}
