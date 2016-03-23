@@ -287,7 +287,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			log("onCreate multiselect YES!");
 			nodeHandles=intent.getLongArrayExtra(EXTRA_NODE_HANDLE);
 		}
-		sendToInbox= intent.getIntExtra("SEND_FILE", -1);		
+		sendToInbox= intent.getIntExtra("SEND_FILE", -1);	
 	}
 	
 	@Override
@@ -298,7 +298,14 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.contacts_explorer_action, menu);
 	    
-	    addContactMenuItem = menu.findItem(R.id.cab_menu_add_contact);	    
+	    addContactMenuItem = menu.findItem(R.id.cab_menu_add_contact);	   
+	    
+		if(sendToInbox==0){
+			addContactMenuItem.setVisible(true);
+		}
+		else{
+			addContactMenuItem.setVisible(false);
+		}
   
 	    return super.onCreateOptionsMenu(menu);
 	}
