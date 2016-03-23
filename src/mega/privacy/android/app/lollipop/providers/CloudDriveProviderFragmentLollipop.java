@@ -1,11 +1,14 @@
 package mega.privacy.android.app.lollipop.providers;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LauncherFileExplorerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
@@ -19,14 +22,17 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -51,6 +57,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+	
+	LinearLayout optionsBar;
+	TextView cancelText;
 	
 	long [] hashes;
 	
@@ -91,7 +100,22 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 				
 		View v = inflater.inflate(R.layout.fragment_clouddriveprovider, container, false);	
 		
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics(metrics);
+		
 		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+		
+		optionsBar = (LinearLayout) v.findViewById(R.id.options_provider_layout);
+				
+		cancelText = (TextView) v.findViewById(R.id.cancel_text);
+		cancelText.setOnClickListener(this);		
+		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+		cancelText.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
@@ -206,10 +230,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-//			case R.id.file_explorer_button:{				
-//				dbH.setLastCloudFolder(Long.toString(parentHandle));
-//				((FileProviderActivity) context).buttonClick(parentHandle);
-//			}
+			case R.id.cancel_text:{			
+				((FileProviderActivity) context).finish();
+			}
 		}
 	}
 
