@@ -1040,32 +1040,37 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			DocumentFile dF = cameraFilesExternalSDCardQueue.poll();
 		
 			File[] fs = getExternalFilesDirs(null);
-			if (fs.length > 1){								
-				fs[1].mkdirs();
-				if (copyFileSDCard(dF, fs[1])){
-					File file = new File(fs[1], dF.getName());
-					if(!file.exists()){
-						uploadNextSDCard();
-					}
-					
-//					String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
-//					
-//					MegaNode nodeExists = null;
-//					nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, cameraUploadNode);
-					
-					final Media media = new Media();
-					media.timestamp = dF.lastModified();
-					media.filePath = file.getAbsolutePath();
-					
-					MegaNode possibleNode = megaApi.getChildNode(cameraUploadNode, dF.getName());
-					if (possibleNode != null){
-						dbH.setCamSyncTimeStamp(media.timestamp);
-						file.delete();
-						uploadNextSDCard();						
-					}
-					else{
-						currentTimeStamp = media.timestamp;
-						megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, media.timestamp/1000, this);
+			if (fs.length > 1){	
+				if (fs[1] == null){
+					finish();
+				}
+				else{
+					fs[1].mkdirs();
+					if (copyFileSDCard(dF, fs[1])){
+						File file = new File(fs[1], dF.getName());
+						if(!file.exists()){
+							uploadNextSDCard();
+						}
+						
+	//					String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
+	//					
+	//					MegaNode nodeExists = null;
+	//					nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, cameraUploadNode);
+						
+						final Media media = new Media();
+						media.timestamp = dF.lastModified();
+						media.filePath = file.getAbsolutePath();
+						
+						MegaNode possibleNode = megaApi.getChildNode(cameraUploadNode, dF.getName());
+						if (possibleNode != null){
+							dbH.setCamSyncTimeStamp(media.timestamp);
+							file.delete();
+							uploadNextSDCard();						
+						}
+						else{
+							currentTimeStamp = media.timestamp;
+							megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, media.timestamp/1000, this);
+						}
 					}
 				}
 			}
