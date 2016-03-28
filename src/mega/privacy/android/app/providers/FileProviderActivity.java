@@ -78,6 +78,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TabHost;
@@ -88,7 +89,8 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-@SuppressLint("NewApi") public class FileProviderActivity extends AppCompatActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
+@SuppressLint("NewApi") 
+public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
 	
 //	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 //	
@@ -276,7 +278,7 @@ import android.widget.Toast;
 //			confirmingAccountText.setVisibility(View.GONE);			
 			
 			loginLogin.setVisibility(View.VISIBLE);
-			loginCreateAccount.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
@@ -291,11 +293,12 @@ import android.widget.Toast;
 		else{
 			log("dbH.getCredentials() NOT null");
 			if (megaApi.getRootNode() == null){
-				setContentView(R.layout.activity_login);
 				log("megaApi.getRootNode() == null");
 				
 				lastEmail = credentials.getEmail();
 				String gSession = credentials.getSession();
+				
+				
 				
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
@@ -384,7 +387,7 @@ import android.widget.Toast;
 									aB.setTitle(getString(R.string.title_incoming_shares_explorer));
 								}
 								else{
-									aB.setTitle(iSharesProvider.name);
+									aB.setTitle(iSharesProviderLol.name);
 								}    					
 							}        			                      	
 						}
@@ -476,7 +479,7 @@ import android.widget.Toast;
 			loginTitle.setTextSize(28*scaleH);
 			
 			loginLogin.setVisibility(View.VISIBLE);
-			loginCreateAccount.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
@@ -567,7 +570,7 @@ import android.widget.Toast;
 				loginTitle.setTextSize(28*scaleH);
 				
 				loginLogin.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.INVISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
 				loginLoggingIn.setVisibility(View.GONE);
 				generatingKeysText.setVisibility(View.GONE);
@@ -834,10 +837,10 @@ import android.widget.Toast;
 		
 		bLoginLol = (TextView) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsbLogin = bLoginLol.getLayoutParams();		
-		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
-		bLoginLol.setLayoutParams(paramsbLogin);
+//		android.view.ViewGroup.LayoutParams paramsbLogin = bLoginLol.getLayoutParams();		
+//		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
+//		bLoginLol.setLayoutParams(paramsbLogin);
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLoginLol.getLayoutParams();
 		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
@@ -847,6 +850,7 @@ import android.widget.Toast;
 		
 		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
+		loginCreateAccount.setVisibility(View.INVISIBLE);
 		
 	    newToMega = (TextView) findViewById(R.id.text_newToMega);
 		//Margins (left, top, right, bottom)
@@ -858,10 +862,10 @@ import android.widget.Toast;
 	    bRegisterLol = (TextView) findViewById(R.id.button_create_account_login);
 	    
 	    bRegisterLol.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb2 = bRegisterLol.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
-		bRegisterLol.setLayoutParams(paramsb2);
+//		android.view.ViewGroup.LayoutParams paramsb2 = bRegisterLol.getLayoutParams();		
+//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
+//		bRegisterLol.setLayoutParams(paramsb2);
 		//Margin
 		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegisterLol.getLayoutParams();
 		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
@@ -1209,7 +1213,7 @@ import android.widget.Toast;
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
-			loginCreateAccount.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
@@ -1274,7 +1278,7 @@ import android.widget.Toast;
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
-			loginCreateAccount.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
@@ -1311,6 +1315,15 @@ import android.widget.Toast;
 		}, 50);
 	}
 	
+	public int getStatusBarHeight() { 
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	      } 
+	      return result;
+	}
+	
 	public static void log(String log) {
 		Util.log("FileProviderActivity", log);
 	}
@@ -1319,6 +1332,9 @@ import android.widget.Toast;
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart");
 	}
+	
+	String gSession = null;
+	UserCredentials credentials = null;
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
@@ -1347,7 +1363,7 @@ import android.widget.Toast;
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.INVISIBLE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				generatingKeysText.setVisibility(View.GONE);
@@ -1375,8 +1391,10 @@ import android.widget.Toast;
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
 				
-//				gSession = megaApi.dumpSession();
-//				credentials = new UserCredentials(lastEmail, gSession);
+				gSession = megaApi.dumpSession();
+				if (lastEmail != null){
+					credentials = new UserCredentials(lastEmail, gSession);
+				}
 				
 //				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //				dbH.clearCredentials();
@@ -1394,7 +1412,7 @@ import android.widget.Toast;
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.INVISIBLE);
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
@@ -1405,6 +1423,13 @@ import android.widget.Toast;
 				Util.showErrorAlertDialog(errorMessage, false, this);
 			}
 			else{
+				
+				if (credentials != null){
+					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					dbH.clearCredentials();
+					dbH.saveCredentials(credentials);
+				}
+				
 				setContentView(R.layout.activity_file_provider);
 				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
@@ -1418,7 +1443,19 @@ import android.widget.Toast;
 
 				mTabHostProvider.setVisibility(View.VISIBLE);    			
 
-				if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
+				if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+
+					//Set toolbar
+					tB = (Toolbar) findViewById(R.id.toolbar_provider);
+					
+					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
+					params.setMargins(0, getStatusBarHeight(), 0, 0);
+					
+					setSupportActionBar(tB);
+					aB = getSupportActionBar();
+					aB.setDisplayHomeAsUpEnabled(true);
+					aB.setDisplayShowHomeEnabled(true);
+					
 					//Lollipop Version
 					if (mTabsAdapterProvider == null){
 						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
@@ -1468,11 +1505,15 @@ import android.widget.Toast;
 										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
 									}
 									else{
+										aB.setTitle(iSharesProviderLol.name);
 									}    					
 								}        			                      	
 							}
 						}
 					});
+					
+					getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+					getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 				}
 				else{
 					//NOT Lollipop

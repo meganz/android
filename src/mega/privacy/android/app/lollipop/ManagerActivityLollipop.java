@@ -108,6 +108,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.Time;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.TypedValue;
@@ -3422,9 +3423,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				Intent intent = new Intent (context, TourActivityLollipop.class);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				context.startActivity(intent);
+				}
+				try{
+					context.startActivity(intent);
+				}
+				catch (AndroidRuntimeException e){
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					context.startActivity(intent);
+				}
 				if (context instanceof Activity){
 					((Activity)context).finish();
 				}
