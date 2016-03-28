@@ -2238,7 +2238,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	    				}
 //    				}
 //    			}
-    			
     			break;
     		}
     		case SAVED_FOR_OFFLINE:{
@@ -4443,7 +4442,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				}				
 		    			}
 		    		}
-		    		if (drawerItem == DrawerItem.SHARED_ITEMS){
+		    		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 		    			int index = viewPagerShares.getCurrentItem();
 		    			if(index==1){				
 		    				//OUTGOING				
@@ -4464,20 +4463,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				}				
 		    			}	
 		    		}
-		    		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 		    			if (oFLol != null){
 		    				oFLol.onBackPressed();
 		    				return true;
 		    			}
 		    		}
 		    		
-		    		if (drawerItem == DrawerItem.SEARCH){
+		    		else if (drawerItem == DrawerItem.SEARCH){
 		    			if (sFLol != null){
 		    				sFLol.onBackPressed();
 		    				return true;
 		    			}
 		    		}
-		    		if (drawerItem == DrawerItem.TRANSFERS){
+		    		else if (drawerItem == DrawerItem.TRANSFERS){
 		    			if (tFLol != null){    		
 		        			if (tFLol.onBackPressed() == 0){
 		        				drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -4493,6 +4492,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			}
 		        		}
 		    		}
+		    		
 				}
 		    	return true;
 		    }
