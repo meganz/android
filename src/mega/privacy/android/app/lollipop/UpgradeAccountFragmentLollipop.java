@@ -304,7 +304,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 					if (s.length == 1){
 						String [] s1 = priceString.split(",");
 						if (s1.length == 1){
-							pro1PriceInteger.setText(s[0]);
+							pro1PriceInteger.setText(s1[0]);
 							pro1PriceDecimal.setText("");
 						}
 						else if (s1.length == 2){
@@ -335,7 +335,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 					if (s.length == 1){
 						String [] s1 = priceString.split(",");
 						if (s1.length == 1){
-							pro2PriceInteger.setText(s[0]);
+							pro2PriceInteger.setText(s1[0]);
 							pro2PriceDecimal.setText("");
 						}
 						else if (s1.length == 2){
@@ -366,7 +366,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 					if (s.length == 1){
 						String [] s1 = priceString.split(",");
 						if (s1.length == 1){
-							pro3PriceInteger.setText(s[0]);
+							pro3PriceInteger.setText(s1[0]);
 							pro3PriceDecimal.setText("");
 						}
 						else if (s1.length == 2){
@@ -396,7 +396,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 					if (s.length == 1){
 						String [] s1 = priceString.split(",");
 						if (s1.length == 1){
-							proLitePriceInteger.setText(s[0]);
+							proLitePriceInteger.setText(s1[0]);
 							proLitePriceDecimal.setText("");
 						}
 						else if (s1.length == 2){
