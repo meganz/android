@@ -92,7 +92,10 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
-		aB.setTitle(getResources().getString(R.string.section_transfers));					
+		aB.setTitle(getResources().getString(R.string.section_transfers));
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 //		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
@@ -338,6 +341,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			pauseImage.setVisibility(View.GONE);
 			pauseText.setVisibility(View.GONE);
 			((ManagerActivityLollipop)context).setPauseIconVisible(false);
+			((ManagerActivityLollipop)context).setCancelTransfersIconVisible(false);
 		}
 	}
 	

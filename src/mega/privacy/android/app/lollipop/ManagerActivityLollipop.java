@@ -1485,7 +1485,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}
 	        }
 	        else{
-	        	log("DRAWERITEM NOT NULL");
+	        	log("DRAWERITEM NOT NULL1: " + drawerItem);
+	        	if (getIntent() != null){
+	        		if (getIntent().getAction() != null){
+	        			if (getIntent().getAction().equals(ACTION_SHOW_TRANSFERS)){
+	        				drawerItem = DrawerItem.TRANSFERS;
+	        				setIntent(null);
+	        			}
+	        		}
+	        	}
+	        	log("DRAWERITEM NOT NULL2: " + drawerItem);
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}	        
 	        
@@ -1668,7 +1677,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}    
     			else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)){
     				log("intent show transfers");
-    				selectDrawerItemLollipop(DrawerItem.TRANSFERS);
+    				drawerItem = DrawerItem.TRANSFERS;
+    				selectDrawerItemLollipop(drawerItem);
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
     				log("Intent take selfie");
@@ -11125,6 +11135,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(pauseTransfersMenuIcon!=null){
 			pauseTransfersMenuIcon.setVisible(true);
 			playTransfersMenuIcon.setVisible(false);
+		}
+	}
+	
+	public void setCancelTransfersIconVisible (boolean visible){
+		log("setCancelTransfersIconVisible");
+		if (cancelAllTransfersMenuItem != null){
+			cancelAllTransfersMenuItem.setVisible(visible);
 		}
 	}
 	
