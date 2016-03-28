@@ -3043,7 +3043,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			
     			drawerLayout.closeDrawer(Gravity.LEFT);
     			aB.setTitle(getString(R.string.action_settings));
-//    			startActivity(new Intent(this, SettingsActivity.class));
+    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    			setFirstNavigationLevel(true);
+    			supportInvalidateOptionsMenu();
+
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
