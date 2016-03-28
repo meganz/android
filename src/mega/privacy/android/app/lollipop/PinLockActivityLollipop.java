@@ -640,11 +640,13 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
-		case R.id.button_logout:
-			ManagerActivity.logout(getApplication(), megaApi, false);
-			finish();
-			break;
-	}
+			case R.id.button_logout:
+				ManagerActivityLollipop.logout(getApplication(), megaApi, false);
+//				Intent intent = new Intent(this, TourActivityLollipop.class);
+//				startActivity(intent);
+				finish();
+				break;
+		}
 		
 	}
 }

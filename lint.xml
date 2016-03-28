@@ -5,4 +5,5 @@
         <ignore path="res/values-ru/strings.xml" />
         <ignore path="res/values-uk/strings.xml" />
     </issue>
+    <issue id="NewApi" severity="ignore" />
 </lint>
