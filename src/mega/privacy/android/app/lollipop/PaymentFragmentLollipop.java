@@ -882,12 +882,12 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							if (s.length == 1){
 								String [] s1 = priceString.split(",");
 								if (s1.length == 1){
-									priceInteger.setText(s[0]);
+									priceInteger.setText(s1[0]);
 									priceDecimal.setText("");
 								}
 								else if (s1.length == 2){
-									priceInteger.setText(s[0]);
-									priceDecimal.setText("." + s[1] + " €");
+									priceInteger.setText(s1[0]);
+									priceDecimal.setText("." + s1[1] + " €");
 								}
 							}
 							else if (s.length == 2){

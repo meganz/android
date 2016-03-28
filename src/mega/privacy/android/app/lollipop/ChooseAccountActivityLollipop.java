@@ -584,6 +584,6 @@ public class ChooseAccountActivityLollipop extends PinActivityLollipop implement
 	}
 	
 	public static void log(String message) {
-		Util.log("ChooseAccountActivity", message);
+		Util.log("ChooseAccountActivityLollipop", message);
 	}
 }
