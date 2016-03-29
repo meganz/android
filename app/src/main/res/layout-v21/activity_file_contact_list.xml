@@ -91,7 +91,7 @@
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
         sothree:umanoPanelHeight="120dp"
-        sothree:umanoParalaxOffset="100dp"
+        sothree:umanoParallaxOffset="100dp"
         sothree:umanoShadowHeight="4dp" 
         android:elevation="16dp">
 
