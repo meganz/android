@@ -330,6 +330,7 @@
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s ya es un contacto existente</string>
     <string name="context_send_no_permission" context="message when trying to send a file without full access">No tiene permisos para enviar este fichero</string>
     <string name="context_folder_created" context="success message when creating a folder">Carpeta creada</string>
+    <string name="context_folder_no_created" context="error message when creating a folder">Error. No se ha podido crear la carpeta</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Renombrado correctamente</string>
     <string name="context_no_renamed" context="error message">Error. No se pudo renombrar</string>
     <string name="context_correctly_copied" context="success message when copying a node">Copiado correctamente</string>
@@ -527,7 +528,7 @@
     </string-array>
     
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Solo cargando</string>
-    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Matener los nombres originales de los ficheros</string>
+    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Mantener los nombres originales de los ficheros</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored.">Carpeta local de la Cámara</string>
     <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored.">Carpeta de MEGA de la Cámara</string>

@@ -335,6 +335,7 @@
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s is already a contact</string>
     <string name="context_send_no_permission" context="message when trying to send a file without full access">No permissions to send this file</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
+    <string name="context_folder_no_created" context="error message when creating a folder">Error. Folder not created</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Renamed successfully</string>
     <string name="context_no_renamed" context="error message">Error. Not renamed</string>
     <string name="context_correctly_copied" context="success message when copying a node">Copied successfully</string>
