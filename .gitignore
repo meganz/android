@@ -23,6 +23,7 @@
 # Gradle:
 .idea/gradle.xml
 .idea/libraries
+.gradle
 
 ## File-based project format:
 *.ipr
