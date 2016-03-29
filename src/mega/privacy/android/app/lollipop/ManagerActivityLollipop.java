@@ -1418,6 +1418,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        megaApi.getAccountDetails(this);
 	        megaApi.creditCardQuerySubscriptions(this);
 	        
+	        //Check the consistency of the offline nodes in the DB
+	        CheckOfflineNodesTask checkOfflineNodesTask = new CheckOfflineNodesTask(this);
+	        checkOfflineNodesTask.execute();	        
+	        
 	        if (drawerItem == null) {
 	        	log("DRAWERITEM NULL");
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -7661,6 +7665,112 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}			
         }
 	}	
+	
+	/*
+	 * Background task to emptying the Rubbish Bin
+	 */
+	private class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
+		Context context;
+		
+		CheckOfflineNodesTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			log("doInBackground-Async Task CheckOfflineNodesTask");
+
+			ArrayList<MegaOffline> offlineNodes = dbH.getOfflineFiles();
+
+			File file=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
+
+			if(file.exists()){
+
+				for(int i=0; i<offlineNodes.size();i++){
+					MegaOffline mOff = offlineNodes.get(i);
+					if(mOff.isIncoming()){
+						File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/" + mOff.getHandleIncoming() + mOff.getPath()+ mOff.getName());
+						log("Check the INCOMING file: "+fileToCheck.getAbsolutePath());
+						if(!fileToCheck.exists()){
+							log("The INCOMING file NOT exists!");
+							//Remove from the DB
+							int removed = dbH.deleteOfflineFile(mOff);		
+							log("INCOMING File removed: "+removed);
+						}
+						else{
+							log("The INCOMING file exists!");
+						}
+					}
+					else{
+						File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ mOff.getPath()+ mOff.getName());
+						log("Check the file: "+fileToCheck.getAbsolutePath());
+						if(!fileToCheck.exists()){
+							log("The file NOT exists!");
+							//Remove from the DB
+							int removed = dbH.deleteOfflineFile(mOff);		
+							log("File removed: "+removed);
+						}
+						else{
+							log("The file exists!");
+						}
+					}						
+				}
+
+				//Check no empty folders
+				offlineNodes = dbH.getOfflineFiles();
+				for(int i=0; i<offlineNodes.size();i++){
+					MegaOffline mOff = offlineNodes.get(i);
+					//Get if its folder
+					if(mOff.isFolder()){					
+						ArrayList<MegaOffline> children = dbH.findByParentId(mOff.getId());
+						if(children.size()<1){
+							log("Delete the empty folder: "+mOff.getName());
+							dbH.deleteOfflineFile(mOff);
+							if(mOff.isIncoming()){
+								File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/" + mOff.getHandleIncoming() + mOff.getPath()+ mOff.getName());
+								try {
+									Util.deleteFolderAndSubfolders(context, folderToDelete);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							else{
+								File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ mOff.getPath()+ mOff.getName());
+								try {
+									Util.deleteFolderAndSubfolders(context, folderToDelete);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+
+			}	
+			else{
+				//Delete the DB if NOT empty
+				if(offlineNodes.size()>0){
+					//Delete the content
+					log("Clear Offline TABLE");
+					dbH.clearOffline();
+				}				
+			}		
+
+			return null;
+		}		
+		
+//		@Override
+//        protected void onPostExecute(String result) {
+//			log("onPostExecute -Async Task CheckOfflineNodesTask");
+//			//update the content label of the Rubbish Bin Fragment
+//			if(rbFLol!=null){
+//					rbFLol.setContentText();
+//			}			
+//        }
+	}
+	
 	
 	
 	/*

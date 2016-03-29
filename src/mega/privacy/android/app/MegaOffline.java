@@ -2,6 +2,9 @@ package mega.privacy.android.app;
 
 public class MegaOffline {
 	
+	public static String FOLDER = "1";
+	public static String FILE = "0";
+	
 	int id = -1;	
 	String handle = "";
 	String path = "";
@@ -102,6 +105,13 @@ public class MegaOffline {
 
 	public void setHandleIncoming(String handleIncoming) {
 		this.handleIncoming = handleIncoming;
+	}
+	
+	public boolean isFolder(){
+		if(type.equals(FOLDER)){
+			return true;
+		}
+		return false;
 	}
 
 

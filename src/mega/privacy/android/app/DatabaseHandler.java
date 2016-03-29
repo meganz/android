@@ -512,13 +512,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(checkInsert==null){
         	String nullColumnHack = null;        	
             
-            values.put(KEY_OFF_HANDLE, offline.getHandle());
-            values.put(KEY_OFF_PATH, offline.getPath());
-            values.put(KEY_OFF_NAME, offline.getName());
+            values.put(KEY_OFF_HANDLE, encrypt(offline.getHandle()));
+            values.put(KEY_OFF_PATH, encrypt(offline.getPath()));
+            values.put(KEY_OFF_NAME, encrypt(offline.getName()));
             values.put(KEY_OFF_PARENT, offline.getparentId());
-            values.put(KEY_OFF_TYPE, offline.getType());
+            values.put(KEY_OFF_TYPE, encrypt(offline.getType()));
             values.put(KEY_OFF_INCOMING, offline.isIncoming());
-            values.put(KEY_OFF_HANDLE_INCOMING, offline.getHandleIncoming());
+            values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.getHandleIncoming()));
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
             
@@ -556,7 +556,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public boolean exists(long handle){
 				
 		//Get the foreign key of the node 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(Long.toString(handle)) + "'";
 		
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
@@ -577,7 +577,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		MegaOffline offline = null;
 		//Get the foreign key of the node 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(Long.toString(handle)) + "'";
 
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
@@ -595,13 +595,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _handleIncoming = null;
 
 				_id = Integer.parseInt(cursor.getString(0));
-				_handle = cursor.getString(1);
-				_path = cursor.getString(2);
-				_name = cursor.getString(3);
+				_handle = decrypt(cursor.getString(1));
+				_path = decrypt(cursor.getString(2));
+				_name = decrypt(cursor.getString(3));
 				_parent = cursor.getInt(4);
-				_type = cursor.getString(5);
+				_type = decrypt(cursor.getString(5));
 				_incoming = (cursor.getInt(6) == 1);
-				_handleIncoming = cursor.getString(7);
+				_handleIncoming = decrypt(cursor.getString(7));
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 				cursor.close();
 				return offline;
@@ -615,7 +615,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		MegaOffline offline = null;
 		//Get the foreign key of the node 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(handle) + "'";
 
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
@@ -632,13 +632,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _handleIncoming = null;
 				
 				_id = Integer.parseInt(cursor.getString(0));
-				_handle = cursor.getString(1);
-				_path = cursor.getString(2);
-				_name = cursor.getString(3);
+				_handle = decrypt(cursor.getString(1));
+				_path = decrypt(cursor.getString(2));
+				_name = decrypt(cursor.getString(3));
 				_parent = cursor.getInt(4);
-				_type = cursor.getString(5);
+				_type = decrypt(cursor.getString(5));
 				_incoming = (cursor.getInt(6) == 1);
-				_handleIncoming = cursor.getString(7);
+				_handleIncoming = decrypt(cursor.getString(7));
+				
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
 				cursor.close();
 				return offline;
@@ -670,13 +671,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _handleIncoming = null;
 					
 					_id = Integer.parseInt(cursor.getString(0));
-					_handle = cursor.getString(1);
-					_path = cursor.getString(2);
-					_name = cursor.getString(3);
+					_handle = decrypt(cursor.getString(1));
+					_path = decrypt(cursor.getString(2));
+					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
-					_type = cursor.getString(5);
+					_type = decrypt(cursor.getString(5));
 					_incoming = (cursor.getInt(6) == 1);
-					_handleIncoming = cursor.getString(7);
+					_handleIncoming = decrypt(cursor.getString(7));
 					
 					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
@@ -706,13 +707,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _handleIncoming = null;
 					
 					_id = Integer.parseInt(cursor.getString(0));
-					_handle = cursor.getString(1);
-					_path = cursor.getString(2);
-					_name = cursor.getString(3);
+					_handle = decrypt(cursor.getString(1));
+					_path = decrypt(cursor.getString(2));
+					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
-					_type = cursor.getString(5);
+					_type = decrypt(cursor.getString(5));
 					_incoming = (cursor.getInt(6) == 1);
-					_handleIncoming = cursor.getString(7);
+					_handleIncoming = decrypt(cursor.getString(7));
 					
 					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 					
@@ -735,7 +736,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
 		//Get the foreign key of the node 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + encrypt(path) + "'";
 
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
@@ -752,13 +753,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _handleIncoming = null;
 	
 					_id = Integer.parseInt(cursor.getString(0));
-					_handle = cursor.getString(1);
-					_path = cursor.getString(2);
-					_name = cursor.getString(3);
+					_handle = decrypt(cursor.getString(1));
+					_path = decrypt(cursor.getString(2));
+					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
-					_type = cursor.getString(5);
+					_type = decrypt(cursor.getString(5));
 					_incoming = (cursor.getInt(6) == 1);
-					_handleIncoming = cursor.getString(7);
+					_handleIncoming = decrypt(cursor.getString(7));
 					
 					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
@@ -770,7 +771,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	public MegaOffline findbyPathAndName(String path, String name){
 		
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND " + KEY_OFF_NAME + " = '" + name + "'"  ;
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + encrypt(path) + "'" + "AND " + KEY_OFF_NAME + " = '" + encrypt(name) + "'"  ;
 		
 		MegaOffline mOffline = null;
 		Cursor cursor = db.rawQuery(selectQuery, null);	
@@ -788,13 +789,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _handleIncoming = null;
 					
 					_id = Integer.parseInt(cursor.getString(0));
-					_handle = cursor.getString(1);
-					_path = cursor.getString(2);
-					_name = cursor.getString(3);
+					_handle = decrypt(cursor.getString(1));
+					_path = decrypt(cursor.getString(2));
+					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
-					_type = cursor.getString(5);
+					_type = decrypt(cursor.getString(5));
 					_incoming = (cursor.getInt(6) == 1);
-					_handleIncoming = cursor.getString(7);
+					_handleIncoming = decrypt(cursor.getString(7));
 					
 					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 					
@@ -817,7 +818,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String _handleIncoming = null;
 		
 		//Get the foreign key of the node 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND" + KEY_OFF_NAME + " = '" + name + "'"  ;
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + encrypt(path) + "'" + "AND" + KEY_OFF_NAME + " = '" + encrypt(name) + "'"  ;
 		
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
@@ -863,11 +864,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return listOffline; 		
 	}
 
-	public void deleteOfflineFile (MegaOffline mOff) {
+	public int deleteOfflineFile (MegaOffline mOff) {
 	    SQLiteDatabase db = this.getWritableDatabase();
 	    
-	    db.delete(TABLE_OFFLINE, KEY_OFF_HANDLE + " = ?",
-	            new String[] { String.valueOf(mOff.getHandle()) });
+	    return db.delete(TABLE_OFFLINE, KEY_OFF_HANDLE + " = ?",
+	            new String[] { encrypt(String.valueOf(mOff.getHandle())) });
 	            
 	}
 	
@@ -1335,11 +1336,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
 	}
 	
-	public void clearOffline(){
-		log("clearOffline");
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
-		onCreate(db);
-	}
+//	public void clearOffline(){
+//		log("clearOffline");
+//		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
+//		onCreate(db);
+//	}
 	
 	public void clearAttributes(){
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
@@ -1348,6 +1349,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	public void clearContacts(){		
 		db.execSQL("DELETE FROM " + TABLE_CONTACTS);   
+	}
+	
+	public void clearOffline(){		
+		db.execSQL("DELETE FROM " + TABLE_OFFLINE);   
 	}
 	
 	private static void log(String log) {
