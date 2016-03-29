@@ -1,10 +1,30 @@
-/.settings
-/bin
-/gen
-/.classpath
-/.project
-/proguard
-/obj
-/libs/armeabi/libmega.so
-/libs/x86/libmega.so
-/libs/
+/local.properties
+
+/app/build/
+/app/src/main/obj/
+/app/src/main/jniLibs/
+/app/src/main/libs/
+
+### Android Studio files ###
+*.iml
+
+# User-specific stuff:
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+
+# Sensitive or high-churn files:
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
+
+## File-based project format:
+*.ipr
+*.iws
+
