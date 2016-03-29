@@ -940,7 +940,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			if(offlineNode!=null){
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming());
+					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
 					log("offline Directory: "+offlineDirectory.getAbsolutePath());
 				}
 				else{
