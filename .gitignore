@@ -1,5 +1,6 @@
 /local.properties
 
+/build/
 /app/build/
 /app/src/main/obj/
 /app/src/main/jniLibs/
