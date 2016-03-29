@@ -374,26 +374,28 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyTextView.setVisibility(View.GONE);
 			}
 			
-			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+			if(megaApi.getRubbishNode()!=null){
+				if (parentHandle == megaApi.getRubbishNode().getHandle()){
+					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+						showProgressBar();
+						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+					}
+					else{
+						MegaNode infoNode = megaApi.getRubbishNode();
+						contentText.setText(getInfoFolder(infoNode));
+					}				
 				}
 				else{
-					MegaNode infoNode = megaApi.getRubbishNode();
-					contentText.setText(getInfoFolder(infoNode));
-				}				
-			}
-			else{
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+						showProgressBar();
+						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+					}
+					else{
+						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+						contentText.setText(getInfoFolder(infoNode));
+					}
 				}
-				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-					contentText.setText(getInfoFolder(infoNode));
-				}
-			}
+			}			
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_list_options);
@@ -498,24 +500,26 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			
-			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+			if(megaApi.getRubbishNode()!=null){
+				if (parentHandle == megaApi.getRubbishNode().getHandle()){
+					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+						showProgressBar();
+						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+					}
+					else{
+						MegaNode infoNode = megaApi.getRubbishNode();
+						contentText.setText(getInfoFolder(infoNode));
+					}				
 				}
 				else{
-					MegaNode infoNode = megaApi.getRubbishNode();
-					contentText.setText(getInfoFolder(infoNode));
-				}				
-			}
-			else{
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-				}
-				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-					contentText.setText(getInfoFolder(infoNode));
+					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+						showProgressBar();
+						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+					}
+					else{
+						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+						contentText.setText(getInfoFolder(infoNode));
+					}
 				}
 			}
 	
@@ -594,110 +598,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	        });
 			
 			return v;			
-//			
-//			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-//			DisplayMetrics outMetrics = new DisplayMetrics ();
-//		    display.getMetrics(outMetrics);
-//		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-//			
-//		    float scaleW = Util.getScaleW(outMetrics, density);
-//		    float scaleH = Util.getScaleH(outMetrics, density);
-//		    
-//		    int totalWidth = outMetrics.widthPixels;
-//		    int totalHeight = outMetrics.heightPixels;
-//		    
-//		    int numberOfCells = totalWidth / GRID_WIDTH;
-//		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-//		    	if (numberOfCells < 3){
-//					numberOfCells = 3;
-//				}	
-//		    }
-//		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//		    	if (numberOfCells < 2){
-//					numberOfCells = 2;
-//				}	
-//		    }
-//				        
-//	        listView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
-//	        listView.setOnItemClickListener(null);
-//	        listView.setItemsCanFocus(false);
-//
-//	        emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
-//			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
-//			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-//			emptyTextView.setText(R.string.file_browser_empty_folder);
-//			contentText = (TextView) v.findViewById(R.id.rubbishbin_content_grid_text);
-//			
-//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid_rubbish);
-//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid_rubbish);
-//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid_rubbish);
-//			outSpaceButton.setVisibility(View.VISIBLE);
-//			outSpaceButton.setOnClickListener(this);
-//			
-//			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-//			
-//			if(usedSpacePerc>95){
-//				//Change below of ListView
-//				log("usedSpacePerc>95");
-////				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-////				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-////				listView.setLayoutParams(p);
-//				outSpaceLayout.setVisibility(View.VISIBLE);
-//				outSpaceLayout.bringToFront();
-//				
-//				Handler handler = new Handler();
-//				handler.postDelayed(new Runnable() {					
-//					
-//					@Override
-//					public void run() {
-//						log("BUTTON DISAPPEAR");
-//						log("altura: "+outSpaceLayout.getHeight());
-//						
-//						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-//						animTop.setDuration(2000);
-//						animTop.setFillAfter(true);
-//						outSpaceLayout.setAnimation(animTop);
-//					
-//						outSpaceLayout.setVisibility(View.GONE);
-//						outSpaceLayout.invalidate();
-////						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-////						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-////						listView.setLayoutParams(p);
-//					}
-//				}, 15 * 1000);
-//				
-//			}	
-//			else{
-//				outSpaceLayout.setVisibility(View.GONE);
-//			}			
-//		
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
-//			}
-//			else{
-//				adapterGrid.setParentHandle(parentHandle);
-//				adapterGrid.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_rubbish_bin));
-//				MegaNode infoNode = megaApi.getRubbishNode();
-//				contentText.setText(getInfoFolder(infoNode));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-//				contentText.setText(getInfoFolder(infoNode));
-//			}
-//			
-//			adapterGrid.setPositionClicked(-1);
-//			listView.setAdapter(adapterGrid);
-//			
-//			setNodes(nodes);
-			
-			//TODO comprobar la vista vacía
-			
-//			return v;	
 		}
 	}
 	
