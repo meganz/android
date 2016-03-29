@@ -7,7 +7,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.utils.Util;
 
-import com.google.android.gms.analytics.CampaignTrackingReceiver;
+//import com.google.android.gms.analytics.CampaignTrackingReceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
