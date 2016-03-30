@@ -242,7 +242,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	DisplayMetrics outMetrics;
     float scaleText;
     FrameLayout fragmentContainer;
-	boolean tranfersPaused = false;	
+//	boolean tranfersPaused = false;	
     Toolbar tB;
     ActionBar aB;
     boolean firstNavigationLevel = true;
@@ -1657,7 +1657,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									if (tFLol != null){
 										if (tFLol.isVisible()){
 											tFLol.setNoActiveTransfers();
-											tranfersPaused = false;
+											supportInvalidateOptionsMenu();
 										}
 									}	
 									startService(cancelIntent);	
@@ -1845,15 +1845,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
         					if (parentNode != null){
         						if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-        							log("aB.setTitle3");
         							aB.setTitle(getString(R.string.section_rubbish_bin));
-        							log("aB.setHomeAsUpIndicator_2");
         							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         							firstNavigationLevel = true;
         						}
         						else{
         							aB.setTitle(parentNode.getName());
-        							log("aB.setHomeAsUpIndicator_3");
         							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         							firstNavigationLevel = false;
         						}
@@ -1862,7 +1859,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
         						parentNode = megaApi.getRootNode();
         						aB.setTitle(getString(R.string.section_rubbish_bin));
-        						log("aB.setHomeAsUpIndicator_4");
         						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         						firstNavigationLevel = true;
         					}
@@ -1905,15 +1901,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
     					if (parentNode != null){
     						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-    							log("aB.setTitle3");
     							aB.setTitle(getString(R.string.section_cloud_drive));
-    							log("aB.setHomeAsUpIndicator_8");
     							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     							firstNavigationLevel = true;
     						}
     						else{
     							aB.setTitle(parentNode.getName());
-    							log("aB.setHomeAsUpIndicator_9");
     							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
     							firstNavigationLevel = false;
     						}
@@ -1921,9 +1914,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					else{
     						parentHandleBrowser = megaApi.getRootNode().getHandle();
     						parentNode = megaApi.getRootNode();
-    						log("aB.setTitle4");
     						aB.setTitle(getString(R.string.section_cloud_drive));
-    						log("aB.setHomeAsUpIndicator_10");
     						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     						firstNavigationLevel = true;
     					}
@@ -2006,6 +1997,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
     			
     			if (!firstTime){
+    				log("Its NOT first time");
     				drawerLayout.closeDrawer(Gravity.LEFT);
     				
     				if (dbH.getContactsSize() != megaApi.getContacts().size()){
@@ -2015,6 +2007,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				}
     			}
     			else{
+    				log("Its first time");
+    				
     				drawerLayout.openDrawer(Gravity.LEFT);
     				//Fill the contacts DB
     				FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
@@ -3121,50 +3115,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			
     			tFLol.setTransfers(megaApi.getTransfers());
-    			tFLol.setPause(tranfersPaused);
+    			
+    			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+    				tFLol.setPause(true);
+    			}
+    			else{
+    				tFLol.setPause(false);
+    			}    			
 				
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, tFLol, "tFLol");
     			ft.commit();
     			
     			drawerLayout.closeDrawer(Gravity.LEFT);
-    			if (createFolderMenuItem != null){
-        			//Options menu
-    				searchMenuItem.setVisible(false);				
-    				//Hide
-    				log("createFolderMenuItem.setVisible_12");
-    				createFolderMenuItem.setVisible(false);
-    				addContactMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			sortByMenuItem.setVisible(false);
-        			selectMenuItem.setVisible(false);
-        			unSelectMenuItem.setVisible(false);
-        			thumbViewMenuItem.setVisible(false);
-        			addMenuItem.setEnabled(false);
-        			createFolderMenuItem.setEnabled(false);
-        			rubbishBinMenuItem.setVisible(false);
-        			clearRubbishBinMenuitem.setVisible(false);
-        			importLinkMenuItem.setVisible(false);
-        			takePicture.setVisible(false);
-    				settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-    				upgradeAccountMenuItem.setVisible(false);
-    				changePass.setVisible(false);
-    				cancelSubscription.setVisible(false);				
-    				killAllSessions.setVisible(false);
-    				
-    				cancelAllTransfersMenuItem.setVisible(true);
-    				
-    				if(tranfersPaused){
-    					playTransfersMenuIcon.setVisible(true);
-    					pauseTransfersMenuIcon.setVisible(false);
-    				}
-    				else{
-    					playTransfersMenuIcon.setVisible(true);
-    					pauseTransfersMenuIcon.setVisible(false);
-    				}
-    			}
+    			
+    			supportInvalidateOptionsMenu();
 
     			break;
     		}
@@ -4214,7 +4179,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (tFLol != null){
 				searchMenuItem.setVisible(false);				
 				//Hide
-				log("createFolderMenuItem.setVisible_25");
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
@@ -4238,15 +4202,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				
 				cancelAllTransfersMenuItem.setVisible(true);
 				
-				if(tranfersPaused){
-					playTransfersMenuIcon.setVisible(true);
-					pauseTransfersMenuIcon.setVisible(false);
+//				if(tranfersPaused){
+//					playTransfersMenuIcon.setVisible(true);
+//					pauseTransfersMenuIcon.setVisible(false);
+//				}
+//				else{
+//					playTransfersMenuIcon.setVisible(true);
+//					pauseTransfersMenuIcon.setVisible(false);
+//				}
+				ArrayList<MegaTransfer> transfersInProgress = megaApi.getTransfers();
+				if(transfersInProgress!=null){
+					if(transfersInProgress.size()>0){
+
+		        		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+		        			log("Any transfer is paused");
+		        			playTransfersMenuIcon.setVisible(true);
+							pauseTransfersMenuIcon.setVisible(false); 
+							cancelAllTransfersMenuItem.setVisible(true);
+		        		}
+		        		else{
+		        			log("No transfers paused");
+		        			playTransfersMenuIcon.setVisible(false);
+							pauseTransfersMenuIcon.setVisible(true);
+							cancelAllTransfersMenuItem.setVisible(true);
+		        		}
+					}
+					else{
+						playTransfersMenuIcon.setVisible(false);
+						pauseTransfersMenuIcon.setVisible(false);
+						cancelAllTransfersMenuItem.setVisible(false);
+					}
 				}
 				else{
-					playTransfersMenuIcon.setVisible(true);
-					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+					pauseTransfersMenuIcon.setVisible(false); 
+					cancelAllTransfersMenuItem.setVisible(false);
 				}
-
 			}
 	    }
 	    
@@ -4439,7 +4430,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (tFLol != null){
 									if (tFLol.isVisible()){
 										tFLol.setNoActiveTransfers();
-										tranfersPaused = false;
 									}
 								}	
 								startService(cancelIntentDownload);	
@@ -4459,48 +4449,48 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    	return true;
 		    }
 	        case R.id.action_pause:{
-	        	if (drawerItem == DrawerItem.TRANSFERS){	    			
-	    			
-    				if(!tranfersPaused)
-    				{
-    					tranfersPaused = true;
-    					pauseTransfersMenuIcon.setVisible(false);
-    					playTransfersMenuIcon.setVisible(true);
-    	    			
-    					//Update the progress in fragments
-    					if (fbFLol != null){	
-    						fbFLol.updateProgressBar(progressPercent);
-    					}
-    					if (rbFLol != null){	
-    						rbFLol.updateProgressBar(progressPercent);
-    					}
-    					if (iFLol != null){	
-    						iFLol.updateProgressBar(progressPercent);
-    					}
-    					if (outSFLol != null){	
-    						outSFLol.updateProgressBar(progressPercent);
-    					}
-    					if (inSFLol != null){	
-    						inSFLol.updateProgressBar(progressPercent);
-    					}
-    					if (tFLol != null){					
-    						tFLol.updateProgressBar(progressPercent);
-    					}
-    					
-    	    			megaApi.pauseTransfers(true, this);
-    				}
+	        	if (drawerItem == DrawerItem.TRANSFERS){
+	        		log("Click on action_pause - play visible");
+	        		megaApi.pauseTransfers(true, this);
+	        		pauseTransfersMenuIcon.setVisible(false);
+	        		playTransfersMenuIcon.setVisible(true);
+//    				if(!tranfersPaused)
+//    				{
+//    					tranfersPaused = true;
+//    					pauseTransfersMenuIcon.setVisible(false);
+//    					playTransfersMenuIcon.setVisible(true);
+//    	    			
+//    					//Update the progress in fragments
+//    					if (fbFLol != null){	
+//    						fbFLol.updateProgressBar(progressPercent);
+//    					}
+//    					if (rbFLol != null){	
+//    						rbFLol.updateProgressBar(progressPercent);
+//    					}
+//    					if (iFLol != null){	
+//    						iFLol.updateProgressBar(progressPercent);
+//    					}
+//    					if (outSFLol != null){	
+//    						outSFLol.updateProgressBar(progressPercent);
+//    					}
+//    					if (inSFLol != null){	
+//    						inSFLol.updateProgressBar(progressPercent);
+//    					}
+//    					if (tFLol != null){					
+//    						tFLol.updateProgressBar(progressPercent);
+//    					}
+//    					
+//    	    			megaApi.pauseTransfers(true, this);
+//    				}
 	        	}
 	        	
 	        	return true;
 	        }
 	        case R.id.action_play:{
-        		if(tranfersPaused){
-        			tranfersPaused = false;
-					pauseTransfersMenuIcon.setVisible(true);
-					playTransfersMenuIcon.setVisible(false);
-
-	    			megaApi.pauseTransfers(false, this);
-        		}    				
+	        	log("Click on action_play - pause visible");
+				pauseTransfersMenuIcon.setVisible(true);
+				playTransfersMenuIcon.setVisible(false);
+    			megaApi.pauseTransfers(false, this);    				
 	        	
 	        	return true;
 	        }
@@ -10473,26 +10463,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+			log("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			if (e.getErrorCode() == MegaError.API_OK) {
-				if (tranfersPaused){
+				
+				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
 					log("show PLAY button");
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(true);
 					if (tFLol != null){
 						tFLol.setPause(true);
 					}
-				}
-				else{
-					log("show PAUSE button");
+    			}
+    			else{
+    				log("show PAUSE button");
 					pauseTransfersMenuIcon.setVisible(true);
 					playTransfersMenuIcon.setVisible(false);
 					if (tFLol != null){
 						tFLol.setPause(false);
 					}
-				}		
+    			}    
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			totalSizeToDownload = 0;
 			//Hide Transfer ProgressBar							
@@ -10511,8 +10504,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (inSFLol != null){						
 				inSFLol.hideProgressBar();
 			}
+			
+			pauseTransfersMenuIcon.setVisible(false);
+			playTransfersMenuIcon.setVisible(false);			
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+			log("one MegaRequest.TYPE_CANCEL_TRANSFER");
 			//After cancelling ONE transfer
 			if (e.getErrorCode() == MegaError.API_OK){
 				tL = megaApi.getTransfers();				
@@ -10544,6 +10541,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fbFLol.setTransfers(mTHash);
 				}
 			}
+			supportInvalidateOptionsMenu();
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -10976,7 +10974,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			statusDialog.dismiss();	
 		} 
 		catch (Exception ex) {}
-		
+				
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			if (fbFLol != null){
 			
@@ -11155,29 +11153,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}	
 	
-	public void setPauseIconVisible(boolean visible){
-		log("setPauseIconVisible");
-		if(pauseTransfersMenuIcon!=null){
-			pauseTransfersMenuIcon.setVisible(true);
-			playTransfersMenuIcon.setVisible(false);
-		}
-	}
-	
-	public void setCancelTransfersIconVisible (boolean visible){
-		log("setCancelTransfersIconVisible");
-		if (cancelAllTransfersMenuItem != null){
-			cancelAllTransfersMenuItem.setVisible(visible);
-		}
-	}
-	
-	public void hideTransfersIcons(){
-		log("hideTransfersIcons");
-		if(pauseTransfersMenuIcon!=null){
-			pauseTransfersMenuIcon.setVisible(false);
-			playTransfersMenuIcon.setVisible(false);
-		}
-	}
-	
 	public void setTransfers(ArrayList<MegaTransfer> transfersList){
 		log("setTransfers");
 		if (tFLol != null){
@@ -11337,9 +11312,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		//Update transfer list
 		tL = megaApi.getTransfers();
 		
-		if (tL != null){
-			log("Hide Transfer ProgressBar: "+tL.size());
+		if (tL != null){			
 			if(tL.size()<=0){
+				log("Hide Transfer ProgressBar: "+tL.size());
+				supportInvalidateOptionsMenu();
 				//Hide Transfer ProgressBar
 				if (fbFLol != null){						
 					fbFLol.hideProgressBar();
@@ -11360,6 +11336,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("megaApi Transfers NULL - Hide Transfer ProgressBar: ");
+			supportInvalidateOptionsMenu();
 			//Hide Transfer ProgressBar
 			if (fbFLol != null){						
 				fbFLol.hideProgressBar();

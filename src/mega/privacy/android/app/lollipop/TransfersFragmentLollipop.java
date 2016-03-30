@@ -172,14 +172,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 				emptyText.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
-				((ManagerActivityLollipop)context).hideTransfersIcons();
 			}
 			else{
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
-				((ManagerActivityLollipop)context).setPauseIconVisible(true);
 			}
 			
 			pauseImage.setVisibility(View.GONE);
@@ -238,12 +236,8 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			}
 			else{
 				if (tL.size() == 0){
-					adapter.setPositionClicked(-1);
-					((ManagerActivityLollipop)context).hideTransfersIcons();
-				}
-				else{
-					((ManagerActivityLollipop)context).setPauseIconVisible(true);
-				}
+					adapter.setPositionClicked(-1);					
+				}				
 			}
 			adapter.setTransfers(tL);
 		}
@@ -263,14 +257,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 					emptyText.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
-					((ManagerActivityLollipop)context).hideTransfersIcons();
 				}
 				else{
 					emptyImage.setVisibility(View.GONE);
 					emptyText.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.VISIBLE);
-					((ManagerActivityLollipop)context).setPauseIconVisible(true);
 				}	
 				
 				pauseImage.setVisibility(View.GONE);
@@ -309,14 +301,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 					emptyText.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
-					((ManagerActivityLollipop)context).hideTransfersIcons();
 				}
 				else{
 					emptyImage.setVisibility(View.GONE);
 					emptyText.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.VISIBLE);
-					((ManagerActivityLollipop)context).setPauseIconVisible(true);
 				}
 				
 				pauseImage.setVisibility(View.GONE);
@@ -340,8 +330,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			listView.setVisibility(View.GONE);
 			pauseImage.setVisibility(View.GONE);
 			pauseText.setVisibility(View.GONE);
-			((ManagerActivityLollipop)context).setPauseIconVisible(false);
-			((ManagerActivityLollipop)context).setCancelTransfersIconVisible(false);
 		}
 	}
 	
