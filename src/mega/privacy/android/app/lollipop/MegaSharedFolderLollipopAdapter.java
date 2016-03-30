@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
@@ -56,6 +58,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 //	RecyclerView listViewActivity;
 	
 	MegaApiAndroid megaApi;
+	DatabaseHandler dbH = null;
 	
 //	boolean removeShare = false;
 	boolean multipleSelect = false;
@@ -122,22 +125,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 									holder.initialLetter.setVisibility(View.GONE);
 								}
 							}
-						}
-						
-						if(request.getParamType()==1){
-							log("(1)request.getText(): "+request.getText());
-							holder.nameText=request.getText();
-							holder.name=true;
-						}
-						else if(request.getParamType()==2){
-							log("(2)request.getText(): "+request.getText());
-							holder.firstNameText = request.getText();
-							holder.firstName = true;
-						}
-						if(holder.name&&holder.firstName){
-							holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
-							holder.name= false;
-							holder.firstName = false;
 						}
 					}
 				}
@@ -229,6 +216,8 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
 		listFragment = (RecyclerView) parent;
 		
+		dbH = DatabaseHandler.getDbHandler(context);
+		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -307,8 +296,19 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		else{
 			holder.contactMail = share.getUser();
 			MegaUser contact = megaApi.getContact(holder.contactMail);	
-			
-			holder.textViewContactName.setText(holder.contactMail);
+		
+			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+			if(contactDB!=null){
+				if(!contactDB.getName().equals("")){
+					holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
+				}
+				else{
+					holder.textViewContactName.setText(holder.contactMail);
+				}
+			}
+			else{
+				log("The contactDB is null: ");
+			}			
 						
 			createDefaultAvatar(holder);
 			
