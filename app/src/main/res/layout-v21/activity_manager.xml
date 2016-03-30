@@ -163,7 +163,6 @@
         android:background="#ffffff"
         android:clipToPadding="false"
         android:paddingBottom="96dp"
-        app:headerLayout="@layout/nav_header"
         app:itemBackground="@drawable/navigation_view_item_background"
         app:itemIconTint="@color/drawer_item_text"
         app:itemTextColor="@color/drawer_item_text"

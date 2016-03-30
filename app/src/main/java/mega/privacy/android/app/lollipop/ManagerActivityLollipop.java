@@ -1197,8 +1197,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
-        
-        //OVERQUOTA WARNING PANEL
+
+		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
+		nV.addHeaderView(nVHeader);
+
+		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
 		outSpaceText =  (TextView) findViewById(R.id.overquota_alert_text);
 		outSpaceButton = (TextView) findViewById(R.id.overquota_alert_btnRight_upgrade);
@@ -1208,14 +1211,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		getProText= (TextView) findViewById(R.id.get_pro_account_text);
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
-        
-        accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
+
+		accountInfoFrame = (FrameLayout) nVHeader.findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
         
-        nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
-        nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
-        nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
-        nVPictureProfileTextView = (TextView) findViewById(R.id.navigation_drawer_user_account_picture_profile_textview);
+        nVDisplayName = (TextView) nVHeader.findViewById(R.id.navigation_drawer_account_information_display_name);
+		nVEmail = (TextView) nVHeader.findViewById(R.id.navigation_drawer_account_information_email);
+        nVPictureProfile = (RoundedImageView) nVHeader.findViewById(R.id.navigation_drawer_user_account_picture_profile);
+        nVPictureProfileTextView = (TextView) nVHeader.findViewById(R.id.navigation_drawer_user_account_picture_profile_textview);
         
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         usedSpaceTV = (TextView) findViewById(R.id.navigation_drawer_used_space);
