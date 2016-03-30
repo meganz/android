@@ -37,9 +37,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 //    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:design:24.0.0-alpha1'
+    compile 'com.android.support:design:23.2.1'
     compile 'com.google.android.gms:play-services-wallet:8.4.0'
-    compile 'com.android.support:recyclerview-v7:24.0.0-alpha1'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
 }
