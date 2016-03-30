@@ -468,7 +468,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 				if (sl != null) {
-					holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+					if(sl.size()!=0){
+						holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+					}
 				}
 			}
 			else{
@@ -608,7 +610,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			if(offlineNode!=null){
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming());
+					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
 					log("offline Directory: "+offlineDirectory.getAbsolutePath());
 				}
 				else{
@@ -771,7 +773,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 				if (sl != null) {
-					holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+					if(sl.size()!=0){
+						holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+					}										
 				}
 			}
 			else{
