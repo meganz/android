@@ -330,6 +330,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 			holder.currentPath = transfer.getPath();
 			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.setMargins(36, 0, 0, 0);
+			holder.imageView.setLayoutParams(params);
+			
 			if (MimeTypeList.typeForName(transfer.getFileName()).isImage()){
 				/*Bitmap thumb = null;
 				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentPath);
