@@ -35,6 +35,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -1078,7 +1079,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			previewDir = getDir("previewsMEGA", 0);
-		}
+		}	
 		
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (Util.isOnline(this)){
@@ -11249,7 +11250,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 		
-		if (e.getErrorCode() == MegaError.API_OK) {
+		if (e.getErrorCode() == MegaError.API_OK) {			
+			
 			long currentSizeDownloaded = 0;
 			if (transfersDownloadedSize.get(transfer.getTag()) != null){
 				currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());	

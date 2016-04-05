@@ -9,6 +9,7 @@ import java.util.List;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -885,7 +886,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				File thumbDir = ThumbnailUtils.getThumbFolder(this);
 				File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
 				megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());				
+				
+				if(Util.isVideoFile(transfer.getPath())){
+					log("Is video!!!");					
+					ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());			
+				}
+				else{
+					log("NOT video!");
+				}				
 			}
 			else{
 				log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
