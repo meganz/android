@@ -11246,11 +11246,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log("onTransferFinish"); 
+		log("onTransferFinish: "+transfer.getPath()); 
 		
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 		
-		if (e.getErrorCode() == MegaError.API_OK) {			
+		if (e.getErrorCode() == MegaError.API_OK) {
+			
+			if(Util.isVideoFile(transfer.getPath())){
+				log("Is video!!!");					
+				ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());			
+			}
+			else{
+				log("NOT video!");
+			}
 			
 			long currentSizeDownloaded = 0;
 			if (transfersDownloadedSize.get(transfer.getTag()) != null){

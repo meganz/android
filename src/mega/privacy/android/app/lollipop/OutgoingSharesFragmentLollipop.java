@@ -1224,7 +1224,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				i.putExtra("name", selectedNode.getHandle());
 				context.startActivity(i);			
 				break;
-			}			
+			}	
+			
+			case R.id.file_list_option_delete_layout:
+			case R.id.file_grid_option_delete_layout:{
+				log("Delete");
+			}
+				
 		}
 	}
 	
