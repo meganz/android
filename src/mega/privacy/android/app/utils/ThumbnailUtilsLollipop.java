@@ -40,11 +40,17 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video.Thumbnails;
 import android.media.ThumbnailUtils;
 import android.util.TypedValue;
@@ -1428,12 +1434,23 @@ public class ThumbnailUtilsLollipop {
 	
 	public static void createThumbnailVideo(Context context, String localPath, MegaApiAndroid megaApi, long handle){
 		log("createThumbnailVideo: "+localPath+ " : "+handle);
+		
+		//mp4 and 3gp OK, other formats check from Android DB with loadVideoThumbnail
+		// mov, mkv, flv not working even not in Android DB
 
 		MegaNode videoNode = megaApi.getNodeByHandle(handle);
 		
 		Bitmap bmThumbnail;
 		// MICRO_KIND, size: 96 x 96 thumbnail 
 		bmThumbnail = ThumbnailUtils.createVideoThumbnail(localPath, Thumbnails.MICRO_KIND);
+		if(bmThumbnail==null){
+			log("Create video thumb NULL, get with Cursor");
+			bmThumbnail= loadVideoThumbnail(localPath, context);
+		}	
+		else{
+			log("Create Video Thumb worked!");
+		}
+		
 		if(bmThumbnail!=null){
 			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 120, 120, false);		
 			
@@ -1474,8 +1491,26 @@ public class ThumbnailUtilsLollipop {
 		}
 		else{
 			log("Create video thumb NULL");
-		}		
+		}
 	}
+	
+	private static final String SELECTION = MediaColumns.DATA + "=?";
+	private static final String[] PROJECTION = { BaseColumns._ID };
+	public static Bitmap loadVideoThumbnail(String videoFilePath,  Context context) {
+		log("loadVideoThumbnail");
+	    Bitmap result = null;
+	    Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+	    String[] selectionArgs = { videoFilePath };
+	    ContentResolver cr = context.getContentResolver();
+	    Cursor cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
+	    if (cursor.moveToFirst()) {
+	        // it's the only & first thing in projection, so it is 0
+	        long videoId = cursor.getLong(0);
+	        result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
+	    }
+	    cursor.close();
+	    return result;
+	}	
 	
 	private static void log(String log) {
 		Util.log("ThumbnailUtilsLollipop", log);
