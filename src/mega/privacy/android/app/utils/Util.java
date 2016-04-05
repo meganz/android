@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -1457,6 +1458,12 @@ public class Util {
 		
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
 		
+	}
+	
+	public static boolean isVideoFile(String path) {
+	    String mimeType = URLConnection.guessContentTypeFromName(path);
+	    log("The mimeType is: "+mimeType);
+	    return mimeType != null && mimeType.indexOf("video") == 0;
 	}
 
 	private static void log(String message) {
