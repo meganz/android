@@ -10089,59 +10089,67 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			log("paramType: "+request.getParamType());
 			boolean avatarExists = false;
-			if (e.getErrorCode() == MegaError.API_OK){
-				
-				File avatar = null;
-				if (getExternalCacheDir() != null){
-					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				else{
-					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				Bitmap imBitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options options = new BitmapFactory.Options();
-						options.inJustDecodeBounds = true;
-						BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-						int imageHeight = options.outHeight;
-						int imageWidth = options.outWidth;
-						String imageType = options.outMimeType;
-						
-						// Calculate inSampleSize
-					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
-					    
-					    // Decode bitmap with inSampleSize set
-					    options.inJustDecodeBounds = false;
-
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-						if (imBitmap == null) {
-							avatar.delete();
-						}
-						else{
-							avatarExists = true;
-							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+			if (e.getErrorCode() == MegaError.API_OK){				
+				if(request.getParamType()==0){
+					File avatar = null;
+					if (getExternalCacheDir() != null){
+						avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					else{
+						avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					Bitmap imBitmap = null;
+					if (avatar.exists()){
+						if (avatar.length() > 0){
+							BitmapFactory.Options options = new BitmapFactory.Options();
+							options.inJustDecodeBounds = true;
+							BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+							int imageHeight = options.outHeight;
+							int imageWidth = options.outWidth;
+							String imageType = options.outMimeType;
 							
-							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-					        Paint paint = new Paint();
-					        paint.setShader(shader);
-					
-					        Canvas c = new Canvas(circleBitmap);
-					        int radius; 
-					        if (imBitmap.getWidth() < imBitmap.getHeight())
-					        	radius = imBitmap.getWidth()/2;
-					        else
-					        	radius = imBitmap.getHeight()/2;
-					        
-						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-					        nVPictureProfile.setImageBitmap(circleBitmap);
-					        nVPictureProfileTextView.setVisibility(View.GONE);
+							// Calculate inSampleSize
+						    options.inSampleSize = calculateInSampleSize(options, 250, 250);
+						    
+						    // Decode bitmap with inSampleSize set
+						    options.inJustDecodeBounds = false;
+
+							imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+							if (imBitmap == null) {
+								avatar.delete();
+							}
+							else{
+								avatarExists = true;
+								Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+								
+								BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+						        Paint paint = new Paint();
+						        paint.setShader(shader);
+						
+						        Canvas c = new Canvas(circleBitmap);
+						        int radius; 
+						        if (imBitmap.getWidth() < imBitmap.getHeight())
+						        	radius = imBitmap.getWidth()/2;
+						        else
+						        	radius = imBitmap.getHeight()/2;
+						        
+							    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
+						        nVPictureProfile.setImageBitmap(circleBitmap);
+						        nVPictureProfileTextView.setVisibility(View.GONE);
+							}
 						}
 					}
-				}
-				
-				if(request.getParamType()==1){
+					
+					if(drawerItem==DrawerItem.ACCOUNT){
+						log("Update the account fragment");
+						if(maFLol!=null){
+							maFLol.updateAvatar(avatar);
+						}
+					}
+				}				
+				else if(request.getParamType()==1){
 					log("(1)request.getText(): "+request.getText());
 					nameText=request.getText();
 					name=true;
@@ -10152,6 +10160,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					firstName = true;
 				}
 				if(name && firstName){
+					log("Name and First Name received!");
 					String fullName = nameText + " " + firstNameText;
 					if (fullName.trim().length() > 0){
 						nVDisplayName.setText(nameText+" "+firstNameText);
@@ -10166,6 +10175,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					name= false;
 					firstName = false;
+					
+					//refresh MyAccountFragment if visible
+					if(drawerItem==DrawerItem.ACCOUNT){
+						log("Update the account fragment");
+						if(maFLol!=null){
+							maFLol.updateUserName(nameText+" "+firstNameText);
+						}
+					}
 				}
 			}
 			else{
@@ -11042,11 +11059,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
 					log("The user: "+user.getEmail()+"changed his first name");
-					megaApi.getUserAttribute(user, 1, new ContactNameListener(this));				
+					if(user.getEmail().equals(megaApi.getMyEmail())){
+						log("I change my first name");
+						megaApi.getUserAttribute(user, 1, this);
+					}
+					else{
+						megaApi.getUserAttribute(user, 1, new ContactNameListener(this));
+					}									
 				}
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
 					log("The user: "+user.getEmail()+"changed his last name");
-					megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+					if(user.getEmail().equals(megaApi.getMyEmail())){
+						log("I change my last name");
+						megaApi.getUserAttribute(user, 2, this);
+					}
+					else{
+						megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+					}					
 				}
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
 					log("The user: "+user.getEmail()+"changed his AVATAR");
@@ -11061,6 +11090,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					Bitmap bitmap = null;
 					if (avatar.exists()){
 						avatar.delete();								
+					}
+					
+					if(user.getEmail().equals(megaApi.getMyEmail())){
+						log("I change my avatar");
+						if (getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						}
+						else{
+							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						}
 					}				
 				}
 			}		

@@ -1044,4 +1044,35 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			ManagerActivityLollipop.logout(context, megaApi, false);
 		}
 	}
+	
+	public void updateAvatar(File avatar){
+		if(avatar!=null){
+			Bitmap imBitmap = null;
+			if (avatar.exists()){
+				if (avatar.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (imBitmap == null) {
+						avatar.delete();
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+						}
+						else{
+							megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
+						}
+					}
+					else{
+						myAccountImage.setImageBitmap(imBitmap);
+						initialLetter.setVisibility(View.GONE);
+					}
+				}
+			}
+		}
+	}
+	
+	public void updateUserName(String name){
+		nameView.setText(name);
+	}
 }
