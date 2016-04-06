@@ -737,13 +737,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 								if(document != null)
 								{
 									File file = document.getFile();
-									if(file.isFile()){
-										files.add(file.getAbsolutePath());
-									}
-									else{
-										files.addAll(getFiles(file));
-									}
-									
+									files.add(file.getAbsolutePath());
 								}
 								
 							}
