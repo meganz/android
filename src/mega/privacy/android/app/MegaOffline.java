@@ -108,8 +108,10 @@ public class MegaOffline {
 	}
 	
 	public boolean isFolder(){
-		if(type.equals(FOLDER)){
-			return true;
+		if (type != null){
+			if(type.equals(FOLDER)){
+				return true;
+			}
 		}
 		return false;
 	}
