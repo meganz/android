@@ -7703,7 +7703,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	
 	public void uploadFile(){
-		fbFLol.showUploadPanel();
+		log("uploadFile");
+		
+		if(drawerItem == DrawerItem.CLOUD_DRIVE){
+			fbFLol.showUploadPanel();
+		}		
+		else if (drawerItem == DrawerItem.SHARED_ITEMS){
+			int index = viewPagerShares.getCurrentItem();
+			if (index == 0){
+				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (inSFLol != null){
+					inSFLol.showUploadPanel();
+				}
+			}
+			else{
+				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (outSFLol != null){
+					outSFLol.showUploadPanel();
+				}				
+			}
+		}	
 	}
 	
 	public void upgradeAccountButton(){
@@ -11252,13 +11273,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 		if (e.getErrorCode() == MegaError.API_OK) {
 			
-			if(Util.isVideoFile(transfer.getPath())){
-				log("Is video!!!");					
-				ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());			
-			}
-			else{
-				log("NOT video!");
-			}
+//			if(Util.isVideoFile(transfer.getPath())){
+//				log("Is video!!!");					
+//				ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());			
+//			}
+//			else{
+//				log("NOT video!");
+//			}
 			
 			long currentSizeDownloaded = 0;
 			if (transfersDownloadedSize.get(transfer.getTag()) != null){
@@ -11496,9 +11517,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
-			byte[] buffer) {
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
 		log("onTransferData");
+		
+//		if(Util.isVideoFile(transfer.getPath())){
+//		log("Is video!!!");					
+//		ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());			
+//	}
+//	else{
+//		log("NOT video!");
+//	}
+			
 		return true;
 	}
 	
