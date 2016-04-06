@@ -93,18 +93,11 @@ public class OpenLinkActivity extends PinActivity {
 		}		
 		
 		// Export Master Key link
-		if (url != null && url.matches("^https://mega.co.nz/#backup/")) {
-			log("export master key url");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-				log("Build.VERSION_CODES.LOLLIPOP");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			if (url != null && url.matches("^https://mega.co.nz/#backup/")) {
+				log("export master key url");			
 				Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
 				exportIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
-				startActivity(exportIntent);
-				finish();
-			}
-			else{
-				Intent exportIntent = new Intent(this, ManagerActivity.class);
-				exportIntent.setAction(ManagerActivity.ACTION_EXPORT_MASTER_KEY);
 				startActivity(exportIntent);
 				finish();
 			}
