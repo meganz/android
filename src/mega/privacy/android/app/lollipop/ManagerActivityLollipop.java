@@ -1,6 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -152,6 +155,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
+	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -1126,7 +1130,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	
 	    	if (newIntent != null){
 		    	if (newIntent.getAction() != null){
-		    		if (newIntent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
+		    		if (newIntent.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
@@ -1291,6 +1295,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						finish();
 						return;
 					}
+					else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(getIntent().getAction());
+						startActivity(intent);
+						finish();
+						return;
+					}
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -1301,6 +1313,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("rootNode != null");
+			
+			//Check if export master key action
+	        if (getIntent() != null){
+				if (getIntent().getAction() != null){
+			        if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
+			        	log("Intent to export Master Key - im logged in!");
+			        	exportMK();
+					}
+				}
+	        }			
 	        
 			initGooglePlayPayments();
 			
@@ -1504,7 +1526,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	parentHandleInbox = -1;
 	        
 	        //INITIAL FRAGMENT
-	        selectDrawerItemLollipop(drawerItem);
+	        selectDrawerItemLollipop(drawerItem);	        
 		}
 	}
 	
@@ -1528,7 +1550,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		if (!openLink){
     			logout(this, megaApi, false);
     			return;
-    		}			
+    		}
+    		else{
+    			log("not credentials");
+    			if (intent != null) {  
+    				log("not credentials -> INTENT");
+    				if (intent.getAction() != null){ 
+    					log("intent with ACTION: "+intent.getAction());
+    					if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+    						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
+    						exportIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    						exportIntent.setAction(getIntent().getAction());
+    						startActivity(exportIntent);
+    						finish();
+    						return;
+    					}
+    				}
+    			}
+    		}
 		}  	
     	   	
     	if (intent != null) {  
@@ -8732,6 +8771,67 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				break;
 //			}
 		}
+	}
+	
+	public void exportMK(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
+		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
+		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	String key = megaApi.exportMasterKey();
+					
+					BufferedWriter out;         
+					try {						
+
+						final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						final File f = new File(path);
+						log("Export in: "+path);
+						FileWriter fileWriter= new FileWriter(path);	
+						out = new BufferedWriter(fileWriter);	
+						out.write(key);	
+						out.close(); 								
+						String message = getString(R.string.toast_master_key) + " " + path;
+//		    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+
+		    			showAlert(message, "MasterKey exported!");
+						/*removeMasterKeyMenuItem.setVisible(true);
+			        	exportMasterKeyMenuItem.setVisible(false);*/
+
+					}catch (FileNotFoundException e) {
+					 e.printStackTrace();
+					}catch (IOException e) {
+					 e.printStackTrace();
+					}
+		        	
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+		builder.setTitle(getString(R.string.action_export_master_key));
+		builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_export, dialogClickListener)
+		    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	@Override
