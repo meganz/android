@@ -97,6 +97,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
+		megaApi = getMegaApi();
+		megaApiFolder = getMegaApiFolder();
 		
 //		initializeGA();
 		
@@ -127,6 +129,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			Log.d(TAG, "Database path: " + path);
 			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
+			
+			megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+			megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 		}
 		
 		return megaApiFolder;
@@ -155,6 +160,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			megaApi = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
 			
+			megaApi.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+			megaApi.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+			
 			requestListener = new BackgroundRequestListener();
 			log("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
@@ -163,6 +171,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		
 		return megaApi;
 	}
+	
 	
 //	synchronized Tracker getTracker(TrackerName trackerId) {
 //		if (!mTrackers.containsKey(trackerId)) {
