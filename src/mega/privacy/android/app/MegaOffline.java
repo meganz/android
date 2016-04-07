@@ -1,5 +1,7 @@
 package mega.privacy.android.app;
 
+import mega.privacy.android.app.utils.Util;
+
 public class MegaOffline {
 	
 	public static String FOLDER = "1";
@@ -113,8 +115,14 @@ public class MegaOffline {
 				return true;
 			}
 		}
+		else{
+			log("isFolder type is NULL");
+		}
 		return false;
 	}
 
+	private static void log(String log) {
+		Util.log("MegaOffline", log);
+	}
 
 }

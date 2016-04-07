@@ -17,7 +17,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 18; 
+	private static final int DATABASE_VERSION = 19; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -257,7 +257,41 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        		KEY_CONTACT_NAME+ " TEXT, " + KEY_CONTACT_LAST_NAME + " TEXT"+")";
 	        db.execSQL(CREATE_CONTACTS_TABLE);
 		}
+		
+		if(oldVersion <= 18){
+			//Changes to encrypt the Offline table
+			ArrayList<MegaOffline> offlinesOld = this.getOfflineFilesOld(db);
+			
+			log("Clear the table offline");
+			this.clearOffline(db);
+			
+			for(int i=0; i<offlinesOld.size();i++){
+				MegaOffline offline = offlinesOld.get(i);
+				
+				if(offline.getType()==null||offline.getType().equals("0")||offline.getType().equals("1")){
+					log("Not encrypted: "+offline.getName());
+					this.setOfflineFile(offline, db);	//using the method that encrypts								
+				}
+				else{
+					log("Encrypted: "+offline.getName());
+					this.setOfflineFileOld(offline, db);	//using the OLD method that doesn't encrypt	
+				}
+			}		
+		}		
 	} 
+	
+//	public MegaOffline encrypt(MegaOffline off){
+//		
+//		off.setHandle(encrypt(off.getHandle()));
+//		off.setPath(encrypt(off.getPath()));
+//		off.setName(encrypt(off.getName()));
+//		//Parent id no encrypted
+//		off.setType(encrypt(off.getType()));
+//		//incoming not encrypted
+//		off.setHandleIncoming(encrypt(off.getHandleIncoming()));
+//		
+//		return off;
+//	}
 	
 	public static String encrypt(String original) {
 		if (original == null) {
@@ -475,7 +509,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		MegaContact contacts = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + encrypt(handle) + "'";
-
+		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 		if (!cursor.equals(null)){
@@ -526,6 +560,81 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return -1;
 	}
+	
+	public long setOfflineFile (MegaOffline offline, SQLiteDatabase db){
+		
+        ContentValues values = new ContentValues();
+        
+        MegaOffline checkInsert = null;
+        checkInsert=findByHandle(offline.getHandle(),db);              
+        
+        if(checkInsert==null){
+        	String nullColumnHack = null;        	
+            
+            values.put(KEY_OFF_HANDLE, encrypt(offline.getHandle()));
+            values.put(KEY_OFF_PATH, encrypt(offline.getPath()));
+            values.put(KEY_OFF_NAME, encrypt(offline.getName()));
+            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_TYPE, encrypt(offline.getType()));
+            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.getHandleIncoming()));
+            
+            long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
+            
+            return ret;        	
+        }
+        return -1;
+	}
+	
+	public long setOfflineFileOld (MegaOffline offline){
+		
+        ContentValues values = new ContentValues();
+        
+        MegaOffline checkInsert = null;
+        checkInsert=findByHandle(offline.getHandle(),db);              
+        
+        if(checkInsert==null){
+        	String nullColumnHack = null;        	
+            
+            values.put(KEY_OFF_HANDLE, (offline.getHandle()));
+            values.put(KEY_OFF_PATH, (offline.getPath()));
+            values.put(KEY_OFF_NAME, (offline.getName()));
+            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_TYPE, (offline.getType()));
+            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_HANDLE_INCOMING, (offline.getHandleIncoming()));
+            
+            long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
+            
+            return ret;        	
+        }
+        return -1;
+	}
+	
+	public long setOfflineFileOld (MegaOffline offline, SQLiteDatabase db){
+		
+        ContentValues values = new ContentValues();
+        
+        MegaOffline checkInsert = null;
+        checkInsert=findByHandle(offline.getHandle(), db);              
+        
+        if(checkInsert==null){
+        	String nullColumnHack = null;        	
+            
+            values.put(KEY_OFF_HANDLE, (offline.getHandle()));
+            values.put(KEY_OFF_PATH, (offline.getPath()));
+            values.put(KEY_OFF_NAME, (offline.getName()));
+            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_TYPE, (offline.getType()));
+            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_HANDLE_INCOMING, (offline.getHandleIncoming()));
+            
+            long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
+            
+            return ret;        	
+        }
+        return -1;
+	}
 		
 	public ArrayList<MegaOffline> getOfflineFiles (){
 		
@@ -540,10 +649,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String handle = decrypt(cursor.getString(1));
 				String path = decrypt(cursor.getString(2));
 				String name = decrypt(cursor.getString(3));
-				int parent = cursor.getInt(4);
-				String type = decrypt(cursor.getString(5));
+				int parent = cursor.getInt(4);				
+				String type = decrypt(cursor.getString(5));				
 				boolean incoming = (cursor.getInt(6) == 1);
 				String handleIncoming = decrypt(cursor.getString(7));
+				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type, incoming, handleIncoming);
+				listOffline.add(offline);
+			} while (cursor.moveToNext());
+		}
+		cursor.close();
+
+		return listOffline;
+	}
+	
+	public ArrayList<MegaOffline> getOfflineFilesOld (SQLiteDatabase db){
+		
+		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
+
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			do{
+				
+				int id = Integer.parseInt(cursor.getString(0));
+				String handle = (cursor.getString(1));
+				String path = (cursor.getString(2));
+				String name = (cursor.getString(3));
+				int parent = cursor.getInt(4);				
+				String type = (cursor.getString(5));				
+				boolean incoming = (cursor.getInt(6) == 1);
+				String handleIncoming = (cursor.getString(7));
 				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type, incoming, handleIncoming);
 				listOffline.add(offline);
 			} while (cursor.moveToNext());
@@ -574,13 +709,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public MegaOffline findByHandle(long handle){
+		log("findByHandle: "+handle);
 
 		MegaOffline offline = null;
+		
+		
+		String handleString = Long.toString(handle);
+		String prueba=handleString+"'";
+		log("Prueba: "+prueba);
+		String prueba2 = encrypt(handleString);
+		String prueba3 = prueba2+"'";
+		log("Prueba3: "+prueba3);
 		//Get the foreign key of the node 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(Long.toString(handle)) + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(String.valueOf(handle)) + "'";
 
-		Cursor cursor = db.rawQuery(selectQuery, null);	
-
+		log("QUERY: gggg "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){		
@@ -612,6 +756,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public MegaOffline findByHandle(String handle){
+
+		MegaOffline offline = null;
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(handle) + "'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+
+				int _id = -1;
+				int _parent = -1;
+				String _handle = null;
+				String _path = null;
+				String _name = null;
+				String _type = null;
+				boolean _incoming = false;
+				String _handleIncoming = null;
+				
+				_id = Integer.parseInt(cursor.getString(0));
+				_handle = decrypt(cursor.getString(1));
+				_path = decrypt(cursor.getString(2));
+				_name = decrypt(cursor.getString(3));
+				_parent = cursor.getInt(4);
+				_type = decrypt(cursor.getString(5));
+				_incoming = (cursor.getInt(6) == 1);
+				_handleIncoming = decrypt(cursor.getString(7));
+				
+				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
+				cursor.close();
+				return offline;
+			}
+		}
+		cursor.close();
+		return null;
+		
+	}
+	
+	public MegaOffline findByHandle(String handle, SQLiteDatabase db){
 
 		MegaOffline offline = null;
 		//Get the foreign key of the node 
@@ -1349,6 +1532,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	public void clearContacts(){		
 		db.execSQL("DELETE FROM " + TABLE_CONTACTS);   
+	}	
+	
+	public void clearOffline(SQLiteDatabase db){		
+		db.execSQL("DELETE FROM " + TABLE_OFFLINE);   
 	}
 	
 	public void clearOffline(){		

@@ -186,41 +186,42 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		this.adapterType = adapterType;
 		this.fragment = fragment;
 		
+		dbH = DatabaseHandler.getDbHandler(context);
+		
 		switch (type) {
-		case ManagerActivityLollipop.FILE_BROWSER_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);			
-			break;
-		}
-		case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
-			((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
-			break;
-		}
-		case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
-			break;
-		}		
-		case ManagerActivityLollipop.FOLDER_LINK_ADAPTER: {
-			megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
-			break;
-		}
-		case ManagerActivityLollipop.SEARCH_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleSearch(parentHandle);
-			break;
-		}
-		case ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleOutgoing(-1);
-			break;
-		}
-		case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
-			incoming=true;
-			dbH = DatabaseHandler.getDbHandler(context);
-			((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
-			break;
-		}
-		default: {
-//			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
-			break;
-		}
+			case ManagerActivityLollipop.FILE_BROWSER_ADAPTER: {
+				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);			
+				break;
+			}
+			case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
+				((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
+				break;
+			}
+			case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER: {
+				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
+				break;
+			}		
+			case ManagerActivityLollipop.FOLDER_LINK_ADAPTER: {
+				megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
+				break;
+			}
+			case ManagerActivityLollipop.SEARCH_ADAPTER: {
+				((ManagerActivityLollipop) context).setParentHandleSearch(parentHandle);
+				break;
+			}
+			case ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER: {
+				((ManagerActivityLollipop) context).setParentHandleOutgoing(-1);
+				break;
+			}
+			case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
+				incoming=true;
+				((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
+				break;
+			}
+			default: {
+	//			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
+				break;
+			}
 		}
 
 		this.listFragment = recyclerView;
@@ -938,11 +939,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		//Find in the database
 		MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
 		if(offlineNode!=null){
+			log("YESS FOUND: "+node.getName());
 			if(incoming){
 				log("Incoming tab: MegaBrowserListAdapter: "+node.getHandle());				
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
-					offlineFile = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
+					offlineFile = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath());
 					log("offline File: "+offlineFile.getAbsolutePath());
 				}
 				else{
@@ -951,15 +953,19 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				
 			}
 			else{
+				log("CLOUD tab: MegaBrowserListAdapter: "+node.getHandle());
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
-					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node)+offlineNode.getName());
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
 				}
 				else{
 					offlineFile = context.getFilesDir();
 				}
 			}	
-		}		
+		}
+		else{
+			log("Not found: "+node.getHandle()+" "+node.getName());
+		}
 		
 		if (offlineFile!=null){
 			if (offlineFile.exists()){
