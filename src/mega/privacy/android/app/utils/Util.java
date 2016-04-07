@@ -1461,9 +1461,16 @@ public class Util {
 	}
 	
 	public static boolean isVideoFile(String path) {
-	    String mimeType = URLConnection.guessContentTypeFromName(path);
-	    log("The mimeType is: "+mimeType);
-	    return mimeType != null && mimeType.indexOf("video") == 0;
+		log("isVideoFile: "+path);
+		try{
+			String mimeType = URLConnection.guessContentTypeFromName(path);
+		    log("The mimeType is: "+mimeType);
+		    return mimeType != null && mimeType.indexOf("video") == 0;
+		}
+		catch(Exception e){
+			log("CATCH EXCEPTION!!!: "+e.getMessage());
+			return false;
+		}	    
 	}
 
 	private static void log(String message) {
