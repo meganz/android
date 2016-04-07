@@ -6365,8 +6365,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(localPath != null){
 						log("localPath != null");
 						try { 
-							log("Call to copyFile");
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
+							log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
+							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+							
+							if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
+								log("Is video!!!");
+//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
+								if (tempNode != null){
+									if(!tempNode.hasThumbnail()){
+										log("The video has not thumb");
+										ThumbnailUtilsLollipop.createThumbnailVideo(this, localPath, megaApi, tempNode.getHandle());	
+									}
+								}
+							}
+							else{
+								log("NOT video!");
+							}							
 						}
 						catch(Exception e) {
 							log("Exception!!");
