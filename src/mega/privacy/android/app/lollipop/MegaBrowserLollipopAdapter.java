@@ -601,47 +601,46 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		//Check if is an offline file to show the red arrow
-		File offlineDirectory = null;
-		
-		if(incoming){
-			log("Incoming tab: MegaBrowserListAdapter: "+node.getHandle());
-			//Find in the database
-			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
-			if(offlineNode!=null){
+		File offlineFile = null;
+		//Find in the database
+		MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
+		if(offlineNode!=null){
+			if(incoming){
+				log("Incoming tab: MegaBrowserGridAdapter: "+node.getHandle());				
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
-					log("offline Directory: "+offlineDirectory.getAbsolutePath());
+					offlineFile = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
+					log("offline File: "+offlineFile.getAbsolutePath());
 				}
 				else{
-					offlineDirectory = context.getFilesDir();
+					offlineFile = context.getFilesDir();
 				}
-			}
-		}
-		else{
-			//Find in the filesystem
-			if (Environment.getExternalStorageDirectory() != null){
-				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
+				
 			}
 			else{
-				offlineDirectory = context.getFilesDir();
-			}
+				//Find in the filesystem
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node)+offlineNode.getName());
+				}
+				else{
+					offlineFile = context.getFilesDir();
+				}
+			}	
 		}		
 		
-		if (offlineDirectory!=null){
-			if (offlineDirectory.exists()){
-				log("Directory EXISTS!!!");
+		if (offlineFile!=null){
+			if (offlineFile.exists()){
+				log("File EXISTS!!!");
 				holder.savedOffline.setVisibility(View.VISIBLE);
 			}
 			else{
-				log("Directory NOT exists!!!");
+				log("File NOT exists!!!");
 				holder.savedOffline.setVisibility(View.INVISIBLE);
 			}
 		}
 		else{
 			holder.savedOffline.setVisibility(View.INVISIBLE);
-		}
-		
+		}		
 	}
 	
 	public void onBindViewHolderList(ViewHolderBrowserList holder, int position){
@@ -935,35 +934,35 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		//Check if is an offline file to show the red arrow
-		File offlineDirectory = null;
-		
-		if(incoming){
-			log("Incoming tab: MegaBrowserListAdapter: "+node.getHandle());
-			//Find in the database
-			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
-			if(offlineNode!=null){
+		File offlineFile = null;
+		//Find in the database
+		MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
+		if(offlineNode!=null){
+			if(incoming){
+				log("Incoming tab: MegaBrowserListAdapter: "+node.getHandle());				
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
-					log("offline Directory: "+offlineDirectory.getAbsolutePath());
+					offlineFile = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming()+offlineNode.getPath()+offlineNode.getName());
+					log("offline File: "+offlineFile.getAbsolutePath());
 				}
 				else{
-					offlineDirectory = context.getFilesDir();
+					offlineFile = context.getFilesDir();
 				}
-			}
-		}
-		else{
-			//Find in the filesystem
-			if (Environment.getExternalStorageDirectory() != null){
-				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
+				
 			}
 			else{
-				offlineDirectory = context.getFilesDir();
-			}
+				//Find in the filesystem
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node)+offlineNode.getName());
+				}
+				else{
+					offlineFile = context.getFilesDir();
+				}
+			}	
 		}		
 		
-		if (offlineDirectory!=null){
-			if (offlineDirectory.exists()){
+		if (offlineFile!=null){
+			if (offlineFile.exists()){
 				holder.savedOffline.setVisibility(View.VISIBLE);
 			}
 			else{
