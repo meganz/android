@@ -2,3 +2,5 @@
 /curl
 /c-ares-*
 /curl-*
+!/c-ares-*.sha1
+!/curl-*.sha1
