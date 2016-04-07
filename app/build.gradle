@@ -33,16 +33,8 @@ android {
     }
 
     task megaSDK(type: Exec) {
-
         workingDir 'src/main/jni'
         commandLine 'make'
-
-//        // call regular ndk-build(.cmd) script from main src directory
-//        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//            commandLine 'ndk-build.cmd', '-C', file('src/main').absolutePath
-//        } else {
-//            commandLine 'ndk-build', '-C', file('src/main/').absolutePath
-//        }
     }
 
     tasks.withType(JavaCompile) {
