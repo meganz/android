@@ -675,30 +675,32 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK){
-				File avatar = null;
-				if (context.getExternalCacheDir() != null){
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				else{
-					avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				Bitmap imBitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-						if (imBitmap == null) {
-							avatar.delete();
-						}
-						else{
-							myAccountImage.setImageBitmap(imBitmap);
-							initialLetter.setVisibility(View.GONE);
+				if(request.getParamType()==0){
+					File avatar = null;
+					if (context.getExternalCacheDir() != null){
+						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					else{
+						avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					Bitmap imBitmap = null;
+					if (avatar.exists()){
+						if (avatar.length() > 0){
+							BitmapFactory.Options bOpts = new BitmapFactory.Options();
+							bOpts.inPurgeable = true;
+							bOpts.inInputShareable = true;
+							imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+							if (imBitmap == null) {
+								avatar.delete();
+							}
+							else{
+								myAccountImage.setImageBitmap(imBitmap);
+								initialLetter.setVisibility(View.GONE);
+							}
 						}
 					}
 				}
-				if(request.getParamType()==1){
+				else if(request.getParamType()==1){
 					log("(1)request.getText(): "+request.getText());
 					nameText=request.getText();
 					name=true;

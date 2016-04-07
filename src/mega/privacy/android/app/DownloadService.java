@@ -800,8 +800,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 					if (videoNode != null){
 						if(!videoNode.hasThumbnail()){
+							log("The video has not thumb");
 							ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());	
 						}
+					}
+					else{
+						log("videoNode is NULL");
 					}
 				}
 				else{

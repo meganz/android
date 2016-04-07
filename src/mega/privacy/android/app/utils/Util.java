@@ -84,7 +84,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	// CreateThumbPreviewService (true=enabled; false=disabled)
 	public static boolean CREATE_THUMB_PREVIEW_SERVICE = false;
