@@ -1,3 +1,2 @@
-/cryptopp
-/cryptopp562.zip
-/cryptopp562.zip_verified
+/cryptopp*
+!/cryptopp*.sha1
