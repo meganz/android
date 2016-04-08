@@ -375,6 +375,8 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">La carpeta ya no está compartida</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, la carpeta todavía está compartida</string>
     <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Se ha vaciado correctamente la Papelera</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. La Papelera no se ha vaciado</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí las posibles mejoras...</string>

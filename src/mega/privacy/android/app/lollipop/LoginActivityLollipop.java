@@ -909,7 +909,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
-				lastEmail = megaApi.getMyEmail();
+				lastEmail = megaApi.getMyUser().getEmail();
 				credentials = new UserCredentials(lastEmail, gSession);
 				
 				dbH.saveCredentials(credentials);

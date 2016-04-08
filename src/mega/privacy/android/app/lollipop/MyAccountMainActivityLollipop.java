@@ -80,7 +80,7 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 				if (maF == null){
 					maF = new MyAccountFragmentLollipop();
 				}
-				maF.setMyEmail(megaApi.getMyEmail());
+				maF.setMyEmail(megaApi.getMyUser().getEmail());
 				
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_myaccount, maF, "maF").commit();
 				
@@ -455,7 +455,7 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
     	/* TODO: for security, generate your payload here for verification. See the comments on
          *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
          *        an empty string, but on a production app you should carefully generate this. */
-    	String payload = megaApi.getMyEmail();
+    	String payload = megaApi.getMyUser().getEmail();
     	
     	if (mHelper == null){
     		initGooglePlayPayments();

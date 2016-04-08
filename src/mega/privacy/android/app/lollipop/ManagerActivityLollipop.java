@@ -791,8 +791,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
            
             if (proLiteMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;	
 	        			maxP = proLiteMonthly;
 	        		}
@@ -800,8 +800,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	}
             
             if (proLiteYearly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;
 	        			maxP = proLiteYearly;
 	        		}
@@ -809,8 +809,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	}
             
             if (proIMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;	
 	        			maxP = proIMonthly;
 	        		}
@@ -818,8 +818,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	}
             
             if (proIYearly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;
 	        			maxP = proIYearly;
 	        		}
@@ -827,8 +827,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	}
             
             if (proIIMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIMonthly;
 	        		}
@@ -836,8 +836,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
             
             if (proIIYearly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIYearly;
 	        		}
@@ -845,8 +845,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	}
             
             if (proIIIMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;	
 	        			maxP = proIIIMonthly;
 	        		}
@@ -854,8 +854,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
             
             if (proIIIYearly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;
 	        			maxP = proIIIYearly;
 	        		}
@@ -900,7 +900,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	/* TODO: for security, generate your payload here for verification. See the comments on
          *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
          *        an empty string, but on a production app you should carefully generate this. */
-    	String payload = megaApi.getMyEmail();
+    	String payload = megaApi.getMyUser().getEmail();
     	
     	if (mHelper == null){
     		initGooglePlayPayments();
@@ -1329,7 +1329,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
 			
-			contact = megaApi.getContact(megaApi.getMyEmail());
+			contact = megaApi.getMyUser();
 			if (contact != null){
 				nVEmail.setVisibility(View.VISIBLE);
 				nVEmail.setText(contact.getEmail());
@@ -3084,7 +3084,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			
     			if (maFLol == null){
     				maFLol = new MyAccountFragmentLollipop();
-    				maFLol.setMyEmail(megaApi.getMyEmail());
+    				maFLol.setMyEmail(megaApi.getMyUser().getEmail());
     			}
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -7504,7 +7504,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setPositiveButton(getString(R.string.general_empty),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						clearRubbishBin();
+						cleanRubbishBin();
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -7513,10 +7513,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		Util.brandAlertDialog(clearRubbishBinDialog);
 	}
 	
-	private void clearRubbishBin(){
-		log("clearRubbishBin");
-		ClearRubbisBinTask clearRubbishBinTask = new ClearRubbisBinTask(this);
-		clearRubbishBinTask.execute();
+	private void cleanRubbishBin(){
+		log("cleanRubbishBin");
+		megaApi.cleanRubbishBin(managerActivity);
 	}
 	
 	private class ContactNameListener implements MegaRequestListenerInterface{
@@ -7577,49 +7576,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	/*
 	 * Background task to emptying the Rubbish Bin
 	 */
-	private class ClearRubbisBinTask extends AsyncTask<String, Void, String> {
-		Context context;
-		MultipleRequestListener moveMultipleListener = null;
-		
-		ClearRubbisBinTask(Context context){
-			this.context = context;
-		}
-		
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task ClearRubbisBinTask");
-			
-			if (rbFLol != null){
-				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-				
-				isClearRubbishBin = true;
-				if(rubbishNodes.size()>1){
-					moveMultipleListener = new MultipleRequestListener(-1);
-					for (int i=0; i<rubbishNodes.size(); i++){
-						megaApi.remove(rubbishNodes.get(i), moveMultipleListener);
-					}
-				}
-				else{
-					for (int i=0; i<rubbishNodes.size(); i++){
-						megaApi.remove(rubbishNodes.get(i), managerActivity);
-					}
-				}				
-			}					
-			return null;
-		}		
-		
-		@Override
-        protected void onPostExecute(String result) {
-			log("onPostExecute -Async Task ClearRubbisBinTask");
-			//update the content label of the Rubbish Bin Fragment
-			if(rbFLol!=null){
-					rbFLol.setContentText();
-			}			
-        }
-	}	
+//	private class ClearRubbisBinTask extends AsyncTask<String, Void, String> {
+//		Context context;
+//		MultipleRequestListener moveMultipleListener = null;
+//		
+//		ClearRubbisBinTask(Context context){
+//			this.context = context;
+//		}
+//		
+//		@Override
+//		protected String doInBackground(String... params) {
+//			log("doInBackground-Async Task ClearRubbisBinTask");
+//			
+//			if (rbFLol != null){
+//				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+//				
+//				isClearRubbishBin = true;
+//				if(rubbishNodes.size()>1){
+//					moveMultipleListener = new MultipleRequestListener(-1);
+//					for (int i=0; i<rubbishNodes.size(); i++){
+//						megaApi.remove(rubbishNodes.get(i), moveMultipleListener);
+//					}
+//				}
+//				else{
+//					for (int i=0; i<rubbishNodes.size(); i++){
+//						megaApi.remove(rubbishNodes.get(i), managerActivity);
+//					}
+//				}				
+//			}					
+//			return null;
+//		}		
+//		
+//		@Override
+//        protected void onPostExecute(String result) {
+//			log("onPostExecute -Async Task ClearRubbisBinTask");
+//			//update the content label of the Rubbish Bin Fragment
+//			if(rbFLol!=null){
+//					rbFLol.setContentText();
+//			}			
+//        }
+//	}	
 	
 	/*
-	 * Background task to emptying the Rubbish Bin
+	 * Background task to verify the offline nodes
 	 */
 	private class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
 		Context context;
@@ -11054,6 +11053,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				Snackbar.make(fragmentContainer, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
+				Snackbar.make(fragmentContainer, getString(R.string.rubbish_bin_emptied), Snackbar.LENGTH_LONG).show();	
+			}
+			else{
+				Snackbar.make(fragmentContainer, getString(R.string.rubbish_bin_no_emptied), Snackbar.LENGTH_LONG).show();			
+			}
+		}
 	}
 
 	@Override
@@ -11073,7 +11081,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
 					log("The user: "+user.getEmail()+"changed his first name");
-					if(user.getEmail().equals(megaApi.getMyEmail())){
+					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my first name");
 						megaApi.getUserAttribute(user, 1, this);
 					}
@@ -11083,7 +11091,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
 					log("The user: "+user.getEmail()+"changed his last name");
-					if(user.getEmail().equals(megaApi.getMyEmail())){
+					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my last name");
 						megaApi.getUserAttribute(user, 2, this);
 					}
@@ -11106,7 +11114,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						avatar.delete();								
 					}
 					
-					if(user.getEmail().equals(megaApi.getMyEmail())){
+					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my avatar");
 						if (getExternalCacheDir() != null){
 							megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
