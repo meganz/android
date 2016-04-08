@@ -563,14 +563,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				availableOfflineBoolean = false;
 				offlineSwitch.setChecked(false);
 			}
-			
-			if(offlineSwitch.isChecked())
-			{
-				log("isChecked!");
-			}
-			else{
-				log(" NOOOOT Checked!");
-			}			
 		
 			if (node.getCreationTime() != 0){
 				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
