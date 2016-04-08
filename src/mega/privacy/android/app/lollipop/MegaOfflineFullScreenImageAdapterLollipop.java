@@ -37,6 +37,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	
 	private Activity activity;
 	private MegaOfflineFullScreenImageAdapterLollipop megaFullScreenImageAdapter;
+	private ArrayList<MegaOffline> mOffList;
 	private ArrayList<String> paths;
 	private SparseArray<ViewHolderOfflineFullImage> visibleImgs = new SparseArray<ViewHolderOfflineFullImage>();
 	private boolean aBshown = true;
@@ -106,9 +107,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
     }
 	
 	// constructor
-	public MegaOfflineFullScreenImageAdapterLollipop(Activity activity, ArrayList<String> paths) {
+	public MegaOfflineFullScreenImageAdapterLollipop(Activity activity, ArrayList<MegaOffline> mOffList) {
 		this.activity = activity;
-		this.paths = paths;
+		this.mOffList = mOffList;
 		this.megaFullScreenImageAdapter = this;
 //		dbH = new DatabaseHandler(activity);
 		dbH = DatabaseHandler.getDbHandler(activity);
@@ -127,7 +128,12 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 	@Override
 	public int getCount() {
-		return paths.size();
+		if (zipImage){
+			return paths.size();
+		}
+		else{
+			return mOffList.size();
+		}
 	}
 
 	@Override
@@ -139,7 +145,13 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
     public Object instantiateItem(ViewGroup container, int position) {
         log ("INSTANTIATE POSITION " + position);
         
-        File currentFile = new File (paths.get(position));
+        File currentFile;
+        if (zipImage){
+        	currentFile = new File (paths.get(position));
+        }
+        else{
+        	currentFile = new File (mOffList.get(position).getPath());
+        }
         
 		ViewHolderOfflineFullImage holder = new ViewHolderOfflineFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -153,56 +165,42 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		
-		holder.currentPath = paths.get(position);
-		
-		visibleImgs.put(position, holder);
-        
 		Bitmap preview = null;
 		Bitmap thumb = null;
 		
-		//Get the path of the file
-		
-		if (!zipImage){
-			String pathFile = currentFile.getAbsolutePath();
-			String[] subPath=pathFile.split(Util.offlineDIR);		
-			int index = subPath[1].lastIndexOf("/");		
-			pathFile = subPath[1].substring(0, index+1);
-			
-			//Get the handle from the db
-			MegaOffline mOff = dbH.findbyPathAndName(pathFile, currentFile.getName());
-
-			long handle;
-			if(mOff != null)
-			{
-				handle = Long.parseLong(mOff.getHandle());
-			}
-			else
-			{
-				handle = -1;
-			}
-			
-			log("Handle: " + handle);
-			holder.currentHandle = handle;
-
-			preview = PreviewUtils.getPreviewFromCache(handle);
-			if (preview != null){
-				holder.imgDisplay.setImageBitmap(preview);
-			}
-			else{
-				thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+		if (zipImage){
+			holder.currentPath = paths.get(position);
+		}
+		else{
+			holder.currentPath = mOffList.get(position).getPath();
+			try{
+				holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
+				
+				
+				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
 				if (thumb != null){
 					holder.imgDisplay.setImageBitmap(thumb);
 				}
-				
-				try{
-					new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
-				}
-				catch(Exception e){
-					//Too many AsyncTasks
+				else{
+					preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					if (preview != null){
+						holder.imgDisplay.setImageBitmap(preview);
+					}
+					
+					try{
+						new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
+					}
+					catch(Exception e){
+						//Too many AsyncTasks
+					}
 				}
 			}
+			catch(Exception e){}
 		}
-		else{
+		
+		visibleImgs.put(position, holder);
+		
+        if (zipImage){
 			try{
 				new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
 			}

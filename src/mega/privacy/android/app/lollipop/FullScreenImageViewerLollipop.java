@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
 import java.io.File;
+import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.FileStorageActivity;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
@@ -40,6 +43,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
@@ -136,6 +140,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 	
+	ArrayList<MegaOffline> mOffList;
+	ArrayList<MegaOffline> mOffListImages;
+	
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -157,10 +164,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate");
 		super.onCreate(savedInstanceState);
 		
 		handler = new Handler();
 		fullScreenImageViewer = this;
+		
+		dbH = DatabaseHandler.getDbHandler(this);
 		
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
 		    requestWindowFeature(Window.FEATURE_NO_TITLE); 
@@ -213,9 +223,136 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		MegaNode parentNode;		
 		
 		adapterType = intent.getIntExtra("adapterType", 0);
-		if ((adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER) || (adapterType == ManagerActivityLollipop.ZIP_ADAPTER)){
+		if (adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER){
+			mOffList = new ArrayList<MegaOffline>();
+			
+			String pathNavigation = intent.getStringExtra("pathNavigation");
+			int orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+			log("PATHNAVIGATION: " + pathNavigation);
+			mOffList=dbH.findByPath(pathNavigation);
+			log ("mOffList.size() = " + mOffList.size());
+			
+			for(int i=0; i<mOffList.size();i++){
+				MegaOffline checkOffline = mOffList.get(i);
+				
+				if(!checkOffline.isIncoming()){				
+					log("NOT isIncomingOffline");
+					File offlineDirectory = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+					}
+					else{
+						offlineDirectory = getFilesDir();
+					}	
+					
+					if (!offlineDirectory.exists()){
+						log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+						//dbH.removeById(mOffList.get(i).getId());
+						mOffList.remove(i);		
+						i--;
+					}	
+				}
+				else{
+					log("isIncomingOffline");
+					File offlineDirectory = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+						log("offlineDirectory: "+offlineDirectory);
+					}
+					else{
+						offlineDirectory = getFilesDir();
+					}	
+					
+					if (!offlineDirectory.exists()){
+						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+						//dbH.removeById(mOffList.get(i).getId());
+						mOffList.remove(i);
+						i--;
+					}						
+				}
+			}
+			
+			if (mOffList != null){
+				if(!mOffList.isEmpty()) {
+					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
+					if(!(lastItem.getHandle().equals("0"))){
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						log("Export in: "+path);
+						File file= new File(path);
+						if(file.exists()){
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+							mOffList.add(masterKeyFile);
+						}
+					}	
+				}
+				else{
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					log("Export in: "+path);
+					File file= new File(path);
+					if(file.exists()){
+						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+						mOffList.add(masterKeyFile);
+					}
+				}
+			}
+			
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
+			
+			if (mOffList.size() > 0){
+				
+				mOffListImages = new ArrayList<MegaOffline>();
+				int positionImage = -1;
+				for (int i=0;i<mOffList.size();i++){
+					if (MimeTypeList.typeForName(mOffList.get(i).getName()).isImage()){
+						mOffListImages.add(mOffList.get(i));
+						positionImage++;
+						if (i == positionG){
+							positionG = positionImage;
+						}
+					}
+				}
+				
+				if (positionG >= mOffListImages.size()){
+					positionG = 0;
+				}
+				
+				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(fullScreenImageViewer, mOffListImages);
+				viewPager.setAdapter(adapterOffline);
+				
+				viewPager.setCurrentItem(positionG);
+		
+				viewPager.setOnPageChangeListener(this);
+				
+				actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+				actionBarIcon.setOnClickListener(this);
+				
+				overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
+				overflowIcon.setVisibility(View.INVISIBLE);
+				
+				downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
+				downloadIcon.setVisibility(View.GONE);
+				
+				propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+				propertiesIcon.setVisibility(View.GONE);
+				
+				linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+				linkIcon.setVisibility(View.GONE);
+				
+				shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
+				shareIcon.setOnClickListener(this);
+				shareIcon.setVisibility(View.VISIBLE);
+				
+				bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+			    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+			}			
+		}				
+		else if (adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
 			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
-			log("OFFLINEPATHDIRECTORY: "  + offlinePathDirectory);
 		
 			File offlineDirectory = new File(offlinePathDirectory);
 //			if (Environment.getExternalStorageDirectory() != null){
@@ -264,10 +401,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			if (adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER){
-				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(fullScreenImageViewer, paths);
-			}
-			else if(adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
+			if(adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
 				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(fullScreenImageViewer, paths, true);
 			}
 			
@@ -530,6 +664,100 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 	
+	public void sortByNameDescending(){
+		
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+		
+		
+		for(int k = 0; k < mOffList.size() ; k++) {
+			MegaOffline node = mOffList.get(k);
+			if(node.getType().equals("1")){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
+		}
+		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(foldersOrder);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(filesOrder);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));
+				}				
+			}
+			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));					
+				}				
+			}
+			
+		}
+		
+		mOffList.clear();
+		mOffList.addAll(tempOffline);
+	}
+
+	
+	public void sortByNameAscending(){
+		log("sortByNameAscending");
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+				
+		for(int k = 0; k < mOffList.size() ; k++) {
+			MegaOffline node = mOffList.get(k);
+			if(node.getType().equals("1")){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
+		}		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));
+				}				
+			}			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));
+				}				
+			}
+			
+		}
+		
+		mOffList.clear();
+		mOffList.addAll(tempOffline);
+	}
+	
 	public ArrayList<MegaNode> sortByNameAscending(ArrayList<MegaNode> nodes){
 		log("sortByNameAscending");
 		
@@ -665,7 +893,39 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onClick(View v) {
 		
-		if ((adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER) || (adapterType == ManagerActivityLollipop.ZIP_ADAPTER)){
+		if (adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER){
+			switch (v.getId()){
+				case R.id.full_image_viewer_icon:{
+					finish();
+					break;
+				}
+				case R.id.full_image_viewer_share:{
+					String offlineDirectory;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+					}
+					else{
+						offlineDirectory = getFilesDir().getPath();
+					}	
+					
+					String fileName = offlineDirectory + mOffListImages.get(positionG).getPath() + mOffListImages.get(positionG).getName();
+					File previewFile = new File(fileName);
+					
+					if (previewFile.exists()){
+						Intent share = new Intent(android.content.Intent.ACTION_SEND);
+						share.setType("image/*");
+						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
+						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
+					}
+					else{
+						Snackbar.make(fragmentContainer, fileName + ": "  + getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+					}
+					
+					break;
+				}
+			}
+		}
+		else if (adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
 					finish();
@@ -1132,7 +1392,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 	
 	public void moveToTrash(){
-log("moveToTrash");
+		log("moveToTrash");
 		
 		final long handle = node.getHandle();
 		moveToRubbish = false;
@@ -1411,7 +1671,7 @@ log("moveToTrash");
 	}
 	
 	public static void log(String message) {
-		Util.log("FullScreenImageViewer", message);
+		Util.log("FullScreenImageViewerLollipop", message);
 	}
 
 	@Override
