@@ -195,7 +195,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
 		
-		myUser = megaApi.getContact(myEmail);
+		myUser = megaApi.getMyUser();
 		if(myUser == null){
 			return null;
 		}
@@ -399,7 +399,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
 		upgradeButton.setOnClickListener(this); 
 
-		myEmail=megaApi.getMyEmail();
+		myEmail=megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
 		
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
@@ -409,7 +409,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		megaApi.getUserData(this);
 		
 		userNameTextView.setText(myEmail);		
-		myUser = megaApi.getContact(myEmail);		
+		myUser = megaApi.getMyUser();
 		
 		name=false;
 		firstName=false;

@@ -380,6 +380,8 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">The folder is no longer shared</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, the folder is still shared with another contact</string>
     <string name="context_select_one_file" context="option available for just one file">Select just one file</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish Bin emptied successfully</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The Rubbish Bin has not be emptied</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here</string>

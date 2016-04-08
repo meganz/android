@@ -69,6 +69,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -403,29 +404,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     /*
 	 * Background task to emptying the Rubbish Bin
 	 */
-	private class ClearRubbisBinTask extends AsyncTask<String, Void, Void> {
-		Context context;
-		
-		ClearRubbisBinTask(Context context){
-			this.context = context;
-		}
-		
-		@Override
-		protected Void doInBackground(String... params) {
-			log("doInBackground-Async Task ClearRubbisBinTask");			
-
-			if (rbF != null){
-				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-				
-				isClearRubbishBin = true;
-				for (int i=0; i<rubbishNodes.size(); i++){
-					megaApi.remove(rubbishNodes.get(i), managerActivity);
-				}
-			}
-			
-			return null;
-		}		
-	}	
+//	private class ClearRubbisBinTask extends AsyncTask<String, Void, Void> {
+//		Context context;
+//		
+//		ClearRubbisBinTask(Context context){
+//			this.context = context;
+//		}
+//		
+//		@Override
+//		protected Void doInBackground(String... params) {
+//			log("doInBackground-Async Task ClearRubbisBinTask");			
+//
+//			if (rbF != null){
+//				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+//				
+//				isClearRubbishBin = true;
+//				for (int i=0; i<rubbishNodes.size(); i++){
+//					megaApi.remove(rubbishNodes.get(i), managerActivity);
+//				}
+//			}
+//			
+//			return null;
+//		}		
+//	}	
 	
     // (arbitrary) request code for the purchase flow
     public static final int RC_REQUEST = 10001;
@@ -550,8 +551,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
            
             if (proLiteMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;	
 	        			maxP = proLiteMonthly;
 	        		}
@@ -559,8 +560,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         	}
             
             if (proLiteYearly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;
 	        			maxP = proLiteYearly;
 	        		}
@@ -568,8 +569,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         	}
             
             if (proIMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;	
 	        			maxP = proIMonthly;
 	        		}
@@ -577,8 +578,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         	}
             
             if (proIYearly!= null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;
 	        			maxP = proIYearly;
 	        		}
@@ -586,8 +587,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         	}
             
             if (proIIMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIMonthly;
 	        		}
@@ -595,8 +596,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             }
             
             if (proIIIMonthly != null){
-            	if (megaApi.getMyEmail() != null){
-	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;	
 	        			maxP = proIIIMonthly;
 	        		}
@@ -671,7 +672,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	/* TODO: for security, generate your payload here for verification. See the comments on
          *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
          *        an empty string, but on a production app you should carefully generate this. */
-    	String payload = megaApi.getMyEmail();
+    	String payload = megaApi.getMyUser().getEmail();
     	
     	if (mHelper == null){
     		initGooglePlayPayments();
@@ -927,15 +928,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log("rootNode != null");		
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
-//			ArrayList<MegaUser> contacts = megaApi.getContacts();
 			
-//			for (int i=0; i < contacts.size(); i++){
-//				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
-//					contact = contacts.get(i);
-//				}
-//			}
-			
-			contact = megaApi.getContact(megaApi.getMyEmail());
+			contact = megaApi.getMyUser();
 			
 			if (contact != null){
 				userEmail.setVisibility(View.VISIBLE);
@@ -5824,6 +5818,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
+				Toast.makeText(this, getString(R.string.rubbish_bin_emptied), Toast.LENGTH_LONG).show();
+			}
+			else{
+				Toast.makeText(this, getString(R.string.rubbish_bin_no_emptied), Toast.LENGTH_LONG).show();
+			}
+		}
 	}
 
 	private void showOverquotaAlert(){
@@ -6196,7 +6199,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		builder.setPositiveButton(getString(R.string.general_empty),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						clearRubbishBin();
+						cleanRubbishBin();
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -6356,10 +6359,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		newFolderDialog.show();
 	}
 	
-	private void clearRubbishBin(){
-		log("clearRubbishBin");
-		ClearRubbisBinTask clearRubbishBinTask = new ClearRubbisBinTask(this);
-		clearRubbishBinTask.execute();
+	private void cleanRubbishBin(){
+		log("cleanRubbishBin");
+		megaApi.cleanRubbishBin(managerActivity);
 	}
 	
 	public void inviteContact(String contactEmail){
