@@ -248,6 +248,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public ArrayList<RelativeLayout> relativeLayoutsComplete;
     	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
     	public ArrayList<ImageView> imageViews;
+    	public ArrayList<ImageView> videoIcons;
     	public TextView textView;
     	public RelativeLayout textRelativeLayout;
     	public ArrayList<LinearLayout> longClickLayoutsSelected;
@@ -617,6 +618,24 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 								}
 							}
 						}
+
+						MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
+						if(Util.isVideoFile(nodeToCheck.getName())){
+							holder.videoIcons.get(i).setVisibility(View.VISIBLE);
+							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);								
+							}
+							else{
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
+								RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+								lp.setMargins(1, 0, 0, 1);								
+								holder.videoIcons.get(i).setLayoutParams(lp);
+							}							
+						}
+						else{
+							holder.videoIcons.get(i).setVisibility(View.GONE);
+						}
 					}
 					else{
 						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
@@ -699,6 +718,24 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 								}
 							}
 						}
+					}
+
+					MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
+					if(Util.isVideoFile(nodeToCheck.getName())){
+						if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
+							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);								
+						}
+						else{
+							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
+							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+							lp.setMargins(1, 0, 0, 1);
+							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+							holder.videoIcons.get(i).setLayoutParams(lp);
+						}
+						holder.videoIcons.get(i).setVisibility(View.VISIBLE);
+					}
+					else{
+						holder.videoIcons.get(i).setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -791,6 +828,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		holder.imageViews = new ArrayList<ImageView>();
 		holder.longClickLayoutsSelected = new ArrayList<LinearLayout>();
 		holder.longClickLayoutsUnselected = new ArrayList<LinearLayout>();
+		holder.videoIcons = new ArrayList<ImageView>();
 		
 		holder.documents = new ArrayList<Long>();
 		
@@ -819,6 +857,9 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			LinearLayout lcLU = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_unselected);
 			lcLU.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
 			holder.longClickLayoutsUnselected.add(lcLU);
+			
+			ImageView vI = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_video_icon);
+			holder.videoIcons.add(vI);					
 			
 			holder.documents.add(-1l);
 		}
