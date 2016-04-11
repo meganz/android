@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2161,6 +2162,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
 				megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
 				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+				
+				if(Util.isVideoFile(transfer.getPath())){
+					log("Is video!!!");					
+					ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());			
+				}
+				else{
+					log("NOT video!");
+				}	
 				
 //				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				
