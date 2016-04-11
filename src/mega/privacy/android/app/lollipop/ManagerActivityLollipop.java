@@ -11124,6 +11124,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}				
 				}
+				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
+					log("I have changed my email "+user.getEmail());
+					
+				}
 			}		
 		}
 		

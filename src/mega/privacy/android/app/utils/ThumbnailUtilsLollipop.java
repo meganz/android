@@ -1440,6 +1440,11 @@ public class ThumbnailUtilsLollipop {
 
 		MegaNode videoNode = megaApi.getNodeByHandle(handle);
 		
+		if(videoNode==null){
+			log("videoNode is NULL");
+			return;
+		}
+		
 		Bitmap bmThumbnail;
 		// MICRO_KIND, size: 96 x 96 thumbnail 
 		bmThumbnail = ThumbnailUtils.createVideoThumbnail(localPath, Thumbnails.MICRO_KIND);
@@ -1454,12 +1459,12 @@ public class ThumbnailUtilsLollipop {
 		if(bmThumbnail!=null){
 			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 120, 120, false);		
 			
-			log("After resize thumb: "+resizedBitmap.getHeight()+" : "+resizedBitmap.getWidth());
-			
-			File thumbDir = getThumbFolder(context);
-			File thumbVideo = new File(thumbDir, videoNode.getBase64Handle()+".jpg");
+			log("After resize thumb: "+resizedBitmap.getHeight()+" : "+resizedBitmap.getWidth());			
 			
 			try {
+				File thumbDir = getThumbFolder(context);
+				File thumbVideo = new File(thumbDir, videoNode.getBase64Handle()+".jpg");
+				
 				thumbVideo.createNewFile();
 				
 				FileOutputStream out = null;
