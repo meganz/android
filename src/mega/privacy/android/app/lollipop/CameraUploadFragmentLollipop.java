@@ -1804,6 +1804,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		this.isLargeGridCameraUploads = isLargeGridCameraUploads;
 	}
 	
+	public boolean getIsLargeGrid(){
+		return this.isLargeGridCameraUploads;
+	}
+	
 	public boolean getIsList(){
 		return isList;
 	}

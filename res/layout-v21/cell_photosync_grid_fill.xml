@@ -12,7 +12,17 @@
      android:scaleType="fitCenter"
      android:layout_margin="3dp"
      android:background="@color/grid_background"
-     android:layout_centerHorizontal="true"/>	
+     android:layout_centerHorizontal="true"/>
+    
+    <ImageView
+        android:id="@+id/cell_photosync_grid_video_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="3dp" 
+        android:src="@drawable/ic_play_arrow_white_24dp"
+		android:background="@null" />
      
     <LinearLayout
         android:id="@+id/cell_photosync_menu_long_click_unselected"
