@@ -56,6 +56,11 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		if (oFLol == null){
 			oFLol = new OfflineFragmentLollipop();			
 			oFLol.setPathNavigation(pathNavigation);
+			oFLol.setIsList(isListOffline);
+		}
+		else{
+			oFLol.setPathNavigation(pathNavigation);
+			oFLol.setIsList(isListOffline);
 		}
 
 //		isListOffline = oFLol.getIsList();

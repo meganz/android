@@ -23,6 +23,7 @@
                 style="@style/InputField"
                 android:hint="@string/settings_pin_lock_code"
                 android:imeOptions="actionDone"
+                android:textColor="@color/black"
                 android:inputType="numberPassword" >
             </EditText>
 

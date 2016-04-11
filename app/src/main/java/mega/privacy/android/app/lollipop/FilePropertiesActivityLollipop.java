@@ -190,8 +190,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	public static String DB_FILE = "0";
-	public static String DB_FOLDER = "1";
+//	public static String DB_FILE = "0";
+//	public static String DB_FOLDER = "1";
 	
 	Display display;
 	DisplayMetrics outMetrics;
@@ -563,14 +563,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				availableOfflineBoolean = false;
 				offlineSwitch.setChecked(false);
 			}
-			
-			if(offlineSwitch.isChecked())
-			{
-				log("isChecked!");
-			}
-			else{
-				log(" NOOOOT Checked!");
-			}			
 		
 			if (node.getCreationTime() != 0){
 				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
@@ -1095,7 +1087,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
 		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
 				
-		if(mOffDelete.getType().equals(DB_FOLDER)){
+		if(mOffDelete.getType().equals(MegaOffline.FOLDER)){
 			log("Finding children... ");
 			//Delete in DB
 			//Delete children

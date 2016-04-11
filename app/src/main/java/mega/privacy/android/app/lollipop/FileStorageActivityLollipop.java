@@ -101,7 +101,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
-	private Mode mode;
+	Mode mode;
 	
 	private MenuItem newFolderMenuItem;
 	
@@ -204,14 +204,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			
 			switch(item.getItemId()){
-			case R.id.cab_menu_select_all:{
-				selectAll();
-				break;
-			}
-			case R.id.cab_menu_unselect_all:{
-				clearSelections();
-				break;
-			}
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}
 			}
 			return false;
 		}
@@ -249,6 +249,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
+			if (!(mode.equals(Mode.PICK_FOLDER))) {
+				log("not Mode.PICK_FOLDER");
+				menu.findItem(R.id.cab_menu_create_folder).setVisible(false);
+			}
+			
 			return false;
 		}
 		
@@ -282,13 +287,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		if (mode == Mode.PICK_FOLDER) {
-			newFolderMenuItem.setVisible(true);
-			
-		}
-		else{
-			newFolderMenuItem.setVisible(false);
-		}
 		
 		if (mode == Mode.PICK_FOLDER) {
 			boolean writable = path.canWrite();
@@ -739,13 +737,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 								if(document != null)
 								{
 									File file = document.getFile();
-									if(file.isFile()){
-										files.add(file.getAbsolutePath());
-									}
-									else{
-										files.addAll(getFiles(file));
-									}
-									
+									files.add(file.getAbsolutePath());
 								}
 								
 							}

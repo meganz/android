@@ -1,6 +1,8 @@
 package mega.privacy.android.app.utils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,10 +40,19 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
+import android.provider.MediaStore.Video.Thumbnails;
+import android.media.ThumbnailUtils;
 import android.util.TypedValue;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -135,6 +146,41 @@ public class ThumbnailUtilsLollipop {
 			// TODO Auto-generated method stub
 			
 		}
+	}
+	
+	static class VideoThumbGeneratorListener implements MegaRequestListenerInterface{
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,
+				MegaError e) {
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK thumb de video");
+			}
+			else{
+				log("ERROR thumb de video: "+e.getErrorString());
+			}
+			
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,
+				MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 	
 	static class ThumbnailDownloadListenerPhotoSyncGrid implements MegaRequestListenerInterface{
@@ -1386,7 +1432,87 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 	
+	public static void createThumbnailVideo(Context context, String localPath, MegaApiAndroid megaApi, long handle){
+		log("createThumbnailVideo: "+localPath+ " : "+handle);
+		
+		//mp4 and 3gp OK, other formats check from Android DB with loadVideoThumbnail
+		// mov, mkv, flv not working even not in Android DB
+
+		MegaNode videoNode = megaApi.getNodeByHandle(handle);
+		
+		Bitmap bmThumbnail;
+		// MICRO_KIND, size: 96 x 96 thumbnail 
+		bmThumbnail = ThumbnailUtils.createVideoThumbnail(localPath, Thumbnails.MICRO_KIND);
+		if(bmThumbnail==null){
+			log("Create video thumb NULL, get with Cursor");
+			bmThumbnail= loadVideoThumbnail(localPath, context);
+		}	
+		else{
+			log("Create Video Thumb worked!");
+		}
+		
+		if(bmThumbnail!=null){
+			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 120, 120, false);		
+			
+			log("After resize thumb: "+resizedBitmap.getHeight()+" : "+resizedBitmap.getWidth());
+			
+			File thumbDir = getThumbFolder(context);
+			File thumbVideo = new File(thumbDir, videoNode.getBase64Handle()+".jpg");
+			
+			try {
+				thumbVideo.createNewFile();
+				
+				FileOutputStream out = null;
+				try {
+				    out = new FileOutputStream(thumbVideo);
+				    boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+				    if(result){
+				    	log("Compress OK!");
+						megaApi.setThumbnail(videoNode, thumbVideo.getAbsolutePath(), new VideoThumbGeneratorListener());
+				    }
+				    else{
+				    	log("Not Compress");
+				    }
+				} catch (Exception e) {
+					log("Error with FileOutputStream: "+e.getMessage());		    
+				} finally {
+				    try {
+				        if (out != null) {
+				            out.close();
+				        }
+				    } catch (IOException e) {
+				    	log("Error: "+e.getMessage());
+				    }
+				}			
+
+			} catch (IOException e1) {
+				log("Error creating new thumb file: "+e1.getMessage());	
+			}			
+		}
+		else{
+			log("Create video thumb NULL");
+		}
+	}
+	
+	private static final String SELECTION = MediaColumns.DATA + "=?";
+	private static final String[] PROJECTION = { BaseColumns._ID };
+	public static Bitmap loadVideoThumbnail(String videoFilePath,  Context context) {
+		log("loadVideoThumbnail");
+	    Bitmap result = null;
+	    Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+	    String[] selectionArgs = { videoFilePath };
+	    ContentResolver cr = context.getContentResolver();
+	    Cursor cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
+	    if (cursor.moveToFirst()) {
+	        // it's the only & first thing in projection, so it is 0
+	        long videoId = cursor.getLong(0);
+	        result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
+	    }
+	    cursor.close();
+	    return result;
+	}	
+	
 	private static void log(String log) {
-		Util.log("ThumbnailUtils", log);
+		Util.log("ThumbnailUtilsLollipop", log);
 	}	
 }

@@ -77,7 +77,7 @@ public class OpenLinkActivity extends PinActivity {
 				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
 				confirmIntent.putExtra(LoginActivity.EXTRA_CONFIRMATION, url);
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				confirmIntent.setAction(LoginActivity.ACTION_CONFIRM);
+				confirmIntent.setAction(LoginActivityLollipop.ACTION_CONFIRM);
 				startActivity(confirmIntent);
 				finish();
 			}
@@ -90,6 +90,18 @@ public class OpenLinkActivity extends PinActivity {
 				finish();
 			}
 			return;
+		}		
+		
+		// Export Master Key link
+		if (url != null && url.matches("^https://mega.co.nz/#backup/")) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {			
+				log("export master key url");			
+				Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
+				exportIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
+				startActivity(exportIntent);
+				finish();
+				return;
+			}			
 		}
 		
 		// Folder Download link

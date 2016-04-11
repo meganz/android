@@ -195,7 +195,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
 		
-		myUser = megaApi.getContact(myEmail);
+		myUser = megaApi.getMyUser();
 		if(myUser == null){
 			return null;
 		}
@@ -399,7 +399,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
 		upgradeButton.setOnClickListener(this); 
 
-		myEmail=megaApi.getMyEmail();
+		myEmail=megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
 		
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
@@ -409,7 +409,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		megaApi.getUserData(this);
 		
 		userNameTextView.setText(myEmail);		
-		myUser = megaApi.getContact(myEmail);		
+		myUser = megaApi.getMyUser();
 		
 		name=false;
 		firstName=false;
@@ -675,30 +675,32 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK){
-				File avatar = null;
-				if (context.getExternalCacheDir() != null){
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				else{
-					avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				Bitmap imBitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-						if (imBitmap == null) {
-							avatar.delete();
-						}
-						else{
-							myAccountImage.setImageBitmap(imBitmap);
-							initialLetter.setVisibility(View.GONE);
+				if(request.getParamType()==0){
+					File avatar = null;
+					if (context.getExternalCacheDir() != null){
+						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					else{
+						avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					Bitmap imBitmap = null;
+					if (avatar.exists()){
+						if (avatar.length() > 0){
+							BitmapFactory.Options bOpts = new BitmapFactory.Options();
+							bOpts.inPurgeable = true;
+							bOpts.inInputShareable = true;
+							imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+							if (imBitmap == null) {
+								avatar.delete();
+							}
+							else{
+								myAccountImage.setImageBitmap(imBitmap);
+								initialLetter.setVisibility(View.GONE);
+							}
 						}
 					}
 				}
-				if(request.getParamType()==1){
+				else if(request.getParamType()==1){
 					log("(1)request.getText(): "+request.getText());
 					nameText=request.getText();
 					name=true;
@@ -1043,5 +1045,36 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
 			ManagerActivityLollipop.logout(context, megaApi, false);
 		}
+	}
+	
+	public void updateAvatar(File avatar){
+		if(avatar!=null){
+			Bitmap imBitmap = null;
+			if (avatar.exists()){
+				if (avatar.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (imBitmap == null) {
+						avatar.delete();
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+						}
+						else{
+							megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
+						}
+					}
+					else{
+						myAccountImage.setImageBitmap(imBitmap);
+						initialLetter.setVisibility(View.GONE);
+					}
+				}
+			}
+		}
+	}
+	
+	public void updateUserName(String name){
+		nameView.setText(name);
 	}
 }

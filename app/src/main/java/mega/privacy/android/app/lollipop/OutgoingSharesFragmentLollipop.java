@@ -945,13 +945,19 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			optionSendToInbox.setVisibility(View.VISIBLE);	
 		}
 		
+		if(deepBrowserTree==0){
+			optionPermissions.setVisibility(View.VISIBLE);
+		}
+		else{
+			optionPermissions.setVisibility(View.GONE);
+		}
+		
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);		
 		optionRename.setVisibility(View.VISIBLE);
 		optionMoveTo.setVisibility(View.VISIBLE);
 		optionCopyTo.setVisibility(View.VISIBLE);
-		optionClearShares.setVisibility(View.VISIBLE);
-		optionPermissions.setVisibility(View.VISIBLE);
+		optionClearShares.setVisibility(View.VISIBLE);		
 		
 		//Hide
 		optionDelete.setVisibility(View.GONE);
@@ -1224,7 +1230,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				i.putExtra("name", selectedNode.getHandle());
 				context.startActivity(i);			
 				break;
-			}			
+			}	
+			
+			case R.id.file_list_option_delete_layout:
+			case R.id.file_grid_option_delete_layout:{
+				log("Delete");
+			}
+				
 		}
 	}
 	

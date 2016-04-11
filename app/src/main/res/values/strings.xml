@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.0.3.official</string>
-    <string name="sdk_version" context="Not translate">3eca2f6</string>
+    <string name="app_version" context="Not translate">3.0.5.official</string>
+    <string name="sdk_version" context="Not translate">324f3e4</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -278,7 +278,7 @@
     <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
     <string name="alert_leave_share" context="Title alert before leaving a share.">Leave share</string>
-    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove shares</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
@@ -335,6 +335,7 @@
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s is already a contact</string>
     <string name="context_send_no_permission" context="message when trying to send a file without full access">No permissions to send this file</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
+    <string name="context_folder_no_created" context="error message when creating a folder">Error. Folder not created</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Renamed successfully</string>
     <string name="context_no_renamed" context="error message">Error. Not renamed</string>
     <string name="context_correctly_copied" context="success message when copying a node">Copied successfully</string>
@@ -379,6 +380,8 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">The folder is no longer shared</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, the folder is still shared with another contact</string>
     <string name="context_select_one_file" context="option available for just one file">Select just one file</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish Bin emptied successfully</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The Rubbish Bin has not be emptied</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here</string>

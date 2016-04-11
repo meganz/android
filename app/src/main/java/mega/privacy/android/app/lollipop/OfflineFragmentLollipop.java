@@ -1700,6 +1700,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						intent.putExtra("adapterType", ManagerActivityLollipop.OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
+						intent.putExtra("pathNavigation", pathNavigation);
+						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 					}
 					else{
