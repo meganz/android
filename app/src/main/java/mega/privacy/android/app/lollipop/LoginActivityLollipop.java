@@ -310,6 +310,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
+			log("There is an intent!");
 			if (ACTION_CONFIRM.equals(intentReceived.getAction())) {
 				handleConfirmationIntent(intentReceived);
 				return;
@@ -319,10 +320,18 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
 				return;
 			}
+			
+			if (intentReceived.getAction() != null){
+				log("action is: "+intentReceived.getAction());
+			}
+			else{
+				log("No ACTION");
+			}
 		}
 		
 		credentials = dbH.getCredentials();
 		if (credentials != null){
+			log("Credentials NOT null");
 			firstTime = false;
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
@@ -373,6 +382,9 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						uriData = intentReceived.getData();
 						extras = intentReceived.getExtras();
 						url = null;
+					}
+					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;						
 					}
 					
 					MegaNode rootNode = megaApi.getRootNode();
@@ -515,27 +527,36 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 		}
 		else{
-			if ((intentReceived != null) && (intentReceived.getAction() != null)){
-				Intent intent;
-				if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
-					intent = new Intent(this, FileProviderActivity.class);
-					if(extras != null)
-					{
-						intent.putExtras(extras);
-					}
-					intent.setData(uriData);
-				
-					intent.setAction(action);
+			log("Credentials IS NULL");
+			if ((intentReceived != null)){
+				log("INTENT NOT NULL");
+				if (intentReceived.getAction() != null){
+					log("ACTION NOT NULL");
+					Intent intent;
+					if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
+						intent = new Intent(this, FileProviderActivity.class);
+						if(extras != null)
+						{
+							intent.putExtras(extras);
+						}
+						intent.setData(uriData);
 					
-					action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
-				}
-				else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-					action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
-//					uriData = intentReceived.getData();
-//					log("URI: "+uriData);
-//					extras = intentReceived.getExtras();
-//					url = null;
-					Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
+						intent.setAction(action);
+						
+						action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
+					}
+					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
+	//					uriData = intentReceived.getData();
+	//					log("URI: "+uriData);
+	//					extras = intentReceived.getExtras();
+	//					url = null;
+						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
+					}
+					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+						log("ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY");
+						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;						
+					}
 				}
 			}
 			if (OldPreferences.getOldCredentials(this) != null){
@@ -574,7 +595,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //			int paddingBottom = Util.px2dp((10*scaleH), outMetrics) + diffHeight;
 //			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
 //		}
-//		Toast.makeText(this, "onWindow: HEIGHT: " + loginCreateAccount.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();
+//		Toast.makeText(this, "onWindow: HEIGHT: " + loginCreateAccount.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();action
 //		int marginBottom = 37; //related to a 533dp height
 //		float dpHeight = outMetrics.heightPixels / density;
 //		marginBottom =  marginBottom + (int) ((dpHeight - 533) / 6);
@@ -888,12 +909,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
-				lastEmail = megaApi.getMyEmail();
+				lastEmail = megaApi.getMyUser().getEmail();
 				credentials = new UserCredentials(lastEmail, gSession);
 				
 				dbH.saveCredentials(credentials);
 			}
 			if(confirmLink==null){
+				log("confirmLink==null");
 				if (error.getErrorCode() != MegaError.API_OK) {
 					String errorMessage;
 					errorMessage = error.getErrorString();
@@ -922,8 +944,16 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						else{
 							Intent intent = null;
 							if (firstTime){
+								log("First time");
 								intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 								intent.putExtra("firstTimeCam", true);
+								if (action != null){
+									log("Action not NULL");
+									if (action.equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+										log("ACTION_EXPORT_MK");
+										intent.setAction(action);
+									}
+								}																
 							}
 							else{
 								boolean initialCam = false;
@@ -958,8 +988,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 								}
 
 								if (!initialCam){
+									log("NOT initialCam");
 									intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 									if (action != null){
+										log("The action is: "+action);
 //										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
 //											intent = new Intent(this, FileExplorerActivityLollipop.class);
 //											if(extras != null)
@@ -981,6 +1013,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 											intent.setData(Uri.parse(url));
 										}
 									}
+								}
+								else{
+									log("initialCam YESSSS");
+									if (action != null){
+										log("The action is: "+action);
+										intent.setAction(action);
+									}									
 								}
 								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							}

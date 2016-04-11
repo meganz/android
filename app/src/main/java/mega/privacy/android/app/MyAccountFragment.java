@@ -182,7 +182,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		upgradeButton.setOnClickListener(this); 
 		upgradeButton.setVisibility(View.VISIBLE);
 		
-		myEmail=megaApi.getMyEmail();
+		myEmail= megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
 		
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
@@ -192,7 +192,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		megaApi.getUserData(this);
 		
 		userNameTextView.setText(myEmail);		
-		myUser = megaApi.getContact(myEmail);		
+		myUser = megaApi.getMyUser();	
 		
 		name=false;
 		firstName=false;

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -194,6 +195,18 @@ public class Util {
 			return false;
 		}
 //		return true;
+	}
+	
+	public static int getFilesCount(File file) {
+		File[] files = file.listFiles();
+		int count = 0;
+		for (File f : files)
+			if (f.isDirectory())
+				count += getFilesCount(f)+1;
+			else
+				count++;
+
+		return count;
 	}
 	
 	public static long getFreeExternalMemorySize() {
@@ -1445,6 +1458,19 @@ public class Util {
 		
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
 		
+	}
+	
+	public static boolean isVideoFile(String path) {
+		log("isVideoFile: "+path);
+		try{
+			String mimeType = URLConnection.guessContentTypeFromName(path);
+		    log("The mimeType is: "+mimeType);
+		    return mimeType != null && mimeType.indexOf("video") == 0;
+		}
+		catch(Exception e){
+			log("CATCH EXCEPTION!!!: "+e.getMessage());
+			return false;
+		}	    
 	}
 
 	private static void log(String message) {

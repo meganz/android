@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -792,6 +793,24 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (error.getErrorCode() == MegaError.API_OK) {
 				log("Download OK: " + transfer.getFileName());
 				log("DOWNLOADFILE: " + transfer.getPath());
+				
+				//To update thumbnails for videos
+				if(Util.isVideoFile(transfer.getPath())){
+					log("Is video!!!");
+					MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+					if (videoNode != null){
+						if(!videoNode.hasThumbnail()){
+							log("The video has not thumb");
+							ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());	
+						}
+					}
+					else{
+						log("videoNode is NULL");
+					}
+				}
+				else{
+					log("NOT video!");
+				}		
 				
 				totalDownloaded++;
 				currentTransfers.remove(transfer.getTag());
