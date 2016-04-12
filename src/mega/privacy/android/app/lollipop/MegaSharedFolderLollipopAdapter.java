@@ -231,13 +231,9 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.shared_folder_item_layout);
 		holder.itemLayout.setOnClickListener(this);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.shared_folder_contact_thumbnail);
-		holder.imageView.getLayoutParams().width = Util.px2dp((54*scaleW), outMetrics);
-		holder.imageView.getLayoutParams().height = Util.px2dp((54*scaleH), outMetrics);
 		holder.initialLetter = (TextView) v.findViewById(R.id.shared_folder_contact_initial_letter);
 		
 		holder.textViewContactName = (TextView) v.findViewById(R.id.shared_folder_contact_name);
-		holder.textViewContactName.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-		holder.textViewContactName.setSingleLine();
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.shared_folder_contact_three_dots);
 		
