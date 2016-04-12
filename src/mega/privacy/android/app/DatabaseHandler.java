@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 import android.content.ContentValues;
@@ -17,7 +18,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 19; 
+	private static final int DATABASE_VERSION = 20; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -40,6 +41,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
+    private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
@@ -113,7 +115,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, " + KEY_SEC_FOLDER_ENABLED + " TEXT, " + KEY_SEC_FOLDER_LOCAL_PATH + 
         		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN, "+
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
-        		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN" + ")";
+        		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT" + ")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -277,7 +279,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					this.setOfflineFileOld(offline, db);	//using the OLD method that doesn't encrypt	
 				}
 			}		
-		}		
+		}
+		
+		if(oldVersion <= 19){
+			
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PIN_LOCK_TYPE + " TEXT;");			
+			
+			if(this.isPinLockEnabled(db)){
+				log("PIN enabled!");
+				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt(Constants.PIN_4) + "';");
+			}
+			else{
+				log("PIN NOT enabled!");
+				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt("") + "';");
+			}			
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -430,6 +446,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		return prefs;
 	}
+	
+	public boolean isPinLockEnabled(SQLiteDatabase db){
+		log("getPinLockEnabled");
+		
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		String pinLockEnabled = null;
+		boolean result = false;
+		if (cursor.moveToFirst()){
+			//get pinLockEnabled
+			pinLockEnabled = decrypt(cursor.getString(7));	
+			if(pinLockEnabled.equals("true")){
+				result = true;
+			}
+			else{
+				result = false;
+			}
+		}
+		cursor.close();
+		
+		return result;
+	}
+
 	
 	public void setAttributes (MegaAttributes attr){
 		log("setAttributes");
@@ -713,17 +752,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		MegaOffline offline = null;
 		
-		
-		String handleString = Long.toString(handle);
-		String prueba=handleString+"'";
-		log("Prueba: "+prueba);
-		String prueba2 = encrypt(handleString);
-		String prueba3 = prueba2+"'";
-		log("Prueba3: "+prueba3);
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(String.valueOf(handle)) + "'";
 
-		log("QUERY: gggg "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (!cursor.equals(null)){
@@ -1451,8 +1482,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
 			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ONLINE + "='" + encrypt(online + "") + "' WHERE " + KEY_ID + " ='1'";
-			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);			
 		}
 		else{
 			values.put(KEY_ATTR_ONLINE, encrypt(online + ""));
