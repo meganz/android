@@ -223,7 +223,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		
 		toolbarBack = (ImageView) v.findViewById(R.id.my_account_toolbar_back);
 		params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-		int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+//		int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+		int leftMarginBack = Util.scaleWidthPx(2, outMetrics);
 		params.setMargins(leftMarginBack, 0, 0, 0);
 		toolbarBack.setLayoutParams(params);
 		toolbarBack.setOnClickListener(this);
@@ -900,7 +901,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 	
 	@SuppressLint("NewApi") 
-	void showAlert(String message, String title) {
+	void showAlert(String message) {
 		AlertDialog.Builder bld;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
 			bld = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
@@ -909,8 +910,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			bld = new AlertDialog.Builder(context);
 		}
         bld.setMessage(message);
-        bld.setTitle(title);
-//        bld.setNeutralButton("OK", null);
         bld.setPositiveButton("OK",null);
         log("Showing alert dialog: " + message);
         bld.create().show();
@@ -958,7 +957,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 							String message = getString(R.string.toast_master_key) + " " + path;
 //			    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
 
-			    			showAlert(message, "MasterKey exported!");
+			    			showAlert(message);
 							/*removeMasterKeyMenuItem.setVisible(true);
 				        	exportMasterKeyMenuItem.setVisible(false);*/
 
@@ -988,7 +987,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			else{
 				builder = new AlertDialog.Builder(context);
 			}
-			builder.setTitle(getString(R.string.confirmation_alert));
+
 			builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_export, dialogClickListener)
 			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
@@ -1014,7 +1013,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			        	/*removeMasterKeyMenuItem.setVisible(false);
 			        	exportMasterKeyMenuItem.setVisible(true);*/
 			        	String message = getString(R.string.toast_master_key_removed);
-			        	showAlert(message, "MasterKey removed!");
+			        	showAlert(message);
 			        	
 			        	createOverflowMenu(overflowMenuList);
 			        	
@@ -1028,7 +1027,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-			builder.setTitle(getString(R.string.confirmation_alert));
 			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
 			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
