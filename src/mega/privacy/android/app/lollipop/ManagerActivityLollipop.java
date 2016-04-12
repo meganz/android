@@ -5416,7 +5416,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		break;
 	        		
 		        	}
-		        	case CLOUD_DRIVE:{
+		        	case CLOUD_DRIVE:
+		        	case INBOX:{
 		        		
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 							
@@ -5428,7 +5429,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			oldestCheck.setChecked(false);
 			        			largestCheck.setChecked(false);
 			        			smallestCheck.setChecked(false);
-			        			selectSortByCloudDrive(MegaApiJava.ORDER_DEFAULT_ASC);
+			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			        				selectSortByCloudDrive(MegaApiJava.ORDER_DEFAULT_ASC);
+			        			}
+			        			else{
+			        				selectSortByInbox(MegaApiJava.ORDER_DEFAULT_ASC);
+			        			}
+			        			
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5445,7 +5452,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			oldestCheck.setChecked(false);
 			        			largestCheck.setChecked(false);
 			        			smallestCheck.setChecked(false);
-			        			selectSortByCloudDrive(MegaApiJava.ORDER_DEFAULT_DESC);
+			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			        				selectSortByCloudDrive(MegaApiJava.ORDER_DEFAULT_DESC);
+			        			}
+			        			else{
+			        				selectSortByInbox(MegaApiJava.ORDER_DEFAULT_DESC);
+			        			}
+			        			
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5462,7 +5475,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			oldestCheck.setChecked(false);
 			        			largestCheck.setChecked(false);
 			        			smallestCheck.setChecked(false);
-			        			selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_DESC);
+			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_DESC);
+			        			}
+			        			else{
+			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_DESC);
+			        			}
+			        			
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5479,7 +5498,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			oldestCheck.setChecked(true);
 			        			largestCheck.setChecked(false);
 			        			smallestCheck.setChecked(false);
-			        			selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_ASC);
+			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_ASC);
+			        			}
+			        			else{
+			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_ASC);
+			        			}
+			        			
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5496,7 +5521,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			oldestCheck.setChecked(false);
 			        			largestCheck.setChecked(true);
 			        			smallestCheck.setChecked(false);
-			        			selectSortByCloudDrive(MegaApiJava.ORDER_SIZE_DESC);
+			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			        				selectSortByCloudDrive(MegaApiJava.ORDER_SIZE_DESC);
+			        			}
+			        			else{
+			        				selectSortByInbox(MegaApiJava.ORDER_SIZE_DESC);
+			        			}
+			        			
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5513,7 +5544,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			oldestCheck.setChecked(false);
 			        			largestCheck.setChecked(false);
 			        			smallestCheck.setChecked(true);
-			        			selectSortByCloudDrive(MegaApiJava.ORDER_SIZE_ASC);
+			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			        				selectSortByCloudDrive(MegaApiJava.ORDER_SIZE_ASC);
+			        			}
+			        			else{
+			        				selectSortByInbox(MegaApiJava.ORDER_SIZE_ASC);
+			        			}
+			        			
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5522,12 +5559,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		
 		        		break;
 	        		}
-		        	default:{
-		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-			    		break;
-		        	}
+//		        	default:{
+//		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
+//			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
+//			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
+//			    		break;
+//		        	}
 	        	}
 	        	return true;
 	        }
@@ -8591,6 +8628,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fbFLol.getRecyclerView().invalidate();					
 			}
 		}
+	}
+	
+	public void selectSortByInbox(int _orderGetChildren){
+		this.orderGetChildren = _orderGetChildren;
+		
+		MegaNode inboxNode = megaApi.getInboxNode();	
+		if(inboxNode!=null){
+			ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+			if (iFLol != null){		
+				iFLol.setOrder(orderGetChildren);
+				iFLol.setNodes(nodes);
+				iFLol.getRecyclerView().invalidate();						
+			}	
+		}			
 	}
 	
 	public long getNumberOfSubscriptions(){

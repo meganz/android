@@ -623,7 +623,11 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						if(Util.isVideoFile(nodeToCheck.getName())){
 							holder.videoIcons.get(i).setVisibility(View.VISIBLE);
 							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
-								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);								
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);	
+								RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+								lp.setMargins(3, 0, 0, 3);								
+								holder.videoIcons.get(i).setLayoutParams(lp);
 							}
 							else{
 								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
@@ -723,7 +727,11 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
 					if(Util.isVideoFile(nodeToCheck.getName())){
 						if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
-							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);								
+							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);	
+							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+							lp.setMargins(3, 0, 0, 3);								
+							holder.videoIcons.get(i).setLayoutParams(lp);
 						}
 						else{
 							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
