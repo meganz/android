@@ -289,11 +289,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(url != null){
 			log("Public node");
 			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
+			if (currentDir != null){
+				currentDir.mkdirs();
+			}
 			megaApi.getPublicNode(url, this);
 			return;
 		}
 		
 		currentDir = getDir(currentDocument, intent);
+		currentDir.mkdirs();
 		if (currentDir.isDirectory()){
 			log("currentDir is Directory");
 			currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName()));
@@ -326,7 +330,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			//To download to Advanced Devices
 			log("Download to advanced devices checked");
 			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
-
+			currentDir.mkdirs();
+			
 			if (currentDir.isDirectory()){
 				log("To download(dir): " + currentDir.getAbsolutePath() + "/");
 			}
