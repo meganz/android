@@ -485,26 +485,26 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		
 		if (cameraFolderSettings){
-			if (camSyncLocalPath != null){
-				if (camSyncLocalPath.compareTo("") == 0){
-					if (Environment.getExternalStorageDirectory() != null){
-						path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-					}
-				}
-				else{
-					path = new File(camSyncLocalPath);
-					if (path == null){
-						if (Environment.getExternalStorageDirectory() != null){
-							path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-						}
-					}
-				}
-			}
-			else{
+//			if (camSyncLocalPath != null){
+//				if (camSyncLocalPath.compareTo("") == 0){
+//					if (Environment.getExternalStorageDirectory() != null){
+//						path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+//					}
+//				}
+//				else{
+//					path = new File(camSyncLocalPath);
+//					if (path == null){
+//						if (Environment.getExternalStorageDirectory() != null){
+//							path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+//						}
+//					}
+//				}
+//			}
+//			else{
 				if (Environment.getExternalStorageDirectory() != null){
 					path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 				}
-			}
+//			}
 		}
 		
 		if (path == null){
