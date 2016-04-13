@@ -402,6 +402,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(prefs.getPreferredViewListCameraUploads()));
         values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()));
         values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.getCameraFolderExternalSDCard()));
+        values.put(KEY_PIN_LOCK_TYPE, encrypt(prefs.getPinLockType()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -437,10 +438,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredViewListCamera = decrypt(cursor.getString(22));
 			String uriExternalSDCard = decrypt(cursor.getString(23));
 			String cameraFolderExternalSDCard = decrypt(cursor.getString(24));
+			String pinLockType = decrypt(cursor.getString(25));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
-					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard);
+					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard, pinLockType);
 		}
 		cursor.close();
 		
@@ -1326,6 +1328,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 	        values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD, encrypt(cameraFolderExternalSDCard + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setPinLockType (String pinLockType){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + "= '" + encrypt(pinLockType) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_PIN_LOCK_TYPE, encrypt(pinLockType));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
