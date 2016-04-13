@@ -28,6 +28,7 @@ public class MegaPreferences{
 	String preferredViewListCameraUploads = "";
 	String uriExternalSDCard = "";
 	String cameraFolderExternalSDCard = "";	
+	String pinLockType = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -35,7 +36,7 @@ public class MegaPreferences{
 	
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
-			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard){
+			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -60,6 +61,7 @@ public class MegaPreferences{
 		this.preferredViewListCameraUploads = preferredViewListCameraUploads;
 		this.uriExternalSDCard = uriExternalSDCard;
 		this.cameraFolderExternalSDCard = cameraFolderExternalSDCard;
+		this.pinLockType = pinLockType;
 	}
 	
 	public String getFirstTime (){
@@ -262,6 +264,14 @@ public class MegaPreferences{
 	
 	public void setCameraFolderExternalSDCard(String cameraFolderExternalSDCard){
 		this.cameraFolderExternalSDCard = cameraFolderExternalSDCard;
+	}
+
+	public String getPinLockType() {
+		return pinLockType;
+	}
+
+	public void setPinLockType(String pinLockType) {
+		this.pinLockType = pinLockType;
 	}
 }
 
