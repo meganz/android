@@ -134,7 +134,7 @@
     </plurals>
     
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
-    <string name="alert_larger_file" context="Alert text before download"> %s will downloaded. Are you sure?</string>
+    <string name="alert_larger_file" context="Alert text before download"> %s will be downloaded. Are you sure?</string>
     <string name="alert_no_app" context="Alert text before download"> There is no app to open the file %s. Do you want to continue with the download?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show again</string>
      
