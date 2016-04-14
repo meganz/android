@@ -443,11 +443,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
     // SKU for our subscription PRO_II monthly
     static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
- // SKU for our subscription PRO_II yearly
+    // SKU for our subscription PRO_II yearly
     static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
     // SKU for our subscription PRO_III monthly
     static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
- // SKU for our subscription PRO_III yearly
+    // SKU for our subscription PRO_III yearly
     static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
     // SKU for our subscription PRO_LITE monthly
     static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
