@@ -66,11 +66,15 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	RelativeLayout fragmentContainer;
     LinearLayout sixPinLayout;
     LinearLayout fourPinLayout;
+    LinearLayout alphanumericLayout;
     LinearLayout warningLayout;
     RelativeLayout redLayout;
+    RelativeLayout buttonsLayout;
 	TextView textLogout;
+	TextView enterButton;
 	TextView logoutButton;
 	TextView unlockText;
+	EditText passwordText;
 	TextView warningText;
 	EditText passFirstLetter;
 	EditText passSecondLetter;
@@ -136,6 +140,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		coordinatorLayoutParams.height = Util.scaleHeightPx(70, outMetrics);
 		coordinatorLayout.setLayoutParams(coordinatorLayoutParams);		
 		
+		fourPinLayout = (LinearLayout) findViewById(R.id.four_pin_layout);
+		sixPinLayout = (LinearLayout) findViewById(R.id.six_pin_layout);
+		alphanumericLayout = (LinearLayout) findViewById(R.id.alphanumeric_pin_layout);
+		
 		redLayout = (RelativeLayout) findViewById(R.id.red_layout);
 		redLayout.setVisibility(View.GONE);
 		
@@ -157,19 +165,16 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		LinearLayout.LayoutParams textWarningParams = (LinearLayout.LayoutParams)warningText.getLayoutParams();
 		textWarningParams.setMargins(Util.scaleWidthPx(3, outMetrics), 0, Util.scaleWidthPx(3, outMetrics), 0); 
 		warningText.setLayoutParams(textWarningParams);
+		
+		buttonsLayout = (RelativeLayout) findViewById(R.id.buttons_layout);		
 
 		logoutButton = (TextView) findViewById(R.id.button_logout);
 		logoutButton.setText(getString(R.string.action_logout).toUpperCase(Locale.getDefault()));
-//		android.view.ViewGroup.LayoutParams paramsbLogin = logoutButton.getLayoutParams();		
-//		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
-//		logoutButton.setLayoutParams(paramsbLogin);
-		//Margin
-		RelativeLayout.LayoutParams textParamsLogin = (RelativeLayout.LayoutParams)logoutButton.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, 0); 
-		logoutButton.setLayoutParams(textParamsLogin);
-		
 		logoutButton.setOnClickListener(this);
+		
+		enterButton = (TextView) findViewById(R.id.button_enter);
+		enterButton.setText(getString(R.string.cam_sync_ok).toUpperCase(Locale.getDefault()));
+		enterButton.setOnClickListener(this);
 		
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
 //		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
@@ -184,7 +189,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			logoutButton.setVisibility(View.VISIBLE);
 		}
 		else{
-			logoutButton.setVisibility(View.GONE);
+			logoutButton.setVisibility(View.INVISIBLE);
 		}
 		
 		if (attemps==MAX_ATTEMPS-1){
@@ -206,21 +211,50 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			log("4 PIN");
 			add4DigitsPin();
 		}
-		else{
+		else if(prefs.getPinLockType().equals(Constants.PIN_6)){
 			add6DigitsPin();
-		}		
+		}
+		else{
+			addAlphanumericPin();
+		}
+	}
+	
+	private void addAlphanumericPin(){
+		log("addAlphanumericPin");
+		
+		fourPinLayout.setVisibility(View.GONE);
+		sixPinLayout.setVisibility(View.GONE);
+		alphanumericLayout.setVisibility(View.VISIBLE);
+		
+		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(240, outMetrics);
+		
+		passwordText = (EditText) findViewById(R.id.alphanumeric_text);
+		android.view.ViewGroup.LayoutParams paramsPassword = passwordText.getLayoutParams();		
+		paramsPassword.width = Util.scaleWidthPx(250, outMetrics);
+		passwordText.setLayoutParams(paramsPassword);
+				
+		enterButton.setVisibility(View.VISIBLE);
+		
+		//Margins warningLayout
+		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
+		warningParams.addRule(RelativeLayout.BELOW, alphanumericLayout.getId());	
 	}
 	
 	private void add6DigitsPin(){
 		log("add6DigitsPin");
-		fourPinLayout = (LinearLayout) findViewById(R.id.four_pin_layout);
+		
 		fourPinLayout.setVisibility(View.GONE);
-		sixPinLayout = (LinearLayout) findViewById(R.id.six_pin_layout);
+		alphanumericLayout.setVisibility(View.GONE);
+		
+		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(280, outMetrics);
+		
 		//Margins
 		RelativeLayout.LayoutParams pinParams = (RelativeLayout.LayoutParams)sixPinLayout.getLayoutParams();
 		pinParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		sixPinLayout.setLayoutParams(pinParams);
 		sixPinLayout.setVisibility(View.VISIBLE);
+		
+		enterButton.setVisibility(View.GONE);
 		
 		//Margins warningLayout
 		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
@@ -491,12 +525,19 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	
 	private void add4DigitsPin(){
-		fourPinLayout = (LinearLayout) findViewById(R.id.four_pin_layout);
+		log("add4DigitsPin");
 		//Margins
 		RelativeLayout.LayoutParams pinParams = (RelativeLayout.LayoutParams)fourPinLayout.getLayoutParams();
 		pinParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		fourPinLayout.setLayoutParams(pinParams);
 		fourPinLayout.setVisibility(View.VISIBLE);
+		
+		enterButton.setVisibility(View.GONE);
+		alphanumericLayout.setVisibility(View.GONE);
+		sixPinLayout.setVisibility(View.GONE);		
+		
+		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(210, outMetrics);
+		
 		//PIN
 		passFirstLetter = (EditText) findViewById(R.id.pass_first);
 		passFirstLetter.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -923,6 +964,180 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	}
 	
+	/*
+	 * Validate Pin code
+	 */
+	private void submitFormAlphanumeric(String code) {
+//		String code = sbSecond
+		
+		switch(mode){
+			case UNLOCK:{
+				String codePref = prefs.getPinLockCode();
+				
+				if (code.compareTo(codePref) == 0){
+					PinUtil.update();
+					attemps=0;
+					att.setAttemps(attemps);
+					dbH.setAttrAttemps(attemps);
+					finish();
+				}
+				else{
+					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
+					attemps=attemps+1;
+					if(attemps==10){
+						//Log out!!
+						log("INTENTS==10 - LOGOUT");
+				    	redLayout.setVisibility(View.VISIBLE);
+				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
+				    	
+				    	passwordText.setCursorVisible(false);				    					    	
+						
+						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//						imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
+						//						startActivity(intent);
+						//						finish();
+						
+						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
+
+						     public void onTick(long millisUntilFinished) {
+						    	 redLayout.setVisibility(View.VISIBLE);
+						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
+						     }
+
+						     public void onFinish() {
+						    	 log("Logout!!!");
+									ManagerActivity.logout(getApplication(), megaApi, false);
+									finish();
+						     }
+						  }.start();						
+					}
+					else{			
+						
+						att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+						dbH.setAttrAttemps(attemps);
+						
+						String message = null;
+		            	if(attemps<5){
+		            		message = getString(R.string.pin_lock_incorrect);
+		            		warningLayout.setVisibility(View.INVISIBLE);
+		            	}
+		            	else{
+		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		warningLayout.setVisibility(View.VISIBLE);
+		            	}
+		            	
+			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
+			        	View view = snack.getView();
+			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
+			        	params.gravity = Gravity.TOP;
+			        	view.setLayoutParams(params);
+			        	snack.show();
+			        	
+			            //Re-enter pass
+			        	passwordText.setText("");
+			            
+			        	passwordText.requestFocus();
+			        	passwordText.setCursorVisible(true);
+			            sbFirst.setLength(0);
+			            sbSecond.setLength(0);
+			            unlockText.setText(R.string.unlock_pin_title);        
+					}					
+				}
+				break;
+			}
+			case SET:{
+				setPin(code);
+				break;
+			}			
+			case RESET_UNLOCK:{
+				log("case RESET_UNLOCK");
+				String codePref = prefs.getPinLockCode();
+				
+				if (code.compareTo(codePref) == 0){
+					//Old PIN OK
+					PinUtil.update();
+					
+					attemps = 0;
+					att.setAttemps(attemps);
+					dbH.setAttrAttemps(attemps);
+					
+					//Ask for code type
+					this.choosePinLockType();
+					
+				}
+				else{
+					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
+//		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
+					attemps=attemps+1;
+					if(attemps==10){
+						//Log out!!
+						log("INTENTS==9 - LOGOUT");
+						passwordText.setCursorVisible(false);
+						
+						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
+						//						startActivity(intent);
+						//						finish();
+						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
+
+						     public void onTick(long millisUntilFinished) {
+//						         mTextField.setText("seconds remaining: " + );
+						    	 redLayout.setVisibility(View.VISIBLE);
+						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
+						     }
+
+						     public void onFinish() {
+						    	 log("Logout!!!");
+									ManagerActivity.logout(getApplication(), megaApi, false);
+									finish();
+						     }							
+						  }.start();
+					}
+					else{					
+					
+						att.setAttemps(attemps);
+						dbH.setAttrAttemps(attemps);
+						
+		            	String message = null;
+       	
+		            	if(attemps<5){
+		            		message = getString(R.string.pin_lock_incorrect);
+		            		warningLayout.setVisibility(View.INVISIBLE);
+		            	}
+		            	else{
+		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		warningLayout.setVisibility(View.VISIBLE);
+		            	}
+			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
+			        	View view = snack.getView();
+			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
+			        	params.gravity = Gravity.TOP;
+			        	view.setLayoutParams(params);
+			        	snack.show();
+			        	
+			            //Re-enter pass
+			        	passwordText.setText("");
+			            
+			        	passwordText.requestFocus();
+			        	passwordText.setCursorVisible(true);
+			            sbFirst.setLength(0);
+			            sbSecond.setLength(0);
+			            unlockText.setText(R.string.unlock_pin_title);        
+					}
+				}
+				break;
+			}
+			case RESET_SET:{
+				log("case RESET_SET");
+				setPin(code);
+				break;
+			}
+		}
+
+	}
+	
 	private void choosePinLockType(){
 		log("setPinLock");
 		
@@ -1015,27 +1230,45 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				sixPinLayout.setVisibility(View.GONE);
 			}
 			add4DigitsPin();
+			
+			//Re-enter pass
+	        passFirstLetter.setText("");
+	        passSecondLetter.setText("");
+	        passThirdLetter.setText("");
+	        passFourthLetter.setText("");
+	        
+	        passFirstLetter.requestFocus();
+	        passFirstLetter.setCursorVisible(true);
 		}
-		else{
+		else if(type.equals(Constants.PIN_6)){
 			log("6 PIN");			
 			add6DigitsPin();
+			
+			//Re-enter pass
+	        passFirstLetter.setText("");
+	        passSecondLetter.setText("");
+	        passThirdLetter.setText("");
+	        passFourthLetter.setText("");
+	        
+	        if(passFifthLetter!=null){
+	        	passFifthLetter.setText("");
+	        }
+	        if(passSixthLetter!=null){
+	        	passSixthLetter.setText("");
+	        }
+	        
+	        passFirstLetter.requestFocus();
+	        passFirstLetter.setCursorVisible(true);
 		}
-		
-		//Re-enter pass
-        passFirstLetter.setText("");
-        passSecondLetter.setText("");
-        passThirdLetter.setText("");
-        passFourthLetter.setText("");
+		else{
+			log("AN PIN");
+			addAlphanumericPin();
+			
+			if(passwordText!=null){
+				passwordText.setText("");
+	        }
+		}
         
-        if(passFifthLetter!=null){
-        	passFifthLetter.setText("");
-        }
-        if(passSixthLetter!=null){
-        	passSixthLetter.setText("");
-        }
-        
-        passFirstLetter.requestFocus();
-        passFirstLetter.setCursorVisible(true);
         sbFirst.setLength(0);
         sbSecond.setLength(0);
         unlockText.setText(R.string.reset_pin_title);
@@ -1063,7 +1296,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	}
 	
 	public static void log(String message) {
-		Util.log("NumericPinLockActivityLollipop", message);
+		Util.log("PinLockActivityLollipop", message);
 	}
 
 
@@ -1081,13 +1314,102 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
-			case R.id.button_logout:
+			case R.id.button_logout:{
 				ManagerActivityLollipop.logout(getApplication(), megaApi, false);
 //				Intent intent = new Intent(this, TourActivityLollipop.class);
 //				startActivity(intent);
 				finish();
 				break;
+			}
+			case R.id.button_enter:{
+				checkPasswordText();
+				break;
+			}
 		}
 		
 	}
+	
+	public void checkPasswordText() {
+		log("checkPasswordText");
+		
+    	if(passwordText.length()!=0){
+    		passwordText.setCursorVisible(false);
+    		passwordText.requestFocus();
+            if(!secondRound)
+            {  
+            	sbFirst.append(passwordText.getText());
+                log("Alphanumeric sbFirst: "+sbFirst);
+                switch(mode){
+                    case RESET_SET:
+                    {
+                    	//Re-enter pass
+                    	passwordText.setText("");
+                        
+                    	passwordText.requestFocus();
+                    	passwordText.setCursorVisible(true);
+                    	unlockText.setText(R.string.reset_pin_title_2);
+                    	secondRound=true;
+                    	break;
+                    }
+                    case UNLOCK:
+                    case RESET_UNLOCK:
+                    {    	                    	
+                    	submitFormAlphanumeric(sbFirst.toString());
+                    	break;
+                    }
+                    default:
+                    {
+                    	//Re-enter pass
+                    	log("Alphanumeric Default CASE");
+                    	passwordText.setText("");
+                        
+                        passwordText.requestFocus();
+                        passwordText.setCursorVisible(true);
+                    	unlockText.setText(R.string.unlock_pin_title_2);
+                    	secondRound=true;
+                    	break;
+                    }
+                }      
+
+            }
+            else if(secondRound)
+            {
+            	log("SECOND TIME alphanumeric");
+            	sbSecond.append(passwordText.getText());
+
+                log("Alphanumeric sbFirst "+sbFirst);
+                log("Alphanumeric sbSecond "+sbSecond);
+//            	submitForm(sbSecond.toString());
+                if(sbFirst.toString().equals(sbSecond.toString())){
+                	log("Alphanumeric PIN match - submit form");
+                	submitFormAlphanumeric(sbSecond.toString());
+                }
+                else{
+                	log("Alphanumeric PIN NOT match - show snackBar");
+                	secondRound = false;
+//                	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
+                	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
+                	View view = snack.getView();
+		        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
+                	params.gravity = Gravity.TOP;
+                	view.setLayoutParams(params);
+                	snack.show();
+                	
+                    //Re-enter pass
+                	passwordText.setText("");
+                    
+                    passwordText.requestFocus();
+                    passwordText.setCursorVisible(true);
+                    sbFirst.setLength(0);
+                    sbSecond.setLength(0);
+                    if(getMode()==RESET_SET){
+                    	unlockText.setText(R.string.reset_pin_title);
+                    }
+                    else{
+                    	unlockText.setText(R.string.unlock_pin_title);
+                    }       	
+                }
+            }
+    	}
+    }	
 }
