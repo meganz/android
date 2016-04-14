@@ -2080,7 +2080,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					createFolderMenuItem.setVisible(false);
     	    			addMenuItem.setVisible(false);
     	    			addContactMenuItem.setVisible(false);
-    	    			upgradeAccountMenuItem.setVisible(false);
+    	    			upgradeAccountMenuItem.setVisible(true);
     	    			unSelectMenuItem.setVisible(false);
     	    			addMenuItem.setEnabled(false);
     	    			changePass.setVisible(false); 
@@ -2128,7 +2128,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					sortByMenuItem.setVisible(true);
         					thumbViewMenuItem.setVisible(true);
         					rubbishBinMenuItem.setVisible(false);				
-        	    			upgradeAccountMenuItem.setVisible(false);    			
+        	    			upgradeAccountMenuItem.setVisible(true);    			
         	    			importLinkMenuItem.setVisible(true);
         	    			takePicture.setVisible(true);
         	    			selectMenuItem.setVisible(true);
@@ -2186,7 +2186,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	    					createFolderMenuItem.setVisible(false);
 //	    	    			addMenuItem.setVisible(false);
 //	    	    			addContactMenuItem.setVisible(false);
-//	    	    			upgradeAccountMenuItem.setVisible(false);
+//	    	    			upgradeAccountMenuItem.setVisible(true);
 //	    	    			unSelectMenuItem.setVisible(false);
 //	    	    			addMenuItem.setEnabled(false);
 //	    	    			changePass.setVisible(false); 
@@ -2233,7 +2233,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	    					sortByMenuItem.setVisible(true);
 //	    					thumbViewMenuItem.setVisible(true);
 //	    					rubbishBinMenuItem.setVisible(false);				
-//	    	    			upgradeAccountMenuItem.setVisible(false);    			
+//	    	    			upgradeAccountMenuItem.setVisible(true);    			
 //	    	    			importLinkMenuItem.setVisible(true);
 //	    	    			takePicture.setVisible(true);
 //	    	    			selectMenuItem.setVisible(true);
@@ -2303,7 +2303,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			addMenuItem.setEnabled(false);
@@ -2386,7 +2386,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2450,7 +2450,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2548,7 +2548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				settingsMenuItem.setVisible(false);
         			clearRubbishBinMenuitem.setVisible(false);
         			rubbishBinMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(true);
         			gridSmallLargeMenuItem.setVisible(false);
         			cancelAllTransfersMenuItem.setVisible(false);
         			
@@ -2928,7 +2928,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -3000,7 +3000,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						settingsMenuItem.setVisible(false);
 						refreshMenuItem.setVisible(false);
 						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(false);
+						upgradeAccountMenuItem.setVisible(true);
 						changePass.setVisible(false);
 						cancelSubscription.setVisible(false);				
 						killAllSessions.setVisible(false);
@@ -3054,7 +3054,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
         			sortByMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
         			addMenuItem.setEnabled(false);
@@ -3108,7 +3108,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
@@ -3667,7 +3667,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			addContactMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			addMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
@@ -3714,7 +3714,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 					rubbishBinMenuItem.setVisible(false);				
-	    			upgradeAccountMenuItem.setVisible(false);    			
+	    			upgradeAccountMenuItem.setVisible(true);    			
 	    			importLinkMenuItem.setVisible(true);
 	    			takePicture.setVisible(true);
 	    			selectMenuItem.setVisible(true);
@@ -3766,7 +3766,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			searchMenuItem.setVisible(true);
     			
 				//Hide
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
 				refreshMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
@@ -3800,7 +3800,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	if (cuFL != null){			
 				
 				//Show
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
     			takePicture.setVisible(true);
 
@@ -3847,7 +3847,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	if (muFLol != null){			
 				
 				//Show
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
     			takePicture.setVisible(true);
 
@@ -3921,7 +3921,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
@@ -4002,7 +4002,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(true);
 					gridSmallLargeMenuItem.setVisible(false);
 					
 					if (isList){	
@@ -4040,7 +4040,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchMenuItem.setVisible(true);
 					
 					//Hide
-					upgradeAccountMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(true);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					addContactMenuItem.setVisible(false);
@@ -4076,7 +4076,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			searchMenuItem.setVisible(true);
 	    			
 	    			//Hide	
@@ -4108,7 +4108,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				//Show
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			searchMenuItem.setVisible(false);
     			
     			//Hide	
@@ -4140,7 +4140,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (createFolderMenuItem != null){
 	    			
 					//Hide
-	    			upgradeAccountMenuItem.setVisible(false);	    			
+	    			upgradeAccountMenuItem.setVisible(true);	    			
 					cancelAllTransfersMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
@@ -4183,7 +4183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				//Show
 				refreshMenuItem.setVisible(true);
 				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
 				changePass.setVisible(true); 
 				
 				//Hide
@@ -4236,7 +4236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				settingsMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				upgradeAccountMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
 				changePass.setVisible(false);
 				cancelSubscription.setVisible(false);				
 				killAllSessions.setVisible(false);
@@ -4304,7 +4304,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				settingsMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				upgradeAccountMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
 				changePass.setVisible(false);
 				cancelSubscription.setVisible(false);				
 				killAllSessions.setVisible(false);
@@ -5580,6 +5580,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	}
 	        case R.id.action_menu_upgrade_account:{
 	        	drawerItem = DrawerItem.ACCOUNT;
+	        	if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
+					hidden.setChecked(true);
+				}
 	        	showUpAF(null);
 				return true;
 	        }
@@ -7817,49 +7823,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}	
 	}
 	
-	public void upgradeAccountButton(){
-		log("upgradeAccountButton");
-		drawerItem = DrawerItem.ACCOUNT;
-		if (accountInfo != null){
-			if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-				Time now = new Time();
-				now.setToNow();
-				if (accountType != 0){
-					log("accountType != 0");
-					if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-							log("SUBSCRIPTION INACTIVE: CHECKBITSET --> CC || FORT || INFO");
-							showUpAF(null);
-						}
-						else{
-							Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
-							
-						}
-					}
-					else{
-						log("CURRENTLY ACTIVE SUBSCRIPTION");
-						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
-					}
-				}
-				else{
-					log("accountType == 0");
-					if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-						log("CHECKBITSET --> CC || FORT || INFO");
-						showUpAF(null);
-					}
-					else{
-						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
-					}
-				}
-			}
-			else{
-				Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
-			}
-		}
-		else{
-			Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
-		}
-	}
+//	public void upgradeAccountButton(){
+//		log("upgradeAccountButton");
+//		drawerItem = DrawerItem.ACCOUNT;
+//		if (accountInfo != null){
+//			if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+//				Time now = new Time();
+//				now.setToNow();
+//				if (accountType != 0){
+//					log("accountType != 0");
+//					if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
+//						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+//							log("SUBSCRIPTION INACTIVE: CHECKBITSET --> CC || FORT || INFO");
+//							showUpAF(null);
+//						}
+//						else{
+//							Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
+//							
+//						}
+//					}
+//					else{
+//						log("CURRENTLY ACTIVE SUBSCRIPTION");
+//						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
+//					}
+//				}
+//				else{
+//					log("accountType == 0");
+//					if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+//						log("CHECKBITSET --> CC || FORT || INFO");
+//						showUpAF(null);
+//					}
+//					else{
+//						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
+//					}
+//				}
+//			}
+//			else{
+//				Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
+//			}
+//		}
+//		else{
+//			Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
+//		}
+//	}
 	
 	public void pickFolderToShare(List<MegaUser> users){
 		
@@ -11256,10 +11262,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}				
 				}
-				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
-					log("I have changed my email "+user.getEmail());
-					
-				}
+//				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
+//					log("I have changed my email "+user.getEmail());
+//					
+//				}
 			}		
 		}
 		
