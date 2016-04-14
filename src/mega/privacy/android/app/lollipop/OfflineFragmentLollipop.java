@@ -986,10 +986,15 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
 		
 		//Remove MK before sorting
-		MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-		if(lastItem.getHandle().equals("0")){
-			mOffList.remove(mOffList.size()-1);
+		if(mOffList.size()>0){
+			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
+			if(lastItem.getHandle().equals("0")){
+				mOffList.remove(mOffList.size()-1);
+			}
 		}		
+		else{
+			return;
+		}
 		
 		for(int k = 0; k < mOffList.size() ; k++) {
 			MegaOffline node = mOffList.get(k);
@@ -1043,10 +1048,15 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
 		
 		//Remove MK before sorting
-		MegaOffline lastItem = mOffList.get(mOffList.size()-1);
-		if(lastItem.getHandle().equals("0")){
-			mOffList.remove(mOffList.size()-1);
+		if(mOffList.size()>0){
+			MegaOffline lastItem = mOffList.get(mOffList.size()-1);
+			if(lastItem.getHandle().equals("0")){
+				mOffList.remove(mOffList.size()-1);
+			}
 		}		
+		else{
+			return;
+		}
 				
 		for(int k = 0; k < mOffList.size() ; k++) {
 			MegaOffline node = mOffList.get(k);

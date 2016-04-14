@@ -42,7 +42,7 @@
         android:maxLines="2"
 		android:ellipsize="end"
 		android:singleLine="false"
-        android:textSize="16sp"/>
+        android:textSize="14sp"/>
     
     <TextView
         android:id="@+id/file_list_filesize"
