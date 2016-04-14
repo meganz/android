@@ -157,7 +157,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		warningLayout = (LinearLayout) findViewById(R.id.warning_layout);
 		//Margins
 		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
-		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(10, outMetrics), 0); 
+		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics)); 
 		warningLayout.setLayoutParams(warningParams);
 
 		warningText = (TextView) findViewById(R.id.warning_text);
@@ -228,10 +228,18 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		
 		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(240, outMetrics);
 		
+		//Margins
+		RelativeLayout.LayoutParams pinParams = (RelativeLayout.LayoutParams)alphanumericLayout.getLayoutParams();
+		pinParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		alphanumericLayout.setLayoutParams(pinParams);
+		alphanumericLayout.setVisibility(View.VISIBLE);		
+		
 		passwordText = (EditText) findViewById(R.id.alphanumeric_text);
 		android.view.ViewGroup.LayoutParams paramsPassword = passwordText.getLayoutParams();		
 		paramsPassword.width = Util.scaleWidthPx(250, outMetrics);
 		passwordText.setLayoutParams(paramsPassword);
+		
+		passwordText.requestFocus();	
 				
 		enterButton.setVisibility(View.VISIBLE);
 		
@@ -522,7 +530,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void onTextChanged(CharSequence s, int start, int before, int count){}
         });	
 	}
-
 	
 	private void add4DigitsPin(){
 		log("add4DigitsPin");
@@ -537,6 +544,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		sixPinLayout.setVisibility(View.GONE);		
 		
 		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(210, outMetrics);
+		
+		//Margins warningLayout
+		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
+		warningParams.addRule(RelativeLayout.BELOW, fourPinLayout.getId());
 		
 		//PIN
 		passFirstLetter = (EditText) findViewById(R.id.pass_first);
