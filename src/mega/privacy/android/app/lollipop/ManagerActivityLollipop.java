@@ -5196,8 +5196,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
         		sortByDialog = builder.create();
         		sortByDialog.show();
-        		if(drawerItem!=DrawerItem.CONTACTS){
-        		
+        		if(drawerItem==DrawerItem.CONTACTS){
+        			switch(orderContacts){
+		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+		        			ascendingCheck.setChecked(true);
+		        			descendingCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(true);
+		        			break;
+		        		}
+	        		}		 
+        		}
+        		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
+        			log("orderOffline: "+orderOffline);
+        			switch(orderOffline){        				
+		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+		        			log("ASCE");
+		        			ascendingCheck.setChecked(true);
+		        			descendingCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
+		        			log("DESC");
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(true);
+		        			break;
+		        		}
+        			}
+        		}
+        		else{        		
 	        		switch(orderGetChildren){
 		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
 		        			ascendingCheck.setChecked(true);
@@ -5255,20 +5285,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		}
 	        		}
 	        	}
-        		else if(drawerItem==DrawerItem.CONTACTS){
-        			switch(orderContacts){
-		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-		        			ascendingCheck.setChecked(true);
-		        			descendingCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(true);
-		        			break;
-		        		}
-	        		}		 
-        		}
         		
         		final AlertDialog dialog = sortByDialog;
 	        	switch(drawerItem){
@@ -11263,8 +11279,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}				
 				}
 //				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
-//					log("I have changed my email "+user.getEmail());
-//					
+//					log("CHANGE_TYPE_EMAIL");
+//					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+//						log("I change my mail");
+//					}
+//					else{
+//						log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
+//						if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
+//							log("The contact NOT exists -> add to DB");
+//
+//						}
+//						else{
+//							log("The contact already exists -> update");
+//
+//						}
+//					}					
 //				}
 			}		
 		}
