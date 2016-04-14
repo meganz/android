@@ -35,6 +35,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -249,6 +251,28 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		this.adapterType = adapterType;
 	}
 	
+	public class MyGlobalLayoutListener implements OnGlobalLayoutListener{
+		
+		ViewHolderBrowserList holder;
+
+		public MyGlobalLayoutListener(ViewHolderBrowserList holder) {
+			super();
+			this.holder = holder;
+		}
+
+		@Override
+		public void onGlobalLayout() {
+			log("onGlobalLayout");
+			if (holder.textViewFileName.getLineCount() > 1) {
+	            log("----------------FILA MAYOR");
+	        }
+			else{
+				log("----------------FILA 1----------------");
+			}
+		}
+		
+	}
+	
 	@Override
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
@@ -278,7 +302,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			
 			holderList.textViewFileName = (TextView) v.findViewById(R.id.file_list_filename);			
 			holderList.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holderList.textViewFileName.getLayoutParams().width = Util.scaleWidthPx(225, outMetrics);
+			holderList.textViewFileName.getLayoutParams().width = Util.scaleWidthPx(210, outMetrics);
+			
+//			holderList.textViewFileName.getViewTreeObserver().addOnGlobalLayoutListener(new MyGlobalLayoutListener(holderList));		
+			
 			holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
 			holderList.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar);
 			
@@ -663,9 +690,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.document = node.getHandle();
 		Bitmap thumb = null;
 		
-		log("Node : "+position+" "+node.getName());
-		
-		holder.textViewFileName.setText(node.getName());
+		log("Node to show: "+position+" "+node.getName());
+		holder.textViewFileName.setText(node.getName());	
 		
 		if (!multipleSelect) {
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
