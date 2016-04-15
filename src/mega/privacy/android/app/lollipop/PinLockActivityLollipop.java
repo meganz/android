@@ -137,7 +137,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_pin_lock);
 		coordinatorLayout = (CoordinatorLayout) findViewById(R.id.myCoordinatorLayout);
 		android.view.ViewGroup.LayoutParams coordinatorLayoutParams = coordinatorLayout.getLayoutParams();		
-		coordinatorLayoutParams.height = Util.scaleHeightPx(70, outMetrics);
+		coordinatorLayoutParams.height = Util.scaleHeightPx(75, outMetrics);
 		coordinatorLayout.setLayoutParams(coordinatorLayoutParams);		
 		
 		fourPinLayout = (LinearLayout) findViewById(R.id.four_pin_layout);
