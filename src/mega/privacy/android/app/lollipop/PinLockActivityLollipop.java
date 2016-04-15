@@ -175,7 +175,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		enterButton = (TextView) findViewById(R.id.button_enter);
 		enterButton.setText(getString(R.string.cam_sync_ok).toUpperCase(Locale.getDefault()));
 		enterButton.setOnClickListener(this);
-		
+
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
 //		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
 		unlockText.setText(R.string.unlock_pin_title);		
@@ -1002,12 +1002,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 				    	
 				    	passwordText.setCursorVisible(false);				    					    	
-						
-						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-//						imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
-						//						startActivity(intent);
-						//						finish();
 						
 						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
