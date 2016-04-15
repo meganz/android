@@ -459,11 +459,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			//get pinLockEnabled
 			pinLockEnabled = decrypt(cursor.getString(7));	
-			if(pinLockEnabled.equals("true")){
-				result = true;
+			if (pinLockEnabled == null){
+				result = false;
 			}
 			else{
-				result = false;
+				if(pinLockEnabled.equals("true")){
+					result = true;
+				}
+				else{
+					result = false;
+				}
 			}
 		}
 		cursor.close();

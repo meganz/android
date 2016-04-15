@@ -204,7 +204,7 @@
 	    
 	     <TextView
 	        android:id="@+id/button_enter"
-	        android:layout_width="80dp"
+	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentRight="true"
 	        android:layout_gravity="right"
