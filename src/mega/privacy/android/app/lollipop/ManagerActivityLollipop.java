@@ -6607,7 +6607,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		//Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
 		log("downloadTo, parentPath: "+parentPath+ " url: "+url+" size: "+size);
 		log("files to download: "+hashes.length);
-		log("SIZE to download: "+size);
+		log("SIZE to download after calculating: "+size);
 		
 		final String parentPathC = parentPath;
 		final String urlC = url;		
@@ -6659,8 +6659,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//100MB=104857600
 			//10MB=10485760
 			//1MB=1048576
-			if(size>104857600){
-				log("Show size confirmacion: "+size);
+			if(sizeC>104857600){
+				log("Show size confirmacion: "+sizeC);
 				//Show alert
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				LinearLayout confirmationLayout = new LinearLayout(this);
@@ -6678,7 +6678,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        
 //				builder.setTitle(getString(R.string.confirmation_required));
 				
-				builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(size)));
+				builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
 				builder.setPositiveButton(getString(R.string.general_download),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
