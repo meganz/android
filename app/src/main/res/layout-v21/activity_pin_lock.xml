@@ -12,7 +12,7 @@
 
     <android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     android:id="@+id/myCoordinatorLayout"
     android:layout_alignParentTop="true"
     android:layout_alignParentLeft="true"
@@ -28,7 +28,7 @@
         android:textColor="@color/mega_text" />
 
     <LinearLayout
-        android:id="@+id/pin_layout"
+        android:id="@+id/four_pin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/unlock_text_view"
@@ -72,12 +72,97 @@
             android:inputType="numberPassword"
             android:maxLength="1" />
     </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/six_pin_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/unlock_text_view"
+        android:background="@color/white"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" 
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/six_pass_first"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+
+        <EditText
+            android:id="@+id/six_pass_second"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+
+        <EditText
+            android:id="@+id/six_pass_third"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+        
+        <EditText
+            android:id="@+id/six_pass_fourth"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+
+        <EditText
+            android:id="@+id/six_pass_fifth"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+
+        <EditText
+            android:id="@+id/six_pass_sixth"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:imeOptions="actionDone"
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/alphanumeric_pin_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/unlock_text_view"
+        android:background="@color/white"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" 
+        android:visibility="gone">
+        
+        <EditText
+            android:id="@+id/alphanumeric_text"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword" />
+        
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/warning_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/pin_layout"
+        android:layout_below="@id/four_pin_layout"
         android:background="@color/white"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="horizontal" >
@@ -98,15 +183,38 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/button_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_below="@id/warning_layout"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="@color/accentColor"
-        android:textSize="14sp" />
+    <RelativeLayout
+	    android:id="@+id/buttons_layout"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:layout_below="@id/warning_layout"
+	    android:background="@color/white">
+        
+	    <TextView
+	        android:id="@+id/button_logout"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="left"
+	        android:layout_alignParentLeft="true"
+	        android:gravity="left"
+	        android:fontFamily="sans-serif-medium"
+	        android:textColor="@color/accentColor"
+	        android:textSize="14sp" />
+	    
+	     <TextView
+	        android:id="@+id/button_enter"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_gravity="right"
+	        android:gravity="right"
+	        android:fontFamily="sans-serif-medium"
+	        android:textColor="@color/accentColor"
+	        android:textSize="14sp"
+	        android:visibility="gone" />
+     
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/red_layout"

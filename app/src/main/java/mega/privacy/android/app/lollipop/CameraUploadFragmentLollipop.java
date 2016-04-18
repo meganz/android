@@ -1282,15 +1282,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
 					}
+
+					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+	        		if (!hasCameraPermission){
+	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+				                new String[]{Manifest.permission.CAMERA},
+				                ManagerActivityLollipop.REQUEST_CAMERA);
+	        		}
 					
-//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//					if (!hasCameraPermission) {
-//						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-//				                new String[]{Manifest.permission.CAMERA},
-//				                ManagerActivityLollipop.REQUEST_CAMERA);
-//					}
-					
-//					if (hasStoragePermission && hasCameraPermission){
 					if (hasStoragePermission){
 						cameraOnOff();
 					}
@@ -1310,14 +1309,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
 					}
 					
-//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//					if (!hasCameraPermission) {
-//						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-//				                new String[]{Manifest.permission.CAMERA},
-//				                ManagerActivityLollipop.REQUEST_CAMERA);
-//					}
-					
-//					if (hasStoragePermission && hasCameraPermission){
+					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+	        		if (!hasCameraPermission){
+	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+				                new String[]{Manifest.permission.CAMERA},
+				                ManagerActivityLollipop.REQUEST_CAMERA);
+	        		}
+
 					if (hasStoragePermission){
 						cameraOnOffFirstTime();
 					}
@@ -1802,6 +1800,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public void setIsLargeGrid(boolean isLargeGridCameraUploads){
 		this.isLargeGridCameraUploads = isLargeGridCameraUploads;
+	}
+	
+	public boolean getIsLargeGrid(){
+		return this.isLargeGridCameraUploads;
 	}
 	
 	public boolean getIsList(){

@@ -1009,26 +1009,26 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
-					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
-				}
-				
-//				boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//				if (!hasCameraPermission) {
-//					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-//			                new String[]{Manifest.permission.CAMERA},
-//			                ManagerActivityLollipop.REQUEST_CAMERA);
-//				}
-			}
-			
 			dbH.setCamSyncTimeStamp(0);			
 			cameraUpload = !cameraUpload;			
 			
 			if (cameraUpload){
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+					}
+					
+					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+	        		if (!hasCameraPermission){
+	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+				                new String[]{Manifest.permission.CAMERA},
+				                ManagerActivityLollipop.REQUEST_CAMERA);
+	        		}
+				}
+				
 				if (camSyncLocalPath!=null){
 					File checkFile = new File(camSyncLocalPath);
 					if(!checkFile.exists()){

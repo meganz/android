@@ -282,7 +282,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			toolbarBack = (ImageView) findViewById(R.id.file_properties_toolbar_back);
 			params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
 //			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
-			int leftMarginBack = Util.scaleWidthPx(3, outMetrics);
+			int leftMarginBack = Util.scaleWidthPx(2, outMetrics);
 			params.setMargins(leftMarginBack, 0, 0, 0);
 			toolbarBack.setLayoutParams(params);
 			toolbarBack.setOnClickListener(this);

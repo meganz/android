@@ -28,8 +28,8 @@
         <ImageView
             android:id="@+id/file_properties_icon"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:paddingLeft="5dp"
+            android:layout_height="54dp"
+            android:layout_marginLeft="14dp"
             android:paddingTop="5dp" />
 
         <TextView

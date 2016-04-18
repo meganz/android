@@ -669,11 +669,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				
 				log("En finish: "+transfer.getFileName()+"path? "+transfer.getPath());
 				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-				
-				if(transfer.getPath().startsWith(pathSelfie)){
-					File f = new File(transfer.getPath());
-					f.delete();
+				if(transfer.getPath()!=null){
+					if(transfer.getPath().startsWith(pathSelfie)){
+						File f = new File(transfer.getPath());
+						f.delete();
+					}
 				}
+				else{
+					log("transfer.getPath() is NULL");
+				}				
 	
 			}
 		}
