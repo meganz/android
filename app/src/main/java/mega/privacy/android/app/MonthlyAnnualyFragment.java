@@ -339,7 +339,7 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 					}
 					
 					paymentPerMonth.setVisibility(View.VISIBLE);
-					paymentPerYear.setVisibility(View.GONE);
+					paymentPerYear.setVisibility(View.VISIBLE);
 					
 					switch (paymentMethod){
 						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -392,7 +392,7 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 					}
 					
 					paymentPerMonth.setVisibility(View.VISIBLE);
-					paymentPerYear.setVisibility(View.GONE);
+					paymentPerYear.setVisibility(View.VISIBLE);
 					
 					switch (paymentMethod){
 						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -620,7 +620,7 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 					}
 					
 					paymentPerMonth.setVisibility(View.VISIBLE);
-					paymentPerYear.setVisibility(View.GONE);
+					paymentPerYear.setVisibility(View.VISIBLE);
 					
 					switch (paymentMethod){
 						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -673,7 +673,7 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 					}
 					
 					paymentPerMonth.setVisibility(View.VISIBLE);
-					paymentPerYear.setVisibility(View.GONE);
+					paymentPerYear.setVisibility(View.VISIBLE);
 					
 					switch (paymentMethod){
 						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -916,6 +916,7 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_YEAR);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -934,6 +935,7 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_YEAR);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{

@@ -550,16 +550,16 @@
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueo con PIN</string>
     
     <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Los ficheros locales serán eliminados y se cerrará la sesión tras 10 intentos fallidos</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez.</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez. Le quedan %2$d intentos.</string>
+    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez. Le quedan %2d intentos.</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Los códigos no coinciden</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Introduce tu código</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu código</string>
      <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introduce tu nuevo código</string>
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu nuevo código</string>
-    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">Se van a borrar todos tus datos locales y tu sesión será inválida en 5 segundos.</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Los ficheros locales serán eliminados y se cerrará la sesión tras 10 intentos fallidos</string>
-
+    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">Se van a borrar todos tus datos locales y tu sesión será inválida en %d segundos.</string>
+    
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>    
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Términos de uso</string>
@@ -636,4 +636,9 @@
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">La información de la tarjeta de crédito no es correcta. No se realizará el pago.</string>
     
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Tu cuenta no se puede mejorar desde la aplicación. Por favor, contacta con support@mega.nz para mejorar tu cuenta.</string>
+
+	<string name="pin_lock_type" context="title to choose the type of PIN code">Tipo de código</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">Código de 4 dígitos</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">Código de 6 dígitos</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Código alfanumércio</string>  
 </resources>

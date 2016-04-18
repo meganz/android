@@ -375,8 +375,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
     // SKU for our subscription PRO_II monthly
     static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+    // SKU for our subscription PRO_II yearly
+    static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
     // SKU for our subscription PRO_III monthly
     static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+    // SKU for our subscription PRO_III yearly
+    static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
     // SKU for our subscription PRO_LITE monthly
     static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
     // SKU for our subscription PRO_LITE yearly
@@ -387,7 +391,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     Purchase proIMonthly;
     Purchase proIYearly;
     Purchase proIIMonthly;
+    Purchase proIIYearly;
     Purchase proIIIMonthly;
+    Purchase proIIIYearly;
     
     Purchase maxP;
     
@@ -467,9 +473,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                 log("PRO II Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO II Monthly!");
             }
+            else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
+                log("PRO II Yearly subscription purchased.");
+                alert("Thank you for subscribing to PRO II Yearly!");
+            }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO III Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
+                log("PRO III Yearly subscription purchased.");
+                alert("Thank you for subscribing to PRO III Yearly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
@@ -548,7 +562,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
             proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
             proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
+            proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR); 
             proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
+            proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR); 
            
             if (proLiteMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
@@ -595,11 +611,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             	}
             }
             
+            if (proIIYearly != null){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+	        			levelInventory = 2;
+	        			maxP = proIIYearly;
+	        		}
+            	}
+            }
+            
             if (proIIIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;	
 	        			maxP = proIIIMonthly;
+	        		}
+            	}
+            }
+            
+            if (proIIIYearly != null){
+            	if (megaApi.getMyUser().getEmail() != null){
+	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+	        			levelInventory = 3;
+	        			maxP = proIIIYearly;
 	        		}
             	}
             }
@@ -693,9 +727,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				SKU_PRO_II_MONTH, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
+    	else if (productId.compareTo(SKU_PRO_II_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_II_YEAR, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
     	else if (productId.compareTo(SKU_PRO_III_MONTH) == 0){
     		mHelper.launchPurchaseFlow(this,
     				SKU_PRO_III_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_III_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_III_YEAR, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
     	else if (productId.compareTo(SKU_PRO_LITE_MONTH) == 0){
@@ -1783,7 +1827,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //			refreshMenuItem.setVisible(true);
 //			sortByMenuItem.setVisible(true);
 //			helpMenuItem.setVisible(true);
-//			upgradeAccountMenuItem.setVisible(false);
+//			upgradeAccountMenuItem.setVisible(true);
 //			settingsMenuItem.setVisible(true);
 //			selectMenuItem.setVisible(true);
 //			unSelectMenuItem.setVisible(false);
@@ -1904,7 +1948,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -1967,7 +2011,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				//Show				
         			sortByMenuItem.setVisible(true);
         			selectMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(true);
         			
     				//Hide
         			refreshMenuItem.setVisible(false);
@@ -2076,7 +2120,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -2147,7 +2191,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(true);
@@ -2271,7 +2315,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				selectMenuItem.setVisible(true);
     				sortByMenuItem.setVisible(true);
     				thumbViewMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(true);
 
     				
         			//Hide
@@ -2353,7 +2397,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
@@ -2419,7 +2463,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (createFolderMenuItem != null){
     				//Show
     				pauseRestartTransfersItem.setVisible(true);
-        			upgradeAccountMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(true);
         			
     				//Hide
     				createFolderMenuItem.setVisible(false);
@@ -2489,7 +2533,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2549,7 +2593,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
         			sortByMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2609,7 +2653,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2972,7 +3016,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				sortByMenuItem.setVisible(true);
 				thumbViewMenuItem.setVisible(true);
 				rubbishBinMenuItem.setVisible(false);				
-    			upgradeAccountMenuItem.setVisible(false);    			
+    			upgradeAccountMenuItem.setVisible(true);    			
     			importLinkMenuItem.setVisible(true);
     			takePicture.setVisible(true);
     			selectMenuItem.setVisible(true);
@@ -3012,7 +3056,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(true);
 	    			
 	    			//Hide	
 	    			pauseRestartTransfersItem.setVisible(false);
@@ -3041,7 +3085,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			else{
 				//Show
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			
     			//Hide	
     			addContactMenuItem.setVisible(false);
@@ -3080,7 +3124,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
@@ -3120,7 +3164,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
@@ -3146,7 +3190,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (inSF != null){
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(true);
 
 					addMenuItem.setEnabled(true);
 					addMenuItem.setVisible(true);
@@ -3187,7 +3231,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(true);
 
 
 					log("parentHandleOutgoing: "+parentHandleOutgoing);
@@ -3225,7 +3269,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//Show
 				refreshMenuItem.setVisible(true);
 				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
 				changePass.setVisible(true); 
 				
 				//Hide
@@ -3270,7 +3314,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.TRANSFERS){
 				//Show
 				pauseRestartTransfersItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			
 				//Hide
 				createFolderMenuItem.setVisible(false);
@@ -3312,7 +3356,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			sortByMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(false); //TODO
     			selectMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -3347,7 +3391,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (createFolderMenuItem != null){
 					
 					//Show
-	    			upgradeAccountMenuItem.setVisible(false);	    			
+	    			upgradeAccountMenuItem.setVisible(true);	    			
 
 					//Hide
 	    			thumbViewMenuItem.setVisible(false);
@@ -3379,7 +3423,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 				
 				//Show
-    			upgradeAccountMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
     			takePicture.setVisible(true);
 
@@ -8482,45 +8526,53 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void upgradeAccountButton(){
 		log("upgradeAccountButton");
+		
+		if (nDA != null){
+			nDA.setPositionClicked(-1);
+		}
 		drawerItem = DrawerItem.ACCOUNT;
-		if (accountInfo != null){
-			if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-				Time now = new Time();
-				now.setToNow();
-				if (accountType != 0){
-					log("accountType != 0");
-					if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-							log("SUBSCRIPTION INACTIVE: CHECKBITSET --> CC || FORT || INFO");
-							showUpAF(null);
-						}
-						else{
-							Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
-						}
-					}
-					else{
-						log("CURRENTLY ACTIVE SUBSCRIPTION");
-						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
-					}
-				}
-				else{
-					log("accountType == 0");
-					if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-						log("CHECKBITSET --> CC || FORT || INFO");
-						showUpAF(null);
-					}
-					else{
-						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
-					}
-				}
-			}
-			else{
-				Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
-			}
-		}
-		else{
-			Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
-		}
+		titleAB = drawerItem.getTitle(this);
+    	showUpAF(null);
+//    	
+//		drawerItem = DrawerItem.ACCOUNT;
+//		if (accountInfo != null){
+//			if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+//				Time now = new Time();
+//				now.setToNow();
+//				if (accountType != 0){
+//					log("accountType != 0");
+//					if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
+//						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+//							log("SUBSCRIPTION INACTIVE: CHECKBITSET --> CC || FORT || INFO");
+//							showUpAF(null);
+//						}
+//						else{
+//							Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+//						}
+//					}
+//					else{
+//						log("CURRENTLY ACTIVE SUBSCRIPTION");
+//						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+//					}
+//				}
+//				else{
+//					log("accountType == 0");
+//					if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+//						log("CHECKBITSET --> CC || FORT || INFO");
+//						showUpAF(null);
+//					}
+//					else{
+//						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+//					}
+//				}
+//			}
+//			else{
+//				Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+//			}
+//		}
+//		else{
+//			Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+//		}
 	}
 
 	public long getNumberOfSubscriptions(){
