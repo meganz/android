@@ -11097,7 +11097,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				sendToInbox=false;				
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Fin 1");
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent_node), Snackbar.LENGTH_LONG).show();
 				}
 				else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -11106,7 +11106,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else
 				{
 					log("Fin 2");
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_sent_node), Snackbar.LENGTH_LONG).show();
 				}								
 			}
 			else{

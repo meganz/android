@@ -1019,13 +1019,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (selectedNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
 			optionShare.setVisibility(View.VISIBLE);
-			optionSendToInbox.setVisibility(View.GONE);
 		}else{
 			propertiesText.setText(R.string.general_file_info);
 			optionShare.setVisibility(View.GONE);
-			optionSendToInbox.setVisibility(View.VISIBLE);
 		}
-		
+
+		optionSendToInbox.setVisibility(View.VISIBLE);
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);				
 		optionDelete.setVisibility(View.VISIBLE);
