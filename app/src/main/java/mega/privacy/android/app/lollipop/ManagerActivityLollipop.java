@@ -8850,6 +8850,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("setParentHandleIncoming: " + parentHandleIncoming);
 		this.parentHandleIncoming = parentHandleIncoming;
 	}
+
+	public void setParentHandleInbox(long parentHandleInbox){
+		log("setParentHandleInbox: " + parentHandleInbox);
+		this.parentHandleInbox = parentHandleInbox;
+	}
 	
 	public void setParentHandleOutgoing(long parentHandleOutgoing){
 		log("setParentHandleOutgoing: " + parentHandleOutgoing);
@@ -11296,7 +11301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //							log("The contact already exists -> update");
 //
 //						}
-//					}					
+//					}
 //				}
 			}		
 		}

@@ -1686,15 +1686,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						emptyTextView.setVisibility(View.GONE);
 
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-							log("aB.setTitle fbF 5");
-							aB.setTitle(getString(R.string.section_cloud_drive));	
-							log("aB.setHomeAsUpIndicator_70");
+							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 						}
 						else{
 							aB.setTitle(parentNode.getName());
-							log("aB.setHomeAsUpIndicator_71");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						}
@@ -1756,15 +1753,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						emptyTextView.setVisibility(View.GONE);
 
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-							log("aB.setTitle fbF 6");
-							aB.setTitle(getString(R.string.section_cloud_drive));	
-							log("aB.setHomeAsUpIndicator_72");
+							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 						}
 						else{
 							aB.setTitle(parentNode.getName());
-							log("aB.setHomeAsUpIndicator_73");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						}

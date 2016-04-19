@@ -624,7 +624,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 			
 			if (parentHandle == -1){			
-				((ManagerActivityLollipop)context).setParentHandleIncoming(-1);					
+				((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);
 				findNodes();	
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -646,7 +646,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			else{
 				adapter.parentHandle=parentHandle;
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
+				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				
