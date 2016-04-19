@@ -24,7 +24,11 @@
 # Gradle:
 .idea/gradle.xml
 .idea/libraries
+.idea/encodings.xml
 .gradle
+
+#Captures
+captures
 
 ## File-based project format:
 *.ipr
