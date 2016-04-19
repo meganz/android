@@ -337,6 +337,8 @@
     <string name="context_correctly_copied" context="success message when copying a node">Copiado correctamente</string>
     <string name="context_correctly_sent" context="success message when sending a file">Fichero enviado correctamente</string>
     <string name="context_no_sent" context="error message when sending a file">Error. No se pudo enviar</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Enviado correctamente</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Error. No se pudo enviar</string>
     <string name="context_no_copied" context="error message">Error. No se pudo copiar</string>
     <string name="context_correctly_moved" context="success message when moving a node">Movido correctamente</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d ficheros movidos correctamente</string>

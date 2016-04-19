@@ -220,7 +220,7 @@
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
-    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Empty Inbox</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Empty Folder</string>
     
     <string name="choose_account_activity" context="Title of the activity Choose Account">Choose Account</string>
 	
@@ -342,6 +342,8 @@
     <string name="context_correctly_copied" context="success message when copying a node">Copied successfully</string>
     <string name="context_correctly_sent" context="success message when sending a file">File sent</string>
     <string name="context_no_sent" context="error message when sending a file">Error. File not sent</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Sent to Inbox</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Error. Not sent to Inbox</string>
     <string name="context_no_copied" context="error message">Error. Not copied</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Please choose a destination folder</string>
     <string name="context_correctly_moved" context="success message when moving a node">Moved successfully</string>
