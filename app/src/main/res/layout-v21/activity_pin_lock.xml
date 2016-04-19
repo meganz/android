@@ -183,6 +183,38 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/switch_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/alphanumeric_pin_layout"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/pin_three_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_three_dots" />
+
+        <Switch
+            android:id="@+id/switch_pin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/pin_ABC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/abc"
+            android:textColor="@color/textGrey"
+            android:textSize="16sp" />
+    </LinearLayout>
+
     <RelativeLayout
 	    android:id="@+id/buttons_layout"
 	    android:layout_width="fill_parent"
