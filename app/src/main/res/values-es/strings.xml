@@ -215,7 +215,8 @@
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No hay carpetas compartidas contigo</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No hay carpetas compartidas con otros</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Carpeta vacía</string>
-    
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Buzón vacío</string>
+
     <string name="choose_account_activity" context="Title of the activity Choose Account">Escoge Tipo de Cuenta</string>
 	
 	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Propiedades</string>

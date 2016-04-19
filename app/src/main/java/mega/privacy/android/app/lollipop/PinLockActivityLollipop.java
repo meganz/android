@@ -266,7 +266,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			}
 		});
 
-
 		enterButton.setVisibility(View.VISIBLE);
 
 		//Margins warningLayout
