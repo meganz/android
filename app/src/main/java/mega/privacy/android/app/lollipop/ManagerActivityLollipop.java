@@ -11287,23 +11287,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}				
 				}
-//				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
-//					log("CHANGE_TYPE_EMAIL");
-//					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-//						log("I change my mail");
-//					}
-//					else{
-//						log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
-//						if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-//							log("The contact NOT exists -> add to DB");
-//
-//						}
-//						else{
-//							log("The contact already exists -> update");
-//
-//						}
-//					}
-//				}
+				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
+					log("CHANGE_TYPE_EMAIL");
+					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+						log("I change my mail");
+					}
+					else{
+						log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
+						if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
+							log("The contact NOT exists -> add to DB");
+
+						}
+						else{
+							log("The contact already exists -> update");
+
+						}
+					}
+				}
 			}		
 		}
 		
