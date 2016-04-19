@@ -1500,7 +1500,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("upgradeAccount false");
 						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", false);
 						if (firstTimeCam){
-							log("intent firstTime==true");
+							log("intent firstTimeCam==true");
 							firstTimeCam = true;
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
@@ -2492,14 +2492,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			
     			if (iFLol == null){
     				iFLol = new InboxFragmentLollipop();
-    				iFLol.setParentHandle(megaApi.getInboxNode().getHandle());
-    				parentHandleInbox = megaApi.getInboxNode().getHandle();
     				iFLol.setIsList(isList);
     				iFLol.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-    				iFLol.setNodes(nodes);
     			}
     			else{
+					log("Inbox Fragment is not NULL");
     				iFLol.setIsList(isList);
     				iFLol.setParentHandle(parentHandleInbox);
     				iFLol.setOrder(orderGetChildren);
@@ -4391,7 +4388,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				return true;
 		    			}
 		    		}
-		    		
+					else if (drawerItem == DrawerItem.INBOX){
+						if (iFLol != null){
+							iFLol.onBackPressed();
+							return true;
+						}
+					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
 		    			if (sFLol != null){
 		    				sFLol.onBackPressed();
@@ -7792,8 +7794,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 */
 	private class FillDBContactsTask extends AsyncTask<String, Void, String> {
 		Context context;
-		MultipleRequestListener moveMultipleListener = null;
-		
+
 		FillDBContactsTask(Context context){
 			this.context = context;
 		}
@@ -8443,9 +8444,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			cloudDrive.setChecked(true);
 			cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 		}
+		firstTime = true;
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.openDrawer(Gravity.LEFT);
-		firstTime = true;
 	}
 	
 	public void refreshCameraUpload(){

@@ -1193,6 +1193,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			((ManagerActivityLollipop) context).setParentHandleSearch(parentHandle);
 			break;
 		}
+		case ManagerActivityLollipop.INBOX_ADAPTER: {
+			((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
+			break;
+		}
 		case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
 			//TODO necesito algo?
 			((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
