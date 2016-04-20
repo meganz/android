@@ -7787,8 +7787,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //        }
 	}
 	
-	
-	
 	/*
 	 * Background task to fill the DB with the contact info the first time
 	 */
@@ -10588,7 +10586,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_added), Snackbar.LENGTH_LONG).show();			
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_sent), Snackbar.LENGTH_LONG).show();
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
 					{
@@ -11291,16 +11289,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("CHANGE_TYPE_EMAIL");
 					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my mail");
+						nVEmail.setText(user.getEmail());
 					}
 					else{
 						log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
 						if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-							log("The contact NOT exists -> add to DB");
-
+							log("The contact NOT exists -> DB inconsistency! -> Clear!");
+							if (dbH.getContactsSize() != megaApi.getContacts().size()){
+								dbH.clearContacts();
+								FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
+								fillDBContactsTask.execute();
+							}
 						}
 						else{
 							log("The contact already exists -> update");
-
+							dbH.setContactMail(user.getHandle(),user.getEmail());
 						}
 					}
 				}
