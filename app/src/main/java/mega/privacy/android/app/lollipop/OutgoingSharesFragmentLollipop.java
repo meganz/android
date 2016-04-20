@@ -1806,9 +1806,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
+//		if (adapter != null){
+//			adapter.setOrder(orderGetChildren);
+//		}
 	}
 	
 	public int getItemCount(){
