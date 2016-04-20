@@ -78,7 +78,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	int type = ManagerActivityLollipop.FILE_BROWSER_ADAPTER;
 	int adapterType;
 
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+//	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	/* public static view holder class */
 	public class ViewHolderBrowser extends RecyclerView.ViewHolder{
@@ -1230,9 +1230,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 	}
 
-	public void setOrder(int orderGetChildren) {
-		this.orderGetChildren = orderGetChildren;
-	}
+//	public void setOrder(int orderGetChildren) {
+//		this.orderGetChildren = orderGetChildren;
+//	}
 
 	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash)
 	{

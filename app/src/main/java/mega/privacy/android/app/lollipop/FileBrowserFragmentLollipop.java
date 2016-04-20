@@ -92,7 +92,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	long parentHandle = -1;
 	boolean isList = true;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	float density;
 	DisplayMetrics outMetrics;
@@ -390,7 +390,22 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
-		
+
+		if(prefs!=null){
+			if(prefs.getPreferredSortCloud()!=null){
+				orderGetChildren = Integer.parseInt(prefs.getPreferredSortCloud());
+				log("The sort preference is: "+Integer.parseInt(prefs.getPreferredSortCloud()));
+			}
+			else{
+				orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
+				log("Preference Sort is NULL -> ORDER_DEFAULT_ASC");
+			}
+		}
+		else {
+			log("Prefs is NULL -> ORDER_DEFAULT_ASC");
+			orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
+		}
+
 	    isList = ((ManagerActivityLollipop)context).isList();
 	    
 		if (parentHandle == -1){
@@ -1902,17 +1917,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //	}
 	
 	public void setOrder(int orderGetChildren){
+		log("setOrder:Cloud");
 		this.orderGetChildren = orderGetChildren;
-		if (isList){
-			if (adapter != null){
-				adapter.setOrder(orderGetChildren);
-			}
-		}
-		else{
-			if (adapter != null){
-				adapter.setOrder(orderGetChildren);
-			}
-		}
+		prefs.setPreferredSortCloud(String.valueOf(orderGetChildren));
+		dbH.setPreferredSortCloud(String.valueOf(orderGetChildren));
 	}
 	
 	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
@@ -1927,8 +1935,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapter != null){
 				adapter.setTransfers(mTHash);
 			}
-		}	
-	
+		}
 	}
 	
 	public void setCurrentTransfer(MegaTransfer mT){

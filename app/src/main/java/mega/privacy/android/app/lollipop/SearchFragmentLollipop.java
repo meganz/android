@@ -1229,10 +1229,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
+//
+//		if (adapter != null){
+//			adapter.setOrder(orderGetChildren);
+//		}
 	}
 	
 	private static void log(String log) {

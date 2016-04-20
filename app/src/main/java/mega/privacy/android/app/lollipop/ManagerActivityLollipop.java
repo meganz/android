@@ -1440,7 +1440,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 			}
-			
+
 			megaApi.getPaymentMethods(this);
 	        megaApi.getAccountDetails(this);
 	        megaApi.creditCardQuerySubscriptions(this);
@@ -1855,8 +1855,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				if (fbFLol != null){
     					fbFLol.setIsList(isList);
         				fbFLol.setParentHandle(parentHandleBrowser);
-        				fbFLol.setOrder(orderGetChildren);
-            			
+
             			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
             			fragTransaction.detach(fbFLol);
             			fragTransaction.commit();
@@ -1869,8 +1868,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				if (rbFLol != null){
     					rbFLol.setIsList(isList);
     					rbFLol.setParentHandle(parentHandleRubbish);
-    					rbFLol.setOrder(orderGetChildren);
-        				
+
     					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
             			fragTransaction.detach(rbFLol);
             			fragTransaction.commit();
@@ -2493,13 +2491,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (iFLol == null){
     				iFLol = new InboxFragmentLollipop();
     				iFLol.setIsList(isList);
-    				iFLol.setOrder(orderGetChildren);
     			}
     			else{
 					log("Inbox Fragment is not NULL");
     				iFLol.setIsList(isList);
     				iFLol.setParentHandle(parentHandleInbox);
-    				iFLol.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
     				iFLol.setNodes(nodes);
     			}
