@@ -44,6 +44,8 @@
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
+
+    <string name="error_general_nodes" context="Error getting the root node">Error. Por favor, inténtelo otra vez.</string>
     
     <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">La carpeta secundaria no existe, por favor, elija una nueva.</string>   
     <string name="no_external_SD_card_detected" context="when no external card exists">Ninguna tarjeta externa SD detectada</string>

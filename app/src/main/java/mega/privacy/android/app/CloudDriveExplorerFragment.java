@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class CloudDriveExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
@@ -138,8 +139,15 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		if(chosenNode == null)
 		{
-			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(megaApi.getRootNode());
+			MegaNode root = megaApi.getRootNode();
+			if(root!=null){
+				parentHandle = root.getHandle();
+				nodes = megaApi.getChildren(root);
+			}
+			else{
+				Toast toast = Toast.makeText(getActivity(), getString(R.string.error_general_nodes), Toast.LENGTH_LONG);
+				toast.show();
+			}
 			changeButtonTitle(context.getString(R.string.section_cloud_drive));
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			changeBackVisibility(false);
