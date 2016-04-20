@@ -549,6 +549,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			return 0;
 		}
 	}
+
+	public int setContactMail (long handle, String mail){
+		log("setContactMail: "+handle+" "+mail);
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CONTACT_MAIL, encrypt(mail));
+		return db.update(TABLE_CONTACTS, values, KEY_CONTACT_HANDLE + " = '" + encrypt(String.valueOf(handle)) + "'", null);
+	}
 	
 	public MegaContact findContactByHandle(String handle){
 		log("findContactByHandle: "+handle);
