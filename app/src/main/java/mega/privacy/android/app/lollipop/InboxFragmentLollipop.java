@@ -313,20 +313,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		if(prefs!=null){
-			if(prefs.getPreferredSortCloud()!=null){
-				orderGetChildren = Integer.parseInt(prefs.getPreferredSortCloud());
-				log("The sort preference is: "+Integer.parseInt(prefs.getPreferredSortCloud()));
-			}
-			else{
-				orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
-				log("Preference Sort is NULL -> ORDER_DEFAULT_ASC");
-			}
-		}
-		else {
-			log("Prefs is NULL -> ORDER_DEFAULT_ASC");
-			orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
-		}
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 
 		if (parentHandle == -1||parentHandle==megaApi.getInboxNode().getHandle()) {
 			log("parentHandle -1");
@@ -1137,8 +1124,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public void setOrder(int orderGetChildren){
 		log("setOrder:Inbox");
 		this.orderGetChildren = orderGetChildren;
-		prefs.setPreferredSortCloud(String.valueOf(orderGetChildren));
-		dbH.setPreferredSortCloud(String.valueOf(orderGetChildren));
 	}
 	
 	private static void log(String log) {

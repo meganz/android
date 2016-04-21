@@ -6278,7 +6278,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		final EditText input = new EditText(this);
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -6355,7 +6355,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		final EditText input = new EditText(this);
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -6487,7 +6487,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -6560,7 +6560,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void showImportLinkDialog(){
 		log("showRenameDialog");
 		final EditText input = new EditText(this);
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -8088,7 +8088,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-			builder.setMessage(getResources().getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?").setPositiveButton(R.string.general_yes, dialogClickListener)
+			builder.setMessage(getResources().getString(R.string.confirmation_remove_contact,c.getEmail())).setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
