@@ -614,6 +614,8 @@
     <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
     
     <string name="sortby_date" context="category in sort by action">Date</string>
+    <string name="sortby_creation_date" context="category in sort by action">Creation Date</string>
+    <string name="sortby_modification_date" context="category in sort by action">Modification Date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
     
