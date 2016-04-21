@@ -5172,7 +5172,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		nameMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
-        		sortByDateTV.setText(getString(R.string.sortby_date));
+        		sortByDateTV.setText(getString(R.string.sortby_creation_date));
         		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
         		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         		dateMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
@@ -5339,7 +5339,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(true);
 			        			descendingCheck.setChecked(false);
-			        			selectSortByContacts(MegaApiJava.ORDER_DEFAULT_ASC);
+								log("order contacts value _ "+orderContacts);
+								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_ASC){
+									log("call to selectSortByContacts ASC _ "+orderContacts);
+									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_ASC);
+								}
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5352,7 +5356,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 			        			descendingCheck.setChecked(true);
-			        			selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
+								log("order contacts value _ "+orderContacts);
+								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_DESC) {
+									log("call to selectSortByContacts DESC _ "+orderContacts);
+									selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
+								}
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -11983,7 +11991,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setOrderContacts(int orderContacts) {
 		log("setOrderContacts");
 		this.orderContacts = orderContacts;
-		prefs.setPreferredSortContacts(String.valueOf(orderContacts));
+		if(prefs!=null) {
+			prefs.setPreferredSortContacts(String.valueOf(orderContacts));
+		}
 		dbH.setPreferredSortContacts(String.valueOf(orderContacts));
 	}
 
@@ -11994,7 +12004,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setOrderOthers(int orderOthers) {
 		log("setOrderOthers");
 		this.orderOthers = orderOthers;
-		prefs.setPreferredSortOthers(String.valueOf(orderOthers));
+		if(prefs!=null) {
+			prefs.setPreferredSortOthers(String.valueOf(orderOthers));
+		}
 		dbH.setPreferredSortOthers(String.valueOf(orderOthers));
 	}
 
