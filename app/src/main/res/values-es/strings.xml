@@ -603,6 +603,7 @@
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">El fichero zip será descargado y descomprimido</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string>
 
+    <string name="sortby_owner_mail" context="category in sort by action">Email del dueño</string>
     <string name="sortby_name" context="category in sort by action">Nombre</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascendente</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">Descendente</string>

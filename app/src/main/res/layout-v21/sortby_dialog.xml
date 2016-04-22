@@ -58,7 +58,31 @@
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"/>
-		
+
+		<TextView
+			android:id="@+id/sortby_dialog_date_modification_text"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textStyle="bold"/>
+
+		<CheckedTextView
+			android:id="@+id/sortby_dialog_newest_modification_check"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+			android:ellipsize="marquee"
+			android:gravity="center_vertical"
+			android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+		<CheckedTextView
+			android:id="@+id/sortby_dialog_oldest_modification_check"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+			android:ellipsize="marquee"
+			android:gravity="center_vertical"
+			android:textAppearance="?android:attr/textAppearanceMedium"/>
+
 		<TextView 
 	        android:id="@+id/sortby_dialog_size_text"
 	        android:layout_width="match_parent"
