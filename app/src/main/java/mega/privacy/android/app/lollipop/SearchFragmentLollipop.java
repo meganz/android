@@ -78,7 +78,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	long parentHandle = -1;
 	boolean isList = true;
 	int levels = -1;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
 	ArrayList<MegaNode> searchNodes;

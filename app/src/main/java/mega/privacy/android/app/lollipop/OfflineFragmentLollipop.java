@@ -82,7 +82,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	long parentHandle = -1;
 	boolean isList = true;
 	boolean gridNavigation=false;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
 	MegaApiAndroid megaApi;
@@ -566,14 +566,25 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		    isList = ((ManagerActivityLollipop)context).isList();
+			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
+
 		}
 		else{
 			prefs = dbH.getPreferences();		
 			if (prefs != null){
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
+				if(prefs.getPreferredSortOthers()!=null){
+					orderGetChildren = Integer.parseInt(prefs.getPreferredSortOthers());
+					log("The orderOthers preference is: "+orderGetChildren);
+				}
+				else{
+					orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
+					log("Preference orderOthers is NULL -> ORDER_DEFAULT_ASC");
+				}
 			}
 			else{
 				isList = true;
+				orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
 			}
 			((OfflineActivityLollipop)context).setListOffline(isList);
 		}	
