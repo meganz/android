@@ -2691,7 +2691,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					firstNavigationLevel = false;
         					}
         					else{
-        						inSFLol.refresh();
+        						inSFLol.findNodes();
         						aB.setTitle(getResources().getString(R.string.section_shared_items));
         						log("aB.setHomeAsUpIndicator_16");
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -5245,7 +5245,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		}
 	        		}
         		}
-        		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE){
+        		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE||drawerItem==DrawerItem.SHARED_ITEMS){
         			log("orderOthers: "+orderOthers);
         			switch(orderOthers){
 		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
@@ -5384,7 +5384,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(true);
 			        			descendingCheck.setChecked(false);
-			        			selectSortByOffline(MegaApiJava.ORDER_DEFAULT_ASC);
+								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC) {
+									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_ASC);
+								}
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5397,7 +5399,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 			        			descendingCheck.setChecked(true);
-			        			selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
+								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC) {
+									selectSortByOffline(MegaApiJava.ORDER_DEFAULT_DESC);
+								}
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
@@ -5432,17 +5436,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(true);
 			        			descendingCheck.setChecked(false);
-			        			if(tabFinal==0){
-			        				//INCOMING
-			        				log("Incoming tab sort");
-			        				selectSortByIncoming(MegaApiJava.ORDER_DEFAULT_ASC);
+								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC){
+									selectSortByIncoming(MegaApiJava.ORDER_DEFAULT_ASC);
+									selectSortByOutgoing(MegaApiJava.ORDER_DEFAULT_ASC);
 
-			        			}
-			        			else{
-			        				//OUTGOING
-			        				log("Outgoing tab sort");
-			        				selectSortByOutgoing(MegaApiJava.ORDER_DEFAULT_ASC);
-			        			}
+								}
 
 			        			if (dialog != null){
 			        				dialog.dismiss();
@@ -5456,17 +5454,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 			        			descendingCheck.setChecked(true);
-			        			if(tabFinal==0){
-			        				//INCOMING
-			        				log("Incoming tab sort");
-			        				selectSortByIncoming(MegaApiJava.ORDER_DEFAULT_DESC);
-
-			        			}
-			        			else{
-			        				//OUTGOING
-			        				log("Outgoing tab sort");
-			        				selectSortByOutgoing(MegaApiJava.ORDER_DEFAULT_DESC);
-			        			}
+								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_DESC){
+										selectSortByIncoming(MegaApiJava.ORDER_DEFAULT_DESC);
+										selectSortByOutgoing(MegaApiJava.ORDER_DEFAULT_DESC);
+								}
 
 			        			if (dialog != null){
 			        				dialog.dismiss();
@@ -8735,12 +8726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.setOrderOthers(orderOthers);
 		if (inSFLol != null){
 			inSFLol.setOrder(orderOthers);
-			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
-				inSFLol.sortByNameAscending();
-			}
-			else{
-				inSFLol.sortByNameDescending();
-			}
+			inSFLol.findNodes();
 		}
 	}
 
@@ -11474,7 +11460,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					firstNavigationLevel = false;
 					}
 					else{
-						inSFLol.refresh();
+						inSFLol.findNodes();
 						aB.setTitle(getResources().getString(R.string.section_shared_items));
 						log("aB.setHomeAsUpIndicator_28");
     					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
