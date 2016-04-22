@@ -608,7 +608,8 @@
     
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The ZIP file will be downloaded and unzipped</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
-    
+
+    <string name="sortby_owner_mail" context="category in sort by action">Owner\'s E-mail</string>
     <string name="sortby_name" context="category in sort by action">Name</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>

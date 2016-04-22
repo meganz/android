@@ -5177,6 +5177,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         		dateMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
+				TextView sortByModificationDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_modification_text);
+				sortByModificationDateTV.setText(getString(R.string.sortby_modification_date));
+				ViewGroup.MarginLayoutParams dateModMLP = (ViewGroup.MarginLayoutParams) sortByModificationDateTV.getLayoutParams();
+				sortByModificationDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+				dateModMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
         		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
         		sortBySizeTV.setText(getString(R.string.sortby_size));
         		ViewGroup.MarginLayoutParams sizeMLP = (ViewGroup.MarginLayoutParams) sortBySizeTV.getLayoutParams();
@@ -5210,6 +5216,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
         		oldestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+				final CheckedTextView newestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_modification_check);
+				newestModificationCheck.setText(getString(R.string.sortby_date_newest));
+				newestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+				newestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+				ViewGroup.MarginLayoutParams newestModMLP = (ViewGroup.MarginLayoutParams) newestModificationCheck.getLayoutParams();
+				newestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+				final CheckedTextView oldestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_modification_check);
+				oldestModificationCheck.setText(getString(R.string.sortby_date_oldest));
+				oldestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+				oldestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+				ViewGroup.MarginLayoutParams oldestModMLP = (ViewGroup.MarginLayoutParams) oldestModificationCheck.getLayoutParams();
+				oldestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
         		largestCheck.setText(getString(R.string.sortby_size_largest_first));
@@ -5270,6 +5290,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -5279,6 +5301,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			descendingCheck.setChecked(true);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -5288,6 +5312,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(true);
 		        			oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -5297,15 +5323,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(true);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
 		        		}
+						case MegaApiJava.ORDER_MODIFICATION_ASC:{
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(true);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(false);
+							break;
+						}
+						case MegaApiJava.ORDER_MODIFICATION_DESC:{
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(true);
+							oldestModificationCheck.setChecked(false);
+							largestCheck.setChecked(false);
+							smallestCheck.setChecked(false);
+							break;
+						}
 		        		case MegaApiJava.ORDER_SIZE_ASC:{
 		        			ascendingCheck.setChecked(false);
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(true);
 		        			break;
@@ -5315,6 +5367,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
+							newestModificationCheck.setChecked(false);
+							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(true);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -5325,10 +5379,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		final AlertDialog dialog = sortByDialog;
 	        	switch(drawerItem){
 		        	case CONTACTS:{
-
+						sortByNameTV.setText(getString(R.string.email_text));
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
+						sortByModificationDateTV.setVisibility(View.GONE);
+						newestModificationCheck.setVisibility(View.GONE);
+						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -5374,6 +5431,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
+						sortByModificationDateTV.setVisibility(View.GONE);
+						newestModificationCheck.setVisibility(View.GONE);
+						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -5416,19 +5476,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
+						sortByModificationDateTV.setVisibility(View.GONE);
+						newestModificationCheck.setVisibility(View.GONE);
+						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
-		        		int tab =-1;
+
 
 		        		if (viewPagerShares.getCurrentItem()==0){
-		        			tab = 0;
+
+							sortByNameTV.setText(getString(R.string.sortby_owner_mail));
 		        		}
 		        		else{
-		        			tab = 1;
-		        		}
 
-		        		final int tabFinal = tab;
+		        		}
 
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 
@@ -5560,6 +5622,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
+							}
+						});
+
+						newestModificationCheck.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
+								newestModificationCheck.setChecked(true);
+								oldestModificationCheck.setChecked(false);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(false);
+								if(drawerItem==DrawerItem.CLOUD_DRIVE){
+									selectSortByCloudDrive(MegaApiJava.ORDER_MODIFICATION_DESC);
+								}
+								else{
+									selectSortByInbox(MegaApiJava.ORDER_MODIFICATION_DESC);
+								}
+
+								if (dialog != null){
+									dialog.dismiss();
+								}
+							}
+						});
+
+						oldestModificationCheck.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
+								newestModificationCheck.setChecked(false);
+								oldestModificationCheck.setChecked(true);
+								largestCheck.setChecked(false);
+								smallestCheck.setChecked(false);
+								if(drawerItem==DrawerItem.CLOUD_DRIVE){
+									selectSortByCloudDrive(MegaApiJava.ORDER_MODIFICATION_ASC);
+								}
+								else{
+									selectSortByInbox(MegaApiJava.ORDER_MODIFICATION_ASC);
+								}
+
+								if (dialog != null){
+									dialog.dismiss();
+								}
 							}
 						});
 
