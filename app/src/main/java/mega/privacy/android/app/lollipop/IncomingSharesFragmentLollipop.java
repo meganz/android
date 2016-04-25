@@ -1284,7 +1284,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		else{
 			if (nodes.get(position).isFolder()){
-												
+				log("Is folder");
 				deepBrowserTree = deepBrowserTree+1;
 				
 				MegaNode n = nodes.get(position);
@@ -1307,7 +1307,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-//					adapterList.setNodes(nodes);
+				adapter.setNodes(nodes);
 				setPositionClicked(-1);
 				
 				//If folder has no files
