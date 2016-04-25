@@ -20,11 +20,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -593,7 +596,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 			case R.id.invite_contact_button:
 			case R.id.invite_contact_button_grid:{
-				((ManagerActivityLollipop)context).showNewContactDialog(null);				
+				((ManagerActivityLollipop)context).chooseAddContactDialog();
 				break;
 			}
 			case R.id.contact_list_option_send_file_layout:

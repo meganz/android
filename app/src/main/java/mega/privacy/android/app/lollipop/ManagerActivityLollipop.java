@@ -3594,7 +3594,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
-	    getSupportActionBar().setDisplayShowCustomEnabled(true);
+//	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 
 	    final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
@@ -4572,7 +4572,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_add_contact:{
 	        	if (drawerItem == DrawerItem.CONTACTS){
-	        		showNewContactDialog(null);
+					chooseAddContactDialog();
 	        	}
 
 	        	return true;
@@ -4589,7 +4589,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		showNewFolderDialog();
 	        	}
 	        	else if (drawerItem == DrawerItem.CONTACTS){
-	        		showNewContactDialog(null);
+					chooseAddContactDialog();
 	        	}
 	        	return true;
 	        }
@@ -8202,7 +8202,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.startActivity(intent);
 	}
 
-	public void showNewContactDialog(String editText){
+
+	public void chooseAddContactDialog(){
+
+		Dialog downloadLocationDialog;
+		String[] sdCardOptions = getResources().getStringArray(R.array.add_contact_array);
+		AlertDialog.Builder b=new AlertDialog.Builder(this);
+
+		b.setTitle(getResources().getString(R.string.menu_add_contact));
+		b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch(which){
+					case 0:{
+						showNewContactDialog();
+						break;
+					}
+					case 1:{
+						addContactFromPhone();
+						break;
+					}
+				}
+			}
+		});
+		b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		downloadLocationDialog = b.create();
+		downloadLocationDialog.show();
+
+	}
+
+
+	public void addContactFromPhone(){
+		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
+		this.startActivity(phoneContactIntent);
+	}
+
+	public void showNewContactDialog(){
 		log("showNewContactDialog");
 
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
@@ -10735,7 +10777,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_added), Snackbar.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_sent), Snackbar.LENGTH_LONG).show();
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
 					{
