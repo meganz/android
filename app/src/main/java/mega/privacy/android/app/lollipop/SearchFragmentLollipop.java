@@ -78,7 +78,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	long parentHandle = -1;
 	boolean isList = true;
 	int levels = -1;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
 	ArrayList<MegaNode> searchNodes;
@@ -297,6 +297,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	    density  = getResources().getDisplayMetrics().density;
 	    
 	    isList = ((ManagerActivityLollipop)context).isList();
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		
 		if (parentHandle == -1){
 			nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
@@ -1229,10 +1230,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
 	}
 	
 	private static void log(String log) {

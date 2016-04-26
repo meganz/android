@@ -3,7 +3,9 @@ package mega.privacy.android.app.lollipop;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -76,7 +78,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		
 	boolean isList = true;
 	long parentHandle = -1;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode = null;
@@ -96,6 +98,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
+
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -247,12 +252,15 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
 		log("onCreate");
+
+		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		super.onCreate(savedInstanceState);
 	}
 	
 	@Override
@@ -262,7 +270,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
-		
+
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		isList = ((ManagerActivityLollipop)context).isList();
 		
 		if (parentHandle == -1){
@@ -1081,11 +1090,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public void setOrder(int orderGetChildren){
+		log("setOrder:Rubbish");
 		this.orderGetChildren = orderGetChildren;
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
-		
 	}
 	
 	@Override

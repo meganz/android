@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.CreateThumbPreviewService;
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
@@ -82,7 +84,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	MegaNode inboxNode;
 	boolean isList = true;
 	long parentHandle = -1;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -102,6 +104,9 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
+
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -286,6 +291,9 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		log("onCreate");
+
+		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -304,6 +312,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
+
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 
 		if (parentHandle == -1||parentHandle==megaApi.getInboxNode().getHandle()) {
 			log("parentHandle -1");
@@ -1112,10 +1122,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	}
 	
 	public void setOrder(int orderGetChildren){
+		log("setOrder:Inbox");
 		this.orderGetChildren = orderGetChildren;
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
 	}
 	
 	private static void log(String log) {

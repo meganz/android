@@ -343,7 +343,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 		// TODO Auto-generated method stub
 		switch(v.getId()){
 			case R.id.invite_contact_button:{				
-				((ManagerActivityLollipop)context).showNewContactDialog(null);				
+				((ManagerActivityLollipop)context).chooseAddContactDialog();
 				break;
 			}
 			case R.id.contact_request_list_out_options:{

@@ -97,7 +97,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	int deepBrowserTree = 0;
 	boolean isList = true;
 	boolean overflowMenu = false;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -359,7 +359,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	    density  = getResources().getDisplayMetrics().density;		
 					
 	    isList = ((ManagerActivityLollipop)context).isList();
-	    
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
+
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
@@ -410,13 +411,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			if (parentHandle == -1){			
 				((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);					
 				findNodes();	
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
-				
+
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				
 //				log("aB.setHomeAsUpIndicator_34");
@@ -626,13 +621,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			if (parentHandle == -1){			
 				((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);
 				findNodes();	
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
-				
+
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				
 //				aB.setTitle(getString(R.string.section_shared_items));
@@ -695,14 +684,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);		
-			
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
-			
+
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
@@ -866,12 +848,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	public void refresh(){
 		log("refresh");
 		findNodes();	
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
 		if(adapter != null){
 			log("adapter != null");
 			adapter.setNodes(nodes);
@@ -896,6 +872,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					nodes.add(node);			
 				}	
 			}
+		}
+
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
 		}
 	}
 	
@@ -1657,12 +1640,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			findNodes();
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
+
 			adapter.setNodes(nodes);
 			
 			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
@@ -1806,9 +1784,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
 	}
 	
 	public int getItemCount(){
