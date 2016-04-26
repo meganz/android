@@ -1087,6 +1087,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (getExternalCacheDir() != null){
 			thumbDir = new File (getExternalCacheDir(), "thumbnailsMEGA");
 			thumbDir.mkdirs();
+			log("------------------ThumbnailsMEGA folder created: "+thumbDir.getAbsolutePath());
 		}
 		else{
 			thumbDir = getDir("thumbnailsMEGA", 0);
