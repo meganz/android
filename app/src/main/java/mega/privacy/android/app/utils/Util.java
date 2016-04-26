@@ -523,7 +523,10 @@ public class Util {
     	log("getCacheSize");
     	File cacheIntDir = context.getCacheDir();
     	File cacheExtDir = context.getExternalCacheDir();
-    	
+
+		if(cacheIntDir!=null){
+			log("Path to check internal: "+cacheIntDir.getAbsolutePath());
+		}
     	long size = getDirSize(cacheIntDir)+getDirSize(cacheExtDir);    	
     	
     	String sizeCache = getSizeString(size);
