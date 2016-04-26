@@ -332,7 +332,6 @@
     <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
-    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
     <string name="context_contact_request_sent" context="success message when sending a contact request">Request correctly sent to %s. The status can be consulted in the Sent Requests tab.</string>
     <string name="context_invitacion_reply" context="success message when adding a contact">Reply to the invitation sent</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
