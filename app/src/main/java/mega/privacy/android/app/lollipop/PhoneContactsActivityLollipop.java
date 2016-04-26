@@ -1,43 +1,29 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.Data;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -50,19 +36,11 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
 
 public class PhoneContactsActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemCheckClickListener, MegaRequestListenerInterface {
-
-	public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
-	public static String EXTRA_CONTACTS = "extra_contacts";
-
-	Handler handler;
 
 	ActionBar aB;
 	Toolbar tB;
@@ -78,7 +56,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	private RecyclerView.LayoutManager mLayoutManager;
 
 	PhoneContactsLollipopAdapter adapter;
-
+	RelativeLayout fragmentContainer;
 	ArrayList<PhoneContacts> phoneContacts;
 
 	public class PhoneContacts{
@@ -111,14 +89,6 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		}
 	}
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
-	        // do nothing
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}
 
 //	@SuppressLint("InlinedApi")
 //	private ArrayList<PhoneContacts> getPhoneContacts() {
@@ -226,10 +196,10 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
-		handler = new Handler();
 
 		aB.setTitle(getResources().getString(R.string.section_contacts));
 
+		fragmentContainer = (RelativeLayout)  findViewById(R.id.fragment_container_contacts_explorer);
 		listView = (RecyclerView) findViewById(R.id.contacts_explorer_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
@@ -359,19 +329,32 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		};
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_remove_contact,contact.getEmail());
-		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+		String message= getResources().getString(R.string.confirmation_add_contact,contact.getEmail());
+		builder.setMessage(message).setPositiveButton(R.string.contact_invite, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
 	}
 
 	public void inviteContact(String email){
+		log("inviteContact");
 		megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, this);
+	}
+
+	void showAlert(String message) {
+		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		bld.setMessage(message);
+		bld.setPositiveButton("OK",new android.content.DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+		log("Showing alert dialog: " + message);
+		bld.create().show();
 	}
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
+		log("onRequestStart");
 	}
 
 	@Override
@@ -381,25 +364,25 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequest finished");
-//		if (e.getErrorCode() == MegaError.API_OK) {
-//			Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_sent), Snackbar.LENGTH_LONG).show();
-//		}
-//		else{
-//			if(e.getErrorCode()==MegaError.API_EEXIST)
-//			{
-//				Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists, request.getEmail()), Snackbar.LENGTH_LONG).show();
-//			}
-//			else{
-//				Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_LONG).show();
-//			}
-//			log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
-//		}
+		log("onRequest finished: "+request.getEmail());
+		if (e.getErrorCode() == MegaError.API_OK) {
+			showAlert(getString(R.string.context_contact_request_sent, request.getEmail()));
+		}
+		else{
+			if(e.getErrorCode()==MegaError.API_EEXIST)
+			{
+				showAlert(getString(R.string.context_contact_already_exists));
+			}
+			else{
+				showAlert(getString(R.string.general_error));
+			}
+			log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
+		log("onRequestTemporaryError");
 	}
 
 

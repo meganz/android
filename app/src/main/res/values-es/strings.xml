@@ -54,7 +54,8 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Desea continuar?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">¿Quieres enviar una invitación a %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
@@ -241,6 +242,7 @@
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida con</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propietario</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invitar</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvitar</string>
 	<string name="contact_ignore" context="option to ignore a contact invitation">Ignorar</string>
 	<string name="contact_decline" context="option to decline a contact invitation">Declinar</string>
@@ -325,6 +327,7 @@
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Invitación eliminada</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Invitación reenviada</string>
     <string name="context_contact_invitation_sent" context="success message when sending a contact request">Invitación enviada</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Invitación correctamente enviada a %s. El estado puede consultarse en la pestaña de Solicitudes enviadas.</string>
     <string name="context_invitacion_reply" context="success message when adding a contact">Contestación a la invitación enviada</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contacto borrado</string>
     <string name="context_contact_not_removed" context="error message">Error. No se pudo borrar el contacto</string>
