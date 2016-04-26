@@ -59,7 +59,8 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are removing the exported master key file</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
@@ -246,7 +247,8 @@
 	<string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Shared with</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
-	<string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>	
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invite</string>
+    <string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
 	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
 	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
 	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
@@ -330,6 +332,7 @@
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
     <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Request correctly sent to %s. The status can be consulted in the Sent Requests tab.</string>
     <string name="context_invitacion_reply" context="success message when adding a contact">Reply to the invitation sent</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
