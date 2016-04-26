@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.ContactPropertiesMainActivity;
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaContactsGridAdapter;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
@@ -18,11 +20,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -71,6 +76,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	TextView emptyTextView;
     ImageButton fabButton;
 	private ActionMode actionMode;
+
+//	DatabaseHandler dbH = null;
 	
 	float scaleH, scaleW;
 	float density;
@@ -84,7 +91,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	ArrayList<MegaUser> contacts;
 	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
-	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderContacts;
 
 	LayoutManager mLayoutManager;
 	MegaUser selectedUser = null;
@@ -296,7 +303,9 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}		
+		}
+
+//		dbH = DatabaseHandler.getDbHandler(context);
 	}
 	
 	@Override
@@ -305,20 +314,24 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
 		
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-//			if (contacts.get(i).getEmail().compareTo("android103@yopmail.com") == 0){
-//				MegaUser cococ = contacts.get(i);
-//				log(contacts.get(i).getEmail() + "__" + contacts.get(i).getVisibility() + "__" + contacts.get(i).getTimestamp() + "______________________" + megaApi.getInShares(contacts.get(i)).size());
-//				ArrayList<MegaNode> ccc = megaApi.getInShares(cococ);
-//				for (int j=0;j<ccc.size();j++){
-//					log("NODO!!!: " + ccc.get(j).getHandle() + "___" + ccc.get(j).getName() + "____");
-//				}
+//		for (int i=0;i<contacts.size();i++){
+//
+//			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()));
+//			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility()+"__"+contactDB.getName()+" "+contactDB.getLastName());
+//			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+//				visibleContacts.add(contacts.get(i));
 //			}
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+//		}
+
+		for (int i=0;i<contacts.size();i++){
+
+//			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()));
+//			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility()+"__"+contactDB.getName()+" "+contactDB.getLastName());
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 				visibleContacts.add(contacts.get(i));
 			}
-		}		
+		}
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -326,6 +339,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	    density  = getResources().getDisplayMetrics().density;
 	    
 	    isList = ((ManagerActivityLollipop)context).isList();
+		orderContacts = ((ManagerActivityLollipop)context).getOrderContacts();
 		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
@@ -556,7 +570,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		visibleContacts.clear();
 		for (int i=0;i<contacts.size();i++){
 			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 				visibleContacts.add(contacts.get(i));
 			}
 		}
@@ -582,7 +596,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 			case R.id.invite_contact_button:
 			case R.id.invite_contact_button_grid:{
-				((ManagerActivityLollipop)context).showNewContactDialog(null);				
+				((ManagerActivityLollipop)context).chooseAddContactDialog();
 				break;
 			}
 			case R.id.contact_list_option_send_file_layout:
@@ -766,6 +780,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	}
 	
 	public void setOrder(int orderContacts){
+		log("setOrder:Contacts");
 		this.orderContacts = orderContacts;
 	}
 

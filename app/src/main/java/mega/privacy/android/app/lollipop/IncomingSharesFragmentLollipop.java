@@ -108,7 +108,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	int deepBrowserTree = 0;
 	boolean isList = true;
 	boolean overflowMenu = false;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -355,7 +355,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	    density  = getResources().getDisplayMetrics().density;
 				
 	    isList = ((ManagerActivityLollipop)context).isList();
-	    
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
+
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
@@ -404,16 +405,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //				adapterList.setNodes(nodes);
 			}
 			
-			if (parentHandle == -1){			
+			if (parentHandle == -1){
+				log("ParentHandle -1");
 				((ManagerActivityLollipop)context).setParentHandleIncoming(-1);					
 				findNodes();	
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
-				
+
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				
 //				aB.setTitle(getString(R.string.section_shared_items));
@@ -428,6 +424,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.parentHandle=parentHandle;
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
+				log("ParentHandle: "+parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				
@@ -462,14 +459,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			
-			recyclerView.setAdapter(adapter);		
-			
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
+			recyclerView.setAdapter(adapter);
 			
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
@@ -651,13 +641,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			if (parentHandle == -1){			
 				((ManagerActivityLollipop)context).setParentHandleIncoming(-1);					
 				findNodes();	
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
-				
+
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				
 //				aB.setTitle(getString(R.string.section_shared_items));
@@ -719,14 +703,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);		
-			
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
-			
+
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
@@ -839,25 +816,17 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}		
 	}
 
-	public void refresh(){
-		log("refresh");
-		//TODO conservar el path
-		findNodes();
-		if(adapter!=null){
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
-		}
-	}
+//	public void refresh(){
+//		log("refresh");
+//		//TODO conservar el path
+//		findNodes();
+//	}
 	
 	public void refresh (long _parentHandle){
 		MegaNode n = megaApi.getNodeByHandle(_parentHandle);
 		if(n == null)
 		{
-			refresh();
+			findNodes();
 			return;
 		}
 		
@@ -878,12 +847,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 		adapter.setParentHandle(parentHandle);
 		nodes = megaApi.getChildren(n, orderGetChildren);
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
 
 		adapter.setPositionClicked(-1);
 		
@@ -1321,7 +1284,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		else{
 			if (nodes.get(position).isFolder()){
-												
+				log("Is folder");
 				deepBrowserTree = deepBrowserTree+1;
 				
 				MegaNode n = nodes.get(position);
@@ -1344,13 +1307,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					sortByNameDescending();
-				}
-				else{
-					sortByNameAscending();
-				}
-//					adapterList.setNodes(nodes);
+				adapter.setNodes(nodes);
 				setPositionClicked(-1);
 				
 				//If folder has no files
@@ -1449,19 +1406,30 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public void findNodes(){
-		deepBrowserTree=0;
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		nodes.clear();
-		for (int i=0;i<contacts.size();i++){			
-			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
-			if(nodeContact!=null){
-				if(nodeContact.size()>0){
-					nodes.addAll(nodeContact);
-				}
-			}			
-		}		
+		log("findNodes");
+//		deepBrowserTree=0;
+//		ArrayList<MegaUser> contacts = megaApi.getContacts();
+//		nodes.clear();
+//		for (int i=0;i<contacts.size();i++){
+//			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
+//			if(nodeContact!=null){
+//				if(nodeContact.size()>0){
+//					nodes.addAll(nodeContact);
+//				}
+//			}
+//		}
+		nodes=megaApi.getInShares();
+		for(int i=0;i<nodes.size();i++){
+			log("NODE: "+nodes.get(i).getName());
+		}
+
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByMailDescending();
+		}
+
+		adapter.setNodes(nodes);
 	}
-	
+
 	public void selectAll(){
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
@@ -1607,12 +1575,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			findNodes();
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
 //				adapterList.setNodes(nodes);
 			recyclerView.setVisibility(View.VISIBLE);
 			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
@@ -1771,26 +1733,18 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (adapter != null){
-			adapter.setOrder(orderGetChildren);
-		}
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
+		log("setNodes");
 		this.nodes = nodes;
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
 	}
 	
-	public void sortByNameDescending(){
-		
+	public void sortByMailDescending(){
+		log("sortByNameDescending");
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-		
+
 		for (int i=0;i<nodes.size();i++){
 			if (nodes.get(i).isFolder()){
 				folderNodes.add(nodes.get(i));
@@ -1799,89 +1753,41 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				fileNodes.add(nodes.get(i));
 			}
 		}
-		
-		for (int i=0;i<folderNodes.size();i++){
-			for (int j=0;j<folderNodes.size()-1;j++){
-				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) < 0){
-					MegaNode nAuxJ = folderNodes.get(j);
-					MegaNode nAuxJ_1 = folderNodes.get(j+1);
-					folderNodes.remove(j+1);
-					folderNodes.remove(j);
-					folderNodes.add(j, nAuxJ_1);
-					folderNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-		
-		for (int i=0;i<fileNodes.size();i++){
-			for (int j=0;j<fileNodes.size()-1;j++){
-				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) < 0){
-					MegaNode nAuxJ = fileNodes.get(j);
-					MegaNode nAuxJ_1 = fileNodes.get(j+1);
-					fileNodes.remove(j+1);
-					fileNodes.remove(j);
-					fileNodes.add(j, nAuxJ_1);
-					fileNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-		
+
+		Collections.reverse(folderNodes);
+		Collections.reverse(fileNodes);
+
 		nodes.clear();
 		nodes.addAll(folderNodes);
 		nodes.addAll(fileNodes);
-		
-		adapter.setNodes(nodes);
 	}
 
 	
-	public void sortByNameAscending(){
-		log("sortByNameAscending");
-		
-		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-		
-		for (int i=0;i<nodes.size();i++){
-			if (nodes.get(i).isFolder()){
-				folderNodes.add(nodes.get(i));
-			}
-			else{
-				fileNodes.add(nodes.get(i));
-			}
-		}
-		
-		for (int i=0;i<folderNodes.size();i++){
-			for (int j=0;j<folderNodes.size()-1;j++){
-				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) > 0){
-					MegaNode nAuxJ = folderNodes.get(j);
-					MegaNode nAuxJ_1 = folderNodes.get(j+1);
-					folderNodes.remove(j+1);
-					folderNodes.remove(j);
-					folderNodes.add(j, nAuxJ_1);
-					folderNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-		
-		for (int i=0;i<fileNodes.size();i++){
-			for (int j=0;j<fileNodes.size()-1;j++){
-				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) > 0){
-					MegaNode nAuxJ = fileNodes.get(j);
-					MegaNode nAuxJ_1 = fileNodes.get(j+1);
-					fileNodes.remove(j+1);
-					fileNodes.remove(j);
-					fileNodes.add(j, nAuxJ_1);
-					fileNodes.add(j+1, nAuxJ);
-				}
-			}
-		}
-		
-		nodes.clear();
-		nodes.addAll(folderNodes);
-		nodes.addAll(fileNodes);
-				
-		adapter.setNodes(nodes);	
-	}
-	
+//	public void sortByMailAscending(){
+//		log("sortByNameAscending");
+//
+//		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+//		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+//
+//		for (int i=0;i<nodes.size();i++){
+//			if (nodes.get(i).isFolder()){
+//				folderNodes.add(nodes.get(i));
+//			}
+//			else{
+//				fileNodes.add(nodes.get(i));
+//			}
+//		}
+//
+//		Collections.reverse(folderNodes);
+//		Collections.reverse(fileNodes);
+//
+//		nodes.clear();
+//		nodes.addAll(folderNodes);
+//		nodes.addAll(fileNodes);
+//
+//		adapter.setNodes(nodes);
+//	}
+//
 	public int getItemCount(){
 		if(adapter != null){
 			return adapter.getItemCount();

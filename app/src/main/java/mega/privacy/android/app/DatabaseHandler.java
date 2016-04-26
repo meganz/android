@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiJava;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,7 +19,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 20; 
+	private static final int DATABASE_VERSION = 21;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -68,6 +69,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CONTACT_MAIL = "mail";
     private static final String KEY_CONTACT_NAME = "name";
     private static final String KEY_CONTACT_LAST_NAME = "lastname";
+	private static final String KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud";
+	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
+	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
     
     private static DatabaseHandler instance;
     
@@ -115,7 +119,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, " + KEY_SEC_FOLDER_ENABLED + " TEXT, " + KEY_SEC_FOLDER_LOCAL_PATH + 
         		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN, "+
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
-        		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT" + ")";
+        		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
+				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT" +")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -294,6 +299,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + " = '" + encrypt("") + "';");
 			}			
 		}
+
+		if(oldVersion <= 20){
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_CLOUD + " TEXT;");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_CONTACTS + " TEXT;");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_OTHERS + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CLOUD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -403,6 +417,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()));
         values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.getCameraFolderExternalSDCard()));
         values.put(KEY_PIN_LOCK_TYPE, encrypt(prefs.getPinLockType()));
+		values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()));
+		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
+		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -439,10 +456,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String uriExternalSDCard = decrypt(cursor.getString(23));
 			String cameraFolderExternalSDCard = decrypt(cursor.getString(24));
 			String pinLockType = decrypt(cursor.getString(25));
+			String preferredSortCloud = decrypt(cursor.getString(26));
+			String preferredSortContacts = decrypt(cursor.getString(27));
+			String preferredSortOthers = decrypt(cursor.getString(28));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
-					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard, pinLockType);
+					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers);
 		}
 		cursor.close();
 		
@@ -484,7 +505,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
-        db.insert(TABLE_ATTRIBUTES, null, values);
+		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
 	public MegaAttributes getAttributes(){
@@ -521,7 +542,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        values.put(KEY_CONTACT_MAIL, (contacts.getMail()));
 //        values.put(KEY_CONTACT_NAME, (contacts.getName()));
 //        values.put(KEY_CONTACT_LAST_NAME, (contacts.getLastName()));
-        db.insert(TABLE_CONTACTS, null, values);
+		db.insert(TABLE_CONTACTS, null, values);
 	}
 	
 	public int setContactName (String name, String mail){
@@ -1163,6 +1184,54 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		else{
 	        values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(list + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setPreferredSortCloud (String order){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CLOUD + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(order));
+			db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setPreferredSortContacts (String order){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(order));
+			db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setPreferredSortOthers (String order){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(order));
+			db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
 	}

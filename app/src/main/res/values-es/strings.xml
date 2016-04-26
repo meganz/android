@@ -44,6 +44,8 @@
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
+
+    <string name="error_general_nodes" context="Error getting the root node">Error. Por favor, inténtelo otra vez.</string>
     
     <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">La carpeta secundaria no existe, por favor, elija una nueva.</string>   
     <string name="no_external_SD_card_detected" context="when no external card exists">Ninguna tarjeta externa SD detectada</string>
@@ -52,7 +54,8 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Desea continuar?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">¿Quieres enviar una invitación a %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
@@ -239,6 +242,7 @@
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida con</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propietario</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invitar</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvitar</string>
 	<string name="contact_ignore" context="option to ignore a contact invitation">Ignorar</string>
 	<string name="contact_decline" context="option to decline a contact invitation">Declinar</string>
@@ -323,7 +327,9 @@
     <string name="context_contact_invitation_sent" context="success message when sending a contact request">Invitación enviada</string>
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Invitación eliminada</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Invitación reenviada</string>
-     <string name="context_invitacion_reply" context="success message when adding a contact">Contestación a la invitación enviada</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Invitación enviada</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Invitación correctamente enviada a %s. El estado puede consultarse en la pestaña de Solicitudes enviadas.</string>
+    <string name="context_invitacion_reply" context="success message when adding a contact">Contestación a la invitación enviada</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contacto borrado</string>
     <string name="context_contact_not_removed" context="error message">Error. No se pudo borrar el contacto</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permisos modificados</string>
@@ -509,6 +515,11 @@
         <item context="internal SD card option">Tarjeta SD interna</item>
         <item context="external SD card option">Tarjeta SD externa</item>
     </string-array>
+
+    <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
+        <item context="write option">Introducir el email</item>
+        <item context="import from phone option">Importar desde la agenda</item>
+    </string-array>
     
     <string name="settings_camera_upload_on" context="settings option">Activar Subidas de la Cámara</string>
     <string name="settings_camera_upload_turn_on" context="settings option">Activar Subidas de la Cámara</string>
@@ -602,11 +613,14 @@
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">El fichero zip será descargado y descomprimido</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string>
 
+    <string name="sortby_owner_mail" context="category in sort by action">Email del dueño</string>
     <string name="sortby_name" context="category in sort by action">Nombre</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascendente</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">Descendente</string>
     
     <string name="sortby_date" context="category in sort by action">Fecha</string>
+    <string name="sortby_creation_date" context="category in sort by action">Fecha de creación</string>
+    <string name="sortby_modification_date" context="category in sort by action">Fecha de modificación</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Más reciente</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Más antigua</string>
     

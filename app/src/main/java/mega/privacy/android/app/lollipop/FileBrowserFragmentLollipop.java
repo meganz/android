@@ -92,7 +92,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	long parentHandle = -1;
 	boolean isList = true;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren;
 	
 	float density;
 	DisplayMetrics outMetrics;
@@ -359,6 +359,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 	@Override
 	public void onCreate (Bundle savedInstanceState){
+		log("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -390,8 +391,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
-		
+
 	    isList = ((ManagerActivityLollipop)context).isList();
+		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 	    
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
@@ -1520,21 +1522,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}	
 	
 	public boolean showSelectMenuItem(){
-		if (isList){
-			if (adapter != null){
-				return adapter.isMultipleSelect();
-			}
-		}
-		else{
-			if (adapter != null){
-				return adapter.isMultipleSelect();
-			}
+		log("showSelectMenuItem");
+		if (adapter != null){
+			return adapter.isMultipleSelect();
 		}
 		
 		return false;
 	}
 	
 	public void selectAll(){
+		log("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -1902,17 +1899,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //	}
 	
 	public void setOrder(int orderGetChildren){
+		log("setOrder:Cloud");
 		this.orderGetChildren = orderGetChildren;
-		if (isList){
-			if (adapter != null){
-				adapter.setOrder(orderGetChildren);
-			}
-		}
-		else{
-			if (adapter != null){
-				adapter.setOrder(orderGetChildren);
-			}
-		}
 	}
 	
 	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
@@ -1927,8 +1915,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapter != null){
 				adapter.setTransfers(mTHash);
 			}
-		}	
-	
+		}
 	}
 	
 	public void setCurrentTransfer(MegaTransfer mT){

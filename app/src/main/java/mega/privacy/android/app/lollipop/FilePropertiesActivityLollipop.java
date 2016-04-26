@@ -550,20 +550,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
 			
 			contentLayout.setVisibility(View.GONE);	
-			
-			//Choose the button offlineSwitch
-			
-			if(dbH.exists(node.getHandle())){
-				log("Exists OFFLINE: setChecket TRUE");
-				availableOfflineBoolean = true;
-				offlineSwitch.setChecked(true);
-			}
-			else{
-				log("NOT Exists OFFLINE: setChecket FALSE");
-				availableOfflineBoolean = false;
-				offlineSwitch.setChecked(false);
-			}
-		
+
 			if (node.getCreationTime() != 0){
 				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
 
@@ -619,34 +606,34 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			long sizeFile=megaApi.getSize(node);				
 			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));				
+
+			//OLD APPROACH, the folder is only shown as offline if all the children are saved offline
 			
-			//Choose the button availableSwitch
-			
-			if(dbH.exists(node.getHandle())){
-				
-				ArrayList<MegaNode> childrenList=megaApi.getChildren(node);
-				if(childrenList.size()>0){
-					
-					result=checkChildrenStatus(childrenList);
-					
-				}
-				
-				if(!result){
-					log("false checkChildrenStatus: "+result);
-					availableOfflineBoolean = false;
-					offlineSwitch.setChecked(false);
-				}
-				else{
-					log("true checkChildrenStatus: "+result);
-					availableOfflineBoolean = true;
-					offlineSwitch.setChecked(true);
-				}
-				
-			}
-			else{
-				availableOfflineBoolean = false;
-				offlineSwitch.setChecked(false);
-			}
+//			if(dbH.exists(node.getHandle())){
+//
+//				ArrayList<MegaNode> childrenList=megaApi.getChildren(node);
+//				if(childrenList.size()>0){
+//
+//					result=checkChildrenStatus(childrenList);
+//
+//				}
+//
+//				if(!result){
+//					log("false checkChildrenStatus: "+result);
+//					availableOfflineBoolean = false;
+//					offlineSwitch.setChecked(false);
+//				}
+//				else{
+//					log("true checkChildrenStatus: "+result);
+//					availableOfflineBoolean = true;
+//					offlineSwitch.setChecked(true);
+//				}
+//
+//			}
+//			else{
+//				availableOfflineBoolean = false;
+//				offlineSwitch.setChecked(false);
+//			}
 			
 			imageView.setImageResource(imageId);
 
@@ -777,46 +764,106 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				dividerSharedLayout.setVisibility(View.GONE);	
 			}
 		}
-	}
-		
-	private boolean checkChildrenStatus(ArrayList<MegaNode> childrenList){
 
-		boolean children = true;
-		ArrayList<MegaNode> childrenListRec;
-		
-		if(childrenList.size()>0){
-			for(int i=0;i<childrenList.size();i++){
-				
-				if(!dbH.exists(childrenList.get(i).getHandle())){
-					children=false;	
-					return children;
-				}
-				else{
-					if(childrenList.get(i).isFolder()){
-						
-						childrenListRec=megaApi.getChildren(childrenList.get(i));
+		//Choose the button offlineSwitch
 
-						if(childrenListRec.size()>0){
-							boolean result=checkChildrenStatus(childrenListRec);
-							if(!result){
-								children=false;
-								return children;
-							}								
-						}											
+		File offlineFile = null;
+
+		if(dbH.exists(node.getHandle())) {
+			log("Exists OFFLINE in the DB!!!");
+
+			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
+			if (offlineNode != null) {
+				log("YESS FOUND: " + node.getName());
+				if (from == FROM_INCOMING_SHARES) {
+					log("FROM_INCOMING_SHARES");
+					//Find in the filesystem
+					if (Environment.getExternalStorageDirectory() != null) {
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath());
+						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
+					} else {
+						offlineFile = this.getFilesDir();
 					}
-					else{
 
-						if(!dbH.exists(childrenList.get(i).getHandle())){
-							children=false;
-							return children;
-						}
-						
+				} else {
+					log("NOT INCOMING");
+					//Find in the filesystem
+					if (Environment.getExternalStorageDirectory() != null) {
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
+						log("offline File: " + offlineFile.getAbsolutePath());
+					} else {
+						offlineFile = this.getFilesDir();
 					}
 				}
-			}	
-		}	
-		return children;
+
+				if (offlineFile != null) {
+					if (offlineFile.exists()) {
+						log("FOUND!!!: " + node.getHandle() + " " + node.getName());
+						availableOfflineBoolean = true;
+						offlineSwitch.setChecked(true);
+					} else {
+						log("Not found: " + node.getHandle() + " " + node.getName());
+						availableOfflineBoolean = false;
+						offlineSwitch.setChecked(false);
+					}
+				} else {
+					log("Not found offLineFile is NULL");
+					availableOfflineBoolean = false;
+					offlineSwitch.setChecked(false);
+				}
+			}
+			else{
+				log("offLineNode is NULL");
+				availableOfflineBoolean = false;
+				offlineSwitch.setChecked(false);
+			}
+
+		}
+		else{
+			log("NOT Exists OFFLINE: setChecket FALSE");
+			availableOfflineBoolean = false;
+			offlineSwitch.setChecked(false);
+		}
 	}
+		
+//	private boolean checkChildrenStatus(ArrayList<MegaNode> childrenList){
+//
+//		boolean children = true;
+//		ArrayList<MegaNode> childrenListRec;
+//
+//		if(childrenList.size()>0){
+//			for(int i=0;i<childrenList.size();i++){
+//
+//				if(!dbH.exists(childrenList.get(i).getHandle())){
+//					children=false;
+//					return children;
+//				}
+//				else{
+//					if(childrenList.get(i).isFolder()){
+//
+//						childrenListRec=megaApi.getChildren(childrenList.get(i));
+//
+//						if(childrenListRec.size()>0){
+//							boolean result=checkChildrenStatus(childrenListRec);
+//							if(!result){
+//								children=false;
+//								return children;
+//							}
+//						}
+//					}
+//					else{
+//
+//						if(!dbH.exists(childrenList.get(i).getHandle())){
+//							children=false;
+//							return children;
+//						}
+//
+//					}
+//				}
+//			}
+//		}
+//		return children;
+//	}
 	@Override
 	public void onClick(View v) {
 		
@@ -1457,7 +1504,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	public void showRenameDialog(){
 		
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setText(node.getName());
 

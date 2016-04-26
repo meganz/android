@@ -100,37 +100,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
 	private AlertDialog addContactDialog;
-	
-	public class PhoneContacts{
-		long id;
-		String name;
-		String email;
-		String phoneNumber;
-		
-		public PhoneContacts(long id, String name, String email, String phoneNumber) {
-			this.id = id;
-			this.name = name;
-			this.email = email;
-			this.phoneNumber = phoneNumber;
-		}
-		
-		public long getId(){
-			return id;
-		}
-		
-		public String getName(){
-			return name;
-		}
-		
-		public String getEmail(){
-			return email;
-		}
-		
-		public String getPhoneNumber(){
-			return phoneNumber;
-		}
-	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
@@ -139,53 +109,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	    }
 	    return super.onKeyDown(keyCode, event);
 	} 	
-	
-	@SuppressLint("InlinedApi")
-	private ArrayList<PhoneContacts> refreshPhoneContacts() {
-       ArrayList<PhoneContacts> contactList = new ArrayList<PhoneContacts>();
-         
-       try {
- 
-            /**************************************************/
-             
-            ContentResolver cr = getBaseContext().getContentResolver();
-            
-            @SuppressLint("InlinedApi")
-            String SORT_ORDER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? Contacts.SORT_KEY_PRIMARY : Contacts.DISPLAY_NAME;
-            
-            Cursor c = cr.query(
-                    Data.CONTENT_URI, 
-                    null, 
-                    "(" + Data.MIMETYPE + "= ? OR " + Data.MIMETYPE + "= ?) AND " + 
-                    Data.CONTACT_ID + " IN (SELECT " + Contacts._ID + " FROM contacts WHERE " + Contacts.HAS_PHONE_NUMBER + "!=0) AND " + Contacts.IN_VISIBLE_GROUP + "=1", 
-                    new String[]{Email.CONTENT_ITEM_TYPE, Phone.CONTENT_ITEM_TYPE}, SORT_ORDER);
-            
-            while (c.moveToNext()){
-            	long id = c.getLong(c.getColumnIndex(Data.CONTACT_ID));
-                String name = c.getString(c.getColumnIndex(Data.DISPLAY_NAME));
-                String data1 = c.getString(c.getColumnIndex(Data.DATA1));
-                String mimetype = c.getString(c.getColumnIndex(Data.MIMETYPE));
-                if (mimetype.compareTo(Email.CONTENT_ITEM_TYPE) == 0){
-                	log("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + data1);
-                	PhoneContacts pc = new PhoneContacts(id, name, data1, null);
-                	contactList.add(pc);
-                }
-                else if (mimetype.compareTo(Phone.CONTENT_ITEM_TYPE) == 0){
-                	PhoneContacts pc = new PhoneContacts(id, name, null, data1);
-                	contactList.add(pc);
-                	log("ID: " + id + "___ NAME: " + name + "____ PHONE: " + data1);
-                }
-            }
-            
-            c.close();
-            
-            return contactList;
- 
-        } catch (Exception e) {}
-         
-        return null;
-    }
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
