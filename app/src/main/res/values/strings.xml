@@ -329,6 +329,7 @@
     <string name="context_delete" context="menu item">Delete</string>
     <string name="context_more" context="menu item">More</string>
     <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
     <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
