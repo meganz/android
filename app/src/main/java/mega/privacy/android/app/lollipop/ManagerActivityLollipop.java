@@ -203,6 +203,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
+	public static final int REQUEST_READ_CONTACTS = 3;
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
@@ -981,8 +982,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
+			case REQUEST_READ_CONTACTS:{
+				log("REQUEST_READ_CONTACTS");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+					boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
+					if (hasReadContactsPermissions){
+						Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
+						this.startActivity(phoneContactIntent);
+					}
+				}
+				break;
+			}
 	        case REQUEST_CAMERA:{
 //	        	if (firstTimeCam){
 //	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -8204,13 +8217,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	public void chooseAddContactDialog(){
+		log("chooseAddContactDialog");
 
-		Dialog downloadLocationDialog;
-		String[] sdCardOptions = getResources().getStringArray(R.array.add_contact_array);
+		Dialog addContactDialog;
+		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
 		AlertDialog.Builder b=new AlertDialog.Builder(this);
 
 		b.setTitle(getResources().getString(R.string.menu_add_contact));
-		b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+		b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -8233,13 +8247,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				dialog.cancel();
 			}
 		});
-		downloadLocationDialog = b.create();
-		downloadLocationDialog.show();
-
+		addContactDialog = b.create();
+		addContactDialog.show();
 	}
 
 
 	public void addContactFromPhone(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
+			if (!hasReadContactsPermission) {
+				log("No read contacts permission");
+				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
+						new String[]{Manifest.permission.READ_CONTACTS},
+						ManagerActivityLollipop.REQUEST_READ_CONTACTS);
+				return;
+			}
+		}
+
 		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
 		this.startActivity(phoneContactIntent);
 	}
