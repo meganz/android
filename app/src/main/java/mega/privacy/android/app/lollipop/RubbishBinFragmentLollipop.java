@@ -765,7 +765,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				MegaNode n = nodes.get(position);
 				
 				aB.setTitle(n.getName());
-				log("aB.setHomeAsUpIndicator_46");
+				log("indicator_arrow_back_190");
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -945,7 +945,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				}
 				else{
 					aB.setTitle(parentNode.getName());
-					log("aB.setHomeAsUpIndicator_48");
+					log("indicator_arrow_back_191");
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				}
