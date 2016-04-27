@@ -73,7 +73,7 @@ import android.widget.Toast;
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 
 	public static int GRID_WIDTH =400;
-		
+
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
@@ -83,36 +83,36 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
-	TextView contentText;	
+	TextView contentText;
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
 	ProgressBar progressBar;
-	
-	MegaApiAndroid megaApi;		
+
+	MegaApiAndroid megaApi;
 
 	long parentHandle = -1;
 	boolean isList = true;
 	int orderGetChildren;
-	
+
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
+
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	
+
 	ArrayList<MegaNode> nodes;
-	
+
 	HashMap<Long, MegaTransfer> mTHash = null;
-	
+
 	private ActionMode actionMode;
 
     ImageButton fabButton;
 	private RecyclerView.LayoutManager mLayoutManager;
 	MegaNode selectedNode = null;
-	
+
 	SlidingUpPanelLayout.PanelSlideListener slidingPanelListener;
-	
+
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
@@ -120,19 +120,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public LinearLayout optionDownload;
 	public LinearLayout optionProperties;
 	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;	
+	public LinearLayout optionPublicLink;
 	public LinearLayout optionShare;
 	public LinearLayout optionPermissions;
 	public LinearLayout optionDelete;
 	public LinearLayout optionRemoveTotal;
 	public LinearLayout optionClearShares;
 	public LinearLayout optionLeaveShare;
-	public LinearLayout optionSendToInbox;	
+	public LinearLayout optionSendToInbox;
 	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
+	public LinearLayout optionCopyTo;
 	public TextView propertiesText;
 	////
-	
+
 	//UPLOAD PANEL
 	private SlidingUpPanelLayout slidingUploadPanel;
 	public FrameLayout uploadOutLayout;
@@ -140,9 +140,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public LinearLayout uploadImage;
 	public LinearLayout uploadAudio;
 	public LinearLayout uploadVideo;
-	public LinearLayout uploadFromSystem;	
+	public LinearLayout uploadFromSystem;
 	////
-	
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
@@ -152,21 +152,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	        // handle long press
 	        if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
+
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		        itemClick(position);
-			}  
+			}
 	        super.onLongPress(e);
 	    }
 	}
-	
+
 	private class ActionBarCallBack implements ActionMode.Callback {
-		
+
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			
+
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
@@ -195,7 +195,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					hideMultipleSelect();
 					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 					break;
-				}	
+				}
 				case R.id.cab_menu_move:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -216,7 +216,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);					
+					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -230,7 +230,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					clearSelections();
 					hideMultipleSelect();
 					log("sendToInbox no of files: "+handleList.size());
-					((ManagerActivityLollipop) context).sendToInboxLollipop(handleList);					
+					((ManagerActivityLollipop) context).sendToInboxLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -280,7 +280,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
-			
+
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -292,18 +292,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
 			}
-			
+
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				showLink = true;
 			}
-			
+
 			if (selected.size() != 0) {
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
-				
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -316,22 +316,22 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 					}
 				}
-				
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}	
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
+				}
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				showShare = false;
 			}
-			
+
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
@@ -341,9 +341,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
-			
+
 			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-			
+
 			for(int i=0;i<selected.size();i++){
 				MegaNode n = selected.get(i);
 				if(n.isFolder()){
@@ -351,42 +351,61 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					break;
 				}
 			}
-			
+
 			return false;
 		}
-		
+
 	}
-			
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		log("onSaveInstanceState");
+		super.onSaveInstanceState(outState);
+
+
+
+
+//		outState.putString("pathNavigation", parentHandle);
+//		outState.putLong("parentHandleBrowser", parentHandleBrowser);
+//		outState.putLong("parentHandleRubbish", parentHandleRubbish);
+//		outState.putLong("parentHandleIncoming", parentHandleIncoming);
+//		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
+//		outState.putLong("parentHandleSearch", parentHandleSearch);
+//		outState.putLong("parentHandleInbox", parentHandleInbox);
+//		outState.putSerializable("drawerItem", drawerItem);
+////		outState.putParcelable("obj", myClass);
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
+
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
-		
+
 		super.onCreate(savedInstanceState);
-		log("onCreate");	
+		log("after onCreate called super");
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");		
-		
+		log("onCreateView");
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
+
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
-		
+
 		if (megaApi.getRootNode() == null){
 			return null;
 		}
-		
+
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -394,27 +413,44 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	    isList = ((ManagerActivityLollipop)context).isList();
 		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
-	    
+
 		if (parentHandle == -1){
+
+			long parentHandleBrowser = ((ManagerActivityLollipop)context).getParentHandleBrowser();
+			if(parentHandleBrowser!=-1){
+				log("After consulting... the parent is: "+parentHandleBrowser);
+				parentHandle = parentHandleBrowser;
+			}
+		}
+
+		if (parentHandle == -1){
+			log("After consulting... the parent keeps -1");
 			parentHandle = megaApi.getRootNode().getHandle();
 			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-//			aB.setTitle(getString(R.string.section_cloud_drive));	
-//			log("aB.setHomeAsUpIndicator_66");
-//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 
+			if(parentNode!=null){
+				log("The parent node is: "+parentNode.getName());
+
+				if(aB!=null){
+					aB.setTitle(parentNode.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				}
+				else
+					log("AB still is NULL");
+			}
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			
+
 //			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 //				log("aB.setTitle fbF 2");
 //				aB.setTitle(getString(R.string.section_cloud_drive));
@@ -429,8 +465,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 //			}
 //			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		}	
-		
+		}
+
 		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
 			if (context != null){
 				Intent intent = new Intent(context, CreateThumbPreviewService.class);
@@ -440,6 +476,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 				
 		if (isList){
+			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
@@ -487,6 +524,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			
 			if (parentHandle == megaApi.getRootNode().getHandle()||parentHandle==-1){
+				log("RootNode shown");
 				MegaNode infoNode = megaApi.getRootNode();
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
@@ -498,6 +536,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				log("Node shown: "+infoNode.getName());
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
@@ -1323,124 +1362,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				if (nodes.get(position).isFolder()){
 					MegaNode n = nodes.get(position);
-					String cameraSyncHandle = null;
-//					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
-//						((ManagerActivityLollipop)context).cameraUploadsClicked();
-//						return;
-//					}
-					//Check if the item is the Camera Uploads folder
-					if(dbH.getPreferences()!=null){
-						prefs = dbH.getPreferences();
-						if(prefs.getCamSyncHandle()!=null){
-							cameraSyncHandle = prefs.getCamSyncHandle();
-						}
-						else{
-							cameraSyncHandle = null;
-						}
-					}
-					else{
-						prefs=null;						
-					}
-					
-					if(cameraSyncHandle!=null){
-						if(!(cameraSyncHandle.equals("")))
-						{
-							if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
-								((ManagerActivityLollipop)context).cameraUploadsClicked();
-								return;
-							}
-						}
-					}
-					else{
-						if(n.getName().equals("Camera Uploads")){
-							prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-							dbH.setCamSyncHandle(n.getHandle());
-							log("FOUND Camera Uploads!!: "+n.getHandle());
-							((ManagerActivityLollipop)context).cameraUploadsClicked();
-							return;
-						}
-					}
-
-					//Check if the item is the Media Uploads folder
-					
-					String secondaryMediaHandle = null;
-					
-					if(prefs!=null){						
-						if(prefs.getMegaHandleSecondaryFolder()!=null){
-							secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
-						}
-						else{
-							secondaryMediaHandle = null;
-						}
-					}
-					
-					if(secondaryMediaHandle!=null){
-						if(!(secondaryMediaHandle.equals("")))
-						{
-							if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
-								log("Click on Media Uploads");
-								((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-								return;
-							}
-						}
-					}
-					else{
-						if(n.getName().equals("Media Uploads")){
-							prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-							dbH.setSecondaryFolderHandle(n.getHandle());
-							log("FOUND Media Uploads!!: "+n.getHandle());
-							((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-							return;
-						}
-					}
-					
-					aB.setTitle(n.getName());
-					log("aB.setHomeAsUpIndicator_69");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = nodes.get(position).getHandle();
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-						showProgressBar();
-					}
-					else{					
-						contentText.setText(getInfoFolder(infoNode));
-					}
-					((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
-					adapter.setParentHandle(parentHandle);
-					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-					adapter.setNodes(nodes);
-					recyclerView.scrollToPosition(0);
-					
-					if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-						if (context != null){
-							Intent intent = new Intent(context, CreateThumbPreviewService.class);
-							intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
-							context.startService(intent);
-						}
-					}
-					
-					//If folder has no files
-					if (adapter.getItemCount() == 0){
-						recyclerView.setVisibility(View.GONE);
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-
-						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextView.setText(R.string.file_browser_empty_folder);
-						}
-					}
-					else{
-						recyclerView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-					}
+					setFolderInfoNavigation(n);
 				}
 				else{
 					//Is file
@@ -1519,7 +1441,135 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				rightUploadButton.setVisibility(View.GONE);
 			}			
 		}*/
-	}	
+	}
+
+	public void setFolderInfoNavigation(MegaNode n){
+		log("setFolderInfoNavigation");
+		String cameraSyncHandle = null;
+//					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+//						((ManagerActivityLollipop)context).cameraUploadsClicked();
+//						return;
+//					}
+		//Check if the item is the Camera Uploads folder
+		if(dbH.getPreferences()!=null){
+			prefs = dbH.getPreferences();
+			if(prefs.getCamSyncHandle()!=null){
+				cameraSyncHandle = prefs.getCamSyncHandle();
+			}
+			else{
+				cameraSyncHandle = null;
+			}
+		}
+		else{
+			prefs=null;
+		}
+
+		if(cameraSyncHandle!=null){
+			if(!(cameraSyncHandle.equals("")))
+			{
+				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+					((ManagerActivityLollipop)context).cameraUploadsClicked();
+					return;
+				}
+			}
+		}
+		else{
+			if(n.getName().equals("Camera Uploads")){
+				prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				dbH.setCamSyncHandle(n.getHandle());
+				log("FOUND Camera Uploads!!: "+n.getHandle());
+				((ManagerActivityLollipop)context).cameraUploadsClicked();
+				return;
+			}
+		}
+
+		//Check if the item is the Media Uploads folder
+
+		String secondaryMediaHandle = null;
+
+		if(prefs!=null){
+			if(prefs.getMegaHandleSecondaryFolder()!=null){
+				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
+			}
+			else{
+				secondaryMediaHandle = null;
+			}
+		}
+
+		if(secondaryMediaHandle!=null){
+			if(!(secondaryMediaHandle.equals("")))
+			{
+				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+					log("Click on Media Uploads");
+					((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
+					return;
+				}
+			}
+		}
+		else{
+			if(n.getName().equals("Media Uploads")){
+				prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				dbH.setSecondaryFolderHandle(n.getHandle());
+				log("FOUND Media Uploads!!: "+n.getHandle());
+				((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
+				return;
+			}
+		}
+		log("aB.setTitle "+n.getName());
+		if(aB==null){
+			aB = ((AppCompatActivity)context).getSupportActionBar();
+		}
+		if(aB==null){
+			log("AB still is NULL");
+		}
+
+		aB.setTitle(n.getName());
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+		parentHandle = n.getHandle();
+		MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+			showProgressBar();
+		}
+		else{
+			contentText.setText(getInfoFolder(infoNode));
+		}
+		((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
+		adapter.setParentHandle(parentHandle);
+		nodes = megaApi.getChildren(n, orderGetChildren);
+		adapter.setNodes(nodes);
+		recyclerView.scrollToPosition(0);
+
+		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
+			if (context != null){
+				Intent intent = new Intent(context, CreateThumbPreviewService.class);
+				intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
+				context.startService(intent);
+			}
+		}
+
+		//If folder has no files
+		if (adapter.getItemCount() == 0){
+			recyclerView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+
+			if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+		}
+		else{
+			recyclerView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
+	}
 	
 	public boolean showSelectMenuItem(){
 		log("showSelectMenuItem");
@@ -1817,16 +1867,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-		if (isList){
-			if (adapter != null){
-				adapter.setParentHandle(parentHandle);
-			}
+
+		if (adapter != null){
+			adapter.setParentHandle(parentHandle);
 		}
-		else{
-			if (adapter != null){
-				adapter.setParentHandle(parentHandle);
-			}
-		}
+
 	}
 	
 	public RecyclerView getRecyclerView(){
