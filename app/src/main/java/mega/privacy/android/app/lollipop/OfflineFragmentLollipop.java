@@ -58,8 +58,6 @@ import android.widget.TextView;
 
 public class OfflineFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 	
-	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
 
 	MegaPreferences prefs;
@@ -79,9 +77,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
-	long parentHandle = -1;
 	boolean isList = true;
-	boolean gridNavigation=false;
 	int orderGetChildren;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -558,12 +554,25 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
-		
-		aB.setTitle(getString(R.string.section_saved_for_offline));	
+
 		if (context instanceof ManagerActivityLollipop){
-			log("aB.setHomeAsUpIndicator_30");
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+
+			if(pathNavigation!=null){
+				log("PathNavigation is: "+pathNavigation);
+				if (pathNavigation.equals("/")){
+					aB.setTitle(getString(R.string.section_saved_for_offline));
+					log("aB.setHomeAsUpIndicator_30");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				}
+				else{
+
+				}
+			}
+			else{
+				log("PathNavigation is NULL");
+			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		    isList = ((ManagerActivityLollipop)context).isList();
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
