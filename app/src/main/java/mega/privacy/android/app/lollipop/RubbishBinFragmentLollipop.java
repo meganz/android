@@ -271,58 +271,64 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
+		if (megaApi.getRootNode() == null){
+			return null;
+		}
+
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+		display.getMetrics(outMetrics);
+		density  = getResources().getDisplayMetrics().density;
+
 		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		isList = ((ManagerActivityLollipop)context).isList();
-		
+
 		if (parentHandle == -1){
-			if (megaApi.getRubbishNode() != null){
-				parentHandle = megaApi.getRubbishNode().getHandle();
-				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-				
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				log("aB.setHomeAsUpIndicator_43");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+			long parentHandleRubbish = ((ManagerActivityLollipop)context).getParentHandleRubbish();
+			if(parentHandleRubbish!=-1){
+				log("After consulting... the parentRubbish is: "+parentHandleRubbish);
+				parentHandle = parentHandleRubbish;
 			}
+		}
+		
+		if (parentHandle == -1||parentHandle==megaApi.getRubbishNode().getHandle()){
+
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			
-			if (parentNode == null){
-				parentNode = megaApi.getRubbishNode();
-				if (parentNode != null){
-					parentHandle = parentNode.getHandle();
-					((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-				}
-			}
+//			if (parentNode == null){
+//				parentNode = megaApi.getRubbishNode();
+//				if (parentNode != null){
+//					parentHandle = parentNode.getHandle();
+//					((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
+//				}
+//			}
 			
 			if (parentNode != null){
+				log("The parent node is: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-//					log("aB.setHomeAsUpIndicator_44");
-//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//				}
-//				else{
-//					aB.setTitle(parentNode.getName());
-//					log("aB.setHomeAsUpIndicator_45");
-//					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-//				}
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			}			
+
+				if(aB!=null){
+					aB.setTitle(parentNode.getName());
+					log("indicator_arrow_back_035");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				}
+				else {
+					log("AB still is NULL");
+				}
+
+			}
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
-		
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
 
 		if (isList){
 			log("isList View");

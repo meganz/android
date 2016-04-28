@@ -19,6 +19,7 @@ import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.FileBrowserFragment;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContact;
@@ -1823,6 +1824,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			if(fbFLol!=null){
 	    				fbFLol.notifyDataSetChanged();
 	    			}
+					//Check the tab to shown and the title of the actionBar
+					int index = viewPagerCDrive.getCurrentItem();
+					if(index==0) {
+						log("onResume - TAB CLOUD DRIVE");
+						if (parentHandleBrowser == -1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
+							log("Parent -1 or ROOTNODE");
+							aB.setTitle(getString(R.string.section_cloud_drive));
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						}
+						else{
+							MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+							aB.setTitle(parentNode.getName());
+							log("indicator_arrow_back_135");
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+					}
+					else{
+						log("onResume - TAB RUBBISH NODE");
+						if (parentHandleRubbish == -1||parentHandleRubbish==megaApi.getRubbishNode().getHandle()){
+							log("Parent -1 or RUBBISHNODE");
+							aB.setTitle(getString(R.string.section_rubbish_bin));
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						}
+						else{
+							MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
+							aB.setTitle(parentNode.getName());
+							log("indicator_arrow_back_137");
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+					}
 	    			break;
 	    		}
 	    		case SHARED_ITEMS:{
@@ -1917,7 +1948,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					log("TABS added to Cloud Drive");
 
-					viewPagerCDrive.setCurrentItem(0);
 					aB.setTitle(getResources().getString(R.string.section_cloud_drive));
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					firstNavigationLevel = true;
@@ -2061,7 +2091,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){
                     @Override
                     public void onTabChanged(String tabId) {
-                    	log("TabId :"+ tabId);
+                    	log("onTabChanged TabId :"+ tabId);
                     	supportInvalidateOptionsMenu();
                         if(tabId.compareTo("fbFLol") == 0){
                         	String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);

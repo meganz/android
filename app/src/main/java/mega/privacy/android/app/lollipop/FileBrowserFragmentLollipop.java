@@ -423,48 +423,31 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 		}
 
-		if (parentHandle == -1){
-			log("After consulting... the parent keeps -1");
-			parentHandle = megaApi.getRootNode().getHandle();
-			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
+		if (parentHandle == -1||parentHandle==megaApi.getRootNode().getHandle()){
+			log("After consulting... the parent keeps -1 or ROOTNODE: "+parentHandle);
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 
 			if(parentNode!=null){
 				log("The parent node is: "+parentNode.getName());
 
 				if(aB!=null){
 					aB.setTitle(parentNode.getName());
+					log("indicator_arrow_back_035");
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				}
-				else
+				else {
 					log("AB still is NULL");
+				}
 			}
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-//			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//				log("aB.setTitle fbF 2");
-//				aB.setTitle(getString(R.string.section_cloud_drive));
-//				log("aB.setHomeAsUpIndicator_67");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//			}
-//			else{
-//				aB.setTitle(parentNode.getName());	
-//				log("aB.setHomeAsUpIndicator_68");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-//			}
-//			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
 		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
@@ -1524,6 +1507,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 
 		aB.setTitle(n.getName());
+		log("indicator_arrow_back_036");
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1737,6 +1721,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 						else{
 							aB.setTitle(parentNode.getName());
+							log("indicator_arrow_back_033");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						}
@@ -1804,6 +1789,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 						else{
 							aB.setTitle(parentNode.getName());
+							log("indicator_arrow_back_034");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						}
