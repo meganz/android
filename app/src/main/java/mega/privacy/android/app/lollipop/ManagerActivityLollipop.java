@@ -237,8 +237,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
 
-	public CheckBox dontShowAgain;
-
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 	MegaAttributes attr = null;
@@ -368,6 +366,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	long parentHandleOutgoing;
 	long parentHandleSearch;
 	long parentHandleInbox;
+	String pathNavigationOffline;
+	int deepBrowserTreeIncoming;
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
@@ -1082,6 +1082,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
+		int deepBrowserTreeIncoming = 0;
 		outState.putString("pathNavigation", pathNavigation);
 		outState.putLong("parentHandleBrowser", parentHandleBrowser);
 		outState.putLong("parentHandleRubbish", parentHandleRubbish);
@@ -1089,7 +1090,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
+		outState.putString("pathNavigationOffline", pathNavigationOffline);
 		outState.putSerializable("drawerItem", drawerItem);
+
+		if(parentHandleIncoming!=-1){
+			if(inSFLol!=null){
+				deepBrowserTreeIncoming = inSFLol.getDeepBrowserTree();
+			}
+		}
+		outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
+
 //		outState.putParcelable("obj", myClass);
 	}
 
@@ -1112,6 +1122,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			parentHandleOutgoing = savedInstanceState.getLong("parentHandleOutgoing", -1);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
+			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
+			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			log("savedInstanceState -> drawerItem: "+drawerItem);
 		}
@@ -9088,10 +9100,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return usedPerc;
 	}
 
-	public void setPathNavigationOffline(String pathNavigation){
-		this.pathNavigation = pathNavigation;
-	}
-
 	public long getParentHandleBrowser() {
 		return parentHandleBrowser;
 	}
@@ -12275,6 +12283,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			prefs.setPreferredSortOthers(String.valueOf(orderOthers));
 		}
 		dbH.setPreferredSortOthers(String.valueOf(orderOthers));
+	}
+
+	public String getPathNavigationOffline() {
+		return pathNavigationOffline;
+	}
+
+	public void setPathNavigationOffline(String pathNavigationOffline) {
+		this.pathNavigationOffline = pathNavigationOffline;
+	}
+
+	public int getDeepBrowserTreeIncoming() {
+		return deepBrowserTreeIncoming;
+	}
+
+	public void setDeepBrowserTreeIncoming(int deepBrowserTreeIncoming) {
+		this.deepBrowserTreeIncoming = deepBrowserTreeIncoming;
 	}
 
 }

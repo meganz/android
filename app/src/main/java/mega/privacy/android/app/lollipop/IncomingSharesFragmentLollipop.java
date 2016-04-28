@@ -107,7 +107,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	long parentHandle = -1;
 	int deepBrowserTree = 0;
 	boolean isList = true;
-	boolean overflowMenu = false;
 	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
@@ -357,6 +356,16 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	    isList = ((ManagerActivityLollipop)context).isList();
 		orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
 
+		if (parentHandle == -1){
+
+			long parentHandleIncoming = ((ManagerActivityLollipop)context).getParentHandleIncoming();
+			if(parentHandleIncoming!=-1){
+				log("After consulting... the INCOMING parent is: "+parentHandleIncoming);
+				parentHandle = parentHandleIncoming;
+				deepBrowserTree = ((ManagerActivityLollipop)context).getDeepBrowserTreeIncoming();
+			}
+		}
+
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
@@ -404,45 +413,20 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 //				adapterList.setNodes(nodes);
 			}
-			
+
 			if (parentHandle == -1){
 				log("ParentHandle -1");
-				((ManagerActivityLollipop)context).setParentHandleIncoming(-1);					
-				findNodes();	
-
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				aB.setTitle(getString(R.string.section_shared_items));
-//				log("aB.setHomeAsUpIndicator_55");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-				adapter.parentHandle=-1;
+				findNodes();
+				adapter.setParentHandle(-1);
 			}
 			else{
-				adapter.parentHandle=parentHandle;
+				adapter.setParentHandle(parentHandle);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				log("ParentHandle: "+parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-				
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-//					sortByNameDescending();
-//				}
-//				else{
-//					sortByNameAscending();
-//				}
-				
-//				aB.setTitle(parentNode.getName());
-//				log("aB.setHomeAsUpIndicator_56");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			}	
+			}
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 //			if (deepBrowserTree == 0){
 //				contentText.setText(getInfoNode());
@@ -454,7 +438,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 //				contentText.setText(getInfoFolder(infoNode));
 //				aB.setTitle(infoNode.getName());
-//			}						
+//			}
 			
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
@@ -637,43 +621,20 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 //				adapterList.setNodes(nodes);
 			}
-			
-			if (parentHandle == -1){			
-				((ManagerActivityLollipop)context).setParentHandleIncoming(-1);					
-				findNodes();	
 
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				aB.setTitle(getString(R.string.section_shared_items));
-//				log("aB.setHomeAsUpIndicator_57");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-				adapter.parentHandle=-1;
+			if (parentHandle == -1){
+				log("ParentHandle -1");
+				findNodes();
+				adapter.setParentHandle(-1);
 			}
 			else{
-				adapter.parentHandle=parentHandle;
+				adapter.setParentHandle(parentHandle);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
+				log("ParentHandle: "+parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-				
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-//					sortByNameDescending();
-//				}
-//				else{
-//					sortByNameAscending();
-//				}
-				
-//				aB.setTitle(parentNode.getName());
-//				log("aB.setHomeAsUpIndicator_58");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			}	
+			}
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (deepBrowserTree == 0){
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
@@ -823,46 +784,60 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //	}
 	
 	public void refresh (long _parentHandle){
-		MegaNode n = megaApi.getNodeByHandle(_parentHandle);
-		if(n == null)
-		{
+		log("refresh")
+;
+		parentHandle = _parentHandle;
+		MegaNode parentNode=null;
+		if (_parentHandle == -1){
+
+			log("ParentHandle -1");
 			findNodes();
-			return;
+			adapter.setParentHandle(-1);
+
+			aB.setTitle(getString(R.string.section_shared_items));
+			log("aB.setHomeAsUpIndicator_111");
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		}
-		
-		aB.setTitle(n.getName());
-		log("aB.setHomeAsUpIndicator_60");
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+		else{
+			adapter.setParentHandle(_parentHandle);
+			parentNode = megaApi.getNodeByHandle(_parentHandle);
+			log("ParentHandle: "+_parentHandle);
+
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			adapter.setNodes(nodes);
+
+			aB.setTitle(parentNode.getName());
+			log("aB.setHomeAsUpIndicator_60");
+			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+			((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		
-		parentHandle = n.getHandle();												
+		adapter.setPositionClicked(-1);
 
 		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 			showProgressBar();
 		}
-		else{					
-			contentText.setText(getInfoFolder(n));
-		}		
-		
-		adapter.setParentHandle(parentHandle);
-		nodes = megaApi.getChildren(n, orderGetChildren);
+		else{
+			if(deepBrowserTree==0){
+				contentText.setText(getInfoNode());
+			}
+			else{
+				if(parentNode!=null){
+					contentText.setText(getInfoFolder(parentNode));
+				}
 
-		adapter.setPositionClicked(-1);
-		
+			}
+		}
+
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
 
-			if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-			} else {
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
-			}
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);
@@ -1867,6 +1842,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public int getDeepBrowserTree() {
+		return deepBrowserTree;
+	}
+
+	public void setDeepBrowserTree(int deepBrowserTree) {
+		this.deepBrowserTree = deepBrowserTree;
 	}
 
 }
