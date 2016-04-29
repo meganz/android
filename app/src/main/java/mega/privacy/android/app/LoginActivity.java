@@ -44,14 +44,14 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
- 
+
 public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
-	
+
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
-	
+
 	TextView loginTitle;
 	EditText et_user;
 	EditText et_password;
@@ -74,41 +74,41 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
 	ScrollView scrollView;
-	
+
 	int heightGrey = 0;
 	float scaleH, scaleW;
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
+
 //	private ProgressDialog progress;
-	
+
 	private String lastEmail;
 	private String lastPassword;
 	private String gPublicKey;
 	private String gPrivateKey;
 	private String gSession;
-	
+
 	private String confirmLink;
-	
+
 	static LoginActivity loginActivity;
-    private MegaApiAndroid megaApi;
-    UserCredentials credentials;
-    private boolean backWhileLogin;
-    private boolean loginClicked = false;
-    private long parentHandle = -1;
-    
-    String action = null;
-    String url = null;
-    
-    boolean firstRequestUpdate = true;
-    boolean firstTime = true;
-        
-    Handler handler = new Handler();
-    
-    Bundle extras = null;
-    Uri uriData = null;
-	
+	private MegaApiAndroid megaApi;
+	UserCredentials credentials;
+	private boolean backWhileLogin;
+	private boolean loginClicked = false;
+	private long parentHandle = -1;
+
+	String action = null;
+	String url = null;
+
+	boolean firstRequestUpdate = true;
+	boolean firstTime = true;
+
+	Handler handler = new Handler();
+
+	Bundle extras = null;
+	Uri uriData = null;
+
 	/*
 	 * Task to process email and password
 	 */
@@ -116,68 +116,73 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 
 		@Override
 		protected String[] doInBackground(String... args) {
+			log("protected String[] doInBackground(String... args) ");
 			String privateKey = megaApi.getBase64PwKey(args[1]);
 			String publicKey = megaApi.getStringHash(privateKey, args[0]);
-			return new String[]{new String(privateKey), new String(publicKey)}; 
+			return new String[]{new String(privateKey), new String(publicKey)};
 		}
 
-		
+
 		@Override
 		protected void onPostExecute(String[] key) {
+			log("protected void onPostExecute(String[] key)");
 			onKeysGenerated(key[0], key[1]);
 		}
 
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("protected void onCreate(Bundle savedInstanceState)");
 		super.onCreate(savedInstanceState);
 
 		loginClicked = false;
-		
+
 		loginActivity = this;
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		
+
 		backWhileLogin = false;
-		
+
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-		
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
-	    
+		display.getMetrics(outMetrics);
+		density  = getResources().getDisplayMetrics().density;
+
+		scaleW = Util.getScaleW(outMetrics, density);
+		scaleH = Util.getScaleH(outMetrics, density);
+
 //	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-	    DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-	    
-	    MegaPreferences prefs = dbH.getPreferences();
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+		MegaPreferences prefs = dbH.getPreferences();
 		if (prefs == null){
-		    setContentView(R.layout.activity_login);
-		    bRegister = (Button) findViewById(R.id.button_create_account_login);
-		    bRegister.setOnClickListener(this);
-		    ((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-		    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
-		    firstTime = true;
+			log("if (prefs == null)");
+			setContentView(R.layout.activity_login);
+			bRegister = (Button) findViewById(R.id.button_create_account_login);
+			bRegister.setOnClickListener(this);
+			((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+			heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
+			firstTime = true;
 		}
 		else{
+			log("if (prefs != null)");
 			setContentView(R.layout.activity_login_returning);
 			registerText = (TextView) findViewById(R.id.login_text_create_account);
 			registerText.setOnClickListener(this);
 			heightGrey = (int) (Util.percScreenLoginReturning * outMetrics.heightPixels);
 			firstTime = false;
-		}	
+		}
 
-//		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
-//		
-//		scrollView.post(new Runnable() { 
-//	        public void run() { 
+//		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);
+//
+//		scrollView.post(new Runnable() {
+//	        public void run() {
 //	        	scrollView.fullScroll(scrollView.FOCUS_DOWN);
-//	        } 
-//		});		
-				
-	    loginTitle = (TextView) findViewById(R.id.login_text_view);
+//	        }
+//		});
+
+		loginTitle = (TextView) findViewById(R.id.login_text_view);
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
@@ -190,10 +195,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
-		
+
 		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(28*scaleH);
-		
+
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
 		loginDelimiter.setVisibility(View.VISIBLE);
@@ -205,11 +210,11 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		loginProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
 		confirmingAccountText.setVisibility(View.GONE);
-		
+
 		et_user = (EditText) findViewById(R.id.login_email_text);
 		et_password = (EditText) findViewById(R.id.login_password_text);
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
-			
+
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -218,43 +223,43 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				}
 				return false;
 			}
-		});		
-		
+		});
+
 		bLogin = (Button) findViewById(R.id.button_login_login);
-		
+
 		bLogin.setOnClickListener(this);
-		
+
 		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((40*scaleH), outMetrics));
-		
+
 		((LinearLayout.LayoutParams)bLogin.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-		
+
 		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
-		
+
 		loginThreeDots.setPadding(0, Util.px2dp((20*scaleH), outMetrics), Util.px2dp((4*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics));
-		
+
 		loginABC = (TextView) findViewById(R.id.ABC);
-		
+
 		((TableRow.LayoutParams)loginABC.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((5*scaleH), outMetrics));
-		
+
 		loginSwitch = (MySwitch) findViewById(R.id.switch_login);
 		loginSwitch.setChecked(true);
-		
+
 		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
+
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
-						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-						et_password.setSelection(et_password.getText().length());
+					et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					et_password.setSelection(et_password.getText().length());
 				}else{
-						et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-						et_password.setSelection(et_password.getText().length());
-			    }				
+					et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+					et_password.setSelection(et_password.getText().length());
+				}
 			}
 		});
-		
+
 		((TableRow.LayoutParams)loginSwitch.getLayoutParams()).setMargins(Util.px2dp((1*scaleH), outMetrics), Util.px2dp((8*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0);
-		
+
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
 			if (ACTION_CONFIRM.equals(intentReceived.getAction())) {
@@ -267,16 +272,18 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				return;
 			}
 		}
-		
+
 		credentials = dbH.getCredentials();
+		log("credentials = dbH.getCredentials();");
 		if (credentials != null){
+			log("if (credentials != null)");
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
 					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
-					
+
 					lastEmail = credentials.getEmail();
 					gSession = credentials.getSession();
-					
+
 					loginLogin.setVisibility(View.GONE);
 					loginDelimiter.setVisibility(View.GONE);
 					loginCreateAccount.setVisibility(View.GONE);
@@ -285,7 +292,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					loginLoggingIn.setVisibility(View.VISIBLE);
 //					generatingKeysText.setVisibility(View.VISIBLE);
 //					megaApi.fastLogin(gSession, this);
-					
+
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					loggingInText.setVisibility(View.VISIBLE);
@@ -318,11 +325,13 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						extras = intentReceived.getExtras();
 						url = null;
 					}
-					
+
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){
+						log("if (rootNode != null)");
 						Intent intent = new Intent(this, ManagerActivity.class);
 						if (action != null){
+							log("if (action != null)");
 							if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 								intent = new Intent(this, FileExplorerActivity.class);
 								if(extras != null)
@@ -347,24 +356,25 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
-					    
-					    handler.postDelayed(new Runnable() {
-							
+
+						handler.postDelayed(new Runnable() {
+
 							@Override
 							public void run() {
 								log("Now I start the service");
-								startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+								startService(new Intent(getApplicationContext(), CameraSyncService.class));
 							}
 						}, 5 * 60 * 1000);
-						
+
 						this.startActivity(intent);
 						this.finish();
 						return;
 					}
 					else{
+						log("if (rootNode == null)");
 						lastEmail = credentials.getEmail();
 						gSession = credentials.getSession();
-						
+
 						loginLogin.setVisibility(View.GONE);
 						loginDelimiter.setVisibility(View.GONE);
 						loginCreateAccount.setVisibility(View.GONE);
@@ -377,18 +387,20 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						loggingInText.setVisibility(View.VISIBLE);
 						fetchingNodesText.setVisibility(View.GONE);
 						prepareNodesText.setVisibility(View.GONE);
+						log("megaApi.fastLogin(gSession, this);");
 						megaApi.fastLogin(gSession, this);
 						return;
 					}
 				}
 			}
 			else{
+				log("if ((intentReceived != null) && (intentReceived.getAction() != null))");
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode != null){
-					
-					log("rootNode != null");
+					log("if (rootNode != null)");
 					Intent intent = new Intent(this, ManagerActivity.class);
 					if (action != null){
+						log("if (action != null)");
 						if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 							intent = new Intent(this, FileExplorerActivity.class);
 							if(extras != null)
@@ -413,7 +425,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					}
-					
+
 					prefs = dbH.getPreferences();
 					if(prefs!=null)
 					{
@@ -421,11 +433,11 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 							if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 								log("Enciendo el servicio de la camara");
 								handler.postDelayed(new Runnable() {
-									
+
 									@Override
 									public void run() {
 										log("Now I start the service");
-										startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+										startService(new Intent(getApplicationContext(), CameraSyncService.class));
 									}
 								}, 30 * 1000);
 							}
@@ -437,10 +449,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				}
 				else{
 					log("rootNode == null");
-					
+
 					lastEmail = credentials.getEmail();
 					gSession = credentials.getSession();
-					
+
 					log("session: " + gSession);
 					loginLogin.setVisibility(View.GONE);
 					loginDelimiter.setVisibility(View.GONE);
@@ -469,9 +481,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						intent.putExtras(extras);
 					}
 					intent.setData(uriData);
-				
+
 					intent.setAction(action);
-					
+
 					action = ManagerActivity.ACTION_FILE_PROVIDER;
 				}
 			}
@@ -488,7 +500,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+
 				OldUserCredentials oldCredentials = OldPreferences.getOldCredentials(this);
 				lastEmail = oldCredentials.getEmail();
 				OldPreferences.clearCredentials(this);
@@ -496,13 +508,13 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 	}
-	
+
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 		if (firstTime){
 			int diffHeight = heightGrey - loginCreateAccount.getTop();
-		
+
 			int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
 			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
 		}
@@ -520,49 +532,55 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 
 	@Override
 	public void onClick(View v) {
-
+		log("public void onClick(View v)");
 		switch(v.getId()){
 			case R.id.button_login_login:
+				log("case R.id.button_login_login:");
 				loginClicked = true;
 				onLoginClick(v);
 				break;
 			case R.id.button_create_account_login:
 			case R.id.login_text_create_account:
+				log("case R.id.button_create_account_login:");
 				onRegisterClick(v);
 				break;
 		}
 	}
-	
+
 	public void onLoginClick(View v){
+		log("public void onLoginClick(View v)");
 		submitForm();
 	}
-	
+
 	public void onRegisterClick(View v){
+		log("public void onRegisterClick(View v)");
 		Intent intent = new Intent(this, CreateAccountActivity.class);
 		startActivity(intent);
 		finish();
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
-	        // do nothing
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}  
-	
+		if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+			// do nothing
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
 	/*
 	 * Log in form submit
 	 */
 	private void submitForm() {
+		log("private void submitForm()");
 		if (!validateForm()) {
+			log("if (!validateForm())");
 			return;
 		}
-		
+
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
-		
+
 		if(!Util.isOnline(this))
 		{
 			loginLoggingIn.setVisibility(View.GONE);
@@ -575,11 +593,11 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
 			return;
 		}
-		
+
 		loginLogin.setVisibility(View.GONE);
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
@@ -589,30 +607,32 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		loginFetchNodesProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
 		confirmingAccountText.setVisibility(View.GONE);
-		
+
 		lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
 		lastPassword = et_password.getText().toString();
-		
+
 		log("generating keys");
-		
+
 		new HashTask().execute(lastEmail, lastPassword);
 	}
-	
+
 	private void onKeysGenerated(String privateKey, String publicKey) {
-		log("key generation finished");
+		log("private void onKeysGenerated(String privateKey, String publicKey)");
 
 		this.gPrivateKey = privateKey;
 		this.gPublicKey = publicKey;
-		
+
 		if (confirmLink == null) {
+			log("if (confirmLink == null)");
 			onKeysGeneratedLogin(privateKey, publicKey);
-		} 
+		}
 		else{
+			log("if (confirmLink != null) ");
 			if(!Util.isOnline(this)){
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), true, this);
 				return;
 			}
-			
+
 			loginLogin.setVisibility(View.GONE);
 			loginDelimiter.setVisibility(View.GONE);
 			loginCreateAccount.setVisibility(View.GONE);
@@ -624,14 +644,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			confirmingAccountText.setVisibility(View.VISIBLE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+
 			log("fastConfirm");
 			megaApi.fastConfirmAccount(confirmLink, privateKey, this);
 		}
 	}
-	
+
 	private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
-		
+		log("private void onKeysGeneratedLogin(final String privateKey, final String publicKey) ");
 		if(!Util.isOnline(this)){
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
@@ -643,19 +663,19 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
 		}
-		
+
 		loggingInText.setVisibility(View.VISIBLE);
 		fetchingNodesText.setVisibility(View.GONE);
 		prepareNodesText.setVisibility(View.GONE);
-		
-		log("fastLogin con publicKey y privateKey");
+
+		log("fastLogin publicKey y privateKey");
 		megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
 	}
-	
+
 	/*
 	 * Validate email and password
 	 */
@@ -675,7 +695,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		}
 		return true;
 	}
-	
+
 	/*
 	 * Validate email
 	 */
@@ -689,7 +709,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		}
 		return null;
 	}
-	
+
 	/*
 	 * Validate password
 	 */
@@ -700,7 +720,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request)
 	{
@@ -712,7 +732,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			loginFetchNodesProgressBar.setProgress(0);
 		}
 	}
-	
+
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 //		log("onRequestUpdate: " + request.getRequestString());
@@ -731,17 +751,19 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					loginProgressBar.setVisibility(View.VISIBLE);
 				}
 //				log("progressValue = " + (int)progressValue);
-				loginFetchNodesProgressBar.setProgress((int)progressValue);				
+				loginFetchNodesProgressBar.setProgress((int)progressValue);
 			}
 		}
-	}	
+	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
-		
+
 		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
+			log("if (request.getType() == MegaRequest.TYPE_LOGIN)");
 			if (error.getErrorCode() != MegaError.API_OK) {
+				log("if (error.getErrorCode() != MegaError.API_OK)");
 				String errorMessage;
 				if (error.getErrorCode() == MegaError.API_ENOENT) {
 					errorMessage = getString(R.string.error_incorrect_email_or_password);
@@ -765,9 +787,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
-				
+
 //				DatabaseHandler dbH = new DatabaseHandler(this);
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
@@ -784,22 +806,22 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				}
 			}
 			else{
-
+				log("if (error.getErrorCode() == MegaError.API_OK)");
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+
 				gSession = megaApi.dumpSession();
 				credentials = new UserCredentials(lastEmail, gSession);
-				
+
 //				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
-				
+
 				log("Logged in: " + gSession);
-				
+
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
 
@@ -816,23 +838,27 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 //					log("AUTTHO: _" + authTokenType + "_");
 //					accountManager.setAuthToken(account, authTokenType, gSession);
 //				}
-				
+
 				megaApi.fetchNodes(loginActivity);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			log("if (request.getType() == MegaRequest.TYPE_FETCH_NODES)");
 			if (error.getErrorCode() == MegaError.API_OK){
+				log("if (error.getErrorCode() == MegaError.API_OK)");
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				
+
 				gSession = megaApi.dumpSession();
 				lastEmail = megaApi.getMyUser().getEmail();
 				credentials = new UserCredentials(lastEmail, gSession);
-				
+
 				dbH.saveCredentials(credentials);
 			}
-			
+
 			if(confirmLink==null){
+				log("if(confirmLink==null)");
 				if (error.getErrorCode() != MegaError.API_OK) {
+					log("if (error.getErrorCode() != MegaError.API_OK)");
 					String errorMessage;
 					errorMessage = error.getErrorString();
 					loginLoggingIn.setVisibility(View.GONE);
@@ -845,52 +871,59 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					prepareNodesText.setVisibility(View.GONE);
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
-					
+
 					Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 				}
 				else{
+					log("if (error.getErrorCode() == MegaError.API_OK)");
 					if (!backWhileLogin){
-						
+
 						if (parentHandle != -1){
+							log("if (parentHandle != -1)");
 							Intent intent = new Intent();
 							intent.putExtra("PARENT_HANDLE", parentHandle);
 							setResult(RESULT_OK, intent);
 							finish();
 						}
 						else{
+							log("if (parentHandle == -1)");
 							Intent intent = null;
 							if (firstTime){
+								log("if (firstTime)");
 //							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 								intent = new Intent(loginActivity,ManagerActivity.class);
 								intent.putExtra("firstTimeCam", true);
 							}
 							else{
+								log("if (!firstTime)");
 								boolean initialCam = false;
 //								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 								DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 								MegaPreferences prefs = dbH.getPreferences();
 								prefs = dbH.getPreferences();
 								if (prefs.getCamSyncEnabled() != null){
+									log("if (prefs.getCamSyncEnabled() != null)");
 									if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-										log("Enciendo el servicio de la camara");
+										log("if (Boolean.parseBoolean(prefs.getCamSyncEnabled()))");
 										handler.postDelayed(new Runnable() {
-											
+
 											@Override
 											public void run() {
-												log("Now I start the service");
-												startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+												log("Camera Service starts");
+												startService(new Intent(getApplicationContext(), CameraSyncService.class));
 											}
 										}, 30 * 1000);
 									}
 								}
 								else{
-//									intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+									log("if (prefs.getCamSyncEnabled() == null)");
 									intent = new Intent(loginActivity,ManagerActivity.class);
 									intent.putExtra("firstTimeCam", true);
-									initialCam = true;								
+									initialCam = true;
 								}
 
 								if (!initialCam){
+									log("if (!initialCam)");
 									intent = new Intent(loginActivity,ManagerActivity.class);
 									if (action != null){
 										if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
@@ -917,7 +950,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 								}
 								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							}
-							
+
+							log("startActivity(intent);");
 							startActivity(intent);
 							finish();
 						}
@@ -925,14 +959,17 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				}
 			}
 			else{
+				log("if(confirmLink != null)");
 				Intent intent = new Intent();
 				intent = new Intent(this,ChooseAccountActivity.class);
+				log("startActivity(intent);");
 				startActivity(intent);
-				finish();				
+				finish();
 			}
-	
+
 		}
 		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
+			log("else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK)");
 			String s = "";
 			loginLogin.setVisibility(View.VISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
@@ -943,7 +980,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			confirmingAccountText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+
 			if(error.getErrorCode() == MegaError.API_OK){
 				s = request.getEmail();
 				et_user.setText(s);
@@ -955,6 +992,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT){
+			log("else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT)");
 			if (error.getErrorCode() == MegaError.API_OK){
 				log("fastConfirm finished - OK");
 				onKeysGeneratedLogin(gPrivateKey, gPublicKey);
@@ -969,7 +1007,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				confirmingAccountText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+
 				if (error.getErrorCode() == MegaError.API_ENOENT){
 					Util.showErrorAlertDialog(getString(R.string.error_incorrect_email_or_password), false, LoginActivity.this);
 				}
@@ -985,11 +1023,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	{
 		log("onRequestTemporaryError: " + request.getRequestString());
 	}
-	
+
 	@Override
 	public void onBackPressed() {
+		log("public void onBackPressed()");
 		backWhileLogin = true;
-		
+
 		if (loginClicked){
 			super.onBackPressed();
 		}
@@ -999,18 +1038,18 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			finish();
 		}
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 	}
-	
+
 	public void onNewIntent(Intent intent){
 		if (intent != null && ACTION_CONFIRM.equals(intent.getAction())) {
 			handleConfirmationIntent(intent);
 		}
 	}
-	
+
 	/*
 	 * Handle intent from confirmation email
 	 */
@@ -1020,7 +1059,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		bLogin.setText(R.string.login_confirm_account);
 		updateConfirmEmail(confirmLink);
 	}
-	
+
 	/*
 	 * Get email address from confirmation code and set to emailView
 	 */
@@ -1029,7 +1068,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), true, this);
 			return;
 		}
-		
+
 		loginLogin.setVisibility(View.GONE);
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
@@ -1043,19 +1082,19 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		log("querySignupLink");
 		megaApi.querySignupLink(link, this);
 	}
-	
-	
+
+
 	public static void log(String message) {
 		Util.log("LoginActivity", message);
 	}
-	
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
-		{	
+		{
 			megaApi.removeRequestListener(this);
 		}
-		
+
 		super.onDestroy();
 	}
 }
