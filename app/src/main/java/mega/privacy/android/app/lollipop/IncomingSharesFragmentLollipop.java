@@ -420,10 +420,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.setParentHandle(-1);
 			}
 			else{
-				adapter.setParentHandle(parentHandle);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				log("ParentHandle: "+parentHandle);
-
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();

@@ -212,12 +212,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				break;
 			}
 			case ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleOutgoing(-1);
+//				((ManagerActivityLollipop) context).setParentHandleOutgoing(parentHandle);
 				break;
 			}
 			case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
 				incoming=true;
-				((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
+//				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
 				break;
 			}
 			default: {
