@@ -8,8 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -325,6 +327,39 @@ public class ShareInfo {
 		}
 		else{
 			log("inputStream is NULL");
+			String path = uri.getPath();
+			log("PATH: " + path);
+			if (path != null){
+				String [] s = path.split("file://");
+				if (s.length > 1){
+					String p = s[1];
+					String [] s1 = p.split("/ORIGINAL");
+					if (s1.length > 1){
+						path = s1[0];
+//						path.replaceAll("%20", " ");
+						try {
+							path = URLDecoder.decode(path, "UTF-8");
+						} catch (UnsupportedEncodingException e) {
+							path.replaceAll("%20", " ");
+						}
+					}
+				}
+			}
+			log("REAL PATH: " + path);
+
+			file = null;
+			try{
+				file = new File(path);
+			}
+			catch(Exception e){
+				log("error when creating File!");
+//					log(e.getMessage());
+			}
+			if((file != null) && file.exists() && file.canRead()) {
+				size = file.length();
+				log("The file is accesible!");
+				return;
+			}
 		}
 		log("END processUri");
 	}
@@ -360,6 +395,9 @@ public class ShareInfo {
 			int dataIndex = cursor.getColumnIndex("_data");
 			if (dataIndex != -1) {
 				String data = cursor.getString(dataIndex);
+				if (data == null){
+					return;
+				}
 				File dataFile = new File(data);
 				if (dataFile.exists() && dataFile.canRead()) {
 					if (size == -1) {
