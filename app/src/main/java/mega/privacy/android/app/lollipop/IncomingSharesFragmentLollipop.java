@@ -1,32 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaStreamingService;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -36,7 +9,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -49,34 +21,48 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.view.animation.TranslateAnimation;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
 
 
 public class IncomingSharesFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
@@ -334,7 +320,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		log("onCreateView: parentHandle is: "+parentHandle);
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -363,6 +349,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				log("After consulting... the INCOMING parent is: "+parentHandleIncoming);
 				parentHandle = parentHandleIncoming;
 				deepBrowserTree = ((ManagerActivityLollipop)context).getDeepBrowserTreeIncoming();
+				log("AND deepBrowserTree: "+deepBrowserTree);
 			}
 		}
 
@@ -418,11 +405,20 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				log("ParentHandle -1");
 				findNodes();
 				adapter.setParentHandle(-1);
+				aB.setTitle(getString(R.string.section_shared_items));
+				log("aB.setHomeAsUpIndicator_333");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				log("ParentHandle: "+parentHandle);
+				log("ParentHandle to find children: "+parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				adapter.setNodes(nodes);
+				aB.setTitle(parentNode.getName());
+				log("ic_arrow_back_white_68");
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
