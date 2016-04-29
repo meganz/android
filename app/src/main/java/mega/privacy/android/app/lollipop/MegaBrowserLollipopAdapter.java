@@ -1,25 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -35,16 +15,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUser;
 
 public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener {
 	
@@ -217,7 +213,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
 				incoming=true;
-//				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
+				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
 				break;
 			}
 			default: {
@@ -1203,13 +1199,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			break;
 		}
 		case ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER: {
-			log("setParentHandleBrowser -ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER");
+			log("setParentHandleOutgoing -ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER");
 			//TODO necesito algo?
 			((ManagerActivityLollipop) context).setParentHandleOutgoing(parentHandle);
 			break;
 		}
 		default: {
-			log("setParentHandleBrowser -default");
+			log("setParentHandle -default");
 //			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
 			break;
 		}
