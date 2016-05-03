@@ -1,5 +1,39 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,50 +45,14 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class OfflineFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 	
@@ -557,8 +555,15 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 
 		if (context instanceof ManagerActivityLollipop){
 
+
+			String pathNavigationOffline = ((ManagerActivityLollipop)context).getPathNavigationOffline();
+			if(pathNavigationOffline!=null){
+				pathNavigation = pathNavigationOffline;
+			}
+
 			if(pathNavigation!=null){
-				log("PathNavigation is: "+pathNavigation);
+
+				log("AFTER PathNavigation is: "+pathNavigation);
 				if (pathNavigation.equals("/")){
 					aB.setTitle(getString(R.string.section_saved_for_offline));
 					log("aB.setHomeAsUpIndicator_30");
@@ -566,7 +571,16 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				}
 				else{
-
+					log("The pathNavigation is: "+pathNavigation);
+					String title = pathNavigation;
+					int index=title.lastIndexOf("/");
+					title=title.substring(0,index);
+					index=title.lastIndexOf("/");
+					title=title.substring(index+1,title.length());
+					aB.setTitle(title);
+					log("aB.setHomeAsUpIndicator_36");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				}
 			}
 			else{
@@ -2138,7 +2152,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}	
 	
 	public void setPathNavigation(String _pathNavigation){
-		log("setPathNavigation");
+		log("setPathNavigation: "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
 		if (adapter != null){	
 //			contentText.setText(getInfoFolder(mOffList));

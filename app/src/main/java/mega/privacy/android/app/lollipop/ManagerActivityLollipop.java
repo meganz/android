@@ -309,7 +309,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     ViewPager viewPagerCDrive;
 
 	boolean firstTime = true;
-	String pathNavigation = "/";
+//	String pathNavigation = "/";
 	MegaUser contact = null;
 	String searchQuery = null;
 	boolean isSearching = false;
@@ -1090,7 +1090,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int indexShares = 0;
 		int indexCloud = 0;
 		int indexContacts = 0;
-		outState.putString("pathNavigation", pathNavigation);
 		outState.putLong("parentHandleBrowser", parentHandleBrowser);
 		outState.putLong("parentHandleRubbish", parentHandleRubbish);
 		outState.putLong("parentHandleIncoming", parentHandleIncoming);
@@ -1098,7 +1097,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
-		outState.putString("pathNavigationOffline", pathNavigationOffline);
 		outState.putSerializable("drawerItem", drawerItem);
 
 		if(parentHandleIncoming!=-1){
@@ -1130,6 +1128,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		outState.putInt("indexContacts", indexContacts);
 
+		if(oFLol!=null){
+			pathNavigationOffline = oFLol.getPathNavigation();
+		}
+		outState.putString("pathNavigationOffline", pathNavigationOffline);
 //		outState.putParcelable("obj", myClass);
 	}
 
@@ -1144,7 +1146,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
-			pathNavigation = savedInstanceState.getString("pathNavigation", "/");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
 			log("savedInstanceState -> parentHandleBrowser: "+parentHandleBrowser);
 			parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish", -1);
@@ -1153,7 +1154,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("savedInstanceState -> parentHandleOutgoing: "+parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
-			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
@@ -1163,6 +1163,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			indexCloud = savedInstanceState.getInt("indexCloud", indexCloud);
 			log("savedInstanceState -> indexCloud: "+indexCloud);
 			indexContacts = savedInstanceState.getInt("indexContacts", indexContacts);
+			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
+			log("savedInstanceState -> pathNavigationOffline: "+pathNavigationOffline);
 		}
 		else{
 			log("Bundle is NULL");
@@ -1172,6 +1174,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
+			this.setPathNavigationOffline("/");
 		}
 
 		File thumbDir;
@@ -1397,7 +1400,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
 
         dbH.setAttrOnline(true);
-        this.setPathNavigationOffline(pathNavigation);
 
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
@@ -2066,36 +2068,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         			String sharesTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
     				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+
     				sharesTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
     				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
-//    				if (fbFLol != null){
-//						log("FileBrowserFragment is not NULL");
-//    					fbFLol.setIsList(isList);
-//        				fbFLol.setParentHandle(parentHandleBrowser);
-//
-//            			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//            			fragTransaction.detach(fbFLol);
-//            			fragTransaction.commit();
-//
-//            			fragTransaction = getSupportFragmentManager().beginTransaction();
-//            			fragTransaction.attach(fbFLol);
-//            			fragTransaction.commit();
-//    				}
-//
-//    				if (rbFLol != null){
-//						log("FileBrowserFragment is not NULL");
-//    					rbFLol.setIsList(isList);
-//    					rbFLol.setParentHandle(parentHandleRubbish);
-//
-//    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//            			fragTransaction.detach(rbFLol);
-//            			fragTransaction.commit();
-//
-//            			fragTransaction = getSupportFragmentManager().beginTransaction();
-//            			fragTransaction.attach(rbFLol);
-//            			fragTransaction.commit();
-//    				}
     				//Check viewPager to determine the tab shown
 
     				if(viewPagerCDrive!=null){
@@ -2501,12 +2477,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			tB.setVisibility(View.VISIBLE);
 
     			if (oFLol == null){
+					log("New OfflineFragment");
     				oFLol = new OfflineFragmentLollipop();
     				oFLol.setIsList(isList);
-    				oFLol.setPathNavigation("/");
+//    				oFLol.setPathNavigation("/");
     			}
     			else{
-    				oFLol.setPathNavigation("/");
+					log("OfflineFragment exist");
+//    				oFLol.setPathNavigation("/");
     				oFLol.setIsList(isList);
     			}
 
@@ -2886,33 +2864,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
     				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
-//    				if (inSFLol != null){
-//	    				inSFLol.setParentHandle(parentHandleIncoming);
-//	        			inSFLol.setOrder(orderOthers);
-//	        			inSFLol.setIsList(isList);
-//
-//	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        			fragTransaction.detach(inSFLol);
-//	        			fragTransaction.commit();
-//
-//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        			fragTransaction.attach(inSFLol);
-//	        			fragTransaction.commit();
-//    				}
-//
-//    				if (outSFLol != null){
-//    					outSFLol.setParentHandle(parentHandleOutgoing);
-//    					outSFLol.setOrder(orderOthers);
-//    					outSFLol.setIsList(isList);
-//
-//    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        			fragTransaction.detach(outSFLol);
-//	        			fragTransaction.commit();
-//
-//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        			fragTransaction.attach(outSFLol);
-//	        			fragTransaction.commit();
-//    				}
+					//Needed when changing list<->grid
+    				if (inSFLol != null){
+	        			inSFLol.setOrder(orderOthers);
+	        			inSFLol.setIsList(isList);
+
+	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(inSFLol);
+	        			fragTransaction.commit();
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(inSFLol);
+	        			fragTransaction.commit();
+    				}
+
+    				if (outSFLol != null){
+    					outSFLol.setOrder(orderOthers);
+    					outSFLol.setIsList(isList);
+
+    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(outSFLol);
+	        			fragTransaction.commit();
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(outSFLol);
+	        			fragTransaction.commit();
+    				}
 
         			int index = viewPagerShares.getCurrentItem();
 					log("Fragment Index Shared Items: " + index);
@@ -3145,7 +3122,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
     			}
     			else{
-					log("mTabsAdapterCloudDrive NOT null");
+					log("mTabsAdapterContacts NOT null");
     				String sharesTag = getFragmentTag(R.id.contact_tabs_pager, 0);
     				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
     				sharesTag = getFragmentTag(R.id.contact_tabs_pager, 1);
@@ -3153,43 +3130,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				sharesTag = getFragmentTag(R.id.contact_tabs_pager, 2);
     				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
-    				if (cFLol != null){
-    					cFLol.setIsList(isList);
-
-            			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-            			fragTransaction.detach(cFLol);
-            			fragTransaction.commit();
-
-            			fragTransaction = getSupportFragmentManager().beginTransaction();
-            			fragTransaction.attach(cFLol);
-            			fragTransaction.commit();
-    				}
-
-    				if (sRFLol != null){
-    					//TODO
-//    					sRFLol.setIsList(isList);
-
-    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-            			fragTransaction.detach(sRFLol);
-            			fragTransaction.commit();
-
-            			fragTransaction = getSupportFragmentManager().beginTransaction();
-            			fragTransaction.attach(sRFLol);
-            			fragTransaction.commit();
-    				}
-
-    				if (rRFLol != null){
-    					//TODO
-//    					rRFLol.setIsList(isList);
-
-    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-            			fragTransaction.detach(rRFLol);
-            			fragTransaction.commit();
-
-            			fragTransaction = getSupportFragmentManager().beginTransaction();
-            			fragTransaction.attach(rRFLol);
-            			fragTransaction.commit();
-    				}
     			}
 
     			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
@@ -5217,6 +5157,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	else{
 		        	isList = !isList;
 	    			dbH.setPreferredViewList(isList);
+
+					updateAliveFragments();
+
 	    			if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -5328,7 +5271,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				fragTransaction.commit();
 
 	        				oFLol.setIsList(isList);
-	        				oFLol.setPathNavigation(pathNavigation);
+	        				oFLol.setPathNavigation(pathNavigationOffline);
 	        				//oFLol.setGridNavigation(false);
 	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
 
@@ -6147,6 +6090,85 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             default:{
 	            return super.onOptionsItemSelected(item);
             }
+		}
+	}
+
+	public void updateAliveFragments(){
+		log("updateAliveFragments");
+		//Needed to update view when changing list<->grid from other section
+		String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+		if (fbFLol != null){
+			log("FileBrowserFragment is not NULL -> UPDATE");
+			fbFLol.setIsList(isList);
+
+			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.detach(fbFLol);
+			fragTransaction.commit();
+
+			fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.attach(fbFLol);
+			fragTransaction.commit();
+		}
+
+		cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+		rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+		if (rbFLol != null){
+			log("RubbishBinFragment is not NULL -> UPDATE");
+			rbFLol.setIsList(isList);
+
+			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.detach(rbFLol);
+			fragTransaction.commit();
+
+			fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.attach(rbFLol);
+			fragTransaction.commit();
+		}
+
+		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
+		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+		if (inSFLol != null){
+			log("IncomingFragment is not NULL -> UPDATE");
+			inSFLol.setIsList(isList);
+
+			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.detach(inSFLol);
+			fragTransaction.commit();
+
+			fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.attach(inSFLol);
+			fragTransaction.commit();
+		}
+
+		sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+		if (outSFLol != null){
+			log("OutgoingFragment is not NULL -> UPDATE");
+			outSFLol.setIsList(isList);
+
+			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.detach(outSFLol);
+			fragTransaction.commit();
+
+			fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.attach(outSFLol);
+			fragTransaction.commit();
+		}
+
+		String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+		if (cFLol != null){
+			log("ContactsFragment is not NULL -> UPDATE");
+			cFLol.setIsList(isList);
+
+			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.detach(cFLol);
+			fragTransaction.commit();
+
+			fragTransaction = getSupportFragmentManager().beginTransaction();
+			fragTransaction.attach(cFLol);
+			fragTransaction.commit();
 		}
 	}
 
@@ -12477,6 +12499,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void setPathNavigationOffline(String pathNavigationOffline) {
+		log("setPathNavigationOffline: "+pathNavigationOffline);
 		this.pathNavigationOffline = pathNavigationOffline;
 	}
 
