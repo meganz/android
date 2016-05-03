@@ -370,6 +370,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int deepBrowserTreeOutgoing;
 	int indexShares = -1;
 	int indexCloud = -1;
+	int indexContacts = -1;
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
@@ -1088,6 +1089,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int deepBrowserTreeOutgoing = 0;
 		int indexShares = 0;
 		int indexCloud = 0;
+		int indexContacts = 0;
 		outState.putString("pathNavigation", pathNavigation);
 		outState.putLong("parentHandleBrowser", parentHandleBrowser);
 		outState.putLong("parentHandleRubbish", parentHandleRubbish);
@@ -1123,6 +1125,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		outState.putInt("indexCloud", indexCloud);
 
+		if (viewPagerContacts != null) {
+			indexContacts = viewPagerContacts.getCurrentItem();
+		}
+		outState.putInt("indexContacts", indexContacts);
+
 //		outState.putParcelable("obj", myClass);
 	}
 
@@ -1155,6 +1162,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("savedInstanceState -> indexShares: "+indexShares);
 			indexCloud = savedInstanceState.getInt("indexCloud", indexCloud);
 			log("savedInstanceState -> indexCloud: "+indexCloud);
+			indexContacts = savedInstanceState.getInt("indexContacts", indexContacts);
 		}
 		else{
 			log("Bundle is NULL");
@@ -1918,6 +1926,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    		}
 		    		break;
 	    		}
+				case SETTINGS:{
+					aB.setTitle(getString(R.string.action_settings));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
+				case CONTACTS:{
+					aB.setTitle(getString(R.string.section_contacts));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
     		}
     	}
 	}
@@ -3056,6 +3072,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.VISIBLE);
 
     			if (mTabsAdapterContacts == null){
+					log("mTabsAdapterContacts == null");
     				mTabsAdapterContacts = new TabsAdapter(this, mTabHostContacts, viewPagerContacts);
 
         			TabHost.TabSpec tabSpec1 = mTabHostContacts.newTabSpec("contactsFragment");
@@ -3075,17 +3092,62 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			textViewContacts = (TextView) mTabHostContacts.getTabWidget().getChildAt(0).findViewById(R.id.textView);
         			textViewSent = (TextView) mTabHostContacts.getTabWidget().getChildAt(1).findViewById(R.id.textView);
         			textViewReceived = (TextView) mTabHostContacts.getTabWidget().getChildAt(2).findViewById(R.id.textView);
-        			textViewContacts.setTypeface(null, Typeface.BOLD);
-        			textViewSent.setTypeface(null, Typeface.NORMAL);
-        			textViewReceived.setTypeface(null, Typeface.NORMAL);
-        			textViewContacts.setGravity(Gravity.CENTER);
-        			textViewSent.setGravity(Gravity.CENTER);
-        			textViewReceived.setGravity(Gravity.CENTER);
-        			textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
-        			textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+					textViewContacts.setGravity(Gravity.CENTER);
+					textViewSent.setGravity(Gravity.CENTER);
+					textViewReceived.setGravity(Gravity.CENTER);
 
+					if(indexContacts!=-1) {
+						log("The index of the TAB CONTACTS is: " + indexContacts);
+						if (viewPagerContacts != null) {
+							switch (indexContacts){
+								case 0:{
+									viewPagerContacts.setCurrentItem(0);
+									log("Select Contacts TAB");
+									textViewContacts.setTypeface(null, Typeface.BOLD);
+									textViewSent.setTypeface(null, Typeface.NORMAL);
+									textViewReceived.setTypeface(null, Typeface.NORMAL);
+									textViewContacts.setTextColor(getResources().getColor(R.color.white));
+									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									break;
+								}
+								case 1:{
+									viewPagerContacts.setCurrentItem(1);
+									log("Select Sent Requests TAB");
+									textViewContacts.setTypeface(null, Typeface.NORMAL);
+									textViewSent.setTypeface(null, Typeface.BOLD);
+									textViewReceived.setTypeface(null, Typeface.NORMAL);
+									textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewSent.setTextColor(getResources().getColor(R.color.white));
+									textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									break;
+								}
+								case 2:{
+									viewPagerContacts.setCurrentItem(2);
+									log("Select Received Request TAB");
+									textViewContacts.setTypeface(null, Typeface.NORMAL);
+									textViewSent.setTypeface(null, Typeface.NORMAL);
+									textViewReceived.setTypeface(null, Typeface.BOLD);
+									textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewReceived.setTextColor(getResources().getColor(R.color.white));
+									break;
+								}
+							}
+						}
+					}
+					else{
+						//No bundle, no change of orientation
+						textViewContacts.setTypeface(null, Typeface.BOLD);
+						textViewSent.setTypeface(null, Typeface.NORMAL);
+						textViewReceived.setTypeface(null, Typeface.NORMAL);
+						textViewContacts.setTextColor(getResources().getColor(R.color.white));
+						textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+						textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+					}
     			}
     			else{
+					log("mTabsAdapterCloudDrive NOT null");
     				String sharesTag = getFragmentTag(R.id.contact_tabs_pager, 0);
     				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
     				sharesTag = getFragmentTag(R.id.contact_tabs_pager, 1);
