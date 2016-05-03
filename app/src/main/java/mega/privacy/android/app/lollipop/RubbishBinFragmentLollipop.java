@@ -1025,6 +1025,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public void setIsList(boolean isList){
+		log("setIsList");
 		this.isList = isList;
 	}
 	
