@@ -2713,12 +2713,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			if (iFLol == null){
     				iFLol = new InboxFragmentLollipop();
-    				iFLol.setIsList(isList);
     			}
     			else{
 					log("Inbox Fragment is not NULL");
-    				iFLol.setIsList(isList);
-    				iFLol.setParentHandle(parentHandleInbox);
+//    				iFLol.setParentHandle(parentHandleInbox);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
     				iFLol.setNodes(nodes);
     			}
@@ -4655,9 +4653,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		switch(id){
 			case android.R.id.home:{
 				if (firstNavigationLevel){
+					log("firstNavigationLevel is TRUE");
 					drawerLayout.openDrawer(nV);
 				}
 				else{
+					log("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		    			int index = viewPagerCDrive.getCurrentItem();
 		    			if(index==1){
