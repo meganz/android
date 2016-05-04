@@ -1,25 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaStreamingService;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -38,13 +18,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -55,6 +35,25 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 
 public class SearchFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
@@ -300,8 +299,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		
 		if (parentHandle == -1){
-			nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
-			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
+			nodes = megaApi.search(searchQuery);
+			searchNodes = megaApi.search(searchQuery);
 			
 			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 			log("aB.setHomeAsUpIndicator_49");
@@ -1122,7 +1121,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				log("levels searchQuery");
 				parentHandle = -1;
 				((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-				nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
+				nodes = megaApi.search(searchQuery);
 				adapter.setNodes(nodes);
 				setNodes(nodes);
 				contentText.setText(getInfoNode());

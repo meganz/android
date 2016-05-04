@@ -3285,8 +3285,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					hidden.setChecked(true);
 				}
 
-    			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
+				log("SEARCH NODES: " + searchQuery);
+    			searchNodes = megaApi.search(searchQuery);
+				log("SEARCH NODES.size = " + searchNodes.size());
 
+				for(int j=0; j<searchNodes.size();j++){
+					MegaNode node = searchNodes.get(j);
+					MegaNode parent = megaApi.getParentNode(node);
+					if(parent!=null){
+						if(parent.getHandle()==megaApi.getRootNode().getHandle()){
+							log("The node: "+node.getName()+"_"+node.getHandle()+" is IN CLOUD");
+						}
+						else if(parent.getHandle()==megaApi.getInboxNode().getHandle()){
+							log("The node: "+node.getName()+"_"+node.getHandle()+" is IN INBOX");
+						}
+						else{
+							log("The node: "+node.getName()+"_"+node.getHandle()+"is ??");
+						}
+					}
+					else{
+						log("The node: "+node.getName()+"_"+node.getHandle()+" HAS null parent");
+					}
+				}
     			drawerItem = DrawerItem.SEARCH;
 
     			sFLol.setSearchNodes(searchNodes);
