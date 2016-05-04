@@ -1,34 +1,11 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.TabsAdapter;
-import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -58,6 +35,30 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.TabsAdapter;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 public class FileExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
@@ -144,6 +145,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	ArrayList<MegaNode> nodes;
 	
 	long gParentHandle;
+	long parentHandleIncoming;
+	long parentHandleCloud;
+	int deepBrowserTree;
 	String gcFTag = "";
 	boolean selectFile = false;
 	
@@ -179,13 +183,42 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
-	}  
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		log("onConfigurationChanged");
+		super.onConfigurationChanged(newConfig);
+
+		// Checks the orientation of the screen
+//		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//
+//		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+//
+//		}
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		if(savedInstanceState!=null){
+			log("Bundle is NOT NULL");
+			parentHandleCloud = savedInstanceState.getLong("parentHandleCloud", -1);
+			log("savedInstanceState -> parentHandleCloud: "+parentHandleCloud);
+			parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
+			log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
+			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", deepBrowserTree);
+			log("savedInstanceState -> deepBrowserTree: "+deepBrowserTree);
+		}
+		else{
+			log("Bundle is NULL");
+			parentHandleCloud = -1;
+			parentHandleIncoming = -1;
+			deepBrowserTree = 0;
+		}
 				
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -417,7 +450,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
     		
     				if(iSharesExplorer!=null){
-    					if(iSharesExplorer.deepBrowserTree==0){
+    					if(iSharesExplorer.getDeepBrowserTree()==0){
     						changeTitle(getString(R.string.title_incoming_shares_explorer));
     					}
     					else{
@@ -493,8 +526,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("Tag: "+ cFTag1);
 				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 				if(iSharesExplorer != null){	
-					log("Level deepBrowserTree: "+iSharesExplorer.deepBrowserTree);
-			    	if (iSharesExplorer.deepBrowserTree==0){
+					log("Level deepBrowserTree: "+iSharesExplorer.getDeepBrowserTree());
+			    	if (iSharesExplorer.getDeepBrowserTree()==0){
 			    		createFolderMenuItem.setVisible(false);
 			    	}
 			    	else{		    		
@@ -568,8 +601,27 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
-		bundle.putBoolean("folderSelected", folderSelected);
+		log("onSaveInstanceState");
 		super.onSaveInstanceState(bundle);
+		bundle.putBoolean("folderSelected", folderSelected);
+		if(cDriveExplorer!=null){
+			parentHandleCloud = cDriveExplorer.getParentHandle();
+		}
+		else{
+			parentHandleCloud = -1;
+		}
+		bundle.putLong("parentHandleCloud", parentHandleCloud);
+		if(iSharesExplorer!=null){
+			parentHandleIncoming = iSharesExplorer.getParentHandle();
+			deepBrowserTree = iSharesExplorer.getDeepBrowserTree();
+		}
+		else{
+			parentHandleIncoming = -1;
+			deepBrowserTree = 0;
+		}
+		bundle.putLong("parentHandleIncoming", parentHandleIncoming);
+		bundle.putInt("deepBrowserTree", deepBrowserTree);
+		log("IN BUNDLE -> deepBrowserTree: "+deepBrowserTree);
 	}
 	
 	@Override
@@ -678,7 +730,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("buttonClick");
 		
 		if (tabShown == INCOMING_TAB){
-			if (iSharesExplorer.deepBrowserTree==0){
+			if (iSharesExplorer.getDeepBrowserTree()==0){
 				Intent intent = new Intent();
 				setResult(RESULT_FIRST_USER, intent);
 				finish();
@@ -1298,7 +1350,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);		
 		
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
@@ -1345,5 +1397,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+	}
+
+	public long getParentHandleCloud() {
+		return parentHandleCloud;
+	}
+
+	public void setParentHandleCloud(long parentHandleCloud) {
+		this.parentHandleCloud = parentHandleCloud;
+	}
+
+	public long getParentHandleIncoming() {
+		return parentHandleIncoming;
+	}
+
+	public void setParentHandleIncoming(long parentHandleIncoming) {
+		this.parentHandleIncoming = parentHandleIncoming;
 	}
 }
