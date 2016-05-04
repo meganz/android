@@ -1,6 +1,21 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -13,28 +28,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 
 public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnClickListener{
@@ -447,6 +440,24 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 * Disable nodes from the list
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
+
+		if (adapter == null){
+			log("Adapter is NULL");
+			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
+
+			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
+
+				@Override
+				public void onItemClick(View view, int position) {
+					itemClick(view, position);
+				}
+			});
+		}
+//		else{
+//			adapter.setParentHandle(parentHandle);
+//			adapter.setNodes(nodes);
+//			adapter.setSelectFile(selectFile);
+//		}
 		adapter.setDisableNodes(disabledNodes);
 	}
 	
