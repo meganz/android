@@ -27,7 +27,7 @@ import android.util.Log;
 public class MegaApplication extends Application implements MegaListenerInterface
 {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.0.6.official";
+	static final String USER_AGENT = "MEGAAndroid/3.0.7";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -99,6 +99,29 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
+
+		Util.setContext(getApplicationContext());
+		DatabaseHandler dbH;
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		boolean fileLogger = false;
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null) {
+				if (attrs.getFileLogger() != null) {
+					try {
+						fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
+					} catch (Exception e) {
+						fileLogger = false;
+					}
+				} else {
+					fileLogger = false;
+				}
+			} else {
+				fileLogger = false;
+			}
+		}
+
+		Util.setFileLogger(fileLogger);
 		
 //		initializeGA();
 		

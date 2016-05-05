@@ -327,7 +327,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_list_filename);
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp(210, outMetrics);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_list_three_dots);
 			
@@ -352,8 +352,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_grid_item_layout);
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_grid_filename);
-			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);

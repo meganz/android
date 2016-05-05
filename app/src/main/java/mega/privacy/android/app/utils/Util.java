@@ -28,6 +28,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -84,7 +85,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	// CreateThumbPreviewService (true=enabled; false=disabled)
 	public static boolean CREATE_THUMB_PREVIEW_SERVICE = false;
@@ -108,6 +109,8 @@ public class Util {
 	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
 	*/
 	public static DatabaseHandler dbH;
+	public static boolean fileLogger = false;
+	public static Context context;
 
 	public static HashMap<String, String> countryCodeDisplay;
 	
@@ -574,49 +577,60 @@ public class Util {
 		
 		return dateString;
 	}
+
+	public static void setContext(Context c){
+		context = c;
+	}
+
+	public static void setDBH(DatabaseHandler d){
+		dbH = d;
+	}
+
+	public static void setFileLogger(boolean fL){
+		fileLogger = fL;
+	}
 	
 	/*
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
-//		File logFile=null;
+		File logFile=null;
 		if (DEBUG) {
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
-			
+		}
+
+		if (fileLogger) {
 			//Send the log to a file
-			/*
-			String dir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/";
-//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
+
+			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
+			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
 			File dirFile = new File(dir);
-			if(!dirFile.exists()){
+			if (!dirFile.exists()) {
 				dirFile.mkdirs();
 				logFile = new File(dirFile, "log.txt");
-				if(!logFile.exists()){
+				if (!logFile.exists()) {
 					try {
 						logFile.createNewFile();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}				
-			}
-			else{
+				}
+			} else {
 				logFile = new File(dirFile, "log.txt");
-				if(!logFile.exists()){
+				if (!logFile.exists()) {
 					try {
 						logFile.createNewFile();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}		
+				}
 			}
 
-			if(logFile!=null&&logFile.exists()){
-				appendStringToFile(origin+": "+message+"\n", logFile);
-			}*/
-				
-//			Log.e(origin, message + "");
+			if (logFile != null && logFile.exists()) {
+				appendStringToFile(origin + ": " + message + "\n", logFile);
+			}
 		}
 	}
 	
@@ -804,7 +818,7 @@ public class Util {
 	 */
 	public static void deleteIfLocal(Context context, File file) {
 		if (isLocal(context, file) && file.exists()) {
-			log("delete!");
+			log("delete");
 			file.delete();
 		}
 	}

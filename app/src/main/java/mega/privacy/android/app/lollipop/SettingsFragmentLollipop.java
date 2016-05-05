@@ -9,6 +9,7 @@ import java.net.URI;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.utils.Util;
@@ -87,6 +88,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
+	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -117,6 +120,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference megaCameraFolder;
 	Preference aboutPrivacy;
 	Preference aboutTOS;
+	Preference aboutSDK;
+	Preference aboutApp;
 	Preference secondaryMediaFolderOn;
 	Preference localSecondaryFolder;
 	Preference megaSecondaryFolder;
@@ -153,6 +158,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Long handleSecondaryMediaFolder = null;
 	MegaNode megaNodeSecondaryMediaFolder = null;
 	String megaPathSecMediaFolder = "";
+
+	int numberOfClicksSDK = 0;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -256,7 +263,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		aboutTOS = findPreference(KEY_ABOUT_TOS);
 		aboutTOS.setOnPreferenceClickListener(this);
-		
+
+		aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
+		aboutApp.setOnPreferenceClickListener(this);
+		aboutSDK = findPreference(KEY_ABOUT_SDK_VERSION);
+		aboutSDK.setOnPreferenceClickListener(this);
+
 		if (prefs == null){
 			dbH.setStorageAskAlways(false);
 			
@@ -846,6 +858,43 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public boolean onPreferenceClick(Preference preference) {
 		log("onPreferenceClick");
 		prefs = dbH.getPreferences();
+		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
+			numberOfClicksSDK++;
+			if (numberOfClicksSDK == 5){
+				MegaAttributes attrs = dbH.getAttributes();
+				if (attrs.getFileLogger() != null){
+					try {
+						if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+							dbH.setFileLogger(true);
+							Util.setFileLogger(true);
+							numberOfClicksSDK = 0;
+							Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+						}
+						else{
+							dbH.setFileLogger(false);
+							Util.setFileLogger(false);
+							numberOfClicksSDK = 0;
+							Toast.makeText(context, getString(R.string.settings_disable_logs), Toast.LENGTH_LONG).show();
+						}
+					}
+					catch(Exception e){
+						dbH.setFileLogger(true);
+						Util.setFileLogger(true);
+						numberOfClicksSDK = 0;
+						Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+					}
+				}
+				else{
+					dbH.setFileLogger(true);
+					Util.setFileLogger(true);
+					numberOfClicksSDK = 0;
+					Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+				}
+			}
+		}
+		else{
+			numberOfClicksSDK = 0;
+		}
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
