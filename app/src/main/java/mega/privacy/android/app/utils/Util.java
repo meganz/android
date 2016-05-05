@@ -85,7 +85,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	// CreateThumbPreviewService (true=enabled; false=disabled)
 	public static boolean CREATE_THUMB_PREVIEW_SERVICE = false;
@@ -815,7 +815,7 @@ public class Util {
 	 */
 	public static void deleteIfLocal(Context context, File file) {
 		if (isLocal(context, file) && file.exists()) {
-			log("delete!");
+			log("delete");
 			file.delete();
 		}
 	}
