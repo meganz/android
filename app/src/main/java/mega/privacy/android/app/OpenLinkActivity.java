@@ -3,17 +3,21 @@ package mega.privacy.android.app;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import mega.privacy.android.app.lollipop.CreateAccountActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 
 
 public class OpenLinkActivity extends PinActivity {
@@ -125,6 +129,34 @@ public class OpenLinkActivity extends PinActivity {
 				finish();
 			}
 			return;
+		}
+
+		// Create account invitation
+		if (url != null && url.matches("^https://mega.co.nz/#newsignup.+$")) {
+			log("new signup url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				MegaNode rootNode = megaApi.getRootNode();
+				if (rootNode == null){
+					log("Not logged");
+					Intent createAccountIntent = new Intent(this, CreateAccountActivityLollipop.class);
+//				createAccountIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
+					startActivity(createAccountIntent);
+					finish();
+				}
+				else{
+					AlertDialog.Builder builder;
+					builder = new AlertDialog.Builder(this);
+					builder.setMessage(R.string.log_out_warning);
+					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									finish();
+								}
+							});
+					builder.show();
+				}
+				return;
+			}
 		}
 		
 		log("wrong url");
