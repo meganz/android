@@ -1,26 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -40,23 +19,43 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -74,6 +73,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	ImageView iconView;
 	TextView nameView;
 	RelativeLayout nameLayout;
+	ScrollView scrollView;
 	TextView sizeTextView;
 	TextView sizeTitleView;
 	TextView importButton;
@@ -129,8 +129,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		fragmentContainer = (RelativeLayout) findViewById(R.id.file_link_fragment_container);
 		
 		infoLayout = (RelativeLayout) findViewById(R.id.file_link_layout);
-		
-		RelativeLayout.LayoutParams infoLayoutParams = (RelativeLayout.LayoutParams)infoLayout.getLayoutParams();
+
+		scrollView = (ScrollView) findViewById(R.id.file_link_scroll_layout);
+
+		FrameLayout.LayoutParams infoLayoutParams = (FrameLayout.LayoutParams)infoLayout.getLayoutParams();
 		infoLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(80, outMetrics)); 		
 		infoLayout.setLayoutParams(infoLayoutParams);
 		
@@ -183,13 +185,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		sizeTextView.setLayoutParams(sizeTextParams);		
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_file_link_layout);
+
 		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
 		downloadButton.setOnClickListener(this);
 		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
-		downloadButton.setLayoutParams(paramsb1);
+//		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();
+//		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
+//		downloadButton.setLayoutParams(paramsb1);
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
 		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
@@ -198,14 +201,18 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
 		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
 		importButton.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
-		importButton.setLayoutParams(paramsb2);
+//		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();
+//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
+//		importButton.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)importButton.getLayoutParams();
 		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
 		importButton.setLayoutParams(optionTextParams);
+
+//		RelativeLayout.LayoutParams paramsScroll = (RelativeLayout.LayoutParams) scrollView.getLayoutParams();
+//		paramsScroll.height =  fragmentContainer.getHeight()-tB.getHeight()-optionsBar.getHeight();
+//		scrollView.setLayoutParams(paramsScroll);
 				
 //		iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
 //		((LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
@@ -231,7 +238,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			importLink(url);
 		}	
 	}
-	
+
 	@Override
 	protected void onResume() {
     	super.onResume();
