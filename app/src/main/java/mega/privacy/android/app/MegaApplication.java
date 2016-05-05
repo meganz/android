@@ -103,19 +103,22 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		Util.setContext(getApplicationContext());
 		DatabaseHandler dbH;
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
 		boolean fileLogger = false;
-		MegaAttributes attrs = dbH.getAttributes();
-		if (attrs.getFileLogger() != null){
-			try {
-				fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
-			}
-			catch(Exception e){
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null) {
+				if (attrs.getFileLogger() != null) {
+					try {
+						fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
+					} catch (Exception e) {
+						fileLogger = false;
+					}
+				} else {
+					fileLogger = false;
+				}
+			} else {
 				fileLogger = false;
 			}
-		}
-		else{
-			fileLogger = false;
 		}
 
 		Util.setFileLogger(fileLogger);
