@@ -657,5 +657,8 @@
 	<string name="pin_lock_type" context="title to choose the type of PIN code">Tipo de código</string>
     <string name="four_pin_lock" context="PIN with 4 digits">Código de 4 dígitos</string>
     <string name="six_pin_lock" context="PIN with 6 digits">Código de 6 dígitos</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">Código alfanumércio</string>  
+    <string name="AN_pin_lock" context="PIN alphanumeric">Código alfanumérico</string>
+
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Los logs están ahora activados</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Los logs están ahora desactivados</string>
 </resources>

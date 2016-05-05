@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="39"
+    android:versionCode="41"
     android:versionName="3.0.7" >
 
     <uses-sdk

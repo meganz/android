@@ -605,16 +605,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 			case R.id.my_account_account_type_button:{
-				
-//				if (myEmail.compareTo("android102@yopmail.com") == 0){
-//					((ManagerActivityLollipop)context).paySubs();
-//				}				
-				
+
 				((ManagerActivityLollipop)context).showUpAF(null);
 				
-//				((ManagerActivityLollipop)context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_MONTH);
-				
-//				Toast.makeText(context, "EOEOEOE", Toast.LENGTH_LONG).show();
 				break;
 			}
 		}
