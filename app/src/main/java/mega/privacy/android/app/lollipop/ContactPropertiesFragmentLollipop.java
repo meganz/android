@@ -1,23 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
-
-import com.nirhart.parallaxscroll.views.ParallaxScrollView;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.utils.FixedCenterCrop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -28,8 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -44,14 +24,27 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
+
+import com.nirhart.parallaxscroll.views.ParallaxScrollView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 public class ContactPropertiesFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface, OnItemClickListener {
@@ -117,6 +110,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		log("onCreateView");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -145,6 +139,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		View v = null;
 
 		if (userEmail != null){
+			log("userMail is NOT null");
 			v = inflater.inflate(R.layout.fragment_contact_properties, container, false);
 			
 			contact = megaApi.getContact(userEmail);
@@ -212,7 +207,6 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			nameIcon.setLayoutParams(lpPL);
 			nameIcon.setVisibility(View.INVISIBLE);
 			
-			
 			//Mail Layout
 			mailLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_email_layout);
 //			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
@@ -229,8 +223,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			separator = (View) v.findViewById(R.id.divider_shared_layout);
 			RelativeLayout.LayoutParams paramsDivider = (RelativeLayout.LayoutParams) separator.getLayoutParams();
 			paramsDivider.leftMargin = Util.scaleWidthPx(55, outMetrics);
-			separator.setLayoutParams(paramsDivider);			
-			
+			separator.setLayoutParams(paramsDivider);
+
 			infoEmail.setText(userEmail);		
 			name=false;
 			firstName=false;
@@ -531,7 +525,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	}
 
 	public static void log(String log) {
-		Util.log("ContactPropertiesFragment", log);
+		Util.log("ContactPropertiesFragmentLollipop", log);
 	}
 
 	@Override

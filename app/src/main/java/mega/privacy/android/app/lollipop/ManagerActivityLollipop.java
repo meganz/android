@@ -1486,7 +1486,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				Canvas c = new Canvas(defaultAvatar);
 				Paint p = new Paint();
 				p.setAntiAlias(true);
-				p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+				p.setColor(getResources().getColor(R.color.lollipop_primary_color));
 
 				int radius;
 		        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -1931,10 +1931,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case SETTINGS:{
 					aB.setTitle(getString(R.string.action_settings));
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					break;
 				}
 				case CONTACTS:{
 					aB.setTitle(getString(R.string.section_contacts));
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					break;
 				}
     		}
     	}

@@ -4,6 +4,6 @@
    	android:layout_height="wrap_content"
    	android:layout_gravity="center|fill_horizontal"
    	android:orientation="horizontal"
-  	android:background="@color/grid_background"
+  	android:background="@color/white"
   	android:layout_centerHorizontal="true">
 </LinearLayout>

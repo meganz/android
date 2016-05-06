@@ -160,7 +160,7 @@
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/photo_sync_list_month_layout" 
-	    android:background="@color/photo_sync_month_layout" 
+	    android:background="@color/white"
 	    android:layout_marginLeft="72dp" >
 	    
     	<TextView

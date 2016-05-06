@@ -4,7 +4,7 @@
    	android:layout_height="wrap_content"
    	android:layout_gravity="center|fill_horizontal"
    	android:orientation="horizontal"
-  	android:background="@color/grid_background"
+  	android:background="@color/white"
     android:layout_marginTop="3dp"
     android:layout_marginRight="3dp">
   	
@@ -13,7 +13,7 @@
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/cell_photosync_grid_month_layout" 
-	    android:background="@color/photo_sync_month_layout"
+	    android:background="@color/white"
 	    android:layout_marginLeft="72dp"
 	    android:layout_gravity="left" >
 	    

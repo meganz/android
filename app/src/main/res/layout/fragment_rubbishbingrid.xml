@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RubbishBinListFragment"
-	android:background="@color/fragment_background">
+	android:background="@color/white">
     
     <TextView
 	    android:id="@+id/rubbishbin_content_grid_text"
@@ -43,7 +43,7 @@
        		android:layout_height="48dp"       		
        		android:layout_width="fill_parent"
             android:background="@drawable/btn_default_holo_light_without_corners"
-            android:textColor="@color/button_text"
+            android:textColor="@color/white"
             android:text="@string/my_account_upgrade_pro" />
      </LinearLayout>  
     

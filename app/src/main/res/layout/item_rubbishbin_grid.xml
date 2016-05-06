@@ -2,7 +2,7 @@
     android:id="@+id/rubbishbin_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grid_background">
+    android:background="@color/white">
     
     <RelativeLayout 
         android:layout_width="172dp"

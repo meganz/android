@@ -1,5 +1,24 @@
 package mega.privacy.android.app;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -13,30 +32,6 @@ import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.text.format.Formatter;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class UpgradeAccountFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{		
@@ -197,11 +192,11 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		storageLite = (TextView) v.findViewById(R.id.prolite_storage);
 		storageLite.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 		storage1 = (TextView) v.findViewById(R.id.pro1_storage);
-		storage1.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+		storage1.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		storage2 = (TextView) v.findViewById(R.id.pro2_storage);
-		storage2.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+		storage2.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		storage3 = (TextView) v.findViewById(R.id.pro3_storage);
-		storage3.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+		storage3.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 		proBandwithLite = (TextView) v.findViewById(R.id.prolite_bandwidth_title);
 		proBandwith1 = (TextView) v.findViewById(R.id.pro1_bandwidth_title);
@@ -211,11 +206,11 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		bandwidthLite = (TextView) v.findViewById(R.id.prolite_bandwidth);
 		bandwidthLite.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 		bandwidth1 = (TextView) v.findViewById(R.id.pro1_bandwidth);
-		bandwidth1.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+		bandwidth1.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		bandwidth2 = (TextView) v.findViewById(R.id.pro2_bandwidth);
-		bandwidth2.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+		bandwidth2.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		bandwidth3 = (TextView) v.findViewById(R.id.pro3_bandwidth);
-		bandwidth3.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+		bandwidth3.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 		pricingPerMonthLite = (TextView) v.findViewById(R.id.princinglite_from);
 		pricingPerMonth1 = (TextView) v.findViewById(R.id.pricing1_from);

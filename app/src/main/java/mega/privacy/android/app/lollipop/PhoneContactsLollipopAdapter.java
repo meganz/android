@@ -24,7 +24,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Util;
@@ -33,7 +32,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
 
 /*
@@ -276,7 +274,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 		if (isMegaContact){
-			p.setColor(mContext.getResources().getColor(R.color.color_default_avatar_mega));
+			p.setColor(mContext.getResources().getColor(R.color.lollipop_primary_color));
 		}
 		else{
 			p.setColor(mContext.getResources().getColor(R.color.color_default_avatar_phone));

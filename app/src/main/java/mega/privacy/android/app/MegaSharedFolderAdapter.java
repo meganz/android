@@ -1,21 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
-
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -43,9 +27,23 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListener, MegaRequestListenerInterface {
@@ -374,7 +372,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 //				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.background_secondary));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		}
@@ -382,7 +380,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 //			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
-			holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
+			holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.background_secondary));
 			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 		}
 		
@@ -408,7 +406,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 		
 		int radius; 
