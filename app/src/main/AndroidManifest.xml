@@ -54,7 +54,6 @@
             android:label="@string/app_name"
             android:launchMode="singleTop" 
             android:theme="@style/login_activity"
-            android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden">
         </activity>
         
@@ -110,8 +109,7 @@
         <activity
             android:name="LauncherActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" > 
+            android:launchMode="singleTop">
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
