@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".IncomingSharesFragment"
-    android:background="@color/fragment_background" >
+    android:background="@color/white" >
 
     <ListView 
         android:id="@+id/sharedwithme_grid_view"

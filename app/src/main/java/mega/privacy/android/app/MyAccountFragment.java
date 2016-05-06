@@ -1,27 +1,7 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Locale;
-
-import mega.privacy.android.app.ManagerActivity.DrawerItem;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.billing.IabHelper;
-import mega.privacy.android.app.utils.billing.IabResult;
-import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -42,18 +22,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Locale;
+
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 public class MyAccountFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
@@ -230,7 +219,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 		int radius; 
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

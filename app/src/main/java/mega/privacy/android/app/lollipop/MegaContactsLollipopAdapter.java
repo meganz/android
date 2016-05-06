@@ -1,23 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -37,6 +19,25 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContactsLollipopAdapter.ViewHolderContacts> implements OnClickListener {
@@ -488,7 +489,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			Canvas c = new Canvas(defaultAvatar);
 			Paint p = new Paint();
 			p.setAntiAlias(true);
-			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 			
 			int radius; 
 	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -528,7 +529,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			Paint p = new Paint();
 			p.setAntiAlias(true);
 			p.setStyle(Paint.Style.FILL);
-			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 	        
 	        c.drawRect(0, 0, ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, p);
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(defaultAvatar);

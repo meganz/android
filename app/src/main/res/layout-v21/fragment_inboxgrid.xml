@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".InboxFragment"
-	android:background="@color/fragment_background">
+	android:background="@color/white">
     
     <RelativeLayout
         android:id="@+id/inbox_grid_content_text_layout"

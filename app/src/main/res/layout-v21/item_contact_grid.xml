@@ -1,10 +1,8 @@
-<RelativeLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/contact_grid_item_complete_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/grid_background">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/contact_grid_item_complete_layout"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:background="@color/white">
     
     <RelativeLayout 
         android:layout_width="172dp"

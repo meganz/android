@@ -78,7 +78,7 @@
        	android:layout_width="fill_parent"
        	android:layout_alignParentBottom="true"
        	android:background="@drawable/btn_default_holo_light_without_corners"
-       	android:textColor="@color/button_text">
+       	android:textColor="@color/white">
     </Button>
  -->
 <TabHost

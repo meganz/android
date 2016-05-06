@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".FileBrowserGridFragment"
-    android:background="@color/grid_background" >
+    android:background="@color/white" >
     
     <TextView
 	    android:id="@+id/content_grid_text"
@@ -44,7 +44,7 @@
        		android:layout_height="48dp"
        		android:layout_weight="1"
              android:background="@drawable/grey_btn_default_holo_light"
-             android:textColor="@color/button_text"
+             android:textColor="@color/white"
              android:text="@string/menu_new_folder" />
          
          <Button
@@ -53,7 +53,7 @@
        		android:layout_height="48dp"
        		android:layout_weight="1"
              android:background="@drawable/btn_default_holo_light_without_corners"
-             android:textColor="@color/button_text"
+             android:textColor="@color/white"
              android:text="@string/general_upload" />
       </LinearLayout>  
       
@@ -86,7 +86,7 @@
        		android:layout_height="48dp"       		
        		android:layout_width="fill_parent"
             android:background="@drawable/btn_default_holo_light_without_corners"
-            android:textColor="@color/button_text"
+            android:textColor="@color/white"
             android:text="@string/my_account_upgrade_pro" />
      </LinearLayout>       
      
@@ -128,7 +128,7 @@
 	       		android:layout_height="48dp"
 	       		android:layout_weight="1"
 	             android:background="@drawable/grey_btn_default_holo_light"
-	             android:textColor="@color/button_text"
+	             android:textColor="@color/white"
 	             android:text="@string/general_cancel" />
 	         
 	         <Button
@@ -137,7 +137,7 @@
 	       		android:layout_height="48dp"
 	       		android:layout_weight="1"
 	             android:background="@drawable/btn_default_holo_light_without_corners"
-	             android:textColor="@color/button_text"
+	             android:textColor="@color/white"
 	             android:text="@string/my_account_upgrade_pro" />
 	      	</LinearLayout> 
      </LinearLayout>        
@@ -161,7 +161,7 @@
        	android:layout_width="fill_parent"
        	android:layout_alignParentBottom="true"
        	android:background="@drawable/btn_default_holo_light_without_corners"
-       	android:textColor="@color/button_text"
+       	android:textColor="@color/white"
        	android:text="@string/settings_camera_upload_on"
        	android:visibility="gone">
     </Button>

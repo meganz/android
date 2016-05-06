@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-medium"
-        android:textColor="@color/mega_text" />
+        android:textColor="@color/lollipop_primary_color" />
 
     <LinearLayout
         android:id="@+id/four_pin_layout"

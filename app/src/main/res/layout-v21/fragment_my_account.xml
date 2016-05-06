@@ -110,14 +110,14 @@
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:text="@string/email_text"
-			                android:textColor="@color/file_properties_info_menu"
+			                android:textColor="@color/grey_info_menu"
 			                android:textStyle="bold" />
 			
 			            <TextView
 			                android:id="@+id/my_account_email"
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
-			                android:textColor="@color/file_properties_info_menu" />
+			                android:textColor="@color/grey_info_menu" />
         			</LinearLayout>
     			</LinearLayout>
     			
@@ -149,14 +149,14 @@
 				            android:layout_height="wrap_content"
 				            android:layout_gravity="center_horizontal"
 				            android:text="@string/my_account_title"
-				            android:textColor="@color/file_properties_info_menu"
+				            android:textColor="@color/grey_info_menu"
 				            android:textStyle="bold"/>
 			            
 			            <TextView
 				            android:id="@+id/my_account_account_type_text"
 				            android:layout_width="wrap_content"
 				            android:layout_height="wrap_content"
-				            android:textColor="@color/file_properties_info_menu" />
+				            android:textColor="@color/grey_info_menu" />
 			            
 			        </LinearLayout>
 			
@@ -209,14 +209,14 @@
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:text="@string/expires_on"
-			                android:textColor="@color/file_properties_info_menu"
+			                android:textColor="@color/grey_info_menu"
 			                android:textStyle="bold" />
 			
 			            <TextView
 			                android:id="@+id/my_account_expiration"
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
-			                android:textColor="@color/file_properties_info_menu" />
+			                android:textColor="@color/grey_info_menu" />
 			        </LinearLayout>
 			    </LinearLayout>
 			    
@@ -249,14 +249,14 @@
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:text="@string/my_account_used_space"
-			                android:textColor="@color/file_properties_info_menu"
+			                android:textColor="@color/grey_info_menu"
 			                android:textStyle="bold" />
 			
 			            <TextView
 			                android:id="@+id/my_account_used_space"
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
-			                android:textColor="@color/file_properties_info_menu" />
+			                android:textColor="@color/grey_info_menu" />
 			        </LinearLayout>
 			    </LinearLayout>
 			    
@@ -289,14 +289,14 @@
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:text="@string/my_account_last_session"
-			                android:textColor="@color/file_properties_info_menu"
+			                android:textColor="@color/grey_info_menu"
 			                android:textStyle="bold" />
 			
 			            <TextView
 			                android:id="@+id/my_account_last_session"
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
-			                android:textColor="@color/file_properties_info_menu" />
+			                android:textColor="@color/grey_info_menu" />
 			        </LinearLayout>
 			    </LinearLayout>
 			    
@@ -329,14 +329,14 @@
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:text="@string/my_account_connections"
-			                android:textColor="@color/file_properties_info_menu"
+			                android:textColor="@color/grey_info_menu"
 			                android:textStyle="bold" />
 			
 			            <TextView
 			                android:id="@+id/my_account_connections"
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
-			                android:textColor="@color/file_properties_info_menu" />
+			                android:textColor="@color/grey_info_menu" />
 			        </LinearLayout>
 			    </LinearLayout>
 	            

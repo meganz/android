@@ -3,7 +3,7 @@
     android:id="@+id/file_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grid_background">
+    android:background="@color/white">
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/file_grid_item_layout"

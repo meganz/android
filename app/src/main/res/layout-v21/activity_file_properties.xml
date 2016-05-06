@@ -185,7 +185,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/file_properties_permission_label"
-                                android:textColor="@color/file_properties_info_menu" />
+                                android:textColor="@color/grey_info_menu" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -224,7 +224,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/file_properties_owner_label"
-                                android:textColor="@color/file_properties_info_menu" />
+                                android:textColor="@color/grey_info_menu" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -262,7 +262,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/file_properties_info_menu_size"
-                                android:textColor="@color/file_properties_info_menu" />
+                                android:textColor="@color/grey_info_menu" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -301,7 +301,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/file_properties_info_menu_content"
-                                android:textColor="@color/file_properties_info_menu" />
+                                android:textColor="@color/grey_info_menu" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -340,7 +340,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/file_properties_info_menu_added"
-                                android:textColor="@color/file_properties_info_menu" />
+                                android:textColor="@color/grey_info_menu" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -379,7 +379,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/file_properties_info_menu_modified"
-                                android:textColor="@color/file_properties_info_menu" />
+                                android:textColor="@color/grey_info_menu" />
                         </RelativeLayout>
                     </RelativeLayout>
                 </LinearLayout>
