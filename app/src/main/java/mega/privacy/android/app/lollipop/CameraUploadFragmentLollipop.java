@@ -990,11 +990,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				else{
 					adapterGrid.setMultipleSelect(true);
 					adapterGrid.selectAll();
-					
-					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());	
 				}
-				
-				updateActionModeTitle();
 			}
 		}
 	}

@@ -324,6 +324,9 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	 */
 	void hideMultipleSelect() {
 		this.multipleSelect = false;
+
+		clearSelections();
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -337,6 +340,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				checkedItems.append(i, true);
 			}
 		}
+		actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
 		updateActionModeTitle();
 		notifyDataSetChanged();
 	}
