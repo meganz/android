@@ -1,5 +1,17 @@
 package mega.privacy.android.app;
 
+import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ContentProviderClient;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.RemoteException;
+import android.provider.MediaStore;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,18 +29,6 @@ import java.util.List;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
-
-import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ContentProviderClient;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.RemoteException;
-import android.provider.MediaStore;
 
 
 /*
@@ -385,9 +385,12 @@ public class ShareInfo {
 			title = cursor.getString(displayIndex);
 		int sizeIndex = cursor.getColumnIndex("_size");
 		if (sizeIndex != -1) {
-			long size = Long.valueOf(cursor.getString(sizeIndex));
-			if (size > 0) {
-				this.size = size;
+			String sizeString = cursor.getString(sizeIndex);
+			if(sizeString!=null){
+				long size = Long.valueOf(sizeString);
+				if (size > 0) {
+					this.size = size;
+				}
 			}
 		}
 

@@ -1,24 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -41,9 +22,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -53,10 +34,30 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 public class LauncherFileExplorerActivity extends PinActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, OnClickListener{	
 	
@@ -808,6 +809,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 				else{
 					onIntentProcessed();
 				}
+				finish();
 			}
 			else if (mode == IMPORT){
 				log("mode IMPORT");
@@ -1330,6 +1332,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 		
 				if(cDriveExplorer!=null){
 					if (cDriveExplorer.onBackPressed() == 0){
+						log("Call to super.onBackPressed");
 						super.onBackPressed();
 						return;
 					}
@@ -1393,7 +1396,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 		}
 		
 		final EditText input = new EditText(this);
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -1452,7 +1455,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);		
 		
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
