@@ -378,7 +378,14 @@ public class ShareInfo {
 		} catch (RemoteException e1) {
 			log("cursor EXCEPTION!!!");
 		}
-		if(cursor.getCount()==0) return;
+		if(cursor!=null){
+			if(cursor.getCount()==0){
+				return;
+			}
+		}
+		else{
+			return;
+		}
 		cursor.moveToFirst();
 		int displayIndex = cursor.getColumnIndex("_display_name");
 		if(displayIndex != -1)
