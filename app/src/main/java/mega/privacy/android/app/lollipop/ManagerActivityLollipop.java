@@ -1916,6 +1916,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
     				if (fbFLol != null){
+						log("FileBrowserFragmentLollipop recovered!");
     					fbFLol.setIsList(isList);
         				fbFLol.setParentHandle(parentHandleBrowser);
 
@@ -1999,7 +2000,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					else{
         						nodes =	megaApi.getChildren(parentNode, orderCloud);
         					}
-        					fbFLol.setNodes(nodes);
+							String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+							if(fbFLol!=null){
+								log("FileBrowserFragmentLollipop recovered twice!");
+								fbFLol.setNodes(nodes);
+							}
             			}
     				}
     				else{
@@ -2024,8 +2030,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     						firstNavigationLevel = true;
     					}
     					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
-    					fbFLol.setNodes(nodes);
-    				}
+						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+						if(fbFLol!=null){
+							log("FileBrowserFragmentLollipop recovered once more!");
+							fbFLol.setNodes(nodes);
+						}
+					}
     			}
 
     			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){
