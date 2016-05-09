@@ -1,63 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.ContactsExplorerActivity;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.MegaContact;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.OldPreferences;
-import mega.privacy.android.app.Product;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.SettingsActivity;
-import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.SortByDialogActivity;
-import mega.privacy.android.app.TabsAdapter;
-import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.billing.IabHelper;
-import mega.privacy.android.app.utils.billing.IabResult;
-import mega.privacy.android.app.utils.billing.Inventory;
-import mega.privacy.android.app.utils.billing.Purchase;
-import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUser;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -134,6 +76,64 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.ContactsExplorerActivity;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.OldPreferences;
+import mega.privacy.android.app.Product;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.SettingsActivity;
+import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.TabsAdapter;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.billing.IabHelper;
+import mega.privacy.android.app.utils.billing.IabResult;
+import mega.privacy.android.app.utils.billing.Inventory;
+import mega.privacy.android.app.utils.billing.Purchase;
+import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener{
 
@@ -1657,6 +1657,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //
 //    			}
     			if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+					log("ACTION_IMPORT_LINK_FETCH_NODES");
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
@@ -1666,20 +1667,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 				else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK)){
+					log("ACTION_OPEN_MEGA_LINK");
 					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					fileLinkIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
-					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(fileLinkIntent);
+					String data = getIntent().getDataString();
+					if(data!=null){
+						fileLinkIntent.setData(Uri.parse(data));
+						startActivity(fileLinkIntent);
+					}
+					else{
+						log("getDataString is NULL");
+					}
 					finish();
 					return;
 				}
     			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
+					log("ACTION_OPEN_MEGA_FOLDER_LINK");
     				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivityLollipop.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     				intentFolderLink.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
-    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(intentFolderLink);
+
+					String data = getIntent().getDataString();
+					if(data!=null){
+						intentFolderLink.setData(Uri.parse(data));
+						startActivity(intentFolderLink);
+					}
+					else{
+						log("getDataString is NULL");
+					}
 					finish();
     			}
     			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
