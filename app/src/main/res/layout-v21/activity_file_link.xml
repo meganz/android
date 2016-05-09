@@ -24,15 +24,6 @@
         android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/file_link_button_download"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:gravity="center_vertical"/>
-
-        <TextView
             android:id="@+id/file_link_button_import"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -41,6 +32,14 @@
             android:textSize="14sp"
             android:gravity="center_vertical"/>
 
+        <TextView
+            android:id="@+id/file_link_button_download"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/accentColor"
+            android:textSize="14sp"
+            android:gravity="center_vertical"/>
     </LinearLayout>
 
     <View
