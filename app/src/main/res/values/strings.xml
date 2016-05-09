@@ -586,7 +586,8 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">MEGA SDK version</string>
-    
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">View source code</string>
+
     <string name="january">January</string>
     <string name="february">February</string>
     <string name="march">March</string>
