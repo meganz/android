@@ -1981,9 +1981,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public void setContentText(){
+		log("setContentText");
 		
 		if (megaApi.getRootNode() != null){
-			if (parentHandle == megaApi.getRootNode().getHandle()){
+			if (parentHandle == megaApi.getRootNode().getHandle()||parentHandle==-1){
+				log("in ROOT node");
 				MegaNode infoNode = megaApi.getRootNode();
 				if (infoNode !=  null){
 					contentText.setText(getInfoFolder(infoNode));
@@ -1997,6 +1999,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	//				aB.setTitle(infoNode.getName());
 				}
 			}
+			log("contentText: "+contentText.getText());
 		}
 	}
 
