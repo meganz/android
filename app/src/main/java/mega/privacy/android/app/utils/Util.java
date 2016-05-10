@@ -60,6 +60,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -183,6 +185,21 @@ public class Util {
 	
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+	}
+
+	public static int countMatches(Pattern pattern, String string)
+	{
+		Matcher matcher = pattern.matcher(string);
+
+		int count = 0;
+		int pos = 0;
+		while (matcher.find(pos))
+		{
+			count++;
+			pos = matcher.start() + 1;
+		}
+
+		return count;
 	}
 	
 	public static boolean showMessageRandom(){

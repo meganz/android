@@ -1,24 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
-import mega.privacy.android.app.LauncherFileExplorerActivity;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -28,14 +13,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
+import mega.privacy.android.app.LauncherFileExplorerActivity;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends Fragment implements OnClickListener{
@@ -285,14 +279,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
 				}
+				break;
 			}
 			case R.id.cancel_text:{
 				if (context instanceof LauncherFileExplorerActivity){
+					log("Cancel back to Cloud");
+					((LauncherFileExplorerActivity) context).backToCloud(-1);
 					((LauncherFileExplorerActivity) context).finish();
 				}
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).finish();
 				}
+				break;
 			}
 		}
 	}
