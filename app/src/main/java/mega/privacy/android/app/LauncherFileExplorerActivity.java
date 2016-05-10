@@ -733,7 +733,8 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 			
 			folderSelected = true;
 			this.gParentHandle = handle;
-			
+
+			//Only UPLOAD MODE is valid, no way to enter in the other options!
 			if (mode == MOVE) {
 				log("MOVE option");
 				long parentHandle = handle;
@@ -867,6 +868,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 			}
 		}
 		else{
+			//BEFORE LOLLIPOP
 			folderSelected = true;
 			this.gParentHandle = handle;
 			

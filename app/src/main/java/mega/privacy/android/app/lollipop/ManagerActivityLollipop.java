@@ -11958,40 +11958,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		catch (Exception ex) {}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if (fbFLol != null){
 
-				if (fbFLol.isVisible()){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
-					fbFLol.setNodes(nodes);
-					fbFLol.setContentText();
-					fbFLol.getRecyclerView().invalidate();
-				}
-			}
-			if (rbFLol != null){
-
-				if (isClearRubbishBin){
-					isClearRubbishBin = false;
-					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-					aB.setTitle(getString(R.string.section_rubbish_bin));
-					log("aB.setHomeAsUpIndicator_24");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					this.firstNavigationLevel = true;
-
-					if(rbFLol.isVisible())
-					{
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-						rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-						rbFLol.setNodes(nodes);
-						rbFLol.getRecyclerView().invalidate();
+			if(viewPagerCDrive!=null) {
+				int index = viewPagerCDrive.getCurrentItem();
+				log("Fragment Index: " + index);
+				if (index == 1) {
+					log("Rubbish bin shown");
+					//Rubbish Bin TAB
+					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+					if (fbFLol != null){
+						getSupportFragmentManager()
+								.beginTransaction()
+								.detach(fbFLol)
+								.attach(fbFLol)
+								.commit();
 					}
-				}
-				else{
-					if(rbFLol.isVisible())
-					{
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
-						rbFLol.setNodes(nodes);
-						rbFLol.setContentText();
-						rbFLol.getRecyclerView().invalidate();
+
+					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
+					if (rbFLol != null){
+
+						if (isClearRubbishBin) {
+							isClearRubbishBin = false;
+						}
+						getSupportFragmentManager()
+								.beginTransaction()
+								.detach(rbFLol)
+								.attach(rbFLol)
+								.commit();
+					}
+				} else {
+					//Cloud Drive TAB
+					log("Cloud drive shown");
+					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
+					if (rbFLol != null){
+
+						if (isClearRubbishBin) {
+							isClearRubbishBin = false;
+						}
+						getSupportFragmentManager()
+								.beginTransaction()
+								.detach(rbFLol)
+								.attach(rbFLol)
+								.commit();
+					}
+
+					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+					if (fbFLol != null){
+						getSupportFragmentManager()
+								.beginTransaction()
+								.detach(fbFLol)
+								.attach(fbFLol)
+								.commit();
 					}
 				}
 			}
