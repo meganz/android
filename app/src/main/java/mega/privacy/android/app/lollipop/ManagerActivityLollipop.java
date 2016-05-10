@@ -91,6 +91,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.ContactsExplorerActivity;
@@ -157,6 +158,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
+	public static String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -1403,6 +1405,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
+			log("Root node is NULL");
 			 if (getIntent() != null){
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
@@ -1465,6 +1468,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
 			        	log("Intent to export Master Key - im logged in!");
 			        	exportMK();
+					}
+					else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
+						log("Open after LauncherFileExplorerActivity ");
+						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+						int access = -1;
+						if (handleIntent != -1) {
+							MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+							if (parentIntentN != null) {
+								access = megaApi.getAccess(parentIntentN);
+								switch (access) {
+									case MegaShare.ACCESS_OWNER:
+									case MegaShare.ACCESS_UNKNOWN: {
+										log("The intent set the parentHandleBrowser to " + handleIntent);
+										parentHandleBrowser = handleIntent;
+										break;
+									}
+									case MegaShare.ACCESS_READ:
+									case MegaShare.ACCESS_READWRITE:
+									case MegaShare.ACCESS_FULL: {
+										log("The intent set the parentHandleIncoming to " + handleIntent);
+										parentHandleIncoming = handleIntent;
+										drawerItem = DrawerItem.SHARED_ITEMS;
+										deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN);
+										log("After calculate deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+										break;
+									}
+									default: {
+										log("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
+										parentHandleBrowser = handleIntent;
+										break;
+									}
+								}
+							}
+						}
 					}
 				}
 	        }
@@ -1672,6 +1709,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("END onCreate");
 	}
 
+	public int calculateDeepBrowserTreeIncoming(MegaNode node){
+		log("calculateDeepBrowserTreeIncoming");
+		String path = megaApi.getNodePath(node);
+		log("The path is: "+path);
+
+		Pattern pattern = Pattern.compile("/");
+		int count = Util.countMatches(pattern, path);
+
+		return count+1;
+	}
+
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
 		log("onPostCreate");
@@ -1872,9 +1920,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		switch(drawerItem){
 	    		case CLOUD_DRIVE:{
 	    			log("onResume - case CLOUD DRIVE");
-	    			if(fbFLol!=null){
-	    				fbFLol.notifyDataSetChanged();
-	    			}
 					//Check the tab to shown and the title of the actionBar
 					int index = viewPagerCDrive.getCurrentItem();
 					if(index==0) {
@@ -1890,6 +1935,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("indicator_arrow_back_135");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						}
+						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+						if (fbFLol != null){
+							getSupportFragmentManager()
+									.beginTransaction()
+									.detach(fbFLol)
+									.attach(fbFLol)
+									.commit();
+						}
 					}
 					else{
 						log("onResume - TAB RUBBISH NODE");
@@ -1903,6 +1957,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							aB.setTitle(parentNode.getName());
 							log("indicator_arrow_back_137");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+						rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+						if (rbFLol != null){
+//								outSFLol.refresh(parentHandleOutgoing);
+							getSupportFragmentManager()
+									.beginTransaction()
+									.detach(rbFLol)
+									.attach(rbFLol)
+									.commit();
 						}
 					}
 	    			break;
@@ -11968,7 +12032,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				//InCOMING
 				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-				log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag1);
+				log("DrawerItem.SHARED_ITEMS Tag Incoming: "+ cFTag1);
 				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 				if (inSFLol != null){
 					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
@@ -12318,7 +12382,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			inSFLol.setTransfers(mTHash);
 		}
 
-		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
+		log("END onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
 	@Override

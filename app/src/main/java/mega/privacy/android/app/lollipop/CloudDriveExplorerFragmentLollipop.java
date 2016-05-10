@@ -305,15 +305,20 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
 				}
+				break;
 			}
 			case R.id.cancel_text:{
 				if (context instanceof LauncherFileExplorerActivity){
+					log("Cancel back to Cloud");
+					((LauncherFileExplorerActivity) context).backToCloud(-1);
 					((LauncherFileExplorerActivity) context).finish();
+
 				}
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).finish();
 				}
 			}
+			break;
 		}
 	}
 
