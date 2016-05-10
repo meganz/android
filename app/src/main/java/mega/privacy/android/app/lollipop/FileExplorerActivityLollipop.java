@@ -1005,7 +1005,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		
 		final EditText input = new EditText(this);
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
