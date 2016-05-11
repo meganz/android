@@ -324,6 +324,9 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	 */
 	void hideMultipleSelect() {
 		this.multipleSelect = false;
+
+		clearSelections();
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -337,6 +340,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				checkedItems.append(i, true);
 			}
 		}
+		if (actionMode == null){
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		}
+
 		updateActionModeTitle();
 		notifyDataSetChanged();
 	}
@@ -451,9 +458,12 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		log("onNodeLongClick");
 		if (!multipleSelect){
 			clearSelections();
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			checkedItems.append(positionInNodes, true);
+
 			this.multipleSelect = true;
+			checkedItems.append(positionInNodes, true);
+
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
 			updateActionModeTitle();
 			notifyDataSetChanged();
 		}

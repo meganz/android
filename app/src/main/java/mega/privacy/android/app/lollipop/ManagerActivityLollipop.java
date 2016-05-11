@@ -93,6 +93,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -1796,6 +1797,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //
 //    			}
     			if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+					log("ACTION_IMPORT_LINK_FETCH_NODES");
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
@@ -1805,20 +1807,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 				else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK)){
+					log("ACTION_OPEN_MEGA_LINK");
 					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					fileLinkIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
-					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(fileLinkIntent);
+					String data = getIntent().getDataString();
+					if(data!=null){
+						fileLinkIntent.setData(Uri.parse(data));
+						startActivity(fileLinkIntent);
+					}
+					else{
+						log("getDataString is NULL");
+					}
 					finish();
 					return;
 				}
     			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
+					log("ACTION_OPEN_MEGA_FOLDER_LINK");
     				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivityLollipop.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     				intentFolderLink.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
-    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(intentFolderLink);
+
+					String data = getIntent().getDataString();
+					if(data!=null){
+						intentFolderLink.setData(Uri.parse(data));
+						startActivity(intentFolderLink);
+					}
+					else{
+						log("getDataString is NULL");
+					}
 					finish();
     			}
     			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
@@ -2199,7 +2216,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         					else{
         						nodes =	megaApi.getChildren(parentNode, orderCloud);
         					}
-        					fbFLol.setNodes(nodes);
+							String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+							if(fbFLol!=null){
+								log("FileBrowserFragmentLollipop recovered twice!");
+								fbFLol.setNodes(nodes);
+							}
             			}
     				}
     				else{
@@ -2225,8 +2247,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     						firstNavigationLevel = true;
     					}
     					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
-    					fbFLol.setNodes(nodes);
-    				}
+						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+						if(fbFLol!=null){
+							log("FileBrowserFragmentLollipop recovered once more!");
+							fbFLol.setNodes(nodes);
+						}
+					}
     			}
 
     			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){

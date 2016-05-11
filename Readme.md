@@ -18,7 +18,7 @@ This document will guide you to build the application on a Linux machine with An
 * Get the source code
 
 ```
-git clone --recursive https://github.com/meganz/android2.git
+git clone --recursive https://github.com/meganz/android.git
 ```
 
 * Configure the variable `NDK_ROOT` to point to your Android NDK installation path at `jni/Makefile`.

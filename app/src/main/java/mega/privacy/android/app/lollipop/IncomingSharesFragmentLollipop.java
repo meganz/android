@@ -499,6 +499,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			optionCopyTo.setOnClickListener(this);			
 			optionSendToInbox.setOnClickListener(this);
 			optionsOutLayout.setOnClickListener(this);
+			optionDelete.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
@@ -712,6 +713,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			optionCopyTo.setOnClickListener(this);			
 			optionSendToInbox.setOnClickListener(this);	
 			optionsOutLayout.setOnClickListener(this);
+			optionDelete.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
@@ -891,7 +893,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 		switch (accessLevel) {			
 			case MegaShare.ACCESS_FULL: {
-	
+				log("access FULL");
 				optionDownload.setVisibility(View.VISIBLE);
 				optionProperties.setVisibility(View.VISIBLE);
 				
@@ -905,13 +907,13 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionRename.setVisibility(View.VISIBLE);
-				optionDelete.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.VISIBLE);
 				optionMoveTo.setVisibility(View.GONE);
 	
 				break;
 			}
 			case MegaShare.ACCESS_READ: {
-				log("read");
+				log("access read");
 				optionDownload.setVisibility(View.VISIBLE);
 				optionProperties.setVisibility(View.VISIBLE);	
 				optionPublicLink.setVisibility(View.GONE);
@@ -1104,6 +1106,17 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			case R.id.file_list_out_options:
 			case R.id.file_grid_out_options:{
 				hideOptionsPanel();
+				break;
+			}
+
+			case R.id.file_list_option_delete_layout:
+			case R.id.file_grid_option_delete_layout: {
+				log("Delete option");
+				hideOptionsPanel();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+
+				((ManagerActivityLollipop) context).moveToTrash(handleList);
 				break;
 			}
 				

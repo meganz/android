@@ -480,6 +480,8 @@
     <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait</string>
+
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Please, log out before creating the account</string>
     
     <string name="import_correct" context="success message after import a file">Imported successfully</string>
     
@@ -584,7 +586,8 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">MEGA SDK version</string>
-    
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">View source code</string>
+
     <string name="january">January</string>
     <string name="february">February</string>
     <string name="march">March</string>
