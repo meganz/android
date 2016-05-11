@@ -278,8 +278,7 @@
         
        <activity 
             android:name="LauncherFileExplorerActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
