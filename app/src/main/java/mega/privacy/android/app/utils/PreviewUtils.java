@@ -22,13 +22,16 @@ public class PreviewUtils {
 		if (previewDir == null) {
 			if (context.getExternalCacheDir() != null){
 				previewDir = new File (context.getExternalCacheDir(), "previewsMEGA");
-				previewDir.mkdirs();
 			}
 			else{
 				previewDir = context.getDir("previewsMEGA", 0);
-				previewDir.mkdirs();
 			}
 		}
+
+		if (previewDir != null){
+			previewDir.mkdirs();
+		}
+
 		return previewDir;
 	}
 

@@ -811,6 +811,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 				else{
 					onIntentProcessed();
 				}
+
 				log("After UPLOAD click - back to Cloud");
 				this.backToCloud(handle);
 			}
@@ -1346,6 +1347,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 		
 				if(cDriveExplorer!=null){
 					if (cDriveExplorer.onBackPressed() == 0){
+						log("Call to super.onBackPressed");
 						super.onBackPressed();
 						log("Intent to Manager");
 						Intent startIntent = new Intent(this, ManagerActivityLollipop.class);

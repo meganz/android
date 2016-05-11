@@ -1,21 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -23,8 +7,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.pm.PackageManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,18 +16,31 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-//import android.support.v4.preference.PreferenceFragment;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
+
+import java.io.File;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+
+//import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
@@ -90,6 +87,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
 	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
+	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -122,6 +120,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference aboutTOS;
 	Preference aboutSDK;
 	Preference aboutApp;
+	Preference codeLink;
 	Preference secondaryMediaFolderOn;
 	Preference localSecondaryFolder;
 	Preference megaSecondaryFolder;
@@ -268,6 +267,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		aboutApp.setOnPreferenceClickListener(this);
 		aboutSDK = findPreference(KEY_ABOUT_SDK_VERSION);
 		aboutSDK.setOnPreferenceClickListener(this);
+
+		codeLink = findPreference(KEY_ABOUT_CODE_LINK);
+		codeLink.setOnPreferenceClickListener(this);
 
 		if (prefs == null){
 			dbH.setStorageAskAlways(false);
@@ -895,6 +897,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else{
 			numberOfClicksSDK = 0;
 		}
+
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
@@ -1331,6 +1334,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (preference.getKey().compareTo(KEY_ABOUT_TOS) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
+			startActivity(viewIntent);
+		}
+		if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
 		}
 		log("KEY = " + preference.getKey());

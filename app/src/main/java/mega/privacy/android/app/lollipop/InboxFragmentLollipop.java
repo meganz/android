@@ -636,8 +636,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);
-		transferArrow.setVisibility(View.VISIBLE);
+		if(progressBar!=null){
+			progressBar.setVisibility(View.VISIBLE);
+			transferArrow.setVisibility(View.VISIBLE);
+		}
 		contentText.setText(R.string.text_downloading);
 		contentTextLayout.setOnClickListener(this);
 	}

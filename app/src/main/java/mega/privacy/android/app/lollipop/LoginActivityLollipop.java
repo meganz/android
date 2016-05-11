@@ -888,7 +888,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
 
 				//TODO
-				//Aqui va el addAccount (email, session)
+				//addAccount (email, session)
 //				String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 //				if (accountType != null){
 //					authTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
