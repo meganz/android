@@ -93,7 +93,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -2221,6 +2220,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							if(fbFLol!=null){
 								log("FileBrowserFragmentLollipop recovered twice!");
 								fbFLol.setNodes(nodes);
+								fbFLol.setParentHandle(parentHandleBrowser);
 							}
             			}
     				}
@@ -2958,31 +2958,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
 					//Needed when changing list<->grid
-    				if (inSFLol != null){
-	        			inSFLol.setOrder(orderOthers);
-	        			inSFLol.setIsList(isList);
-
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(inSFLol);
-	        			fragTransaction.commit();
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(inSFLol);
-	        			fragTransaction.commit();
-    				}
-
-    				if (outSFLol != null){
-    					outSFLol.setOrder(orderOthers);
-    					outSFLol.setIsList(isList);
-
-    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(outSFLol);
-	        			fragTransaction.commit();
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(outSFLol);
-	        			fragTransaction.commit();
-    				}
+//    				if (inSFLol != null){
+//	        			inSFLol.setOrder(orderOthers);
+//	        			inSFLol.setIsList(isList);
+//
+//	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.detach(inSFLol);
+//	        			fragTransaction.commit();
+//
+//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.attach(inSFLol);
+//	        			fragTransaction.commit();
+//    				}
+//
+//    				if (outSFLol != null){
+//    					outSFLol.setOrder(orderOthers);
+//    					outSFLol.setIsList(isList);
+//
+//    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.detach(outSFLol);
+//	        			fragTransaction.commit();
+//
+//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.attach(outSFLol);
+//	        			fragTransaction.commit();
+//    				}
 
         			int index = viewPagerShares.getCurrentItem();
 					log("Fragment Index Shared Items: " + index);
@@ -2993,8 +2993,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (inSFLol != null){
         					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 							log("Selected Incoming with parent: "+parentHandleIncoming);
+							log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
         					if (node != null){
         						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+								inSFLol.setParentHandle(parentHandleIncoming);
+								inSFLol.setDeepBrowserTree(deepBrowserTreeIncoming);
         						aB.setTitle(node.getName());
 								log("indicator_arrow_back_893");
             					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3571,6 +3574,137 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
+	}
+
+	public void openFolderFromSearch(long folderHandle){
+		log("openFolderFromSearch: "+folderHandle);
+
+		int access = -1;
+		if (folderHandle != -1) {
+			MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
+			if (parentIntentN != null) {
+				log("Check the parent node: "+parentIntentN.getName()+" handle: "+parentIntentN.getHandle());
+				access = megaApi.getAccess(parentIntentN);
+				switch (access) {
+					case MegaShare.ACCESS_OWNER:
+					case MegaShare.ACCESS_UNKNOWN: {
+						log("GO to Cloud: " + parentIntentN.getName());
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						//Not incoming folder, check if Cloud or Rubbish tab
+						if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
+							log("Navigate to TAB CLOUD first level");
+							firstNavigationLevel=true;
+							parentHandleBrowser = parentIntentN.getHandle();
+							viewPagerCDrive.setCurrentItem(0);
+						}
+						else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
+							log("Navigate to TAB RUBBISH first level");
+							firstNavigationLevel=true;
+							parentHandleRubbish = parentIntentN.getHandle();
+							viewPagerCDrive.setCurrentItem(1);
+						}
+						else{
+							int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
+							log("The parent result is: "+parent);
+							switch (parent){
+								case 0:{
+									//ROOT NODE
+									log("Navigate to TAB CLOUD with parentHandle");
+									parentHandleBrowser = parentIntentN.getHandle();
+									viewPagerCDrive.setCurrentItem(0);
+									firstNavigationLevel=false;
+									break;
+								}
+								case 1:{
+									log("Navigate to TAB RUBBISH");
+									parentHandleRubbish = parentIntentN.getHandle();
+									viewPagerCDrive.setCurrentItem(1);
+									firstNavigationLevel=false;
+									break;
+								}
+								case -1:{
+									log("Navigate to TAB CLOUD general");
+									parentHandleBrowser = -1;
+									viewPagerCDrive.setCurrentItem(0);
+									firstNavigationLevel=true;
+									break;
+								}
+							}
+						}
+						break;
+					}
+					case MegaShare.ACCESS_READ:
+					case MegaShare.ACCESS_READWRITE:
+					case MegaShare.ACCESS_FULL: {
+						log("GO to INCOMING TAB: " + parentIntentN.getName());
+						drawerItem = DrawerItem.SHARED_ITEMS;
+						if(parentIntentN.getHandle()==-1){
+							log("Level 0 of Incoming");
+							parentHandleIncoming = -1;
+							deepBrowserTreeIncoming = 0;
+						}
+						else{
+							parentHandleIncoming = parentIntentN.getHandle();
+							deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN);
+							log("After calculating deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+						}
+						viewPagerShares.setCurrentItem(0);
+						break;
+					}
+					default: {
+						log("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
+						parentHandleBrowser = parentIntentN.getHandle();
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						viewPagerCDrive.setCurrentItem(0);
+						break;
+					}
+				}
+			}
+			else{
+				log("Parent is already NULL");
+
+				drawerItem = DrawerItem.SHARED_ITEMS;
+				parentHandleIncoming = -1;
+				deepBrowserTreeIncoming = 0;
+				viewPagerShares.setCurrentItem(0);
+			}
+			selectDrawerItemLollipop(drawerItem);
+		}
+
+	}
+
+	public int checkParentNodeToOpenFolder(long folderHandle){
+		log("checkParentNodeToOpenFolder");
+		MegaNode folderNode = megaApi.getNodeByHandle(folderHandle);
+		MegaNode parentNode = megaApi.getParentNode(folderNode);
+		if(parentNode!=null){
+			log("parentName: "+parentNode.getName());
+			if(parentNode.getHandle()==megaApi.getRootNode().getHandle()){
+				log("The parent is the ROOT");
+				return 0;
+			}
+			else if(parentNode.getHandle()==megaApi.getRubbishNode().getHandle()){
+				log("The parent is the RUBBISH");
+				return 1;
+			}
+			else if(parentNode.getHandle()==-1){
+				log("The parent is -1");
+				return -1;
+			}
+			else{
+				int result = checkParentNodeToOpenFolder(parentNode.getHandle());
+				log("Call returns "+result);
+				switch(result){
+					case -1:
+						return -1;
+					case 0:
+						return 0;
+					case 1:
+						return 1;
+				}
+			}
+		}
+		return -1;
 	}
 
 	static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
@@ -4749,7 +4883,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
 		    				log("Tag: "+ cFTag1);
 		    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		    				if (inSFLol != null){
+		    				log("deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+
+							if (inSFLol != null){
+								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
 		    				}
 		    			}

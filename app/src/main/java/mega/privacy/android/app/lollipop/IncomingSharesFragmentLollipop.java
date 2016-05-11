@@ -1498,7 +1498,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	}
 	
 	public int onBackPressed(){
-		log("onBackPressed "+deepBrowserTree);
+		log("onBackPressed deepBrowserTree:"+deepBrowserTree);
 		
 		PanelState pS=slidingOptionsPanel.getPanelState();
 		
@@ -1720,6 +1720,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes");
 		this.nodes = nodes;
+		adapter.setNodes(nodes);
 	}
 	
 	public void sortByMailDescending(){
@@ -1856,6 +1857,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public void setDeepBrowserTree(int deepBrowserTree) {
+		log("setDeepBrowserTree:" + deepBrowserTree);
 		this.deepBrowserTree = deepBrowserTree;
 	}
 
