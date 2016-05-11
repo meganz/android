@@ -790,9 +790,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 
 		app = (MegaApplication)getApplication();
-		
-		initGooglePlayPayments();
-		
+
 //		// Get tracker.
 //		Tracker t = app.getTracker(TrackerName.APP_TRACKER);
 //		// Enable Advertising Features.
@@ -964,7 +962,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			return;
 		}
 		else{
-			log("rootNode != null");		
+			log("rootNode != null");
+
+			initGooglePlayPayments();
+			
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
 			
