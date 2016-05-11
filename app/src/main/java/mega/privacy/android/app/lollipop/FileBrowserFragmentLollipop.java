@@ -1714,14 +1714,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					return 1;
 				}
 				else{
-					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
+					log("parentHandle is: "+parentHandle);
+					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 					if (parentNode != null){
-						log("ParentNode: "+parentNode.getName());
 						recyclerView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
 
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+							log("Parent is ROOT");
 							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -1759,9 +1760,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						else{					
 							contentText.setText(getInfoFolder(parentNode));
 						}
+						log("return 2");
 						return 2;
 					}
 					else{
+						log("ParentNode is NULL");
 						return 0;
 					}
 				}
@@ -1859,6 +1862,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public void setParentHandle(long parentHandle){
+		log("setParentHandle: "+parentHandle);
 		this.parentHandle = parentHandle;
 
 		if (adapter != null){
@@ -1894,7 +1898,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-				}			
+				}
+				log("Now the parentHandle of the adapter is; "+adapter.getParentHandle());
 			}
 			else{
 				log("adapter is NULL----------------");

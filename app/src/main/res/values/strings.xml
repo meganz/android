@@ -670,4 +670,5 @@
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
 
+    <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
 </resources>

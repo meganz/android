@@ -106,9 +106,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	public LinearLayout optionClearShares;
 	public LinearLayout optionLeaveShare;
 	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
+	public LinearLayout optionCopyTo;
+	public LinearLayout optionOpenFolder;
 	public TextView propertiesText;
-	
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
@@ -378,8 +379,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			
 			optionDownload = (LinearLayout) v.findViewById(R.id.file_list_option_download_layout);
 			optionProperties = (LinearLayout) v.findViewById(R.id.file_list_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_list_option_properties_text);			
-	
+			propertiesText = (TextView) v.findViewById(R.id.file_list_option_properties_text);
+
 			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_list_option_public_link_layout);
 	//			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
 	//			((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -397,7 +398,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			optionClearShares = (LinearLayout) v.findViewById(R.id.file_list_option_clear_share_layout);	
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_list_option_move_layout);		
 			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_list_option_copy_layout);			
-			
+			optionOpenFolder = (LinearLayout) v.findViewById(R.id.file_list_option_open_folder_layout);
+
 			optionDownload.setOnClickListener(this);
 			optionShare.setOnClickListener(this);
 			optionSendToInbox.setOnClickListener(this);
@@ -408,7 +410,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			optionPublicLink.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);
-			
+			optionOpenFolder.setOnClickListener(this);
+
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
@@ -518,7 +521,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			
 			optionDownload = (LinearLayout) v.findViewById(R.id.file_grid_option_download_layout);
 			optionProperties = (LinearLayout) v.findViewById(R.id.file_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);			
+			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);
 
 			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_grid_option_public_link_layout);
 //				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
@@ -536,7 +539,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 
 			optionClearShares = (LinearLayout) v.findViewById(R.id.file_grid_option_clear_share_layout);	
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);			
+			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);
+			optionOpenFolder = (LinearLayout) v.findViewById(R.id.file_grid_option_open_folder_layout);
 			
 			optionDownload.setOnClickListener(this);
 			optionShare.setOnClickListener(this);
@@ -548,6 +552,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			optionPublicLink.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);
+			optionOpenFolder.setOnClickListener(this);
 			
 			optionsOutLayout.setOnClickListener(this);
 			
@@ -581,6 +586,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		optionRename.setVisibility(View.VISIBLE);
 		optionMoveTo.setVisibility(View.VISIBLE);
 		optionCopyTo.setVisibility(View.VISIBLE);
+		optionOpenFolder.setVisibility(View.VISIBLE);
 		
 		//Hide
 		optionClearShares.setVisibility(View.GONE);
@@ -818,6 +824,16 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
 				((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+				break;
+			}
+			case R.id.file_list_option_open_folder_layout:
+			case R.id.file_grid_option_open_folder_layout: {
+				log("Open folder option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).openFolderFromSearch(selectedNode.getHandle());
 				break;
 			}
 		}
