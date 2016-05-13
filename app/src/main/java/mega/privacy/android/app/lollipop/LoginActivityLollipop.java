@@ -1,24 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.Locale;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.ChooseAccountActivity;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.OldPreferences;
-import mega.privacy.android.app.OldUserCredentials;
-import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.providers.FileProviderActivity;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -27,9 +8,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -49,6 +30,25 @@ import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import java.util.Locale;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.OldPreferences;
+import mega.privacy.android.app.OldUserCredentials;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
  
 public class LoginActivityLollipop extends Activity implements OnClickListener, MegaRequestListenerInterface{
@@ -80,7 +80,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView loggingInText;
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
+	TextView serversBusyText;
 	ScrollView scrollView;
+
+	CountDownTimer timer;
 
 	float scaleH, scaleW;
 	float density;
@@ -283,6 +286,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
+		serversBusyText = (TextView) findViewById(R.id.login_servers_busy_text);
 		
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
@@ -294,8 +298,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		prepareNodesText.setVisibility(View.GONE);
 		loginProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
-		confirmingAccountText.setVisibility(View.GONE);		
-		
+		confirmingAccountText.setVisibility(View.GONE);
+		serversBusyText.setVisibility(View.GONE);
 //		loginLogin.setVisibility(View.GONE);
 //		loginCreateAccount.setVisibility(View.GONE);
 //		loginDelimiter.setVisibility(View.GONE);
@@ -307,7 +311,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //		loginProgressBar.setVisibility(View.VISIBLE);
 //		queryingSignupLinkText.setVisibility(View.VISIBLE);
 //		confirmingAccountText.setVisibility(View.VISIBLE);
-			
+
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
 			log("There is an intent!");
@@ -320,7 +324,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
+
 			if (intentReceived.getAction() != null){
 				log("action is: "+intentReceived.getAction());
 			}
@@ -328,7 +332,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				log("No ACTION");
 			}
 		}
-		
+
 		credentials = dbH.getCredentials();
 		if (credentials != null){
 			log("Credentials NOT null");
@@ -336,10 +340,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
 					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
-					
+
 					lastEmail = credentials.getEmail();
 					gSession = credentials.getSession();
-					
+
 					loginLogin.setVisibility(View.GONE);
 					loginDelimiter.setVisibility(View.GONE);
 					loginCreateAccount.setVisibility(View.GONE);
@@ -348,12 +352,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					loginLoggingIn.setVisibility(View.VISIBLE);
 //					generatingKeysText.setVisibility(View.VISIBLE);
 //					megaApi.fastLogin(gSession, this);
-					
+
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					loggingInText.setVisibility(View.VISIBLE);
 					fetchingNodesText.setVisibility(View.VISIBLE);
 					prepareNodesText.setVisibility(View.GONE);
+					serversBusyText.setVisibility(View.GONE);
 					megaApi.fetchNodes(loginActivity);
 					return;
 				}
@@ -384,9 +389,9 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						url = null;
 					}
 					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
-						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;						
+						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;
 					}
-					
+
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -415,16 +420,16 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
-					    
+
 					    handler.postDelayed(new Runnable() {
-							
+
 							@Override
 							public void run() {
 								log("Now I start the service");
-								startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+								startService(new Intent(getApplicationContext(), CameraSyncService.class));
 							}
 						}, 5 * 60 * 1000);
-						
+
 						this.startActivity(intent);
 						this.finish();
 						return;
@@ -432,7 +437,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					else{
 						lastEmail = credentials.getEmail();
 						gSession = credentials.getSession();
-						
+
 						loginLogin.setVisibility(View.GONE);
 						loginDelimiter.setVisibility(View.GONE);
 						loginCreateAccount.setVisibility(View.GONE);
@@ -445,6 +450,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						loggingInText.setVisibility(View.VISIBLE);
 						fetchingNodesText.setVisibility(View.GONE);
 						prepareNodesText.setVisibility(View.GONE);
+						serversBusyText.setVisibility(View.GONE);
 						megaApi.fastLogin(gSession, this);
 						return;
 					}
@@ -453,7 +459,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			else{
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode != null){
-					
+
 					log("rootNode != null");
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					if (action != null){
@@ -481,7 +487,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					}
-					
+
 					prefs = dbH.getPreferences();
 					if(prefs!=null)
 					{
@@ -489,11 +495,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 							if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 								log("Enciendo el servicio de la camara");
 								handler.postDelayed(new Runnable() {
-									
+
 									@Override
 									public void run() {
 										log("Now I start the service");
-										startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+										startService(new Intent(getApplicationContext(), CameraSyncService.class));
 									}
 								}, 30 * 1000);
 							}
@@ -505,7 +511,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				}
 				else{
 					log("rootNode == null");
-					
+
 					lastEmail = credentials.getEmail();
 					gSession = credentials.getSession();
 					log("session: " + gSession);
@@ -521,6 +527,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					loggingInText.setVisibility(View.VISIBLE);
 					fetchingNodesText.setVisibility(View.GONE);
 					prepareNodesText.setVisibility(View.GONE);
+					serversBusyText.setVisibility(View.GONE);
 					megaApi.fastLogin(gSession, this);
 					return;
 				}
@@ -540,9 +547,9 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 							intent.putExtras(extras);
 						}
 						intent.setData(uriData);
-					
+
 						intent.setAction(action);
-						
+
 						action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
 					}
 					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
@@ -555,7 +562,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					}
 					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
 						log("ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY");
-						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;						
+						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;
 					}
 				}
 			}
@@ -572,7 +579,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+				serversBusyText.setVisibility(View.GONE);
+
 				OldUserCredentials oldCredentials = OldPreferences.getOldCredentials(this);
 				lastEmail = oldCredentials.getEmail();
 				OldPreferences.clearCredentials(this);
@@ -580,13 +588,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 		}
 	}
-	
+
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
 //		if (firstTime){
 //			int diffHeight = heightGrey - loginCreateAccount.getTop();
-//		
+//
 //			int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
 //			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
 //		}
@@ -616,17 +624,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				break;
 		}
 	}
-	
+
 	public void onLoginClick(View v){
 		submitForm();
 	}
-	
+
 	public void onRegisterClick(View v){
 		Intent intent = new Intent(this, CreateAccountActivityLollipop.class);
 		startActivity(intent);
 		finish();
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
@@ -634,8 +642,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
-	}  
-	
+	}
+
 	/*
 	 * Log in form submit
 	 */
@@ -643,10 +651,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		if (!validateForm()) {
 			return;
 		}
-		
+
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
-		
+
 		if(!Util.isOnline(this))
 		{
 			loginLoggingIn.setVisibility(View.GONE);
@@ -659,11 +667,12 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
+			serversBusyText.setVisibility(View.GONE);
 
 			Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
-		
+
 		loginLogin.setVisibility(View.GONE);
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
@@ -673,30 +682,30 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loginFetchNodesProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
 		confirmingAccountText.setVisibility(View.GONE);
-		
+
 		lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
 		lastPassword = et_password.getText().toString();
-		
+
 		log("generating keys");
-		
+
 		new HashTask().execute(lastEmail, lastPassword);
 	}
-	
+
 	private void onKeysGenerated(String privateKey, String publicKey) {
 		log("key generation finished");
 
 		this.gPrivateKey = privateKey;
 		this.gPublicKey = publicKey;
-		
+
 		if (confirmLink == null) {
 			onKeysGeneratedLogin(privateKey, publicKey);
-		} 
+		}
 		else{
 			if(!Util.isOnline(this)){
-				Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();				
+				Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
+
 			loginLogin.setVisibility(View.GONE);
 			loginDelimiter.setVisibility(View.GONE);
 			loginCreateAccount.setVisibility(View.GONE);
@@ -708,14 +717,15 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			confirmingAccountText.setVisibility(View.VISIBLE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+			serversBusyText.setVisibility(View.GONE);
+
 			log("fastConfirm");
 			megaApi.fastConfirmAccount(confirmLink, privateKey, this);
 		}
 	}
-	
+
 	private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
-		
+
 		if(!Util.isOnline(this)){
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
@@ -727,19 +737,21 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+			serversBusyText.setVisibility(View.GONE);
+
 			Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
-		
+
 		loggingInText.setVisibility(View.VISIBLE);
 		fetchingNodesText.setVisibility(View.GONE);
 		prepareNodesText.setVisibility(View.GONE);
-		
+		serversBusyText.setVisibility(View.GONE);
+
 		log("fastLogin con publicKey y privateKey");
 		megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
 	}
-	
+
 	/*
 	 * Validate email and password
 	 */
@@ -759,7 +771,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		}
 		return true;
 	}
-	
+
 	/*
 	 * Validate email
 	 */
@@ -773,7 +785,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		}
 		return null;
 	}
-	
+
 	/*
 	 * Validate password
 	 */
@@ -784,7 +796,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request)
 	{
@@ -796,9 +808,20 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			loginFetchNodesProgressBar.setProgress(0);
 		}
 	}
-	
+
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+		try{
+			if(timer!=null){
+				timer.cancel();
+				serversBusyText.setVisibility(View.GONE);
+			}
+		}
+		catch(Exception e){
+			log("TIMER EXCEPTION");
+			log(e.getMessage());
+		}
 //		log("onRequestUpdate: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (firstRequestUpdate){
@@ -815,14 +838,24 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					loginProgressBar.setVisibility(View.VISIBLE);
 				}
 //				log("progressValue = " + (int)progressValue);
-				loginFetchNodesProgressBar.setProgress((int)progressValue);				
+				loginFetchNodesProgressBar.setProgress((int)progressValue);
 			}
 		}
-	}	
+	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
-		
+		try{
+			if(timer!=null){
+				timer.cancel();
+				serversBusyText.setVisibility(View.GONE);
+			}
+		}
+		catch(Exception e){
+			log("TIMER EXCEPTION");
+			log(e.getMessage());
+		}
+
 		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (error.getErrorCode() != MegaError.API_OK) {
@@ -849,9 +882,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
+				serversBusyText.setVisibility(View.GONE);
 
 				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
-				
+
 //				DatabaseHandler dbH = new DatabaseHandler(this);
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
@@ -874,16 +908,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+				serversBusyText.setVisibility(View.GONE);
+
 				gSession = megaApi.dumpSession();
 				credentials = new UserCredentials(lastEmail, gSession);
-				
+
 //				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
-				
+
 				log("Logged in: " + gSession);
-				
+
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
 
@@ -900,18 +935,18 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //					log("AUTTHO: _" + authTokenType + "_");
 //					accountManager.setAuthToken(account, authTokenType, gSession);
 //				}
-				
+
 				megaApi.fetchNodes(loginActivity);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (error.getErrorCode() == MegaError.API_OK){
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				
+
 				gSession = megaApi.dumpSession();
 				lastEmail = megaApi.getMyUser().getEmail();
 				credentials = new UserCredentials(lastEmail, gSession);
-				
+
 				dbH.saveCredentials(credentials);
 			}
 			if(confirmLink==null){
@@ -927,14 +962,15 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					loggingInText.setVisibility(View.GONE);
 					fetchingNodesText.setVisibility(View.GONE);
 					prepareNodesText.setVisibility(View.GONE);
+					serversBusyText.setVisibility(View.GONE);
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
-					
+
 					Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
 				}
 				else{
 					if (!backWhileLogin){
-						
+
 						if (parentHandle != -1){
 							Intent intent = new Intent();
 							intent.putExtra("PARENT_HANDLE", parentHandle);
@@ -953,7 +989,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 										log("ACTION_EXPORT_MK");
 										intent.setAction(action);
 									}
-								}																
+								}
 							}
 							else{
 								boolean initialCam = false;
@@ -966,11 +1002,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 										if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 											log("Enciendo el servicio de la camara");
 											handler.postDelayed(new Runnable() {
-												
+
 												@Override
 												public void run() {
 													log("Now I start the service");
-													startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+													startService(new Intent(getApplicationContext(), CameraSyncService.class));
 												}
 											}, 30 * 1000);
 										}
@@ -978,13 +1014,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 									else{
 										intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 										intent.putExtra("firstTimeCam", true);
-										initialCam = true;								
+										initialCam = true;
 									}
 								}
 								else{
 									intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 									intent.putExtra("firstTimeCam", true);
-									initialCam = true;								
+									initialCam = true;
 								}
 
 								if (!initialCam){
@@ -1019,11 +1055,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 									if (action != null){
 										log("The action is: "+action);
 										intent.setAction(action);
-									}									
+									}
 								}
 								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							}
-							
+
 							startActivity(intent);
 							finish();
 						}
@@ -1034,9 +1070,9 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				Intent intent = new Intent();
 				intent = new Intent(this,ChooseAccountActivityLollipop.class);
 				startActivity(intent);
-				finish();				
+				finish();
 			}
-	
+
 		}
 		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
 			String s = "";
@@ -1049,7 +1085,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			confirmingAccountText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+			serversBusyText.setVisibility(View.GONE);
+
 			if(error.getErrorCode() == MegaError.API_OK){
 				s = request.getEmail();
 				et_user.setText(s);
@@ -1075,7 +1112,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				confirmingAccountText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
-				
+				serversBusyText.setVisibility(View.GONE);
+
 				if (error.getErrorCode() == MegaError.API_ENOENT){
 					Snackbar.make(scrollView,getString(R.string.error_incorrect_email_or_password),Snackbar.LENGTH_LONG).show();
 				}
@@ -1090,12 +1128,35 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
 	{
 		log("onRequestTemporaryError: " + request.getRequestString());
+
+//		if (request.getType() == MegaRequest.TYPE_LOGIN){
+//
+//		}
+//		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+//
+//		}
+		try{
+			timer = new CountDownTimer(10000, 2000) {
+
+				public void onTick(long millisUntilFinished) {
+					log("TemporaryError one more");
+				}
+
+				public void onFinish() {
+					log("the timer finished, message shown");
+					serversBusyText.setVisibility(View.VISIBLE);
+				}
+			}.start();
+		}catch (Exception exception){
+			log(exception.getMessage());
+			log("EXCEPTION when starting count");
+		}
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		backWhileLogin = true;
-		
+
 		if (loginClicked){
 			super.onBackPressed();
 		}
@@ -1105,18 +1166,18 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			finish();
 		}
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 	}
-	
+
 	public void onNewIntent(Intent intent){
 		if (intent != null && ACTION_CONFIRM.equals(intent.getAction())) {
 			handleConfirmationIntent(intent);
 		}
 	}
-	
+
 	/*
 	 * Handle intent from confirmation email
 	 */
@@ -1126,7 +1187,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		bLogin.setText(getString(R.string.login_confirm_account).toUpperCase(Locale.getDefault()));
 		updateConfirmEmail(confirmLink);
 	}
-	
+
 	/*
 	 * Get email address from confirmation code and set to emailView
 	 */
@@ -1135,7 +1196,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
-		
+
 		loginLogin.setVisibility(View.GONE);
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
@@ -1145,6 +1206,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		confirmingAccountText.setVisibility(View.GONE);
 		fetchingNodesText.setVisibility(View.GONE);
 		prepareNodesText.setVisibility(View.GONE);
+		serversBusyText.setVisibility(View.GONE);
 		loginProgressBar.setVisibility(View.VISIBLE);
 		log("querySignupLink");
 		megaApi.querySignupLink(link, this);

@@ -254,6 +254,7 @@
 	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">No hay contactos en la cuenta. Añádelos en la pantalla de Contactos</string>
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
 	<string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string>
+
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Añade un nuevo contacto para compartir</string>
 	
 	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
@@ -667,4 +668,5 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Los logs están ahora desactivados</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Abrir ubicación</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servidores ocupados, por favor, espere.</string>
 </resources>
