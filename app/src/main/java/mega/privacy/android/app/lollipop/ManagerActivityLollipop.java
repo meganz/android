@@ -1773,15 +1773,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		if (intent.getAction() != null){
     			log("intent action");
 
-//    			if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){
-//
-//    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
-//
-//    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
-//    				intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
-//    			    startActivity(intentZip);
-//
-//    			}
+    			if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){
+
+    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
+
+    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
+    				intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
+    			    startActivity(intentZip);
+    			}
 //    			else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){
 //
 //    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
