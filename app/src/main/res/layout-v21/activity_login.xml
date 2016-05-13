@@ -188,6 +188,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/login_servers_busy_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/servers_busy" />
         </LinearLayout>
     </LinearLayout>
 

@@ -12165,8 +12165,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						}
 					}
-
-
 				}
 				else {
 					//Cloud Drive TAB

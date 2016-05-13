@@ -164,7 +164,7 @@
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please log in to share with MEGA</string>
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
-    
+
     <string name="tour_space_title">MEGA SPACE</string>
     <string name="tour_speed_title">MEGA SPEED</string>
     <string name="tour_privacy_title">MEGA PRIVACY</string>
@@ -671,4 +671,5 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servers are too busy. Please wait.</string>
 </resources>
