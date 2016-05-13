@@ -7129,7 +7129,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
 					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
-
+					//Check if the file is already downloaded
 					if(localPath != null){
 						log("localPath != null");
 						try {
@@ -7154,23 +7154,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("Exception!!");
 						}
 
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						if (isIntentAvailable(this, viewIntent)){
-							log("if isIntentAvailable");
-							startActivity(viewIntent);
+						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
+							log("MimeTypeList ZIP");
+							File zipFile = new File(localPath);
+
+							Intent intentZip = new Intent();
+							intentZip.setClass(this, ZipBrowserActivityLollipop.class);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
+
+							this.startActivity(intentZip);
+
 						}
-						else{
-							log("ELSE isIntentAvailable");
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, intentShare)){
-								log("call to startActivity(intentShare)");
-								startActivity(intentShare);
+						else {
+							log("MimeTypeList other file");
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+							if (isIntentAvailable(this, viewIntent)) {
+								log("if isIntentAvailable");
+								startActivity(viewIntent);
+							} else {
+								log("ELSE isIntentAvailable");
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+								if (isIntentAvailable(this, intentShare)) {
+									log("call to startActivity(intentShare)");
+									startActivity(intentShare);
+								}
+								Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
 							}
-							Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
 						}
 						return;
+					}
+					else{
+						log("localPath is NULL");
 					}
 				}
 			}

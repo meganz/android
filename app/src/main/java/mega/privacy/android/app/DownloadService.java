@@ -1,5 +1,27 @@
 package mega.privacy.android.app;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
+import android.os.Environment;
+import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.support.v4.app.NotificationCompat;
+import android.text.format.Formatter;
+import android.util.SparseArray;
+import android.widget.RemoteViews;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,10 +30,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -23,34 +45,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.database.Cursor;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
-import android.os.IBinder;
-import android.os.ParcelFileDescriptor;
-import android.os.PowerManager;
-import android.os.StatFs;
-import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
-import android.support.v4.app.NotificationCompat;
-import android.text.format.Formatter;
-import android.util.SparseArray;
-import android.view.View;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 
 /*
@@ -499,14 +493,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Download success of zip file!");				
 					
 					if(pathFileToOpen!=null){
-//						Intent intentZip = new Intent(this, ZipBrowserActivity.class);
-//						intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
-//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//						intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-//						intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-//						intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-//						startActivity(intentZip);
-						
+						Intent intentZip;
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+							intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+						}
+						else{
+							intentZip = new Intent(this, ZipBrowserActivity.class);
+							intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+						}
+
+						if(intentZip!=null){
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intentZip);
+						}
 					}
 					else{
 						Intent intentZip = null;
