@@ -1,5 +1,27 @@
 package mega.privacy.android.app.lollipop;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,30 +41,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
-
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ListView;
-import android.widget.Toast;
 
 
 public class ZipBrowserActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
@@ -303,7 +301,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			
 		}
 		else{
-			
 			aB.setTitle("ZIP "+currentFolder);
 			//currentFolder="";
 			
@@ -335,19 +332,19 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 
 				e.printStackTrace();
 			} 	
-		}			
+		}
 		
-			/*			
+
 		if (adapterList == null){
 			adapterList = new ZipListAdapterLollipop(this, listView, aB, zipNodes, currentFolder);
 			
 		}
 		else{
-			//adapterList.setParentHandle(parentHandle);
-			//adapterList.setNodes(nodes);
+//			adapterList.setParentHandle(parentHandle);
+//			adapterList.setNodes(nodes);
 		}		
 
-		listView.setAdapter(adapterList);*/		
+		listView.setAdapter(adapterList);
 	}
 	
 	@Override
@@ -356,7 +353,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				finish();
+				onBackPressed();
 				return true;
 			}
 		}
@@ -365,7 +362,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 	
 	public void openFile(int position) {
 		log("openFile");
-	
 		
 		if (dbH == null){
 //			dbH = new DatabaseHandler(getApplicationContext());
@@ -387,16 +383,20 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		}		
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
-		 if(!folderzipped){			 
-			 int index = pathZip.lastIndexOf(".");
-			 absolutePath = pathZip.substring(0, index);		
-			 absolutePath = absolutePath +"/"+currentPath;
-		 }
-		
+		if(!folderzipped){
+			log("folderzipped = "+folderzipped);
+			int index = pathZip.lastIndexOf(".");
+			absolutePath = pathZip.substring(0, index);
+			absolutePath = absolutePath +"/"+currentPath;
+		}
+		else{
+			log("folderzipped = "+folderzipped);
+		}
 		
 		log("The absolutePath of the file to open is: "+absolutePath);
 		 
 		if (MimeTypeList.typeForName(absolutePath).isImage()){
+			log("isImage");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra("position", position);
 			intent.putExtra("adapterType", ManagerActivityLollipop.ZIP_ADAPTER);
@@ -417,7 +417,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 //			this.startActivity(intentPdf);
 //			
 //		}
-		else{							
+		else{
+			log("NOT Image");
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
 			if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
