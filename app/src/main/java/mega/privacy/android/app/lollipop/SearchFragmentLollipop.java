@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -71,7 +70,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	ProgressBar progressBar;
 	MegaNode selectedNode = null;
 	MegaApiAndroid megaApi;	
-    ImageButton fabButton;
 	ImageView transferArrow;
 		
 	long parentHandle = -1;
@@ -334,8 +332,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
-			fabButton.setVisibility(View.GONE);
 			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
 			progressBar.setVisibility(View.GONE);
 			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
@@ -480,9 +476,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
 			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
 			transferArrow.setLayoutParams(lp);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
-			fabButton.setVisibility(View.GONE);
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);			

@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.design.widget.Snackbar;
@@ -112,6 +113,7 @@ import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -237,6 +239,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
+	FloatingActionButton fabButton;
+
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingUploadPanel;
+	public FrameLayout uploadOutLayout;
+	public LinearLayout uploadLayout;
+	public LinearLayout uploadImage;
+	public LinearLayout uploadAudio;
+	public LinearLayout uploadVideo;
+	public LinearLayout uploadFromSystem;
+	private UploadPanelListener uploadPanelListener;
+	////
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -275,6 +289,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return null;
 		}
 	}
+
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
 	static MenuItem drawerMenuItem = null;
@@ -1351,6 +1366,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
 
+		//FAB button
+		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
+		fabButton.setOnClickListener(new FabButtonListener(this));
+
+		slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
+		uploadLayout = (LinearLayout) findViewById(R.id.file_list_upload);
+		uploadOutLayout = (FrameLayout) findViewById(R.id.file_list_out_upload);
+		uploadImage = (LinearLayout) findViewById(R.id.file_list_upload_image_layout);
+		uploadAudio= (LinearLayout) findViewById(R.id.file_list_upload_audio_layout);
+		uploadVideo = (LinearLayout) findViewById(R.id.file_list_upload_video_layout);
+		uploadFromSystem = (LinearLayout) findViewById(R.id.file_list_upload_from_system_layout);
+
+		uploadPanelListener = new UploadPanelListener(this);
+
+		uploadImage.setOnClickListener(uploadPanelListener);
+		uploadAudio.setOnClickListener(uploadPanelListener);
+		uploadVideo.setOnClickListener(uploadPanelListener);
+		uploadFromSystem.setOnClickListener(uploadPanelListener);
+
+		uploadOutLayout.setOnClickListener(uploadPanelListener);
+
+		slidingUploadPanel.setVisibility(View.INVISIBLE);
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+//		slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
+
 		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
 		outSpaceText =  (TextView) findViewById(R.id.overquota_alert_text);
@@ -1774,7 +1815,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			log("intent action");
 
     			if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){
-
+					log("open zip browser");
     				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
 
     				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
@@ -5117,13 +5158,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
 	        		if (viewPagerShares.getCurrentItem()==1){
 		        		if (outSFLol != null){
-//		        			this.uploadFile();
-		        			outSFLol.showUploadPanel();
+		        			this.uploadFile();
 		        		}
 	        		}
 	        	}
 	        	else {
-	        		fbFLol.showUploadPanel();
+        			this.uploadFile();
 	        	}
 
 	        	return true;
@@ -6460,6 +6500,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		drawerLayout.closeDrawer(Gravity.LEFT);
     		return;
     	}
+
+		if(slidingUploadPanel.getVisibility()==View.VISIBLE){
+			hideUploadPanel();
+			return;
+		}
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -8537,26 +8582,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void uploadFile(){
 		log("uploadFile");
 
-		if(drawerItem == DrawerItem.CLOUD_DRIVE){
-			fbFLol.showUploadPanel();
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if (index == 0){
-				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (inSFLol != null){
-					inSFLol.showUploadPanel();
-				}
-			}
-			else{
-				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (outSFLol != null){
-					outSFLol.showUploadPanel();
-				}
-			}
-		}
+		showUploadPanel();
 	}
 
 //	public void upgradeAccountButton(){
@@ -11910,7 +11936,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				catch (Exception ex) {}
 
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+					Snackbar.make(fabButton, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
 						int index = viewPagerCDrive.getCurrentItem();
@@ -12847,6 +12874,80 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setDeepBrowserTreeOutgoing(int deepBrowserTreeOutgoing) {
 		this.deepBrowserTreeOutgoing = deepBrowserTreeOutgoing;
+	}
+
+	public static DrawerItem getDrawerItem() {
+		return drawerItem;
+	}
+
+	public static void setDrawerItem(DrawerItem drawerItem) {
+		ManagerActivityLollipop.drawerItem = drawerItem;
+	}
+
+	public int getIndexCloud(){
+		if(viewPagerCDrive!=null){
+			return viewPagerCDrive.getCurrentItem();
+		}
+		return -1;
+	}
+
+	public int getIndexShares(){
+		if(viewPagerShares!=null){
+			return viewPagerShares.getCurrentItem();
+		}
+		return -1;
+	}
+
+	public void showUploadPanel(){
+		log("showUploadPanel");
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+			}
+		}
+
+		fabButton.setVisibility(View.GONE);
+		slidingUploadPanel.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
+
+	public void hideUploadPanel(){
+		log("hideUploadPanel");
+		fabButton.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingUploadPanel.setVisibility(View.GONE);
+	}
+
+	public void showFabButton(){
+
+//		if(deepBrowserTree==0){
+//			fabButton.setVisibility(View.GONE);
+//		}
+//		else{
+//			fabButton.setVisibility(View.VISIBLE);
+//		}
+
+		//Check the folder's permissions
+//		int accessLevel= megaApi.getAccess(parentNode);
+//		log("Node: "+parentNode.getName());
+//
+//		switch(accessLevel){
+//			case MegaShare.ACCESS_OWNER:
+//			case MegaShare.ACCESS_READWRITE:
+//			case MegaShare.ACCESS_FULL:{
+//				fabButton.setVisibility(View.VISIBLE);
+//				break;
+//			}
+//			case MegaShare.ACCESS_READ:{
+//				fabButton.setVisibility(View.GONE);
+//				break;
+//			}
+//		}
+
 	}
 
 }

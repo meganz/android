@@ -1,31 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.CreateThumbPreviewService;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -75,6 +49,33 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.CreateThumbPreviewService;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
@@ -745,16 +746,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
-			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
-			fabButton.setVisibility(View.GONE);
-			
+
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
 			slidingOptionsPanel.setVisibility(View.GONE);
-			
-			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
-			slidingUploadPanel.setVisibility(View.GONE);
-			
+
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    

@@ -1,18 +1,13 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +29,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -105,7 +99,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	private ActionMode actionMode;
 
-    ImageButton fabButton;
+//    FloatingActionButton fabButton;
 	private RecyclerView.LayoutManager mLayoutManager;
 	MegaNode selectedNode = null;
 
@@ -129,16 +123,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;
 	public TextView propertiesText;
-	////
-
-	//UPLOAD PANEL
-	private SlidingUpPanelLayout slidingUploadPanel;
-	public FrameLayout uploadOutLayout;
-	public LinearLayout uploadLayout;
-	public LinearLayout uploadImage;
-	public LinearLayout uploadAudio;
-	public LinearLayout uploadVideo;
-	public LinearLayout uploadFromSystem;
 	////
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -359,19 +343,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-
-
-
-
-//		outState.putString("pathNavigation", parentHandle);
-//		outState.putLong("parentHandleBrowser", parentHandleBrowser);
-//		outState.putLong("parentHandleRubbish", parentHandleRubbish);
-//		outState.putLong("parentHandleIncoming", parentHandleIncoming);
-//		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
-//		outState.putLong("parentHandleSearch", parentHandleSearch);
-//		outState.putLong("parentHandleInbox", parentHandleInbox);
-//		outState.putSerializable("drawerItem", drawerItem);
-////		outState.putParcelable("obj", myClass);
 	}
 
 	@Override
@@ -487,8 +458,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //			progressBar.setVisibility(View.VISIBLE);
 //			transferArrow.setVisibility(View.VISIBLE);
 			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
-			fabButton.setOnClickListener(this);
+//			fabButton = (FloatingActionButton) v.findViewById(R.id.file_upload_button);
+//			fabButton.setOnClickListener(this);
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
@@ -634,27 +605,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	            }
 	        };			
 			
-			slidingOptionsPanel.setPanelSlideListener(slidingPanelListener);			
-			
-			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
-			uploadLayout = (LinearLayout) v.findViewById(R.id.file_list_upload);
-			uploadOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_upload);
-			uploadImage = (LinearLayout) v.findViewById(R.id.file_list_upload_image_layout);
-			uploadAudio= (LinearLayout) v.findViewById(R.id.file_list_upload_audio_layout);
-			uploadVideo = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
-			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_list_upload_from_system_layout);
-			
-			uploadImage.setOnClickListener(this);
-			uploadAudio.setOnClickListener(this);
-			uploadVideo.setOnClickListener(this);
-			uploadFromSystem.setOnClickListener(this);
-			
-			uploadOutLayout.setOnClickListener(this);
-			
-			slidingUploadPanel.setVisibility(View.INVISIBLE);
-			slidingUploadPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingUploadPanel.setPanelSlideListener(slidingPanelListener);			
+			slidingOptionsPanel.setPanelSlideListener(slidingPanelListener);
 			
 			return v;
 		}
@@ -686,10 +637,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
 			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
 			transferArrow.setLayoutParams(lp);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
-			fabButton.setOnClickListener(this);
-			
+
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
@@ -797,26 +745,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
-			uploadLayout = (LinearLayout) v.findViewById(R.id.file_grid_upload);
-			uploadOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_upload);
-			uploadImage = (LinearLayout) v.findViewById(R.id.file_grid_upload_image_layout);
-			uploadAudio= (LinearLayout) v.findViewById(R.id.file_grid_upload_audio_layout);
-			uploadVideo = (LinearLayout) v.findViewById(R.id.file_grid_upload_video_layout);
-			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_grid_upload_from_system_layout);
-			
-			uploadImage.setOnClickListener(this);
-			uploadAudio.setOnClickListener(this);
-			uploadVideo.setOnClickListener(this);
-			uploadFromSystem.setOnClickListener(this);
-			
-			uploadOutLayout.setOnClickListener(this);
-			
-			slidingUploadPanel.setVisibility(View.INVISIBLE);
-			slidingUploadPanel.setPanelState(PanelState.HIDDEN);
-			
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+
 			/*slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
@@ -982,36 +912,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				emptyTextView.setVisibility(View.GONE);
 				leftNewFolder.setVisibility(View.GONE);
 				rightUploadButton.setVisibility(View.GONE);
-			}		*/		
+			}		*/
 			
 			return v;
 		}		
 	}
-	
-	public void showUploadPanel(){
-		log("showUploadPanel");
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
-			}
-		}
-		
-		fabButton.setVisibility(View.GONE);
-		slidingUploadPanel.setVisibility(View.VISIBLE);
-		slidingUploadPanel.setPanelState(PanelState.EXPANDED);
-	}
-	
-	public void hideUploadPanel(){
-		log("hideUploadPanel");
-		fabButton.setVisibility(View.VISIBLE);
-		slidingUploadPanel.setPanelState(PanelState.HIDDEN);
-		slidingUploadPanel.setVisibility(View.GONE);
-	}
-	
+
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
@@ -1043,7 +949,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");
 		
-		fabButton.setVisibility(View.GONE);
+//		fabButton.setVisibility(View.GONE);
 		
 		this.selectedNode = sNode;
 		
@@ -1079,7 +985,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		log("hideOptionsPanel");
 				
 		adapter.setPositionClicked(-1);
-		fabButton.setVisibility(View.VISIBLE);
+//		fabButton.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
@@ -1109,71 +1015,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
 				}				
-				break;
-			}
-	
-			case R.id.file_upload_button:
-			case R.id.file_upload_button_grid:{
-//				((ManagerActivityLollipop)getActivity()).uploadFile();
-				showUploadPanel();
-				break;			
-			}
-			
-			case R.id.file_list_upload_audio_layout:
-			case R.id.file_grid_upload_audio_layout:{
-				log("click upload audio");
-				hideUploadPanel();
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				intent.setType("*/*");
-				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
-							    
-				break;
-			}
-			
-			case R.id.file_list_upload_video_layout:
-			case R.id.file_grid_upload_video_layout:{
-				log("click upload video");
-				hideUploadPanel();
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				intent.setType("*/*");
-				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
-				break;
-			}
-			
-			case R.id.file_list_upload_image_layout:
-			case R.id.file_grid_upload_image_layout:{
-				log("click upload image");
-				hideUploadPanel();
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				intent.setType("*/*");
-				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
-				break;
-			}
-			
-			case R.id.file_list_upload_from_system_layout:
-			case R.id.file_grid_upload_from_system_layout:{
-				log("click upload from_system");
-				hideUploadPanel();
-				Intent intent = new Intent();
-				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
-				((ManagerActivityLollipop)getActivity()).startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
-				break;
-			}
-			
-			case R.id.file_list_out_upload:
-			case R.id.file_grid_out_upload:{
-				hideUploadPanel();
 				break;
 			}
 		
@@ -1688,11 +1529,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingOptionsPanel.setVisibility(View.GONE);
 			adapter.setPositionClicked(-1);
 			notifyDataSetChanged();
-			return 4;
-		}
-		
-		if(slidingUploadPanel.getVisibility()==View.VISIBLE){
-			hideUploadPanel();
 			return 4;
 		}
 		
