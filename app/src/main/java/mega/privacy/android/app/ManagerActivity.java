@@ -322,6 +322,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private boolean moveToRubbish = false;
     private boolean sendToInbox = false;
     private boolean isClearRubbishBin = false;
+
+	String nameText;
+	String firstNameText;
+
+	boolean name = false;
+	boolean firstName = false;
     
     ProgressDialog statusDialog;
     
@@ -981,7 +987,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //					userName.setVisibility(View.VISIBLE);
 //					userName.setText(userNameString);
 //				}
-				megaApi.getUserData(this);
+				megaApi.getUserAttribute(1, this);
+				megaApi.getUserAttribute(2, this);
 				
 				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 				Canvas c = new Canvas(defaultAvatar);
@@ -5331,11 +5338,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //				}
 //			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
-			if (e.getErrorCode() == MegaError.API_OK){
-				userName.setText(request.getName());
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
 		}
@@ -5735,59 +5737,73 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			boolean avatarExists = false;
-			if (e.getErrorCode() == MegaError.API_OK){
-				
-				File avatar = null;
-				if (getExternalCacheDir() != null){
-					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				else{
-					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				Bitmap imBitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options options = new BitmapFactory.Options();
-						options.inJustDecodeBounds = true;
-						BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-						int imageHeight = options.outHeight;
-						int imageWidth = options.outWidth;
-						String imageType = options.outMimeType;
-						
-						// Calculate inSampleSize
-					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
-					    
-					    // Decode bitmap with inSampleSize set
-					    options.inJustDecodeBounds = false;
+			if (e.getErrorCode() == MegaError.API_OK) {
 
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-						if (imBitmap == null) {
-							avatar.delete();
-						}
-						else{
-							avatarExists = true;
-							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-							
-							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-					        Paint paint = new Paint();
-					        paint.setShader(shader);
-					
-					        Canvas c = new Canvas(circleBitmap);
-					        int radius; 
-					        if (imBitmap.getWidth() < imBitmap.getHeight())
-					        	radius = imBitmap.getWidth()/2;
-					        else
-					        	radius = imBitmap.getHeight()/2;
-					        
-						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-					        imageProfile.setImageBitmap(circleBitmap);
-					        textViewProfile.setVisibility(View.GONE);
+				if (request.getParamType() == 1) {
+					log("(1)request.getText(): " + request.getText());
+					nameText = request.getText();
+					name = true;
+				} else if (request.getParamType() == 2) {
+					log("(2)request.getText(): " + request.getText());
+					firstNameText = request.getText();
+					firstName = true;
+				}
+				if (name && firstName) {
+					userName.setText(nameText + " " + firstNameText);
+					name = false;
+					firstName = false;
+				}
+
+				if (request.getParamType() == 0) {
+					File avatar = null;
+					if (getExternalCacheDir() != null) {
+						avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					} else {
+						avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					Bitmap imBitmap = null;
+					if (avatar.exists()) {
+						if (avatar.length() > 0) {
+							BitmapFactory.Options options = new BitmapFactory.Options();
+							options.inJustDecodeBounds = true;
+							BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+							int imageHeight = options.outHeight;
+							int imageWidth = options.outWidth;
+							String imageType = options.outMimeType;
+
+							// Calculate inSampleSize
+							options.inSampleSize = calculateInSampleSize(options, 250, 250);
+
+							// Decode bitmap with inSampleSize set
+							options.inJustDecodeBounds = false;
+
+							imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+							if (imBitmap == null) {
+								avatar.delete();
+							} else {
+								avatarExists = true;
+								Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+								BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
+								Paint paint = new Paint();
+								paint.setShader(shader);
+
+								Canvas c = new Canvas(circleBitmap);
+								int radius;
+								if (imBitmap.getWidth() < imBitmap.getHeight())
+									radius = imBitmap.getWidth() / 2;
+								else
+									radius = imBitmap.getHeight() / 2;
+
+								c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
+								imageProfile.setImageBitmap(circleBitmap);
+								textViewProfile.setVisibility(View.GONE);
+							}
 						}
 					}
 				}
+				log("avatar user downloaded");
 			}
-			
-			log("avatar user downloaded");
 		}
 		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
 			
