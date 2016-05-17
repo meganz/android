@@ -176,10 +176,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
-		
-		//My Name
-		megaApi.getUserData(this);
-		
+
 		userNameTextView.setText(myEmail);		
 		myUser = megaApi.getMyUser();	
 		
@@ -420,6 +417,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
 			if (e.getErrorCode() == MegaError.API_OK){
 				userNameTextView.setText(request.getName());
+				log("REQUEST.GETNAME=" + request.getName());
 			}
 		}
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
