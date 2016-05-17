@@ -924,11 +924,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		log("onclick");
 		
 		switch(v.getId()){
-				
-			case R.id.btnRight_upload:
-			case R.id.btnRight_grid_upload:
-				((ManagerActivityLollipop)getActivity()).uploadFile();
-				break;
 
 			case R.id.file_list_option_send_inbox_layout:
 			case R.id.file_grid_option_send_inbox_layout: {

@@ -2355,6 +2355,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 			}
 
                         }
+						showFabButton();
                      }
     			});
 
@@ -2602,6 +2603,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	    				}
 //    				}
 //    			}
+				showFabButton();
 				log("END selectDrawerItem for Cloud Drive");
     			break;
     		}
@@ -2661,7 +2663,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				searchMenuItem.setVisible(true);
     				thumbViewMenuItem.setVisible(true);
     			}
-
+				showFabButton();
     			break;
     		}
     		case CAMERA_UPLOADS:{
@@ -2751,6 +2753,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
     			}
+				showFabButton();
       			break;
     		}
     		case MEDIA_UPLOADS:{
@@ -2816,6 +2819,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
     			}
+				showFabButton();
       			break;
     		}
     		case INBOX:{
@@ -2887,7 +2891,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
 	    		}
-
+				showFabButton();
     			break;
     		}
     		case SHARED_ITEMS:{
@@ -3157,6 +3161,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
+				showFabButton();
     			break;
     		}
     		case CONTACTS:{
@@ -3340,6 +3345,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			searchMenuItem.setVisible(true);
 	    			gridSmallLargeMenuItem.setVisible(false);
     			}
+				showFabButton();
     			break;
     		}
     		case SETTINGS:{
@@ -3404,6 +3410,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						pauseTransfersMenuIcon.setVisible(false);
 					}
 				}
+				showFabButton();
 				break;
     		}
     		case SEARCH:{
@@ -3488,6 +3495,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 
     			}
+				showFabButton();
     			break;
     		}
     		case ACCOUNT:{
@@ -3540,6 +3548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			searchMenuItem.setVisible(false);
         			cancelAllTransfersMenuItem.setVisible(false);
 	    		}
+				showFabButton();
     			break;
     		}
     		case TRANSFERS:{
@@ -3584,7 +3593,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
-
+				showFabButton();
     			break;
     		}
     	}
@@ -5131,10 +5140,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			MegaNode checkNode = megaApi.getNodeByHandle(checkHandle);
 
 		        			if((megaApi.checkAccess(checkNode, MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-		        				this.uploadFile();
+		        				this.showUploadPanel();
 							}
 							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
-								this.uploadFile();
+								this.showUploadPanel();
 							}
 							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 								log("Not permissions to upload");
@@ -5158,12 +5167,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
 	        		if (viewPagerShares.getCurrentItem()==1){
 		        		if (outSFLol != null){
-		        			this.uploadFile();
+		        			this.showUploadPanel();
 		        		}
 	        		}
 	        	}
 	        	else {
-        			this.uploadFile();
+        			this.showUploadPanel();
 	        	}
 
 	        	return true;
@@ -8576,13 +8585,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			return null;
 		}
-	}
-
-
-	public void uploadFile(){
-		log("uploadFile");
-
-		showUploadPanel();
 	}
 
 //	public void upgradeAccountButton(){
@@ -12923,6 +12925,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showFabButton(){
+		log("showFabButton");
+		switch (drawerItem){
+			case CLOUD_DRIVE:{
+				log("Cloud Drive SECTION");
+				int indexCloud = getIndexCloud();
+				switch(indexCloud){
+					case 0:{
+						log("cloud TAB");
+						fabButton.setVisibility(View.VISIBLE);
+						break;
+					}
+					case 1:{
+						log("rubbish TAB");
+						fabButton.setVisibility(View.GONE);
+						break;
+					}
+					default: {
+						break;
+					}
+				}
+				break;
+			}
+			case SHARED_ITEMS:{
+				log("Shared Items SECTION");
+
+				break;
+			}
+			case CONTACTS:{
+
+				break;
+			}
+			default:{
+				log("default GONE");
+				fabButton.setVisibility(View.GONE);
+				break;
+			}
+		}
 
 //		if(deepBrowserTree==0){
 //			fabButton.setVisibility(View.GONE);
