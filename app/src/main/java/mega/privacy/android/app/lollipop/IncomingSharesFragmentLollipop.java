@@ -338,6 +338,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 		}
 
+		((ManagerActivityLollipop)context).showFabButton();
+
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
@@ -1647,6 +1649,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public int getDeepBrowserTree() {
+		log("getDeepBrowserTree:" + deepBrowserTree);
 		return deepBrowserTree;
 	}
 

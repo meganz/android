@@ -156,6 +156,7 @@
                     android:layout_weight="1" />
             </LinearLayout>
         </TabHost>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/floating_button"
             android:layout_width="@dimen/fab_button_diameter"

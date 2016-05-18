@@ -1,9 +1,10 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
@@ -29,7 +30,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 break;
             }
             case CONTACTS:{
-
+                ((ManagerActivityLollipop)context).chooseAddContactDialog();
                 break;
             }
         }

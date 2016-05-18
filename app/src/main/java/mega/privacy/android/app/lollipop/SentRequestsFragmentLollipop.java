@@ -1,24 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -31,12 +16,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 
 public class SentRequestsFragmentLollipop extends Fragment implements OnClickListener{
 	
@@ -59,8 +54,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
-    ImageButton fabButton;
+
 	private ActionMode actionMode;
 	
 	boolean isList = true;
@@ -160,9 +154,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 			
 			emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 			emptyTextView.setText(R.string.sent_requests_empty);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
-			fabButton.setOnClickListener(this);
 
 			if (adapterList == null){
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER);
@@ -251,7 +242,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 		log("showOptionsPanel");	
 		
 		this.selectedRequest = request;
-		fabButton.setVisibility(View.GONE);					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
 	}
@@ -260,7 +250,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 		log("hideOptionsPanel");
 				
 		adapterList.setPositionClicked(-1);
-		fabButton.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}

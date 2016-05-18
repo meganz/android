@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -62,7 +61,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	MegaContactsLollipopAdapter adapter;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-    ImageButton fabButton;
 	private ActionMode actionMode;
 
 //	DatabaseHandler dbH = null;
@@ -347,10 +345,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
-			fabButton.setOnClickListener(this);
-			
+
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -451,10 +446,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button_grid);
-			fabButton.setOnClickListener(this);
-			
+
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -539,7 +531,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		log("showOptionsPanel");	
 		
 		this.selectedUser = user;
-		fabButton.setVisibility(View.GONE);					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
 	}
@@ -548,7 +539,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		log("hideOptionsPanel");
 				
 		adapter.setPositionClicked(-1);
-		fabButton.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
@@ -581,11 +571,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			case R.id.contact_list_out_options:
 			case R.id.contact_grid_out_options:{
 				hideOptionsPanel();
-				break;
-			}
-			case R.id.invite_contact_button:
-			case R.id.invite_contact_button_grid:{
-				((ManagerActivityLollipop)context).chooseAddContactDialog();
 				break;
 			}
 			case R.id.contact_list_option_send_file_layout:

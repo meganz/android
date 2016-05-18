@@ -115,6 +115,8 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
+import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -3144,6 +3146,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         		log("inSFLol == null");
                         	}
                         }
+						showFabButton();
                      }
     			});
 
@@ -3161,7 +3164,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
-				showFabButton();
     			break;
     		}
     		case CONTACTS:{
@@ -3301,6 +3303,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 			textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
                 			textViewReceived.setTextColor(getResources().getColor(R.color.white));
                     	}
+						showFabButton();
                     }
     			});
 
@@ -12900,6 +12903,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return -1;
 	}
 
+	public int getIndexContacts(){
+		if(viewPagerContacts!=null){
+			return viewPagerContacts.getCurrentItem();
+		}
+		return -1;
+	}
+
 	public void showUploadPanel(){
 		log("showUploadPanel");
 
@@ -12942,6 +12952,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 					default: {
+						fabButton.setVisibility(View.GONE);
 						break;
 					}
 				}
@@ -12949,11 +12960,82 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case SHARED_ITEMS:{
 				log("Shared Items SECTION");
+				int indexShares = getIndexShares();
+				switch(indexShares){
+					case 0:{
+						log("INCOMING TAB");
+						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
+						inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+						if(inSFLol!=null){
+							int deepBrowserTreeIn = inSFLol.getDeepBrowserTree();
+							if(deepBrowserTreeIn<=0){
+								log("fabButton GONE");
+								fabButton.setVisibility(View.GONE);
+							}
+							else {
+								//Check the folder's permissions
+								long handle = inSFLol.getParentHandle();
+								log("handle from incoming: "+handle);
+								MegaNode parentNodeInSF = megaApi.getNodeByHandle(handle);
+								if(parentNodeInSF!=null){
+									int accessLevel= megaApi.getAccess(parentNodeInSF);
+									log("Node: "+parentNodeInSF.getName());
 
+									switch(accessLevel) {
+										case MegaShare.ACCESS_OWNER:
+										case MegaShare.ACCESS_READWRITE:
+										case MegaShare.ACCESS_FULL: {
+											fabButton.setVisibility(View.VISIBLE);
+											break;
+										}
+										case MegaShare.ACCESS_READ: {
+											fabButton.setVisibility(View.GONE);
+											break;
+										}
+									}
+								}
+								else{
+									fabButton.setVisibility(View.GONE);
+								}
+							}
+						}
+						break;
+					}
+					case 1:{
+						log("OUTGOING TAB");
+						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+						outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+						if(outSFLol!=null){
+							int deepBrowserTreeOut = outSFLol.getDeepBrowserTree();
+							if(deepBrowserTreeOut<=0){
+								fabButton.setVisibility(View.GONE);
+							}
+							else {
+								fabButton.setVisibility(View.VISIBLE);
+							}
+						}
+						break;
+					}
+					default: {
+						fabButton.setVisibility(View.GONE);
+						break;
+					}
+				}
 				break;
 			}
 			case CONTACTS:{
-
+				int indexContacts = getIndexContacts();
+				switch(indexContacts){
+					case 0:
+					case 1:{
+						fabButton.setVisibility(View.VISIBLE);
+						break;
+					}
+					default:{
+						fabButton.setVisibility(View.GONE);
+						break;
+					}
+				}
 				break;
 			}
 			default:{
