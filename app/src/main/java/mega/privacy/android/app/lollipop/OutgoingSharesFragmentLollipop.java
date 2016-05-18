@@ -357,6 +357,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			log("The parent is not -1: "+parentHandle);
 		}
 
+		((ManagerActivityLollipop)context).showFabButton();
+
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			

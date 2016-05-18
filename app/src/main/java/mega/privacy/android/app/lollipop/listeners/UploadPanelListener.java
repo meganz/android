@@ -1,10 +1,12 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class UploadPanelListener implements View.OnClickListener {

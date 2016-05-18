@@ -28,20 +28,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="multipleChoice" />
-    
-    <ImageButton
-        android:id="@+id/invite_contact_button"
-        android:layout_width="@dimen/fab_button_diameter"
-        android:layout_height="@dimen/fab_button_diameter"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="@dimen/fab_button_margin_bottom"
-        android:layout_marginRight="@dimen/fab_button_margin_right"
-        android:background="@drawable/ripple"
-        android:elevation="@dimen/elevation_low"
-        android:stateListAnimator="@anim/button_elevation"
-        android:src="@drawable/ic_add_white"
-        android:tint="@android:color/white" />
 
     <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
