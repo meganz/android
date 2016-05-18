@@ -7583,14 +7583,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					outSF.refresh(this.parentHandleOutgoing);				
 				}
 			}
-			else{			
+			else{
 				//InCOMING
 				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
 				log("Tag: "+ cFTag1);
 				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSF != null){					
-					aB.setTitle(getString(R.string.section_shared_items));	
-					inSF.refresh(this.parentHandleIncoming);			
+				if (inSF != null){
+					aB.setTitle(getString(R.string.section_shared_items));
+					inSF.refresh(this.parentHandleIncoming);
 				}				
 			}	
 		}
