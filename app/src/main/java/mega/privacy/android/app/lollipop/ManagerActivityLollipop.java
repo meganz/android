@@ -1451,6 +1451,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		optionsPanelListener = new OptionsPanelListener(this);
 
+		optionClearShares.setOnClickListener(optionsPanelListener);
+		optionPermissions.setOnClickListener(optionsPanelListener);
 		optionDownload.setOnClickListener(optionsPanelListener);
 		optionShare.setOnClickListener(optionsPanelListener);
 		optionProperties.setOnClickListener(optionsPanelListener);
@@ -9379,8 +9381,66 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
+			case SHARED_ITEMS:{
+				int index = viewPagerShares.getCurrentItem();
+				if (index == 0){
+					String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
+					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if (inSFLol != null){
+
+					}
+				}
+				else{
+					String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+					outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if (outSFLol != null){
+						outSFLol.resetAdapter();
+					}
+				}
+				break;
+			}
 		}
 
+	}
+
+	public void showOptionsPanelOutgoing(MegaNode sNode, int deep){
+		log("showOptionsPanelOutgoing");
+
+		this.selectedNode = sNode;
+
+		if (selectedNode.isFolder()) {
+			propertiesText.setText(R.string.general_folder_info);
+			optionShare.setVisibility(View.VISIBLE);
+			optionSendToInbox.setVisibility(View.GONE);
+		}else{
+			propertiesText.setText(R.string.general_file_info);
+			optionShare.setVisibility(View.GONE);
+			optionSendToInbox.setVisibility(View.VISIBLE);
+		}
+
+		if(deep==0){
+			optionPermissions.setVisibility(View.VISIBLE);
+		}
+		else{
+			optionPermissions.setVisibility(View.GONE);
+		}
+
+		optionDownload.setVisibility(View.VISIBLE);
+		optionProperties.setVisibility(View.VISIBLE);
+		optionRename.setVisibility(View.VISIBLE);
+		optionMoveTo.setVisibility(View.VISIBLE);
+		optionCopyTo.setVisibility(View.VISIBLE);
+		optionClearShares.setVisibility(View.VISIBLE);
+
+		//Hide
+		optionDelete.setVisibility(View.GONE);
+		optionDelete.setVisibility(View.GONE);
+		optionRemoveTotal.setVisibility(View.GONE);
+		optionPublicLink.setVisibility(View.GONE);
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		log("Show the slidingPanel");
 	}
 
 	public void showOptionsPanelFileBrowser(MegaNode sNode){
@@ -9457,7 +9517,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);
 				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (outSFLol != null){
-					outSFLol.showOptionsPanel(node);
+					showOptionsPanelOutgoing(node, outSFLol.getDeepBrowserTree());
 				}
 			}
 		}
