@@ -2600,8 +2600,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false);
 
 	    			if (isList){
@@ -2684,8 +2682,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false);
         			settingsMenuItem.setVisible(false);
     				refreshMenuItem.setVisible(false);
@@ -2748,8 +2744,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false);
 
         			settingsMenuItem.setVisible(false);
@@ -3374,7 +3368,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			unSelectMenuItem.setVisible(false);
 		    			thumbViewMenuItem.setVisible(false);
 		    			addMenuItem.setEnabled(false);
-		    			createFolderMenuItem.setEnabled(false);
 		    			rubbishBinMenuItem.setVisible(false);
 		    			clearRubbishBinMenuitem.setVisible(false);
 		    			importLinkMenuItem.setVisible(false);
@@ -3521,7 +3514,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			killAllSessions.setVisible(true);
 
 	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
         			settingsMenuItem.setVisible(false);
@@ -4262,6 +4254,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
 				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (fbFLol!=null){
+					log("in CloudDrive");
 					//Cloud Drive
 					//Show
 					addMenuItem.setEnabled(true);
@@ -4333,7 +4326,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			addMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
@@ -4372,8 +4364,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			sortByMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
@@ -4419,8 +4409,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			sortByMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
@@ -4709,8 +4697,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			sortByMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			changePass.setVisible(false);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
 	    			importLinkMenuItem.setVisible(false);
@@ -4754,8 +4740,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
@@ -4784,8 +4768,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
@@ -4853,7 +4835,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
@@ -8261,6 +8242,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		long parentHandle=-1;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			parentHandle = fbFLol.getParentHandle();
+			if(parentHandle==-1){
+				parentHandle= megaApi.getRootNode().getHandle();
+			}
 		}
 		else if(drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();
@@ -11496,6 +11480,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				}
 					}
 					else{
+						log("Not moved to rubbish");
 						int index = viewPagerCDrive.getCurrentItem();
 	        			log("----------------------------------------INDEX: "+index);
 	        			if(index==1){
@@ -11514,9 +11499,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 	        				if (fbFLol != null){
 	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
-	    						fbFLol.setNodes(nodes);
+	    						log("nodes: "+nodes.size());
+								fbFLol.setNodes(nodes);
 	    						fbFLol.getRecyclerView().invalidate();
 	        				}
+							else{
+								log("FileBrowser is NULL after move");
+							}
 	        			}
 					}
 				}
