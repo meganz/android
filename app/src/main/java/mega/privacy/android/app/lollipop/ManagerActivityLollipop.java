@@ -2787,9 +2787,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			else{
 					log("Inbox Fragment is not NULL");
 //    				iFLol.setParentHandle(parentHandleInbox);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-    				iFLol.setNodes(nodes);
-    			}
+					MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+					log("Selected Inbox with parent: "+parentHandleInbox);
+//					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
+					if (node != null){
+						log("Go to inbox node: "+node.getName());
+						iFLol.setParentHandle(parentHandleInbox);
+
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+						iFLol.setNodes(nodes);
+
+						if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
+							aB.setTitle(getResources().getString(R.string.section_inbox));
+							log("aB.setHomeAsUpIndicator_886");
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							firstNavigationLevel = true;
+						}
+						else{
+							aB.setTitle(node.getName());
+							log("indicator_arrow_back_893");
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							firstNavigationLevel = false;
+						}
+					}
+					else{
+						log("The Node is NULL");
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
+						iFLol.setNodes(nodes);
+						aB.setTitle(getResources().getString(R.string.section_inbox));
+						log("aB.setHomeAsUpIndicator_16");
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						firstNavigationLevel = true;
+					}
+				}
 
     			mTabHostCDrive.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -3587,27 +3617,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch (access) {
 					case MegaShare.ACCESS_OWNER:
 					case MegaShare.ACCESS_UNKNOWN: {
-						log("GO to Cloud: " + parentIntentN.getName());
-						drawerItem = DrawerItem.CLOUD_DRIVE;
 						//Not incoming folder, check if Cloud or Rubbish tab
 						if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
-							log("Navigate to TAB CLOUD first level");
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							log("Navigate to TAB CLOUD first level"+ parentIntentN.getName());
 							firstNavigationLevel=true;
 							parentHandleBrowser = parentIntentN.getHandle();
 							viewPagerCDrive.setCurrentItem(0);
 						}
 						else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
-							log("Navigate to TAB RUBBISH first level");
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							log("Navigate to TAB RUBBISH first level"+ parentIntentN.getName());
 							firstNavigationLevel=true;
 							parentHandleRubbish = parentIntentN.getHandle();
 							viewPagerCDrive.setCurrentItem(1);
 						}
+						else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
+							log("Navigate to INBOX first level"+ parentIntentN.getName());
+							firstNavigationLevel=true;
+							parentHandleInbox = parentIntentN.getHandle();
+							drawerItem = DrawerItem.INBOX;
+						}
 						else{
 							int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
 							log("The parent result is: "+parent);
+
 							switch (parent){
 								case 0:{
 									//ROOT NODE
+									drawerItem = DrawerItem.CLOUD_DRIVE;
 									log("Navigate to TAB CLOUD with parentHandle");
 									parentHandleBrowser = parentIntentN.getHandle();
 									viewPagerCDrive.setCurrentItem(0);
@@ -3616,12 +3654,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 								case 1:{
 									log("Navigate to TAB RUBBISH");
+									drawerItem = DrawerItem.CLOUD_DRIVE;
 									parentHandleRubbish = parentIntentN.getHandle();
 									viewPagerCDrive.setCurrentItem(1);
 									firstNavigationLevel=false;
 									break;
 								}
+								case 2:{
+									log("Navigate to INBOX WITH parentHandle");
+									drawerItem = DrawerItem.INBOX;
+									parentHandleInbox = parentIntentN.getHandle();
+									firstNavigationLevel=false;
+									break;
+								}
 								case -1:{
+									drawerItem = DrawerItem.CLOUD_DRIVE;
 									log("Navigate to TAB CLOUD general");
 									parentHandleBrowser = -1;
 									viewPagerCDrive.setCurrentItem(0);
@@ -3632,6 +3679,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						break;
 					}
+
 					case MegaShare.ACCESS_READ:
 					case MegaShare.ACCESS_READWRITE:
 					case MegaShare.ACCESS_FULL: {
@@ -3686,6 +3734,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("The parent is the RUBBISH");
 				return 1;
 			}
+			else if(parentNode.getHandle()==megaApi.getInboxNode().getHandle()){
+				log("The parent is the INBOX");
+				return 2;
+			}
 			else if(parentNode.getHandle()==-1){
 				log("The parent is -1");
 				return -1;
@@ -3700,6 +3752,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return 0;
 					case 1:
 						return 1;
+					case 2:
+						return 2;
 				}
 			}
 		}
