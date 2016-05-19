@@ -1336,7 +1336,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
 			startActivity(viewIntent);
 		}
-		if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
+		else if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
