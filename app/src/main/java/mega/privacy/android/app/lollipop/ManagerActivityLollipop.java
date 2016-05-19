@@ -11467,7 +11467,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						//Update both tabs
         				//Rubbish bin
         				if (rbFLol != null){
-        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+							ArrayList<MegaNode> nodes;
+							if(rbFLol.getParentHandle()==-1){
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+							}
+							else{
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+							}
     						rbFLol.setNodes(nodes);
     						rbFLol.getRecyclerView().invalidate();
             			}
@@ -11494,7 +11500,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 	        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 	        				if (rbFLol != null){
-	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+								ArrayList<MegaNode> nodes;
+								if(rbFLol.getParentHandle()==-1){
+									nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+								}
+								else{
+									nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+								}
 	    						rbFLol.setNodes(nodes);
 	    						rbFLol.getRecyclerView().invalidate();
 	            			}
@@ -11770,7 +11782,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     							this.firstNavigationLevel = true;
     						}
     						else{
-    							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+								ArrayList<MegaNode> nodes;
+								if(rbFLol.getParentHandle()==-1){
+									nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+								}
+								else{
+									nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+								}
     							rbFLol.setNodes(nodes);
     							rbFLol.getRecyclerView().invalidate();
     						}
@@ -12228,7 +12246,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 					if (fbFLol != null){
 						log("FileBrowser is not NULL");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
+						ArrayList<MegaNode> nodes;
+						if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
+							nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
+						}
 						fbFLol.setNodes(nodes);
 						fbFLol.setContentText();
 						fbFLol.getRecyclerView().invalidate();
@@ -12245,7 +12269,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							this.firstNavigationLevel = true;
 
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+							ArrayList<MegaNode> nodes;
+							if(rbFLol.getParentHandle()==-1){
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+							}
+							else{
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+							}
 							rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
 							rbFLol.setNodes(nodes);
 							rbFLol.getRecyclerView().invalidate();
@@ -12253,7 +12283,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else{
 
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+							ArrayList<MegaNode> nodes;
+							if(rbFLol.getParentHandle()==-1){
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+							}
+							else{
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+							}
 							rbFLol.setNodes(nodes);
 							rbFLol.setContentText();
 							rbFLol.getRecyclerView().invalidate();
