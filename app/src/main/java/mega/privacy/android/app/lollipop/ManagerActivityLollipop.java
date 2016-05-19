@@ -274,6 +274,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionSendToInbox;
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;
+	public LinearLayout optionOpenFolder;
 	public TextView propertiesText;
 	private NodeOptionsPanelListener nodeOptionsPanelListener;
 	////
@@ -1445,6 +1446,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionMoveTo = (LinearLayout) findViewById(R.id.file_list_option_move_layout);
 		optionCopyTo = (LinearLayout) findViewById(R.id.file_list_option_copy_layout);
 		optionSendToInbox = (LinearLayout) findViewById(R.id.file_list_option_send_inbox_layout);
+		optionOpenFolder = (LinearLayout) findViewById(R.id.file_list_option_open_folder_layout);
 
 		nodeOptionsPanelListener = new NodeOptionsPanelListener(this);
 
@@ -1462,6 +1464,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionSendToInbox.setOnClickListener(nodeOptionsPanelListener);
 		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
 		optionLeaveShare.setOnClickListener(nodeOptionsPanelListener);
+		optionOpenFolder.setOnClickListener(nodeOptionsPanelListener);
 
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -9396,6 +9399,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
+			case INBOX:{
+				iFLol.resetAdapter();
+				break;
+			}
+			case SEARCH:{
+				sFLol.resetAdapter();
+				break;
+			}
 		}
 
 	}
@@ -9415,19 +9426,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		int accessLevel = megaApi.getAccess(selectedNode);
 		log("Node: "+selectedNode.getName()+" "+accessLevel);
+		optionOpenFolder.setVisibility(View.GONE);
+		optionDownload.setVisibility(View.VISIBLE);
+		optionProperties.setVisibility(View.VISIBLE);
 
+		if(selectedNode.isFile()){
+			optionLeaveShare.setVisibility(View.GONE);
+		}
+		else {
+			optionLeaveShare.setVisibility(View.VISIBLE);
+		}
 		switch (accessLevel) {
 			case MegaShare.ACCESS_FULL: {
 				log("access FULL");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
-
-				if(selectedNode.isFile()){
-					optionLeaveShare.setVisibility(View.GONE);
-				}
-				else {
-					optionLeaveShare.setVisibility(View.VISIBLE);
-				}
 				optionPublicLink.setVisibility(View.GONE);
 				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
@@ -9439,8 +9450,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case MegaShare.ACCESS_READ: {
 				log("access read");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionMoveTo.setVisibility(View.GONE);
+				break;
+			}
+			case MegaShare.ACCESS_READWRITE: {
+				log("readwrite");
 				optionPublicLink.setVisibility(View.GONE);
 				optionRename.setVisibility(View.GONE);
 				optionDelete.setVisibility(View.GONE);
@@ -9448,31 +9467,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
 
-				if(selectedNode.isFile()){
-					optionLeaveShare.setVisibility(View.GONE);
-				}
-				else {
-					optionLeaveShare.setVisibility(View.VISIBLE);
-				}
-				break;
-			}
-			case MegaShare.ACCESS_READWRITE: {
-				log("readwrite");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
-				//						holder.shareDisabled.setVisibility(View.VISIBLE);
-				optionPublicLink.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				if(selectedNode.isFile()){
-					optionLeaveShare.setVisibility(View.GONE);
-				}
-				else {
-					optionLeaveShare.setVisibility(View.VISIBLE);
-				}
 				break;
 			}
 		}
@@ -9517,6 +9511,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionRemoveTotal.setVisibility(View.GONE);
 		optionPublicLink.setVisibility(View.GONE);
 		optionLeaveShare.setVisibility(View.GONE);
+		optionOpenFolder.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -9549,6 +9544,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionRemoveTotal.setVisibility(View.GONE);
 		optionPermissions.setVisibility(View.GONE);
 		optionLeaveShare.setVisibility(View.GONE);
+		optionOpenFolder.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -9571,7 +9567,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionDelete.setVisibility(View.VISIBLE);
-		optionDelete.setVisibility(View.VISIBLE);
 		optionRename.setVisibility(View.VISIBLE);
 		optionMoveTo.setVisibility(View.VISIBLE);
 		optionCopyTo.setVisibility(View.VISIBLE);
@@ -9581,6 +9576,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionPermissions.setVisibility(View.GONE);
 		optionSendToInbox.setVisibility(View.GONE);
 		optionLeaveShare.setVisibility(View.GONE);
+		optionOpenFolder.setVisibility(View.GONE);
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		log("Show the slidingPanel");
+	}
+
+	public void showOptionsPanelSearch(MegaNode sNode){
+		log("showNodeOptionsPanel");
+
+		this.selectedNode = sNode;
+
+		if (selectedNode.isFolder()) {
+			propertiesText.setText(R.string.general_folder_info);
+		}else{
+			propertiesText.setText(R.string.general_file_info);
+		}
+
+		optionDownload.setVisibility(View.VISIBLE);
+		optionProperties.setVisibility(View.VISIBLE);
+		optionPublicLink.setVisibility(View.VISIBLE);
+		optionOpenFolder.setVisibility(View.VISIBLE);
+
+		//Hide
+		optionClearShares.setVisibility(View.GONE);
+		optionRemoveTotal.setVisibility(View.GONE);
+		optionPermissions.setVisibility(View.GONE);
+		optionLeaveShare.setVisibility(View.GONE);
+		optionDelete.setVisibility(View.GONE);
+		optionDelete.setVisibility(View.GONE);
+		optionRename.setVisibility(View.GONE);
+		optionMoveTo.setVisibility(View.GONE);
+		optionCopyTo.setVisibility(View.GONE);
+		optionSendToInbox.setVisibility(View.GONE);
+		optionShare.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -9610,7 +9640,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if(drawerItem == DrawerItem.SEARCH){
 			if (sFLol != null){
-				sFLol.showOptionsPanel(node);
+				showOptionsPanelSearch(node);
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX){
