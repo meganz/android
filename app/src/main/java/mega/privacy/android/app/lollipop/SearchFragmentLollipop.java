@@ -27,9 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -45,8 +43,6 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -86,26 +82,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;
-	public LinearLayout optionShare;
-	public LinearLayout optionSendToInbox;
-	public LinearLayout optionPermissions;
-	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
-	public LinearLayout optionClearShares;
-	public LinearLayout optionLeaveShare;
-	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;
-	public LinearLayout optionOpenFolder;
-	public TextView propertiesText;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -363,10 +339,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			setNodes(nodes);
 			
 			contentText.setText(getInfoNode());
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+
 			return v;
 		}
 		else{
@@ -424,54 +397,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.file_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.file_grid_option_rename_layout);
-			optionRename.setVisibility(View.GONE);
-			optionLeaveShare = (LinearLayout) v.findViewById(R.id.file_grid_option_leave_share_layout);
-			optionLeaveShare.setVisibility(View.GONE);
-			
-			optionDownload = (LinearLayout) v.findViewById(R.id.file_grid_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.file_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);
-
-			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_grid_option_public_link_layout);
-//				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-			optionShare = (LinearLayout) v.findViewById(R.id.file_grid_option_share_layout);
-			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_grid_option_send_inbox_layout);
-			optionPermissions = (LinearLayout) v.findViewById(R.id.file_grid_option_permissions_layout);
-			
-			optionDelete = (LinearLayout) v.findViewById(R.id.file_grid_option_delete_layout);			
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.file_grid_option_remove_layout);
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-
-			optionClearShares = (LinearLayout) v.findViewById(R.id.file_grid_option_clear_share_layout);	
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);
-			optionOpenFolder = (LinearLayout) v.findViewById(R.id.file_grid_option_open_folder_layout);
-			
-			optionDownload.setOnClickListener(this);
-			optionShare.setOnClickListener(this);
-			optionSendToInbox.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionRename.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);
-			optionPublicLink.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);
-			optionCopyTo.setOnClickListener(this);
-			optionOpenFolder.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			
 			return v;
 		}
@@ -754,34 +679,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
 		
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);

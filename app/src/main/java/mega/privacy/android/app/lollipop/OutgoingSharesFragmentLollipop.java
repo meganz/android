@@ -27,9 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,8 +45,6 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -70,9 +66,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
-	
-	SlidingUpPanelLayout.PanelSlideListener slidingPanelListener;
-	
+
 	TextView contentText;	
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
@@ -97,25 +91,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
 	private ActionMode actionMode;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;
-	public LinearLayout optionShare;
-	public LinearLayout optionPermissions;
-	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
-	public LinearLayout optionClearShares;
-	public LinearLayout optionLeaveShare;
-	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
-	public TextView propertiesText;
-	public LinearLayout optionSendToInbox;
 	////
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -448,11 +423,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			else{					
 				contentText.setText(getInfoNode());
 			}			
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-
 			return v;
 		}
 		else{
@@ -554,85 +524,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				emptyTextView.setVisibility(View.GONE);
 			}	
 //			setNodes(nodes);	
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.file_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.file_grid_option_rename_layout);
-			optionLeaveShare = (LinearLayout) v.findViewById(R.id.file_grid_option_leave_share_layout);
-			optionDownload = (LinearLayout) v.findViewById(R.id.file_grid_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.file_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);		
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);
-			optionLeaveShare.setVisibility(View.GONE);
-
-			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_grid_option_public_link_layout);
-			optionPublicLink.setVisibility(View.GONE);
-//				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-			optionShare = (LinearLayout) v.findViewById(R.id.file_grid_option_share_layout);
-			optionShare.setVisibility(View.GONE);
-			optionPermissions = (LinearLayout) v.findViewById(R.id.file_grid_option_permissions_layout);
-			optionPermissions.setVisibility(View.GONE);
-			optionDelete = (LinearLayout) v.findViewById(R.id.file_grid_option_delete_layout);	
-			optionDelete.setVisibility(View.GONE);
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.file_grid_option_remove_layout);
-			optionRemoveTotal.setVisibility(View.GONE);
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-
-			optionClearShares = (LinearLayout) v.findViewById(R.id.file_grid_option_clear_share_layout);
-			optionClearShares.setVisibility(View.GONE);	
-			
-			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_grid_option_send_inbox_layout);
-			optionSendToInbox.setVisibility(View.GONE);
-			
-			optionDownload.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionLeaveShare.setOnClickListener(this);
-			optionRename.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);
-			optionCopyTo.setOnClickListener(this);			
-			optionSendToInbox.setOnClickListener(this);	
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });
 
 			return v;
 		}		
@@ -1163,33 +1054,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			return 2;
 		}
 		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
-			log("PanelState NOT HIDDEN or VISIBLE");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			adapter.setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-
 		deepBrowserTree = deepBrowserTree-1;
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		if(deepBrowserTree==0){
