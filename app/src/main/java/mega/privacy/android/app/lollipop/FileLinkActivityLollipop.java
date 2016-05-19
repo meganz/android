@@ -49,6 +49,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -440,7 +441,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		else{
 			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
-			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER);	
+			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 		}		
 	}
 	
@@ -515,7 +516,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -540,7 +541,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -574,7 +575,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -583,7 +584,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}	
 			return;
 		}
@@ -614,7 +615,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -639,7 +640,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -673,7 +674,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -682,7 +683,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}
 		}
 		else{
@@ -711,7 +712,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			return;
 		}
 		
-		if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
@@ -722,7 +723,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			downloadTo (parentPath, url, size, hashes);
 			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
-		else if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
@@ -866,7 +867,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -891,7 +892,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -925,7 +926,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -934,7 +935,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}	
 			return;
 		}
@@ -965,7 +966,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -990,7 +991,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -1024,7 +1025,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -1033,7 +1034,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}
 		}
 		else{

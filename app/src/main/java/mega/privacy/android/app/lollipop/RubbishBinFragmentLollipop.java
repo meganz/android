@@ -46,6 +46,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -133,7 +134,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.moveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -706,7 +708,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
-				((ManagerActivityLollipop) context).showMoveLollipop(handleList);	
+				NodeController nC = new NodeController(context);
+				nC.moveNodes(handleList);
 				break;
 			}
 			case R.id.rubbishbin_list_option_properties_layout: 

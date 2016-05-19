@@ -13,6 +13,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -23,6 +24,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
     Context context;
     ManagerActivityLollipop.DrawerItem drawerItem;
     MegaApiAndroid megaApi;
+    NodeController nodeController;
 
     public NodeOptionsPanelListener(Context context){
         log("NodeOptionsPanelListener created");
@@ -30,6 +32,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+        nodeController = new NodeController(context);
     }
 
     @Override
@@ -71,8 +74,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                ((ManagerActivityLollipop) context).showMoveLollipop(handleList);
-
+                nodeController.moveNodes(handleList);
                 break;
             }
 
@@ -144,7 +146,8 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                ((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+                nodeController.copyNodes(handleList);
+//                ((ManagerActivityLollipop) context).showCopyLollipop(handleList);
                 break;
             }
             case R.id.file_list_option_clear_share_layout:{

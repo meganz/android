@@ -1,12 +1,5 @@
 package mega.privacy.android.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 
 
 /*
@@ -94,7 +94,7 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
-				getActivity().startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
+				getActivity().startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
 			}
 			else{
 				intent.setAction(FileStorageActivity.Mode.PICK_FILE.getAction());
@@ -110,7 +110,7 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 			}
 			intent.setType(item.type);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-				getActivity().startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				getActivity().startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
 			}
 			else{
 				getActivity().startActivityForResult(Intent.createChooser(intent, null), ManagerActivity.REQUEST_CODE_GET);
