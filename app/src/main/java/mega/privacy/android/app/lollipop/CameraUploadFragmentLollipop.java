@@ -67,7 +67,6 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -95,10 +94,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	GestureDetectorCompat detector;
 	private RecyclerView.LayoutManager mLayoutManager;
 	ImageButton fabButton;
-	SlidingUpPanelLayout slidingOptionsPanel;
-	//UPLOAD PANEL
-	private SlidingUpPanelLayout slidingUploadPanel;
-	
+
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	RelativeLayout contentTextLayout;
@@ -560,13 +556,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
 			fabButton.setVisibility(View.GONE);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			
-			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
-			slidingUploadPanel.setVisibility(View.GONE);			
-			
+
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
@@ -746,9 +736,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
-
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
-			slidingOptionsPanel.setVisibility(View.GONE);
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);

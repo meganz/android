@@ -28,9 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -49,8 +47,6 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -96,20 +92,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-	public LinearLayout optionDelete;
-	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
-	public TextView propertiesText;
-	////
-	
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
@@ -395,11 +378,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}			
 			
 			setNodes(nodes);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_inbox);
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-						
+
 			return v;
 		}
 		else{
@@ -474,67 +453,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}
 			
 			setNodes(nodes);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_inbox_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.file_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.file_grid_option_rename_layout);
-			optionRename.setVisibility(View.GONE);
-			
-			optionDownload = (LinearLayout) v.findViewById(R.id.file_grid_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.file_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);			
-			
-			optionDelete = (LinearLayout) v.findViewById(R.id.file_grid_option_delete_layout);			
 
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);			
-			
-			optionDownload.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionRename.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);
-			optionCopyTo.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });
-			
 			return v;	
 		}
 	}
@@ -577,13 +496,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			progressBar.setProgress(progress);
 		}
 	}
-	
-	public PanelState getPanelState ()
-	{
-		log("getPanelState: "+slidingOptionsPanel.getPanelState());
-		return slidingOptionsPanel.getPanelState();
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -772,37 +685,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	}
 	
 	public int onBackPressed(){
-
 		log("onBackPressed");
 
-		PanelState pS=slidingOptionsPanel.getPanelState();
-
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}
-
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			adapter.setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-
-		log("Sliding not shown");
-					
 		if (adapter == null){
 			return 0;
 		}
