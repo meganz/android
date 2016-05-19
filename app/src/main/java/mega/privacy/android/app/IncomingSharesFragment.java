@@ -514,9 +514,25 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				sortByNameAscending();
 			}
 		}
+
+		if (adapterList.getCount() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			contentText.setVisibility(View.GONE);
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			aB.setTitle(getInfoNode());
+			contentText.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	public void refresh (long _parentHandle){
+		log("refresh(long)");
+		log("parentHandle=" + _parentHandle);
 		MegaNode n = megaApi.getNodeByHandle(_parentHandle);
 		if(n == null)
 		{

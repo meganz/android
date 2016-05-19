@@ -58,6 +58,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
+	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -82,6 +84,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	Preference megaCameraFolder;
 	Preference aboutPrivacy;
 	Preference aboutTOS;
+	Preference aboutSDK;
+	Preference codeLink;
 	Preference secondaryMediaFolderOn;
 	Preference localSecondaryFolder;
 	Preference megaSecondaryFolder;
@@ -115,7 +119,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	Long handleSecondaryMediaFolder = null;
 	MegaNode megaNodeSecondaryMediaFolder = null;
 	String megaPathSecMediaFolder = "";
-	
+
+	int numberOfClicksSDK = 0;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -194,6 +199,12 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		
 		aboutTOS = findPreference(KEY_ABOUT_TOS);
 		aboutTOS.setOnPreferenceClickListener(this);
+
+		aboutSDK = findPreference(KEY_ABOUT_SDK_VERSION);
+		aboutSDK.setOnPreferenceClickListener(this);
+
+		codeLink = findPreference(KEY_ABOUT_CODE_LINK);
+		codeLink.setOnPreferenceClickListener(this);
 		
 		if (prefs == null){
 			dbH.setStorageAskAlways(false);
@@ -610,6 +621,45 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
 		prefs = dbH.getPreferences();
+		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
+			numberOfClicksSDK++;
+			if (numberOfClicksSDK == 5){
+				MegaAttributes attrs = dbH.getAttributes();
+				if (attrs.getFileLogger() != null){
+					try {
+						if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+							dbH.setFileLogger(true);
+							Util.setFileLogger(true);
+							numberOfClicksSDK = 0;
+							Toast.makeText(this, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+						}
+						else{
+							dbH.setFileLogger(false);
+							Util.setFileLogger(false);
+							numberOfClicksSDK = 0;
+							Toast.makeText(this, getString(R.string.settings_disable_logs), Toast.LENGTH_LONG).show();
+						}
+					}
+					catch(Exception e){
+						dbH.setFileLogger(true);
+						Util.setFileLogger(true);
+						numberOfClicksSDK = 0;
+						Toast.makeText(this, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+					}
+				}
+				else{
+					dbH.setFileLogger(true);
+					Util.setFileLogger(true);
+					numberOfClicksSDK = 0;
+					Toast.makeText(this, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+				}
+			}
+		}
+		else{
+			numberOfClicksSDK = 0;
+		}
+
+
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
 			Intent intent = new Intent(SettingsActivity.this, FileStorageActivity.class);
 			intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
@@ -912,6 +962,11 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		else if (preference.getKey().compareTo(KEY_ABOUT_TOS) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
+			startActivity(viewIntent);
+		}
+		else if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
 		}
 		log("KEY = " + preference.getKey());
