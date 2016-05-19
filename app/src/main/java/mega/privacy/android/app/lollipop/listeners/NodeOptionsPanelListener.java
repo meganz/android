@@ -168,6 +168,13 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).leaveIncomingShare(selectedNode);
                 break;
             }
+            case R.id.file_list_option_open_folder_layout:
+            case R.id.file_grid_option_open_folder_layout: {
+                log("Open folder option");
+                ((ManagerActivityLollipop) context).hideOptionsPanel();
+                ((ManagerActivityLollipop) context).openFolderFromSearch(selectedNode.getHandle());
+                break;
+            }
         }
 
     }
