@@ -49,6 +49,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -215,7 +216,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.moveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -231,7 +233,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.copyNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -1223,8 +1226,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(n.getHandle());									
-		((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+		handleList.add(n.getHandle());
+		NodeController nC = new NodeController(context);
+		nC.moveNodes(handleList);
 	}
 	
 	public void copy (String path){
@@ -1235,8 +1239,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(n.getHandle());									
-		((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+		handleList.add(n.getHandle());
+		NodeController nC = new NodeController(context);
+		nC.copyNodes(handleList);
 	}
 	
 	public boolean isFolder(String path){

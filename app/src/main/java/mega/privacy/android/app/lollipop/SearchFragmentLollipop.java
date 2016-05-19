@@ -43,6 +43,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -134,7 +135,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.copyNodes(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -144,7 +146,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.moveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{

@@ -7,6 +7,7 @@ import android.view.View;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 public class UploadPanelListener implements View.OnClickListener {
@@ -33,7 +34,7 @@ public class UploadPanelListener implements View.OnClickListener {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("*/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
 
                 break;
             }
@@ -46,7 +47,7 @@ public class UploadPanelListener implements View.OnClickListener {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("*/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 break;
             }
 
@@ -58,7 +59,7 @@ public class UploadPanelListener implements View.OnClickListener {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("*/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 break;
             }
 
@@ -69,7 +70,7 @@ public class UploadPanelListener implements View.OnClickListener {
                 intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
                 intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
                 intent.setClass(((ManagerActivityLollipop)context), FileStorageActivityLollipop.class);
-                ((ManagerActivityLollipop)context).startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
+                ((ManagerActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
                 break;
             }
 

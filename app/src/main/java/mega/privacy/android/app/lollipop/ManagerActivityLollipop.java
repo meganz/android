@@ -181,19 +181,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
 
-	public static int REQUEST_CODE_GET = 1000;
-	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_GET_LOCAL = 1003;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	public static int REQUEST_CODE_REFRESH = 1005;
-	public static int REQUEST_CODE_SORT_BY = 1006;
-	public static int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
-	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
-	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
-	public static int TAKE_PHOTO_CODE = 1010;
-	public static int REQUEST_CODE_TREE = 1014;
-
 	private static int WRITE_SD_CARD_REQUEST_CODE = 1011;
 	private static int REQUEST_CODE_SELECT_FILE = 1012;
 	private static int SET_PIN = 1013;
@@ -5774,14 +5761,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 		        		break;
 		        	}
 		        	case CONTACTS:{
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 			    		break;
 		        	}
 		        	case SHARED_ITEMS:{
@@ -5796,7 +5783,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 					    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 					    		intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 					    		break;
 		    				}
 		    			}
@@ -5809,7 +5796,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 					    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 					    		intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 					    		break;
 		    				}
 		    			}
@@ -5818,7 +5805,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 			    		break;
 		        	}
 	        	}
@@ -7190,7 +7177,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-						startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -7215,7 +7202,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
 										intent.setClass(managerActivity, FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-										startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -7249,7 +7236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -7273,7 +7260,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 		}
@@ -7866,29 +7853,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}, 50);
 	}
 
-	public void showCopyLollipop(ArrayList<Long> handleList){
-		log("showCopyLollipop");
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("COPY_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
-	}
+//	public void showCopyLollipop(ArrayList<Long> handleList){
+//		log("showCopyLollipop");
+//		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+//		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
+//		long[] longArray = new long[handleList.size()];
+//		for (int i=0; i<handleList.size(); i++){
+//			longArray[i] = handleList.get(i);
+//		}
+//		intent.putExtra("COPY_FROM", longArray);
+//		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_COPY_FOLDER);
+//	}
 
-	public void showMoveLollipop(ArrayList<Long> handleList){
-		log("showMoveLollipop");
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("MOVE_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
-	}
+//	public void showMoveLollipop(ArrayList<Long> handleList){
+//		log("showMoveLollipop");
+//		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+//		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
+//		long[] longArray = new long[handleList.size()];
+//		for (int i=0; i<handleList.size(); i++){
+//			longArray[i] = handleList.get(i);
+//		}
+//		intent.putExtra("MOVE_FROM", longArray);
+//		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_MOVE_FOLDER);
+//	}
 
 	public void sendToInboxLollipop(MegaNode node){
 		log("sentToInbox MegaNode");
@@ -7901,7 +7888,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	intent.putExtra("MULTISELECT", 0);
 	    	intent.putExtra("SEND_FILE",1);
 	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+	    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 		}
 	}
 
@@ -7922,7 +7909,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	intent.putExtra("SEND_FILE",1);
 	    	log("handles length: "+handles.length);
 	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+	    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 		}
 	}
 
@@ -7943,7 +7930,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	//Multiselect=1 (multiple folders)
     	intent.putExtra("MULTISELECT", 1);
     	intent.putExtra("SEND_FILE",0);
-    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 	}
 
 	public void shareFolderLollipop(MegaNode node){
@@ -7956,7 +7943,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	intent.putExtra("MULTISELECT", 0);
     	intent.putExtra("SEND_FILE",0);
     	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 
 	}
 
@@ -8246,7 +8233,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
-        startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+        startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
 	}
 
 	public void showCancelMessage(){
@@ -8783,7 +8770,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			longArray[i] = users.get(i).getEmail();
 		}
 		intent.putExtra("SELECTED_CONTACTS", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
+		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
 	}
 
 	public void pickFileToSend(List<MegaUser> users){
@@ -10248,7 +10235,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_TREE && resultCode == RESULT_OK){
+		if (requestCode == Constants.REQUEST_CODE_TREE && resultCode == RESULT_OK){
 			if (intent == null){
 				log("intent NULL");
 				return;
@@ -10257,7 +10244,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Uri treeUri = intent.getData();
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
-		else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -10363,7 +10350,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
 			if (intent == null) {
 				log("Return.....");
@@ -10452,7 +10439,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				}
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
 			log("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
 
 			if (intent == null) {
@@ -10772,7 +10759,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			}
 		}
-		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
+		else if (requestCode == Constants.REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 
 			if (intent == null) {
 				log("Return.....");
@@ -10818,7 +10805,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, parentHandleUpload);
 			uploadServiceTask.start();
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
 			if (intent == null) {
 				log("Return.....");
@@ -10852,7 +10839,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, this);
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+		else if (requestCode ==  Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
 
 			if (intent == null) {
 				log("Return.....");
@@ -10881,7 +10868,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[0]), parent, this);
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
 			if (intent == null) {
 				log("Return.....");
@@ -10900,7 +10887,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			downloadTo (parentPath, url, size, hashes);
 			Util.showToast(this, R.string.download_began);
 		}
-		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
+		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 
 			if (intent == null) {
 				log("Return.....");
@@ -10964,7 +10951,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-		else if (requestCode == TAKE_PHOTO_CODE){
+		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("Entrooo en requestCode");
 			if(resultCode == Activity.RESULT_OK){
 
@@ -10977,7 +10964,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 	    }
-		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 
 			if (intent == null) {
 				log("Return.....");
