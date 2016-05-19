@@ -557,7 +557,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	}
 	
 	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 	
 		this.selectedNode = sNode;
 		

@@ -18,14 +18,14 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-public class OptionsPanelListener implements View.OnClickListener {
+public class NodeOptionsPanelListener implements View.OnClickListener {
 
     Context context;
     ManagerActivityLollipop.DrawerItem drawerItem;
     MegaApiAndroid megaApi;
 
-    public OptionsPanelListener(Context context){
-        log("OptionsPanelListener created");
+    public NodeOptionsPanelListener(Context context){
+        log("NodeOptionsPanelListener created");
         this.context = context;
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -34,7 +34,7 @@ public class OptionsPanelListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        log("onClick OptionsPanelListener");
+        log("onClick NodeOptionsPanelListener");
         MegaNode selectedNode = ((ManagerActivityLollipop) context).getSelectedNode();
 
         if(selectedNode==null){
@@ -80,6 +80,13 @@ public class OptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
                 i.putExtra("handle", selectedNode.getHandle());
+
+                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
+                    if(((ManagerActivityLollipop) context).getIndexShares()==0){
+                        i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
+                    }
+                }
 
                 if (selectedNode.isFolder()) {
                     if (megaApi.isShared(selectedNode)){
@@ -155,11 +162,17 @@ public class OptionsPanelListener implements View.OnClickListener {
                 context.startActivity(i);
                 break;
             }
+            case R.id.file_list_option_leave_share_layout:{
+                log("Leave share option");
+                ((ManagerActivityLollipop) context).hideOptionsPanel();
+                ((ManagerActivityLollipop) context).leaveIncomingShare(selectedNode);
+                break;
+            }
         }
 
     }
 
     public static void log(String message) {
-        Util.log("OptionsPanelListener", message);
+        Util.log("NodeOptionsPanelListener", message);
     }
 }
