@@ -1113,7 +1113,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					((FolderLinkActivityLollipop) context).showOptionsPanel(n);
 				}
 				else{
-					((ManagerActivityLollipop) context).showOptionsPanel(n);
+					((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
 				}				
 				
 				break;

@@ -531,7 +531,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	}
 	
 	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 		
 //		fabButton.setVisibility(View.GONE);
 		

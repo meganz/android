@@ -528,7 +528,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	}
 	
 	public void showOptionsPanel(MegaUser user){		
-		log("showOptionsPanel");	
+		log("showNodeOptionsPanel");
 		
 		this.selectedUser = user;
 		slidingOptionsPanel.setVisibility(View.VISIBLE);

@@ -116,7 +116,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
-import mega.privacy.android.app.lollipop.listeners.OptionsPanelListener;
+import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -275,7 +275,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;
 	public TextView propertiesText;
-	private OptionsPanelListener optionsPanelListener;
+	private NodeOptionsPanelListener nodeOptionsPanelListener;
 	////
 
 	DatabaseHandler dbH = null;
@@ -1423,10 +1423,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionsLayout = (LinearLayout) findViewById(R.id.file_list_options);
 		optionsOutLayout = (FrameLayout) findViewById(R.id.file_list_out_options);
 		optionRename = (LinearLayout) findViewById(R.id.file_list_option_rename_layout);
-		optionRename.setVisibility(View.GONE);
 		optionLeaveShare = (LinearLayout) findViewById(R.id.file_list_option_leave_share_layout);
-		optionLeaveShare.setVisibility(View.GONE);
-
 		optionDownload = (LinearLayout) findViewById(R.id.file_list_option_download_layout);
 		optionProperties = (LinearLayout) findViewById(R.id.file_list_option_properties_layout);
 		propertiesText = (TextView) findViewById(R.id.file_list_option_properties_text);
@@ -1449,22 +1446,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionCopyTo = (LinearLayout) findViewById(R.id.file_list_option_copy_layout);
 		optionSendToInbox = (LinearLayout) findViewById(R.id.file_list_option_send_inbox_layout);
 
-		optionsPanelListener = new OptionsPanelListener(this);
+		nodeOptionsPanelListener = new NodeOptionsPanelListener(this);
 
-		optionClearShares.setOnClickListener(optionsPanelListener);
-		optionPermissions.setOnClickListener(optionsPanelListener);
-		optionDownload.setOnClickListener(optionsPanelListener);
-		optionShare.setOnClickListener(optionsPanelListener);
-		optionProperties.setOnClickListener(optionsPanelListener);
-		optionRename.setOnClickListener(optionsPanelListener);
-		optionDelete.setOnClickListener(optionsPanelListener);
-		optionRemoveTotal.setOnClickListener(optionsPanelListener);
-		optionPublicLink.setOnClickListener(optionsPanelListener);
-		optionMoveTo.setOnClickListener(optionsPanelListener);
-		optionCopyTo.setOnClickListener(optionsPanelListener);
-		optionSendToInbox.setOnClickListener(optionsPanelListener);
-
-		optionsOutLayout.setOnClickListener(optionsPanelListener);
+		optionClearShares.setOnClickListener(nodeOptionsPanelListener);
+		optionPermissions.setOnClickListener(nodeOptionsPanelListener);
+		optionDownload.setOnClickListener(nodeOptionsPanelListener);
+		optionShare.setOnClickListener(nodeOptionsPanelListener);
+		optionProperties.setOnClickListener(nodeOptionsPanelListener);
+		optionRename.setOnClickListener(nodeOptionsPanelListener);
+		optionDelete.setOnClickListener(nodeOptionsPanelListener);
+		optionRemoveTotal.setOnClickListener(nodeOptionsPanelListener);
+		optionPublicLink.setOnClickListener(nodeOptionsPanelListener);
+		optionMoveTo.setOnClickListener(nodeOptionsPanelListener);
+		optionCopyTo.setOnClickListener(nodeOptionsPanelListener);
+		optionSendToInbox.setOnClickListener(nodeOptionsPanelListener);
+		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
+		optionLeaveShare.setOnClickListener(nodeOptionsPanelListener);
 
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -9376,7 +9373,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (rbFLol != null){
-//						rbFLol.showOptionsPanel(node);
+//						rbFLol.showNodeOptionsPanel(node);
 					}
 				}
 				break;
@@ -9387,7 +9384,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (inSFLol != null){
-
+						inSFLol.resetAdapter();
 					}
 				}
 				else{
@@ -9401,6 +9398,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
+	}
+
+	public void showOptionsPanelIncoming(MegaNode sNode){
+		log("showOptionsPanelIncoming");
+
+		this.selectedNode = sNode;
+
+		if (selectedNode.isFolder()) {
+			propertiesText.setText(R.string.general_folder_info);
+			optionSendToInbox.setVisibility(View.GONE);
+		}else{
+			propertiesText.setText(R.string.general_file_info);
+			optionSendToInbox.setVisibility(View.VISIBLE);
+		}
+
+		int accessLevel = megaApi.getAccess(selectedNode);
+		log("Node: "+selectedNode.getName()+" "+accessLevel);
+
+		switch (accessLevel) {
+			case MegaShare.ACCESS_FULL: {
+				log("access FULL");
+				optionDownload.setVisibility(View.VISIBLE);
+				optionProperties.setVisibility(View.VISIBLE);
+
+				if(selectedNode.isFile()){
+					optionLeaveShare.setVisibility(View.GONE);
+				}
+				else {
+					optionLeaveShare.setVisibility(View.VISIBLE);
+				}
+				optionPublicLink.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionRename.setVisibility(View.VISIBLE);
+				optionDelete.setVisibility(View.VISIBLE);
+				optionMoveTo.setVisibility(View.GONE);
+
+				break;
+			}
+			case MegaShare.ACCESS_READ: {
+				log("access read");
+				optionDownload.setVisibility(View.VISIBLE);
+				optionProperties.setVisibility(View.VISIBLE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionMoveTo.setVisibility(View.GONE);
+
+				if(selectedNode.isFile()){
+					optionLeaveShare.setVisibility(View.GONE);
+				}
+				else {
+					optionLeaveShare.setVisibility(View.VISIBLE);
+				}
+				break;
+			}
+			case MegaShare.ACCESS_READWRITE: {
+				log("readwrite");
+				optionDownload.setVisibility(View.VISIBLE);
+				optionProperties.setVisibility(View.VISIBLE);
+				//						holder.shareDisabled.setVisibility(View.VISIBLE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionMoveTo.setVisibility(View.GONE);
+				if(selectedNode.isFile()){
+					optionLeaveShare.setVisibility(View.GONE);
+				}
+				else {
+					optionLeaveShare.setVisibility(View.VISIBLE);
+				}
+				break;
+			}
+		}
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		log("Show the slidingPanel");
 	}
 
 	public void showOptionsPanelOutgoing(MegaNode sNode, int deep){
@@ -9437,6 +9516,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDelete.setVisibility(View.GONE);
 		optionRemoveTotal.setVisibility(View.GONE);
 		optionPublicLink.setVisibility(View.GONE);
+		optionLeaveShare.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -9468,14 +9548,48 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionClearShares.setVisibility(View.GONE);
 		optionRemoveTotal.setVisibility(View.GONE);
 		optionPermissions.setVisibility(View.GONE);
+		optionLeaveShare.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 		log("Show the slidingPanel");
 	}
 
-	public void showOptionsPanel(MegaNode node){
-		log("showOptionsPanel");
+	public void showOptionsPanelInbox(MegaNode sNode){
+		log("showNodeOptionsPanel");
+
+		this.selectedNode = sNode;
+
+		if (sNode.isFolder()) {
+			propertiesText.setText(R.string.general_folder_info);
+			optionShare.setVisibility(View.VISIBLE);
+		}else{
+			propertiesText.setText(R.string.general_file_info);
+			optionShare.setVisibility(View.GONE);
+		}
+
+		optionDownload.setVisibility(View.VISIBLE);
+		optionProperties.setVisibility(View.VISIBLE);
+		optionDelete.setVisibility(View.VISIBLE);
+		optionDelete.setVisibility(View.VISIBLE);
+		optionRename.setVisibility(View.VISIBLE);
+		optionMoveTo.setVisibility(View.VISIBLE);
+		optionCopyTo.setVisibility(View.VISIBLE);
+
+		optionClearShares.setVisibility(View.GONE);
+		optionRemoveTotal.setVisibility(View.GONE);
+		optionPermissions.setVisibility(View.GONE);
+		optionSendToInbox.setVisibility(View.GONE);
+		optionLeaveShare.setVisibility(View.GONE);
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		log("Show the slidingPanel");
+	}
+
+
+	public void showNodeOptionsPanel(MegaNode node){
+		log("showNodeOptionsPanel");
 		selectedNode=node;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			int index = viewPagerCDrive.getCurrentItem();
@@ -9501,7 +9615,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (drawerItem == DrawerItem.INBOX){
 			if (iFLol != null){
-				iFLol.showOptionsPanel(node);
+				showOptionsPanelInbox(node);
 			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
@@ -9510,7 +9624,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (inSFLol != null){
-					inSFLol.showOptionsPanel(node);
+					showOptionsPanelIncoming(node);
 				}
 			}
 			else{
@@ -9523,8 +9637,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showOptionsPanel(MegaOffline node){
-		log("showOptionsPanel-Offline");
+	public void showNodeOptionsPanel(MegaOffline node){
+		log("showNodeOptionsPanel-Offline");
 
 		if (oFLol != null){
 			oFLol.showOptionsPanel(node);
@@ -9532,7 +9646,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showOptionsPanel(MegaUser user){
-		log("showOptionsPanel-Offline");
+		log("showNodeOptionsPanel-Offline");
 
 		String cFTag1 = getFragmentTag(R.id.contact_tabs_pager, 0);
 		log("Tag: "+ cFTag1);
@@ -9543,7 +9657,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showOptionsPanel(MegaContactRequest request){
-		log("showOptionsPanel-MegaContactRequest");
+		log("showNodeOptionsPanel-MegaContactRequest");
 
 		int index = viewPagerContacts.getCurrentItem();
 		if (index == 2){

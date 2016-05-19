@@ -1324,7 +1324,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}
 	
 	public void showOptionsPanel(MegaOffline sNode){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 		
 		this.selectedNode = sNode;
 		

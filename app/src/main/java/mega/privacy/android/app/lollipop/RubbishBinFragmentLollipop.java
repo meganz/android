@@ -612,7 +612,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 		
 		this.selectedNode = sNode;
 		

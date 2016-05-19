@@ -239,7 +239,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
     }
 
 	public void showOptionsPanel(MegaContactRequest request){		
-		log("showOptionsPanel");	
+		log("showNodeOptionsPanel");
 		
 		this.selectedRequest = request;
 		slidingOptionsPanel.setVisibility(View.VISIBLE);

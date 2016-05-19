@@ -45,7 +45,6 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
@@ -443,84 +442,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.file_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.file_list_option_rename_layout);
-			optionLeaveShare = (LinearLayout) v.findViewById(R.id.file_list_option_leave_share_layout);
-			optionDownload = (LinearLayout) v.findViewById(R.id.file_list_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.file_list_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_list_option_properties_text);		
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_list_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_list_option_copy_layout);
-
-			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_list_option_public_link_layout);
-			optionPublicLink.setVisibility(View.GONE);
-//				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-			optionShare = (LinearLayout) v.findViewById(R.id.file_list_option_share_layout);
-			optionShare.setVisibility(View.GONE);
-			optionPermissions = (LinearLayout) v.findViewById(R.id.file_list_option_permissions_layout);
-			optionPermissions.setVisibility(View.GONE);
-			optionDelete = (LinearLayout) v.findViewById(R.id.file_list_option_delete_layout);	
-			optionDelete.setVisibility(View.GONE);
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.file_list_option_remove_layout);
-			optionRemoveTotal.setVisibility(View.GONE);
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-
-			optionClearShares = (LinearLayout) v.findViewById(R.id.file_list_option_clear_share_layout);
-			optionClearShares.setVisibility(View.GONE);	
-			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_list_option_send_inbox_layout);
-			optionSendToInbox.setVisibility(View.GONE);	
-			
-			optionDownload.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionLeaveShare.setOnClickListener(this);
-			optionRename.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);
-			optionCopyTo.setOnClickListener(this);			
-			optionSendToInbox.setOnClickListener(this);
-			optionsOutLayout.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
-			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingPanelListener = new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        };			
-			
-			slidingOptionsPanel.setPanelSlideListener(slidingPanelListener);	
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 
 			return v;
 		}
@@ -784,96 +707,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	}
 
-	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");		
-	
-		this.selectedNode = sNode;
-
-		if (selectedNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-			optionSendToInbox.setVisibility(View.GONE);	
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-			optionSendToInbox.setVisibility(View.VISIBLE);	
-		}			
-
-		int accessLevel = megaApi.getAccess(selectedNode);
-		log("Node: "+selectedNode.getName()+" "+accessLevel);
-		
-		switch (accessLevel) {			
-			case MegaShare.ACCESS_FULL: {
-				log("access FULL");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
-				
-				if(selectedNode.isFile()){
-					optionLeaveShare.setVisibility(View.GONE);
-				}
-				else {
-					optionLeaveShare.setVisibility(View.VISIBLE);
-				}
-				optionPublicLink.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionRename.setVisibility(View.VISIBLE);
-				optionDelete.setVisibility(View.VISIBLE);
-				optionMoveTo.setVisibility(View.GONE);
-	
-				break;
-			}
-			case MegaShare.ACCESS_READ: {
-				log("access read");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);	
-				optionPublicLink.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				
-				if(selectedNode.isFile()){
-					optionLeaveShare.setVisibility(View.GONE);
-				}
-				else {
-					optionLeaveShare.setVisibility(View.VISIBLE);
-				}						
-				break;
-			}
-			case MegaShare.ACCESS_READWRITE: {
-				log("readwrite");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
-				//						holder.shareDisabled.setVisibility(View.VISIBLE);
-				optionPublicLink.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				if(selectedNode.isFile()){
-					optionLeaveShare.setVisibility(View.GONE);
-				}
-				else {
-					optionLeaveShare.setVisibility(View.VISIBLE);
-				}
-				break;
-			}
-		}
-					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-
-		adapter.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-	}
-	
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
@@ -927,119 +760,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 		switch(v.getId()){
 
-			case R.id.file_list_option_send_inbox_layout:
-			case R.id.file_grid_option_send_inbox_layout: {
-				log("send to inbox");
-				hideOptionsPanel();
-				((ManagerActivityLollipop) context).sendToInboxLollipop(selectedNode);
-//				ArrayList<Long> handleList = new ArrayList<Long>();
-//				handleList.add(selectedNode.getHandle());
-//				((ManagerActivityLollipop) context).onFileClick(handleList);
-				break;
-			}
-			
-			case R.id.file_list_out_options:
-			case R.id.file_grid_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-
-			case R.id.file_list_option_delete_layout:
-			case R.id.file_grid_option_delete_layout: {
-				log("Delete option");
-				hideOptionsPanel();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-
-				((ManagerActivityLollipop) context).moveToTrash(handleList);
-				break;
-			}
-				
-			case R.id.file_list_option_download_layout: 
-			case R.id.file_grid_option_download_layout: {
-				log("Download option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-				((ManagerActivityLollipop) context).onFileClick(handleList);
-				break;
-			}
-			case R.id.file_list_option_leave_share_layout: 
-			case R.id.file_grid_option_leave_share_layout: {
-				log("Leave share option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).leaveIncomingShare(selectedNode);
-				break;
-			}
-			case R.id.file_list_option_move_layout:
-			case R.id.file_grid_option_move_layout:{
-				log("Move option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());									
-				((ManagerActivityLollipop) context).showMoveLollipop(handleList);
-
-				break;
-			}
-			case R.id.file_list_option_properties_layout:
-			case R.id.file_grid_option_properties_layout: {
-				log("Properties option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
-				i.putExtra("handle", selectedNode.getHandle());
-				i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
-				
-				if (selectedNode.isFolder()) {
-					if (megaApi.isShared(selectedNode)){
-						i.putExtra("imageId", R.drawable.folder_shared_mime);	
-					}
-					else{
-						i.putExtra("imageId", R.drawable.folder_mime);
-					}
-				} 
-				else {
-					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+			case R.id.content_text_layout:
+			case R.id.content_grid_text_layout:{
+				log("click show transfersFragment");
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.TRANSFERS);
 				}
-				i.putExtra("name", selectedNode.getName());
-				context.startActivity(i);
-
 				break;
 			}
-			case R.id.file_list_option_rename_layout: 
-			case R.id.file_grid_option_rename_layout: {
-				log("Rename option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
-				break;
-			}	
-			case R.id.file_list_option_copy_layout: 
-			case R.id.file_grid_option_copy_layout: {
-				log("Copy option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());									
-				((ManagerActivityLollipop) context).showCopyLollipop(handleList);
-				break;
-			}	
-				
 		}
 	}
 	
@@ -1656,6 +1384,13 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	public void setDeepBrowserTree(int deepBrowserTree) {
 		log("setDeepBrowserTree:" + deepBrowserTree);
 		this.deepBrowserTree = deepBrowserTree;
+	}
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapter!=null){
+			adapter.setPositionClicked(-1);
+		}
 	}
 
 }

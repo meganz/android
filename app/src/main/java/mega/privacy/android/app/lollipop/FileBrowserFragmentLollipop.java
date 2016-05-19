@@ -867,8 +867,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 	
-//	public void showOptionsPanel(MegaNode sNode){
-//		log("showOptionsPanel");
+//	public void showNodeOptionsPanel(MegaNode sNode){
+//		log("showNodeOptionsPanel");
 //
 ////		fabButton.setVisibility(View.GONE);
 //
