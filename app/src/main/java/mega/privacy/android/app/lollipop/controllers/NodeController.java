@@ -17,6 +17,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +31,9 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactsExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -93,7 +97,7 @@ public class NodeController {
     }
 
     public void sendToInboxNodes(ArrayList<Long> handleList){
-        log("sentToInbox handleList");
+        log("sendToInboxNodes handleList");
 
         ((ManagerActivityLollipop) context).setSendToInbox(true);
 
@@ -114,7 +118,7 @@ public class NodeController {
 
     //Old onFileClick
     public void prepareForDownload(ArrayList<Long> handleList){
-        log("onFileClick: "+handleList.size()+" files to download");
+        log("prepareForDownload: "+handleList.size()+" files to download");
         long size = 0;
         long[] hashes = new long[handleList.size()];
         for (int i=0;i<handleList.size();i++){
@@ -268,7 +272,7 @@ public class NodeController {
     //Old downloadTo
     public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        log("downloadTo, parentPath: "+parentPath+ " url: "+url+" size: "+size);
+        log("checkSizeBeforeDownload - parentPath: "+parentPath+ " url: "+url+" size: "+size);
         log("files to download: "+hashes.length);
         log("SIZE to download before calculating: "+size);
 
@@ -606,7 +610,111 @@ public class NodeController {
         }
     }
 
+    public void renameNode(MegaNode document, String newName){
+        log("renameNode");
+        if (newName.compareTo(document.getName()) == 0) {
+            return;
+        }
 
+        if(!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        log("renaming " + document.getName() + " to " + newName);
+
+        megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
+    }
+
+    public void importLink(String url) {
+
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {}
+        url.replace(' ', '+');
+        if(url.startsWith("mega://")){
+            url = url.replace("mega://", "https://mega.co.nz/");
+        }
+
+        log("url " + url);
+
+        // Download link
+        if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+            log("open link url");
+
+//			Intent openIntent = new Intent(this, ManagerActivityLollipop.class);
+            Intent openFileIntent = new Intent(context, FileLinkActivityLollipop.class);
+            openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            openFileIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK);
+            openFileIntent.setData(Uri.parse(url));
+            ((ManagerActivityLollipop) context).startActivity(openFileIntent);
+//			finish();
+            return;
+        }
+
+        // Folder Download link
+        else if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
+            log("folder link url");
+            Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
+            openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            openFolderIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
+            openFolderIntent.setData(Uri.parse(url));
+            ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
+//			finish();
+            return;
+        }
+        else{
+            log("wrong url");
+            Intent errorIntent = new Intent(context, ManagerActivityLollipop.class);
+            errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            ((ManagerActivityLollipop) context).startActivity(errorIntent);
+        }
+    }
+
+    //old getPublicLinkAndShareIt
+    public void exportLink(MegaNode document){
+        log("exportLink");
+        if (!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+        ((ManagerActivityLollipop) context).setIsGetLink(true);
+        megaApi.exportNode(document, ((ManagerActivityLollipop) context));
+    }
+
+
+    public void shareFolders(ArrayList<Long> handleList){
+        log("shareFolders ArrayListLong");
+        //TODO shareMultipleFolders
+
+        Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+        intent.setClass(context, ContactsExplorerActivityLollipop.class);
+
+        long[] handles=new long[handleList.size()];
+        int j=0;
+        for(int i=0; i<handleList.size();i++){
+            handles[j]=handleList.get(i);
+            j++;
+        }
+        intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
+        //Multiselect=1 (multiple folders)
+        intent.putExtra("MULTISELECT", 1);
+        intent.putExtra("SEND_FILE",0);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+    }
+
+    public void shareFolder(MegaNode node){
+        log("shareFolder");
+
+        Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+        intent.setClass(context, ContactsExplorerActivityLollipop.class);
+        //Multiselect=0
+        intent.putExtra("MULTISELECT", 0);
+        intent.putExtra("SEND_FILE",0);
+        intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+    }
 
     public static void log(String message) {
         Util.log("NodeController", message);

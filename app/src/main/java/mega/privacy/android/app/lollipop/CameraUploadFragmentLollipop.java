@@ -262,13 +262,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if(adapterList!=null){
 						if (documentsList.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
-							((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+							NodeController nC = new NodeController(context);
+							nC.exportLink(n);
 						}
 					}
 					else if(adapterGrid != null){
 						if (documentsGrid.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
-							((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+							NodeController nC = new NodeController(context);
+							nC.exportLink(n);
 						}
 					}
 					

@@ -182,7 +182,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						{
 							break;
 						}
-						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+						NodeController nC = new NodeController(context);
+						nC.exportLink(n);
 					}
 					
 					break;
@@ -201,7 +202,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);					
+					NodeController nC = new NodeController(context);
+					nC.shareFolders(handleList);
 					break;
 				}
 				case R.id.cab_menu_move:{					
@@ -1195,9 +1197,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		{
 			return;
 		}
-		
-		((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
-
+		NodeController nC = new NodeController(context);
+		nC.exportLink(n);
 	}
 	
 	public void shareFolder (String path){
@@ -1206,8 +1207,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		{
 			return;
 		}
-		
-		((ManagerActivityLollipop) context).shareFolderLollipop(n);
+		NodeController nC = new NodeController(context);
+		nC.shareFolder(n);
 	}
 	
 	public void rename (String path){

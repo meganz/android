@@ -24,7 +24,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
     Context context;
     ManagerActivityLollipop.DrawerItem drawerItem;
     MegaApiAndroid megaApi;
-    NodeController nodeController;
+    NodeController nC;
 
     public NodeOptionsPanelListener(Context context){
         log("NodeOptionsPanelListener created");
@@ -32,7 +32,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-        nodeController = new NodeController(context);
+        nC = new NodeController(context);
     }
 
     @Override
@@ -57,14 +57,14 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
 //                ((ManagerActivityLollipop) context).onFileClick(handleList);
-                nodeController.prepareForDownload(handleList);
+                nC.prepareForDownload(handleList);
                 break;
             }
 
             case R.id.file_list_option_send_inbox_layout: {
                 log("Send inbox option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                nodeController.sendToInbox(selectedNode);
+                nC.sendToInbox(selectedNode);
                 break;
             }
             case R.id.file_list_option_move_layout:{
@@ -72,7 +72,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                nodeController.moveNodes(handleList);
+                nC.moveNodes(handleList);
                 break;
             }
 
@@ -120,8 +120,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_public_link_layout: {
                 log("Public link option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                ((ManagerActivityLollipop) context).getPublicLinkAndShareIt(selectedNode);
-
+                nC.exportLink(selectedNode);
                 break;
             }
 
@@ -135,7 +134,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_share_layout:{
                 log("Share option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                ((ManagerActivityLollipop) context).shareFolderLollipop(selectedNode);
+                nC.shareFolder(selectedNode);
                 break;
             }
 
@@ -144,7 +143,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                nodeController.copyNodes(handleList);
+                nC.copyNodes(handleList);
 //                ((ManagerActivityLollipop) context).showCopyLollipop(handleList);
                 break;
             }
