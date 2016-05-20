@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -688,6 +689,11 @@ public class NodeController {
         log("shareFolders ArrayListLong");
         //TODO shareMultipleFolders
 
+        if (!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
         Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
         intent.setClass(context, ContactsExplorerActivityLollipop.class);
 
@@ -714,6 +720,47 @@ public class NodeController {
         intent.putExtra("SEND_FILE",0);
         intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+    }
+
+    public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){
+        log("moveToTrash: "+moveToRubbish);
+
+        MultipleRequestListener moveMultipleListener = null;
+        MegaNode parent;
+        //Check if the node is not yet in the rubbish bin (if so, remove it)
+        if(handleList!=null){
+            if(handleList.size()>1){
+                log("MOVE multiple: "+handleList.size());
+                if (moveToRubbish){
+                    moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, context);
+                }
+                else{
+                    moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_MOVE, context);
+                }
+                for (int i=0;i<handleList.size();i++){
+                    if (moveToRubbish){
+                        megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
+
+                    }
+                    else{
+                        megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), moveMultipleListener);
+                    }
+                }
+            }
+            else{
+                log("MOVE single");
+                if (moveToRubbish){
+                    megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), ((ManagerActivityLollipop) context));
+                }
+                else{
+                    megaApi.remove(megaApi.getNodeByHandle(handleList.get(0)), ((ManagerActivityLollipop) context));
+                }
+            }
+        }
+        else{
+            log("handleList NULL");
+            return;
+        }
     }
 
     public static void log(String message) {

@@ -7149,114 +7149,78 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void moveToTrash(final ArrayList<Long> handleList){
-		log("moveToTrash");
-		isClearRubbishBin = false;
+	public void setIsClearRubbishBin(boolean value){
+		this.isClearRubbishBin = value;
+	}
 
-		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-			return;
-		}
+	public void setMoveToRubbish(boolean value){
+		this.moveToRubbish = value;
+	}
 
-		if(isFinishing()){
-			return;
-		}
-
-		final MegaNode rubbishNode = megaApi.getRubbishNode();
+	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
+		log("askConfirmationMoveToRubbish");
+		isClearRubbishBin=false;
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the outgoing shares
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						//TODO remove the outgoing shares
+						nC.moveToTrash(handleList, moveToRubbish);
+						break;
 
-		        	MultipleRequestListener moveMultipleListener = null;
-		        	MegaNode parent;
-	    			//Check if the node is not yet in the rubbish bin (if so, remove it)
-		        	if(handleList!=null){
-		        		parent = megaApi.getNodeByHandle(handleList.get(0));
-		        		while (megaApi.getParentNode(parent) != null){
-		    				parent = megaApi.getParentNode(parent);
-		    			}
-		        		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-		    				moveToRubbish = true;
-		    				moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, managerActivity);
-		        		}
-	    				else{
-	    					moveToRubbish = false;
-	    					moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_MOVE, managerActivity);
-	    				}
-		        	}
-
-					if(handleList.size()>1){
-						log("MOVE multiple: "+handleList.size());
-						for (int i=0;i<handleList.size();i++){
-			    			if (moveToRubbish){
-		    					megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, moveMultipleListener);
-
-			    			}
-			    			else{
-			    				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), moveMultipleListener);
-			    			}
-			    		}
-					}
-					else{
-						log("MOVE single");
-		    			if (moveToRubbish){
-		    				moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, managerActivity);
-		    				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), rubbishNode, managerActivity);
-		    			}
-		    			else{
-		    				moveMultipleListener = new MultipleRequestListener(-1,managerActivity);
-		    				megaApi.remove(megaApi.getNodeByHandle(handleList.get(0)), managerActivity);
-		    			}
-					}
-
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
 		};
 
-		if (handleList.size() > 0){
-			MegaNode p = megaApi.getNodeByHandle(handleList.get(0));
-			while (megaApi.getParentNode(p) != null){
-				p = megaApi.getParentNode(p);
-			}
-			if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+		if(handleList!=null){
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			if (handleList.size() > 0){
+				MegaNode p = megaApi.getNodeByHandle(handleList.get(0));
+				while (megaApi.getParentNode(p) != null){
+					p = megaApi.getParentNode(p);
+				}
+				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+					setMoveToRubbish(true);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
-				if (handleList.size() > 1){
-					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
+					if (handleList.size() > 1){
+						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
+					}
+					else{
+						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+					}
+					builder.setPositiveButton(R.string.general_move, dialogClickListener);
+					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+					builder.show();
 				}
 				else{
-					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
-				}
-	            builder.setPositiveButton(R.string.general_move, dialogClickListener);
-	            builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-	            builder.show();
-			}
-			else{
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					setMoveToRubbish(false);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
-				if (handleList.size() > 1){
-					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega_plural));
+					if (handleList.size() > 1){
+						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega_plural));
+					}
+					else{
+						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+					}
+					builder.setPositiveButton(R.string.general_remove, dialogClickListener);
+					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+					builder.show();
 				}
-				else{
-					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
-				}
-				builder.setPositiveButton(R.string.general_remove, dialogClickListener);
-				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-				builder.show();
 			}
 		}
+		else{
+			log("handleList NULL");
+			return;
+		}
+
 	}
+
 
 	public void showImportLinkDialog(){
 		log("showImportLinkDialog");

@@ -168,7 +168,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{

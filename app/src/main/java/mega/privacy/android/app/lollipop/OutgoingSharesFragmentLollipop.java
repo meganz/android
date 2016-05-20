@@ -207,7 +207,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
