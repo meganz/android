@@ -598,7 +598,16 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	
 	public void refresh(){
 		log("refresh");
-		nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+		if(parentHandle==-1||parentHandle==inboxNode.getHandle()){
+			nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode!=null){
+				log("parentNode: "+parentNode.getName());
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			}
+		}
 		setNodes(nodes);
 		if(adapter != null){				
 			adapter.notifyDataSetChanged();
