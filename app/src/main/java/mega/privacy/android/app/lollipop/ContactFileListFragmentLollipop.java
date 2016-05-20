@@ -37,7 +37,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -59,6 +58,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -962,11 +962,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 
 					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 			  			startActivity(mediaIntent);
 			  		}
 			  		else{
-			  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
 			  			adapter.setPositionClicked(-1);
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();

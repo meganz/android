@@ -17,6 +17,9 @@ public class Constants {
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
+	public static int WRITE_SD_CARD_REQUEST_CODE = 1011;
+	public static int REQUEST_CODE_SELECT_FILE = 1012;
+	public static int SET_PIN = 1013;
 	public static int REQUEST_CODE_TREE = 1014;
 
 }

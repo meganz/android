@@ -34,6 +34,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -545,7 +546,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -573,7 +574,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -602,7 +603,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							.getType());
 					
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-						if (!ManagerActivityLollipop.isIntentAvailable(DownloadService.this, intent)){
+						if (!MegaApiUtils.isIntentAvailable(DownloadService.this, intent)){
 							intent.setAction(Intent.ACTION_SEND);
 							intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 									.getType());

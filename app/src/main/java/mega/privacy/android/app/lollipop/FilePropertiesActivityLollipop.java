@@ -69,6 +69,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -925,7 +926,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					}
 		    		Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
-					if (ManagerActivityLollipop.isIntentAvailable(this, intent)){
+					if (MegaApiUtils.isIntentAvailable(this, intent)){
 						startActivity(intent);
 					}
 					else{
@@ -2368,12 +2369,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Snackbar.make(container, toastMessage, Snackbar.LENGTH_LONG).show();
@@ -2489,7 +2490,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				}
 	    		Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
-				if (ManagerActivityLollipop.isIntentAvailable(this, intent)){
+				if (MegaApiUtils.isIntentAvailable(this, intent)){
 					startActivity(intent);
 				}
 				else{
