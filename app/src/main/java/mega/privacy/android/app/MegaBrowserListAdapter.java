@@ -1110,7 +1110,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public int getCount() {
-		return nodes.size();
+		if (nodes != null){
+			return nodes.size();
+		}
+		else{
+			return 0;
+		}
 	}
 
 	@Override
