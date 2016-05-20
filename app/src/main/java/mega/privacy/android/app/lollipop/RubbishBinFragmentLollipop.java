@@ -145,7 +145,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -745,7 +745,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				handleList.add(selectedNode.getHandle());
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).moveToTrash(handleList);
+				((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 				break;
 			}
 		}

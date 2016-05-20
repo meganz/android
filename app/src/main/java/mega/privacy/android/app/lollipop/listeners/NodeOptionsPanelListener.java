@@ -112,7 +112,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
 
-                ((ManagerActivityLollipop) context).moveToTrash(handleList);
+                ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 
                 break;
             }
@@ -144,7 +144,6 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
                 nC.copyNodes(handleList);
-//                ((ManagerActivityLollipop) context).showCopyLollipop(handleList);
                 break;
             }
             case R.id.file_list_option_clear_share_layout:{
