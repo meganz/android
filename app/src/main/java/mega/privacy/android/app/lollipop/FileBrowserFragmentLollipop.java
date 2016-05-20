@@ -176,7 +176,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.shareFolders(handleList);
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -198,7 +199,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(documents.get(0));
+						NodeController nC = new NodeController(context);
+						nC.exportLink(documents.get(0));
 					}
 					break;
 				}

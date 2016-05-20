@@ -134,7 +134,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(documents.get(0));
+						NodeController nC = new NodeController(context);
+						nC.exportLink(documents.get(0));
 					}
 					break;
 				}
