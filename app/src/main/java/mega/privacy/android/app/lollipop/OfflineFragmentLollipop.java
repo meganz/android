@@ -50,6 +50,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -152,8 +153,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
-					
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -1005,7 +1006,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			handleList.add(node.getHandle());
 			log("download "+node.getName());
 			if (context instanceof ManagerActivityLollipop){
-				((ManagerActivityLollipop) context).onFileClick(handleList);
+				NodeController nC = new NodeController(context);
+				nC.prepareForDownload(handleList);
 			}
 			else{
 				//TODO toast no connection
@@ -1434,7 +1436,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(Long.parseLong(selectedNode.getHandle()));
-				((ManagerActivityLollipop) context).onFileClick(handleList);
+				NodeController nC = new NodeController(context);
+				nC.prepareForDownload(handleList);
 				break;
 			}
 			case R.id.offline_list_option_move_layout:
@@ -1774,13 +1777,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
     public void openFile (File currentFile){
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 		viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-		if (ManagerActivityLollipop.isIntentAvailable(context, viewIntent)){
+		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){
 			context.startActivity(viewIntent);
 		}
 		else{
 			Intent intentShare = new Intent(Intent.ACTION_SEND);
 			intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-			if (ManagerActivityLollipop.isIntentAvailable(context, intentShare)){
+			if (MegaApiUtils.isIntentAvailable(context, intentShare)){
 				context.startActivity(intentShare);
 			}
 		}

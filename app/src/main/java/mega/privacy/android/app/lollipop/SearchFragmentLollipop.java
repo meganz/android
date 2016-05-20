@@ -44,6 +44,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -117,7 +118,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -570,7 +572,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-			  		if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 			  			context.startActivity(mediaIntent);
 			  		}
 			  		else{
@@ -579,7 +581,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			  			adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
-						((ManagerActivityLollipop) context).onFileClick(handleList);
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
 			  		}						
 				}
 				else{
@@ -587,7 +590,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 				}
 			}
 		}

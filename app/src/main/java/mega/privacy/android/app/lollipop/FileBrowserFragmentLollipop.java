@@ -50,6 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -131,7 +132,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -188,7 +190,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					clearSelections();
 					hideMultipleSelect();
 					log("sendToInbox no of files: "+handleList.size());
-					((ManagerActivityLollipop) context).sendToInboxLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.sendToInboxNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -910,7 +913,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+				  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 				  			startActivity(mediaIntent);
 				  		}
 				  		else{
@@ -919,15 +922,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
-							((ManagerActivityLollipop) context).onFileClick(handleList);
-				  		}						
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
+						}
 					}
 					else{
 						adapter.setPositionClicked(-1);
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
-						((ManagerActivityLollipop) context).onFileClick(handleList);
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
 					}
 				}
 			}

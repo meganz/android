@@ -46,6 +46,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -536,13 +537,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)),
 									MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								intentShare.setDataAndType(Uri.fromFile(new File(localPath)),
 										MimeTypeList.typeForName(tempNode.getName()).getType());
-								if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();

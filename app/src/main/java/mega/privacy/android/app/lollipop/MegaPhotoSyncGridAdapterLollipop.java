@@ -38,6 +38,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -103,7 +104,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -412,20 +414,22 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+				  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 				  			context.startActivity(mediaIntent);
 				  		}
 				  		else{
 				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 				  			ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(n.getHandle());
-							((ManagerActivityLollipop) context).onFileClick(handleList);
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
 				  		}						
 					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(n.getHandle());
-						((ManagerActivityLollipop) context).onFileClick(handleList);
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
 					}	
 					notifyDataSetChanged();
 				}

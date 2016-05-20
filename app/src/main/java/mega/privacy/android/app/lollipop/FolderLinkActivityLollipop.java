@@ -69,6 +69,7 @@ import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1292,7 +1293,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-			  		if (ManagerActivityLollipop.isIntentAvailable(this, mediaIntent)){
+			  		if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
 			  			startActivity(mediaIntent);
 			  		}
 			  		else{

@@ -56,17 +56,15 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                ((ManagerActivityLollipop) context).onFileClick(handleList);
+//                ((ManagerActivityLollipop) context).onFileClick(handleList);
+                nodeController.prepareForDownload(handleList);
                 break;
             }
 
             case R.id.file_list_option_send_inbox_layout: {
                 log("Send inbox option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                ((ManagerActivityLollipop) context).sendToInboxLollipop(selectedNode);
-//				ArrayList<Long> handleList = new ArrayList<Long>();
-//				handleList.add(selectedNode.getHandle());
-//				((ManagerActivityLollipop) context).onFileClick(handleList);
+                nodeController.sendToInbox(selectedNode);
                 break;
             }
             case R.id.file_list_option_move_layout:{

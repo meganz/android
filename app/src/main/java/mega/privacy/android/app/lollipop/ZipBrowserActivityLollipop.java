@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 
@@ -421,12 +422,12 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			log("NOT Image");
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
-			if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+			if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 				startActivity(viewIntent);
 			else{
 				Intent intentShare = new Intent(Intent.ACTION_SEND);
 				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
-				if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+				if (MegaApiUtils.isIntentAvailable(this, intentShare))
 					startActivity(intentShare);
 				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;
 				Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
