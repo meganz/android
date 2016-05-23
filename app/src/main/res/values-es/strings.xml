@@ -92,7 +92,7 @@
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clave Maestra ha sido exportada en:</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La subscripción ha sido cancelada correctamente</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">Ha habido algún problema cancelando la subscripción. Por favor, contacta con support\@mega.co.nz para cancelar la subscripción</string>
-    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar todas las sesiones</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar el resto de sesiones</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">El resto de sesiones se han cerrado con éxito</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error al cerrar las sesiones abiertas</string> 
     <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">El fichero con la Clave Maestra fue eliminado</string>
