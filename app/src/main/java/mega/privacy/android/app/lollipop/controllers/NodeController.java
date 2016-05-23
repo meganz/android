@@ -61,8 +61,8 @@ public class NodeController {
         }
     }
 
-    public void copyNodes(ArrayList<Long> handleList){
-        log("showCopyLollipop");
+    public void chooseLocationToCopyNodes(ArrayList<Long> handleList){
+        log("chooseLocationToCopyNodes");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
@@ -73,8 +73,33 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_COPY_FOLDER);
     }
 
-    public void moveNodes(ArrayList<Long> handleList){
-        log("showMoveLollipop");
+    public void copyNodes(long[] copyHandles, long toHandle) {
+        log("copyNodes");
+
+        if(!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        MegaNode parent = megaApi.getNodeByHandle(toHandle);
+        if(parent!=null) {
+            MultipleRequestListener copyMultipleListener = null;
+            if (copyHandles.length > 1) {
+                log("Copy multiple files");
+                copyMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_COPY, context);
+                for (int i = 0; i < copyHandles.length; i++) {
+                    megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, copyMultipleListener);
+                }
+            } else {
+                log("Copy one file");
+                megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[0]), parent, (ManagerActivityLollipop) context);
+            }
+        }
+
+    }
+
+    public void chooseLocationToMoveNodes(ArrayList<Long> handleList){
+        log("chooseLocationToMoveNodes");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
         long[] longArray = new long[handleList.size()];
@@ -85,7 +110,34 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_MOVE_FOLDER);
     }
 
-    public void sendToInbox(MegaNode node){
+    public void moveNodes(long[] moveHandles, long toHandle){
+        log("moveNodes");
+
+        if(!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        MegaNode parent = megaApi.getNodeByHandle(toHandle);
+        if(parent!=null){
+            MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_MOVE, context);
+
+            if(moveHandles.length>1){
+                log("MOVE multiple: "+moveHandles.length);
+
+                for(int i=0; i<moveHandles.length;i++){
+                    megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, moveMultipleListener);
+                }
+            }
+            else{
+                log("MOVE single");
+
+                megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
+            }
+        }
+    }
+
+    public void selectContactToSendNode(MegaNode node){
         log("sentToInbox MegaNode");
 
         ((ManagerActivityLollipop) context).setSendToInbox(true);
@@ -99,7 +151,52 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
-    public void sendToInboxNodes(ArrayList<Long> handleList){
+    public void sendToInbox(long fileHandle, String[] selectedContacts){
+
+        if(!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        MultipleRequestListener sendMultipleListener = null;
+        MegaNode node = megaApi.getNodeByHandle(fileHandle);
+        if(node!=null)
+        {
+            ((ManagerActivityLollipop) context).setSendToInbox(true);
+            log("File to send: "+node.getName());
+            if(selectedContacts.length>1){
+                log("File to multiple contacts");
+                sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SEND_INBOX, context);
+                for (int i=0;i<selectedContacts.length;i++){
+                    MegaUser user= megaApi.getContact(selectedContacts[i]);
+
+                    if(user!=null){
+                        log("Send File to contact: "+user.getEmail());
+                        megaApi.sendFileToUser(node, user, sendMultipleListener);
+                    }
+                    else{
+                        log("Send File to a NON contact! ");
+                        megaApi.sendFileToUser(node, selectedContacts[i], sendMultipleListener);
+                    }
+                }
+            }
+            else{
+                log("File to a single contact");
+                MegaUser user= megaApi.getContact(selectedContacts[0]);
+                if(user!=null){
+                    log("Send File to contact: "+user.getEmail());
+                    megaApi.sendFileToUser(node, user, (ManagerActivityLollipop) context);
+                }
+                else{
+                    log("Send File to a NON contact! ");
+                    megaApi.sendFileToUser(node, selectedContacts[0], (ManagerActivityLollipop) context);
+                }
+            }
+        }
+
+    }
+
+    public void selectContactToSendNodes(ArrayList<Long> handleList){
         log("sendToInboxNodes handleList");
 
         ((ManagerActivityLollipop) context).setSendToInbox(true);
@@ -712,7 +809,7 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
-    public void shareFolder(MegaNode node){
+    public void selectContactToShareFolder(MegaNode node){
         log("shareFolder");
 
         Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
@@ -723,6 +820,44 @@ public class NodeController {
         intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
+
+    public void shareFolder(long folderHandle, String[] selectedContacts, int level){
+
+        if(!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        MegaNode parent = megaApi.getNodeByHandle(folderHandle);
+        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SHARE, (ManagerActivityLollipop) context);
+        if(parent!=null&parent.isFolder()){
+            if(selectedContacts.length>1){
+                log("Share READ one file multiple contacts");
+                for (int i=0;i<selectedContacts.length;i++){
+                    MegaUser user= megaApi.getContact(selectedContacts[i]);
+                    if(user!=null){
+                        megaApi.share(parent, user, level,shareMultipleListener);
+                    }
+                    else {
+                        log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                        megaApi.share(parent, selectedContacts[i], level, shareMultipleListener);
+                    }
+                }
+            }
+            else{
+                log("Share READ one file one contact");
+                MegaUser user= megaApi.getContact(selectedContacts[0]);
+                if(user!=null){
+                    megaApi.share(parent, user, level, (ManagerActivityLollipop) context);
+                }
+                else {
+                    log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                    megaApi.share(parent, selectedContacts[0], level, (ManagerActivityLollipop) context);
+                }
+            }
+        }
+    }
+
 
     public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){
         log("moveToTrash: "+moveToRubbish);

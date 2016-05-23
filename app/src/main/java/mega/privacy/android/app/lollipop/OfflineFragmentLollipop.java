@@ -220,7 +220,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.moveNodes(handleList);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -237,7 +237,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.copyNodes(handleList);
+					nC.chooseLocationToCopyNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -1208,7 +1208,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			return;
 		}
 		NodeController nC = new NodeController(context);
-		nC.shareFolder(n);
+		nC.selectContactToShareFolder(n);
 	}
 	
 	public void rename (String path){
@@ -1231,7 +1231,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());
 		NodeController nC = new NodeController(context);
-		nC.moveNodes(handleList);
+		nC.chooseLocationToMoveNodes(handleList);
 	}
 	
 	public void copy (String path){
@@ -1244,7 +1244,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());
 		NodeController nC = new NodeController(context);
-		nC.copyNodes(handleList);
+		nC.chooseLocationToCopyNodes(handleList);
 	}
 	
 	public boolean isFolder(String path){

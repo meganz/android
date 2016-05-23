@@ -135,7 +135,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.moveNodes(handleList);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -709,7 +709,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
 				NodeController nC = new NodeController(context);
-				nC.moveNodes(handleList);
+				nC.chooseLocationToMoveNodes(handleList);
 				break;
 			}
 			case R.id.rubbishbin_list_option_properties_layout: 
