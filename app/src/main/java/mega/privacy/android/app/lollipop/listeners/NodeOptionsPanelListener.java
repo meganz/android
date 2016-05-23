@@ -111,7 +111,6 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-
                 ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 
                 break;
@@ -171,7 +170,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_open_folder_layout: {
                 log("Open folder option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                ((ManagerActivityLollipop) context).openFolderFromSearch(selectedNode.getHandle());
+                nC.openFolderFromSearch(selectedNode.getHandle());
                 break;
             }
         }
