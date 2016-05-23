@@ -64,7 +64,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_send_inbox_layout: {
                 log("Send inbox option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                nC.sendToInbox(selectedNode);
+                nC.selectContactToSendNode(selectedNode);
                 break;
             }
             case R.id.file_list_option_move_layout:{
@@ -72,7 +72,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                nC.moveNodes(handleList);
+                nC.chooseLocationToMoveNodes(handleList);
                 break;
             }
 
@@ -133,7 +133,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_share_layout:{
                 log("Share option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                nC.shareFolder(selectedNode);
+                nC.selectContactToShareFolder(selectedNode);
                 break;
             }
 
@@ -142,7 +142,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
-                nC.copyNodes(handleList);
+                nC.chooseLocationToCopyNodes(handleList);
                 break;
             }
             case R.id.file_list_option_clear_share_layout:{

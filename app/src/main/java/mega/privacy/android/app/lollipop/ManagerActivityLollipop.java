@@ -6927,7 +6927,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void setSendToInbox(boolean value){
-		sendToInbox = true;
+		log("setSendToInbox: "+value);
+		sendToInbox = value;
 	}
 
 	public void setIsGetLink(boolean value){
@@ -9137,138 +9138,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
-
 			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
 			final long fileHandle = intent.getLongExtra("SELECT", 0);
 
-			MultipleRequestListener sendMultipleListener = null;
-			MegaNode node = megaApi.getNodeByHandle(fileHandle);
-			if(node!=null)
-			{
-				sendToInbox=true;
-				log("File to send: "+node.getName());
-				if(selectedContacts.length>1){
-					log("File to multiple contacts");
-					sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SEND_INBOX, this);
-					for (int i=0;i<selectedContacts.length;i++){
-	            		MegaUser user= megaApi.getContact(selectedContacts[i]);
-
-	            		if(user!=null){
-							log("Send File to contact: "+user.getEmail());
-							megaApi.sendFileToUser(node, user, sendMultipleListener);
-                		}
-                		else{
-                			log("Send File to a NON contact! ");
-                			megaApi.sendFileToUser(node, selectedContacts[i], sendMultipleListener);
-                		}
-	            	}
-				}
-				else{
-					log("File to a single contact");
-					MegaUser user= megaApi.getContact(selectedContacts[0]);
-					if(user!=null){
-						log("Send File to contact: "+user.getEmail());
-						megaApi.sendFileToUser(node, user, this);
-            		}
-            		else{
-            			log("Send File to a NON contact! ");
-            			megaApi.sendFileToUser(node, selectedContacts[0], this);
-            		}
-				}
-			}
+			nC.sendToInbox(fileHandle, selectedContacts);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+			log("REQUEST_CODE_SELECT_FOLDER");
 
 			if (intent == null) {
 				log("Return.....");
 				return;
 			}
 
-			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
-
 			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
-			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
+			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+			final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
 
-			if (parent.isFolder()){
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SHARE, managerActivity);
-						permissionsDialog.dismiss();
-						switch(item) {
-						    case 0:{
-						    	if(selectedContacts.length>1){
-						    		log("Share READ one file multiple contacts");
-						    		for (int i=0;i<selectedContacts.length;i++){
-			                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
-			                    		megaApi.share(parent, user, MegaShare.ACCESS_READ,shareMultipleListener);
-			                    	}
-						    	}
-						    	else{
-						    		log("Share READ one file one contact");
-						    		MegaUser user= megaApi.getContact(selectedContacts[0]);
-		                    		megaApi.share(parent, user, MegaShare.ACCESS_READ,managerActivity);
-						    	}
-
-		                    	break;
-		                    }
-		                    case 1:{
-		                    	if(selectedContacts.length>1){
-						    		log("Share READWRITE one file multiple contacts");
-						    		for (int i=0;i<selectedContacts.length;i++){
-			                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
-			                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,shareMultipleListener);
-			                    	}
-		                    	}
-		                    	else{
-		                    		log("Share READWRITE one file one contact");
-		                    		MegaUser user= megaApi.getContact(selectedContacts[0]);
-		                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,managerActivity);
-		                    	}
-		                        break;
-		                    }
-		                    case 2:{
-		                    	if(selectedContacts.length>1){
-						    		log("Share ACCESS_FULL one file multiple contacts");
-						    		for (int i=0;i<selectedContacts.length;i++){
-			                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
-			                    		megaApi.share(parent, user, MegaShare.ACCESS_FULL,shareMultipleListener);
-			                    	}
-		                    	}
-		                    	else{
-		                    		log("Share ACCESS_FULL one file one contact");
-		                    		MegaUser user= megaApi.getContact(selectedContacts[0]);
-		                    		megaApi.share(parent, user, MegaShare.ACCESS_FULL,managerActivity);
-		                    	}
-		                        break;
-		                    }
-		                }
+					permissionsDialog.dismiss();
+					switch(item) {
+						case 0:{
+							nC.shareFolder(folderHandle, selectedContacts, MegaShare.ACCESS_READ);
+							break;
+						}
+						case 1:{
+							nC.shareFolder(folderHandle, selectedContacts, MegaShare.ACCESS_READWRITE);
+							break;
+						}
+						case 2:{
+							nC.shareFolder(folderHandle, selectedContacts, MegaShare.ACCESS_FULL);
+							break;
+						}
 					}
-				});
-				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-				permissionsDialog = dialogBuilder.create();
-				permissionsDialog.show();
-//				Resources resources = permissionsDialog.getContext().getResources();
-//				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-//				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-//		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-//				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-//				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//				if(titleDivider!=null){
-//					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-//				}
-			}
+				}
+			});
+			dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+			permissionsDialog = dialogBuilder.create();
+			permissionsDialog.show();
+
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
 			log("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
@@ -9284,15 +9196,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			if(contactsData!=null){
-				for(int i=0; i<contactsData.size();i++){
-					log("setResultContacts: "+contactsData.get(i));
-				}
-			}
-			else{
-				log("contactsData is NULL");
-			}
-
 			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
@@ -9366,15 +9269,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 						permissionsDialog = dialogBuilder.create();
 						permissionsDialog.show();
-//						Resources resources = permissionsDialog.getContext().getResources();
-//						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-//						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-//				        alertTitle.setTextColor(resources.getColor(R.color.mega));
-//						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-//						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//						if(titleDivider!=null){
-//							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-//						}
 					}
 					else if(multiselectIntent==1){
 						//Several folders to share
@@ -9507,15 +9401,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 						permissionsDialog = dialogBuilder.create();
 						permissionsDialog.show();
-//						Resources resources = permissionsDialog.getContext().getResources();
-//						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-//						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-//				        alertTitle.setTextColor(resources.getColor(R.color.mega));
-//						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-//						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//						if(titleDivider!=null){
-//							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-//						}
 					}
 				}
 				else if (sentToInbox==1){
@@ -9643,61 +9528,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
+			moveToRubbish = false;
 
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-//			final int totalMoves = moveHandles.length;
 
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			moveToRubbish = false;
+			nC.moveNodes(moveHandles, toHandle);
 
-			MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_MOVE, this);
-
-			if(moveHandles.length>1){
-				log("MOVE multiple: "+moveHandles.length);
-				moveToRubbish = false;
-				for(int i=0; i<moveHandles.length;i++){
-					megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, moveMultipleListener);
-				}
-			}
-			else{
-				log("MOVE single");
-				moveToRubbish = false;
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, this);
-			}
 		}
 		else if (requestCode ==  Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-
+			log("onActivityResult: REQUEST_CODE_SELECT_COPY_FOLDER");
 			if (intent == null) {
 				log("Return.....");
 				return;
 			}
-
-			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
-
 			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			MultipleRequestListener copyMultipleListener = null;
-			if(copyHandles.length>1){
-				log("Copy multiple files");
-				copyMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_COPY, this);
-				for(int i=0; i<copyHandles.length;i++){
-					megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, copyMultipleListener);
-				}
-			}
-			else{
-				log("Copy one file");
-				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[0]), parent, this);
-			}
+			nC.copyNodes(copyHandles, toHandle);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
@@ -11200,7 +11048,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("TYPE_COPY");
 			if(sendToInbox){
 				log("sendToInbox: "+e.getErrorCode()+" "+e.getErrorString());
-				sendToInbox=false;
+				setSendToInbox(false);
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Fin 1");
 					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent_node), Snackbar.LENGTH_LONG).show();

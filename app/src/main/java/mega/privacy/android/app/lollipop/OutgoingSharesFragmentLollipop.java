@@ -163,7 +163,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.copyNodes(handleList);
+					nC.chooseLocationToCopyNodes(handleList);
 					break;
 				}	
 				case R.id.cab_menu_share:{
@@ -188,7 +188,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.moveNodes(handleList);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{
