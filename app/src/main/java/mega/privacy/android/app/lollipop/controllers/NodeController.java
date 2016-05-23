@@ -44,6 +44,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 public class NodeController {
 
@@ -924,6 +925,76 @@ public class NodeController {
             }
         }
         return -1;
+    }
+
+    public void leaveIncomingShare (final MegaNode n){
+        log("leaveIncomingShare");
+
+        megaApi.remove(n);
+    }
+
+    public void leaveMultipleIncomingShares (final ArrayList<Long> handleList){
+        log("leaveMultipleIncomingShares");
+
+        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_LEAVE_SHARE, context);
+        if(handleList.size()>1){
+            log("handleList.size()>1");
+            for (int i=0; i<handleList.size(); i++){
+                MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+                megaApi.remove(node, moveMultipleListener);
+            }
+        }
+        else{
+            log("handleList.size()<=1");
+            MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
+            megaApi.remove(node, (ManagerActivityLollipop)context);
+        }
+    }
+
+    public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
+        log("removeAllSharingContacts");
+
+        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_REMOVE_SHARING_CONTACTS, context);
+        if(listContacts.size()>1){
+            log("listContacts.size()>1");
+            for(int j=0; j<listContacts.size();j++){
+                String cMail = listContacts.get(j).getUser();
+                if(cMail!=null){
+                    MegaUser c = megaApi.getContact(cMail);
+                    if (c != null){
+                        megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, shareMultipleListener);
+                    }
+                    else{
+                        ((ManagerActivityLollipop)context).setIsGetLink(false);
+                        megaApi.disableExport(node);
+                    }
+                }
+                else{
+                    ((ManagerActivityLollipop)context).setIsGetLink(false);
+                    megaApi.disableExport(node);
+                }
+            }
+        }
+        else{
+            log("listContacts.size()<=1");
+            for(int j=0; j<listContacts.size();j++){
+                String cMail = listContacts.get(j).getUser();
+                if(cMail!=null){
+                    MegaUser c = megaApi.getContact(cMail);
+                    if (c != null){
+                        megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, ((ManagerActivityLollipop)context));
+                    }
+                    else{
+                        ((ManagerActivityLollipop)context).setIsGetLink(false);
+                        megaApi.disableExport(node);
+                    }
+                }
+                else{
+                    ((ManagerActivityLollipop)context).setIsGetLink(false);
+                    megaApi.disableExport(node);
+                }
+            }
+        }
     }
 
     public static void log(String message) {

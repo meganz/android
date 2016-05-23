@@ -149,7 +149,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 log("Clear shares");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<MegaShare> shareList = megaApi.getOutShares(selectedNode);
-                ((ManagerActivityLollipop) context).removeAllSharingContacts(shareList, selectedNode);
+                nC.removeAllSharingContacts(shareList, selectedNode);
                 break;
             }
 
@@ -164,7 +164,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_leave_share_layout:{
                 log("Leave share option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                ((ManagerActivityLollipop) context).leaveIncomingShare(selectedNode);
+                ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(selectedNode);
                 break;
             }
             case R.id.file_list_option_open_folder_layout: {
