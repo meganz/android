@@ -8101,28 +8101,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void leaveMultipleShares (final ArrayList<Long> handleList){
-		log("leaveMultipleShares");
+	public void showConfirmationLeaveMultipleShares (final ArrayList<Long> handleList){
+		log("showConfirmationleaveMultipleShares");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the incoming shares
-		        	MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_LEAVE_SHARE, managerActivity);
-		    		if(handleList.size()>1){
-		    			log("handleList.size()>1");
-		    			for (int i=0; i<handleList.size(); i++){
-		    				MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-		    				megaApi.remove(node, moveMultipleListener);
-		    			}
-		    		}
-		    		else{
-		    			log("handleList.size()<=1");
-		    			MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
-		    			megaApi.remove(node, managerActivity);
-		    		}
+		        	nC.leaveMultipleIncomingShares(handleList);
 		            break;
 
 		        case DialogInterface.BUTTON_NEGATIVE:
@@ -8139,8 +8126,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void leaveIncomingShare (final MegaNode n){
-		log("leaveIncomingShare");
+	public void showConfirmationLeaveIncomingShare (final MegaNode n){
+		log("showConfirmationLeaveIncomingShare");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 		    @Override
@@ -8148,7 +8135,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
 		        	//TODO remove the incoming shares
-		        	megaApi.remove(n);
+		        	nC.leaveIncomingShare(n);
 		            break;
 
 		        case DialogInterface.BUTTON_NEGATIVE:
@@ -8163,52 +8150,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
-	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
-		log("removeAllSharingContacts");
-
-		MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_REMOVE_SHARING_CONTACTS, this);
-		if(listContacts.size()>1){
-			log("listContacts.size()>1");
-			for(int j=0; j<listContacts.size();j++){
-				String cMail = listContacts.get(j).getUser();
-				if(cMail!=null){
-					MegaUser c = megaApi.getContact(cMail);
-					if (c != null){
-						megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, shareMultipleListener);
-					}
-					else{
-						isGetLink = false;
-						megaApi.disableExport(node);
-					}
-				}
-				else{
-					isGetLink = false;
-					megaApi.disableExport(node);
-				}
-			}
-		}
-		else{
-			log("listContacts.size()<=1");
-			for(int j=0; j<listContacts.size();j++){
-				String cMail = listContacts.get(j).getUser();
-				if(cMail!=null){
-					MegaUser c = megaApi.getContact(cMail);
-					if (c != null){
-						megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, this);
-					}
-					else{
-						isGetLink = false;
-						megaApi.disableExport(node);
-					}
-				}
-				else{
-					isGetLink = false;
-					megaApi.disableExport(node);
-				}
-			}
-		}
 	}
 
 	public void cameraUploadsClicked(){
@@ -8370,6 +8311,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionOpenFolder.setVisibility(View.GONE);
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
+		optionPermissions.setVisibility(View.GONE);
 
 		if(selectedNode.isFile()){
 			optionLeaveShare.setVisibility(View.GONE);

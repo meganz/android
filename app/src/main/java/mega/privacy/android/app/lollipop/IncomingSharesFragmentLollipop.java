@@ -189,7 +189,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).leaveMultipleShares(handleList);					
+					((ManagerActivityLollipop) context).showConfirmationLeaveMultipleShares(handleList);
 				}
 			}
 			return false;
