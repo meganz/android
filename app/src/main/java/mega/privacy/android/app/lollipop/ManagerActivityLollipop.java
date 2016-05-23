@@ -892,6 +892,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
+		if (drawerItem != null){
+			log("DrawerItem = " + drawerItem);
+		}
+		else{
+			log("DrawerItem is null");
+		}
 		super.onSaveInstanceState(outState);
 		int deepBrowserTreeIncoming = 0;
 		int deepBrowserTreeOutgoing = 0;
@@ -965,6 +971,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+			log("DrawerItem onCreate = " + drawerItem);
 			log("savedInstanceState -> drawerItem: "+drawerItem);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
@@ -1603,9 +1610,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	protected void onResume() {
-		log("onResume ");
-    	super.onResume();
+	protected void onResume(){
+		log("onResume");
+		super.onResume();
+	}
+
+	@Override
+	protected void onPostResume() {
+		log("onPostResume ");
+    	super.onPostResume();
+
+		if (isSearching){
+			selectDrawerItemLollipop(DrawerItem.SEARCH);
+			isSearching = false;
+			return;
+		}
+
     	managerActivity = this;
 
     	Intent intent = getIntent();
@@ -1897,14 +1917,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	}
 	}
 
+//	@Override
+//	protected void onPostResume() {
+//		log("onPostResume");
+//	    super.onPostResume();
+//	    if (isSearching){
+//			selectDrawerItemLollipop(DrawerItem.SEARCH);
+//    		isSearching = false;
+//	    }
+//	}
+
 	@Override
-	protected void onPostResume() {
-		log("onPostResume");
-	    super.onPostResume();
-	    if (isSearching){
-			selectDrawerItemLollipop(DrawerItem.SEARCH);
-    		isSearching = false;
-	    }
+	protected void onStop(){
+		log("onStop");
+		super.onStop();
 	}
 
 	@Override
@@ -9722,7 +9748,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        else {
 	            log("onActivityResult handled by IABUtil.");
-	            drawerItem = DrawerItem.CLOUD_DRIVE;
+	            drawerItem = DrawerItem.ACCOUNT;
 //	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }

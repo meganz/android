@@ -97,7 +97,7 @@
     <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The master key file has been removed</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support@mega.nz for assistance</string>
-    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close all sessions</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close other sessions</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been closed</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
     

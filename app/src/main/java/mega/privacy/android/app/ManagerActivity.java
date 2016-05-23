@@ -7385,7 +7385,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        else {
 	            log("onActivityResult handled by IABUtil.");
-	            drawerItem = DrawerItem.CLOUD_DRIVE;
+	            drawerItem = DrawerItem.ACCOUNT;
 //	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }
