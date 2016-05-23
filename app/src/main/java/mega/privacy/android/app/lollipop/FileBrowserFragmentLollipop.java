@@ -1371,7 +1371,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
-		log("setNodes");
+		log("setNodes: "+nodes.size());
 		this.nodes = nodes;
 		if (isList){
 			if (adapter != null){
@@ -1381,7 +1381,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRootNode().getHandle()==parentHandle) {
+					if (megaApi.getRootNode().getHandle()==parentHandle||parentHandle==-1) {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
 					} else {

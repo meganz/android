@@ -557,9 +557,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			return;
 		}
 		File[] files = path.listFiles();
-		log("Number of files: "+files.length);
+
 		if(files != null)
 		{
+			log("Number of files: "+files.length);
 			for (File file : files) {
 				FileDocument document = new FileDocument(file);
 				if (document.isHidden()) {
