@@ -27,7 +27,7 @@ import android.util.Log;
 public class MegaApplication extends Application implements MegaListenerInterface
 {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.0.7";
+	static final String USER_AGENT = "MEGAAndroid/3.0.9";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";

@@ -1679,7 +1679,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (outMetrics == null){
 				outMetrics = new DisplayMetrics ();
 			}
-			
+
+			if (listView == null){
+				return;
+			}
+
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);			
