@@ -8295,12 +8295,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionProperties.setVisibility(View.VISIBLE);
 		optionPermissions.setVisibility(View.GONE);
 
-		if(selectedNode.isFile()){
-			optionLeaveShare.setVisibility(View.GONE);
+		if(inSFLol!=null){
+			int dBT=inSFLol.getDeepBrowserTree();
+			if(dBT>0){
+				optionLeaveShare.setVisibility(View.GONE);
+			}
+			else{
+				optionLeaveShare.setVisibility(View.VISIBLE);
+			}
 		}
-		else {
-			optionLeaveShare.setVisibility(View.VISIBLE);
-		}
+
 		switch (accessLevel) {
 			case MegaShare.ACCESS_FULL: {
 				log("access FULL");
@@ -8358,9 +8362,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(deep==0){
 			optionPermissions.setVisibility(View.VISIBLE);
+			optionClearShares.setVisibility(View.VISIBLE);
 		}
 		else{
 			optionPermissions.setVisibility(View.GONE);
+			optionClearShares.setVisibility(View.GONE);
 		}
 
 		optionDownload.setVisibility(View.VISIBLE);
@@ -8368,7 +8374,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionRename.setVisibility(View.VISIBLE);
 		optionMoveTo.setVisibility(View.VISIBLE);
 		optionCopyTo.setVisibility(View.VISIBLE);
-		optionClearShares.setVisibility(View.VISIBLE);
 
 		//Hide
 		optionDelete.setVisibility(View.GONE);
