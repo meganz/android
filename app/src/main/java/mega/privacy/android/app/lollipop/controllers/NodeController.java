@@ -43,6 +43,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 public class NodeController {
 
@@ -761,6 +762,168 @@ public class NodeController {
             log("handleList NULL");
             return;
         }
+    }
+
+    public void openFolderFromSearch(long folderHandle){
+        log("openFolderFromSearch: "+folderHandle);
+        boolean firstNavigationLevel=true;
+        int access = -1;
+        ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+        if (folderHandle != -1) {
+            MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
+            if (parentIntentN != null) {
+                log("Check the parent node: "+parentIntentN.getName()+" handle: "+parentIntentN.getHandle());
+                access = megaApi.getAccess(parentIntentN);
+                switch (access) {
+                    case MegaShare.ACCESS_OWNER:
+                    case MegaShare.ACCESS_UNKNOWN: {
+                        //Not incoming folder, check if Cloud or Rubbish tab
+                        if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
+                            drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                            log("Navigate to TAB CLOUD first level"+ parentIntentN.getName());
+                            firstNavigationLevel=true;
+                            ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
+                            ((ManagerActivityLollipop) context).setIndexCloud(0);
+                        }
+                        else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
+                            drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                            log("Navigate to TAB RUBBISH first level"+ parentIntentN.getName());
+                            firstNavigationLevel=true;
+                            ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
+                            ((ManagerActivityLollipop) context).setIndexCloud(1);
+                        }
+                        else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
+                            log("Navigate to INBOX first level"+ parentIntentN.getName());
+                            firstNavigationLevel=true;
+                            ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
+                            drawerItem = ManagerActivityLollipop.DrawerItem.INBOX;
+                        }
+                        else{
+                            int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
+                            log("The parent result is: "+parent);
+
+                            switch (parent){
+                                case 0:{
+                                    //ROOT NODE
+                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    log("Navigate to TAB CLOUD with parentHandle");
+                                    ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
+                                    ((ManagerActivityLollipop) context).setIndexCloud(0);
+                                    firstNavigationLevel=false;
+                                    break;
+                                }
+                                case 1:{
+                                    log("Navigate to TAB RUBBISH");
+                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
+                                    ((ManagerActivityLollipop) context).setIndexCloud(1);
+                                    firstNavigationLevel=false;
+                                    break;
+                                }
+                                case 2:{
+                                    log("Navigate to INBOX WITH parentHandle");
+                                    drawerItem = ManagerActivityLollipop.DrawerItem.INBOX;
+                                    ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
+                                    firstNavigationLevel=false;
+                                    break;
+                                }
+                                case -1:{
+                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    log("Navigate to TAB CLOUD general");
+                                    ((ManagerActivityLollipop) context).setParentHandleBrowser(-1);
+                                    ((ManagerActivityLollipop) context).setIndexCloud(0);
+                                    firstNavigationLevel=true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+
+                    case MegaShare.ACCESS_READ:
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_FULL: {
+                        log("GO to INCOMING TAB: " + parentIntentN.getName());
+                        drawerItem = ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+                        if(parentIntentN.getHandle()==-1){
+                            log("Level 0 of Incoming");
+                            ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
+                            ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(0);
+                            firstNavigationLevel=true;
+                        }
+                        else{
+                            firstNavigationLevel=false;
+                            ((ManagerActivityLollipop) context).setParentHandleIncoming(parentIntentN.getHandle());
+                            int deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, context);
+                            ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming);
+                            log("After calculating deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+                        }
+                        ((ManagerActivityLollipop) context).setIndexShares(0);
+                        break;
+                    }
+                    default: {
+                        log("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
+                        ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
+                        drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                        ((ManagerActivityLollipop) context).setIndexCloud(0);
+                        firstNavigationLevel=true;
+                        break;
+                    }
+                }
+            }
+            else{
+                log("Parent is already NULL");
+
+                drawerItem = ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+                ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
+                ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(0);
+                firstNavigationLevel=true;
+                ((ManagerActivityLollipop) context).setIndexShares(0);
+            }
+            ((ManagerActivityLollipop) context).setFirstNavigationLevel(firstNavigationLevel);
+            ((ManagerActivityLollipop) context).setDrawerItem(drawerItem);
+            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(drawerItem);
+        }
+    }
+
+    public int checkParentNodeToOpenFolder(long folderHandle){
+        log("checkParentNodeToOpenFolder");
+        MegaNode folderNode = megaApi.getNodeByHandle(folderHandle);
+        MegaNode parentNode = megaApi.getParentNode(folderNode);
+        if(parentNode!=null){
+            log("parentName: "+parentNode.getName());
+            if(parentNode.getHandle()==megaApi.getRootNode().getHandle()){
+                log("The parent is the ROOT");
+                return 0;
+            }
+            else if(parentNode.getHandle()==megaApi.getRubbishNode().getHandle()){
+                log("The parent is the RUBBISH");
+                return 1;
+            }
+            else if(parentNode.getHandle()==megaApi.getInboxNode().getHandle()){
+                log("The parent is the INBOX");
+                return 2;
+            }
+            else if(parentNode.getHandle()==-1){
+                log("The parent is -1");
+                return -1;
+            }
+            else{
+                int result = checkParentNodeToOpenFolder(parentNode.getHandle());
+                log("Call returns "+result);
+                switch(result){
+                    case -1:
+                        return -1;
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 1;
+                    case 2:
+                        return 2;
+                }
+            }
+        }
+        return -1;
     }
 
     public static void log(String message) {

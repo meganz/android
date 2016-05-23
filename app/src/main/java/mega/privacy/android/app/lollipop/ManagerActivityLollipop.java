@@ -85,7 +85,6 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.ContactsExplorerActivity;
@@ -112,6 +111,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -255,7 +255,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	boolean tranfersPaused = false;
     Toolbar tB;
     ActionBar aB;
-    boolean firstNavigationLevel = true;
+
+	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
     public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS;
@@ -1378,7 +1379,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 										log("The intent set the parentHandleIncoming to " + handleIntent);
 										parentHandleIncoming = handleIntent;
 										drawerItem = DrawerItem.SHARED_ITEMS;
-										deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN);
+										deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, this);
 										log("After calculate deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
 										break;
 									}
@@ -1595,17 +1596,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        selectDrawerItemLollipop(drawerItem);
 		}
 		log("END onCreate");
-	}
-
-	public int calculateDeepBrowserTreeIncoming(MegaNode node){
-		log("calculateDeepBrowserTreeIncoming");
-		String path = megaApi.getNodePath(node);
-		log("The path is: "+path);
-
-		Pattern pattern = Pattern.compile("/");
-		int count = Util.countMatches(pattern, path);
-
-		return count+1;
 	}
 
 	@Override
@@ -3501,161 +3491,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-	}
-
-	public void openFolderFromSearch(long folderHandle){
-		log("openFolderFromSearch: "+folderHandle);
-
-		int access = -1;
-		if (folderHandle != -1) {
-			MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
-			if (parentIntentN != null) {
-				log("Check the parent node: "+parentIntentN.getName()+" handle: "+parentIntentN.getHandle());
-				access = megaApi.getAccess(parentIntentN);
-				switch (access) {
-					case MegaShare.ACCESS_OWNER:
-					case MegaShare.ACCESS_UNKNOWN: {
-						//Not incoming folder, check if Cloud or Rubbish tab
-						if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
-							drawerItem = DrawerItem.CLOUD_DRIVE;
-							log("Navigate to TAB CLOUD first level"+ parentIntentN.getName());
-							firstNavigationLevel=true;
-							parentHandleBrowser = parentIntentN.getHandle();
-							viewPagerCDrive.setCurrentItem(0);
-						}
-						else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
-							drawerItem = DrawerItem.CLOUD_DRIVE;
-							log("Navigate to TAB RUBBISH first level"+ parentIntentN.getName());
-							firstNavigationLevel=true;
-							parentHandleRubbish = parentIntentN.getHandle();
-							viewPagerCDrive.setCurrentItem(1);
-						}
-						else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
-							log("Navigate to INBOX first level"+ parentIntentN.getName());
-							firstNavigationLevel=true;
-							parentHandleInbox = parentIntentN.getHandle();
-							drawerItem = DrawerItem.INBOX;
-						}
-						else{
-							int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
-							log("The parent result is: "+parent);
-
-							switch (parent){
-								case 0:{
-									//ROOT NODE
-									drawerItem = DrawerItem.CLOUD_DRIVE;
-									log("Navigate to TAB CLOUD with parentHandle");
-									parentHandleBrowser = parentIntentN.getHandle();
-									viewPagerCDrive.setCurrentItem(0);
-									firstNavigationLevel=false;
-									break;
-								}
-								case 1:{
-									log("Navigate to TAB RUBBISH");
-									drawerItem = DrawerItem.CLOUD_DRIVE;
-									parentHandleRubbish = parentIntentN.getHandle();
-									viewPagerCDrive.setCurrentItem(1);
-									firstNavigationLevel=false;
-									break;
-								}
-								case 2:{
-									log("Navigate to INBOX WITH parentHandle");
-									drawerItem = DrawerItem.INBOX;
-									parentHandleInbox = parentIntentN.getHandle();
-									firstNavigationLevel=false;
-									break;
-								}
-								case -1:{
-									drawerItem = DrawerItem.CLOUD_DRIVE;
-									log("Navigate to TAB CLOUD general");
-									parentHandleBrowser = -1;
-									viewPagerCDrive.setCurrentItem(0);
-									firstNavigationLevel=true;
-									break;
-								}
-							}
-						}
-						break;
-					}
-
-					case MegaShare.ACCESS_READ:
-					case MegaShare.ACCESS_READWRITE:
-					case MegaShare.ACCESS_FULL: {
-						log("GO to INCOMING TAB: " + parentIntentN.getName());
-						drawerItem = DrawerItem.SHARED_ITEMS;
-						if(parentIntentN.getHandle()==-1){
-							log("Level 0 of Incoming");
-							parentHandleIncoming = -1;
-							deepBrowserTreeIncoming = 0;
-						}
-						else{
-							parentHandleIncoming = parentIntentN.getHandle();
-							deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN);
-							log("After calculating deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
-						}
-						viewPagerShares.setCurrentItem(0);
-						break;
-					}
-					default: {
-						log("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
-						parentHandleBrowser = parentIntentN.getHandle();
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						viewPagerCDrive.setCurrentItem(0);
-						break;
-					}
-				}
-			}
-			else{
-				log("Parent is already NULL");
-
-				drawerItem = DrawerItem.SHARED_ITEMS;
-				parentHandleIncoming = -1;
-				deepBrowserTreeIncoming = 0;
-				viewPagerShares.setCurrentItem(0);
-			}
-			selectDrawerItemLollipop(drawerItem);
-		}
-
-	}
-
-	public int checkParentNodeToOpenFolder(long folderHandle){
-		log("checkParentNodeToOpenFolder");
-		MegaNode folderNode = megaApi.getNodeByHandle(folderHandle);
-		MegaNode parentNode = megaApi.getParentNode(folderNode);
-		if(parentNode!=null){
-			log("parentName: "+parentNode.getName());
-			if(parentNode.getHandle()==megaApi.getRootNode().getHandle()){
-				log("The parent is the ROOT");
-				return 0;
-			}
-			else if(parentNode.getHandle()==megaApi.getRubbishNode().getHandle()){
-				log("The parent is the RUBBISH");
-				return 1;
-			}
-			else if(parentNode.getHandle()==megaApi.getInboxNode().getHandle()){
-				log("The parent is the INBOX");
-				return 2;
-			}
-			else if(parentNode.getHandle()==-1){
-				log("The parent is -1");
-				return -1;
-			}
-			else{
-				int result = checkParentNodeToOpenFolder(parentNode.getHandle());
-				log("Call returns "+result);
-				switch(result){
-					case -1:
-						return -1;
-					case 0:
-						return 0;
-					case 1:
-						return 1;
-					case 2:
-						return 2;
-				}
-			}
-		}
-		return -1;
 	}
 
 	static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
@@ -9048,12 +8883,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public boolean IsFirstNavigationLevel(){
-		return firstNavigationLevel;
+	public void setFirstNavigationLevel(boolean firstNavigationLevel){
+		log("setFirstNavigationLevel: "+firstNavigationLevel);
+		this.firstNavigationLevel = firstNavigationLevel;
 	}
 
-	public void setFirstNavigationLevel(boolean firstNavigationLevel){
-		this.firstNavigationLevel = firstNavigationLevel;
+	public boolean isFirstNavigationLevel() {
+		return firstNavigationLevel;
 	}
 
 	public int getUsedPerc(){
@@ -12327,6 +12163,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void setDeepBrowserTreeIncoming(int deepBrowserTreeIncoming) {
+		log("setDeepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
 		this.deepBrowserTreeIncoming = deepBrowserTreeIncoming;
 	}
 
@@ -12365,6 +12202,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return viewPagerContacts.getCurrentItem();
 		}
 		return -1;
+	}
+
+	public void setIndexCloud(int index){
+		viewPagerCDrive.setCurrentItem(index);
+	}
+
+	public void setIndexShares(int index){
+		viewPagerShares.setCurrentItem(index);
+	}
+
+	public void setIndexContacts(int index){
+		viewPagerContacts.setCurrentItem(index);
 	}
 
 	public void showUploadPanel(){
