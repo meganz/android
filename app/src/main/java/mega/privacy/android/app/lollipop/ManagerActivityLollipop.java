@@ -135,8 +135,6 @@ import nz.mega.sdk.MegaUser;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener{
 
-	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
-
 	private static int EDIT_TEXT_ID = 1;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
@@ -1408,7 +1406,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				megaApi.getUserAttribute(1, this);
 				megaApi.getUserAttribute(2, this);
 
-				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+				Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 				Canvas c = new Canvas(defaultAvatar);
 				Paint p = new Paint();
 				p.setAntiAlias(true);
