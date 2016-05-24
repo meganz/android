@@ -177,7 +177,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.shareFolders(handleList);
+					nC.selectContactToShareFolders(handleList);
 					break;
 				}
 				case R.id.cab_menu_send_file:{

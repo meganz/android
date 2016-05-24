@@ -177,7 +177,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.shareFolders(handleList);
+					nC.selectContactToShareFolders(handleList);
 					break;
 				}
 				case R.id.cab_menu_move:{
