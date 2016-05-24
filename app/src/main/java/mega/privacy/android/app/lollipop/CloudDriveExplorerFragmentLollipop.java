@@ -263,7 +263,26 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		adapter.setPositionClicked(-1);		
 		
-		listView.setAdapter(adapter);		
+		listView.setAdapter(adapter);
+
+		//If folder has no files
+		if (adapter.getItemCount() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			if (megaApi.getRootNode().getHandle()==parentHandle) {
+				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
 		
 		return v;
 	}
