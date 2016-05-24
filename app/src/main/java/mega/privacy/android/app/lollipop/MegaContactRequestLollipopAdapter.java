@@ -441,7 +441,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 						notifyDataSetChanged();
 					}
 				}
-				((ManagerActivityLollipop) context).showOptionsPanel(c);
+				((ManagerActivityLollipop) context).showContactOptionsPanel(null, c);
 				break;
 			}
 		}
