@@ -346,6 +346,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
@@ -440,6 +442,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -875,7 +879,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (adapter != null){
 			return adapter.isMultipleSelect();
 		}
-		
+
 		return false;
 	}
 
