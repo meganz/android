@@ -36,6 +36,10 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
+import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
+import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
+import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -571,8 +575,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
 		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_calculating));
 		
-		((ManagerActivityLollipop)getActivity()).taskGetSizeCache();
-		((ManagerActivityLollipop)getActivity()).taskGetSizeOffline();
+		taskGetSizeCache();
+		taskGetSizeOffline();
 
 		if (cameraUpload){
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
@@ -958,15 +962,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			downloadLocationDialog.show();
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
-			log("Clear Cache!");		
-			((ManagerActivityLollipop)getActivity()).taskClearCache();
-//			advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
+			log("Clear Cache!");
+
+			ClearCacheTask clearCacheTask = new ClearCacheTask(context);
+			clearCacheTask.execute();
 		}
 		else if (preference.getKey().compareTo(KEY_OFFLINE) == 0){
 			log("Clear Offline!");
-			((ManagerActivityLollipop)getActivity()).taskClearOffline();
-//			Util.clearOffline(getActivity());
-//			advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
+
+			ClearOfflineTask clearOfflineTask = new ClearOfflineTask(context);
+			clearOfflineTask.execute();
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
 			log("Changing the secondaty uploads");
@@ -1542,8 +1547,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 		}	    
 
-		((ManagerActivityLollipop)getActivity()).taskGetSizeCache();
-		((ManagerActivityLollipop)getActivity()).taskGetSizeOffline();
+		taskGetSizeCache();
+		taskGetSizeOffline();
 	}
 	
 	public void afterSetPinLock(){
@@ -1569,6 +1574,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		pinLockCode.setSummary(ast);
 		pinLockCategory.addPreference(pinLockCode);
 		dbH.setPinLockEnabled(true);
+	}
+
+	public void taskGetSizeCache (){
+		log("taskGetSizeCache");
+		GetCacheSizeTask getCacheSizeTask = new GetCacheSizeTask(context);
+		getCacheSizeTask.execute();
+	}
+
+	public void taskGetSizeOffline (){
+		log("taskGetSizeOffline");
+		GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(context);
+		getOfflineSizeTask.execute();
 	}
 	
 	private static void log(String log) {

@@ -351,7 +351,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	long numberOfSubscriptions = -1;
 	long usedGbStorage = -1;
 	private List<ShareInfo> filePreparedInfos;
-	ArrayList<String> contactsData;
 	boolean megaContacts = true;
 	String feedback;
 
@@ -7385,19 +7384,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setPositiveButton(getString(R.string.general_empty),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						cleanRubbishBin();
+						nC.cleanRubbishBin();
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		clearRubbishBinDialog = builder.create();
 		clearRubbishBinDialog.show();
-//		Util.brandAlertDialog(clearRubbishBinDialog);
 	}
 
-	private void cleanRubbishBin(){
-		log("cleanRubbishBin");
-		megaApi.cleanRubbishBin(managerActivity);
-	}
+
 
 //	public void upgradeAccountButton(){
 //		log("upgradeAccountButton");
@@ -7442,30 +7437,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //			Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
 //		}
 //	}
-
-	public void pickFolderToShare(List<MegaUser> users){
-
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
-		String[] longArray = new String[users.size()];
-		for (int i=0; i<users.size(); i++){
-			longArray[i] = users.get(i).getEmail();
-		}
-		intent.putExtra("SELECTED_CONTACTS", longArray);
-		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
-	}
-
-	public void pickFileToSend(List<MegaUser> users){
-
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
-		String[] longArray = new String[users.size()];
-		for (int i=0; i<users.size(); i++){
-			longArray[i] = users.get(i).getEmail();
-		}
-		intent.putExtra("SELECTED_CONTACTS", longArray);
-		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
-	}
 
 	public void removeMultipleContacts(final List<MegaUser> contacts){
 		log("removeMultipleContacts");
@@ -8934,7 +8905,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
 			final long fileHandle = intent.getLongExtra("SELECT", 0);
 
 			nC.sendToInbox(fileHandle, selectedContacts);
@@ -8947,7 +8918,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -8986,12 +8957,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
-
-			contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
 			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
@@ -9004,7 +8970,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(multiselectIntent==0){
 						//One file to share
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
-						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
 
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -9012,54 +8977,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int item) {
 
-								permissionsDialog.dismiss();
+							permissionsDialog.dismiss();
 
-								switch(item) {
-				                    case 0:{
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		if(u!=null){
-				                    			log("Node: "+node.getName());
-					                    		log("User: "+u.getEmail());
-					                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
-				                    		}
-				                    		else{
-				                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-				                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, managerActivity);
-				                    		}
-
-				                    	}
-				                    	break;
-				                    }
-				                    case 1:{
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-					                    	if(u!=null){
-					                    		log("User: "+u.getEmail());
-					                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-				                    		}
-				                    		else{
-				                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-				                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, managerActivity);
-				                    		}
-				                    	}
-				                        break;
-				                    }
-				                    case 2:{
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		if(u!=null){
-					                    		log("User: "+u.getEmail());
-					                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-				                    		}
-				                    		else{
-				                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-				                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, managerActivity);
-				                    		}
-				                    	}
-				                        break;
-				                    }
-				                }
+							switch(item) {
+								case 0:{
+									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
+									break;
+								}
+								case 1:{
+									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
+									break;
+								}
+								case 2:{
+									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
+									break;
+								}
+							}
 							}
 						});
 						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
@@ -9077,179 +9010,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(DialogInterface dialog, int item) {
 
 								permissionsDialog.dismiss();
-								MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILE_SHARE, managerActivity);
 								switch(item) {
 				                    case 0:{
 				                    	log("ACCESS_READ");
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-					                    	if(nodeHandles.length>1){
-					                    		log("one folder to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){
-
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						if(u!=null){
-							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
-							                    		megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
-						                    		}
-						                    		else{
-						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, shareMultipleListener);
-						                    		}
-					                    		}
-					                    	}
-					                    	else{
-					                    		log("many folders to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){
-
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						if(u!=null){
-							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
-							                    		megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
-						                    		}
-						                    		else{
-						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, shareMultipleListener);
-						                    		}
-					                    		}
-					                    	}
-				                    	}
+										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
 				                    	break;
 				                    }
 				                    case 1:{
 				                    	log("ACCESS_READWRITE");
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-
-				                    		if(nodeHandles.length>1){
-					                    		log("one folder to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){
-
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						if(u!=null){
-							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
-							                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
-						                    		}
-						                    		else{
-						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, shareMultipleListener);
-						                    		}
-					                    		}
-					                    	}
-					                    	else{
-					                    		log("many folders to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){
-					                    			final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-							                    	if(u!=null){
-							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
-							                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
-						                    		}
-						                    		else{
-						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, shareMultipleListener);
-						                    		}
-					                    		}
-					                    	}
-				                    	}
+										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
 				                        break;
 				                    }
 				                    case 2:{
 				                    	log("ACCESS_FULL");
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		if(nodeHandles.length>1){
-					                    		log("one folder to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){
+										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
 
-					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						if(u!=null){
-							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
-							                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
-						                    		}
-						                    		else{
-						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, shareMultipleListener);
-						                    		}
-					                    		}
-					                    	}
-					                    	else{
-					                    		log("many folders to many contacts");
-					                    		for(int j=0; j<nodeHandles.length;j++){
-
-					                    			final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-					        						if(u!=null){
-							                    		log("Share: "+ node.getName() + " to "+ u.getEmail());
-							                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
-						                    		}
-						                    		else{
-						                    			log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
-						                    			megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, shareMultipleListener);
-						                    		}
-					                    		}
-					                    	}
-	//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-				                    	}
 				                        break;
-				                    }
-				                }
+									}
+								}
 							}
 						});
 						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 						permissionsDialog = dialogBuilder.create();
 						permissionsDialog.show();
 					}
+
 				}
 				else if (sentToInbox==1){
 					if(multiselectIntent==0){
 						//Send one file to one contact
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
-						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
-						MegaUser u = megaApi.getContact(contactsData.get(0));
-						if(u!=null){
-							log("Send File to contact: "+u.getEmail());
-							megaApi.sendFileToUser(node, u, this);
-                		}
-                		else{
-                			log("Send File to a NON contact! ");
-                			megaApi.sendFileToUser(node, contactsData.get(0), this);
-                		}
+						nC.sendToInbox(nodeHandle, contactsData);
 					}
 					else{
 						//Send multiple files to one contact
 						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
-						MegaUser u = megaApi.getContact(contactsData.get(0));
-						if(nodeHandles!=null){
-							MultipleRequestListener sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILES_SEND_INBOX, this);
-							if(nodeHandles.length>1){
-								log("many files to one contact");
-	                    		for(int j=0; j<nodeHandles.length;j++){
-
-	        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-
-	        						if(u!=null){
-	        							log("Send: "+ node.getName() + " to "+ u.getEmail());
-	        							megaApi.sendFileToUser(node, u, sendMultipleListener);
-	                        		}
-	                        		else{
-	                        			log("Send File to a NON contact! ");
-	                        			megaApi.sendFileToUser(node, contactsData.get(0), sendMultipleListener);
-	                        		}
-	                    		}
-	                    	}
-							else{
-								log("one file to many contacts");
-
-        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[0]);
-        						if(u!=null){
-        							log("Send: "+ node.getName() + " to "+ u.getEmail());
-        							megaApi.sendFileToUser(node, u, this);
-                        		}
-                        		else{
-                        			log("Send File to a NON contact! ");
-                        			megaApi.sendFileToUser(node, contactsData.get(0), this);
-                        		}
-							}
-						}
+						nC.sendToInbox(nodeHandles, contactsData);
 					}
 				}
 			}
@@ -9616,140 +9412,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			filePreparedInfos = info;
 			onIntentProcessed();
 		}
-	}
-
-	/*
-	 * Background task to clear cache
-	 */
-	private class ClearCacheTask extends AsyncTask<String, Void, String> {
-		Context context;
-
-		ClearCacheTask(Context context){
-			this.context = context;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task ClearCacheTask");
-
-			Util.clearCache(context);
-			String size = Util.getCacheSize(context);
-			return size;
-		}
-
-		@Override
-		protected void onPostExecute(String size) {
-			log("ClearCacheTask::onPostExecute");
-			if(sttFLol!=null){
-					sttFLol.setCacheSize(size);
-			}
-		}
-	}
-
-	/*
-	 * Background task to clear offline files
-	 */
-	private class ClearOfflineTask extends AsyncTask<String, Void, String> {
-		Context context;
-
-		ClearOfflineTask(Context context){
-			this.context = context;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task ClearOfflineTask");
-
-			Util.clearOffline(context);
-			dbH.clearOffline();
-			String size = Util.getOfflineSize(context);
-			return size;
-		}
-
-		@Override
-		protected void onPostExecute(String size) {
-			log("ClearOfflineTask::onPostExecute");
-			if(sttFLol!=null){
-					sttFLol.setOfflineSize(size);
-			}
-		}
-	}
-
-	/*
-	 * Background task to calculate the size of offline folder
-	 */
-	private class GetOfflineSizeTask extends AsyncTask<String, Void, String> {
-		Context context;
-
-		GetOfflineSizeTask(Context context){
-			this.context = context;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task GetOfflineSizeTask");
-
-			String size = Util.getOfflineSize(context);
-			return size;
-		}
-
-		@Override
-		protected void onPostExecute(String size) {
-			log("GetOfflineSizeTask::onPostExecute");
-			if(sttFLol!=null){
-					sttFLol.setOfflineSize(size);
-			}
-		}
-	}
-
-	/*
-	 * Background task to calculate the size of cache folder
-	 */
-	private class GetCacheSizeTask extends AsyncTask<String, Void, String> {
-		Context context;
-
-		GetCacheSizeTask(Context context){
-			this.context = context;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task GetCacheSizeTask");
-
-			String size = Util.getCacheSize(context);
-			return size;
-		}
-
-		@Override
-		protected void onPostExecute(String size) {
-			log("GetCacheSizeTask::onPostExecute");
-			if(sttFLol!=null){
-					sttFLol.setCacheSize(size);
-			}
-		}
-	}
-
-	public void taskGetSizeCache (){
-		log("taskGetSizeCache");
-		GetCacheSizeTask getCacheSizeTask = new GetCacheSizeTask(this);
-		getCacheSizeTask.execute();
-	}
-
-	public void taskGetSizeOffline (){
-		log("taskGetSizeOffline");
-		GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(this);
-		getOfflineSizeTask.execute();
-	}
-
-	public void taskClearCache (){
-		ClearCacheTask clearCacheTask = new ClearCacheTask(this);
-		clearCacheTask.execute();
-	}
-
-	public void taskClearOffline (){
-		ClearOfflineTask clearOfflineTask = new ClearOfflineTask(this);
-		clearOfflineTask.execute();
-//		dbH.clearOffline();
 	}
 
 	void resetNavigationViewMenu(Menu menu){
@@ -12017,5 +11679,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
 		this.cFLol = cFLol;
+	}
+
+	public SettingsFragmentLollipop getSettingsFragment() {
+		return sttFLol;
+	}
+
+	public void setSettingsFragment(SettingsFragmentLollipop sttFLol) {
+		this.sttFLol = sttFLol;
 	}
 }

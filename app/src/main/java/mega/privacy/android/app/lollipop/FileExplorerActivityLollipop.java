@@ -118,7 +118,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	private long[] moveFromHandles;
 	private long[] copyFromHandles;
-	private String[] selectedContacts;
+	private ArrayList<String> selectedContacts;
 	private String imagePath;
 	String actionBarTitle;
 	private boolean folderSelected = false;
@@ -370,14 +370,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
 				log("action = ACTION_SELECT_FOLDER");
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
+				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 				
 			}
 			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
 				log("action = ACTION_SELECT_FILE");
 				mode = SELECT;
 				selectFile = true;
-				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");				
+				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 			}
 			else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
 				log("action = ACTION_UPLOAD_SELFIE");
@@ -837,7 +837,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			{
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", handle);
-				intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
 				finish();
 			}
@@ -850,7 +850,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", parentNode.getHandle());
-				intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
 				finish();
 			}

@@ -42,6 +42,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
@@ -125,7 +126,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 					clearSelections();
 					hideMultipleSelect();
 					if (users.size()>0){
-						((ManagerActivityLollipop) context).pickFolderToShare(users);
+						NodeController nC = new NodeController(context);
+						nC.pickFolderToShare(users);
 					}										
 					break;
 				}
@@ -133,7 +135,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 					clearSelections();
 					hideMultipleSelect();
 					if (users.size()>0){
-						((ManagerActivityLollipop) context).pickFileToSend(users);
+						NodeController nC = new NodeController(context);
+						nC.pickFileToSend(users);
 					}										
 					break;
 				}
@@ -579,7 +582,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				hideOptionsPanel();
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(selectedUser);
-				((ManagerActivityLollipop) context).pickFileToSend(user);
+				NodeController nC = new NodeController(context);
+				nC.pickFileToSend(user);
 				break;
 			}
 			case R.id.contact_list_option_properties_layout:
@@ -599,7 +603,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				hideOptionsPanel();
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(selectedUser);
-				((ManagerActivityLollipop) context).pickFolderToShare(user);
+				NodeController nC = new NodeController(context);
+				nC.pickFolderToShare(user);
 				break;
 			}
 			case R.id.contact_list_option_remove_layout:
