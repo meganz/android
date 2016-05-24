@@ -138,55 +138,7 @@ import nz.mega.sdk.MegaUser;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener{
 
-	private static int EDIT_TEXT_ID = 1;
-
-	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
-	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
-	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
-	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
-	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
-	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
-	public static String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
-	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
-	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
-	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
-	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
-	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
-	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
-	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
-	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
-	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
-	public static String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
-
-	final public static int FILE_BROWSER_ADAPTER = 2000;
-	final public static int CONTACT_FILE_ADAPTER = 2001;
-	final public static int RUBBISH_BIN_ADAPTER = 2002;
-	final public static int SHARED_WITH_ME_ADAPTER = 2003;
-	final public static int OFFLINE_ADAPTER = 2004;
-	final public static int FOLDER_LINK_ADAPTER = 2005;
-	final public static int SEARCH_ADAPTER = 2006;
-	final public static int PHOTO_SYNC_ADAPTER = 2007;
-	final public static int ZIP_ADAPTER = 2008;
-	final public static int OUTGOING_SHARES_ADAPTER = 2009;
-	final public static int INCOMING_SHARES_ADAPTER = 2010;
-	final public static int INBOX_ADAPTER = 2011;
-	final public static int INCOMING_REQUEST_ADAPTER = 2012;
-	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
-	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
-
 	public int accountFragment;
-	final public static int MY_ACCOUNT_FRAGMENT = 5000;
-	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
-	final public static int PAYMENT_FRAGMENT = 5002;
-	final public static int OVERQUOTA_ALERT = 5003;
-	final public static int CC_FRAGMENT = 5004;
-	final public static int FORTUMO_FRAGMENT = 5005;
-	final public static int MONTHLY_YEARLY_FRAGMENT = 5006;
-	final public static int CENTILI_FRAGMENT = 5007;
-
-	public static final int REQUEST_WRITE_STORAGE = 1;
-	public static final int REQUEST_CAMERA = 2;
-	public static final int REQUEST_READ_CONTACTS = 3;
 
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
@@ -799,7 +751,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-			case REQUEST_READ_CONTACTS:{
+			case Constants.REQUEST_READ_CONTACTS:{
 				log("REQUEST_READ_CONTACTS");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
@@ -810,7 +762,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
-	        case REQUEST_CAMERA:{
+	        case Constants.REQUEST_CAMERA:{
 //	        	if (firstTimeCam){
 //	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 //		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -834,7 +786,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		if (!hasStoragePermission){
 		        			ActivityCompat.requestPermissions(this,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+									Constants.REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
 		        			this.takePicture();
@@ -844,7 +796,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}
 	        	break;
 	        }
-	        case REQUEST_WRITE_STORAGE:{
+	        case Constants.REQUEST_WRITE_STORAGE:{
 	        	if (firstTimeCam){
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 //		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -858,7 +810,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				        		if (!hasCameraPermission){
 				        			ActivityCompat.requestPermissions(this,
 							                new String[]{Manifest.permission.CAMERA},
-							                ManagerActivityLollipop.REQUEST_CAMERA);
+											Constants.REQUEST_CAMERA);
 				        		}
 				        		else{
 				        			this.takePicture();
@@ -1059,10 +1011,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    	if (newIntent != null){
 		    	if (newIntent.getAction() != null){
-		    		if (newIntent.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
+		    		if (newIntent.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(Constants.ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
 		    			openLink = true;
 		    		}
-		    		else if (newIntent.getAction().equals(ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 		    			Intent cancelTourIntent = new Intent(this, TourActivityLollipop.class);
 		    			cancelTourIntent.setAction(newIntent.getAction());
 		    			startActivity(cancelTourIntent);
@@ -1304,34 +1256,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Root node is NULL");
 			 if (getIntent() != null){
 				if (getIntent().getAction() != null){
-					if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+					if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
+						intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK)){
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_MEGA_LINK)){
 						Intent intent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
+						intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
+						intent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
@@ -1339,7 +1291,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
+					else if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
@@ -1361,11 +1313,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Check if export master key action
 	        if (getIntent() != null){
 				if (getIntent().getAction() != null){
-			        if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
+			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 			        	log("Intent to export Master Key - im logged in!");
 			        	exportMK();
 					}
-					else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
 						log("Open after LauncherFileExplorerActivity ");
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 						int access = -1;
@@ -1430,7 +1382,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 				nVPictureProfile.setImageBitmap(defaultAvatar);
 
-			    int avatarTextSize = getAvatarTextSize(density);
+			    int avatarTextSize = Util.getAvatarTextSize(density);
 			    log("DENSITY: " + density + ":::: " + avatarTextSize);
 			    if (contact.getEmail() != null){
 				    if (contact.getEmail().length() > 0){
@@ -1463,7 +1415,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						String imageType = options.outMimeType;
 
 						// Calculate inSampleSize
-					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
+					    options.inSampleSize = Util.calculateInSampleSize(options, 250, 250);
 
 					    // Decode bitmap with inSampleSize set
 					    options.inJustDecodeBounds = false;
@@ -1589,7 +1541,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	log("DRAWERITEM NOT NULL1: " + drawerItem);
 	        	if (getIntent() != null){
 	        		if (getIntent().getAction() != null){
-	        			if (getIntent().getAction().equals(ACTION_SHOW_TRANSFERS)){
+	        			if (getIntent().getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
 	        				setIntent(null);
 	        			}
@@ -1645,7 +1597,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				log("not credentials -> INTENT");
     				if (intent.getAction() != null){
     					log("intent with ACTION: "+intent.getAction());
-    					if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+    					if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
     						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
     						exportIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     						exportIntent.setAction(getIntent().getAction());
@@ -1661,19 +1613,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	if (intent != null) {
     		log("intent not null! "+intent.getAction());
     		// Open folder from the intent
-			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
+			if (intent.hasExtra(Constants.EXTRA_OPEN_FOLDER)) {
 				log("INTENT: EXTRA_OPEN_FOLDER");
-				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
-				intent.removeExtra(EXTRA_OPEN_FOLDER);
+				parentHandleBrowser = intent.getLongExtra(Constants.EXTRA_OPEN_FOLDER, -1);
+				intent.removeExtra(Constants.EXTRA_OPEN_FOLDER);
 				setIntent(null);
 			}
 
     		if (intent.getAction() != null){
     			log("intent action");
 
-    			if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){
+    			if(getIntent().getAction().equals(Constants.ACTION_EXPLORE_ZIP)){
 					log("open zip browser");
-    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
+    				String pathZip=intent.getExtras().getString(Constants.EXTRA_PATH_ZIP);
 
     				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
     				intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
@@ -1692,21 +1644,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //    				this.startActivity(intentPdf);
 //
 //    			}
-    			if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+    			if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
 					log("ACTION_IMPORT_LINK_FETCH_NODES");
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					loginIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
+					loginIntent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 					loginIntent.setData(Uri.parse(getIntent().getDataString()));
 					startActivity(loginIntent);
 					finish();
 					return;
 				}
-				else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK)){
+				else if (getIntent().getAction().equals(Constants.ACTION_OPEN_MEGA_LINK)){
 					log("ACTION_OPEN_MEGA_LINK");
 					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					fileLinkIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
+					fileLinkIntent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 					String data = getIntent().getDataString();
 					if(data!=null){
 						fileLinkIntent.setData(Uri.parse(data));
@@ -1718,11 +1670,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					finish();
 					return;
 				}
-    			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
+    			else if (intent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
 					log("ACTION_OPEN_MEGA_FOLDER_LINK");
     				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivityLollipop.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    				intentFolderLink.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
+    				intentFolderLink.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
 
 					String data = getIntent().getDataString();
 					if(data!=null){
@@ -1734,7 +1686,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					finish();
     			}
-    			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
+    			else if (intent.getAction().equals(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER)){
 
     				parentHandleBrowser = intent.getLongExtra("parentHandle", -1);
     				intent.removeExtra("parentHandle");
@@ -1762,27 +1714,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					}
     				}
     			}
-    			else if(intent.getAction().equals(ACTION_OVERQUOTA_ALERT)){
+    			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_ALERT)){
 	    			showOverquotaAlert();
 	    		}
-    			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
 					String title = null;
 					String text = null;
-					if(intent.getAction().equals(ACTION_CANCEL_UPLOAD)){
+					if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
 						tempIntent = new Intent(this, UploadService.class);
 						tempIntent.setAction(UploadService.ACTION_CANCEL);
 						title = getString(R.string.upload_uploading);
 						text = getString(R.string.upload_cancel_uploading);
 					}
-					else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
+					else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
 						tempIntent = new Intent(this, DownloadService.class);
 						tempIntent.setAction(DownloadService.ACTION_CANCEL);
 						title = getString(R.string.download_downloading);
 						text = getString(R.string.download_cancel_downloading);
 					}
-					else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+					else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						tempIntent = new Intent(this, CameraSyncService.class);
 						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
 						title = getString(R.string.cam_sync_syncing);
@@ -1815,12 +1767,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						startService(cancelIntent);
 					}
 				}
-    			else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)){
+    			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
     				log("intent show transfers");
     				drawerItem = DrawerItem.TRANSFERS;
     				selectDrawerItemLollipop(drawerItem);
     			}
-    			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
+    			else if (intent.getAction().equals(Constants.ACTION_TAKE_SELFIE)){
     				log("Intent take selfie");
     				takePicture();
     			}
@@ -2360,112 +2312,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				}
     			}
 
-
-
-//    			//OncreateOptionsMenu
-//    			int index = viewPagerCDrive.getCurrentItem();
-//    			log("Fragment Index: " + index);
-//    			if(index == 1){
-//    				if (rbFLol != null){
-//    					if (createFolderMenuItem != null){
-//	    					//Show
-//	    	    			sortByMenuItem.setVisible(true);
-//	    	    			selectMenuItem.setVisible(true);
-//	    	    			thumbViewMenuItem.setVisible(true);
-//	    	    			clearRubbishBinMenuitem.setVisible(true);
-//	    	    			searchMenuItem.setVisible(true);
-//
-//	    					//Hide
-//	    	    			refreshMenuItem.setVisible(false);
-//	    					pauseTransfersMenuIcon.setVisible(false);
-//	    					playTransfersMenuIcon.setVisible(false);
-//	    					createFolderMenuItem.setVisible(false);
-//	    	    			addMenuItem.setVisible(false);
-//	    	    			addContactMenuItem.setVisible(false);
-//	    	    			upgradeAccountMenuItem.setVisible(true);
-//	    	    			unSelectMenuItem.setVisible(false);
-//	    	    			addMenuItem.setEnabled(false);
-//	    	    			changePass.setVisible(false);
-//	    	    			importLinkMenuItem.setVisible(false);
-//	    	    			takePicture.setVisible(false);
-//	    	    			refreshMenuItem.setVisible(false);
-//	    					helpMenuItem.setVisible(false);
-//	    					settingsMenuItem.setVisible(false);
-//	    					gridSmallLargeMenuItem.setVisible(false);
-//	    					cancelAllTransfersMenuItem.setVisible(false);
-//
-//	    	    			if (isList){
-//	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-//	    					}
-//	    					else{
-//	    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-//	    	    			}
-//
-//	    					rbFLol.setIsList(isList);
-//	    					rbFLol.setParentHandle(parentHandleRubbish);
-//
-//	    					if(rbFLol.getItemCount()>0){
-//	    						selectMenuItem.setVisible(true);
-//	    						clearRubbishBinMenuitem.setVisible(true);
-//	    					}
-//	    					else{
-//	    						selectMenuItem.setVisible(false);
-//	    						clearRubbishBinMenuitem.setVisible(false);
-//	    					}
-//
-//	    	    			rubbishBinMenuItem.setVisible(false);
-//	    	    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
-//	    				}
-//    				}
-//    			}
-//    			else{
-//    				if (fbFLol!=null){
-//    					if (createFolderMenuItem != null){
-//    					//Cloud Drive
-//    					//Show
-//	    					addMenuItem.setEnabled(true);
-//	    					addMenuItem.setVisible(true);
-//	    					createFolderMenuItem.setVisible(true);
-//	    					sortByMenuItem.setVisible(true);
-//	    					thumbViewMenuItem.setVisible(true);
-//	    					rubbishBinMenuItem.setVisible(false);
-//	    	    			upgradeAccountMenuItem.setVisible(true);
-//	    	    			importLinkMenuItem.setVisible(true);
-//	    	    			takePicture.setVisible(true);
-//	    	    			selectMenuItem.setVisible(true);
-//	    	    			searchMenuItem.setVisible(true);
-//
-//	    					//Hide
-//	    					pauseTransfersMenuIcon.setVisible(false);
-//	    					playTransfersMenuIcon.setVisible(false);
-//	    	    			addContactMenuItem.setVisible(false);
-//	    	    			unSelectMenuItem.setVisible(false);
-//	    	    			clearRubbishBinMenuitem.setVisible(false);
-//	    	    			changePass.setVisible(false);
-//	    	    			refreshMenuItem.setVisible(false);
-//	    					helpMenuItem.setVisible(false);
-//	    					settingsMenuItem.setVisible(false);
-//	    					killAllSessions.setVisible(false);
-//	    					gridSmallLargeMenuItem.setVisible(false);
-//	    					cancelAllTransfersMenuItem.setVisible(false);
-//
-//	    					if(fbFLol.getItemCount()>0){
-//	    						selectMenuItem.setVisible(true);
-//	    					}
-//	    					else{
-//	    						selectMenuItem.setVisible(true);
-//	    					}
-//
-//	    	    			if (isList){
-//	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-//	    					}
-//	    					else{
-//	    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-//	    	    			}
-//
-//	    				}
-//    				}
-//    			}
 				showFabButton();
 				log("END selectDrawerItem for Cloud Drive");
     			break;
@@ -2558,7 +2404,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 					}
 
 //					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -3389,7 +3235,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			tB.setVisibility(View.GONE);
 
-    			accountFragment=MY_ACCOUNT_FRAGMENT;
+    			accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 
     			if (maFLol == null){
     				maFLol = new MyAccountFragmentLollipop();
@@ -3657,7 +3503,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		accountFragment = CC_FRAGMENT;
+		accountFragment = Constants.CC_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		mTabHostShares.setVisibility(View.GONE);
@@ -3700,7 +3546,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showFortumo(){
-		accountFragment = FORTUMO_FRAGMENT;
+		accountFragment = Constants.FORTUMO_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		mTabHostShares.setVisibility(View.GONE);
@@ -3718,7 +3564,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showCentili(){
-		accountFragment = CENTILI_FRAGMENT;
+		accountFragment = Constants.CENTILI_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		mTabHostShares.setVisibility(View.GONE);
@@ -3744,7 +3590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		accountFragment = MONTHLY_YEARLY_FRAGMENT;
+		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
 
 		mTabHostCDrive.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
@@ -3780,7 +3626,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		accountFragment=PAYMENT_FRAGMENT;
+		accountFragment=Constants.PAYMENT_FRAGMENT;
 
 		mTabHostCDrive.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
@@ -3842,7 +3688,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
+		accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 
 		mTabHostContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
@@ -4733,14 +4579,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 					}
 
 					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 					if (!hasCameraPermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.CAMERA},
-				                ManagerActivityLollipop.REQUEST_CAMERA);
+								Constants.REQUEST_CAMERA);
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
@@ -4871,7 +4717,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			if (!hasStoragePermission) {
 	    				ActivityCompat.requestPermissions(this,
 	    		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-	    		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 	    			}
 	    		}
 
@@ -6495,7 +6341,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     		switch(accountFragment){
 
-	    		case MY_ACCOUNT_FRAGMENT:{
+	    		case Constants.MY_ACCOUNT_FRAGMENT:{
 	    			if (maFLol != null){
 	    				if (maFLol.onBackPressed() == 0){
 		    				drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -6511,7 +6357,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 	    			return;
 	    		}
-	    		case UPGRADE_ACCOUNT_FRAGMENT:{
+	    		case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 	    			if (upAFL != null){
 	    				drawerItem = DrawerItem.ACCOUNT;
 	    				selectDrawerItemLollipop(drawerItem);
@@ -6524,7 +6370,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 	    			return;
 	    		}
-	    		case PAYMENT_FRAGMENT:{
+	    		case Constants.PAYMENT_FRAGMENT:{
 	    			if (pFL != null){
 	    				if (pFL.onBackPressed() == 0){
 	    					drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -6540,7 +6386,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 	    			return;
 	    		}
-	    		case CC_FRAGMENT:{
+	    		case Constants.CC_FRAGMENT:{
 	    			if (ccFL != null){
 	    				int parameterType = ccFL.getParameterType();
 	    				ArrayList<Product> accounts = ccFL.getAccounts();
@@ -6552,7 +6398,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 	    			return;
 	    		}
-	    		case OVERQUOTA_ALERT:{
+	    		case Constants.OVERQUOTA_ALERT:{
 	    			if (upAFL != null){
 	    				drawerItem = DrawerItem.CLOUD_DRIVE;
 	    				if (nV != null){
@@ -6566,7 +6412,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 	    			return;
 	    		}
-	    		case MONTHLY_YEARLY_FRAGMENT:{
+	    		case Constants.MONTHLY_YEARLY_FRAGMENT:{
 	    			if (myFL != null){
 	    				myFL.onBackPressed();
 	    			}
@@ -7493,8 +7339,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void setPinLock(){
-		log("setPinLock");
+	public void showPanelSetPinLock(){
+		log("showPanelSetPinLock");
 
 		AlertDialog setPinDialog;
 		LayoutInflater inflater = getLayoutInflater();
@@ -7540,7 +7386,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (dialog != null){
     				dialog.dismiss();
     			}
-    			intentToPinLock();
+				if(sttFLol!=null){
+					sttFLol.intentToPinLock();
+				}
 			}
 		});
 
@@ -7554,7 +7402,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (dialog != null){
     				dialog.dismiss();
     			}
-    			intentToPinLock();
+				if(sttFLol!=null){
+					sttFLol.intentToPinLock();
+				}
 			}
 		});
 
@@ -7568,25 +7418,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (dialog != null){
     				dialog.dismiss();
     			}
-    			intentToPinLock();
+				if(sttFLol!=null){
+					sttFLol.intentToPinLock();
+				}
 			}
 		});
-
 	}
-
-	public void intentToPinLock(){
-		Intent intent = new Intent(this, PinLockActivityLollipop.class);
-		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
-		this.startActivityForResult(intent, Constants.SET_PIN);
-	}
-
-	public void resetPinLock(){
-		log("resetPinLock");
-		Intent intent = new Intent(this, PinLockActivityLollipop.class);
-		intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
-		this.startActivity(intent);
-	}
-
 
 	public void chooseAddContactDialog(){
 		log("chooseAddContactDialog");
@@ -7631,7 +7468,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("No read contacts permission");
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
 						new String[]{Manifest.permission.READ_CONTACTS},
-						ManagerActivityLollipop.REQUEST_READ_CONTACTS);
+						Constants.REQUEST_READ_CONTACTS);
 				return;
 			}
 		}
@@ -7680,7 +7517,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = input.getText().toString().trim();
-					String emailError = getEmailError(value);
+					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
 						input.setError(emailError);
 						input.requestFocus();
@@ -7721,7 +7558,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public void onClick(View v) {
 				String value = input.getText().toString().trim();
-				String emailError = getEmailError(value);
+				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
 					input.setError(emailError);
 				} else {
@@ -7730,20 +7567,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-	}
-
-	/*
-	 * Validate email
-	 */
-	private String getEmailError(String value) {
-		log("getEmailError");
-		if (value.length() == 0) {
-			return getString(R.string.error_enter_email);
-		}
-		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
-			return getString(R.string.error_invalid_email);
-		}
-		return null;
 	}
 
 	public void inviteContact(String contactEmail){
@@ -8346,53 +8169,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
-	}
-
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-
-	    if (height > reqHeight || width > reqWidth) {
-
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-
-	    return inSampleSize;
-	}
-
 	private void showOverquotaAlert(){
 
 		dbH.setCamSyncEnabled(false);
@@ -8415,13 +8191,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						upAFL = new UpgradeAccountFragmentLollipop();
 						ft.replace(R.id.fragment_container, upAFL, "upAFL");
 						drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=OVERQUOTA_ALERT;
+						accountFragment=Constants.OVERQUOTA_ALERT;
 						ft.commit();
 					}
 					else{
 						ft.replace(R.id.fragment_container, upAFL, "upAFL");
 						drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=OVERQUOTA_ALERT;
+						accountFragment=Constants.OVERQUOTA_ALERT;
 						ft.commit();
 					}
 				}
@@ -8769,7 +8545,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 
@@ -8875,7 +8651,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (!hasStoragePermission) {
 					ActivityCompat.requestPermissions(this,
 			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+							Constants.REQUEST_WRITE_STORAGE);
 				}
 			}
 
@@ -9638,7 +9414,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							String imageType = options.outMimeType;
 
 							// Calculate inSampleSize
-						    options.inSampleSize = calculateInSampleSize(options, 250, 250);
+						    options.inSampleSize = Util.calculateInSampleSize(options, 250, 250);
 
 						    // Decode bitmap with inSampleSize set
 						    options.inJustDecodeBounds = false;
@@ -11534,7 +11310,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 

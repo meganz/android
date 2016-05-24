@@ -27,6 +27,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -116,7 +117,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);			
 			
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -261,7 +262,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 	public void updateView(){
 		contacts = megaApi.getIncomingContactRequests();
 		if (adapterList == null){
-			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
+			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			listView.setAdapter(adapterList);
 		}
 		else{
@@ -326,8 +327,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
     		else
     		{
     			log("adapter==NULL");
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
-    		} 
+    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
+    		}
     		
     		if (adapterList.getItemCount() == 0){				
 				log("adapterList.getCount() == 0");

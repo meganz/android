@@ -249,7 +249,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
     	
     	if (intent != null){
     		if (intent.getAction() != null){
-    			if (intent.getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+    			if (intent.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
     				importNode();
     			}
     			intent.setAction(null);
@@ -383,7 +383,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					log("OVERQUOTA ERROR: "+e.getErrorCode());					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 					startActivity(intent);
 					finish();
 
@@ -434,7 +434,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		if (megaApi.getRootNode() == null){
 			Intent intent = new Intent(this, ManagerActivityLollipop.class);
-			intent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
+			intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 			intent.setData(Uri.parse(url));
 			startActivity(intent);
 			finish();
@@ -490,7 +490,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 				this.urlM = url;
 				this.sizeM = size;
 				this.hashesM = new long[hashes.length];
@@ -1047,7 +1047,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+        	case Constants.REQUEST_WRITE_STORAGE:{
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					downloadWithPermissions();

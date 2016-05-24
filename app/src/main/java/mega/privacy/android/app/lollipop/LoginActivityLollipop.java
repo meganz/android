@@ -42,6 +42,7 @@ import mega.privacy.android.app.OldUserCredentials;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -363,15 +364,15 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					return;
 				}
 				else{
-					if(intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
-						action = ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK;
+					if(intentReceived.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
+						action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
 						url = intentReceived.getDataString();
 					}
-					else if(intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
-						action = ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK;
+					else if(intentReceived.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
+						action = Constants.ACTION_OPEN_MEGA_LINK;
 						url = intentReceived.getDataString();
 					}
-					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+					else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						action = intentReceived.getAction();
 					}
 //					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
@@ -382,14 +383,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //						url = null;
 //						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
 //					}
-					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
-						action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
+					else if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)){
+						action = Constants.ACTION_FILE_PROVIDER;
 						uriData = intentReceived.getData();
 						extras = intentReceived.getExtras();
 						url = null;
 					}
-					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
-						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;
+					else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
+						action = Constants.ACTION_EXPORT_MASTER_KEY;
 					}
 
 					MegaNode rootNode = megaApi.getRootNode();
@@ -404,7 +405,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //								}
 //								intent.setData(uriData);
 //							}
-							if (action.equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
+							if (action.equals(Constants.ACTION_FILE_PROVIDER)){
 								intent = new Intent(this, FileProviderActivity.class);
 								if(extras != null)
 								{
@@ -471,7 +472,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //							}
 //							intent.setData(uriData);
 //						}
-						if (action.equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
+						if (action.equals(Constants.ACTION_FILE_PROVIDER)){
 							intent = new Intent(this, FileProviderActivity.class);
 							if(extras != null)
 							{
@@ -540,7 +541,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				if (intentReceived.getAction() != null){
 					log("ACTION NOT NULL");
 					Intent intent;
-					if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
+					if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)){
 						intent = new Intent(this, FileProviderActivity.class);
 						if(extras != null)
 						{
@@ -550,19 +551,19 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 
 						intent.setAction(action);
 
-						action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
+						action = Constants.ACTION_FILE_PROVIDER;
 					}
-					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
+					else if (intentReceived.getAction().equals(Constants.ACTION_FILE_EXPLORER_UPLOAD)){
+						action = Constants.ACTION_FILE_EXPLORER_UPLOAD;
 	//					uriData = intentReceived.getData();
 	//					log("URI: "+uriData);
 	//					extras = intentReceived.getExtras();
 	//					url = null;
 						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
 					}
-					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+					else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 						log("ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY");
-						action = ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY;
+						action = Constants.ACTION_EXPORT_MASTER_KEY;
 					}
 				}
 			}
@@ -985,7 +986,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 								intent.putExtra("firstTimeCam", true);
 								if (action != null){
 									log("Action not NULL");
-									if (action.equals(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY)){
+									if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 										log("ACTION_EXPORT_MK");
 										intent.setAction(action);
 									}
@@ -1036,7 +1037,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //											}
 //											intent.setData(uriData);
 //										}
-										if (action.equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
+										if (action.equals(Constants.ACTION_FILE_PROVIDER)){
 											intent = new Intent(this, FileProviderActivity.class);
 											if(extras != null)
 											{

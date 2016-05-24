@@ -1,5 +1,12 @@
 package mega.privacy.android.app;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
@@ -8,16 +15,10 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 
 
 public class OpenLinkActivity extends PinActivity {
@@ -101,7 +102,7 @@ public class OpenLinkActivity extends PinActivity {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {			
 				log("export master key url");			
 				Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
-				exportIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
+				exportIntent.setAction(Constants.ACTION_EXPORT_MASTER_KEY);
 				startActivity(exportIntent);
 				finish();
 				return;

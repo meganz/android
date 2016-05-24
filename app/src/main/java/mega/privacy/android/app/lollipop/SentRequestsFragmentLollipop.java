@@ -28,6 +28,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -87,7 +88,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	public void updateView(){
 		contacts = megaApi.getOutgoingContactRequests();
 		if (adapterList == null){
-			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER);
+			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 			listView.setAdapter(adapterList);
 		}
 		else{
@@ -156,7 +157,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 			emptyTextView.setText(R.string.sent_requests_empty);
 
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -292,7 +293,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
         		adapterList.notifyDataSetChanged();
     		}
     		else{
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER);
+    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
     		}
     		
     		if (adapterList.getItemCount() == 0){				

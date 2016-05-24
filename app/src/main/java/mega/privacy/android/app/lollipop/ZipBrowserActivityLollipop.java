@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -400,7 +401,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			log("isImage");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra("position", position);
-			intent.putExtra("adapterType", ManagerActivityLollipop.ZIP_ADAPTER);
+			intent.putExtra("adapterType", Constants.ZIP_ADAPTER);
 			intent.putExtra("parentNodeHandle", -1L);			
 			File currentFile = new File(absolutePath);			
 			intent.putExtra("offlinePathDirectory", currentFile.getParent());

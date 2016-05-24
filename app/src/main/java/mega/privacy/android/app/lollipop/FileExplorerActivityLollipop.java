@@ -48,6 +48,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -234,7 +235,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			ManagerActivityLollipop.logout(this, megaApi, false);
 			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.setAction(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD);
+			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
 			/*if (intent != null){
 				if(intent.getExtras() != null)
 				{

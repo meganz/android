@@ -38,6 +38,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -85,7 +86,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	Object fragment;
-	int type = ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER;
+	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	private ActionMode actionMode;
 	
@@ -393,7 +394,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", positionInNodes);
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-						intent.putExtra("adapterType", ManagerActivityLollipop.PHOTO_SYNC_ADAPTER);
+						intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						context.startActivity(intent);
 					}
