@@ -44,6 +44,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -329,7 +330,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -388,7 +389,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			contentText.setLayoutParams(contentTextParams);
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -544,7 +545,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("searchQuery", searchQuery);
-					intent.putExtra("adapterType", ManagerActivityLollipop.SEARCH_ADAPTER);
+					intent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
 					if (parentHandle == -1){
 						intent.putExtra("parentNodeHandle", -1L);
 					}

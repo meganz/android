@@ -43,6 +43,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -826,7 +827,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
-				i.setAction(ManagerActivityLollipop.ACTION_REFRESH_PARENTHANDLE_BROWSER);
+				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
 				i.putExtra("parentHandle", node.getHandle());
 				startActivity(i);
 				finish();

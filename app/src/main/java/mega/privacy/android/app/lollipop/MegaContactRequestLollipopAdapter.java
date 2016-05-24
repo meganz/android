@@ -133,7 +133,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			}
 		}
 						
-		if(type==ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER)
+		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
 		{
 			holder.contactMail = contact.getTargetEmail();
 			createDefaultAvatar(holder);
@@ -205,7 +205,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density); 		
 	
-		if(type==ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER)
+		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
 		{
 			log("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_outg_request_list, parent, false);	

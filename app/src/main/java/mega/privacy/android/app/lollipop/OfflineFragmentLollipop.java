@@ -50,6 +50,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1760,7 +1761,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivityLollipop.OFFLINE_ADAPTER);
+						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);

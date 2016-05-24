@@ -34,6 +34,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -520,9 +521,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
 							intentZip = new Intent(this, ManagerActivityLollipop.class);
-							intentZip.setAction(ManagerActivityLollipop.ACTION_EXPLORE_ZIP);
+							intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
 							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							intentZip.putExtra(ManagerActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
 						}
 						else{
 							intentZip = new Intent(this, ManagerActivity.class);
@@ -696,10 +697,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());	
 			}
 			if (dbH.getCredentials() == null){
-				intent.setAction(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD);
+				intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
 			}
 			else{
-				intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
+				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 			}
 		}
 		else{

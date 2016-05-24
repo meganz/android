@@ -50,6 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -452,7 +453,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			contentText.setLayoutParams(contentTextParams);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -549,7 +550,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			contentText.setLayoutParams(contentTextParams);
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -885,7 +886,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivityLollipop.FILE_BROWSER_ADAPTER);
+						intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 						intent.putExtra("isFolderLink", false);
 						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 							intent.putExtra("parentNodeHandle", -1L);

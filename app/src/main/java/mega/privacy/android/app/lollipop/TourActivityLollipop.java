@@ -25,6 +25,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -203,24 +204,24 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	    
 	    if (intent != null){
 	    	if (intent.getAction() != null){
-	    		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    		if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    			log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 	    			Intent tempIntent = null;
 	    			String title = null;
 	    			String text = null;
-	    			if(intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD)){
+	    			if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
 	    				tempIntent = new Intent(this, UploadService.class);
 	    				tempIntent.setAction(UploadService.ACTION_CANCEL);
 	    				title = getString(R.string.upload_uploading);
 	    				text = getString(R.string.upload_cancel_uploading);
 	    			} 
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
 	    				tempIntent = new Intent(this, DownloadService.class);
 	    				tempIntent.setAction(DownloadService.ACTION_CANCEL);
 	    				title = getString(R.string.download_downloading);
 	    				text = getString(R.string.download_cancel_downloading);
 	    			}
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    				tempIntent = new Intent(this, CameraSyncService.class);
 	    				tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
 	    				title = getString(R.string.cam_sync_syncing);
@@ -260,24 +261,24 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	    
 	    if (intent != null){
 	    	if (intent.getAction() != null){
-	    		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    		if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    			log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 	    			Intent tempIntent = null;
 	    			String title = null;
 	    			String text = null;
-	    			if(intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD)){
+	    			if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
 	    				tempIntent = new Intent(this, UploadService.class);
 	    				tempIntent.setAction(UploadService.ACTION_CANCEL);
 	    				title = getString(R.string.upload_uploading);
 	    				text = getString(R.string.upload_cancel_uploading);
 	    			} 
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
 	    				tempIntent = new Intent(this, DownloadService.class);
 	    				tempIntent.setAction(DownloadService.ACTION_CANCEL);
 	    				title = getString(R.string.download_downloading);
 	    				text = getString(R.string.download_cancel_downloading);
 	    			}
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    				tempIntent = new Intent(this, CameraSyncService.class);
 	    				tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
 	    				title = getString(R.string.cam_sync_syncing);

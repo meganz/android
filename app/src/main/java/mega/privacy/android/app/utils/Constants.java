@@ -39,4 +39,52 @@ public class Constants {
 	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
 	final public static int MULTIPLE_LEAVE_SHARE = MULTIPLE_FILE_SHARE+1;
 
+	final public static int MY_ACCOUNT_FRAGMENT = 5000;
+	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
+	final public static int PAYMENT_FRAGMENT = 5002;
+	final public static int OVERQUOTA_ALERT = 5003;
+	final public static int CC_FRAGMENT = 5004;
+	final public static int FORTUMO_FRAGMENT = 5005;
+	final public static int MONTHLY_YEARLY_FRAGMENT = 5006;
+	final public static int CENTILI_FRAGMENT = 5007;
+
+	public static final int REQUEST_WRITE_STORAGE = 1;
+	public static final int REQUEST_CAMERA = 2;
+	public static final int REQUEST_READ_CONTACTS = 3;
+
+
+	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
+	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
+	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
+	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
+	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
+	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
+	public static String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
+	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
+	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
+	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
+	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
+	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
+	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
+	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
+	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
+	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
+	public static String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
+
+	final public static int FILE_BROWSER_ADAPTER = 2000;
+	final public static int CONTACT_FILE_ADAPTER = 2001;
+	final public static int RUBBISH_BIN_ADAPTER = 2002;
+	final public static int SHARED_WITH_ME_ADAPTER = 2003;
+	final public static int OFFLINE_ADAPTER = 2004;
+	final public static int FOLDER_LINK_ADAPTER = 2005;
+	final public static int SEARCH_ADAPTER = 2006;
+	final public static int PHOTO_SYNC_ADAPTER = 2007;
+	final public static int ZIP_ADAPTER = 2008;
+	final public static int OUTGOING_SHARES_ADAPTER = 2009;
+	final public static int INCOMING_SHARES_ADAPTER = 2010;
+	final public static int INBOX_ADAPTER = 2011;
+	final public static int INCOMING_REQUEST_ADAPTER = 2012;
+	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
+	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
+
 }

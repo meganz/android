@@ -550,7 +550,7 @@ public class NodeController {
             if (!hasStoragePermission) {
                 ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+                        Constants.REQUEST_WRITE_STORAGE);
             }
         }
 
@@ -789,7 +789,7 @@ public class NodeController {
 //			Intent openIntent = new Intent(this, ManagerActivityLollipop.class);
             Intent openFileIntent = new Intent(context, FileLinkActivityLollipop.class);
             openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFileIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK);
+            openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFileIntent);
 //			finish();
@@ -801,7 +801,7 @@ public class NodeController {
             log("folder link url");
             Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFolderIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
+            openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
 //			finish();

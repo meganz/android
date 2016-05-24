@@ -69,6 +69,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -1073,7 +1074,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 
@@ -2329,7 +2330,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		

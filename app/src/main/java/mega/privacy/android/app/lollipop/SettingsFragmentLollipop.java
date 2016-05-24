@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -1075,14 +1076,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 					}
 					
 					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 	        		if (!hasCameraPermission){
 	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.CAMERA},
-				                ManagerActivityLollipop.REQUEST_CAMERA);
+								Constants.REQUEST_CAMERA);
 	        		}
 				}
 				
@@ -1221,7 +1222,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			pinLock = !pinLock;
 			if (pinLock){
 				//Intent to set the PIN
-				((ManagerActivityLollipop)getActivity()).setPinLock();	
+				((ManagerActivityLollipop)getActivity()).showPanelSetPinLock();
 			}
 			else{
 				dbH.setPinLockEnabled(false);
@@ -1232,7 +1233,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
-			((ManagerActivityLollipop)getActivity()).resetPinLock();	
+			resetPinLock();
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ASK_ME_ALWAYS) == 0){
 			askMe = storageAskMeAlways.isChecked();
@@ -1587,7 +1588,21 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(context);
 		getOfflineSizeTask.execute();
 	}
-	
+
+	public void intentToPinLock(){
+		log("intentToPinLock");
+		Intent intent = new Intent(context, PinLockActivityLollipop.class);
+		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
+		this.startActivityForResult(intent, Constants.SET_PIN);
+	}
+
+	public void resetPinLock(){
+		log("resetPinLock");
+		Intent intent = new Intent(context, PinLockActivityLollipop.class);
+		intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
+		this.startActivity(intent);
+	}
+
 	private static void log(String log) {
 		Util.log("SettingsFragmentLollipop", log);
 	}

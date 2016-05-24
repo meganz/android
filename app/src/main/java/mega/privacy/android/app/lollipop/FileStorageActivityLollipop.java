@@ -1,19 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -47,20 +33,30 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 
 
 public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
@@ -338,7 +334,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		requestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -54,6 +54,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -915,7 +916,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				if (!hasStoragePermission) {
 					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+							Constants.REQUEST_WRITE_STORAGE);
 				}
 			}
 			
@@ -979,7 +980,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				if (!hasStoragePermission) {
 					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-			                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+							Constants.REQUEST_WRITE_STORAGE);
 				}
 			}
 			

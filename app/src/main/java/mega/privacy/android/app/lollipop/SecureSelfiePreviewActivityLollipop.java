@@ -1,52 +1,31 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.io.File;
+import java.io.IOException;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaNode;
 
 
 public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop implements OnClickListener{
@@ -190,7 +169,7 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 			case R.id.secure_selfie_viewer_discard:{
 				//Delete image
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.setAction(ManagerActivityLollipop.ACTION_TAKE_SELFIE);
+				intent.setAction(Constants.ACTION_TAKE_SELFIE);
 				//intent.putExtra("IMAGE_PATH", imagePath);
 				//Delete image
 				if(imgFile.exists()){

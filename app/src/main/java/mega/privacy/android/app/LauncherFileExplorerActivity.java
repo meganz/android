@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -191,7 +192,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 				ManagerActivityLollipop.logout(this, megaApi, false);
 				
 				Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-				loginIntent.setAction(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD);
+				loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
 				startActivity(loginIntent);
 				return;
 			}
@@ -1224,7 +1225,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 		log("backToCloud: "+handle);
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
 		if(handle!=-1){
-			startIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_FOLDER);
+			startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", handle);
 		}
 		startActivity(startIntent);

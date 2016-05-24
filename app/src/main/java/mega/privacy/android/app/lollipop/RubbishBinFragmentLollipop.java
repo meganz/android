@@ -47,6 +47,7 @@ import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -359,7 +360,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			contentText.setLayoutParams(contentTextParams);
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -504,7 +505,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			contentText.setLayoutParams(contentTextParams);			
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -806,7 +807,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
+					intent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						intent.putExtra("parentNodeHandle", -1L);
 					}

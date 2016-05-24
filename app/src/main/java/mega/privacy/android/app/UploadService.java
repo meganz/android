@@ -1,23 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.HashMap;
-
-
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferListenerInterface;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -37,6 +19,24 @@ import android.text.format.Formatter;
 import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import java.io.File;
+import java.util.HashMap;
+
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
 
 
 /*
@@ -470,10 +470,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());	
 			}
 			if (dbH.getCredentials() == null){
-				intent.setAction(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD);
+				intent.setAction(Constants.ACTION_CANCEL_UPLOAD);
 			}
 			else{
-				intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
+				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 			}
 		}
 		else{
@@ -623,7 +623,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						Intent intent;
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 							intent = new Intent(this, ManagerActivityLollipop.class);
-							intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+							intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 						}
 						else{
 							intent = new Intent(this, ManagerActivity.class);
@@ -791,7 +791,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				Intent intent;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 				}
 				else{
 					intent = new Intent(this, ManagerActivity.class);

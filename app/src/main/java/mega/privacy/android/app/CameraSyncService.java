@@ -1,25 +1,46 @@
 package mega.privacy.android.app;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.provider.DocumentFile;
+import android.text.format.Formatter;
+import android.text.format.Time;
+import android.widget.RemoteViews;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -35,35 +56,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
-
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.provider.DocumentFile;
-import android.text.format.Formatter;
-import android.text.format.Time;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface{
@@ -1875,11 +1867,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		Intent intent = null;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
-			intent.putExtra(ManagerActivityLollipop.EXTRA_OPEN_FOLDER, cameraUploadHandle);
+			intent.putExtra(Constants.EXTRA_OPEN_FOLDER, cameraUploadHandle);
 		}
 		else{
 			intent = new Intent(CameraSyncService.this, ManagerActivity.class);
-			intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, cameraUploadHandle);
+			intent.putExtra(Constants.EXTRA_OPEN_FOLDER, cameraUploadHandle);
 		}
 
 		mBuilderCompat
@@ -2223,7 +2215,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				Intent intent = null;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 				}
 				else{
 					intent = new Intent(this, ManagerActivity.class);
@@ -2299,7 +2291,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
-			intent.setAction(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC);
+			intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
 		}
 		else{
 			intent = new Intent(CameraSyncService.this, ManagerActivity.class);

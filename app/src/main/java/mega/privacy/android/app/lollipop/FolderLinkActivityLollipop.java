@@ -178,7 +178,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions(folderLinkActivityLollipop,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+									Constants.REQUEST_WRITE_STORAGE);
 							
 							handleListM.clear();
 							for (int i=0;i<documents.size();i++){
@@ -352,7 +352,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		Intent intent = getIntent();
     	
     	if (intent != null) {
-    		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
+    		if (intent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
     			if (parentHandle == -1){
     				url = intent.getDataString();
     				int counter = url.split("!").length - 1;
@@ -823,7 +823,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		
@@ -1018,7 +1018,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					log("OVERQUOTA ERROR: "+e.getErrorCode());
 					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 					startActivity(intent);
 					finish();
 				}
@@ -1053,7 +1053,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					supportInvalidateOptionsMenu();
 					
 					if (adapterList == null){
-						adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, ManagerActivityLollipop.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+						adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 					}
 					else{
 						adapterList.setParentHandle(parentHandle);
@@ -1264,7 +1264,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivityLollipop.FOLDER_LINK_ADAPTER);
+					intent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
 					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -1311,7 +1311,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions(this,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+									Constants.REQUEST_WRITE_STORAGE);
 							
 							handleListM.clear();
 							handleListM.add(nodes.get(position).getHandle());
@@ -1334,7 +1334,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+        	case Constants.REQUEST_WRITE_STORAGE:{
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					if (downloadCompleteFolder){
@@ -1512,7 +1512,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 						
 						downloadCompleteFolder = true;
 						
@@ -1548,7 +1548,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 						
 						handleListM.clear();
 						handleListM.add(selectedNode.getHandle());
