@@ -730,7 +730,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 							notifyDataSetChanged();
 						}
 					}
-					((ManagerActivityLollipop) context).showOptionsPanel(c);
+					((ManagerActivityLollipop) context).showContactOptionsPanel(c, null);
 					break;
 				}			
 				case R.id.contact_list_item_layout:{
@@ -760,7 +760,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 							notifyDataSetChanged();
 						}
 					}
-					((ManagerActivityLollipop) context).showOptionsPanel(c);
+					((ManagerActivityLollipop) context).showContactOptionsPanel(c,null);
 					break;
 				}			
 				case R.id.contact_grid_item_layout:{
