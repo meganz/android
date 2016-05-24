@@ -48,7 +48,7 @@
     <string name="error_general_nodes" context="Error getting the root node">Error. Por favor, inténtelo otra vez.</string>
     
     <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">La carpeta secundaria no existe, por favor, elija una nueva.</string>   
-    <string name="no_external_SD_card_detected" context="when no external card exists">Ninguna tarjeta externa SD detectada</string>
+    <string name="no_external_SD_card_detected" context="when no external card exists">Ningún dispositivo de almacenamiento externo detectado</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">La carpeta es sólo de lectura. No tiene permisos para subir contenido.</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
@@ -514,13 +514,13 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Mostrar dispositivos avanzados (SD externa)</string>
     
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
-        <item context="internal SD card option">Tarjeta SD interna</item>
-        <item context="external SD card option">Tarjeta SD externa</item>
+        <item context="internal storage option">Almacenamiento interno</item>
+        <item context="external storage option">Almacenamiento externo</item>
     </string-array>
 
     <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
         <item context="write option">Introducir el email</item>
-        <item context="import from phone option">Importar desde la agenda</item>
+        <item context="import from phone option">Importar desde el dispositivo</item>
     </string-array>
     
     <string name="settings_camera_upload_on" context="settings option">Activar Subidas de la Cámara</string>
