@@ -53,7 +53,7 @@
     <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
  
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder</string>   
-    <string name="no_external_SD_card_detected" context="when no external card exists">No external SD card detected</string>
+    <string name="no_external_SD_card_detected" context="when no external card exists">No external storage detected</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are removing the exported master key file</string>  
@@ -90,7 +90,7 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export master key</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup master key</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove master key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The master key has been exported into: </string>
@@ -518,13 +518,13 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
     
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
-        <item context="internal SD card option">Internal SD card</item>
-        <item context="external SD card option">External SD card</item>
+        <item context="internal storage option">Internal storage</item>
+        <item context="external storage option">External storage</item>
     </string-array>
 
     <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
         <item context="write option">Write the user\'s e-mail</item>
-        <item context="import from phone option">Import from phone</item>
+        <item context="import from phone option">Import from device</item>
     </string-array>
     
     <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>

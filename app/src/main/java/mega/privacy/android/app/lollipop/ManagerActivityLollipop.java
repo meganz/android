@@ -106,10 +106,13 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
+import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
+import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -6741,6 +6744,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showSnackbar(String s){
+		log("showSnackbar");
 		Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG).show();
 	}
 
@@ -7395,237 +7399,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		megaApi.cleanRubbishBin(managerActivity);
 	}
 
-	private class ContactNameListener implements MegaRequestListenerInterface{
-
-		Context context;
-
-		public ContactNameListener(Context context) {
-			this.context = context;
-		}
-
-		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		}
-
-		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-			log("ContactNameListener:onRequestFinish()");
-			if (e.getErrorCode() == MegaError.API_OK){
-
-				if(request.getParamType()==1){
-					log("(ManagerActivityLollipop(1)request.getText(): "+request.getText()+" -- "+request.getEmail());
-					int rows = dbH.setContactName(request.getText(), request.getEmail());
-					log("Rows affected: "+rows);
-
-					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (cFLol != null){
-						if (drawerItem == DrawerItem.CONTACTS){
-							cFLol.updateView();
-						}
-					}
-				}
-				else if(request.getParamType()==2){
-					log("ManagerActivityLollipop(2)request.getText(): "+request.getText()+" -- "+request.getEmail());
-					int rows = dbH.setContactLastName(request.getText(), request.getEmail());
-					log("Rows affected: "+rows);
-
-					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (cFLol != null){
-						if (drawerItem == DrawerItem.CONTACTS){
-							cFLol.updateView();
-						}
-					}
-				}
-			}
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-		}
-	}
-
-	/*
-	 * Background task to emptying the Rubbish Bin
-	 */
-//	private class ClearRubbisBinTask extends AsyncTask<String, Void, String> {
-//		Context context;
-//		MultipleRequestListener moveMultipleListener = null;
-//
-//		ClearRubbisBinTask(Context context){
-//			this.context = context;
-//		}
-//
-//		@Override
-//		protected String doInBackground(String... params) {
-//			log("doInBackground-Async Task ClearRubbisBinTask");
-//
-//			if (rbFLol != null){
-//				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-//
-//				isClearRubbishBin = true;
-//				if(rubbishNodes.size()>1){
-//					moveMultipleListener = new MultipleRequestListener(-1);
-//					for (int i=0; i<rubbishNodes.size(); i++){
-//						megaApi.remove(rubbishNodes.get(i), moveMultipleListener);
-//					}
-//				}
-//				else{
-//					for (int i=0; i<rubbishNodes.size(); i++){
-//						megaApi.remove(rubbishNodes.get(i), managerActivity);
-//					}
-//				}
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//        protected void onPostExecute(String result) {
-//			log("onPostExecute -Async Task ClearRubbisBinTask");
-//			//update the content label of the Rubbish Bin Fragment
-//			if(rbFLol!=null){
-//					rbFLol.setContentText();
-//			}
-//        }
-//	}
-
-	/*
-	 * Background task to verify the offline nodes
-	 */
-	private class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
-		Context context;
-
-		CheckOfflineNodesTask(Context context){
-			this.context = context;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task CheckOfflineNodesTask");
-
-			ArrayList<MegaOffline> offlineNodes = dbH.getOfflineFiles();
-
-			File file=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-
-			if(file.exists()){
-
-				for(int i=0; i<offlineNodes.size();i++){
-					MegaOffline mOff = offlineNodes.get(i);
-					if(mOff.isIncoming()){
-						File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/" + mOff.getHandleIncoming() + mOff.getPath()+ mOff.getName());
-						log("Check the INCOMING file: "+fileToCheck.getAbsolutePath());
-						if(!fileToCheck.exists()){
-							log("The INCOMING file NOT exists!");
-							//Remove from the DB
-							int removed = dbH.deleteOfflineFile(mOff);
-							log("INCOMING File removed: "+removed);
-						}
-						else{
-							log("The INCOMING file exists!");
-						}
-					}
-					else{
-						File fileToCheck=new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ mOff.getPath()+ mOff.getName());
-						log("Check the file: "+fileToCheck.getAbsolutePath());
-						if(!fileToCheck.exists()){
-							log("The file NOT exists!");
-							//Remove from the DB
-							int removed = dbH.deleteOfflineFile(mOff);
-							log("File removed: "+removed);
-						}
-						else{
-							log("The file exists!");
-						}
-					}
-				}
-
-				//Check no empty folders
-				offlineNodes = dbH.getOfflineFiles();
-				for(int i=0; i<offlineNodes.size();i++){
-					MegaOffline mOff = offlineNodes.get(i);
-					//Get if its folder
-					if(mOff.isFolder()){
-						ArrayList<MegaOffline> children = dbH.findByParentId(mOff.getId());
-						if(children.size()<1){
-							log("Delete the empty folder: "+mOff.getName());
-							dbH.deleteOfflineFile(mOff);
-							if(mOff.isIncoming()){
-								File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ "/" + mOff.getHandleIncoming() + mOff.getPath()+ mOff.getName());
-								try {
-									Util.deleteFolderAndSubfolders(context, folderToDelete);
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-							else{
-								File folderToDelete = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR+ mOff.getPath()+ mOff.getName());
-								try {
-									Util.deleteFolderAndSubfolders(context, folderToDelete);
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-						}
-					}
-				}
-
-			}
-			else{
-				//Delete the DB if NOT empty
-				if(offlineNodes.size()>0){
-					//Delete the content
-					log("Clear Offline TABLE");
-					dbH.clearOffline();
-				}
-			}
-
-			return null;
-		}
-
-//		@Override
-//        protected void onPostExecute(String result) {
-//			log("onPostExecute -Async Task CheckOfflineNodesTask");
-//			//update the content label of the Rubbish Bin Fragment
-//			if(rbFLol!=null){
-//					rbFLol.setContentText();
-//			}
-//        }
-	}
-	/*
-	 * Background task to fill the DB with the contact info the first time
-	 */
-	private class FillDBContactsTask extends AsyncTask<String, Void, String> {
-		Context context;
-
-		FillDBContactsTask(Context context){
-			this.context = context;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			log("doInBackground-Async Task FillDBContactsTask");
-
-			ArrayList<MegaUser> contacts = megaApi.getContacts();
-
-			ContactNameListener listener = new ContactNameListener(context);
-
-			for(int i=0; i<contacts.size(); i++){
-				MegaContact megaContact = new MegaContact(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
-				dbH.setContact(megaContact);
-				megaApi.getUserAttribute(contacts.get(i), 1, listener);
-				megaApi.getUserAttribute(contacts.get(i), 2, listener);
-			}
-			return null;
-		}
-	}
-
 //	public void upgradeAccountButton(){
 //		log("upgradeAccountButton");
 //		drawerItem = DrawerItem.ACCOUNT;
@@ -8050,9 +7823,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void removeContact(final MegaUser c){
-
-		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)
-
 		final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
 
 		if(inShares.size() != 0)
@@ -9657,15 +9427,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
-			log("Entrooo en requestCode");
+			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-
-				log("REcibo el intent OOOOKK");
 				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
 				startActivity(intentPicture);
 			}
 			else{
-				log("REcibo el intent con error");
+				log("TAKE_PHOTO_CODE--->ERROR!");
 			}
 
 	    }
@@ -12238,5 +12006,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setSelectedNode(MegaNode selectedNode) {
 		this.selectedNode = selectedNode;
+	}
+
+
+	public ContactsFragmentLollipop getContactsFragment() {
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		return cFLol;
+	}
+
+	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
+		this.cFLol = cFLol;
 	}
 }

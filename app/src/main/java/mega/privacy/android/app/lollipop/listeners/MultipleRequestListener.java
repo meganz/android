@@ -37,9 +37,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        // TODO Auto-generated method stub
-        counter--;
-        error++;
+
         log("Counter on onRequestTemporaryError: "+counter);
 //			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 //			if(node!=null){
@@ -49,7 +47,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        // TODO Auto-generated method stub
+
         counter++;
         if(counter>max_items){
             max_items=counter;
@@ -59,7 +57,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        // TODO Auto-generated method stub
+
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
             error++;
