@@ -489,6 +489,7 @@ public class NodeController {
         final String urlC = url;
         final long sizeC = size;
         final long [] hashesC = hashes;
+        String nodeToDownload = null;
 
         String ask=dbH.getAttributes().getAskNoAppDownload();
 
@@ -517,13 +518,13 @@ public class NodeController {
                         try{
                             if (!MegaApiUtils.isIntentAvailable(context, checkIntent)){
                                 confirmationToDownload = true;
-//                                nodeToDownload=node.getName();
+                                nodeToDownload=node.getName();
                                 break;
                             }
                         }catch(Exception e){
                             log("isIntent EXCEPTION");
                             confirmationToDownload = true;
-//                            nodeToDownload=node.getName();
+                            nodeToDownload=node.getName();
                             break;
                         }
                     }
@@ -533,7 +534,7 @@ public class NodeController {
             //Check if show the alert message
             if(confirmationToDownload){
                 //Show message
-                ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
             }
             else{
                 download(parentPathC, urlC, sizeC, hashesC);

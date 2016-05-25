@@ -434,9 +434,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
-//	boolean confirmationToDownload=false;
-	String nodeToDownload;
-
 
  // Callback for when a purchase is finished
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
@@ -6593,7 +6590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG).show();
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes){
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
 		log("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
