@@ -1233,7 +1233,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionContactSendFile.setOnClickListener(contactOptionsPanelListener);
 		optionsOutLayout.setOnClickListener(contactOptionsPanelListener);
 		optionReinvite.setOnClickListener(contactOptionsPanelListener);
-		optionDelete.setOnClickListener(contactOptionsPanelListener);
+		optionDeleteSentRequest.setOnClickListener(contactOptionsPanelListener);
 		optionAccept.setOnClickListener(contactOptionsPanelListener);
 		optionDecline.setOnClickListener(contactOptionsPanelListener);
 		optionIgnore.setOnClickListener(contactOptionsPanelListener);
@@ -9580,7 +9580,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-
+					log("OK INVITE CONTACT: ");
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
 						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_sent), Snackbar.LENGTH_LONG).show();
@@ -9595,6 +9595,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					}
 				}
 				else{
+					log("Code: "+e.getErrorString());
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
 						Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists, request.getEmail()), Snackbar.LENGTH_LONG).show();
