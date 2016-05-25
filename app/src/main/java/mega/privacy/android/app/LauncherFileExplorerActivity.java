@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -189,7 +190,8 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 			
 			if (credentials == null){
 				log("User credentials NULL");
-				ManagerActivityLollipop.logout(this, megaApi, false);
+				AccountController aC = new AccountController(this);
+				aC.logout(this, megaApi, false);
 				
 				Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 				loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);

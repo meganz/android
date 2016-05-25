@@ -1,13 +1,10 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,9 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
@@ -43,18 +38,14 @@ import android.widget.TextView;
 
 import com.nirhart.parallaxscroll.views.ParallaxScrollView;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -509,7 +500,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		menuOptions.add(getString(R.string.my_account_change_password));
 		
 		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-		log("Export in: "+path);
+		log("Exists MK in: "+path);
 		File file= new File(path);
 		if(file.exists()){
 			menuOptions.add(getString(R.string.action_remove_master_key));
@@ -591,7 +582,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 			case R.id.my_account_logout:{
-				ManagerActivityLollipop.logout(context, megaApi, false);
+				AccountController aC = new AccountController(context);
+				aC.logout(context, megaApi, false);
 				break;
 			}
 			case R.id.my_account_account_type_button:{
@@ -911,107 +903,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			startActivity(intent);
 		}
 		else if (itemText.compareTo(getString(R.string.action_export_master_key)) == 0){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
-					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							Constants.REQUEST_WRITE_STORAGE);
-				}
-			}
-			
-			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        switch (which){
-			        case DialogInterface.BUTTON_POSITIVE:
-			        	String key = megaApi.exportMasterKey();
-						
-						BufferedWriter out;         
-						try {						
-
-							final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-							final File f = new File(path);
-							log("Export in: "+path);
-							FileWriter fileWriter= new FileWriter(path);	
-							out = new BufferedWriter(fileWriter);	
-							out.write(key);	
-							out.close(); 								
-							String message = getString(R.string.toast_master_key) + " " + path;
-//			    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
-
-			    			showAlert(message);
-							/*removeMasterKeyMenuItem.setVisible(true);
-				        	exportMasterKeyMenuItem.setVisible(false);*/
-
-						}catch (FileNotFoundException e) {
-						 e.printStackTrace();
-						}catch (IOException e) {
-						 e.printStackTrace();
-						}
-						
-						if (overflowMenuList != null){
-							createOverflowMenu(overflowMenuList);
-						}
-			        	
-			            break;
-
-			        case DialogInterface.BUTTON_NEGATIVE:
-			            //No button clicked
-			            break;
-			        }
-			    }
-			};
-			
-			AlertDialog.Builder builder;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
-				builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-			}
-			else{
-				builder = new AlertDialog.Builder(context);
-			}
-
-			builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_export, dialogClickListener)
-			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+			((ManagerActivityLollipop) context).showConfirmationExportMK();
+			createOverflowMenu(overflowMenuList);
 		}
 		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
-					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							Constants.REQUEST_WRITE_STORAGE);
-				}
-			}
-			
-			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        switch (which){
-			        case DialogInterface.BUTTON_POSITIVE:
 
-						final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-						final File f = new File(path);
-			        	f.delete();	
-			        	/*removeMasterKeyMenuItem.setVisible(false);
-			        	exportMasterKeyMenuItem.setVisible(true);*/
-			        	String message = getString(R.string.toast_master_key_removed);
-			        	showAlert(message);
-			        	
-			        	createOverflowMenu(overflowMenuList);
-			        	
-			            break;
-
-			        case DialogInterface.BUTTON_NEGATIVE:
-			            //No button clicked
-			            break;
-			        }
-			    }
-			};
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
-			    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+			((ManagerActivityLollipop) context).showConfirmationRemoveMK();
+			createOverflowMenu(overflowMenuList);
 		}
 		else if (itemText.compareTo(getString(R.string.action_help)) == 0){
 			Intent intent = new Intent();
@@ -1024,7 +922,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			((ManagerActivityLollipop)context).showUpAF(null);
 		}
 		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
-			ManagerActivityLollipop.logout(context, megaApi, false);
+			AccountController aC = new AccountController(context);
+			aC.logout(context, megaApi, false);
 		}
 	}
 	

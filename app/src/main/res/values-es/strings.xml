@@ -57,7 +57,7 @@
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">¿Quieres enviar una invitación a %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borrar estos %d contactos?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Está seguro de que desea enviar estos elementos a la Papelera?</string>
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Borrar de MEGA</string>

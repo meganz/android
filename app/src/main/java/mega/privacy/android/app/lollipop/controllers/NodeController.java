@@ -21,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -949,30 +948,6 @@ public class NodeController {
                 }
             }
         }
-    }
-
-    public void pickFolderToShare(List<MegaUser> users){
-
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
-        ArrayList<String> longArray = new ArrayList<String>();
-        for (int i=0; i<users.size(); i++){
-            longArray.add(users.get(i).getEmail());
-        }
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
-    }
-
-    public void pickFileToSend(List<MegaUser> users){
-        log("pickFileToSend");
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
-        ArrayList<String> longArray = new ArrayList<String>();
-        for (int i=0; i<users.size(); i++){
-            longArray.add(users.get(i).getEmail());
-        }
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
     public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){

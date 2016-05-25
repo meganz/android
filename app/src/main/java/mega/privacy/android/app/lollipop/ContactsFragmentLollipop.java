@@ -1,9 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -27,7 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,12 +35,12 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
-public class ContactsFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class ContactsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 
 	public static int GRID_WIDTH =400;
 	
@@ -105,16 +102,15 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaUser> users = adapter.getSelectedUsers();
-			final List<MegaUser> multipleContacts = users;;
-			
+			ArrayList<MegaUser> users = adapter.getSelectedUsers();
+
 			switch(item.getItemId()){
 				case R.id.cab_menu_share_folder:{
 					clearSelections();
 					hideMultipleSelect();
 					if (users.size()>0){
-						NodeController nC = new NodeController(context);
-						nC.pickFolderToShare(users);
+						ContactController cC = new ContactController(context);
+						cC.pickFolderToShare(users);
 					}										
 					break;
 				}
@@ -122,37 +118,16 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 					clearSelections();
 					hideMultipleSelect();
 					if (users.size()>0){
-						NodeController nC = new NodeController(context);
-						nC.pickFileToSend(users);
+						ContactController cC = new ContactController(context);
+						cC.pickFileToSend(users);
 					}										
 					break;
 				}
 				case R.id.cab_menu_delete:{
 					clearSelections();
 					hideMultipleSelect();
-					if (users.size()>0){
-						DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-						    @Override
-						    public void onClick(DialogInterface dialog, int which) {
-						        switch (which){
-						        case DialogInterface.BUTTON_POSITIVE:						        	
-						        	((ManagerActivityLollipop) context).removeMultipleContacts(multipleContacts);		        	
-						            break;
-			
-						        case DialogInterface.BUTTON_NEGATIVE:
-						            //No button clicked
-						            break;
-						        }
-						    }
-						};
-			
-						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-						builder.setMessage(getResources().getString(R.string.confirmation_remove_multiple_contacts)).setPositiveButton(R.string.general_remove, dialogClickListener)
-						    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-						
-					}	
-					//TODO remove contact
-					
+					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
+
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -434,12 +409,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
 
-	}
-			
     public void itemClick(int position) {
 					
 		if (adapter.isMultipleSelect()){

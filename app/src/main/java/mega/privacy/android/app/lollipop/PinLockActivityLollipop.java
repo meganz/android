@@ -1,17 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.Locale;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.ManagerActivity;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.PinUtil;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,21 +15,32 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.util.Locale;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.ManagerActivity;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.PinUtil;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 
 
 @SuppressLint("NewApi")
@@ -1347,7 +1346,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		log("onClick");
 		switch(v.getId()){
 			case R.id.button_logout:{
-				ManagerActivityLollipop.logout(getApplication(), megaApi, false);
+				AccountController aC = new AccountController(this);
+				aC.logout(getApplication(), megaApi, false);
 //				Intent intent = new Intent(this, TourActivityLollipop.class);
 //				startActivity(intent);
 				finish();
