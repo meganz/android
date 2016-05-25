@@ -110,7 +110,7 @@ public class ContactOptionsPanelListener implements View.OnClickListener {
                 cC.reinviteContact(selectedRequest);
                 break;
             }
-            case R.id.contact_list_option_delete_layout:{
+            case R.id.contact_list_option_delete_request_layout:{
                 log("Remove Invitation");
                 MegaContactRequest selectedRequest = ((ManagerActivityLollipop) context).getSelectedRequest();
                 if(selectedRequest==null){
