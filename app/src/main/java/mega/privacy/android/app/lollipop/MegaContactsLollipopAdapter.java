@@ -680,7 +680,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	/*
 	 * Get list of all selected contacts
 	 */
-	public List<MegaUser> getSelectedUsers() {
+	public ArrayList<MegaUser> getSelectedUsers() {
 		ArrayList<MegaUser> users = new ArrayList<MegaUser>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {

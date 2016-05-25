@@ -99,7 +99,7 @@
             android:textColor="@color/text_secondary"
             android:textSize="16sp" />
     </RelativeLayout>
-        
+
     <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout_contact_file"
@@ -195,8 +195,8 @@
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
-            </LinearLayout> 
-                        
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/contact_file_list_option_delete_layout"
                 android:layout_width="match_parent"

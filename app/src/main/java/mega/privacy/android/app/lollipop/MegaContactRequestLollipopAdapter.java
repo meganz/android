@@ -123,13 +123,17 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 		} else {
-			holder.imageButtonThreeDots.setVisibility(View.GONE);		
-
-			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			if (positionClicked == -1){
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
+				if(this.isItemChecked(position)){
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				}
+				else{
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+				}
 			}
 		}
 						
@@ -417,6 +421,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
     
     public void setPositionClicked(int p){
     	positionClicked = p;
+		notifyDataSetChanged();
     }
     
 	@Override

@@ -14,11 +14,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -26,15 +23,13 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 
-public class SentRequestsFragmentLollipop extends Fragment implements OnClickListener{
+public class SentRequestsFragmentLollipop extends Fragment {
 	
 	public static int GRID_WIDTH =400;
 	
@@ -66,14 +61,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 //	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
 	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;	
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionReinvite;
-	public LinearLayout optionDelete;
-	
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -83,7 +71,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}	
     }
-	
 	
 	public void updateView(){
 		contacts = megaApi.getOutgoingContactRequests();
@@ -181,56 +168,8 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_request_list_out_options);
-			optionReinvite = (LinearLayout) v.findViewById(R.id.contact_list_option_reinvite_layout);
-			optionDelete = (LinearLayout) v.findViewById(R.id.contact_list_option_delete_layout);
-			
-			optionReinvite.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
 
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });			
-						
 			return v;
-
     	}
     	else{
 
@@ -239,22 +178,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
     	}
     }
 
-	public void showOptionsPanel(MegaContactRequest request){		
-		log("showNodeOptionsPanel");
-		
-		this.selectedRequest = request;
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapterList.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-	}
-    
 	private static void log(String log) {		
 		Util.log("SentRequestsFragmentLollipop", log);
 	}
@@ -328,69 +251,9 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		switch(v.getId()){
-			case R.id.invite_contact_button:{				
-				((ManagerActivityLollipop)context).chooseAddContactDialog();
-				break;
-			}
-			case R.id.contact_request_list_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-			case R.id.contact_list_option_reinvite_layout:{
-				log("optionReinvite");
-				hideOptionsPanel();
-				((ManagerActivityLollipop) context).reinviteContact(selectedRequest);				
-				break;
-			}
-			case R.id.contact_list_option_delete_layout:{
-				log("Remove Invitation");
-				hideOptionsPanel();
-				((ManagerActivityLollipop) context).removeInvitationContact(selectedRequest);
-				break;
-			}
-		}		
-	}
-	
 	public int onBackPressed(){
-		
-		log("onBackPressed");	
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			hideOptionsPanel();
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
-		
-//		if (adapterList.isMultipleSelect()){
-//			adapterList.hideMultipleSelect();
-//			return 2;
-//		}
-		
+		log("onBackPressed");
+
 		if (adapterList.getPositionClicked() != -1){
 			adapterList.setPositionClicked(-1);
 			adapterList.notifyDataSetChanged();
@@ -407,5 +270,12 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapterList!=null){
+			adapterList.setPositionClicked(-1);
+		}
+	}
 
 }

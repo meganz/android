@@ -48,6 +48,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -232,7 +233,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 		if (credentials == null){
 			log("User credentials NULL");
-			ManagerActivityLollipop.logout(this, megaApi, false);
+			AccountController aC = new AccountController(this);
+			aC.logout(this, megaApi, false);
 			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
