@@ -1069,24 +1069,28 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if(tabShown==CLOUD_TAB){
 			if (cDriveExplorer != null){
 				parentHandle = cDriveExplorer.getParentHandle();
+				log("1)cDriveExplorer != null: " + parentHandle);
 			}
 			else{
 				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
+					log("2)cDriveExplorer != null: " + parentHandle);
 				}	
 			}
 		}
 		else if (tabShown == INCOMING_TAB){
 			if (iSharesExplorer != null){
 				parentHandle = iSharesExplorer.getParentHandle();
+				log("1)iSharesExplorer != null: " + parentHandle);
 			}
 			else{
 				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (iSharesExplorer != null){
 					parentHandle = iSharesExplorer.getParentHandle();
+					log("2)iSharesExplorer != null: " + parentHandle);
 				}	
 			}
 		}
@@ -1117,6 +1121,40 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else{
 				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+			}
+		}
+		else{
+			log("parentNode == null: " + parentHandle);
+			parentNode = megaApi.getRootNode();
+			if (parentNode != null){
+				log("megaApi.getRootNode() != null");
+				boolean exists = false;
+				ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+				for (int i=0;i<nL.size();i++){
+					if (title.compareTo(nL.get(i).getName()) == 0){
+						exists = true;
+					}
+				}
+
+				if (!exists){
+					statusDialog = null;
+					try {
+						statusDialog = new ProgressDialog(this);
+						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog.show();
+					}
+					catch(Exception e){
+						return;
+					}
+
+					megaApi.createFolder(title, parentNode, this);
+				}
+				else{
+					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				}
+			}
+			else{
+				return;
 			}
 		}
 		
@@ -1290,6 +1328,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 				cDriveExplorer.setNodes(nodes);
 				cDriveExplorer.getListView().invalidate();
+			}
+			else{
+				if (megaApi.getRootNode() != null){
+					cDriveExplorer.setParentHandle(megaApi.getRootNode().getHandle());
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+					cDriveExplorer.setNodes(nodes);
+					cDriveExplorer.getListView().invalidate();
+				}
 			}
 		}
 	}
