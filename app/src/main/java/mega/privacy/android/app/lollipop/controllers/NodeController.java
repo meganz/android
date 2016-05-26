@@ -60,6 +60,9 @@ public class NodeController {
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        }
     }
 
     public void chooseLocationToCopyNodes(ArrayList<Long> handleList){
@@ -274,7 +277,6 @@ public class NodeController {
         log("Number of files: "+hashes.length);
 
         if (dbH == null){
-//			dbH = new DatabaseHandler(getApplicationContext());
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
@@ -454,6 +456,10 @@ public class NodeController {
             return;
         }
 
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        }
+
         String ask=dbH.getAttributes().getAskSizeDownload();
 
         if(ask==null){
@@ -490,6 +496,10 @@ public class NodeController {
         final long sizeC = size;
         final long [] hashesC = hashes;
         String nodeToDownload = null;
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        }
 
         String ask=dbH.getAttributes().getAskNoAppDownload();
 

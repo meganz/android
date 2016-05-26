@@ -1,6 +1,7 @@
 package mega.privacy.android.app.utils;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -54,6 +55,71 @@ public class MegaApiUtils {
         int count = Util.countMatches(pattern, path);
 
         return count+1;
+    }
+
+    public static String createStringTree (MegaNode node, Context context){
+        log("createStringTree");
+        MegaApiAndroid megaApi = null;
+        if (context instanceof Service){
+            megaApi = ((MegaApplication) ((Service)context).getApplication()).getMegaApi();
+        }
+        else if (context instanceof Activity){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+        if(megaApi==null){
+            log("ERROR megaApi is null");
+            return null;
+        }
+
+        ArrayList<MegaNode> dTreeList = new ArrayList<MegaNode>();
+        MegaNode parentNode = null;
+        MegaNode nodeTemp = node;
+        StringBuilder dTree = new StringBuilder();
+        String s;
+
+        dTreeList.add(node);
+
+        if(node.getType() != MegaNode.TYPE_ROOT){
+            parentNode=megaApi.getParentNode(nodeTemp);
+
+//			if(parentNode!=null){
+//				while (parentNode.getType() != MegaNode.TYPE_ROOT){
+//					if(parentNode!=null){
+//						dTreeList.add(parentNode);
+//						dTree.insert(0, parentNode.getName()+"/");
+//						nodeTemp=parentNode;
+//						parentNode=megaApi.getParentNode(nodeTemp);
+//					}
+//				}
+//			}
+
+            if(parentNode!=null){
+
+                if((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle()!=megaApi.getInboxNode().getHandle())){
+                    do{
+
+                        dTreeList.add(parentNode);
+                        dTree.insert(0, parentNode.getName()+"/");
+                        nodeTemp=parentNode;
+
+                        parentNode=megaApi.getParentNode(nodeTemp);
+                        if(parentNode==null){
+                            break;
+                        }
+                    }while ((parentNode.getType() != MegaNode.TYPE_ROOT) & (parentNode.getHandle()!=megaApi.getInboxNode().getHandle()));
+                }
+            }
+        }
+
+        if(dTree.length()>0){
+            s = dTree.toString();
+        }
+        else{
+            s="";
+        }
+
+        log("createStringTree: "+s);
+        return s;
     }
 
     private static void log(String message) {

@@ -47,11 +47,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
-	
-	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
-	static int FROM_OFFLINE= 15;
-		
+
 	Context context;
 	MegaApiAndroid megaApi;
 
@@ -70,6 +66,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	HashMap<Long, MegaTransfer> mTHash = null;
 	MegaTransfer currentTransfer = null;
 	boolean incoming = false;
+	boolean inbox = false;
 	DatabaseHandler dbH = null;
 	boolean multipleSelect;
 	int type = Constants.FILE_BROWSER_ADAPTER;
@@ -215,6 +212,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			case Constants.INCOMING_SHARES_ADAPTER: {
 				incoming=true;
 				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
+				break;
+			}
+			case Constants.INBOX_ADAPTER: {
+				log("onCreate INBOX_ADAPTER");
+				inbox=true;
+				((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
 				break;
 			}
 			default: {
@@ -630,6 +633,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		//Find in the database
 		MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
 		if(offlineNode!=null){
+			log("Node found OFFLINE: "+offlineNode.getName());
 			if(incoming){
 				log("Incoming tab: MegaBrowserGridAdapter: "+node.getHandle());				
 				//Find in the filesystem
@@ -642,6 +646,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				
 			}
+			else if(inbox){
+				String pathMega = megaApi.getNodePath(node);
+				pathMega = pathMega.replace("/in", "");
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +pathMega+offlineNode.getName());
+				}
+				else{
+					offlineFile = context.getFilesDir();
+				}
+			}
 			else{
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
@@ -651,7 +665,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					offlineFile = context.getFilesDir();
 				}
 			}	
-		}		
+		}
+		else{
+			log("Node NOT found OFFLINE: "+node.getName());
+		}
 		
 		if (offlineFile!=null){
 			if (offlineFile.exists()){
@@ -975,6 +992,18 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				
 			}
+			else if(inbox){
+				log("In Inbox");
+				String pathMega = megaApi.getNodePath(node);
+				pathMega = pathMega.replace("/in", "");
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +pathMega);
+					log("The path to find is: "+offlineFile.getPath());
+				}
+				else{
+					offlineFile = context.getFilesDir();
+				}
+			}
 			else{
 				log("CLOUD tab: MegaBrowserListAdapter: "+node.getHandle());
 				//Find in the filesystem
@@ -1191,6 +1220,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			break;
 		}
 		case Constants.INBOX_ADAPTER: {
+			log("setParentHandleBrowser -INBOX_ADAPTER");
 			((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
 			break;
 		}

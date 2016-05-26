@@ -1017,12 +1017,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (megaApi.checkAccess(nodeToInsert, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 				
 				if(megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT){
-					
+
 					parentNode = megaApi.getParentNode(nodeToInsert);
 					log("ParentNode: "+parentNode.getName());
 					log("PARENT NODE nooot ROOT");
 
-					path = createStringTree(nodeToInsert);
+					path = MegaApiUtils.createStringTree(nodeToInsert, this);
 					if(path==null){
 						path="/";
 					}
@@ -1086,7 +1086,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				parentNode = megaApi.getParentNode(nodeToInsert);
 				log("ParentNode: "+parentNode.getName());
 
-				path = createStringTree(nodeToInsert);
+				path = MegaApiUtils.createStringTree(nodeToInsert, this);
 				if(path==null){
 					path="/";
 				}
@@ -1167,7 +1167,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("insertIncomingParentDB: Check SaveOffline: "+parentNode.getName());
 		
 		MegaOffline mOffParentParent = null;
-		String path=createStringTree(parentNode);
+		String path=MegaApiUtils.createStringTree(parentNode, this);
 		if(path==null){
 			path="/";
 		}
@@ -1268,7 +1268,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("insertParentDB: Check SaveOffline: "+parentNode.getName());
 		
 		MegaOffline mOffParentParent = null;
-		String path=createStringTree(parentNode);
+		String path=MegaApiUtils.createStringTree(parentNode, this);
 		if(path==null){
 			path="/";
 		}
@@ -1278,21 +1278,42 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		MegaNode parentparentNode = megaApi.getParentNode(parentNode);
 		if(parentparentNode==null){
+			log("return insertParentDB");
 			return;
 		}		
 		
 		if(parentparentNode.getType() != MegaNode.TYPE_ROOT){
+
+
+			if(parentparentNode.getHandle()==megaApi.getInboxNode().getHandle()){
+				log("En algun momento!!!");
+				log("---------------PARENT NODE INBOX------");
+				if(parentNode.isFile()){
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, false, "-1");
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert M: "+checkInsert);
+				}
+				else{
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, false, "-1");
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert N: "+checkInsert);
+				}
+				return;
+			}
 			
 			mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
-			if(mOffParentParent==null){						
+			if(mOffParentParent==null){
+				log("mOffParentParent==null");
 				insertParentDB(megaApi.getParentNode(parentNode));
 				//Insert the parent node
 				mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
-				if(mOffParentParent==null){						
+				if(mOffParentParent==null){
+					log("call again");
 					insertParentDB(megaApi.getParentNode(parentNode));						
 					
 				}
-				else{			
+				else{
+					log("second check NOOOTTT mOffParentParent==null");
 					if(parentNode.isFile()){
 						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false, "-1");
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
@@ -1306,7 +1327,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}	
 			}
 			else{
-
+				log("NOOOTTT mOffParentParent==null");
 				if(parentNode.isFile()){
 					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false, "-1");
 					long checkInsert=dbH.setOfflineFile(mOffInsert);
@@ -1331,63 +1352,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				long checkInsert=dbH.setOfflineFile(mOffInsert);
 				log("Test insert N: "+checkInsert);
 			}						
-		}			
-		
-	}
+		}
 
-	
-	private String createStringTree (MegaNode node){
-		log("createStringTree");
-		dTreeList = new ArrayList<MegaNode>();
-		MegaNode parentNode = null;
-		MegaNode nodeTemp = node;
-		StringBuilder dTree = new StringBuilder();
-		String s;
-		
-		dTreeList.add(node);
-		
-		if(node.getType() != MegaNode.TYPE_ROOT){
-			parentNode=megaApi.getParentNode(nodeTemp);
-	
-//			if(parentNode!=null){
-//				while (parentNode.getType() != MegaNode.TYPE_ROOT){
-//					if(parentNode!=null){
-//						dTreeList.add(parentNode);
-//						dTree.insert(0, parentNode.getName()+"/");	
-//						nodeTemp=parentNode;
-//						parentNode=megaApi.getParentNode(nodeTemp);
-//					}					
-//				}
-//			}
-			
-			if(parentNode!=null){
-				
-				if(parentNode.getType() != MegaNode.TYPE_ROOT){					
-					do{
-						
-						dTreeList.add(parentNode);
-						dTree.insert(0, parentNode.getName()+"/");	
-						nodeTemp=parentNode;
-						parentNode=megaApi.getParentNode(nodeTemp);
-						if(parentNode==null){
-							break;
-						}					
-					}while (parentNode.getType() != MegaNode.TYPE_ROOT);
-				
-				}				
-			}	
-			
-		}			
-		
-		if(dTree.length()>0){
-			s = dTree.toString();
-		}
-		else{
-			s="";
-		}
-			
-		log("createStringTree: "+s);
-		return s;
 	}
 
 	@Override
