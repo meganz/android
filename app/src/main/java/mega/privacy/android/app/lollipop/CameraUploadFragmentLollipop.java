@@ -96,7 +96,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	RecyclerView listView;
 	GestureDetectorCompat detector;
 	private RecyclerView.LayoutManager mLayoutManager;
-	ImageButton fabButton;
 
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -561,9 +560,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
-			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
-			fabButton.setVisibility(View.GONE);
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
