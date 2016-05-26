@@ -423,8 +423,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });					
-			
+	        });
+			aB.setTitle(getString(R.string.section_contacts));
 			return v;
 		}
 		else{
@@ -524,8 +524,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });	
-			
+	        });
+			aB.setTitle(getString(R.string.section_contacts));
 			return v;
 		}			
 	}
