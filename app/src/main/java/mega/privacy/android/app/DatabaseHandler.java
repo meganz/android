@@ -1,12 +1,5 @@
 package mega.privacy.android.app;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiJava;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +8,13 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.util.Base64;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiJava;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -618,7 +618,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public long setOfflineFile (MegaOffline offline){
-		
+		log("setOfflineFile");
         ContentValues values = new ContentValues();
         
         MegaOffline checkInsert = null;

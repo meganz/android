@@ -95,6 +95,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	static int FROM_FILE_BROWSER = 13;
 	static public int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
+	static public int FROM_INBOX= 16;
 	
 	RelativeLayout imageLayout;
 	ImageView toolbarBack;
@@ -160,7 +161,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	TextView ownerInfo;	
 	ImageView ownerIcon;
 
-	ArrayList<MegaNode> dTreeList = null;
+//	ArrayList<MegaNode> dTreeList = null;
 	
 	MegaNode node;
 	long handle;
@@ -524,7 +525,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	private void refreshProperties(){		
-		log("refresh");
+		log("refreshProperties");
 	
 		boolean result=true;
 		
@@ -784,8 +785,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				} else {
 					log("NOT INCOMING");
 					//Find in the filesystem
+					//Path MEGA
+					String pathMega = megaApi.getNodePath(node);
+					if(from==FROM_INBOX){
+						pathMega = pathMega.replace("/in", "");
+					}
 					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + pathMega);
 						log("offline File: " + offlineFile.getAbsolutePath());
 					} else {
 						offlineFile = this.getFilesDir();
@@ -898,7 +904,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		    		File destination = null;
 					File offlineFile = null;
 					if (Environment.getExternalStorageDirectory() != null){
-						destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+						destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 					}
 					else{
 						destination = new File(getFilesDir(), node.getHandle()+"");
@@ -970,11 +976,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				availableOfflineBoolean = true;
 				offlineSwitch.setChecked(true);	
 				
-				log("Path destination: "+Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+				log("Path destination: "+Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 				
 				File destination = null;
 				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 				}
 				else{
 					destination = getFilesDir();
@@ -1021,7 +1027,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						log("ParentHandleIncoming: "+megaNode.getName());
 					}
 					String handleString = Long.toString(result);
-					String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+createStringTree(node);
+					String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+MegaApiUtils.createStringTree(node, this);
 					log("Not owner path destination: "+destinationPath);
 					
 					File destination = null;
@@ -2079,60 +2085,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		return info;
 	}
 	
-	private String createStringTree (MegaNode node){
-		log("createStringTree");
-		dTreeList = new ArrayList<MegaNode>();
-		MegaNode parentNode = null;
-		MegaNode nodeTemp = node;
-		StringBuilder dTree = new StringBuilder();
-		String s;
-		
-		dTreeList.add(node);
-		
-		if(node.getType() != MegaNode.TYPE_ROOT){
-			parentNode=megaApi.getParentNode(nodeTemp);
-			
-//			if(parentNode!=null){
-//				while (parentNode.getType() != MegaNode.TYPE_ROOT){
-//					if(parentNode!=null){
-//						dTreeList.add(parentNode);
-//						dTree.insert(0, parentNode.getName()+"/");	
-//						nodeTemp=parentNode;
-//						parentNode=megaApi.getParentNode(nodeTemp);
-//					}					
-//				}
-//			}
-			
-			if(parentNode!=null){
-				
-				if(parentNode.getType() != MegaNode.TYPE_ROOT){					
-					do{
-						
-						dTreeList.add(parentNode);
-						dTree.insert(0, parentNode.getName()+"/");	
-						nodeTemp=parentNode;
-						parentNode=megaApi.getParentNode(nodeTemp);
-						if(parentNode==null){
-							break;
-						}					
-					}while (parentNode.getType() != MegaNode.TYPE_ROOT);
-				
-				}				
-			}
-		
-		}			
-		
-		if(dTree.length()>0){
-			s = dTree.toString();
-		}
-		else{
-			s="";
-		}
-			
-		log("createStringTree: "+s);
-		return s;
-	}
-	
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");		
@@ -2462,7 +2414,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	    		File destination = null;
 				File offlineFile = null;
 				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 				}
 				else{
 					destination = new File(getFilesDir(), node.getHandle()+"");
