@@ -88,6 +88,11 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                         i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
                     }
                 }
+                else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
+                    if(((ManagerActivityLollipop) context).getIndexShares()==0){
+                        i.putExtra("from", FilePropertiesActivityLollipop.FROM_INBOX);
+                    }
+                }
 
                 if (selectedNode.isFolder()) {
                     if (megaApi.isShared(selectedNode)){

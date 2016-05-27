@@ -1,8 +1,16 @@
 package mega.privacy.android.app;
 
+import android.annotation.SuppressLint;
+import android.app.Service;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.IBinder;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
+
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,39 +18,8 @@ import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
-import nz.mega.sdk.MegaUtilsAndroid;
-
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
-import android.os.IBinder;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
-import android.support.v4.app.NotificationCompat;
-import android.text.format.Formatter;
-import android.util.SparseArray;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 
 /*
@@ -248,7 +225,12 @@ public class CreateThumbPreviewService extends Service {
 		if (parentNode != null){
 			nodes = megaApi.getChildren(parentNode);
 		}
-		
+
+		if(nodes==null){
+			log("Nodes is NULL!!!");
+			return;
+		}
+
 		hm = initDBHM();
 		
 //		mediaDB = initDB();

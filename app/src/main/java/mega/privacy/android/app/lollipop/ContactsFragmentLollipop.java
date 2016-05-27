@@ -336,6 +336,18 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 				emptyTextView.setVisibility(View.GONE);
 			}
 
+			if (aB != null){
+				aB.setTitle(getString(R.string.section_contacts));
+			}
+			else{
+				if (context != null) {
+					aB = ((AppCompatActivity) context).getSupportActionBar();
+					if (aB != null) {
+						aB.setTitle(getString(R.string.section_contacts));
+					}
+				}
+			}
+
 			return v;
 		}
 		else{
@@ -385,6 +397,19 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+
+			if (aB != null){
+				aB.setTitle(getString(R.string.section_contacts));
+			}
+			else{
+				if (context != null) {
+					aB = ((AppCompatActivity) context).getSupportActionBar();
+					if (aB != null) {
+						aB.setTitle(getString(R.string.section_contacts));
+					}
+				}
+			}
+
 			return v;
 		}			
 	}
