@@ -86,11 +86,8 @@ public class Util {
 	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
-	
-	// CreateThumbPreviewService (true=enabled; false=disabled)
-	public static boolean CREATE_THUMB_PREVIEW_SERVICE = true;
-	
-	public static String offlineDIR = "MEGA/MEGA Offline"; 
+
+	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";
 	public static String logDIR = "MEGA/MEGA Logs";

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -409,14 +408,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
-		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-			if (context != null){
-				Intent intent = new Intent(context, CreateThumbPreviewService.class);
-				intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
-				context.startService(intent);
-			}
-		}
-				
 		if (isList){
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -1061,14 +1052,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		nodes = megaApi.getChildren(n, orderGetChildren);
 		adapter.setNodes(nodes);
 		recyclerView.scrollToPosition(0);
-
-		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-			if (context != null){
-				Intent intent = new Intent(context, CreateThumbPreviewService.class);
-				intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
-				context.startService(intent);
-			}
-		}
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
