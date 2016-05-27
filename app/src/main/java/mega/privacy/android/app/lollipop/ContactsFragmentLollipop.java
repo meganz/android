@@ -424,7 +424,17 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	                log("onPanelHidden");                
 	            }
 	        });
-			aB.setTitle(getString(R.string.section_contacts));
+			if (aB != null){
+				aB.setTitle(getString(R.string.section_contacts));
+			}
+			else{
+				if (context != null) {
+					aB = ((AppCompatActivity) context).getSupportActionBar();
+					if (aB != null) {
+						aB.setTitle(getString(R.string.section_contacts));
+					}
+				}
+			}
 			return v;
 		}
 		else{
@@ -525,7 +535,17 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	                log("onPanelHidden");                
 	            }
 	        });
-			aB.setTitle(getString(R.string.section_contacts));
+			if (aB != null){
+				aB.setTitle(getString(R.string.section_contacts));
+			}
+			else{
+				if (context != null) {
+					aB = ((AppCompatActivity) context).getSupportActionBar();
+					if (aB != null) {
+						aB.setTitle(getString(R.string.section_contacts));
+					}
+				}
+			}
 			return v;
 		}			
 	}
