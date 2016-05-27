@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="48"
+    android:versionCode="49"
     android:versionName="3.0.10.1" >
 
     <uses-sdk
@@ -489,12 +489,7 @@
             android:name="MegaStreamingService"
             android:exported="false" >
         </service>
-        
-        <service
-            android:name="CreateThumbPreviewService"
-            android:exported="false" >
-        </service>
-        
+
         <!-- Used for Google Play Store Campaign Measurement-->
 		<service 
 		    android:name="com.google.android.gms.analytics.CampaignTrackingService" />

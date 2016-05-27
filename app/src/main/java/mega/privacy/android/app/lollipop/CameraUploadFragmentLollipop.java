@@ -40,7 +40,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -59,7 +58,6 @@ import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -661,14 +659,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
 				
-				if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, photosyncHandle);
-						context.startService(intent);
-					}
-				}
-				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;
 				int year = 0;
@@ -863,14 +853,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
-				
-				if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, photosyncHandle);
-						context.startService(intent);
-					}
-				}
 				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;

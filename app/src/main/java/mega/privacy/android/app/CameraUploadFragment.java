@@ -509,14 +509,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
 				
-				if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, photosyncHandle);
-						context.startService(intent);
-					}
-				}
-				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;
 				int year = 0;
@@ -761,14 +753,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			}
 			
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
-				
-				if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, photosyncHandle);
-						context.startService(intent);
-					}
-				}
 				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;
