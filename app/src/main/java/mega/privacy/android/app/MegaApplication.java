@@ -4,6 +4,12 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Logger.LogLevel;
 //import com.google.android.gms.analytics.Tracker;
 
+import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.utils.Util;
@@ -17,11 +23,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
-import android.app.Application;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.util.Log;
 
 
 public class MegaApplication extends Application implements MegaListenerInterface
