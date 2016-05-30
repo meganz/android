@@ -1,18 +1,10 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-
-import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -20,6 +12,13 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.widget.Toast;
+
+import java.io.File;
+
+import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 
 public class SettingsActivity extends PinPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {

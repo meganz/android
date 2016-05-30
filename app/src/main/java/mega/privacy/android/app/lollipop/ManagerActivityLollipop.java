@@ -8020,7 +8020,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	private void showOverquotaAlert(){
-
+		log("showOverquotaAlert");
 		dbH.setCamSyncEnabled(false);
 
 		if(overquotaDialog==null){
@@ -8390,6 +8390,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showConfirmationExportMK(){
+		log("showConfirmationExportMK");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
@@ -8428,7 +8429,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showConfirmationRemoveMK(){
-
+		log("showConfirmationRemoveMK");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {

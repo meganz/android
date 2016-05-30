@@ -4,18 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.text.format.Time;
@@ -28,15 +24,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.nirhart.parallaxscroll.views.ParallaxScrollView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +37,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,22 +57,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int PAYMENT_FRAGMENT = 5002;
 
 	Context context;
-	
-	ParallaxScrollView sV;
-	RelativeLayout mainLayout;
-	RelativeLayout imageLayout;
-	RelativeLayout optionsBackLayout;
-	ImageView toolbarBack;
-	ImageView toolbarOverflow;
-	RelativeLayout overflowMenuLayout;
-	ListView overflowMenuList;
-	
+
 	TextView initialLetter;
 	ImageView myAccountImage;
 	
 	TextView nameView;
-	ImageView nameIcon;
-	
+
 	String myEmail;
 	MegaUser myUser;
 	
@@ -91,12 +72,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
-	
+
+	LinearLayout buttonsLayout;
 	Button upgradeButton;
+	Button logoutButton;
+	Button mkButton;
 	
 	RelativeLayout typeLayout;
 	LinearLayout expirationLayout;
-	LinearLayout usedSpaceLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
 	
@@ -180,68 +163,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if(myUser == null){
 			return null;
 		}
-		
-		sV = (ParallaxScrollView) v.findViewById(R.id.my_account_scroll_view);
-		sV.post(new Runnable() { 
-	        public void run() { 
-	             sV.scrollTo(0, outMetrics.heightPixels/3);
-	        } 
-		});
-		
-		mainLayout = (RelativeLayout) v.findViewById(R.id.my_account_main_layout);
-		mainLayout.setOnClickListener(this);
-		imageLayout = (RelativeLayout) v.findViewById(R.id.my_account_image_layout);
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageLayout.getLayoutParams();
-//		params.setMargins(0, -getStatusBarHeight(), 0, 0);
-		params.setMargins(0, 0, 0, 0);
-		imageLayout.setLayoutParams(params);
-		
-		optionsBackLayout = (RelativeLayout) v.findViewById(R.id.my_account_toolbar_back_options_layout);
-		params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-//		params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
-		params.setMargins(0, 0, 0, Util.px2dp(100, outMetrics));
-		optionsBackLayout.setLayoutParams(params);
-		
-		toolbarBack = (ImageView) v.findViewById(R.id.my_account_toolbar_back);
-		params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-//		int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
-		int leftMarginBack = Util.scaleWidthPx(2, outMetrics);
-		params.setMargins(leftMarginBack, 0, 0, 0);
-		toolbarBack.setLayoutParams(params);
-		toolbarBack.setOnClickListener(this);
-		
-		toolbarOverflow = (ImageView) v.findViewById(R.id.my_account_toolbar_overflow);
-		params = (RelativeLayout.LayoutParams) toolbarOverflow.getLayoutParams();
-		params.setMargins(0, 0, leftMarginBack, 0);
-		toolbarOverflow.setLayoutParams(params);
-		toolbarOverflow.setOnClickListener(this);
-		
-		overflowMenuLayout = (RelativeLayout) v.findViewById(R.id.my_account_overflow_menu_layout);
-		params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
-//		params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
-		params.setMargins(0, 0, 0, 0);
-		overflowMenuLayout.setLayoutParams(params);
-		overflowMenuList = (ListView) v.findViewById(R.id.my_account_overflow_menu_list);
-		overflowMenuLayout.setVisibility(View.GONE);
-		
-		createOverflowMenu(overflowMenuList);
-		overflowMenuList.setOnItemClickListener(this);
-		
-		myAccountImage = (ImageView) v.findViewById(R.id.my_account_toolbar_image);
-		initialLetter = (TextView) v.findViewById(R.id.my_account_toolbar_initial_letter);
-		
+
 		nameView = (TextView) v.findViewById(R.id.my_account_name);
 		nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 		nameView.setSingleLine();
 		nameView.setTypeface(null, Typeface.BOLD);	
 		
 		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+
+		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 		
-		nameIcon = (ImageView) v.findViewById(R.id.my_account_name_icon);
-		RelativeLayout.LayoutParams lpPL = new RelativeLayout.LayoutParams(nameIcon .getLayoutParams());
-		lpPL.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-		nameIcon.setLayoutParams(lpPL);
-		nameIcon.setVisibility(View.INVISIBLE);
+		myAccountImage = (ImageView) v.findViewById(R.id.my_account_thumbnail);
+		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
+
+		mkButton = (Button) v.findViewById(R.id.MK_button);
+		mkButton.setOnClickListener(this);
+		mkButton.setVisibility(View.VISIBLE);
+
+		logoutButton = (Button) v.findViewById(R.id.logout_button);
+		logoutButton.setOnClickListener(this);
+		logoutButton.setVisibility(View.VISIBLE);
 		
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
@@ -256,13 +197,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		typeLayout.setLayoutParams(lp);
 		
 		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
-		usedSpaceLayout = (LinearLayout) v.findViewById(R.id.my_account_used_space_layout);
+
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
 		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
 		
 		typeLayout.setVisibility(View.GONE);
 		expirationLayout.setVisibility(View.GONE);
-		usedSpaceLayout.setVisibility(View.GONE);
 		lastSessionLayout.setVisibility(View.GONE);
 		
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
@@ -285,7 +225,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		p.setColor(Color.TRANSPARENT);
 		c.drawPaint(p);
 		myAccountImage.setImageBitmap(defaultAvatar);
-		
+
 	    int avatarTextSize = getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (myEmail != null){
@@ -492,38 +432,38 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return v;
 	}
 	
-	@SuppressLint("NewApi")
-	private void createOverflowMenu(ListView list){
-		ArrayList<String> menuOptions = new ArrayList<String>();
-		
-		menuOptions.add(getString(R.string.action_kill_all_sessions));
-		menuOptions.add(getString(R.string.my_account_change_password));
-		
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-		log("Exists MK in: "+path);
-		File file= new File(path);
-		if(file.exists()){
-			menuOptions.add(getString(R.string.action_remove_master_key));
-		}
-		else{
-			menuOptions.add(getString(R.string.action_export_master_key)); 
-		}
-		
-		menuOptions.add(getString(R.string.action_help));
-		menuOptions.add(getString(R.string.action_upgrade_account));
-		menuOptions.add(getString(R.string.action_logout));
-		
-		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-		if (list.getAdapter() != null){
-			ArrayAdapter<String> ad = (ArrayAdapter<String>) list.getAdapter();
-			ad.clear();
-			ad.addAll(menuOptions);
-			ad.notifyDataSetChanged();
-		}
-		else{
-			list.setAdapter(arrayAdapter);
-		}
-	}
+//	@SuppressLint("NewApi")
+//	private void createOverflowMenu(ListView list){
+//		ArrayList<String> menuOptions = new ArrayList<String>();
+//
+//		menuOptions.add(getString(R.string.action_kill_all_sessions));
+//		menuOptions.add(getString(R.string.my_account_change_password));
+//
+//		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+//		log("Exists MK in: "+path);
+//		File file= new File(path);
+//		if(file.exists()){
+//			menuOptions.add(getString(R.string.action_remove_master_key));
+//		}
+//		else{
+//			menuOptions.add(getString(R.string.action_export_master_key));
+//		}
+//
+//		menuOptions.add(getString(R.string.action_help));
+//		menuOptions.add(getString(R.string.action_upgrade_account));
+//		menuOptions.add(getString(R.string.action_logout));
+//
+//		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
+//		if (list.getAdapter() != null){
+//			ArrayAdapter<String> ad = (ArrayAdapter<String>) list.getAdapter();
+//			ad.clear();
+//			ad.addAll(menuOptions);
+//			ad.notifyDataSetChanged();
+//		}
+//		else{
+//			list.setAdapter(arrayAdapter);
+//		}
+//	}
 	
 	private int getAvatarTextSize (float density){
 		float textSize = 0.0f;
@@ -564,44 +504,44 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.my_account_main_layout:{
-				if (overflowMenuLayout != null){
-					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-						overflowMenuLayout.setVisibility(View.GONE);
-						return;
-					}
-				}
-				break;
-			}
-			case R.id.my_account_toolbar_back:{
-				((ManagerActivityLollipop)context).showCloudDrive();
-				break;
-			}
-			case R.id.my_account_toolbar_overflow:{
-				overflowMenuLayout.setVisibility(View.VISIBLE);
-				break;
-			}
-			case R.id.my_account_logout:{
-				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, false);
-				break;
-			}
-			case R.id.my_account_account_type_button:{
-
-				((ManagerActivityLollipop)context).showUpAF(null);
-				
-				break;
-			}
+//			case R.id.my_account_main_layout:{
+//				if (overflowMenuLayout != null){
+//					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+//						overflowMenuLayout.setVisibility(View.GONE);
+//						return;
+//					}
+//				}
+//				break;
+//			}
+//			case R.id.my_account_toolbar_back:{
+//				((ManagerActivityLollipop)context).showCloudDrive();
+//				break;
+//			}
+//			case R.id.my_account_toolbar_overflow:{
+//				overflowMenuLayout.setVisibility(View.VISIBLE);
+//				break;
+//			}
+//			case R.id.my_account_logout:{
+//				AccountController aC = new AccountController(context);
+//				aC.logout(context, megaApi, false);
+//				break;
+//			}
+//			case R.id.my_account_account_type_button:{
+//
+//				((ManagerActivityLollipop)context).showUpAF(null);
+//
+//				break;
+//			}
 		}
 	}
 	
 	public int onBackPressed(){
-		if (overflowMenuLayout != null){
-			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-				overflowMenuLayout.setVisibility(View.GONE);
-				return 1;
-			}
-		}
+//		if (overflowMenuLayout != null){
+//			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+//				overflowMenuLayout.setVisibility(View.GONE);
+//				return 1;
+//			}
+//		}
 		
 		return 0;
 	}
@@ -693,9 +633,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 							if (nameText.length() > 0){
 								String firstLetter = nameText.charAt(0) + "";
 								firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-								initialLetter.setText(firstLetter);
-								initialLetter.setTextSize(100);
-								initialLetter.setTextColor(Color.WHITE);
+//								initialLetter.setText(firstLetter);
+//								initialLetter.setTextSize(100);
+//								initialLetter.setTextColor(Color.WHITE);
 							}
 						}
 					}
@@ -842,19 +782,18 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 				
 				String usedSpaceString = used + " / " + total;
-		        usedSpace.setText(usedSpaceString);    
-			    
-		        usedSpaceLayout.setVisibility(View.VISIBLE);
+		        usedSpace.setText(usedSpaceString);
+				typeLayout.setVisibility(View.VISIBLE);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(mainLayout, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_LONG).show();
+//				Snackbar.make(mainLayout, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_LONG).show();
 			}
 			else
 			{
 				log("error when killing sessions: "+e.getErrorString());
-				Snackbar.make(mainLayout, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_LONG).show();
+//				Snackbar.make(mainLayout, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -893,38 +832,38 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	@SuppressLint("NewApi")
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		overflowMenuLayout.setVisibility(View.GONE);
-		String itemText = (String) parent.getItemAtPosition(position);
-		if (itemText.compareTo(getString(R.string.action_kill_all_sessions)) == 0){
-			megaApi.killSession(-1, this);
-		}
-		else if (itemText.compareTo(getString(R.string.my_account_change_password)) == 0){
-			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-			startActivity(intent);
-		}
-		else if (itemText.compareTo(getString(R.string.action_export_master_key)) == 0){
-			((ManagerActivityLollipop) context).showConfirmationExportMK();
-			createOverflowMenu(overflowMenuList);
-		}
-		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
-
-			((ManagerActivityLollipop) context).showConfirmationRemoveMK();
-			createOverflowMenu(overflowMenuList);
-		}
-		else if (itemText.compareTo(getString(R.string.action_help)) == 0){
-			Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.addCategory(Intent.CATEGORY_BROWSABLE);
-            intent.setData(Uri.parse("https://mega.co.nz/#help/android"));
-            startActivity(intent);
-		}
-		else if (itemText.compareTo(getString(R.string.action_upgrade_account)) == 0){
-			((ManagerActivityLollipop)context).showUpAF(null);
-		}
-		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
-			AccountController aC = new AccountController(context);
-			aC.logout(context, megaApi, false);
-		}
+//		overflowMenuLayout.setVisibility(View.GONE);
+//		String itemText = (String) parent.getItemAtPosition(position);
+//		if (itemText.compareTo(getString(R.string.action_kill_all_sessions)) == 0){
+//			megaApi.killSession(-1, this);
+//		}
+//		else if (itemText.compareTo(getString(R.string.my_account_change_password)) == 0){
+//			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+//			startActivity(intent);
+//		}
+//		else if (itemText.compareTo(getString(R.string.action_export_master_key)) == 0){
+//			((ManagerActivityLollipop) context).showConfirmationExportMK();
+//			createOverflowMenu(overflowMenuList);
+//		}
+//		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
+//
+//			((ManagerActivityLollipop) context).showConfirmationRemoveMK();
+//			createOverflowMenu(overflowMenuList);
+//		}
+//		else if (itemText.compareTo(getString(R.string.action_help)) == 0){
+//			Intent intent = new Intent();
+//            intent.setAction(Intent.ACTION_VIEW);
+//            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//            intent.setData(Uri.parse("https://mega.co.nz/#help/android"));
+//            startActivity(intent);
+//		}
+//		else if (itemText.compareTo(getString(R.string.action_upgrade_account)) == 0){
+//			((ManagerActivityLollipop)context).showUpAF(null);
+//		}
+//		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
+//			AccountController aC = new AccountController(context);
+//			aC.logout(context, megaApi, false);
+//		}
 	}
 	
 	public void updateAvatar(File avatar){
