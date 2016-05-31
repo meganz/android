@@ -27,9 +27,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -37,6 +41,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -731,49 +736,49 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			if (e.getErrorCode() == MegaError.API_OK && typeAccount != null)
 			{
 				accountInfo = request.getMegaAccountDetails();
-				
+
 				accountType = accountInfo.getProLevel();
 				accountDetailsBoolean = true;
 				typeLayout.setVisibility(View.VISIBLE);
-				switch(accountType){				
-				
+				switch(accountType){
+
 					case 0:{
 
 						typeAccount.setText(R.string.my_account_free);
 						expirationLayout.setVisibility(View.GONE);
 						break;
 					}
-						
+
 					case 1:{
 						typeAccount.setText(getString(R.string.my_account_pro1));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
-					
+
 					case 2:{
 						typeAccount.setText(getString(R.string.my_account_pro2));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
-					
+
 					case 3:{
 						typeAccount.setText(getString(R.string.my_account_pro3));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
-					
+
 					case 4:{
 						typeAccount.setText(getString(R.string.my_account_prolite));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
-					
+
 				}
-				
+
 				if (getPaymentMethodsBoolean == true){
 					if (upgradeButton != null){
 						if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
@@ -794,17 +799,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						}
 					}
 				}
-						
+
 				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();	
-				
+				long usedStorage = accountInfo.getStorageUsed();
+
 		        int usedPerc = 0;
 		        if (totalStorage != 0){
 		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
 		        }
-			        
+
 				boolean totalGb = false;
-				
+
 				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 				String total = "";
 				if (totalStorage >= 1024){
@@ -819,9 +824,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
 				String used = "";
 				if(totalGb){
-					
+
 					used = used + usedStorage + " GB";
-					
+
 				}
 				else{
 					if (usedStorage >= 1024){
@@ -832,15 +837,30 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						used = used + usedStorage + " GB";
 					}
 				}
-				
+
 				String usedSpaceString = used + " / " + total;
 		        usedSpace.setText(usedSpaceString);
 				typeLayout.setVisibility(View.VISIBLE);
 			}
 			if(request.getMegaAccountDetails()!=null){
 				log("getMegaAccountDetails not Null");
-//				request.getMegaAccountDetails().getSession().getMostRecentUsage();
 
+				MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
+
+				if(megaAccountSession!=null){
+					log("getMegaAccountSESSION not Null");
+					long mostRecentSession = megaAccountSession.getMostRecentUsage();
+					log("The last session: "+mostRecentSession);
+					java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.MEDIUM,Locale.getDefault());
+					Date date = new Date(mostRecentSession * 1000);
+					Calendar cal = Calendar.getInstance();
+					TimeZone tz = cal.getTimeZone();
+					df.setTimeZone(tz);
+					String formattedDate = df.format(date);
+					log("Formatted date: "+formattedDate);
+					lastSession.setText(formattedDate);
+					lastSessionLayout.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
