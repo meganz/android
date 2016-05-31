@@ -404,6 +404,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
+	private MenuItem logoutMenuItem;
 
 	boolean fromTakePicture = false;
 
@@ -2250,110 +2251,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			viewPagerContacts.setVisibility(View.GONE);
 
-    			int index = viewPagerCDrive.getCurrentItem();
-    			log("----------------------------------------INDEX: "+index);
-    			if(index==1){
-    				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-    				if (rbFLol != null) {
-						//Show
-						if (addMenuItem != null){
-							sortByMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
-							thumbViewMenuItem.setVisible(true);
-							clearRubbishBinMenuitem.setVisible(true);
-							searchMenuItem.setVisible(true);
-
-							//Hide
-							refreshMenuItem.setVisible(false);
-							pauseTransfersMenuIcon.setVisible(false);
-							playTransfersMenuIcon.setVisible(false);
-							log("createFolderMenuItem.setVisible_1");
-							createFolderMenuItem.setVisible(false);
-							addMenuItem.setVisible(false);
-							addContactMenuItem.setVisible(false);
-							upgradeAccountMenuItem.setVisible(true);
-							unSelectMenuItem.setVisible(false);
-							addMenuItem.setEnabled(false);
-							changePass.setVisible(false);
-							importLinkMenuItem.setVisible(false);
-							takePicture.setVisible(false);
-							refreshMenuItem.setVisible(false);
-							helpMenuItem.setVisible(false);
-							settingsMenuItem.setVisible(false);
-
-							if (isList) {
-								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-							} else {
-								thumbViewMenuItem.setTitle(getString(R.string.action_list));
-							}
-
-							rbFLol.setIsList(isList);
-							rbFLol.setParentHandle(parentHandleRubbish);
-
-							if (rbFLol.getItemCount() > 0) {
-								selectMenuItem.setVisible(true);
-								clearRubbishBinMenuitem.setVisible(true);
-							} else {
-								selectMenuItem.setVisible(false);
-								clearRubbishBinMenuitem.setVisible(false);
-							}
-
-							rubbishBinMenuItem.setVisible(false);
-							rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
-							gridSmallLargeMenuItem.setVisible(false);
-						}
-    				}
-    			}
-    			else{
-    				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-    				if (fbFLol!=null){
-    					//Cloud Drive
-    					//Show
-    					if (addMenuItem != null){
-    						addMenuItem.setEnabled(true);
-        					addMenuItem.setVisible(true);
-        					log("createFolderMenuItem.setVisible_2");
-        					createFolderMenuItem.setVisible(true);
-        					sortByMenuItem.setVisible(true);
-        					thumbViewMenuItem.setVisible(true);
-        					rubbishBinMenuItem.setVisible(false);
-        	    			upgradeAccountMenuItem.setVisible(true);
-        	    			importLinkMenuItem.setVisible(true);
-        	    			takePicture.setVisible(true);
-        	    			selectMenuItem.setVisible(true);
-        	    			searchMenuItem.setVisible(true);
-
-        					//Hide
-        					pauseTransfersMenuIcon.setVisible(false);
-        					playTransfersMenuIcon.setVisible(false);
-        	    			addContactMenuItem.setVisible(false);
-        	    			unSelectMenuItem.setVisible(false);
-        	    			clearRubbishBinMenuitem.setVisible(false);
-        	    			changePass.setVisible(false);
-        	    			refreshMenuItem.setVisible(false);
-        					helpMenuItem.setVisible(false);
-        					settingsMenuItem.setVisible(false);
-        					killAllSessions.setVisible(false);
-
-        					if(fbFLol.getItemCount()>0){
-        						selectMenuItem.setVisible(true);
-        					}
-        					else{
-        						selectMenuItem.setVisible(false);
-        					}
-
-        	    			if (isList){
-        	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-        					}
-        					else{
-        						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-        	    			}
-        	    			gridSmallLargeMenuItem.setVisible(false);
-    					}
-    				}
-    			}
+    			supportInvalidateOptionsMenu();
 
 				showFabButton();
 				log("END selectDrawerItem for Cloud Drive");
@@ -2387,32 +2285,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				log("createFolderMenuItem.setVisible_3");
-	    			createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(false);
-	    			changePass.setVisible(false);
-
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				cancelAllTransfersMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-    				gridSmallLargeMenuItem.setVisible(false);
-    				searchMenuItem.setVisible(true);
-    				thumbViewMenuItem.setVisible(true);
-    			}
+    			supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -2468,39 +2341,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				log("createFolderMenuItem.setVisible_4");
-	    			createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-	    			changePass.setVisible(false);
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				cancelAllTransfersMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-	    			if (isListCameraUploads){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-	    				gridSmallLargeMenuItem.setVisible(false);
-	    				searchMenuItem.setVisible(true);
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if (isLargeGridCameraUploads){
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
-	        			}
-	        			else{
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
-	        			}
-						gridSmallLargeMenuItem.setVisible(true);
-						searchMenuItem.setVisible(false);
-	    			}
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-    			}
+    			supportInvalidateOptionsMenu();
 				showFabButton();
       			break;
     		}
@@ -2531,40 +2372,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				log("createFolderMenuItem.setVisible_5");
-	    			createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-	    			changePass.setVisible(false);
-
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				cancelAllTransfersMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-	    			if (isListCameraUploads){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-	    				gridSmallLargeMenuItem.setVisible(false);
-	    				searchMenuItem.setVisible(true);
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if (isLargeGridCameraUploads){
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
-	        			}
-	        			else{
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
-	        			}
-						gridSmallLargeMenuItem.setVisible(true);
-						searchMenuItem.setVisible(false);
-	    			}
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-    			}
+    			supportInvalidateOptionsMenu();
 				showFabButton();
       			break;
     		}
@@ -2626,47 +2434,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				//Show
-        			sortByMenuItem.setVisible(true);
-        			if(iFLol.getItemCount()>0){
-						selectMenuItem.setVisible(true);
-					}
-					else{
-						selectMenuItem.setVisible(true);
-					}
-        			searchMenuItem.setVisible(true);
-        			thumbViewMenuItem.setVisible(true);
-
-    				//Hide
-        			refreshMenuItem.setVisible(false);
-        			pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_6");
-    				createFolderMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			addContactMenuItem.setVisible(false);
-        			unSelectMenuItem.setVisible(false);
-        			addMenuItem.setEnabled(false);
-        			changePass.setVisible(false);
-        			importLinkMenuItem.setVisible(false);
-        			takePicture.setVisible(false);
-        			refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-    				settingsMenuItem.setVisible(false);
-        			clearRubbishBinMenuitem.setVisible(false);
-        			rubbishBinMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(true);
-        			gridSmallLargeMenuItem.setVisible(false);
-        			cancelAllTransfersMenuItem.setVisible(false);
-
-        			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-	    		}
+    			supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -3094,34 +2862,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				changePass.setVisible(false);
-    				log("createFolderMenuItem.setVisible_9");
-    				createFolderMenuItem.setVisible(false);
-    				addContactMenuItem.setVisible(true);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(true);
-	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			settingsMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-	    			cancelAllTransfersMenuItem.setVisible(false);
-
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-	    			searchMenuItem.setVisible(true);
-	    			gridSmallLargeMenuItem.setVisible(false);
-    			}
+				supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -3155,37 +2896,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
     			ft.commit();
 
-				if (sttFLol != null){
-					if (createFolderMenuItem != null){
-						searchMenuItem.setVisible(false);
-						//Hide
-						log("createFolderMenuItem.setVisible_settings");
-						createFolderMenuItem.setVisible(false);
-						addContactMenuItem.setVisible(false);
-		    			addMenuItem.setVisible(false);
-		    			sortByMenuItem.setVisible(false);
-		    			selectMenuItem.setVisible(false);
-		    			unSelectMenuItem.setVisible(false);
-		    			thumbViewMenuItem.setVisible(false);
-		    			addMenuItem.setEnabled(false);
-		    			rubbishBinMenuItem.setVisible(false);
-		    			clearRubbishBinMenuitem.setVisible(false);
-		    			importLinkMenuItem.setVisible(false);
-		    			takePicture.setVisible(false);
-						settingsMenuItem.setVisible(false);
-						refreshMenuItem.setVisible(false);
-						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
-						changePass.setVisible(false);
-						cancelSubscription.setVisible(false);
-						killAllSessions.setVisible(false);
-
-						cancelAllTransfersMenuItem.setVisible(false);
-
-						playTransfersMenuIcon.setVisible(false);
-						pauseTransfersMenuIcon.setVisible(false);
-					}
-				}
+				supportInvalidateOptionsMenu();
 				showFabButton();
 				break;
     		}
@@ -3244,33 +2955,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
     			ft.commit();
 
-    			if (createFolderMenuItem != null){
-    				searchMenuItem.setVisible(true);
-    				log("createFolderMenuItem.setVisible_10");
-        			createFolderMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			sortByMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(false);
-        			addMenuItem.setEnabled(false);
-        			rubbishBinMenuItem.setVisible(false);
-        			clearRubbishBinMenuitem.setVisible(false);
-        			changePass.setVisible(false);
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-    				gridSmallLargeMenuItem.setVisible(false);
-    				cancelAllTransfersMenuItem.setVisible(false);
-    				thumbViewMenuItem.setVisible(true);
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
-    			}
+				supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -3651,6 +3336,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
 		killAllSessions.setVisible(false);
 
+		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
+		logoutMenuItem.setVisible(false);
+
 	    if (drawerItem == null){
 	    	if (nV != null){
 	    		Menu nVMenu = nV.getMenu();
@@ -3721,6 +3409,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
 
 	    			if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3777,6 +3466,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
 					killAllSessions.setVisible(false);
+					logoutMenuItem.setVisible(false);
 
 					if(fbFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
@@ -3830,6 +3520,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
 
     			if (isList){
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3867,6 +3558,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
 
     			if (isListCameraUploads){
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3912,6 +3604,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
 
     			if (isListCameraUploads){
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3974,6 +3667,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			clearRubbishBinMenuitem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			gridSmallLargeMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
 			}
 		}
 
@@ -4045,6 +3739,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					upgradeAccountMenuItem.setVisible(true);
 					gridSmallLargeMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
 
 					if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -4095,6 +3790,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
 
 					if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -4107,52 +3803,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 	    else if (drawerItem == DrawerItem.CONTACTS){
+			log("createOptions CONTACTS");
 			int index = viewPagerContacts.getCurrentItem();
 			if (index == 0){
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					//Show
-					addContactMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
-					sortByMenuItem.setVisible(true);
-					thumbViewMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			searchMenuItem.setVisible(true);
+				log("createOptions TAB CONTACTS");
+				//Show
+				addContactMenuItem.setVisible(true);
+				selectMenuItem.setVisible(true);
+				sortByMenuItem.setVisible(true);
+				thumbViewMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(true);
+				searchMenuItem.setVisible(true);
 
-	    			//Hide
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_21");
-					createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			addMenuItem.setEnabled(false);
-	    			changePass.setVisible(false);
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-	    			importLinkMenuItem.setVisible(false);
-	    			takePicture.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
+				//Hide
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_21");
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				changePass.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				settingsMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				changePass.setVisible(false);
+				settingsMenuItem.setVisible(false);
+				killAllSessions.setVisible(false);
 
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
-	    			gridSmallLargeMenuItem.setVisible(false);
+				if (isList){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+				}
+
+				gridSmallLargeMenuItem.setVisible(false);
+			}
+			else if (index == 1){
+				log("createOptions TAB SENT requests");
+				//Show
+				addContactMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(true);
+
+				//Hide
+				selectMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_21");
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				changePass.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				settingsMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				changePass.setVisible(false);
+				settingsMenuItem.setVisible(false);
+				killAllSessions.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				gridSmallLargeMenuItem.setVisible(false);
 			}
 			else{
+				log("createOptions TAB RECEIVED requests");
 				//Show
     			upgradeAccountMenuItem.setVisible(true);
-    			searchMenuItem.setVisible(false);
 
     			//Hide
+				searchMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
 				sortByMenuItem.setVisible(false);
@@ -4173,10 +3905,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
 			}
 		}
 
 	    else if (drawerItem == DrawerItem.SEARCH){
+			log("createOptions search");
 	    	if (sFLol != null){
 				if (createFolderMenuItem != null){
 
@@ -4201,6 +3938,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
 
 					//Show
 	    			selectMenuItem.setVisible(true);
@@ -4217,6 +3955,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 	    else if (drawerItem == DrawerItem.ACCOUNT){
+			log("createOptions ACCOUNT");
 			if (maFLol != null){
 				if (createFolderMenuItem != null) {
 					//Show
@@ -4224,6 +3963,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					killAllSessions.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					changePass.setVisible(true);
+					logoutMenuItem.setVisible(true);
 
 					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 					log("Exists MK in: "+path);
@@ -4289,6 +4029,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				changePass.setVisible(false);
 				cancelSubscription.setVisible(false);
 				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
@@ -4356,14 +4097,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				changePass.setVisible(false);
 				cancelSubscription.setVisible(false);
 				killAllSessions.setVisible(false);
-
+				logoutMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
 
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 			}
 	    }
-
+		log("Call to super onCreateOptionsMenu");
 	    return super.onCreateOptionsMenu(menu);
 	}
 
