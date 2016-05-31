@@ -396,8 +396,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem rubbishBinMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
-//	private MenuItem exportMK;
-//	private MenuItem removeMK;
+	private MenuItem exportMK;
+	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem cancelSubscription;
 	private MenuItem killAllSessions;
@@ -3276,7 +3276,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case ACCOUNT:{
 
-    			tB.setVisibility(View.GONE);
+//    			tB.setVisibility(View.GONE);
 
     			accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 
@@ -3298,31 +3298,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				log("createFolderMenuItem.setVisible_11");
-    				createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(true);
-	    			sortByMenuItem.setVisible(false);
-	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(false);
-	    			changePass.setVisible(true);
-	    			if (numberOfSubscriptions > 0){
-	    				cancelSubscription.setVisible(true);
-	    			}
-	    			killAllSessions.setVisible(true);
-
-	    			addMenuItem.setEnabled(false);
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-        			settingsMenuItem.setVisible(false);
-        			gridSmallLargeMenuItem.setVisible(false);
-        			searchMenuItem.setVisible(false);
-        			cancelAllTransfersMenuItem.setVisible(false);
-	    		}
+				supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -3666,6 +3642,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		cancelSubscription.setVisible(false);
+
+		exportMK = menu.findItem(R.id.action_menu_export_MK);
+		exportMK.setVisible(false);
+		removeMK = menu.findItem(R.id.action_menu_remove_MK);
+		removeMK.setVisible(false);
 
 		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
 		killAllSessions.setVisible(false);
@@ -4237,37 +4218,51 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    else if (drawerItem == DrawerItem.ACCOUNT){
 			if (maFLol != null){
+				if (createFolderMenuItem != null) {
+					//Show
+					refreshMenuItem.setVisible(true);
+					killAllSessions.setVisible(true);
+					upgradeAccountMenuItem.setVisible(true);
+					changePass.setVisible(true);
 
-				//Show
-				refreshMenuItem.setVisible(true);
-				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(true);
-				changePass.setVisible(true);
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					log("Exists MK in: "+path);
+					File file= new File(path);
+					if(file.exists()){
+						removeMK.setVisible(true);
+						exportMK.setVisible(false);
+					}
+					else{
+						removeMK.setVisible(false);
+						exportMK.setVisible(true);
+					}
 
-				//Hide
-				pauseTransfersMenuIcon.setVisible(false);
-				playTransfersMenuIcon.setVisible(false);
-				log("createFolderMenuItem.setVisible_24");
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			sortByMenuItem.setVisible(false);
-    			selectMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
-				cancelAllTransfersMenuItem.setVisible(false);
+					//Hide
+					helpMenuItem.setVisible(false);
+					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_24");
+					createFolderMenuItem.setVisible(false);
+					addContactMenuItem.setVisible(false);
+					addMenuItem.setVisible(false);
+					sortByMenuItem.setVisible(false);
+					selectMenuItem.setVisible(false);
+					unSelectMenuItem.setVisible(false);
+					thumbViewMenuItem.setVisible(false);
+					rubbishBinMenuItem.setVisible(false);
+					clearRubbishBinMenuitem.setVisible(false);
+					importLinkMenuItem.setVisible(false);
+					takePicture.setVisible(false);
+					settingsMenuItem.setVisible(false);
+					cancelAllTransfersMenuItem.setVisible(false);
 
-				if (numberOfSubscriptions > 0){
-					cancelSubscription.setVisible(true);
+					if (numberOfSubscriptions > 0) {
+						cancelSubscription.setVisible(true);
+					}
+
+
+					gridSmallLargeMenuItem.setVisible(false);
 				}
-
-				killAllSessions.setVisible(true);
-    			gridSmallLargeMenuItem.setVisible(false);
 			}
 		}
 
@@ -5797,7 +5792,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				startActivity(intent);
 				return true;
 	        }
-//	        case R.id.action_menu_remove_MK:{
+	        case R.id.action_menu_remove_MK:{
+				log("remove MK option selected");
+				showConfirmationRemoveMK();
 //	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 //				    @Override
 //				    public void onClick(DialogInterface dialog, int which) {
@@ -5822,10 +5819,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				builder.setTitle(getString(R.string.confirmation_alert));
 //				builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
 //				    .setNegativeButton(R.string.general_no, dialogClickListener).show();
-//				return true;
-//	        }
-//	        case R.id.action_menu_export_MK:{
-//	        	log("export MK option selected");
+				return true;
+	        }
+	        case R.id.action_menu_export_MK:{
+	        	log("export MK option selected");
+				showConfirmationExportMK();
+
 //	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 //				    @Override
 //				    public void onClick(DialogInterface dialog, int which) {
@@ -5872,12 +5871,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				builder.setNegativeButton(R.string.general_no, dialogClickListener);
 //				AlertDialog dialog = builder.create();
 //				dialog.show();
-//	        	return true;
-//	        }
-//	        case R.id.action_menu_logout:{
-//	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi, false);
-//	        	return true;
-//	        }
+	        	return true;
+	        }
+	        case R.id.action_menu_logout:{
+
+				AccountController aC = new AccountController(this);
+				aC.logout(this, megaApi, false);
+	        	return true;
+	        }
 	        case R.id.action_menu_cancel_subscriptions:{
 	        	if (megaApi != null){
 	        		//Show the message
@@ -8462,7 +8463,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			builder = new AlertDialog.Builder(this);
 		}
-		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_export, dialogClickListener)
+		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 

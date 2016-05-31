@@ -12,7 +12,7 @@
 
 		<LinearLayout
 			android:id="@+id/my_account_email_layout"
-			android:layout_width="fill_parent"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:gravity="left"
@@ -27,7 +27,7 @@
 
 			<LinearLayout
 				android:id="@+id/my_account_email_text_layout"
-				android:layout_width="fill_parent"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:background="@color/white"
 				android:gravity="left"
@@ -37,22 +37,24 @@
 					android:id="@+id/my_account_name"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/grey_info_menu"
-					android:textStyle="bold" />
+					android:textColor="@color/name_my_account"
+					android:textSize="16sp" />
 
 				<TextView
 					android:id="@+id/my_account_email"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/grey_info_menu" />
+					android:textSize="14sp"
+					android:textColor="@color/mail_my_account" />
 			</LinearLayout>
 
-			<RelativeLayout
+			<LinearLayout
 				android:id="@+id/my_account_relative_layout_avatar"
 				android:layout_width="60dp"
 				android:layout_height="60dp"
-				android:layout_marginLeft="18dp"
-				android:layout_centerVertical="true">
+				android:layout_marginLeft="16dp"
+				android:layout_centerVertical="true"
+				android:orientation="horizontal">
 
 				<mega.privacy.android.app.components.RoundedImageView
 					android:id="@+id/my_account_thumbnail"
@@ -70,7 +72,9 @@
 					android:layout_height="fill_parent"
 					android:layout_marginLeft="10dp"
 					android:layout_marginTop="-5dp" />
-			</RelativeLayout>
+			</LinearLayout>
+
+
 		</LinearLayout>
 
 		<LinearLayout
@@ -89,9 +93,7 @@
 				android:layout_marginRight="15dp"
 				android:paddingLeft="20dp"
 				android:paddingRight="20dp"
-				android:paddingTop="5dp"
-				android:paddingBottom="5dp"
-				android:textColor="@color/black"
+				android:textColor="@color/name_my_account"
 				android:layout_centerVertical="true"
 				android:text="@string/action_export_master_key"
 				android:background="@android:color/white"
@@ -106,9 +108,7 @@
 				android:layout_marginRight="15dp"
 				android:paddingLeft="20dp"
 				android:paddingRight="20dp"
-				android:paddingTop="5dp"
-				android:paddingBottom="5dp"
-				android:textColor="@color/black"
+				android:textColor="@color/name_my_account"
 				android:layout_centerVertical="true"
 				android:text="@string/action_logout"
 				android:background="@android:color/white"
@@ -293,6 +293,32 @@
 					android:layout_height="wrap_content"
 					android:textColor="@color/grey_info_menu" />
 			</LinearLayout>
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/delete_account__layout"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@color/white"
+			android:gravity="left"
+			android:orientation="horizontal" >
+
+			<Button
+				android:id="@+id/delete_account_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:layout_marginRight="15dp"
+				android:paddingLeft="20dp"
+				android:paddingRight="20dp"
+				android:paddingTop="5dp"
+				android:paddingBottom="5dp"
+				android:textColor="@color/white"
+				android:layout_centerVertical="true"
+				android:text="@string/delete_account"
+				android:background="@color/delete_account"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation" />
 		</LinearLayout>
 
 	</LinearLayout>

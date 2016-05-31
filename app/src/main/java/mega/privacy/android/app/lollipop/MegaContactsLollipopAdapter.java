@@ -195,7 +195,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	    
 	    if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 	   
-		    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);	
+		    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);
 	
 		    holderList = new ViewHolderContactsList(v);
 		    holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);

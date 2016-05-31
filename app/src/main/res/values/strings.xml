@@ -71,7 +71,8 @@
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
-    
+
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
