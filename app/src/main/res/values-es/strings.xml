@@ -670,4 +670,10 @@
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Abrir ubicación</string>
     <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servidores ocupados, por favor, espere.</string>
+
+    <string name="my_account_free" context="Label in My Account section to show user account type">Cuenta gratis</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cuenta Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
 </resources>

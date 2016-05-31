@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -22,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,8 +57,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Context context;
 	ActionBar aB;
 
+	LinearLayout avatarLayout;
 	TextView initialLetter;
 	RoundedImageView myAccountImage;
+	ImageView mailIcon;
 	
 	TextView nameView;
 
@@ -166,62 +168,114 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return null;
 		}
 
-		nameView = (TextView) v.findViewById(R.id.my_account_name);
-		nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-		nameView.setSingleLine();
-		nameView.setTypeface(null, Typeface.BOLD);	
-		
-		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		avatarLayout = (LinearLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		mailIcon = (ImageView)  v.findViewById(R.id.my_account_email_icon);
+		LinearLayout.LayoutParams mailIconParams = (LinearLayout.LayoutParams)mailIcon.getLayoutParams();
+		mailIconParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(28, outMetrics), 0, 0);
+		mailIcon.setLayoutParams(mailIconParams);
 
-		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+		nameView = (TextView) v.findViewById(R.id.my_account_name);
+		nameView.setEllipsize(TextUtils.TruncateAt.END);
+		nameView.setSingleLine();
+		LinearLayout.LayoutParams nameViewParams = (LinearLayout.LayoutParams)nameView.getLayoutParams();
+		nameViewParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(26, outMetrics), 0, 0);
+		nameView.setLayoutParams(nameViewParams);
+
+		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+
+		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
+		infoEmail.setText(myEmail);
+		LinearLayout.LayoutParams infoEmailParams = (LinearLayout.LayoutParams)infoEmail.getLayoutParams();
+		infoEmailParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, Util.scaleHeightPx(26, outMetrics));
+		infoEmail.setLayoutParams(infoEmailParams);
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
+
+		RelativeLayout.LayoutParams avatarLayoutParams = (RelativeLayout.LayoutParams)avatarLayout.getLayoutParams();
+		avatarLayoutParams.setMargins(0, Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(16, outMetrics));
+		avatarLayout.setLayoutParams(avatarLayoutParams);
+
 		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
 
-		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
-		deleteAccountButton.setOnClickListener(this);
-		deleteAccountButton.setVisibility(View.VISIBLE);
+		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
 
+		LinearLayout.LayoutParams mkButtonParams = (LinearLayout.LayoutParams)mkButton.getLayoutParams();
+		mkButtonParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
+		mkButton.setLayoutParams(mkButtonParams);
+
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
-		
-		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
-		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
-		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
-		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
-		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
-		connections = (TextView) v.findViewById(R.id.my_account_connections);
-		
-		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
-		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) typeLayout.getLayoutParams();
-		lp.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-		typeLayout.setLayoutParams(lp);
-		
-		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
 
-		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
-		
-		typeLayout.setVisibility(View.GONE);
-		expirationLayout.setVisibility(View.GONE);
-		lastSessionLayout.setVisibility(View.GONE);
-		
+		LinearLayout.LayoutParams logoutButtonParams = (LinearLayout.LayoutParams)logoutButton.getLayoutParams();
+		logoutButtonParams.setMargins(Util.scaleWidthPx(18, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
+		logoutButton.setLayoutParams(logoutButtonParams);
+
+		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
+		deleteAccountButton.setOnClickListener(this);
+		deleteAccountButton.setVisibility(View.VISIBLE);
+
+		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
+		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, 0);
+		deleteAccountButton.setLayoutParams(deleteAccountParams);
+
+		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
+		LinearLayout.LayoutParams typeLayoutParams = (LinearLayout.LayoutParams)typeLayout.getLayoutParams();
+		typeLayoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, Util.scaleHeightPx(17, outMetrics));
+		typeLayout.setLayoutParams(typeLayoutParams);
+
+		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
+
+//		LinearLayout.LayoutParams typeAccountParams = (LinearLayout.LayoutParams)typeAccount.getLayoutParams();
+//		typeAccountParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, 0);
+//		typeAccount.setLayoutParams(typeAccountParams);
+
+		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
+//		LinearLayout.LayoutParams usedSpaceParams = (LinearLayout.LayoutParams)usedSpace.getLayoutParams();
+//		usedSpaceParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(17, outMetrics));
+//		usedSpace.setLayoutParams(usedSpaceParams);
+
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
 		upgradeButton.setOnClickListener(this);
 		upgradeButton.setVisibility(View.VISIBLE);
+
+		RelativeLayout.LayoutParams upgradeButtonParams = (RelativeLayout.LayoutParams)upgradeButton.getLayoutParams();
+		upgradeButtonParams.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
+		upgradeButton.setLayoutParams(upgradeButtonParams);
+
+		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
+		LinearLayout.LayoutParams lastSessionParams = (LinearLayout.LayoutParams)lastSessionLayout.getLayoutParams();
+		lastSessionParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, Util.scaleHeightPx(17, outMetrics));
+		lastSessionLayout.setLayoutParams(lastSessionParams);
+
+		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
+
+		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
+		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
+
+
+		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
+		LinearLayout.LayoutParams connectionsParams = (LinearLayout.LayoutParams)connectionsLayout.getLayoutParams();
+		connectionsParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, Util.scaleHeightPx(17, outMetrics));
+		connectionsLayout.setLayoutParams(connectionsParams);
+
+		connections = (TextView) v.findViewById(R.id.my_account_connections);
 		
-		infoEmail.setText(myEmail);
+
+		typeLayout.setVisibility(View.GONE);
+		expirationLayout.setVisibility(View.GONE);
+		lastSessionLayout.setVisibility(View.GONE);
 		
 		name=false;
 		firstName=false;
 		megaApi.getUserAttribute(myUser, 1, this);
 		megaApi.getUserAttribute(myUser, 2, this);
+		megaApi.getExtendedAccountDetails(true, false, false, this);
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -683,36 +737,36 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				typeLayout.setVisibility(View.VISIBLE);
 				switch(accountType){				
 				
-					case 0:{	  
-						typeAccount.setTextColor(getActivity().getResources().getColor(R.color.green_free_account));
-						typeAccount.setText(R.string.free_account);
+					case 0:{
+
+						typeAccount.setText(R.string.my_account_free);
 						expirationLayout.setVisibility(View.GONE);
 						break;
 					}
 						
 					case 1:{
-						typeAccount.setText(getString(R.string.pro1_account));
+						typeAccount.setText(getString(R.string.my_account_pro1));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 2:{
-						typeAccount.setText(getString(R.string.pro2_account));
+						typeAccount.setText(getString(R.string.my_account_pro2));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 3:{
-						typeAccount.setText(getString(R.string.pro3_account));
+						typeAccount.setText(getString(R.string.my_account_pro3));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 4:{
-						typeAccount.setText(getString(R.string.prolite_account));
+						typeAccount.setText(getString(R.string.my_account_prolite));
 						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
@@ -782,6 +836,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				String usedSpaceString = used + " / " + total;
 		        usedSpace.setText(usedSpaceString);
 				typeLayout.setVisibility(View.VISIBLE);
+			}
+			if(request.getMegaAccountDetails()!=null){
+				log("getMegaAccountDetails not Null");
+//				request.getMegaAccountDetails().getSession().getMostRecentUsage();
+
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
