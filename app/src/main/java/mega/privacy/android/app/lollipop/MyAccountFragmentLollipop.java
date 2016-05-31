@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,9 +8,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
@@ -22,10 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,6 +33,8 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -48,7 +46,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface, OnItemClickListener {
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface{
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -57,9 +55,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int PAYMENT_FRAGMENT = 5002;
 
 	Context context;
+	ActionBar aB;
 
 	TextView initialLetter;
-	ImageView myAccountImage;
+	RoundedImageView myAccountImage;
 	
 	TextView nameView;
 
@@ -77,6 +76,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
+	Button deleteAccountButton;
 	
 	RelativeLayout typeLayout;
 	LinearLayout expirationLayout;
@@ -124,20 +124,22 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		super.onDestroy();
 	}
 
-	public int getStatusBarHeight() { 
-	      int result = 0;
-	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-	      if (resourceId > 0) {
-	          result = getResources().getDimensionPixelSize(resourceId);
-	      } 
-	      return result;
-	}
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+		log("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		if (aB == null){
+			aB = ((AppCompatActivity)context).getSupportActionBar();
+		}
+
+		if(aB!=null){
+			aB.setTitle(getString(R.string.section_account));
+			log("indicator_menu_white_559");
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -173,8 +175,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 		
-		myAccountImage = (ImageView) v.findViewById(R.id.my_account_thumbnail);
+		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
+
+		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
+		deleteAccountButton.setOnClickListener(this);
+		deleteAccountButton.setVisibility(View.VISIBLE);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		mkButton.setOnClickListener(this);
@@ -216,14 +222,20 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		firstName=false;
 		megaApi.getUserAttribute(myUser, 1, this);
 		megaApi.getUserAttribute(myUser, 2, this);
-		
-		
-		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(Color.TRANSPARENT);
-		c.drawPaint(p);
+		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 		myAccountImage.setImageBitmap(defaultAvatar);
 
 	    int avatarTextSize = getAvatarTextSize(density);
@@ -252,12 +264,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Bitmap imBitmap = null;
 		if (avatar.exists()){
 			if (avatar.length() > 0){
+				log("my avatar exists!");
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
 				bOpts.inPurgeable = true;
 				bOpts.inInputShareable = true;
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (imBitmap == null) {
 					avatar.delete();
+					log("Call to getUserAvatar");
 					if (context.getExternalCacheDir() != null){
 						megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
 					}
@@ -266,9 +280,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 				}
 				else{
+					log("Show my avatar");
 					myAccountImage.setImageBitmap(imBitmap);
 					initialLetter.setVisibility(View.GONE);
 				}
+			}
+		}else{
+			log("my avatar NOT exists!");
+			log("Call to getUserAvatar");
+			if (context.getExternalCacheDir() != null){
+				megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+			}
+			else{
+				megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
 			}
 		}
 		
@@ -431,40 +455,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		*/
 		return v;
 	}
-	
-//	@SuppressLint("NewApi")
-//	private void createOverflowMenu(ListView list){
-//		ArrayList<String> menuOptions = new ArrayList<String>();
-//
-//		menuOptions.add(getString(R.string.action_kill_all_sessions));
-//		menuOptions.add(getString(R.string.my_account_change_password));
-//
-//		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-//		log("Exists MK in: "+path);
-//		File file= new File(path);
-//		if(file.exists()){
-//			menuOptions.add(getString(R.string.action_remove_master_key));
-//		}
-//		else{
-//			menuOptions.add(getString(R.string.action_export_master_key));
-//		}
-//
-//		menuOptions.add(getString(R.string.action_help));
-//		menuOptions.add(getString(R.string.action_upgrade_account));
-//		menuOptions.add(getString(R.string.action_logout));
-//
-//		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-//		if (list.getAdapter() != null){
-//			ArrayAdapter<String> ad = (ArrayAdapter<String>) list.getAdapter();
-//			ad.clear();
-//			ad.addAll(menuOptions);
-//			ad.notifyDataSetChanged();
-//		}
-//		else{
-//			list.setAdapter(arrayAdapter);
-//		}
-//	}
-	
+
 	private int getAvatarTextSize (float density){
 		float textSize = 0.0f;
 		
@@ -504,6 +495,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onClick(View v) {
 
 		switch (v.getId()) {
+
+			case R.id.logout_button:{
+				AccountController aC = new AccountController(context);
+				aC.logout(context, megaApi, false);
+				break;
+			}
 //			case R.id.my_account_main_layout:{
 //				if (overflowMenuLayout != null){
 //					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
@@ -592,6 +589,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK){
 				if(request.getParamType()==0){
+					log("(0)request");
 					File avatar = null;
 					if (context.getExternalCacheDir() != null){
 						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
@@ -813,59 +811,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		// TODO Auto-generated method stub
 
 	}
-	
-	@SuppressLint("NewApi") 
-	void showAlert(String message) {
-		AlertDialog.Builder bld;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
-			bld = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			bld = new AlertDialog.Builder(context);
-		}
-        bld.setMessage(message);
-        bld.setPositiveButton("OK",null);
-        log("Showing alert dialog: " + message);
-        bld.create().show();
-    }
 
-	@Override
-	@SuppressLint("NewApi")
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//		overflowMenuLayout.setVisibility(View.GONE);
-//		String itemText = (String) parent.getItemAtPosition(position);
-//		if (itemText.compareTo(getString(R.string.action_kill_all_sessions)) == 0){
-//			megaApi.killSession(-1, this);
-//		}
-//		else if (itemText.compareTo(getString(R.string.my_account_change_password)) == 0){
-//			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-//			startActivity(intent);
-//		}
-//		else if (itemText.compareTo(getString(R.string.action_export_master_key)) == 0){
-//			((ManagerActivityLollipop) context).showConfirmationExportMK();
-//			createOverflowMenu(overflowMenuList);
-//		}
-//		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
-//
-//			((ManagerActivityLollipop) context).showConfirmationRemoveMK();
-//			createOverflowMenu(overflowMenuList);
-//		}
-//		else if (itemText.compareTo(getString(R.string.action_help)) == 0){
-//			Intent intent = new Intent();
-//            intent.setAction(Intent.ACTION_VIEW);
-//            intent.addCategory(Intent.CATEGORY_BROWSABLE);
-//            intent.setData(Uri.parse("https://mega.co.nz/#help/android"));
-//            startActivity(intent);
-//		}
-//		else if (itemText.compareTo(getString(R.string.action_upgrade_account)) == 0){
-//			((ManagerActivityLollipop)context).showUpAF(null);
-//		}
-//		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
-//			AccountController aC = new AccountController(context);
-//			aC.logout(context, megaApi, false);
-//		}
-	}
-	
 	public void updateAvatar(File avatar){
 		if(avatar!=null){
 			Bitmap imBitmap = null;

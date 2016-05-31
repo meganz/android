@@ -378,7 +378,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			if(aB!=null){
 				aB.setTitle(getString(R.string.section_cloud_drive));
-				log("indicator_arrow_back_435");
+				log("indicator_menu_white_435");
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}

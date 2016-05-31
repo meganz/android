@@ -67,7 +67,7 @@ public class AccountController {
             out.write(key);
             out.close();
             String message = context.getString(R.string.toast_master_key) + " " + path;
-
+            ((ManagerActivityLollipop) context).invalidateOptionsMenu();
             ((ManagerActivityLollipop) context).showAlert(message, "MasterKey exported!");
 
         }catch (FileNotFoundException e) {
@@ -82,13 +82,14 @@ public class AccountController {
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
         final File f = new File(path);
         f.delete();
-			        	/*removeMasterKeyMenuItem.setVisible(false);
-			        	exportMasterKeyMenuItem.setVisible(true);*/
         String message = context.getString(R.string.toast_master_key_removed);
+        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         ((ManagerActivityLollipop) context).showAlert(message, null);
+
     }
 
-        static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
+    static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
+        log("logout");
         logout(context, megaApi, confirmAccount, false);
     }
 
