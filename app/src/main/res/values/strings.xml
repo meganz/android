@@ -440,7 +440,7 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Storage Space</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade now!</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">You can be a PRO user!\n Do you want to upgrade your account?</string>
@@ -673,4 +673,11 @@
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
     <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servers are too busy. Please wait.</string>
+
+    <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
+
 </resources>
