@@ -1398,8 +1398,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}, 5 * 1000);
 		}
+		else if(requestCode == Constants.SET_PIN){
+			if(resultCode == Activity.RESULT_OK) {
+				log("Set PIN Ok");
+
+				afterSetPinLock();
+			}
+			else{
+				log("Set PIN ERROR");
+			}
+		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_CANCELED && intent != null){
-			
+			log("REQUEST_DOWNLOAD_FOLDER - canceled");
 		}
 		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
 			String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);

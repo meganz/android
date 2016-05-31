@@ -8246,12 +8246,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			statusDialog = temp;
 		}
-		else if(requestCode == Constants.SET_PIN && resultCode == RESULT_OK){
-			log("Set PIN Ok");
-			if(sttFLol!=null){
-				sttFLol.afterSetPinLock();
-			}
-		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
