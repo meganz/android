@@ -94,7 +94,7 @@
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup recovery key</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove recovery key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been exported into: </string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key is available at the Saved for Offline Section and has been exported into: </string>
     <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The recovery key file has been removed</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support@mega.nz for assistance</string>

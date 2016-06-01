@@ -90,7 +90,7 @@
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar Clave Maestra</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar la Clave Maestra</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar subscripción</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clave Maestra ha sido exportada en:</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clave Maestra puede verse en la sección Disponible Sin Conexión y ha sido exportada en:</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La subscripción ha sido cancelada correctamente</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">Ha habido algún problema cancelando la subscripción. Por favor, contacta con support\@mega.co.nz para cancelar la subscripción</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar el resto de sesiones</string>
