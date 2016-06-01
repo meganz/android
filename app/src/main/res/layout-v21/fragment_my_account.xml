@@ -2,6 +2,7 @@
 	xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/my_account_complete_relative_layout"
 	android:layout_width="match_parent"
+	android:background="@color/white"
 	android:layout_height="match_parent" >
 
 	<LinearLayout

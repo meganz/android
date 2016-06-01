@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -20,12 +22,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -58,7 +62,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
-	
+
+	private AlertDialog insertMailDialog;
 	TextView loginTitle;
 	TextView newToMega;
 	EditText et_user;
@@ -66,6 +71,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView bRegister;
 	TextView registerText;
 	TextView bLogin;
+	TextView bForgotPass;
 	ImageView loginThreeDots;
 	Switch loginSwitch;
 	TextView loginABC;
@@ -83,6 +89,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView prepareNodesText;
 	TextView serversBusyText;
 	ScrollView scrollView;
+	RelativeLayout forgotPassLayout;
+	TextView forgotPassTitle;
+	TextView forgotPassFirstP;
+	TextView forgotPassSecondP;
+	TextView forgotPassAction;
+	Button yesMK;
+	Button noMK;
 
 	CountDownTimer timer;
 
@@ -179,7 +192,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
 		loginTitle.setLayoutParams(textParams);
 		
 		loginTitle.setText(R.string.login_text);
@@ -191,7 +204,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		et_user.setLayoutParams(paramsb1);
 		//Left margin
 		textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		et_user.setLayoutParams(textParams);	
 		
 		et_user.setCursorVisible(true);
@@ -248,10 +261,23 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		bLogin.setLayoutParams(paramsbLogin);
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
+		textParamsLogin.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		bLogin.setLayoutParams(textParamsLogin);
-		
+
 		bLogin.setOnClickListener(this);
+
+		bForgotPass = (TextView) findViewById(R.id.button_forgot_pass);
+		bForgotPass.setText(getString(R.string.forgot_pass).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsbForgotPass = bForgotPass.getLayoutParams();
+		paramsbForgotPass.height = Util.scaleHeightPx(48, outMetrics);
+		/*paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);*/
+		bForgotPass.setLayoutParams(paramsbForgotPass);
+		//Margin
+		LinearLayout.LayoutParams textParamsForgotPass = (LinearLayout.LayoutParams)bForgotPass.getLayoutParams();
+		textParamsForgotPass.setMargins(Util.scaleWidthPx(65, outMetrics), 0, 0, Util.scaleHeightPx(20, outMetrics));
+		bForgotPass.setLayoutParams(textParamsForgotPass);
+
+		bForgotPass.setOnClickListener(this);
 		
 		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
@@ -259,20 +285,19 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	    newToMega = (TextView) findViewById(R.id.text_newToMega);
 		//Margins (left, top, right, bottom)
 		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
-		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics)); 
+		textnewToMega.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
 		newToMega.setLayoutParams(textnewToMega);	
-		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
 		
 	    bRegister = (TextView) findViewById(R.id.button_create_account_login);
 	    
 	    bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
 		android.view.ViewGroup.LayoutParams paramsb2 = bRegister.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
 		bRegister.setLayoutParams(paramsb2);
 		//Margin
 		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
-		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
+		textParamsRegister.setMargins(Util.scaleWidthPx(65, outMetrics), 0, 0, 0);
 		bRegister.setLayoutParams(textParamsRegister);
 	    
 	    bRegister.setOnClickListener(this);
@@ -312,6 +337,39 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //		loginProgressBar.setVisibility(View.VISIBLE);
 //		queryingSignupLinkText.setVisibility(View.VISIBLE);
 //		confirmingAccountText.setVisibility(View.VISIBLE);
+
+		forgotPassLayout = (RelativeLayout) findViewById(R.id.forgot_pass_full_layout);
+		forgotPassTitle = (TextView) findViewById(R.id.title_forgot_pass_layout);
+		RelativeLayout.LayoutParams forgotPassTitleParams = (RelativeLayout.LayoutParams)forgotPassTitle.getLayoutParams();
+		forgotPassTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(70, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassTitle.setLayoutParams(forgotPassTitleParams);
+
+		forgotPassFirstP = (TextView) findViewById(R.id.first_par_forgot_pass_layout);
+		RelativeLayout.LayoutParams firstParParams = (RelativeLayout.LayoutParams)forgotPassFirstP.getLayoutParams();
+		firstParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassFirstP.setLayoutParams(firstParParams);
+
+		forgotPassSecondP = (TextView) findViewById(R.id.second_par_forgot_pass_layout);
+		RelativeLayout.LayoutParams secondParParams = (RelativeLayout.LayoutParams)forgotPassSecondP.getLayoutParams();
+		secondParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassSecondP.setLayoutParams(secondParParams);
+
+		forgotPassAction = (TextView) findViewById(R.id.action_forgot_pass_layout);
+		RelativeLayout.LayoutParams actionParams = (RelativeLayout.LayoutParams)forgotPassAction.getLayoutParams();
+		actionParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(25, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassAction.setLayoutParams(actionParams);
+
+		yesMK = (Button) findViewById(R.id.yes_MK_button);
+		LinearLayout.LayoutParams yesMKParams = (LinearLayout.LayoutParams)yesMK.getLayoutParams();
+		yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
+		yesMK.setLayoutParams(yesMKParams);
+		yesMK.setOnClickListener(this);
+
+		noMK = (Button) findViewById(R.id.no_MK_button);
+		LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
+		noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
+		noMK.setLayoutParams(noMKParams);
+		noMK.setOnClickListener(this);
 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
@@ -614,16 +672,128 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	@Override
 	public void onClick(View v) {
 
-		switch(v.getId()){
-			case R.id.button_login_login:
-				loginClicked = true;
-				onLoginClick(v);
+		switch(v.getId()) {
+            case R.id.button_login_login: {
+                log("click on button_login_login");
+                loginClicked = true;
+                onLoginClick(v);
+                break;
+            }
+            case R.id.button_create_account_login:
+            case R.id.login_text_create_account: {
+                log("click on button_create_account_login");
+                onRegisterClick(v);
+                break;
+            }
+			case R.id.button_forgot_pass:{
+				log("click on button_forgot_pass");
+				loginLoggingIn.setVisibility(View.GONE);
+				loginLogin.setVisibility(View.GONE);
+				forgotPassLayout.setVisibility(View.VISIBLE);
 				break;
-			case R.id.button_create_account_login:
-			case R.id.login_text_create_account:
-				onRegisterClick(v);
+			}
+			case R.id.yes_MK_button:{
+                log("click on yes_MK_button");
+				showDialogInsertMailToChangePass();
 				break;
+			}
+			case R.id.no_MK_button:{
+                log("click on no_MK_button");
+				break;
+			}
 		}
+	}
+
+	public void showDialogInsertMailToChangePass(){
+		log("showDialogInsertMailToChangePass");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setHint(getString(R.string.edit_text_insert_mail));
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = input.getText().toString().trim();
+					String emailError = Util.getEmailError(value, loginActivity);
+					if (emailError != null) {
+						input.setError(emailError);
+						input.requestFocus();
+					} else {
+						//Ok, send
+						log("OK RESET PASSWORD");
+						insertMailDialog.dismiss();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.title_alert_reset_with_MK));
+		builder.setMessage(getString(R.string.text_alert_reset_with_MK));
+		builder.setPositiveButton(getString(R.string.context_send),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		insertMailDialog = builder.create();
+		insertMailDialog.show();
+		insertMailDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String value = input.getText().toString().trim();
+				String emailError = Util.getEmailError(value, loginActivity);
+				if (emailError != null) {
+					input.setError(emailError);
+				} else {
+					log("OK BTTN PASSWORD");
+					insertMailDialog.dismiss();
+				}
+			}
+		});
+	}
+
+	/*
+ * Display keyboard
+ */
+	private void showKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
 	}
 
 	public void onLoginClick(View v){
