@@ -697,6 +697,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			if (adapter == null){
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				contentText.setText(getInfoFolder(mOffList));
+				adapter.setNodes(mOffList);
+				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				contentText.setText(getInfoFolder(mOffList));
@@ -885,6 +888,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			if (adapter == null){
 
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				contentText.setText(getInfoFolder(mOffList));
+				adapter.setNodes(mOffList);
+				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				contentText.setText(getInfoFolder(mOffList));
