@@ -689,4 +689,17 @@
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clave maestra se ha copiado satisfactoriamente</string>
 
     <string name="change_pass" context="Button to change the password">Cambiar</string>
+
+    <string name="general_positive_button" context="Positive button to perform a general action">SI</string>
+    <string name="general_negative_button" context="Negative button to perform a general action">NO</string>
+
+    <string name="forgot_pass" context="Button in the Login screen to reset the password">¿Has olvidado tu contraseña?</string>
+    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Si tienes una copia de respaldo de tu clave principal de cifrado, puedes resetear tu contraseña eligiendo la opción SI. Ningún dato se perderá en el proceso.</string>
+    <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">Puedes todavía exportar la clave maestra si tienes una sesión de MEGA activa en un navegador en este o en otro ordenador. Si no es así, ya no puedes descifrar tu cuenta existente, pero puedes empezar una nueva cuenta con la misma dirección de correo electrónico seleccionando NO.</string>
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">¿Tienes copia de seguridad de tu clave maestra?</string>
+
+    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">¡Bien!</string>
+    <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">escribe aquí tu email</string>
+    <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace de recuperación que te permitirá enviar tu clave maestra y restablecer su contraseña.</string>
+
 </resources>
