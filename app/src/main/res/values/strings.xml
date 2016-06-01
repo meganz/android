@@ -691,4 +691,6 @@
     <string name="save_action" context="Action of the button to save the master key as a text file">Save</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The recovery has been successfully copied</string>
 
+    <string name="change_pass" context="Button to change the password">Change</string>
+
 </resources>

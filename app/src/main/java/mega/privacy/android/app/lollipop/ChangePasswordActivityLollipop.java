@@ -1,17 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.Locale;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -30,13 +18,26 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+
+import java.util.Locale;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 @SuppressLint("NewApi")
@@ -59,6 +60,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	Switch loginSwitch;
 	TextView loginABC;
     RelativeLayout fragmentContainer;
+	TextView title;
 	
 	private ActionBar aB;
 	Toolbar tB;
@@ -96,6 +98,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    else{
 	    	scaleText = scaleW;
 	    }
+
+		title = (TextView) findViewById(R.id.title_change_pass);
+		LinearLayout.LayoutParams titleParams = (LinearLayout.LayoutParams)title.getLayoutParams();
+		titleParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0,  0, Util.scaleHeightPx(30, outMetrics));
+		title.setLayoutParams(titleParams);
 		
 		oldPasswordView = (EditText) findViewById(R.id.change_password_oldPassword);
 		android.view.ViewGroup.LayoutParams paramsb1 = oldPasswordView.getLayoutParams();		
@@ -103,7 +110,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		oldPasswordView.setLayoutParams(paramsb1);
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		oldPasswordView.setLayoutParams(textParams);		
 		
 		newPassword1View = (EditText) findViewById(R.id.change_password_newPassword1);
@@ -155,10 +162,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				
 		changePasswordButton = (TextView) findViewById(R.id.change_password_password);
 		
-		changePasswordButton.setText(getString(R.string.my_account_change_password).toUpperCase(Locale.getDefault()));
+		changePasswordButton.setText(getString(R.string.change_pass).toUpperCase(Locale.getDefault()));
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)changePasswordButton.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
+		textParamsLogin.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(80, outMetrics));
 		changePasswordButton.setLayoutParams(textParamsLogin);		
 		
 		changePasswordButton.setOnClickListener(this);
