@@ -23,6 +23,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.TourActivityLollipop;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -68,6 +69,10 @@ public class AccountController {
             out.close();
             String message = context.getString(R.string.toast_master_key) + " " + path;
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+            if(mAF!=null){
+                mAF.updateMKButton();
+            }
             ((ManagerActivityLollipop) context).showAlert(message, "MasterKey exported!");
 
         }catch (FileNotFoundException e) {
@@ -77,6 +82,15 @@ public class AccountController {
         }
     }
 
+    public void copyMK(){
+        log("copyMK");
+        String key = megaApi.exportMasterKey();
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
+        clipboard.setPrimaryClip(clip);
+        ((ManagerActivityLollipop) context).showAlert(context.getString(R.string.copy_MK_confirmation), null);
+    }
+
     public void removeMK() {
         log("removeMK");
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
@@ -84,8 +98,11 @@ public class AccountController {
         f.delete();
         String message = context.getString(R.string.toast_master_key_removed);
         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+        if(mAF!=null){
+            mAF.updateMKButton();
+        }
         ((ManagerActivityLollipop) context).showAlert(message, null);
-
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {

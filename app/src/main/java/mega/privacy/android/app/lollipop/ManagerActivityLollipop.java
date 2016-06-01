@@ -1358,7 +1358,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (getIntent().getAction() != null){
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 			        	log("Intent to export Master Key - im logged in!");
-			        	showConfirmationExportMK();
+						selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+						if(maFLol!=null){
+							maFLol.showMKLayout();
+						}
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
 						log("Open after LauncherFileExplorerActivity ");
@@ -5564,7 +5567,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_menu_export_MK:{
 	        	log("export MK option selected");
-				showConfirmationExportMK();
+				if(maFLol!=null){
+					maFLol.showMKLayout();
+				}
 
 //	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 //				    @Override
@@ -8129,45 +8134,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				break;
 //			}
 		}
-	}
-
-	public void showConfirmationExportMK(){
-		log("showConfirmationExportMK");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
-		}
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-					AccountController aC = new AccountController(managerActivity);
-					aC.exportMK();
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
-		builder.setTitle(getString(R.string.action_export_master_key));
-		builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_export, dialogClickListener)
-		    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void showConfirmationRemoveMK(){
@@ -11054,6 +11020,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		return cFLol;
+	}
+
+	public MyAccountFragmentLollipop getMyAccountFragment() {
+		return maFLol;
 	}
 
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {

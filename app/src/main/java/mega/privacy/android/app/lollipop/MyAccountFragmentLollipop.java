@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -89,6 +90,18 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout expirationLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
+
+	RelativeLayout exportMKLayout;
+	TextView titleExportMK;
+	TextView subTitleExportMK;
+	TextView firstParExportMK;
+	TextView secondParExportMK;
+	TextView thirdParExportMK;
+	TextView actionExportMK;
+	Button copyMK;
+	Button saveMK;
+
+	LinearLayout parentLinearLayout;
 	
 	DisplayMetrics outMetrics;
 	
@@ -212,6 +225,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		mkButtonParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
 		mkButton.setLayoutParams(mkButtonParams);
 
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		log("Exists MK in: "+path);
+		File file= new File(path);
+		if(file.exists()){
+			mkButton.setText(getString(R.string.action_remove_master_key));
+		}
+		else{
+			mkButton.setText(getString(R.string.action_export_master_key));
+		}
+
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
@@ -220,29 +243,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logoutButtonParams.setMargins(Util.scaleWidthPx(18, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
 		logoutButton.setLayoutParams(logoutButtonParams);
 
-		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
-		deleteAccountButton.setOnClickListener(this);
-		deleteAccountButton.setVisibility(View.VISIBLE);
-
-		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, 0);
-		deleteAccountButton.setLayoutParams(deleteAccountParams);
-
 		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
 		LinearLayout.LayoutParams typeLayoutParams = (LinearLayout.LayoutParams)typeLayout.getLayoutParams();
-		typeLayoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, Util.scaleHeightPx(17, outMetrics));
+		typeLayoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(27, outMetrics), 0, 0);
 		typeLayout.setLayoutParams(typeLayoutParams);
 
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
-
-//		LinearLayout.LayoutParams typeAccountParams = (LinearLayout.LayoutParams)typeAccount.getLayoutParams();
-//		typeAccountParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, 0);
-//		typeAccount.setLayoutParams(typeAccountParams);
+		LinearLayout.LayoutParams typeAccountParams = (LinearLayout.LayoutParams)typeAccount.getLayoutParams();
+		typeAccountParams.setMargins(0, Util.scaleHeightPx(5, outMetrics), 0, 0);
+		typeAccount.setLayoutParams(typeAccountParams);
 
 		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
-//		LinearLayout.LayoutParams usedSpaceParams = (LinearLayout.LayoutParams)usedSpace.getLayoutParams();
-//		usedSpaceParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(17, outMetrics));
-//		usedSpace.setLayoutParams(usedSpaceParams);
 
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
@@ -253,29 +264,83 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButtonParams.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
 		upgradeButton.setLayoutParams(upgradeButtonParams);
 
+		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
+		LinearLayout.LayoutParams expirationParams = (LinearLayout.LayoutParams)expirationLayout.getLayoutParams();
+		expirationParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
+		expirationLayout.setLayoutParams(expirationParams);
+		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
+
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
 		LinearLayout.LayoutParams lastSessionParams = (LinearLayout.LayoutParams)lastSessionLayout.getLayoutParams();
-		lastSessionParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, Util.scaleHeightPx(17, outMetrics));
+		lastSessionParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
 		lastSessionLayout.setLayoutParams(lastSessionParams);
 
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
-		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
-		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
-
-
 		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
 		LinearLayout.LayoutParams connectionsParams = (LinearLayout.LayoutParams)connectionsLayout.getLayoutParams();
-		connectionsParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(19, outMetrics), 0, Util.scaleHeightPx(17, outMetrics));
+		connectionsParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
 		connectionsLayout.setLayoutParams(connectionsParams);
 
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
-		
+
+		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
+		deleteAccountButton.setOnClickListener(this);
+		deleteAccountButton.setVisibility(View.VISIBLE);
+
+		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
+		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(36, outMetrics), 0, 0);
+		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
 		typeLayout.setVisibility(View.GONE);
 		expirationLayout.setVisibility(View.GONE);
 		lastSessionLayout.setVisibility(View.GONE);
-		
+
+		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
+		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
+
+		titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
+		RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
+		titleExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(50, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		titleExportMK.setLayoutParams(titleExportMKParams);
+
+		subTitleExportMK = (TextView) v.findViewById(R.id.subtitle_export_MK_layout);
+		RelativeLayout.LayoutParams subTitleExportMKParams = (RelativeLayout.LayoutParams)subTitleExportMK.getLayoutParams();
+		subTitleExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		subTitleExportMK.setLayoutParams(subTitleExportMKParams);
+
+		firstParExportMK = (TextView) v.findViewById(R.id.first_par_export_MK_layout);
+		RelativeLayout.LayoutParams firstParExportMKParams = (RelativeLayout.LayoutParams)firstParExportMK.getLayoutParams();
+		firstParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		firstParExportMK.setLayoutParams(firstParExportMKParams);
+
+		secondParExportMK = (TextView) v.findViewById(R.id.second_par_export_MK_layout);
+		RelativeLayout.LayoutParams secondParExportMKParams = (RelativeLayout.LayoutParams)secondParExportMK.getLayoutParams();
+		secondParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		secondParExportMK.setLayoutParams(secondParExportMKParams);
+
+		thirdParExportMK = (TextView) v.findViewById(R.id.third_par_export_MK_layout);
+		RelativeLayout.LayoutParams thirdParExportMKParams = (RelativeLayout.LayoutParams)thirdParExportMK.getLayoutParams();
+		thirdParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		thirdParExportMK.setLayoutParams(thirdParExportMKParams);
+
+		actionExportMK = (TextView) v.findViewById(R.id.action_export_MK_layout);
+		RelativeLayout.LayoutParams actionExportMKParams = (RelativeLayout.LayoutParams)actionExportMK.getLayoutParams();
+		actionExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		actionExportMK.setLayoutParams(actionExportMKParams);
+
+		copyMK = (Button) v.findViewById(R.id.copy_MK_button);
+		LinearLayout.LayoutParams copyMKParams = (LinearLayout.LayoutParams)copyMK.getLayoutParams();
+		copyMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+		copyMK.setLayoutParams(copyMKParams);
+		copyMK.setOnClickListener(this);
+
+		saveMK = (Button) v.findViewById(R.id.save_MK_button);
+		LinearLayout.LayoutParams saveMKParams = (LinearLayout.LayoutParams)saveMK.getLayoutParams();
+		saveMKParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+		saveMK.setLayoutParams(saveMKParams);
+		saveMK.setOnClickListener(this);
+
 		name=false;
 		firstName=false;
 		megaApi.getUserAttribute(myUser, 1, this);
@@ -552,12 +617,46 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	@Override
 	public void onClick(View v) {
-
+		log("onClick");
 		switch (v.getId()) {
 
 			case R.id.logout_button:{
+				log("Logout button");
 				AccountController aC = new AccountController(context);
 				aC.logout(context, megaApi, false);
+				break;
+			}
+			case R.id.MK_button:{
+				log("Master Key button");
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				log("Exists MK in: "+path);
+				File file= new File(path);
+				if(file.exists()){
+					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
+				}
+				else{
+					showMKLayout();
+				}
+
+				break;
+			}
+			case R.id.copy_MK_button:{
+				log("Copy Master Key button");
+				hideMKLayout();
+				AccountController aC = new AccountController(context);
+				aC.copyMK();
+				break;
+			}
+			case R.id.save_MK_button:{
+				log("Save Master Key button");
+				hideMKLayout();
+				AccountController aC = new AccountController(context);
+				aC.exportMK();
+				break;
+			}
+			case R.id.delete_account_button:{
+				log("Delete Account button");
+
 				break;
 			}
 //			case R.id.my_account_main_layout:{
@@ -582,22 +681,42 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 //				aC.logout(context, megaApi, false);
 //				break;
 //			}
-//			case R.id.my_account_account_type_button:{
-//
-//				((ManagerActivityLollipop)context).showUpAF(null);
-//
-//				break;
-//			}
+			case R.id.my_account_account_type_button:{
+
+				((ManagerActivityLollipop)context).showUpAF(null);
+
+				break;
+			}
+		}
+	}
+
+	public void updateMKButton(){
+		log("updateMKButton");
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		log("update MK Button - Exists MK in: "+path);
+		File file= new File(path);
+		if(file.exists()){
+			mkButton.setText(getString(R.string.action_remove_master_key));
+		}
+		else{
+			mkButton.setText(getString(R.string.action_export_master_key));
 		}
 	}
 	
 	public int onBackPressed(){
+		log("onBackPressed");
 //		if (overflowMenuLayout != null){
 //			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
 //				overflowMenuLayout.setVisibility(View.GONE);
 //				return 1;
 //			}
 //		}
+
+		if(exportMKLayout.getVisibility()==View.VISIBLE){
+			log("Master Key layout is VISIBLE");
+			hideMKLayout();
+			return 1;
+		}
 		
 		return 0;
 	}
@@ -838,7 +957,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 				}
 
-				String usedSpaceString = used + " / " + total;
+				String usedSpaceString = used + " " + getString(R.string.general_x_of_x) + " " + total;
 		        usedSpace.setText(usedSpaceString);
 				typeLayout.setVisibility(View.VISIBLE);
 			}
@@ -889,6 +1008,20 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void showMKLayout(){
+		log("showMKLayout");
+		aB.hide();
+		parentLinearLayout.setVisibility(View.GONE);
+		exportMKLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void hideMKLayout(){
+		log("hideMKLayout");
+		aB.show();
+		exportMKLayout.setVisibility(View.GONE);
+		parentLinearLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void updateAvatar(File avatar){

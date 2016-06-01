@@ -444,8 +444,8 @@
     <string name="overquota_alert_text" context="Dialod text overquota error">Operación no permitida, excederá el límite de almacenamiento de su cuenta. ¿Desea mejorar su tipo de cuenta?</string>
     
     <string name="op_not_allowed" context="Dialod text overquota error">Operación no permitida</string>
-    <string name="my_account_last_session" context="when did the last session happen">Última sesión:</string>
-    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones:</string>
+    <string name="my_account_last_session" context="when did the last session happen">Última sesión</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones</string>
     
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Cambiando contraseña</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Contraseña actual</string>
@@ -676,4 +676,15 @@
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
+
+    <string name="backup_title" context="Title of the screen to backup the master key">Haz copia de tu clave principal de cifrado</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Tu contraseña desbloquea tu clave maestra</string>
+
+    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Tus datos sólo se pueden leer a través de una cadena de operaciones de descifrado que comienza con tu clave maestra de cifrado, que se guardará cifrada con su contraseña. Esto significa que si pierdes tu contraseña, tu clave maestra ya no puede ser descifrada, y tu no puedes descifrar los datos.</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exportar la clave maestra y guardarla en un lugar seguro te permite establecer otra contraseña sin perdida de datos.</string>
+    <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacante desde el exterior no puede acceder a tu cuenta solo con tu clave. Un restablecimiento de contraseña requiere tanto la clave principal como el acceso a tu correo electrónico.</string>
+    <string name="backup_action" context="Sentence to inform the user. the available actions in the screen to backup the master key">Copia la clave maestra o guárdala en un fichero de texto</string>
+
+    <string name="save_action" context="Action of the button to save the master key as a text file">Guardar</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clave maestra se ha copiado satisfactoriamente</string>
 </resources>

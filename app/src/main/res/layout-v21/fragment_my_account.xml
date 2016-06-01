@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/my_account_complete_relative_layout"
 	android:layout_width="match_parent"
@@ -11,295 +11,404 @@
 		android:orientation="vertical">
 
 		<LinearLayout
-			android:id="@+id/my_account_email_layout"
+			android:id="@+id/parent_linear_layout"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="match_parent"
 			android:background="@color/white"
-			android:gravity="left"
-			android:orientation="horizontal" >
-
-			<ImageView
-				android:id="@+id/my_account_email_icon"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/ic_email_grey" />
+			android:orientation="vertical">
 
 			<LinearLayout
-				android:id="@+id/my_account_email_text_layout"
-				android:layout_width="wrap_content"
+				android:id="@+id/my_account_email_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<ImageView
+					android:id="@+id/my_account_email_icon"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey" />
+
+				<LinearLayout
+					android:id="@+id/my_account_email_text_layout"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_name"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/name_my_account"
+						android:textSize="16sp" />
+
+					<TextView
+						android:id="@+id/my_account_email"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/my_account_extra_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<RelativeLayout
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true">
+
+						<LinearLayout
+							android:id="@+id/my_account_relative_layout_avatar"
+							android:layout_width="60dp"
+							android:layout_height="60dp"
+							android:layout_gravity="right"
+							android:layout_alignParentRight="true"
+							android:orientation="horizontal">
+
+							<mega.privacy.android.app.components.RoundedImageView
+								android:id="@+id/my_account_thumbnail"
+								android:layout_width="fill_parent"
+								android:layout_height="fill_parent"
+								android:scaleType="fitCenter"
+								android:layout_centerInParent="true"
+								rounded:border_color="@color/border_file_properties"
+								rounded:border_width="0dp"
+								rounded:corner_radius="30dp" />
+
+							<TextView
+								android:id="@+id/my_account_initial_letter"
+								android:layout_width="fill_parent"
+								android:layout_height="fill_parent"
+								android:layout_marginLeft="10dp"
+								android:layout_marginTop="-5dp" />
+						</LinearLayout>
+
+					</RelativeLayout>
+
+				</LinearLayout>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/buttons_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<Button
+					android:id="@+id/MK_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/name_my_account"
+					android:layout_centerVertical="true"
+					android:paddingLeft="12dp"
+					android:paddingRight="12dp"
+					android:text="@string/action_export_master_key"
+					android:background="@android:color/white"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation"/>
+
+				<Button
+					android:id="@+id/logout_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/name_my_account"
+					android:layout_centerVertical="true"
+					android:text="@string/action_logout"
+					android:background="@android:color/white"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation" />
+			</LinearLayout>
+
+			<RelativeLayout
+				android:id="@+id/my_account_account_type_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white">
+
+				<LinearLayout
+					android:id="@+id/my_account_account_type_account_type_layout"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="left"
+					android:orientation="vertical">
+
+					<TextView
+						android:id="@+id/my_account_account_type_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_account_used_space"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account"/>
+
+				</LinearLayout>
+
+				<Button
+					android:id="@+id/my_account_account_type_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentRight="true"
+					android:paddingLeft="20dp"
+					android:paddingRight="20dp"
+					android:paddingTop="-3dp"
+					android:paddingBottom="-3dp"
+					android:textColor="@color/white"
+					android:text="@string/my_account_upgrade_pro"
+					android:background="@drawable/ripple_upgrade"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation"
+					android:tint="@android:color/white" />
+
+			</RelativeLayout>
+
+			<LinearLayout
+				android:id="@+id/my_account_expiration_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<ImageView
+					android:id="@+id/my_account_expiration_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="invisible" />
+
+				<LinearLayout
+					android:id="@+id/my_account_expiration_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_expiration_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/expires_on"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account" />
+
+					<TextView
+						android:id="@+id/my_account_expiration"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_account_last_session_layout"
+				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:background="@color/white"
 				android:gravity="left"
 				android:orientation="vertical" >
 
 				<TextView
-					android:id="@+id/my_account_name"
+					android:id="@+id/my_account_last_session_label"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/name_my_account"
-					android:textSize="16sp" />
-
-				<TextView
-					android:id="@+id/my_account_email"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-			</LinearLayout>
-
-			<LinearLayout
-				android:id="@+id/my_account_extra_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<RelativeLayout
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true">
-
-					<LinearLayout
-						android:id="@+id/my_account_relative_layout_avatar"
-						android:layout_width="60dp"
-						android:layout_height="60dp"
-						android:layout_gravity="right"
-						android:layout_alignParentRight="true"
-						android:orientation="horizontal">
-
-						<mega.privacy.android.app.components.RoundedImageView
-							android:id="@+id/my_account_thumbnail"
-							android:layout_width="fill_parent"
-							android:layout_height="fill_parent"
-							android:scaleType="fitCenter"
-							android:layout_centerInParent="true"
-							rounded:border_color="@color/border_file_properties"
-							rounded:border_width="0dp"
-							rounded:corner_radius="30dp" />
-
-						<TextView
-							android:id="@+id/my_account_initial_letter"
-							android:layout_width="fill_parent"
-							android:layout_height="fill_parent"
-							android:layout_marginLeft="10dp"
-							android:layout_marginTop="-5dp" />
-					</LinearLayout>
-
-				</RelativeLayout>
-
-			</LinearLayout>
-
-		</LinearLayout>
-
-		<LinearLayout
-			android:id="@+id/buttons_layout"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:gravity="left"
-			android:orientation="horizontal" >
-
-			<Button
-				android:id="@+id/MK_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/name_my_account"
-				android:layout_centerVertical="true"
-				android:paddingLeft="12dp"
-				android:paddingRight="12dp"
-				android:text="@string/action_export_master_key"
-				android:background="@android:color/white"
-				android:elevation="@dimen/elevation_upgrade_low"
-				android:stateListAnimator="@anim/button_upgrade_elevation"/>
-
-			<Button
-				android:id="@+id/logout_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/name_my_account"
-				android:layout_centerVertical="true"
-				android:text="@string/action_logout"
-				android:background="@android:color/white"
-				android:elevation="@dimen/elevation_upgrade_low"
-				android:stateListAnimator="@anim/button_upgrade_elevation" />
-		</LinearLayout>
-
-		<RelativeLayout
-			android:id="@+id/my_account_account_type_layout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white">
-
-			<LinearLayout
-				android:id="@+id/my_account_account_type_account_type_layout"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:gravity="left"
-				android:orientation="vertical">
-
-				<TextView
-					android:id="@+id/my_account_account_type_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
+					android:text="@string/my_account_last_session"
 					android:textSize="16sp"
 					android:textColor="@color/name_my_account"/>
 
 				<TextView
-					android:id="@+id/my_account_used_space"
+					android:id="@+id/my_account_last_session"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:textSize="14sp"
 					android:textColor="@color/mail_my_account"/>
-
 			</LinearLayout>
 
-			<Button
-				android:id="@+id/my_account_account_type_button"
+			<LinearLayout
+				android:id="@+id/my_account_connections_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_account_connections_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_connections_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/my_account_connections"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_account_connections"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<ImageView
+					android:id="@+id/my_account_connections_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="invisible" />
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/delete_account__layout"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:paddingLeft="12dp"
-				android:paddingRight="12dp"
-				android:textColor="@color/white"
-				android:layout_centerVertical="true"
-				android:text="@string/my_account_upgrade_pro"
-				android:background="@drawable/ripple_upgrade"
-				android:elevation="@dimen/elevation_upgrade_low"
-				android:stateListAnimator="@anim/button_upgrade_elevation"
-				android:tint="@android:color/white" />
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<Button
+					android:id="@+id/delete_account_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentRight="true"
+					android:layout_marginRight="15dp"
+					android:paddingLeft="20dp"
+					android:paddingRight="20dp"
+					android:paddingTop="5dp"
+					android:paddingBottom="5dp"
+					android:textColor="@color/white"
+					android:layout_centerVertical="true"
+					android:text="@string/delete_account"
+					android:background="@color/delete_account"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation" />
+			</LinearLayout>
+		</LinearLayout>
+
+		<RelativeLayout
+			android:id="@+id/export_mk_full_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@color/white"
+			android:visibility="gone">
+
+			<TextView
+				android:id="@+id/title_export_MK_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_title"
+				android:textColor="@color/delete_account"
+				android:textSize="20sp"/>
+
+
+			<TextView
+				android:id="@+id/subtitle_export_MK_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_subtitle"
+				android:textColor="@color/name_my_account"
+				android:textSize="16sp"
+				android:layout_below="@id/title_export_MK_layout"/>
+
+			<TextView
+				android:id="@+id/first_par_export_MK_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_first_paragraph"
+				android:textColor="@color/mail_my_account"
+				android:textSize="16sp"
+				android:layout_below="@id/subtitle_export_MK_layout"/>
+
+			<TextView
+				android:id="@+id/second_par_export_MK_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_second_paragraph"
+				android:textColor="@color/mail_my_account"
+				android:textSize="16sp"
+				android:layout_below="@id/first_par_export_MK_layout"/>
+
+			<TextView
+				android:id="@+id/third_par_export_MK_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_third_paragraph"
+				android:textColor="@color/name_my_account"
+				android:textSize="14sp"
+				android:layout_below="@id/second_par_export_MK_layout"/>
+
+			<TextView
+				android:id="@+id/action_export_MK_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/backup_action"
+				android:textColor="@color/mail_my_account"
+				android:textSize="8sp"
+				android:layout_below="@id/third_par_export_MK_layout"/>
+
+			<LinearLayout
+				android:id="@+id/MK_buttons_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal"
+				android:layout_below="@id/action_export_MK_layout">
+
+				<Button
+					android:id="@+id/copy_MK_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_centerVertical="true"
+					android:paddingLeft="12dp"
+					android:paddingRight="12dp"
+					android:textColor="@color/white"
+					android:text="@string/context_copy"
+					android:background="@drawable/ripple_upgrade"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation"
+					android:tint="@android:color/white" />
+
+				<Button
+					android:id="@+id/save_MK_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_centerVertical="true"
+					android:textColor="@color/white"
+					android:text="@string/save_action"
+					android:background="@drawable/ripple_upgrade"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation"
+					android:tint="@android:color/white" />
+			</LinearLayout>
 
 		</RelativeLayout>
 
-		<LinearLayout
-			android:id="@+id/my_account_expiration_layout"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:gravity="left"
-			android:orientation="horizontal" >
-
-			<ImageView
-				android:id="@+id/my_account_expiration_icon"
-				style="@style/dialogActionButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/ic_email_grey"
-				android:visibility="invisible" />
-
-			<LinearLayout
-				android:id="@+id/my_account_expiration_text_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:orientation="vertical" >
-
-				<TextView
-					android:id="@+id/my_account_expiration_label"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/expires_on"
-					android:textColor="@color/grey_info_menu"
-					android:textStyle="bold" />
-
-				<TextView
-					android:id="@+id/my_account_expiration"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textColor="@color/grey_info_menu" />
-			</LinearLayout>
-		</LinearLayout>
-
-		<LinearLayout
-			android:id="@+id/my_account_last_session_layout"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:gravity="left"
-			android:orientation="vertical" >
-
-			<TextView
-				android:id="@+id/my_account_last_session_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/my_account_last_session"
-				android:textSize="16sp"
-				android:textColor="@color/name_my_account"/>
-
-			<TextView
-				android:id="@+id/my_account_last_session"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="14sp"
-				android:textColor="@color/mail_my_account"/>
-		</LinearLayout>
-
-		<LinearLayout
-			android:id="@+id/my_account_connections_layout"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:gravity="left"
-			android:orientation="horizontal" >
-
-			<LinearLayout
-				android:id="@+id/my_account_connections_text_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:orientation="vertical" >
-
-				<TextView
-					android:id="@+id/my_account_connections_label"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/my_account_connections"
-					android:textSize="16sp"
-					android:textColor="@color/name_my_account"/>
-
-				<TextView
-					android:id="@+id/my_account_connections"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-			</LinearLayout>
-
-			<ImageView
-				android:id="@+id/my_account_connections_icon"
-				style="@style/dialogActionButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/ic_email_grey"
-				android:visibility="invisible" />
-		</LinearLayout>
-
-		<LinearLayout
-			android:id="@+id/delete_account__layout"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:gravity="left"
-			android:orientation="horizontal" >
-
-			<Button
-				android:id="@+id/delete_account_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_marginRight="15dp"
-				android:paddingLeft="20dp"
-				android:paddingRight="20dp"
-				android:paddingTop="5dp"
-				android:paddingBottom="5dp"
-				android:textColor="@color/white"
-				android:layout_centerVertical="true"
-				android:text="@string/delete_account"
-				android:background="@color/delete_account"
-				android:elevation="@dimen/elevation_upgrade_low"
-				android:stateListAnimator="@anim/button_upgrade_elevation" />
-		</LinearLayout>
-
 	</LinearLayout>
-	
-</RelativeLayout>
+
+</ScrollView>
