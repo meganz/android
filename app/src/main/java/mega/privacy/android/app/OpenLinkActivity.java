@@ -98,7 +98,7 @@ public class OpenLinkActivity extends PinActivity {
 		}		
 		
 		// Export Master Key link
-		if (url != null && url.matches("^https://mega.co.nz/#backup/")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#backup")||url.matches("^https://mega.nz/#backup"))) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {			
 				log("export master key url");			
 				Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
@@ -133,7 +133,7 @@ public class OpenLinkActivity extends PinActivity {
 		}
 
 		// Create account invitation
-		if (url != null && url.matches("^https://mega.co.nz/#newsignup.+$")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#newsignup.+$"))||(url.matches("^https://mega.nz/#newsignup.+$"))) {
 			log("new signup url");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				MegaNode rootNode = megaApi.getRootNode();

@@ -63,7 +63,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Context context;
 	ActionBar aB;
 
-	LinearLayout avatarLayout;
+	RelativeLayout avatarLayout;
 	TextView initialLetter;
 	RoundedImageView myAccountImage;
 	ImageView mailIcon;
@@ -186,7 +186,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return null;
 		}
 
-		avatarLayout = (LinearLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
 		mailIcon = (ImageView)  v.findViewById(R.id.my_account_email_icon);
 		LinearLayout.LayoutParams mailIconParams = (LinearLayout.LayoutParams)mailIcon.getLayoutParams();
 		mailIconParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(28, outMetrics), 0, 0);
@@ -289,7 +289,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		deleteAccountButton.setVisibility(View.VISIBLE);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(36, outMetrics), 0, 0);
+		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(27, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
 		typeLayout.setVisibility(View.GONE);
@@ -371,7 +371,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		    	String firstLetter = myEmail.charAt(0) + "";
 		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 		    	initialLetter.setText(firstLetter);
-		    	initialLetter.setTextSize(100);
+		    	initialLetter.setTextSize(40);
 		    	initialLetter.setTextColor(Color.WHITE);
 		    	initialLetter.setVisibility(View.VISIBLE);
 		    }
@@ -659,28 +659,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 				break;
 			}
-//			case R.id.my_account_main_layout:{
-//				if (overflowMenuLayout != null){
-//					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-//						overflowMenuLayout.setVisibility(View.GONE);
-//						return;
-//					}
-//				}
-//				break;
-//			}
-//			case R.id.my_account_toolbar_back:{
-//				((ManagerActivityLollipop)context).showCloudDrive();
-//				break;
-//			}
-//			case R.id.my_account_toolbar_overflow:{
-//				overflowMenuLayout.setVisibility(View.VISIBLE);
-//				break;
-//			}
-//			case R.id.my_account_logout:{
-//				AccountController aC = new AccountController(context);
-//				aC.logout(context, megaApi, false);
-//				break;
-//			}
 			case R.id.my_account_account_type_button:{
 
 				((ManagerActivityLollipop)context).showUpAF(null);
@@ -787,6 +765,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 							}
 							else{
 								myAccountImage.setImageBitmap(imBitmap);
+								log("initialLetter.setVisibility");
 								initialLetter.setVisibility(View.GONE);
 							}
 						}
@@ -1012,6 +991,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void showMKLayout(){
 		log("showMKLayout");
+		if (aB == null){
+			aB = ((AppCompatActivity)context).getSupportActionBar();
+		}
 		aB.hide();
 		parentLinearLayout.setVisibility(View.GONE);
 		exportMKLayout.setVisibility(View.VISIBLE);
@@ -1044,6 +1026,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 					else{
 						myAccountImage.setImageBitmap(imBitmap);
+						log("initialLetter.setVisibility2");
 						initialLetter.setVisibility(View.GONE);
 					}
 				}

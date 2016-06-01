@@ -65,7 +65,7 @@
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true">
 
-						<LinearLayout
+						<RelativeLayout
 							android:id="@+id/my_account_relative_layout_avatar"
 							android:layout_width="60dp"
 							android:layout_height="60dp"
@@ -87,9 +87,9 @@
 								android:id="@+id/my_account_initial_letter"
 								android:layout_width="fill_parent"
 								android:layout_height="fill_parent"
-								android:layout_marginLeft="10dp"
-								android:layout_marginTop="-5dp" />
-						</LinearLayout>
+								android:layout_marginLeft="19dp"
+								android:layout_marginTop="3dp" />
+						</RelativeLayout>
 
 					</RelativeLayout>
 
@@ -184,14 +184,6 @@
 				android:background="@color/white"
 				android:gravity="left"
 				android:orientation="horizontal" >
-
-				<ImageView
-					android:id="@+id/my_account_expiration_icon"
-					style="@style/dialogActionButton"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:src="@drawable/ic_email_grey"
-					android:visibility="invisible" />
 
 				<LinearLayout
 					android:id="@+id/my_account_expiration_text_layout"
