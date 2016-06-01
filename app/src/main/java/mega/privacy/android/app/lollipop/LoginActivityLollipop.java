@@ -751,6 +751,9 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				if (hasFocus) {
 					showKeyboardDelayed(v);
 				}
+				else{
+					hideKeyboardDelayed(v);
+				}
 			}
 		});
 
@@ -763,6 +766,16 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 
 					}
 				});
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				View view = getCurrentFocus();
+				if (view != null) {
+					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				}
+			}
+		});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		builder.setView(layout);
 		insertMailDialog = builder.create();
@@ -783,8 +796,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	}
 
 	/*
- * Display keyboard
- */
+	 * Display keyboard
+	 */
 	private void showKeyboardDelayed(final View view) {
 		log("showKeyboardDelayed");
 		handler.postDelayed(new Runnable() {
@@ -792,6 +805,19 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			public void run() {
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
+
+	private void hideKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				if (imm.isActive()) {
+					imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+				}
 			}
 		}, 50);
 	}
