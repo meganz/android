@@ -5,6 +5,7 @@
     <color name="text_secondary">#7a7a7a</color>
     <color name="separator_grey">#10000000</color>
     <color name="background_secondary">#eeeeee</color>
+    <color name="background_create_account">#33cccccc</color>
     <color name="mega">#d90007</color>
     <color name="mega_transparency">#CCdb0605</color>
     <color name="text_login">#333333</color>
@@ -56,6 +57,7 @@
 
     <color name="name_my_account">#de000000</color>
     <color name="mail_my_account">#8a000000</color>
+    <color name="forgot_pass_text">#91000000</color>
         
     <color name="tab_pressed">#ee0008</color>
     

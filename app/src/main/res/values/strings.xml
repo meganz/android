@@ -686,11 +686,22 @@
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.</string>
     <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your e-mail.</string>
-    <string name="backup_action" context="Sentence to inform the user. the available actions in the screen to backup the master key">Copy the recovery key to clipboard or save it as text file</string>
+    <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copy the recovery key to clipboard or save it as text file</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Save</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The recovery has been successfully copied</string>
 
     <string name="change_pass" context="Button to change the password">Change</string>
 
+    <string name="general_positive_button" context="Positive button to perform a general action">YES</string>
+    <string name="general_negative_button" context="Negative button to perform a general action">NO</string>
+
+    <string name="forgot_pass" context="Button in the Login screen to reset the password">Forgot your password?</string>
+    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">If you have a backup of your recovery crypto key, you can reset your password by selecting YES. No data will be lost.</string>
+    <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">You can still export your recovery key now if you have an active MEGA session in any other browser on this or any other computer. If you don\&apos;t, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.</string>
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Do you have a backup of your recovery key?</string>
+
+    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Great!</string>
+    <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">email goes here</string>
+    <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your recovery key and reset your password.</string>
 </resources>
