@@ -56,7 +56,7 @@ public class OpenLinkActivity extends PinActivity {
 //				Intent openIntent = new Intent(this, ManagerActivity.class);
 				Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
 				openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+				openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
 				openFileIntent.setData(Uri.parse(url));
 				startActivity(openFileIntent);
 				finish();
@@ -116,7 +116,7 @@ public class OpenLinkActivity extends PinActivity {
 				log("Build.VERSION_CODES.LOLLIPOP");
 				Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
 				openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openFolderIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+				openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
 				openFolderIntent.setData(Uri.parse(url));
 				startActivity(openFolderIntent);
 				finish();
@@ -155,6 +155,37 @@ public class OpenLinkActivity extends PinActivity {
 								}
 							});
 					builder.show();
+				}
+				return;
+			}
+		}
+
+		// Cancel account
+		if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
+			log("cancel account url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				MegaNode rootNode = megaApi.getRootNode();
+				if (rootNode == null){
+					log("Not logged");
+					AlertDialog.Builder builder;
+					builder = new AlertDialog.Builder(this);
+					builder.setMessage(R.string.alert_not_logged_in);
+					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									finish();
+								}
+							});
+					builder.show();
+				}
+				else{
+					log("Build.VERSION_CODES.LOLLIPOP");
+					//Check that the link corresponds to this account
+					Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
+					cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+					cancelAccountIntent.setData(Uri.parse(url));
+					startActivity(cancelAccountIntent);
+					finish();
 				}
 				return;
 			}

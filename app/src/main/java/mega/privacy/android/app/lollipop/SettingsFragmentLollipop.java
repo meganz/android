@@ -872,7 +872,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public boolean onPreferenceClick(Preference preference) {
 		log("onPreferenceClick");
 		prefs = dbH.getPreferences();
+		log("KEY = " + preference.getKey());
 		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
+			log("KEY_ABOUT_SDK_VERSION pressed");
 			numberOfClicksSDK++;
 			if (numberOfClicksSDK == 5){
 				MegaAttributes attrs = dbH.getAttributes();
@@ -913,12 +915,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
+			log("KEY_STORAGE_DOWNLOAD_LOCATION pressed");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE) == 0){
+			log("KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE pressed");
 			Dialog downloadLocationDialog;
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
@@ -928,8 +932,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+					log("onClick");
 					switch(which){
 						case 0:{
+							log("intent to FileStorageActivityLollipop");
 							Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 							intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 							intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -937,9 +943,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 							break;
 						}
 						case 1:{
+							log("get External Files");
 							File[] fs = context.getExternalFilesDirs(null);
-							if (fs.length > 1){	
+							if (fs.length > 1){
+								log("more than one");
 								if (fs[1] != null){
+									log("external not NULL");
 									String path = fs[1].getAbsolutePath();
 									dbH.setStorageDownloadLocation(path);
 									if (downloadLocation != null){
@@ -950,6 +959,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 									}
 								}
 								else{
+									log("external NULL -- intent to FileStorageActivityLollipop");
 									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
@@ -965,11 +975,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+					log("Cancel dialog");
 					dialog.cancel();
 				}
 			});
 			downloadLocationDialog = b.create();
 			downloadLocationDialog.show();
+			log("downloadLocationDialog shown");
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
 			log("Clear Cache!");
@@ -984,7 +996,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			clearOfflineTask.execute();
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
-			log("Changing the secondaty uploads");
+			log("Changing the secondary uploads");
 			dbH.setSecSyncTimeStamp(0);			
 			secondaryUpload = !secondaryUpload;
 			if (secondaryUpload){
@@ -1060,29 +1072,37 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					advancedDevices = !advancedDevices;
 				}
 			}
+			else{
+				log("No advanced devices");
+			}
 			
 			dbH.setStorageAdvancedDevices(advancedDevices);
 		}
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
+			log("Changing the local folder for secondary uploads");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
-			log("Changing the MEGA folder for secondary mega folder");
+			log("Changing the MEGA folder for secondary uploads");
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
+			log("Changing camera upload");
 			dbH.setCamSyncTimeStamp(0);			
 			cameraUpload = !cameraUpload;			
 			
 			if (cameraUpload){
+				log("Camera ON");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					log("Lollipop version");
 					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 					if (!hasStoragePermission) {
+						log("No storage permission");
 						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
@@ -1090,6 +1110,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					
 					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 	        		if (!hasCameraPermission){
+						log("No camera permission");
 	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.CAMERA},
 								Constants.REQUEST_CAMERA);
@@ -1100,7 +1121,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					File checkFile = new File(camSyncLocalPath);
 					if(!checkFile.exists()){
 						//Local path does not exist, then Camera folder by default
-
+						log("local path not exist, default camera folder");
 						File cameraDownloadLocation = null;
 						if (Environment.getExternalStorageDirectory() != null){
 							cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -1116,6 +1137,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					} 	
 				}
 				else{
+					log("local parh is NULL");
 					//Local path not valid = null, then Camera folder by default
 					File cameraDownloadLocation = null;
 					if (Environment.getExternalStorageDirectory() != null){
@@ -1205,6 +1227,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			}
 			else{
+				log("Camera OFF");
 				dbH.setCamSyncEnabled(false);
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryUpload = false;
@@ -1228,9 +1251,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}			
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
+			log("KEY_PIN_LOCK_ENABLE");
 			pinLock = !pinLock;
 			if (pinLock){
 				//Intent to set the PIN
+				log("call to showPAnelSetPinLock");
 				((ManagerActivityLollipop)getActivity()).showPanelSetPinLock();
 			}
 			else{
@@ -1242,12 +1267,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
+			log("KEY_PIN_LOCK_CODE");
 			resetPinLock();
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ASK_ME_ALWAYS) == 0){
+			log("KEY_STORAGE_ASK_ME_ALWAYS");
 			askMe = storageAskMeAlways.isChecked();
 			dbH.setStorageAskAlways(askMe);
 			if (storageAskMeAlways.isChecked()){
+				log("storageAskMeAlways is checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(false);
 					downloadLocation.setSummary("");
@@ -1259,6 +1287,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				storageAdvancedDevices.setEnabled(true);
 			}
 			else{
+				log("storageAskMeAlways NOT checked!");
 				if (downloadLocation != null){
 					downloadLocation.setEnabled(true);
 					downloadLocation.setSummary(downloadLocationPath);
@@ -1271,10 +1300,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CHARGING) == 0){
+			log("KEY_CAMERA_UPLOAD_CHARGING");
 			charging = cameraUploadCharging.isChecked();
 			dbH.setCamSyncCharging(charging);
 		}
 		else if(preference.getKey().compareTo(KEY_KEEP_FILE_NAMES) == 0){
+			log("KEY_KEEP_FILE_NAMES");
 			fileNames = keepFileNames.isChecked();
 			dbH.setKeepFileNames(fileNames);
 		}
@@ -1287,6 +1318,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD) == 0){
+			log("KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD");
 			Dialog localCameraDialog;
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
@@ -1356,7 +1388,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
 		}
-		log("KEY = " + preference.getKey());
 		
 		return true;
 	}
