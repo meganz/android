@@ -237,23 +237,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		megaSecondaryFolder.setOnPreferenceClickListener(this);
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			log("lollipop version check storage");
 			storageCategory.removePreference(storageAdvancedDevices);
 			File[] fs = context.getExternalFilesDirs(null);
 			if (fs.length == 1){
+				log("fs.length == 1");
 				storageCategory.removePreference(downloadLocationPreference);
 			}
 			else{
 				if (fs.length > 1){
+					log("fs.length > 1");
 					if (fs[1] == null){
+						log("storageCategory.removePreference");
 						storageCategory.removePreference(downloadLocationPreference);		
 					}
 					else{
+						log("storageCategory.removePreference");
 						storageCategory.removePreference(downloadLocation);
 					}
 				}
 			}			
 		}
 		else{
+			log("NOT lollipop version check storage");
 			storageCategory.removePreference(downloadLocationPreference);
 		}
 		
@@ -277,6 +283,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		codeLink.setOnPreferenceClickListener(this);
 
 		if (prefs == null){
+			log("pref is NULL");
 			dbH.setStorageAskAlways(false);
 			
 			File defaultDownloadLocation = null;

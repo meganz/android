@@ -693,10 +693,13 @@
     <string name="general_positive_button" context="Positive button to perform a general action">SI</string>
     <string name="general_negative_button" context="Negative button to perform a general action">NO</string>
 
+    <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">Contraseña olvidada?</string>
     <string name="forgot_pass" context="Button in the Login screen to reset the password">¿Has olvidado tu contraseña?</string>
     <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Si tienes una copia de respaldo de tu clave principal de cifrado, puedes resetear tu contraseña eligiendo la opción SI. Ningún dato se perderá en el proceso.</string>
     <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">Puedes todavía exportar la clave maestra si tienes una sesión de MEGA activa en un navegador en este o en otro ordenador. Si no es así, ya no puedes descifrar tu cuenta existente, pero puedes empezar una nueva cuenta con la misma dirección de correo electrónico seleccionando NO.</string>
     <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">¿Tienes copia de seguridad de tu clave maestra?</string>
+    <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">Si no es así, todavía puedes exportar la clave maestra en esta sesión de MEGA. Por favor, vuelve a la pantalla anterior y exporta tu clave maestra.</string>
+
 
     <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">¡Bien!</string>
     <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">escribe aquí tu email</string>
