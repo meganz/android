@@ -669,6 +669,20 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((marginBottom*scaleH), outMetrics));
 	}
 
+	public void showForgotPassLayout(){
+		log("showForgotPassLayout");
+		loginLoggingIn.setVisibility(View.GONE);
+		loginLogin.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void hideForgotPassLayout(){
+		log("hideForgotPassLayout");
+		loginLoggingIn.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.GONE);
+		loginLogin.setVisibility(View.VISIBLE);
+	}
+
 	@Override
 	public void onClick(View v) {
 
@@ -687,9 +701,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
             }
 			case R.id.button_forgot_pass:{
 				log("click on button_forgot_pass");
-				loginLoggingIn.setVisibility(View.GONE);
-				loginLogin.setVisibility(View.GONE);
-				forgotPassLayout.setVisibility(View.VISIBLE);
+				showForgotPassLayout();
 				break;
 			}
 			case R.id.yes_MK_button:{
@@ -1358,6 +1370,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			super.onBackPressed();
 		}
 		else{
+
+			if(forgotPassLayout.getVisibility()==View.VISIBLE){
+				log("Forgot Pass layout is VISIBLE");
+				hideForgotPassLayout();
+				return;
+			}
+
 			Intent intent = new Intent(this, TourActivityLollipop.class);
 			startActivity(intent);
 			finish();

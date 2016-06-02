@@ -377,6 +377,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog alertNotPermissionsUpload;
 	private AlertDialog clearRubbishBinDialog;
 	private AlertDialog downloadConfirmationDialog;
+	private AlertDialog insertMKDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -405,6 +406,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
 	private MenuItem logoutMenuItem;
+	private MenuItem forgotPassMenuItem;
 
 	boolean fromTakePicture = false;
 
@@ -3342,6 +3344,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		logoutMenuItem.setVisible(false);
 
+		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
+		forgotPassMenuItem.setVisible(false);
+
 	    if (drawerItem == null){
 	    	if (nV != null){
 	    		Menu nVMenu = nV.getMenu();
@@ -3413,6 +3418,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
 
 	    			if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3470,6 +3476,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
 
 					if(fbFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
@@ -3524,6 +3531,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
     			if (isList){
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3562,6 +3570,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
     			if (isListCameraUploads){
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3608,6 +3617,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
     			if (isListCameraUploads){
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3671,6 +3681,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			rubbishBinMenuItem.setVisible(false);
     			gridSmallLargeMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 			}
 		}
 
@@ -3743,6 +3754,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					upgradeAccountMenuItem.setVisible(true);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
 
 					if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3794,6 +3806,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
 
 					if (isList){
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3838,6 +3851,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				changePass.setVisible(false);
 				settingsMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
 				if (isList){
 					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3880,6 +3894,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				killAllSessions.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 			}
 			else{
 				log("createOptions TAB RECEIVED requests");
@@ -3912,6 +3927,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				logoutMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 			}
 		}
 
@@ -3942,6 +3958,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
 
 					//Show
 	    			selectMenuItem.setVisible(true);
@@ -3967,6 +3984,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					upgradeAccountMenuItem.setVisible(true);
 					changePass.setVisible(true);
 					logoutMenuItem.setVisible(true);
+					forgotPassMenuItem.setVisible(true);
 
 					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 					log("Exists MK in: "+path);
@@ -4033,6 +4051,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				cancelSubscription.setVisible(false);
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
@@ -4102,7 +4121,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
-
+				forgotPassMenuItem.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 			}
@@ -5620,24 +5639,111 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_menu_logout:{
-
+				log("action menu logout pressed");
 				AccountController aC = new AccountController(this);
 				aC.logout(this, megaApi, false);
 	        	return true;
 	        }
 	        case R.id.action_menu_cancel_subscriptions:{
+				log("action menu cancel subscriptions pressed");
 	        	if (megaApi != null){
 	        		//Show the message
 	        		showCancelMessage();
 	        	}
 	        	return true;
 	        }
+			case R.id.action_menu_forgot_pass:{
+				log("action menu forgot pass pressed");
+				if(maFLol!=null){
+					maFLol.showForgotPassLayout();
+				}
+				return true;
+			}
             default:{
 	            return super.onOptionsItemSelected(item);
             }
 		}
 	}
 
+	public void showDialogInsertMKToChangePass(){
+		log("showDialogInsertMKToChangePass");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setHint(getString(R.string.edit_text_insert_mk));
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = input.getText().toString().trim();
+					String emailError = Util.getEmailError(value, managerActivity);
+					if (emailError != null) {
+						input.setError(emailError);
+						input.requestFocus();
+					} else {
+						//Ok, send
+						log("OK RESET PASSWORD");
+						insertMKDialog.dismiss();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.title_alert_reset_with_MK));
+		builder.setMessage(getString(R.string.text_alert_reset_with_MK));
+		builder.setPositiveButton(getString(R.string.context_send),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+					}
+				});
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				View view = getCurrentFocus();
+				if (view != null) {
+					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				}
+			}
+		});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		insertMKDialog = builder.create();
+		insertMKDialog.show();
+		insertMKDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String value = input.getText().toString().trim();
+				String emailError = Util.getEmailError(value, managerActivity);
+				if (emailError != null) {
+					input.setError(emailError);
+				} else {
+					log("OK BTTN PASSWORD");
+					insertMKDialog.dismiss();
+				}
+			}
+		});
+	}
 	public void updateAliveFragments(){
 		log("updateAliveFragments");
 		//Needed to update view when changing list<->grid from other section

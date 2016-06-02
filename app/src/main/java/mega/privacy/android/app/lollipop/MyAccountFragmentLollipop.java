@@ -101,6 +101,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button copyMK;
 	Button saveMK;
 
+	RelativeLayout forgotPassLayout;
+	TextView forgotPassTitle;
+	TextView forgotPassFirstP;
+	TextView forgotPassSecondP;
+	TextView forgotPassAction;
+	Button yesMK;
+	Button noMK;
+
 	LinearLayout parentLinearLayout;
 	
 	DisplayMetrics outMetrics;
@@ -340,6 +348,40 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		saveMKParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
 		saveMK.setLayoutParams(saveMKParams);
 		saveMK.setOnClickListener(this);
+
+		forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
+		forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
+		RelativeLayout.LayoutParams forgotPassTitleParams = (RelativeLayout.LayoutParams)forgotPassTitle.getLayoutParams();
+		forgotPassTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(70, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassTitle.setLayoutParams(forgotPassTitleParams);
+
+		forgotPassFirstP = (TextView) v.findViewById(R.id.first_par_forgot_pass_layout);
+		RelativeLayout.LayoutParams firstParParams = (RelativeLayout.LayoutParams)forgotPassFirstP.getLayoutParams();
+		firstParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassFirstP.setLayoutParams(firstParParams);
+
+		forgotPassSecondP = (TextView) v.findViewById(R.id.second_par_forgot_pass_layout);
+		forgotPassSecondP.setText(getString(R.string.forgot_pass_second_paragraph_logged_in));
+		RelativeLayout.LayoutParams secondParParams = (RelativeLayout.LayoutParams)forgotPassSecondP.getLayoutParams();
+		secondParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassSecondP.setLayoutParams(secondParParams);
+
+		forgotPassAction = (TextView) v.findViewById(R.id.action_forgot_pass_layout);
+		RelativeLayout.LayoutParams actionParams = (RelativeLayout.LayoutParams)forgotPassAction.getLayoutParams();
+		actionParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(25, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		forgotPassAction.setLayoutParams(actionParams);
+
+		yesMK = (Button) v.findViewById(R.id.yes_MK_button);
+		LinearLayout.LayoutParams yesMKParams = (LinearLayout.LayoutParams)yesMK.getLayoutParams();
+		yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
+		yesMK.setLayoutParams(yesMKParams);
+		yesMK.setOnClickListener(this);
+
+		noMK = (Button) v.findViewById(R.id.no_MK_button);
+		LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
+		noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
+		noMK.setLayoutParams(noMKParams);
+		noMK.setOnClickListener(this);
 
 		name=false;
 		firstName=false;
@@ -654,13 +696,23 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				aC.exportMK();
 				break;
 			}
+			case R.id.yes_MK_button:{
+				log("click on yes_MK_button");
+				((ManagerActivityLollipop)context).showDialogInsertMKToChangePass();
+				break;
+			}
+			case R.id.no_MK_button:{
+				log("click on no_MK_button");
+				hideForgotPassLayout();
+				break;
+			}
 			case R.id.delete_account_button:{
 				log("Delete Account button");
 
 				break;
 			}
 			case R.id.my_account_account_type_button:{
-
+				log("Upgrade Account button");
 				((ManagerActivityLollipop)context).showUpAF(null);
 
 				break;
@@ -683,16 +735,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-//		if (overflowMenuLayout != null){
-//			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-//				overflowMenuLayout.setVisibility(View.GONE);
-//				return 1;
-//			}
-//		}
 
 		if(exportMKLayout.getVisibility()==View.VISIBLE){
 			log("Master Key layout is VISIBLE");
 			hideMKLayout();
+			return 1;
+		}
+
+		if(forgotPassLayout.getVisibility()==View.VISIBLE){
+			log("Forgot Pass layout is VISIBLE");
+			hideForgotPassLayout();
 			return 1;
 		}
 		
@@ -996,15 +1048,43 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		aB.hide();
 		parentLinearLayout.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.GONE);
 		exportMKLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void hideMKLayout(){
 		log("hideMKLayout");
+		if (aB == null){
+			aB = ((AppCompatActivity)context).getSupportActionBar();
+		}
 		aB.show();
 		exportMKLayout.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.GONE);
 		parentLinearLayout.setVisibility(View.VISIBLE);
 	}
+
+	public void showForgotPassLayout(){
+		log("showForgotPassLayout");
+		if (aB == null){
+			aB = ((AppCompatActivity)context).getSupportActionBar();
+		}
+		aB.hide();
+		parentLinearLayout.setVisibility(View.GONE);
+		exportMKLayout.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void hideForgotPassLayout(){
+		log("hideForgotPassLayout");
+		if (aB == null){
+			aB = ((AppCompatActivity)context).getSupportActionBar();
+		}
+		aB.show();
+		exportMKLayout.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.GONE);
+		parentLinearLayout.setVisibility(View.VISIBLE);
+	}
+
 
 	public void updateAvatar(File avatar){
 		if(avatar!=null){

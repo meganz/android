@@ -56,6 +56,13 @@
 		MEGA:showAsAction="never" />
 
 	<item
+		android:id="@+id/action_menu_forgot_pass"
+		android:orderInCategory="90"
+		android:title="@string/forgot_pass_menu"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="never" />
+
+	<item
 		android:id="@+id/action_menu_export_MK"
 		android:orderInCategory="95"
 		android:title="@string/action_export_master_key"
