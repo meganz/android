@@ -70,6 +70,7 @@ public class Constants {
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
 	public static String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
+	public static String ACTION_CANCEL_ACCOUNT = "CANCEL_ACCOUNT";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

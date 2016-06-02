@@ -152,6 +152,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	NodeController nC;
 	ContactController cC;
+	AccountController aC;
 
 	MegaNode selectedNode;
 	MegaUser selectedUser;
@@ -378,6 +379,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog clearRubbishBinDialog;
 	private AlertDialog downloadConfirmationDialog;
 	private AlertDialog insertMKDialog;
+	private AlertDialog insertPassDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -960,6 +962,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
+		aC = new AccountController(this);
 
 		File thumbDir;
 		if (getExternalCacheDir() != null){
@@ -1355,7 +1358,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("rootNode != null");
 
-			//Check if export master key action
 	        if (getIntent() != null){
 				if (getIntent().getAction() != null){
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
@@ -1363,6 +1365,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(DrawerItem.ACCOUNT);
 						if(maFLol!=null){
 							maFLol.showMKLayout();
+						}
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
+						String link = getIntent().getDataString();
+						if(link!=null){
+							log("link to cancel: "+link);
+							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							showDialogInsertPasswordToCancelAccount(link);
 						}
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
@@ -6675,6 +6685,125 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
+	}
+
+	public void showEmailVerificacionDialog(){
+
+	}
+
+	public void showDialogInsertPasswordToCancelAccount(String link){
+		log("showDialogInsertPasswordToCancelAccount");
+
+		final String linkCancellation = link;
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setHint(getString(R.string.edit_text_insert_pass));
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String pass = input.getText().toString().trim();
+					if(pass.equals("")||pass.isEmpty()){
+						log("input is empty");
+						input.setError(getString(R.string.invalid_string));
+						input.requestFocus();
+					}
+					else {
+						log("action DONE ime - cancel account");
+						aC.confirmDeleteAccount(linkCancellation, pass, maFLol);
+						insertPassDialog.dismiss();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.context_delete),EditorInfo.IME_ACTION_DONE);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.delete_account));
+		builder.setMessage(getString(R.string.delete_account_text_last_step));
+		builder.setPositiveButton(getString(R.string.context_delete),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+					}
+				});
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				View view = getCurrentFocus();
+				if (view != null) {
+					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				}
+			}
+		});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		insertPassDialog = builder.create();
+		insertPassDialog.show();
+		insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				log("OK BTTN PASSWORD");
+				String pass = input.getText().toString().trim();
+				if(pass.equals("")||pass.isEmpty()){
+					log("input is empty");
+					input.setError(getString(R.string.invalid_string));
+					input.requestFocus();
+//					insertPassDialog.show();
+				}
+				else {
+					log("positive button pressed - cancel account");
+					aC.confirmDeleteAccount(linkCancellation, pass, maFLol);
+					insertPassDialog.dismiss();
+				}
+			}
+		});
+	}
+
+	public void askConfirmationDeleteAccount(){
+		log("askConfirmationDeleteAccount");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						aC.deleteAccount(maFLol);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.delete_account));
+
+		builder.setMessage(getResources().getString(R.string.delete_account_text));
+
+		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+		builder.show();
 	}
 
 

@@ -708,7 +708,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.delete_account_button:{
 				log("Delete Account button");
-
+				((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 				break;
 			}
 			case R.id.my_account_account_type_button:{
@@ -786,12 +786,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart()");
+		log("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("MegaRequest.TYPE_GET_ATTR_USER");
@@ -850,6 +849,29 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					firstName = false;
 				}
 				
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
+			log("TYPE_GET_CANCEL_LINK request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The cancel link has been sent");
+				((ManagerActivityLollipop)context).showAlert(getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else{
+				log("ERROR when asking for link to cancel account");
+				((ManagerActivityLollipop)context).showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
+			log("TYPE_CONFIRM_CANCEL_LINK request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The account has been canceled");
+				AccountController aC = new AccountController(context);
+				aC.logout(context, megaApi, false);
+			}
+			else{
+				log("ERROR when cancelling account: "+e.getErrorString());
+				((ManagerActivityLollipop)context).showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){

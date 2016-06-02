@@ -705,9 +705,19 @@
     <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Do you have a backup of your recovery key?</string>
 
     <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Great!</string>
-    <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">email goes here</string>
+    <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">email goes here</string>
     <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your recovery key and reset your password.</string>
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">recovery key goes here</string>
 
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
+    <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password goes here</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+
+    <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Email verification</string>
+    <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Please check your email to proceed.</string>
+    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">An error occurred, please try again.</string>
+
+    <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">You must be logged in to perform this action.</string>
+    <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrect</string>
 </resources>

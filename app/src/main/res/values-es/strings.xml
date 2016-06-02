@@ -705,4 +705,16 @@
     <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">escribe aquí tu email</string>
     <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace de recuperación que te permitirá enviar tu clave maestra y restablecer su contraseña.</string>
 
+    <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">escribe aquí la clave</string>
+
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si borras tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
+    <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">escribe aquí la contraseña</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancelation of an account">Este es el último paso para cancelar la cuenta. Perderás toda la información almacenada en la nube. Por favor, introduce tu contraseña.</string>
+
+    <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verificación necesaria</string>
+    <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Por favor, comprueba tu correo electrónico para proceder.</string>
+    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">Ocurrió un error. Por favor, inténtalo de nuevo.</string>
+
+    <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Debes haber iniciado sesión para realizar esta operación.</string>
+    <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrecto</string>
 </resources>

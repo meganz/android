@@ -30,9 +30,6 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-/**
- * Created by carol on 5/25/16.
- */
 public class AccountController {
 
     Context context;
@@ -46,6 +43,16 @@ public class AccountController {
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+    }
+
+    public void deleteAccount(MyAccountFragmentLollipop mAF){
+        log("deleteAccount");
+        megaApi.cancelAccount(mAF);
+    }
+
+    public void confirmDeleteAccount(String link, String pass, MyAccountFragmentLollipop mAF){
+        log("confirmDeleteAccount");
+        megaApi.confirmCancelAccount(link, pass, mAF);
     }
 
     public void exportMK(){
