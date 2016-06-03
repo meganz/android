@@ -726,4 +726,10 @@
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Por favor, escribe tu clave maestra.</string>
 
     <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Contraseña modificada!</string>
+
+    <string name="park_account_button" context="Button to park an account">Aparcar cuenta</string>
+    <string name="park_account_title" context="Title of the screen to park an account">Ups!</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Debido a nuestro paradigma de cifrado end-to-end no podrás acceder a tus datos sin tu contraseña o una copia de seguridad de la clave maestra.</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Puedes aparcar tu cuenta existente y empezar con una nueva usando la misma dirección de correo electrónico. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
+
 </resources>

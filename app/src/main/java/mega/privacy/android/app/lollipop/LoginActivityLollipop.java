@@ -90,6 +90,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView prepareNodesText;
 	TextView serversBusyText;
 	ScrollView scrollView;
+
 	RelativeLayout forgotPassLayout;
 	TextView forgotPassTitle;
 	TextView forgotPassFirstP;
@@ -97,6 +98,12 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView forgotPassAction;
 	Button yesMK;
 	Button noMK;
+
+	RelativeLayout parkAccountLayout;
+	TextView parkAccountTitle;
+	TextView parkAccountFirstP;
+	TextView parkAccountSecondP;
+	Button parkAccountButton;
 
 	CountDownTimer timer;
 
@@ -371,6 +378,28 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
 		noMK.setLayoutParams(noMKParams);
 		noMK.setOnClickListener(this);
+
+		parkAccountLayout = (RelativeLayout) findViewById(R.id.park_account_layout);
+		parkAccountTitle = (TextView) findViewById(R.id.title_park_account_layout);
+		RelativeLayout.LayoutParams parkAccountTitleParams = (RelativeLayout.LayoutParams)parkAccountTitle.getLayoutParams();
+		parkAccountTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(70, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		parkAccountTitle.setLayoutParams(parkAccountTitleParams);
+
+		parkAccountFirstP = (TextView) findViewById(R.id.first_par_park_account_layout);
+		RelativeLayout.LayoutParams parkAccountFParams = (RelativeLayout.LayoutParams)parkAccountFirstP.getLayoutParams();
+		parkAccountFParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		parkAccountFirstP.setLayoutParams(parkAccountFParams);
+
+		parkAccountSecondP = (TextView) findViewById(R.id.second_par_park_account_layout);
+		RelativeLayout.LayoutParams parkAccountSParams = (RelativeLayout.LayoutParams)parkAccountSecondP.getLayoutParams();
+		parkAccountSParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		parkAccountSecondP.setLayoutParams(parkAccountSParams);
+
+		parkAccountButton = (Button) findViewById(R.id.park_account_button);
+		RelativeLayout.LayoutParams parkButtonParams = (RelativeLayout.LayoutParams)parkAccountButton.getLayoutParams();
+		parkButtonParams.setMargins(0, Util.scaleHeightPx(25, outMetrics),  Util.scaleWidthPx(24, outMetrics), 0);
+		parkAccountButton.setLayoutParams(parkButtonParams);
+		parkAccountButton.setOnClickListener(this);
 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
@@ -787,6 +816,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		log("showForgotPassLayout");
 		loginLoggingIn.setVisibility(View.GONE);
 		loginLogin.setVisibility(View.GONE);
+		parkAccountLayout.setVisibility(View.GONE);
 		forgotPassLayout.setVisibility(View.VISIBLE);
 		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 	}
@@ -795,6 +825,25 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		log("hideForgotPassLayout");
 		loginLoggingIn.setVisibility(View.GONE);
 		forgotPassLayout.setVisibility(View.GONE);
+		parkAccountLayout.setVisibility(View.GONE);
+		loginLogin.setVisibility(View.VISIBLE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+	}
+
+	public void showParkAccountLayout(){
+		log("showParkAccountLayout");
+		loginLoggingIn.setVisibility(View.GONE);
+		loginLogin.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.GONE);
+		parkAccountLayout.setVisibility(View.VISIBLE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+	}
+
+	public void hideParkAccountLayout(){
+		log("hideParkAccountLayout");
+		loginLoggingIn.setVisibility(View.GONE);
+		forgotPassLayout.setVisibility(View.GONE);
+		parkAccountLayout.setVisibility(View.GONE);
 		loginLogin.setVisibility(View.VISIBLE);
 		scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 	}
@@ -815,6 +864,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
                 onRegisterClick(v);
                 break;
             }
+			case R.id.park_account_button:{
+				log("click to park account");
+				showDialogInsertMail(false);
+				break;
+			}
 			case R.id.button_forgot_pass:{
 				log("click on button_forgot_pass");
 				showForgotPassLayout();
@@ -822,18 +876,19 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 			case R.id.yes_MK_button:{
                 log("click on yes_MK_button");
-				showDialogInsertMailToChangePass();
+				showDialogInsertMail(true);
 				break;
 			}
 			case R.id.no_MK_button:{
                 log("click on no_MK_button");
+				showParkAccountLayout();
 				break;
 			}
 		}
 	}
 
-	public void showDialogInsertMailToChangePass(){
-		log("showDialogInsertMailToChangePass");
+	public void showDialogInsertMail(final boolean reset){
+		log("showDialogInsertMail");
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
@@ -863,8 +918,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						input.setError(emailError);
 						input.requestFocus();
 					} else {
-						log("ask for link to reset pass");
-						megaApi.resetPassword(value, true, loginActivity);
+						if(reset){
+							log("ask for link to reset pass");
+							megaApi.resetPassword(value, true, loginActivity);
+						}
+						else{
+							log("ask for link to park account");
+							megaApi.resetPassword(value, false, loginActivity);
+						}
 						insertMailDialog.dismiss();
 					}
 				}
@@ -886,11 +947,23 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				}
 			}
 		});
-
+		String title;
+		String text;
+		String buttonText;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.title_alert_reset_with_MK));
-		builder.setMessage(getString(R.string.text_alert_reset_with_MK));
-		builder.setPositiveButton(getString(R.string.context_send),
+		if(reset){
+			title= getString(R.string.title_alert_reset_with_MK);
+			text = getString(R.string.text_alert_reset_with_MK);
+			buttonText=getString(R.string.context_send);
+		}
+		else{
+			title= getString(R.string.park_account_dialog_title);
+			text = getString(R.string.dialog_park_account);
+			buttonText=getString(R.string.park_account_button);
+		}
+		builder.setTitle(title);
+		builder.setMessage(text);
+		builder.setPositiveButton(buttonText,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -920,8 +993,15 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					log("mail incorrect");
 					input.setError(emailError);
 				} else {
-					log("ask for link to reset pass");
-					megaApi.resetPassword(value, true, loginActivity);
+					if(reset){
+						log("ask for link to reset pass");
+						megaApi.resetPassword(value, true, loginActivity);
+					}
+					else{
+						log("ask for link to park account");
+						megaApi.resetPassword(value, false, loginActivity);
+					}
+
 					insertMailDialog.dismiss();
 				}
 			}
@@ -1513,6 +1593,12 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			if(forgotPassLayout.getVisibility()==View.VISIBLE){
 				log("Forgot Pass layout is VISIBLE");
 				hideForgotPassLayout();
+				return;
+			}
+
+			if(parkAccountLayout.getVisibility()==View.VISIBLE){
+				log("Park account layout is VISIBLE");
+				hideParkAccountLayout();
 				return;
 			}
 
