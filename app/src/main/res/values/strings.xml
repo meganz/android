@@ -729,4 +729,13 @@
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Please write below your recovery key.</string>
 
     <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Password changed!</string>
+
+    <string name="park_account_dialog_title" context="Title of the dialog to park an account">Park account</string>
+    <string name="park_account_button" context="Button to park an account">Park</string>
+    <string name="park_account_title" context="Title of the screen to park an account">Oops!</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your recovery key.</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">You can park your existing account and start a fresh one under the same e-mail address. Your data will be retained for at least 60 days. In case that you recall your parked account\'s password, please contact support&#64;mega.nz</string>
+
+    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Please enter you e-mail address below. You will receive a recovery link that will allow you park your account.</string>
+
 </resources>

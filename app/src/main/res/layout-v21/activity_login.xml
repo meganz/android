@@ -213,6 +213,12 @@
             android:layout_height="match_parent"
             layout="@layout/forgot_password_layout"
             android:visibility="gone"/>
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/park_account_layout"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </ScrollView>
