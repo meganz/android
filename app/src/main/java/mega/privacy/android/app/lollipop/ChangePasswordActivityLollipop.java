@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -55,6 +56,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	Display display;
 	
 	private MegaApiAndroid megaApi;
+	boolean changePassword = true;
 	
 	private EditText oldPasswordView, newPassword1View, newPassword2View;
 	private TextView changePasswordButton;
@@ -182,21 +184,49 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		Intent intentReceived = getIntent();
 		if (intentReceived != null) {
 			log("There is an intent!");
-			if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_LINK)) {
-				linkToReset = getIntent().getDataString();
-				if (linkToReset == null) {
-					log("link is NULL - close activity");
-					finish();
+			if(intentReceived.getAction()!=null){
+				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_LINK)) {
+					log("ACTION_RESET_PASS_FROM_LINK");
+					changePassword=false;
+					linkToReset = getIntent().getDataString();
+					if (linkToReset == null) {
+						log("link is NULL - close activity");
+						finish();
+					}
+					mk = getIntent().getStringExtra("MK");
+					if(mk==null){
+						log("MK is NULL - close activity");
+						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+					oldPasswordView.setVisibility(View.GONE);
+					title.setText(getString(R.string.title_enter_new_password));
 				}
-				mk = getIntent().getStringExtra("MK");
-				if(mk==null){
-					log("MK is NULL - close activity");
-					finish();
+				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT)) {
+					changePassword=false;
+					log("ACTION_RESET_PASS_FROM_PARK_ACCOUNT");
+					linkToReset = getIntent().getDataString();
+					if (linkToReset == null) {
+						log("link is NULL - close activity");
+						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+					mk = null;
+					oldPasswordView.setVisibility(View.GONE);
+					title.setText(getString(R.string.title_enter_new_password));
 				}
-				oldPasswordView.setVisibility(View.GONE);
 			}
 		}
 
+	}
+
+	public void showAlert(String message, String title) {
+		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		bld.setMessage(message);
+		if(title!=null){
+			bld.setTitle(title);
+		}
+		bld.setPositiveButton("OK",null);
+		log("Showing alert dialog: " + message);
+		bld.create().show();
 	}
 	
 	@Override
@@ -216,24 +246,33 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		log("onClick");
 		switch(v.getId()){
 			case R.id.change_password_password:{
-				if(linkToReset==null||mk==null){
-					log("link and mk are NULL");
-					finish();
-				}
-				else if(linkToReset!=null&&mk!=null){
-					log("ok proceed to reset");
-					onResetPasswordClick();
-				}
-				else {
+				if(changePassword){
 					log("ok proceed to change");
 					onChangePasswordClick();
+				}
+				else{
+					log("reset pass on click");
+					if(linkToReset==null){
+						log("link is NULL");
+						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+					else{
+						if(mk==null){
+							log("procced to park account");
+							onResetPasswordClick(false);
+						}
+						else{
+							log("ok proceed to reset");
+							onResetPasswordClick(true);
+						}
+					}
 				}
 				break;
 			}
 		}
 	}
 
-	public void onResetPasswordClick(){
+	public void onResetPasswordClick(boolean hasMk){
 		log("onResetPasswordClick");
 		if(!Util.isOnline(this))
 		{
@@ -263,7 +302,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		progress.setMessage(getString(R.string.my_account_changing_password));
 		progress.show();
 
-		megaApi.confirmResetPassword(linkToReset, newPassword, mk, this);
+		if(hasMk){
+			log("reset with mk");
+			megaApi.confirmResetPassword(linkToReset, newPassword, mk, this);
+		}
+		else{
+			megaApi.confirmResetPassword(linkToReset, newPassword, null, this);
+		}
+
 	}
 	
 	public void onChangePasswordClick(){

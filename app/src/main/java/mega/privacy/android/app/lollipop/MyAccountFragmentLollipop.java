@@ -866,8 +866,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("TYPE_CONFIRM_CANCEL_LINK request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The account has been canceled");
-				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, false);
 			}
 			else{
 				log("ERROR when cancelling account: "+e.getErrorString());

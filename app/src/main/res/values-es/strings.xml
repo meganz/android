@@ -727,9 +727,16 @@
 
     <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Contraseña modificada!</string>
 
-    <string name="park_account_button" context="Button to park an account">Aparcar cuenta</string>
+    <string name="park_account_dialog_title" context="Button to park an account">Aparcar cuenta</string>
     <string name="park_account_title" context="Title of the screen to park an account">Ups!</string>
+    <string name="park_account_button" context="Button to park an account">Aparcar</string>
     <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Debido a nuestro paradigma de cifrado end-to-end no podrás acceder a tus datos sin tu contraseña o una copia de seguridad de la clave maestra.</string>
     <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Puedes aparcar tu cuenta existente y empezar con una nueva usando la misma dirección de correo electrónico. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
 
+    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace que te permitirá aparcar la cuenta.</string>
+    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">Este es el último paso para aparcar tu cuenta, debes establecer una nueva contraseña. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
+
+    <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Escribe la nueva contraseña</string>
+    <string name="set_new_password_button" context="Button shown in the last alert dialog to park an account ans set a new password">Establecer</string>
+    <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">El enlace ha caducado, por favor, inténtalo de nuevo.</string>
 </resources>
