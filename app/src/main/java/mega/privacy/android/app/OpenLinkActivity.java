@@ -18,10 +18,14 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class OpenLinkActivity extends PinActivity {
+public class OpenLinkActivity extends PinActivity implements MegaRequestListenerInterface {
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -194,17 +198,13 @@ public class OpenLinkActivity extends PinActivity {
 		// Reset password
 		if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
 			log("reset pass url");
+			//Check if link with MK or not
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				log("Build.VERSION_CODES.LOLLIPOP");
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode == null){
 					log("Not logged");
-					//Check that the link corresponds to this account
-					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-					resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
-					resetPassIntent.setData(Uri.parse(url));
-					startActivity(resetPassIntent);
-					finish();
+					megaApi.queryResetPasswordLink(url, this);
 				}
 				else{
 					log("Logged IN");
@@ -241,5 +241,77 @@ public class OpenLinkActivity extends PinActivity {
 	
 	public static void log(String message) {
 		Util.log("OpenLinkActivity", message);
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		log("onRequestStart");
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("onRequestFinish");
+		if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK){
+			log("TYPE_GET_RECOVERY_LINK");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The recovery link has been sent");
+				boolean mk = request.getFlag();
+				String url = request.getLink();
+				if(mk){
+					log("Link with master key");
+					if(url!=null){
+						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+						resetPassIntent.setData(Uri.parse(url));
+						startActivity(resetPassIntent);
+						finish();
+					}
+					else{
+						log("LINK is null");
+						log(e.getErrorString() + "___" + e.getErrorCode());
+						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+				}
+				else{
+					log("Link without master key - park account");
+					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
+					resetPassIntent.setData(Uri.parse(url));
+					startActivity(resetPassIntent);
+					finish();
+				}
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
+				log("Error expired link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				showAlert(getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
+	}
+
+	public void showAlert(String message, String title) {
+		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		bld.setMessage(message);
+		if(title!=null){
+			bld.setTitle(title);
+		}
+		bld.setPositiveButton("OK",null);
+		log("Showing alert dialog: " + message);
+		bld.create().show();
 	}
 }

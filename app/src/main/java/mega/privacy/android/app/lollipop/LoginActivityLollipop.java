@@ -432,6 +432,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 				}
+				else if(intentReceived.getAction().equals(Constants.ACTION_PARK_ACCOUNT)){
+					String link = getIntent().getDataString();
+					if(link!=null){
+						log("link to parkAccount: "+link);
+						showConfirmationParkAccount(link);
+					}
+					else{
+						log("Error when parking account - show error message");
+						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+				}
 			}
 			else{
 				log("No ACTION");
@@ -696,6 +707,37 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				onKeysGeneratedLogin(oldCredentials.getPrivateKey(), oldCredentials.getPublicKey());
 			}
 		}
+	}
+
+	public void showConfirmationParkAccount(String link){
+		log("showConfirmationParkAccount");
+
+		final String linkUrl = link;
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Call to Change Password Activity: "+linkUrl);
+						Intent intent = new Intent(loginActivity, ChangePasswordActivityLollipop.class);
+						intent.setAction(Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
+						intent.setData(Uri.parse(linkUrl));
+						startActivity(intent);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getResources().getString(R.string.park_account_dialog_title));
+		String message= getResources().getString(R.string.park_account_text_last_step);
+		builder.setMessage(message).setPositiveButton(R.string.set_new_password_button, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void showDialogInsertMKToChangePass(String link){

@@ -7402,11 +7402,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the incoming shares
-		        	nC.leaveIncomingShare(n);
-		            break;
-
+		        case DialogInterface.BUTTON_POSITIVE: {
+					//TODO remove the incoming shares
+					nC.leaveIncomingShare(n);
+					break;
+				}
 		        case DialogInterface.BUTTON_NEGATIVE:
 		            //No button clicked
 		            break;

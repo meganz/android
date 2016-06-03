@@ -42,7 +42,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:textColor="@color/accentColor"
-        android:text="@string/park_account_title"
+        android:text="@string/park_account_dialog_title"
         android:background="@color/white"
         android:layout_below="@id/second_par_park_account_layout"/>
 

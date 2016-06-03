@@ -74,6 +74,9 @@ public class Constants {
 	public static String ACTION_RESET_PASS = "RESET_PASS";
 	public static String ACTION_RESET_PASS_FROM_LINK = "RESET_PASS_FROM_LINK";
 	public static String ACTION_PASS_CHANGED = "PASS_CHANGED";
+	public static String ACTION_PARK_ACCOUNT = "PARK_ACCOUNT";
+	public static String ACTION_RESET_PASS_FROM_PARK_ACCOUNT = "RESET_PASS_FROM_PARK_ACCOUNT";
+
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
