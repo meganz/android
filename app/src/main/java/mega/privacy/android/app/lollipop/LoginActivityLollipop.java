@@ -64,6 +64,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 
 	private AlertDialog insertMailDialog;
+	private AlertDialog insertMKDialog;
 	TextView loginTitle;
 	TextView newToMega;
 	EditText et_user;
@@ -374,18 +375,34 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
 			log("There is an intent!");
-			if (ACTION_CONFIRM.equals(intentReceived.getAction())) {
-				handleConfirmationIntent(intentReceived);
-				return;
-			}
-			else if (ACTION_CREATE_ACCOUNT_EXISTS.equals(intentReceived.getAction())){
-				String message = getString(R.string.error_email_registered);
-				Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
-				return;
-			}
-
-			if (intentReceived.getAction() != null){
-				log("action is: "+intentReceived.getAction());
+			if(intentReceived.getAction()!=null){
+				if (ACTION_CONFIRM.equals(intentReceived.getAction())) {
+					handleConfirmationIntent(intentReceived);
+					return;
+				}
+				else if (ACTION_CREATE_ACCOUNT_EXISTS.equals(intentReceived.getAction())){
+					String message = getString(R.string.error_email_registered);
+					Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
+					return;
+				}
+				else if(intentReceived.getAction().equals(Constants.ACTION_RESET_PASS)){
+					String link = getIntent().getDataString();
+					if(link!=null){
+						log("link to resetPass: "+link);
+						showDialogInsertMKToChangePass(link);
+					}
+				}
+				else if(intentReceived.getAction().equals(Constants.ACTION_PASS_CHANGED)){
+					int result = intentReceived.getIntExtra("RESULT",-20);
+					if(result==0){
+						log("Show success mesage");
+						showAlert(getString(R.string.pass_changed_alert), null);
+					}
+					else{
+						log("Error when changing pass - show error message");
+						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+				}
 			}
 			else{
 				log("No ACTION");
@@ -409,6 +426,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
+					scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 //					generatingKeysText.setVisibility(View.VISIBLE);
 //					megaApi.fastLogin(gSession, this);
 
@@ -503,6 +521,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						queryingSignupLinkText.setVisibility(View.GONE);
 						confirmingAccountText.setVisibility(View.GONE);
 						loginLoggingIn.setVisibility(View.VISIBLE);
+						scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 //						generatingKeysText.setVisibility(View.VISIBLE);
 						loginProgressBar.setVisibility(View.VISIBLE);
 						loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -580,6 +599,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
+					scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 //					generatingKeysText.setVisibility(View.VISIBLE);
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -632,6 +652,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
+				scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 //				generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -646,6 +667,99 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				onKeysGeneratedLogin(oldCredentials.getPrivateKey(), oldCredentials.getPublicKey());
 			}
 		}
+	}
+
+	public void showDialogInsertMKToChangePass(String link){
+		log("showDialogInsertMKToChangePass");
+
+		final String linkUrl = link;
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setHint(getString(R.string.edit_text_insert_mk));
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					log("IME OK BTTN PASSWORD");
+					String value = input.getText().toString().trim();
+					if(value.equals("")||value.isEmpty()){
+						log("input is empty");
+						input.setError(getString(R.string.invalid_string));
+						input.requestFocus();
+					}
+					else {
+						log("ime ok pressed - reset pass");
+
+						insertMKDialog.dismiss();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.title_dialog_insert_MK));
+		builder.setMessage(getString(R.string.text_dialog_insert_MK));
+		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+					}
+				});
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				View view = getCurrentFocus();
+				if (view != null) {
+					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				}
+			}
+		});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		insertMKDialog = builder.create();
+		insertMKDialog.show();
+		insertMKDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				log("OK BTTN PASSWORD");
+				String value = input.getText().toString().trim();
+				if(value.equals("")||value.isEmpty()){
+					log("input is empty");
+					input.setError(getString(R.string.invalid_string));
+					input.requestFocus();
+				}
+				else {
+					log("positive button pressed - reset pass");
+					Intent intent = new Intent(loginActivity, ChangePasswordActivityLollipop.class);
+					intent.setAction(Constants.ACTION_RESET_PASS_FROM_LINK);
+					intent.setData(Uri.parse(linkUrl));
+					intent.putExtra("MK", value);
+					startActivity(intent);
+					insertMKDialog.dismiss();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -674,6 +788,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loginLoggingIn.setVisibility(View.GONE);
 		loginLogin.setVisibility(View.GONE);
 		forgotPassLayout.setVisibility(View.VISIBLE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 	}
 
 	public void hideForgotPassLayout(){
@@ -681,6 +796,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loginLoggingIn.setVisibility(View.GONE);
 		forgotPassLayout.setVisibility(View.GONE);
 		loginLogin.setVisibility(View.VISIBLE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 	}
 
 	@Override
@@ -738,15 +854,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				log("OK RESET PASSWORD");
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = input.getText().toString().trim();
 					String emailError = Util.getEmailError(value, loginActivity);
 					if (emailError != null) {
+						log("mail incorrect");
 						input.setError(emailError);
 						input.requestFocus();
 					} else {
-						//Ok, send
-						log("OK RESET PASSWORD");
+						log("ask for link to reset pass");
+						megaApi.resetPassword(value, true, loginActivity);
 						insertMailDialog.dismiss();
 					}
 				}
@@ -795,12 +913,15 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		insertMailDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				log("OK BTTN PASSWORD");
 				String value = input.getText().toString().trim();
 				String emailError = Util.getEmailError(value, loginActivity);
 				if (emailError != null) {
+					log("mail incorrect");
 					input.setError(emailError);
 				} else {
-					log("OK BTTN PASSWORD");
+					log("ask for link to reset pass");
+					megaApi.resetPassword(value, true, loginActivity);
 					insertMailDialog.dismiss();
 				}
 			}
@@ -886,6 +1007,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 		generatingKeysText.setVisibility(View.VISIBLE);
 		loginProgressBar.setVisibility(View.VISIBLE);
 		loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -919,6 +1041,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			loginDelimiter.setVisibility(View.GONE);
 			loginCreateAccount.setVisibility(View.GONE);
 			loginLoggingIn.setVisibility(View.VISIBLE);
+			scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 			generatingKeysText.setVisibility(View.VISIBLE);
 			loginProgressBar.setVisibility(View.VISIBLE);
 			loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1139,13 +1262,29 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //					if (authTokenType == null){
 //						authTokenType = LoginActivity.AUTH_TOKEN_TYPE_INSTANTIATE;
 //					}
-//					Account account = new Account(lastEmail, accountType);
+//					Account account = new Account(lastEmail, accountscroll_view_loginType);
 //					accountManager.addAccountExplicitly(account, gSession, null);
 //					log("AUTTHO: _" + authTokenType + "_");
 //					accountManager.setAuthToken(account, authTokenType, gSession);
 //				}
 
 				megaApi.fetchNodes(loginActivity);
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
+			log("TYPE_GET_RECOVERY_LINK");
+			if (error.getErrorCode() == MegaError.API_OK){
+				log("The recovery link has been sent");
+				showAlert(getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else if (error.getErrorCode() == MegaError.API_ENOENT){
+				log("No account with this mail");
+				showAlert(getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(error.getErrorString() + "___" + error.getErrorCode());
+				showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1417,6 +1556,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 		generatingKeysText.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.VISIBLE);
 		confirmingAccountText.setVisibility(View.GONE);
@@ -1427,7 +1567,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		log("querySignupLink");
 		megaApi.querySignupLink(link, this);
 	}
-	
+
+	public void showAlert(String message, String title) {
+		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		bld.setMessage(message);
+		if(title!=null){
+			bld.setTitle(title);
+		}
+		bld.setPositiveButton("OK",null);
+		log("Showing alert dialog: " + message);
+		bld.create().show();
+	}
 	
 	public static void log(String message) {
 		Util.log("LoginActivityLollipop", message);

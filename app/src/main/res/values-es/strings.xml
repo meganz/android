@@ -717,4 +717,13 @@
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Debes haber iniciado sesión para realizar esta operación.</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrecto</string>
+
+    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Correo electrónico no válido</string>
+    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Por favor, comprueba el correo y prueba otra vez.</string>
+    <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">No se puede realizar esta acción con una sesión abierta.</string>
+
+    <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Reestablecer contraseña</string>
+    <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Por favor, escribe tu clave maestra.</string>
+
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Contraseña modificada!</string>
 </resources>

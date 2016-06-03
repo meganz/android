@@ -190,6 +190,38 @@ public class OpenLinkActivity extends PinActivity {
 				return;
 			}
 		}
+
+		// Reset password
+		if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
+			log("reset pass url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				log("Build.VERSION_CODES.LOLLIPOP");
+				MegaNode rootNode = megaApi.getRootNode();
+				if (rootNode == null){
+					log("Not logged");
+					//Check that the link corresponds to this account
+					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+					resetPassIntent.setData(Uri.parse(url));
+					startActivity(resetPassIntent);
+					finish();
+				}
+				else{
+					log("Logged IN");
+					AlertDialog.Builder builder;
+					builder = new AlertDialog.Builder(this);
+					builder.setMessage(R.string.alert_not_logged_out);
+					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									finish();
+								}
+							});
+					builder.show();
+				}
+				return;
+			}
+		}
 		
 		log("wrong url");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
