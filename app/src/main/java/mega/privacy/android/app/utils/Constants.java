@@ -71,6 +71,9 @@ public class Constants {
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
 	public static String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
 	public static String ACTION_CANCEL_ACCOUNT = "CANCEL_ACCOUNT";
+	public static String ACTION_RESET_PASS = "RESET_PASS";
+	public static String ACTION_RESET_PASS_FROM_LINK = "RESET_PASS_FROM_LINK";
+	public static String ACTION_PASS_CHANGED = "PASS_CHANGED";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

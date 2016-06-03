@@ -3,7 +3,7 @@
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background_create_account"
     android:stackFromBottom="true"
     tools:context=".LoginActivityLollipop">
 
@@ -132,7 +132,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:background="@color/white">
 
             <ImageView
                 android:id="@+id/login_mega_logo"

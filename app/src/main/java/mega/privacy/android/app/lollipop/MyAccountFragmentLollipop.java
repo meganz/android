@@ -698,7 +698,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.yes_MK_button:{
 				log("click on yes_MK_button");
-				((ManagerActivityLollipop)context).showDialogInsertMKToChangePass();
+//				((ManagerActivityLollipop)context).showDialogInsertMKToChangePass();
 				break;
 			}
 			case R.id.no_MK_button:{
