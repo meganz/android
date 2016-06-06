@@ -737,12 +737,11 @@
     <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">You can park your existing account and start a fresh one under the same e-mail address. Your data will be retained for at least 60 days. In case that you recall your parked account\'s password, please contact support&#64;mega.nz</string>
 
     <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Please enter you e-mail address below. You will receive a recovery link that will allow you to park your account.</string>
-    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">This is the last step to park your account, you have to set your new password. Your data will be retained for at least 60 days. In case that you recall your parked account\'s password, please contact support&#64;mega.nz</string>
+    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. In case that you recall your parked account\'s password, please contact support&#64;mega.nz</string>
 
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Enter new password</string>
-    <string name="set_new_password_button" context="Button shown in the last alert dialog to park an account ans set a new password">Set</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">This recovery link has expired, please try again.</string>
 
-    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Your recovery key is going to be used to reset your password. Please, set your new password.</string>
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Your recovery key is going to be used to reset your password. Please, enter your new password.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.</string>
 </resources>

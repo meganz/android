@@ -736,7 +736,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getResources().getString(R.string.park_account_dialog_title));
 		String message= getResources().getString(R.string.park_account_text_last_step);
-		builder.setMessage(message).setPositiveButton(R.string.set_new_password_button, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 

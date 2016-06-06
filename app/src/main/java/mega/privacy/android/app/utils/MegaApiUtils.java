@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -33,6 +34,36 @@ public class MegaApiUtils {
             }
         }
         return size;
+    }
+
+    public static String getInfoFolder(MegaNode n, Context context) {
+        log("getInfoFolder");
+        MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        int numFolders = megaApi.getNumChildFolders(n);
+        int numFiles = megaApi.getNumChildFiles(n);
+        log("numFolders, numFiles: "+numFolders+ " " + numFiles);
+        String info = "";
+        if (numFolders > 0) {
+            info = numFolders
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_folders, numFolders);
+            if (numFiles > 0) {
+                info = info
+                        + ", "
+                        + numFiles
+                        + " "
+                        + context.getResources().getQuantityString(
+                        R.plurals.general_num_files, numFiles);
+            }
+        } else {
+            info = numFiles
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_files, numFiles);
+        }
+
+        return info;
     }
 
     /*
