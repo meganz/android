@@ -101,14 +101,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button copyMK;
 	Button saveMK;
 
-	RelativeLayout forgotPassLayout;
-	TextView forgotPassTitle;
-	TextView forgotPassFirstP;
-	TextView forgotPassSecondP;
-	TextView forgotPassAction;
-	Button yesMK;
-	Button noMK;
-
 	LinearLayout parentLinearLayout;
 	
 	DisplayMetrics outMetrics;
@@ -349,40 +341,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		saveMK.setLayoutParams(saveMKParams);
 		saveMK.setOnClickListener(this);
 
-		forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
-		forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
-		RelativeLayout.LayoutParams forgotPassTitleParams = (RelativeLayout.LayoutParams)forgotPassTitle.getLayoutParams();
-		forgotPassTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(70, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		forgotPassTitle.setLayoutParams(forgotPassTitleParams);
-
-		forgotPassFirstP = (TextView) v.findViewById(R.id.first_par_forgot_pass_layout);
-		RelativeLayout.LayoutParams firstParParams = (RelativeLayout.LayoutParams)forgotPassFirstP.getLayoutParams();
-		firstParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		forgotPassFirstP.setLayoutParams(firstParParams);
-
-		forgotPassSecondP = (TextView) v.findViewById(R.id.second_par_forgot_pass_layout);
-		forgotPassSecondP.setText(getString(R.string.forgot_pass_second_paragraph_logged_in));
-		RelativeLayout.LayoutParams secondParParams = (RelativeLayout.LayoutParams)forgotPassSecondP.getLayoutParams();
-		secondParParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		forgotPassSecondP.setLayoutParams(secondParParams);
-
-		forgotPassAction = (TextView) v.findViewById(R.id.action_forgot_pass_layout);
-		RelativeLayout.LayoutParams actionParams = (RelativeLayout.LayoutParams)forgotPassAction.getLayoutParams();
-		actionParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(25, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		forgotPassAction.setLayoutParams(actionParams);
-
-		yesMK = (Button) v.findViewById(R.id.yes_MK_button);
-		LinearLayout.LayoutParams yesMKParams = (LinearLayout.LayoutParams)yesMK.getLayoutParams();
-		yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
-		yesMK.setLayoutParams(yesMKParams);
-		yesMK.setOnClickListener(this);
-
-		noMK = (Button) v.findViewById(R.id.no_MK_button);
-		LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
-		noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
-		noMK.setLayoutParams(noMKParams);
-		noMK.setOnClickListener(this);
-
 		name=false;
 		firstName=false;
 		megaApi.getUserAttribute(myUser, 1, this);
@@ -475,150 +433,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		
 		megaApi.getAccountDetails(this);
 		megaApi.getPaymentMethods(this);
-		
-		/*
-		
-		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_avatar_layout);
-		avatarLayout.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
-		avatarLayout.getLayoutParams().height = Util.px2dp((200*scaleW), outMetrics);
-	
-		imageView = (RoundedImageView) v.findViewById(R.id.my_avatar_image);
-		imageView.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
-		imageView.getLayoutParams().height = Util.px2dp((200*scaleW), outMetrics);
-		
-		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
-		
-		userNameTextView = (TextView) v.findViewById(R.id.my_name);
-		infoEmail = (TextView) v.findViewById(R.id.my_email);
-		bottomControlBar = (TableLayout) v.findViewById(R.id.progress_my_account);
-		
-		usedSpace = (TextView) v.findViewById(R.id.used_space_my_account);
-	    usedSpaceText = (TextView) v.findViewById(R.id.used_space_text_my_account);
-	    usedSpaceBar = (ProgressBar) v.findViewById(R.id.my_account_used_space_bar);	      
-	    usedSpaceBar.setProgress(0);    
-	    
-		titleTypeAccount = (TextView) v.findViewById(R.id.my_account_title);	  
-		typeAccount = (TextView) v.findViewById(R.id.my_account_type_account);	 
-		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
-		expiresOn = (TextView) v.findViewById(R.id.my_account_expires_on);
-		expirationAccount.setVisibility(View.GONE);
-		expiresOn.setVisibility(View.GONE);
-		titleLastSession = (TextView) v.findViewById(R.id.my_last_session_title);	
-		lastSession= (TextView) v.findViewById(R.id.my_last_session);	
-		titleConnections = (TextView) v.findViewById(R.id.my_connections_title);	
-		connections = (TextView) v.findViewById(R.id.my_connections);	
-			
-		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
-		upgradeButton.setOnClickListener(this); 
-
-		myEmail=megaApi.getMyUser().getEmail();
-		infoEmail.setText(myEmail);
-		
-		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
-		logoutButton.setOnClickListener(this);
-		
-		//My Name
-		megaApi.getUserData(this);
-		
-		userNameTextView.setText(myEmail);		
-		myUser = megaApi.getMyUser();
-		
-		name=false;
-		firstName=false;
-		megaApi.getUserAttribute(1, this);
-		megaApi.getUserAttribute(2, this);
-
-		logoutButton.setText(R.string.action_logout);
-		lastSession.setText(R.string.general_not_yet_implemented);
-		
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
-
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}		
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
-		
-		getPaymentMethodsBoolean = false;
-		accountDetailsBoolean = false;
-		megaApi.getPaymentMethods(this);
-		megaApi.getAccountDetails(this);
-		numberOfSubscriptions = ((ManagerActivityLollipop)context).getNumberOfSubscriptions();
-
-		upgradeButton.setVisibility(View.INVISIBLE);
-//		if (numberOfSubscriptions > 0){
-//			upgradeButton.setVisibility(View.INVISIBLE);
-//		}
-//		else if (numberOfSubscriptions == 0){
-//			upgradeButton.setVisibility(View.VISIBLE);
-//		}
-		
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
-		
-		int radius; 
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-        	radius = defaultAvatar.getWidth()/2;
-        else
-        	radius = defaultAvatar.getHeight()/2;
-        
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		imageView.setImageBitmap(defaultAvatar);
-		
-	    int avatarTextSize = getAvatarTextSize(density);
-	    log("DENSITY: " + density + ":::: " + avatarTextSize);
-	    if (myEmail != null){
-		    if (myEmail.length() > 0){
-		    	log("TEXT: " + myEmail);
-		    	log("TEXT AT 0: " + myEmail.charAt(0));
-		    	String firstLetter = myEmail.charAt(0) + "";
-		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		    	initialLetter.setText(firstLetter);
-		    	initialLetter.setTextSize(100);
-		    	initialLetter.setTextColor(Color.WHITE);
-		    	initialLetter.setVisibility(View.VISIBLE);
-		    }
-	    }
-		
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-		}
-
-		Bitmap imBitmap = null;
-		if (avatar.exists()){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (imBitmap == null) {
-					avatar.delete();
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
-					}
-					else{
-						megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
-					}
-				}
-				else{
-					imageView.setImageBitmap(imBitmap);
-					initialLetter.setVisibility(View.GONE);
-				}
-			}
-		}
-		//infoAdded.setText(contact.getTimestamp()+"");
-		
-		*/
 		return v;
 	}
 
@@ -696,16 +510,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				aC.exportMK();
 				break;
 			}
-			case R.id.yes_MK_button:{
-				log("click on yes_MK_button");
-//				((ManagerActivityLollipop)context).showDialogInsertMKToChangePass();
-				break;
-			}
-			case R.id.no_MK_button:{
-				log("click on no_MK_button");
-				hideForgotPassLayout();
-				break;
-			}
 			case R.id.delete_account_button:{
 				log("Delete Account button");
 				((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
@@ -742,12 +546,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return 1;
 		}
 
-		if(forgotPassLayout.getVisibility()==View.VISIBLE){
-			log("Forgot Pass layout is VISIBLE");
-			hideForgotPassLayout();
-			return 1;
-		}
-		
 		return 0;
 	}
 
@@ -851,15 +649,31 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
+			log("TYPE_GET_RECOVERY_LINK");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The recovery link has been sent");
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_pass), getString(R.string.email_verification_title));
+			}
+			else if (e.getErrorCode() == MegaError.API_ENOENT){
+				log("No account with this mail");
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
 			log("TYPE_GET_CANCEL_LINK request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The cancel link has been sent");
-				((ManagerActivityLollipop)context).showAlert(getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text), getString(R.string.email_verification_title));
 			}
 			else{
 				log("ERROR when asking for link to cancel account");
-				((ManagerActivityLollipop)context).showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
@@ -869,7 +683,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			else{
 				log("ERROR when cancelling account: "+e.getErrorString());
-				((ManagerActivityLollipop)context).showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
@@ -1033,16 +847,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
-			if (e.getErrorCode() == MegaError.API_OK){
-//				Snackbar.make(mainLayout, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_LONG).show();
-			}
-			else
-			{
-				log("error when killing sessions: "+e.getErrorString());
-//				Snackbar.make(mainLayout, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_LONG).show();
-			}
-		}
 	}
 
 	@Override
@@ -1068,8 +872,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		aB.hide();
 		parentLinearLayout.setVisibility(View.GONE);
-		forgotPassLayout.setVisibility(View.GONE);
 		exportMKLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void resetPass(){
+		megaApi.resetPassword(myEmail, true, this);
 	}
 
 	public void hideMKLayout(){
@@ -1079,32 +886,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		aB.show();
 		exportMKLayout.setVisibility(View.GONE);
-		forgotPassLayout.setVisibility(View.GONE);
 		parentLinearLayout.setVisibility(View.VISIBLE);
 	}
-
-	public void showForgotPassLayout(){
-		log("showForgotPassLayout");
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		aB.hide();
-		parentLinearLayout.setVisibility(View.GONE);
-		exportMKLayout.setVisibility(View.GONE);
-		forgotPassLayout.setVisibility(View.VISIBLE);
-	}
-
-	public void hideForgotPassLayout(){
-		log("hideForgotPassLayout");
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		aB.show();
-		exportMKLayout.setVisibility(View.GONE);
-		forgotPassLayout.setVisibility(View.GONE);
-		parentLinearLayout.setVisibility(View.VISIBLE);
-	}
-
 
 	public void updateAvatar(File avatar){
 		if(avatar!=null){

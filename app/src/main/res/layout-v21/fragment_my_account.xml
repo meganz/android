@@ -88,8 +88,8 @@
 								android:id="@+id/my_account_initial_letter"
 								android:layout_width="fill_parent"
 								android:layout_height="fill_parent"
-								android:layout_marginLeft="19dp"
-								android:layout_marginTop="3dp" />
+								android:layout_marginLeft="17dp"
+								android:layout_marginTop="2dp" />
 						</RelativeLayout>
 
 					</RelativeLayout>
@@ -307,12 +307,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			layout="@layout/export_mk_layout"
-			android:visibility="gone"/>
-
-		<include
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			layout="@layout/forgot_password_layout"
 			android:visibility="gone"/>
 
 	</LinearLayout>

@@ -476,35 +476,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             log("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
             if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
                 log("PRO I Monthly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO I Monthly!", null);
+                Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Monthly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
                 log("PRO I Yearly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO I Yearly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Yearly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
                 log("PRO II Monthly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO II Monthly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Monthly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
                 log("PRO II Yearly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO II Yearly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Yearly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO III Monthly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Monthly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
                 log("PRO III Yearly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO III Yearly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Yearly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO LITE Monthly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Monthly!", null);
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
                 log("PRO LITE Yearly subscription purchased.");
-                showAlert("Thank you for subscribing to PRO LITE Yearly!", null);
+				Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Yearly!", null);
             }
 
             if (managerActivity != null){
@@ -1406,6 +1406,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									}
 								}
 							}
+						}
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_PASS_CHANGED)){
+						int result = getIntent().getIntExtra("RESULT",-20);
+						if(result==0){
+							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							log("Show success mesage");
+							Util.showAlert(this, getString(R.string.pass_changed_alert), null);
+						}
+						else{
+							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							log("Error when changing pass - show error message");
+							Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						}
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_RESET_PASS)){
+						String link = getIntent().getDataString();
+						if(link!=null){
+							log("link to resetPass: "+link);
+							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							showConfirmationResetPassword(link);
 						}
 					}
 				}
@@ -4373,7 +4394,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_menu_kill_all_sessions:{
-	        	megaApi.killSession(-1, this);
+				aC.killAllSessions(this);
 	        	return true;
 	        }
 	        case R.id.action_new_folder:{
@@ -5664,7 +5685,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_menu_forgot_pass:{
 				log("action menu forgot pass pressed");
 				if(maFLol!=null){
-					maFLol.showForgotPassLayout();
+					maFLol.resetPass();
 				}
 				return true;
 			}
@@ -5752,29 +5773,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			fragTransaction.commit();
 		}
 	}
-
-    public void showAlert(String message, String title) {
-        AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        bld.setMessage(message);
-		if(title!=null){
-			bld.setTitle(title);
-		}
-        bld.setPositiveButton("OK",null);
-        log("Showing alert dialog: " + message);
-        bld.create().show();
-    }
-
-    public void showCloudDrive(){
-    	drawerItem = DrawerItem.CLOUD_DRIVE;
-		if (nV != null){
-			Menu nVMenu = nV.getMenu();
-			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-			resetNavigationViewMenu(nVMenu);
-			cloudDrive.setChecked(true);
-			cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-		}
-		selectDrawerItemLollipop(drawerItem);
-    }
 
 	@Override
 	public void onBackPressed() {
@@ -7414,11 +7412,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void showConfirmationResetPassword (final String link){
+		log("showConfirmationResetPassword: "+link);
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						Intent intent = new Intent(managerActivity, ChangePasswordActivityLollipop.class);
+						intent.setAction(Constants.ACTION_RESET_PASS_FROM_LINK);
+						intent.setData(Uri.parse(link));
+						String key = megaApi.exportMasterKey();
+						intent.putExtra("MK", key);
+						startActivity(intent);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
+		String message= getResources().getString(R.string.text_reset_pass_logged_in);
+		builder.setMessage(message).setPositiveButton(R.string.set_new_password_button, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void cameraUploadsClicked(){
@@ -9757,7 +9785,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			supportInvalidateOptionsMenu();
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+			log("requestFinish TYPE_KILL_SESSION"+MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
+				log("success kill sessions");
 				Snackbar.make(fragmentContainer, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_LONG).show();
 			}
 			else

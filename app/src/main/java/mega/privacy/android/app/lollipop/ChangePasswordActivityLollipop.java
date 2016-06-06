@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -196,7 +195,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					mk = getIntent().getStringExtra("MK");
 					if(mk==null){
 						log("MK is NULL - close activity");
-						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 					oldPasswordView.setVisibility(View.GONE);
 					title.setText(getString(R.string.title_enter_new_password));
@@ -207,7 +206,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
 						log("link is NULL - close activity");
-						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
 					oldPasswordView.setVisibility(View.GONE);
@@ -218,17 +217,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	}
 
-	public void showAlert(String message, String title) {
-		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		bld.setMessage(message);
-		if(title!=null){
-			bld.setTitle(title);
-		}
-		bld.setPositiveButton("OK",null);
-		log("Showing alert dialog: " + message);
-		bld.create().show();
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -254,7 +242,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					log("reset pass on click");
 					if(linkToReset==null){
 						log("link is NULL");
-						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 					else{
 						if(mk==null){
@@ -482,7 +470,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					progress.dismiss();
 				} catch(Exception ex) {};
 
-				Snackbar.make(fragmentContainer, getString(R.string.my_account_change_password_error_2), Snackbar.LENGTH_LONG).show();				
+				//Intent to MyAccount
+				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+				resetPassIntent.putExtra("RESULT", -1);
+				startActivity(resetPassIntent);
+				finish();
 			}
 			else{
 				log("pass changed");
@@ -491,42 +484,80 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				} catch(Exception ex) {};
 				
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				finish();				
-				Snackbar.make(fragmentContainer, getString(R.string.my_account_change_password_OK), Snackbar.LENGTH_LONG).show();
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
-			log("TYPE_CONFIRM_RECOVERY_LINK");
-			if (e.getErrorCode() != MegaError.API_OK){
-				log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
-
-				try{
-					progress.dismiss();
-				} catch(Exception ex) {};
-
-				//Intent to Login
-				Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-				resetPassIntent.putExtra("RESULT", -1);
-				startActivity(resetPassIntent);
-				finish();
-			}
-			else{
-				log("pass changed");
-				try{
-					progress.dismiss();
-				} catch(Exception ex) {};
-
-				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				//Intent to Login
-				Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+				//Intent to MyAccount
+				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
 				resetPassIntent.putExtra("RESULT", 0);
 				startActivity(resetPassIntent);
 				finish();
-				finish();
 			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
+			log("TYPE_CONFIRM_RECOVERY_LINK");
+			if(megaApi.getRootNode()==null) {
+				log("Not logged in");
+				if (e.getErrorCode() != MegaError.API_OK){
+					log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
 
+					try{
+						progress.dismiss();
+					} catch(Exception ex) {};
+
+					//Intent to Login
+					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", -1);
+					startActivity(resetPassIntent);
+					finish();
+				}
+				else{
+					log("pass changed");
+					try{
+						progress.dismiss();
+					} catch(Exception ex) {};
+
+					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+					//Intent to Login
+					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", 0);
+					startActivity(resetPassIntent);
+					finish();
+				}
+			}
+			else {
+				log("Logged IN");
+
+				if (e.getErrorCode() != MegaError.API_OK){
+					log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+
+					try{
+						progress.dismiss();
+					} catch(Exception ex) {};
+
+					//Intent to Login
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", -1);
+					startActivity(resetPassIntent);
+					finish();
+				}
+				else{
+					log("pass changed");
+					try{
+						progress.dismiss();
+					} catch(Exception ex) {};
+
+					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+					//Intent to Login
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", 0);
+					startActivity(resetPassIntent);
+					finish();
+				}
+
+			}
 		}
 	}
 

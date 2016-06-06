@@ -208,16 +208,11 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				}
 				else{
 					log("Logged IN");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_out);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+					resetPassIntent.setData(Uri.parse(url));
+					startActivity(resetPassIntent);
+					finish();
 				}
 				return;
 			}
@@ -274,7 +269,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					else{
 						log("LINK is null");
 						log(e.getErrorString() + "___" + e.getErrorCode());
-						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 				}
 				else{
@@ -289,12 +284,12 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
 				log("Error expired link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
 			}
 			else{
 				log("Error when asking for recovery pass link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
 	}
@@ -302,16 +297,5 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
-	}
-
-	public void showAlert(String message, String title) {
-		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		bld.setMessage(message);
-		if(title!=null){
-			bld.setTitle(title);
-		}
-		bld.setPositiveButton("OK",null);
-		log("Showing alert dialog: " + message);
-		bld.create().show();
 	}
 }

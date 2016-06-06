@@ -739,4 +739,7 @@
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Escribe la nueva contraseña</string>
     <string name="set_new_password_button" context="Button shown in the last alert dialog to park an account ans set a new password">Establecer</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">El enlace ha caducado, por favor, inténtalo de nuevo.</string>
+
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu clave maestra se utilizará para resetear tu contraseña. Por favor, establece tu nueva contraseña.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás en tu correo electrónico un link que te permitirá resetear tu contraseña. Por favor, comprueba tu correo electrónico para proceder.</string>
 </resources>

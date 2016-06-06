@@ -1541,6 +1541,18 @@ public class Util {
 		return (int)textSize;
 	}
 
+	public static void showAlert(Context context, String message, String title) {
+		log("showAlert");
+		android.support.v7.app.AlertDialog.Builder bld = new android.support.v7.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+		bld.setMessage(message);
+		if(title!=null){
+			bld.setTitle(title);
+		}
+		bld.setPositiveButton("OK",null);
+		log("Showing alert dialog: " + message);
+		bld.create().show();
+	}
+
 	private static void log(String message) {
 		log("Util", message);
 	}
