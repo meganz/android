@@ -6592,7 +6592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else{
 						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 					}
-					builder.setPositiveButton(R.string.general_remove, dialogClickListener);
+					builder.setPositiveButton(R.string.context_delete, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
 				}
@@ -7040,7 +7040,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
-		builder.setPositiveButton(getString(R.string.general_empty),
+		builder.setPositiveButton(getString(R.string.context_delete),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nC.cleanRubbishBin();
