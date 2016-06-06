@@ -1612,41 +1612,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						megaApi.copyNode(nodeExists, cameraUploadNode, photoFinalName, this);
 						log("CHANGED!!!! MediaFinalName: " + file.getName());
 					}
-
-//				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
-
-//					boolean photoAlreadyExists = false;
-//					ArrayList<MegaNode> nL = megaApi.getChildren(cameraUploadNode);
-//					for (int i=0;i<nL.size();i++){
-//						if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
-//							photoAlreadyExists = true;
-//						}
-//					}
-//
-//					if (!photoAlreadyExists){
-//						currentTimeStamp = media.timestamp;
-//						megaApi.copyNode(nodeExists, cameraUploadNode, this);
-//					}
-//					else{
-//						currentTimeStamp = media.timestamp;
-//						dbH.setCamSyncTimeStamp(currentTimeStamp);
-//						File f = new File(media.filePath);
-//						totalSizeUploaded += f.length();
-//						uploadNextImage();
-//					}
 				}
 				else{
-//					if (nodeExists.getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
-//						currentTimeStamp = media.timestamp;
-//						dbH.setCamSyncTimeStamp(currentTimeStamp);
-//						File f = new File(media.filePath);
-//						totalSizeUploaded += f.length();
-//						uploadNextImage();
-//					}
-//					else{
-//						log("The file is in PhotoSync but with a different name");
-//						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
-//					}
 					if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
 						//Change the file names as device
 						log("Call Look for Rename Task");
@@ -1659,6 +1626,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						});
 					}
 					else{
+						currentTimeStamp = media.timestamp;
+						dbH.setCamSyncTimeStamp(currentTimeStamp);
 						uploadNext();
 					}
 
@@ -1666,11 +1635,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 		}
 		else{
-//			if (mediaFilesSecondary.size() <= 0){
-//				log("Finishing service: no more elements queuing");
-//				onQueueComplete(true, totalUploaded);
-//				finish();
-//			}
 			uploadNext();
 		}
 	}
