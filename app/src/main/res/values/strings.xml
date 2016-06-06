@@ -743,4 +743,6 @@
     <string name="set_new_password_button" context="Button shown in the last alert dialog to park an account ans set a new password">Set</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">This recovery link has expired, please try again.</string>
 
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Your recovery key is going to be used to reset your password. Please, set your new password.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.</string>
 </resources>

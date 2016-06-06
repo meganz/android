@@ -29,7 +29,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/login_text"
                 android:textColor="@color/lollipop_primary_color"
-                android:textSize="14sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/login_email_text"

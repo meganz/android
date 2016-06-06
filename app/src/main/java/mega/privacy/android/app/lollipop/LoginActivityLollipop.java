@@ -204,7 +204,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		loginTitle.setLayoutParams(textParams);
 		
 		loginTitle.setText(R.string.login_text);
-		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
 		
 		et_user = (EditText) findViewById(R.id.login_email_text);
 		android.view.ViewGroup.LayoutParams paramsb1 = et_user.getLayoutParams();		
@@ -425,11 +425,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					int result = intentReceived.getIntExtra("RESULT",-20);
 					if(result==0){
 						log("Show success mesage");
-						showAlert(getString(R.string.pass_changed_alert), null);
+						Util.showAlert(this, getString(R.string.pass_changed_alert), null);
 					}
 					else{
 						log("Error when changing pass - show error message");
-						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 				}
 				else if(intentReceived.getAction().equals(Constants.ACTION_PARK_ACCOUNT)){
@@ -440,7 +440,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					}
 					else{
 						log("Error when parking account - show error message");
-						showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 				}
 			}
@@ -556,12 +556,12 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						gSession = credentials.getSession();
 
 						loginLogin.setVisibility(View.GONE);
+						scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 						loginDelimiter.setVisibility(View.GONE);
 						loginCreateAccount.setVisibility(View.GONE);
 						queryingSignupLinkText.setVisibility(View.GONE);
 						confirmingAccountText.setVisibility(View.GONE);
 						loginLoggingIn.setVisibility(View.VISIBLE);
-						scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 //						generatingKeysText.setVisibility(View.VISIBLE);
 						loginProgressBar.setVisibility(View.VISIBLE);
 						loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -733,7 +733,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getResources().getString(R.string.park_account_dialog_title));
 		String message= getResources().getString(R.string.park_account_text_last_step);
 		builder.setMessage(message).setPositiveButton(R.string.set_new_password_button, dialogClickListener)
@@ -773,8 +773,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						input.requestFocus();
 					}
 					else {
-						log("ime ok pressed - reset pass");
 
+						log("positive button pressed - reset pass");
+						Intent intent = new Intent(loginActivity, ChangePasswordActivityLollipop.class);
+						intent.setAction(Constants.ACTION_RESET_PASS_FROM_LINK);
+						intent.setData(Uri.parse(linkUrl));
+						intent.putExtra("MK", value);
+						startActivity(intent);
 						insertMKDialog.dismiss();
 					}
 				}
@@ -831,27 +836,6 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				}
 			}
 		});
-	}
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-//		if (firstTime){
-//			int diffHeight = heightGrey - loginCreateAccount.getTop();
-//
-//			int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
-//			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
-//		}
-//		else{
-//			int diffHeight = heightGrey - loginCreateAccount.getTop();
-//			int paddingBottom = Util.px2dp((10*scaleH), outMetrics) + diffHeight;
-//			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
-//		}
-//		Toast.makeText(this, "onWindow: HEIGHT: " + loginCreateAccount.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();action
-//		int marginBottom = 37; //related to a 533dp height
-//		float dpHeight = outMetrics.heightPixels / density;
-//		marginBottom =  marginBottom + (int) ((dpHeight - 533) / 6);
-//		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((marginBottom*scaleH), outMetrics));
 	}
 
 	public void showForgotPassLayout(){
@@ -1111,6 +1095,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		{
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
+			scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.VISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
@@ -1126,6 +1111,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		}
 
 		loginLogin.setVisibility(View.GONE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
@@ -1160,6 +1146,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 
 			loginLogin.setVisibility(View.GONE);
+			scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 			loginDelimiter.setVisibility(View.GONE);
 			loginCreateAccount.setVisibility(View.GONE);
 			loginLoggingIn.setVisibility(View.VISIBLE);
@@ -1183,6 +1170,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		if(!Util.isOnline(this)){
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
+			scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.VISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
@@ -1328,6 +1316,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				}
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
+				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.VISIBLE);
 				queryingSignupLinkText.setVisibility(View.GONE);
@@ -1397,16 +1386,16 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			log("TYPE_GET_RECOVERY_LINK");
 			if (error.getErrorCode() == MegaError.API_OK){
 				log("The recovery link has been sent");
-				showAlert(getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
 			}
 			else if (error.getErrorCode() == MegaError.API_ENOENT){
 				log("No account with this mail");
-				showAlert(getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+				Util.showAlert(this, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
 			}
 			else{
 				log("Error when asking for recovery pass link");
 				log(error.getErrorString() + "___" + error.getErrorCode());
-				showAlert(getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1426,6 +1415,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					errorMessage = error.getErrorString();
 					loginLoggingIn.setVisibility(View.GONE);
 					loginLogin.setVisibility(View.VISIBLE);
+					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 					loginDelimiter.setVisibility(View.VISIBLE);
 					loginCreateAccount.setVisibility(View.VISIBLE);
 					generatingKeysText.setVisibility(View.GONE);
@@ -1545,8 +1535,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 
 		}
 		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
+			log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
 			String s = "";
 			loginLogin.setVisibility(View.VISIBLE);
+			scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+			bForgotPass.setVisibility(View.INVISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.VISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
@@ -1574,6 +1567,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 			else{
 				loginLogin.setVisibility(View.VISIBLE);
+				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.VISIBLE);
 				loginLoggingIn.setVisibility(View.GONE);
@@ -1681,6 +1675,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		}
 
 		loginLogin.setVisibility(View.GONE);
+		scrollView.setBackgroundColor(getResources().getColor(R.color.white));
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
@@ -1696,17 +1691,6 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		megaApi.querySignupLink(link, this);
 	}
 
-	public void showAlert(String message, String title) {
-		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		bld.setMessage(message);
-		if(title!=null){
-			bld.setTitle(title);
-		}
-		bld.setPositiveButton("OK",null);
-		log("Showing alert dialog: " + message);
-		bld.create().show();
-	}
-	
 	public static void log(String message) {
 		Util.log("LoginActivityLollipop", message);
 	}

@@ -80,7 +80,7 @@ public class AccountController {
             if(mAF!=null){
                 mAF.updateMKButton();
             }
-            ((ManagerActivityLollipop) context).showAlert(message, "MasterKey exported!");
+            Util.showAlert(((ManagerActivityLollipop) context), message, "MasterKey exported!");
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -95,7 +95,7 @@ public class AccountController {
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
         clipboard.setPrimaryClip(clip);
-        ((ManagerActivityLollipop) context).showAlert(context.getString(R.string.copy_MK_confirmation), null);
+        Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
     }
 
     public void removeMK() {
@@ -109,7 +109,12 @@ public class AccountController {
         if(mAF!=null){
             mAF.updateMKButton();
         }
-        ((ManagerActivityLollipop) context).showAlert(message, null);
+        Util.showAlert(((ManagerActivityLollipop) context), message, null);
+    }
+
+    public void killAllSessions(Context context){
+        log("killAllSessions");
+        megaApi.killSession(-1, (ManagerActivityLollipop) context);
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
