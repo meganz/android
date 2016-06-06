@@ -7445,7 +7445,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
 		String message= getResources().getString(R.string.text_reset_pass_logged_in);
-		builder.setMessage(message).setPositiveButton(R.string.set_new_password_button, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 

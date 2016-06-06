@@ -567,7 +567,7 @@
     <string name="settings_reset_lock_code" context="settings of the pin lock">Restaurar PIN</string> 
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueo con PIN</string>
     
-    <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
+    <string name="pin_lock_enter" context="Button after the pin code input field">Introducir</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Los ficheros locales serán eliminados y se cerrará la sesión tras 10 intentos fallidos</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez.</string>
     <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez. Le quedan %2d intentos.</string>
@@ -737,7 +737,6 @@
     <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">Este es el último paso para aparcar tu cuenta, debes establecer una nueva contraseña. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
 
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Escribe la nueva contraseña</string>
-    <string name="set_new_password_button" context="Button shown in the last alert dialog to park an account ans set a new password">Establecer</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">El enlace ha caducado, por favor, inténtalo de nuevo.</string>
 
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu clave maestra se utilizará para resetear tu contraseña. Por favor, establece tu nueva contraseña.</string>
