@@ -1,15 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,10 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements OnClickListener{
@@ -178,7 +178,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
 				}
 			}
-			holder.textViewFileSize.setText(getInfoFolder(node));
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, (ManagerActivityLollipop)context));
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 		}
 		else{
@@ -262,25 +262,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 		}		
 	}
-	
-	private String getInfoFolder (MegaNode n){
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		
-		return info;
-	}
-	
+
 	public boolean isEnabled(int position) {
 		if (nodes.size() == 0){
 			return false;

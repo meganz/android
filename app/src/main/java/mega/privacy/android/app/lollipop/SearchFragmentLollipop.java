@@ -345,7 +345,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			
 			setNodes(nodes);
 			
-			contentText.setText(getInfoNode());
+			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 
 			return v;
 		}
@@ -398,7 +398,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			}
 			
 			setNodes(nodes);
-			contentText.setText(getInfoNode());
+			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 			
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
@@ -409,73 +409,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		}
 	}
 
-	private String getInfoFolder(MegaNode n) {
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		return info;
-	}
-	
-	private String getInfoNode() {
-		
-		int numFolders = 0;
-		int numFiles = 0;
-		
-		for (int i=0;i<nodes.size();i++){
-			MegaNode n = nodes.get(i);
-			if (n.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		return info;
-	}
-		
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -502,7 +435,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
 				
-				contentText.setText(getInfoFolder(n));
+				contentText.setText(MegaApiUtils.getInfoFolder(n, (ManagerActivityLollipop)context));
 				
 				aB.setTitle(n.getName());
 				log("aB.setHomeAsUpIndicator_51");
@@ -707,7 +640,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				log("levels > 0");
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 				if (parentNode != null){
-					contentText.setText(getInfoFolder(parentNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
 					recyclerView.setVisibility(View.VISIBLE);
 					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
@@ -766,7 +699,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				nodes = megaApi.search(searchQuery);
 				adapter.setNodes(nodes);
 				setNodes(nodes);
-				contentText.setText(getInfoNode());
+				contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 				if(nodes!=null){
 					log("nodes.size: "+nodes.size());
 					if(nodes.size()>0){

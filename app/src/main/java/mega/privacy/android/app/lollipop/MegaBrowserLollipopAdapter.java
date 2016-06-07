@@ -34,6 +34,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -460,7 +461,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if (node.isFolder()) {
 			holder.transferProgressBar.setVisibility(View.GONE);		
 			holder.textViewFileSize.setVisibility(View.VISIBLE);			
-			holder.textViewFileSize.setText(getInfoFolder(node));
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, (ManagerActivityLollipop)context));
 			
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
@@ -777,7 +778,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.transferProgressBar.setVisibility(View.GONE);		
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
-			holder.textViewFileSize.setText(getInfoFolder(node));
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, (ManagerActivityLollipop)context));
 			
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
@@ -1030,34 +1031,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else{
 			holder.savedOffline.setVisibility(View.INVISIBLE);
 		}
-	}
-	
-	private String getInfoFolder(MegaNode n) {
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		return info;
 	}
 
 //	public boolean isEnabled(int position) {
