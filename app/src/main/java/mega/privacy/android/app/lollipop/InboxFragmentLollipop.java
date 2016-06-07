@@ -379,7 +379,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{					
-				contentText.setText(getInfoFolder(inboxNode));
+				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, (ManagerActivityLollipop)context));
 			}			
 			
 			setNodes(nodes);
@@ -454,7 +454,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{					
-				contentText.setText(getInfoFolder(inboxNode));
+				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, (ManagerActivityLollipop)context));
 			}
 			
 			setNodes(nodes);
@@ -497,7 +497,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		downloadInProgress = false;
 		progressBar.setVisibility(View.GONE);	
 		transferArrow.setVisibility(View.GONE);
-		contentText.setText(getInfoFolder(inboxNode));
+		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, (ManagerActivityLollipop)context));
 		contentTextLayout.setOnClickListener(null);
 	}
 	
@@ -563,7 +563,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					showProgressBar();
 				}
 				else{
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 				}
 //				((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 				adapter.setParentHandle(parentHandle);
@@ -752,7 +752,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					showProgressBar();
 				}
 				else{
-					contentText.setText(getInfoFolder(parentNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
 				}
 				return 2;
 			}
@@ -761,21 +761,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}
 		}
 	}
-	
-	private String getInfoFolder(MegaNode n) {
-		int numFiles = megaApi.getNumChildFiles(n);
 
-		String info = "";
-		
-		info = numFiles
-				+ " "
-				+ context.getResources().getQuantityString(
-						R.plurals.general_num_files, numFiles);
-		
-
-		return info;
-	}
-	
 	public void setIsList(boolean isList){
 		this.isList = isList;
 	}

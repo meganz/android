@@ -464,7 +464,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 				}
 			}
 			else{
@@ -475,7 +475,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 				}
 			}						
 			
@@ -560,7 +560,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 				}
 			}
 			else{
@@ -570,7 +570,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 				}
 			}						
 			
@@ -822,35 +822,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			adapter.setPositionClicked(positionClicked);
 		}			
 	}
-	
-	private String getInfoFolder(MegaNode n) {
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
 
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		return info;
-	}
-	
     public void itemClick(int position) {
 		log("item click position: " + position);
 		
@@ -1045,7 +1017,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			showProgressBar();
 		}
 		else{
-			contentText.setText(getInfoFolder(infoNode));
+			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 		}
 		((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 		adapter.setParentHandle(parentHandle);
@@ -1237,7 +1209,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							showProgressBar();
 						}
 						else{					
-							contentText.setText(getInfoFolder(parentNode));
+							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
 						}
 						log("return 2");
 						return 2;
@@ -1307,7 +1279,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							showProgressBar();
 						}
 						else{					
-							contentText.setText(getInfoFolder(parentNode));
+							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
 						}						
 						return 2;
 					}
@@ -1472,14 +1444,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("in ROOT node");
 				MegaNode infoNode = megaApi.getRootNode();
 				if (infoNode !=  null){
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 	//				aB.setTitle(getString(R.string.section_cloud_drive));
 				}
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				if (infoNode !=  null){
-					contentText.setText(getInfoFolder(infoNode));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 	//				aB.setTitle(infoNode.getName());
 				}
 			}

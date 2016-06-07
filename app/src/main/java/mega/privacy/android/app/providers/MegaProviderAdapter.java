@@ -1,15 +1,5 @@
 package mega.privacy.android.app.providers;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,6 +14,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 
 public class MegaProviderAdapter extends BaseAdapter implements OnClickListener{
@@ -203,11 +203,11 @@ public class MegaProviderAdapter extends BaseAdapter implements OnClickListener{
 		
 		return convertView;
 	}
-	
+
 	private String getInfoFolder (MegaNode n){
 		int numFolders = megaApi.getNumChildFolders(n);
 		int numFiles = megaApi.getNumChildFiles(n);
-		
+
 		String info = "";
 		if (numFolders > 0){
 			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
@@ -218,10 +218,10 @@ public class MegaProviderAdapter extends BaseAdapter implements OnClickListener{
 		else {
 			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
 		}
-		
+
 		return info;
 	}
-	
+
 	@Override
 	public void onClick(View arg0) {
 		// TODO Auto-generated method stub

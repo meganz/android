@@ -36,6 +36,60 @@ public class MegaApiUtils {
         return size;
     }
 
+    public static String getInfoNodeOnlyFolders(ArrayList<MegaNode> nodes, Context context) {
+        log("getInfoNodeOnlyFolders");
+        int numFolders = nodes.size();
+
+        String info = "";
+        if (numFolders > 0) {
+            info = numFolders
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_folders, numFolders);
+
+        }
+        return info;
+    }
+
+    public static String getInfoNode(ArrayList<MegaNode> nodes, Context context) {
+        log("getInfoNode");
+        int numFolders = 0;
+        int numFiles = 0;
+
+        for (int i=0;i<nodes.size();i++){
+            MegaNode n = nodes.get(i);
+            if (n.isFolder()){
+                numFolders++;
+            }
+            else{
+                numFiles++;
+            }
+        }
+
+        String info = "";
+        if (numFolders > 0) {
+            info = numFolders
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_folders, numFolders);
+            if (numFiles > 0) {
+                info = info
+                        + ", "
+                        + numFiles
+                        + " "
+                        + context.getResources().getQuantityString(
+                        R.plurals.general_num_files, numFiles);
+            }
+        } else {
+            info = numFiles
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_files, numFiles);
+        }
+
+        return info;
+    }
+
     public static String getInfoFolder(MegaNode n, Context context) {
         log("getInfoFolder");
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

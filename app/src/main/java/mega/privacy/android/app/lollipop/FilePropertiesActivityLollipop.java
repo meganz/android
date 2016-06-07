@@ -599,7 +599,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			contentTextView.setVisibility(View.VISIBLE);
 			contentTitleTextView.setVisibility(View.VISIBLE);
 			
-			contentTextView.setText(getInfoFolder(node));
+			contentTextView.setText(MegaApiUtils.getInfoFolder(node, this));
 			
 			long sizeFile=megaApi.getSize(node);				
 			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));				
@@ -2066,25 +2066,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 	}
-	
-	private String getInfoFolder (MegaNode n){
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		
-		return info;
-	}
-	
+
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");		
