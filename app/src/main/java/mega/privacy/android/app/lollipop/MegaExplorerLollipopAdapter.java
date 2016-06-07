@@ -178,7 +178,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
 				}
 			}
-			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, (ManagerActivityLollipop)context));
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 		}
 		else{
