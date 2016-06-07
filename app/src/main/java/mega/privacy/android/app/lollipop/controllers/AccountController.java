@@ -43,6 +43,10 @@ public class AccountController {
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context);
+        }
     }
 
     public void deleteAccount(MyAccountFragmentLollipop mAF){

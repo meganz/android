@@ -58,7 +58,7 @@ public class NodeController {
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
         if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+            dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
