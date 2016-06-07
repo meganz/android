@@ -9015,28 +9015,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showProPanel");
 		//Left and Right margin
 		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)getProText.getLayoutParams();
-		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0);
+		proTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(23, outMetrics), Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(23, outMetrics));
 		getProText.setLayoutParams(proTextParams);
 
 		rightUpgradeButton.setOnClickListener(this);
 		android.view.ViewGroup.LayoutParams paramsb2 = rightUpgradeButton.getLayoutParams();
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		rightUpgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
-//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)rightUpgradeButton.getLayoutParams();
 		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
 		rightUpgradeButton.setLayoutParams(optionTextParams);
 
 		leftCancelButton.setOnClickListener(this);
-		leftCancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 		android.view.ViewGroup.LayoutParams paramsb1 = leftCancelButton.getLayoutParams();
-		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb1.width = Util.scaleWidthPx(145, metrics);
 		leftCancelButton.setLayoutParams(paramsb1);
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)leftCancelButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(6, outMetrics), 0);
 		leftCancelButton.setLayoutParams(cancelTextParams);
 
 		getProLayout.setVisibility(View.VISIBLE);

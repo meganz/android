@@ -440,10 +440,8 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Storage Space</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">You can be a PRO user!\n Do you want to upgrade your account?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
      <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
     
@@ -744,4 +742,8 @@
 
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Your recovery key is going to be used to reset your password. Please, enter your new password.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.</string>
+
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
+    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; bandwidth with a Pro account!</string>
 </resources>
