@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_centerHorizontal="true"
+    android:elevation="8dp"
     android:background="@color/white"
     android:layout_gravity="center|fill_horizontal"
     android:orientation="vertical" >
@@ -20,11 +21,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:gravity="center"
+        android:gravity="left"
         android:text="@string/get_pro_account"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textColor="@color/name_my_account"
+        android:textSize="16sp"/>
        
     <LinearLayout
         android:id="@+id/get_pro_account_buttons_layout"
@@ -35,22 +35,34 @@
         android:background="@color/white"
         android:orientation="horizontal" >
 
-        <TextView
+        <Button
             android:id="@+id/btnLeft_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_vertical|center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="14sp"
             android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:text="@string/general_cancel"
+            android:background="@color/white"/>
 
-        <TextView
+        <Button
             android:id="@+id/btnRight_upgrade"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_vertical|center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="14sp"
             android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:text="@string/my_account_upgrade_pro_panel"
+            android:background="@color/white"/>
     </LinearLayout>
 </LinearLayout>
