@@ -385,7 +385,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_delete" />
+                android:src="@drawable/ic_remove" />
 
             <TextView
                 android:id="@+id/file_list_option_remove_text"
