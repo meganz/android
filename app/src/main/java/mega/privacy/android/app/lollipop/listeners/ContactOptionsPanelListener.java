@@ -40,6 +40,7 @@ public class ContactOptionsPanelListener implements View.OnClickListener {
 
         switch(v.getId()){
             case R.id.contact_list_out_options:{
+                log("contact_list_out_options");
                 ((ManagerActivityLollipop) context).hideContactOptionsPanel();
                 break;
             }

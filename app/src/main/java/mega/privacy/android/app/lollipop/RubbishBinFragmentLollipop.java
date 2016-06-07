@@ -26,9 +26,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,11 +38,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -92,15 +87,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRemoveTotal;
-	public LinearLayout optionMoveTo;
-	public TextView propertiesText;
 	////
 		
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -401,62 +387,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
 					}
 				}
-			}			
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.rubbishbin_list_out_options);
-			
-			optionProperties = (LinearLayout) v.findViewById(R.id.rubbishbin_list_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.rubbishbin_list_option_properties_text);			
-		
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.rubbishbin_list_option_remove_layout);
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-	
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.rubbishbin_list_option_move_layout);		
-
-			optionProperties.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });
+			}
 			
 			return v;
 		}
@@ -547,92 +478,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.rubbishbin_grid_out_options);
-			
-			optionProperties = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.rubbishbin_grid_option_properties_text);			
-		
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_remove_layout);
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-	
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_move_layout);		
-
-			optionProperties.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });
-			
-			return v;			
+			return v;
 		}
-	}
-	
-	public void showOptionsPanel(MegaNode sNode){
-		log("showNodeOptionsPanel");
-		
-		this.selectedNode = sNode;
-		
-		if (selectedNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-		}
-		
-		optionProperties.setVisibility(View.VISIBLE);				
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionRemoveTotal.setVisibility(View.VISIBLE);
-					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapter.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
 	}
 	
 	public void showProgressBar(){
@@ -662,13 +509,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			progressBar.setProgress(progress);
 		}
 	}
-	
-	public PanelState getPanelState ()
-	{
-		log("getPanelState: "+slidingOptionsPanel.getPanelState());
-		return slidingOptionsPanel.getPanelState();
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -687,59 +528,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
 				}				
-				break;
-			}
-			case R.id.rubbishbin_list_out_options:
-			case R.id.rubbishbin_grid_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-			case R.id.rubbishbin_list_option_move_layout:
-			case R.id.rubbishbin_grid_option_move_layout:{
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-				NodeController nC = new NodeController(context);
-				nC.chooseLocationToMoveNodes(handleList);
-				break;
-			}
-			case R.id.rubbishbin_list_option_properties_layout: 
-			case R.id.rubbishbin_grid_option_properties_layout: {
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
-				i.putExtra("handle", selectedNode.getHandle());
-				
-				if (selectedNode.isFolder()) {
-					if (megaApi.isShared(selectedNode)){
-						i.putExtra("imageId", R.drawable.folder_shared_mime);	
-					}
-					else{
-						i.putExtra("imageId", R.drawable.folder_mime);
-					}
-				} 
-				else {
-					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
-				}
-				i.putExtra("name", selectedNode.getName());
-				context.startActivity(i);
-				notifyDataSetChanged();
-				break;
-			}
-			case R.id.rubbishbin_list_option_remove_layout: 
-			case R.id.rubbishbin_grid_option_remove_layout: {
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 				break;
 			}
 		}
@@ -884,35 +672,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public int onBackPressed(){
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
-		
+
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 		
@@ -1120,6 +880,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapter!=null){
+			adapter.setPositionClicked(-1);
+		}
 	}
 	
 	public int getItemCount(){

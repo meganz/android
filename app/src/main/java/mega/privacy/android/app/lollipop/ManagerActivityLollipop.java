@@ -1233,7 +1233,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionContactShare.setOnClickListener(contactOptionsPanelListener);
 		optionContactProperties.setOnClickListener(contactOptionsPanelListener);
 		optionContactSendFile.setOnClickListener(contactOptionsPanelListener);
-		optionsOutLayout.setOnClickListener(contactOptionsPanelListener);
+		optionsContactOutLayout.setOnClickListener(contactOptionsPanelListener);
 		optionReinvite.setOnClickListener(contactOptionsPanelListener);
 		optionDeleteSentRequest.setOnClickListener(contactOptionsPanelListener);
 		optionAccept.setOnClickListener(contactOptionsPanelListener);
@@ -7530,7 +7530,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (rbFLol != null){
-//						rbFLol.showNodeOptionsPanel(node);
+						rbFLol.resetAdapter();
 					}
 				}
 				break;
@@ -7708,7 +7708,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showOptionsPanelInbox(MegaNode sNode){
-		log("showNodeOptionsPanel");
+		log("showOptionsPanelInbox");
 
 		if (sNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
@@ -7738,7 +7738,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showOptionsPanelSearch(MegaNode sNode){
-		log("showNodeOptionsPanel");
+		log("showOptionsPanelSearch");
 
 		if (sNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
@@ -7769,6 +7769,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("Show the slidingPanel");
 	}
 
+	public void showOptionsPanelRubbish(MegaNode sNode){
+		log("showOptionsPanelRubbish");
+
+		this.selectedNode = sNode;
+
+		if (selectedNode.isFolder()) {
+			propertiesText.setText(R.string.general_folder_info);
+		}else{
+			propertiesText.setText(R.string.general_file_info);
+		}
+
+		optionMoveTo.setVisibility(View.VISIBLE);
+		optionRemoveTotal.setVisibility(View.VISIBLE);
+		optionProperties.setVisibility(View.VISIBLE);
+
+		//Hide
+		optionClearShares.setVisibility(View.GONE);
+		optionPermissions.setVisibility(View.GONE);
+		optionLeaveShare.setVisibility(View.GONE);
+		optionDelete.setVisibility(View.GONE);
+		optionRename.setVisibility(View.GONE);
+		optionCopyTo.setVisibility(View.GONE);
+		optionSendToInbox.setVisibility(View.GONE);
+		optionShare.setVisibility(View.GONE);
+		optionDownload.setVisibility(View.GONE);
+		optionPublicLink.setVisibility(View.GONE);
+		optionOpenFolder.setVisibility(View.GONE);
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		log("Show the slidingPanel");
+	}
 
 	public void showNodeOptionsPanel(MegaNode node){
 		log("showNodeOptionsPanel");
@@ -7786,7 +7818,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (rbFLol != null){
-					rbFLol.showOptionsPanel(node);
+					showOptionsPanelRubbish(node);
 				}
 			}
 		}

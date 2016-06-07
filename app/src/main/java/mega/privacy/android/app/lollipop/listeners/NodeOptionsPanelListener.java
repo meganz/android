@@ -47,6 +47,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
         switch(v.getId()){
 
             case R.id.file_list_out_options:{
+                log("file_list_out_options option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 break;
             }
@@ -107,17 +108,16 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 }
                 i.putExtra("name", selectedNode.getName());
                 context.startActivity(i);
-
                 break;
             }
 
-            case R.id.file_list_option_delete_layout: {
-                log("Delete option");
+            case R.id.file_list_option_delete_layout:
+            case R.id.file_list_option_remove_layout:{
+                log("Delete/Move to rubbish option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(selectedNode.getHandle());
                 ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-
                 break;
             }
 
