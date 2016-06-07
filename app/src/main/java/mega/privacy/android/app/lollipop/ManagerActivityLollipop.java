@@ -1870,6 +1870,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("onResume - TAB CLOUD DRIVE");
 						if (parentHandleBrowser == -1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
 							log("Parent -1 or ROOTNODE");
+							parentHandleBrowser = megaApi.getRootNode().getHandle();
 							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						}
