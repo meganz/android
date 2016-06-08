@@ -90,7 +90,6 @@
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar Clave Maestra</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar la Clave Maestra</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar subscripción</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clave Maestra puede verse en la sección Disponible Sin Conexión y ha sido exportada en:</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La subscripción ha sido cancelada correctamente</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">Ha habido algún problema cancelando la subscripción. Por favor, contacta con support\@mega.co.nz para cancelar la subscripción</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar el resto de sesiones</string>
@@ -436,10 +435,8 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Espacio de almacenamiento</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Espacio Libre</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espacio utilizado</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">¡Hazte PRO!</string>
     <string name="my_account_change_password" context="menu item">Cambiar contraseña</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Te estás quedando sin espacio libre.\n ¿Quieres mejorar tu cuenta?</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Podrías ser un usuario PRO.\n ¿Quieres mejorar tu cuenta?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">¡Alerta! ¡Superada la cuota de almacenamiento!</string>
     <string name="overquota_alert_text" context="Dialod text overquota error">Operación no permitida, excederá el límite de almacenamiento de su cuenta. ¿Desea mejorar su tipo de cuenta?</string>
     
@@ -741,4 +738,9 @@
 
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu clave maestra se utilizará para resetear tu contraseña. Por favor, establece tu nueva contraseña.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás en tu correo electrónico un link que te permitirá resetear tu contraseña. Por favor, comprueba tu correo electrónico para proceder.</string>
+
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
+    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta Pro!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave Maestra ha sido exportada en: %s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Disponible Sin Conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 </resources>
