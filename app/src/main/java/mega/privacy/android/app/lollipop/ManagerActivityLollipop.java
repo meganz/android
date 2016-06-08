@@ -293,8 +293,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	long handleToDownload=0;
 	long lastTimeOnTransferUpdate = -1;
 
-	String nameText = "";
 	String firstNameText = "";
+	String lastNameText = "";
 	boolean name = false;
 	boolean firstName = false;
 
@@ -379,6 +379,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog clearRubbishBinDialog;
 	private AlertDialog downloadConfirmationDialog;
 	private AlertDialog insertPassDialog;
+	private AlertDialog changeUserAttributeDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -1960,6 +1961,169 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //    		isSearching = false;
 //	    }
 //	}
+
+	public void showDialogChangeUserAttribute(){
+		log("showDialogChangeUserAttribute");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText inputFirstName = new EditText(this);
+		layout.addView(inputFirstName, params);
+		final EditText inputLastName = new EditText(this);
+		layout.addView(inputLastName, params);
+		final EditText inputMail = new EditText(this);
+		layout.addView(inputMail, params);
+
+		inputFirstName.setSingleLine();
+		inputFirstName.setText(firstNameText);
+		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+		inputFirstName.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_NEXT) {
+					String value = inputFirstName.getText().toString().trim();
+					if(value.equals("")||value.isEmpty()){
+						log("input is empty");
+						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.requestFocus();
+					} else {
+						log("action NEXT ime - change user attribute");
+						inputLastName.requestFocus();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		inputFirstName.setImeActionLabel(getString(R.string.next_ime_action),EditorInfo.IME_ACTION_NEXT);
+		inputLastName.setSingleLine();
+		inputLastName.setText(lastNameText);
+		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputLastName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+		inputLastName.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_NEXT) {
+					String value = inputLastName.getText().toString().trim();
+					if(value.equals("")||value.isEmpty()){
+						log("input is empty");
+						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.requestFocus();
+					} else {
+						log("action NEXT ime - change user attribute");
+						inputMail.requestFocus();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		inputLastName.setImeActionLabel(getString(R.string.next_ime_action),EditorInfo.IME_ACTION_NEXT);
+
+		inputMail.setSingleLine();
+		inputMail.setText(contact.getEmail());
+		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		inputMail.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String valueFirstName = inputFirstName.getText().toString().trim();
+					String valueLastName = inputLastName.getText().toString().trim();
+					String value = inputMail.getText().toString().trim();
+					String emailError = Util.getEmailError(value, managerActivity);
+					if (emailError != null) {
+						inputMail.setError(emailError);
+						inputMail.requestFocus();
+					}
+					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
+						log("input is empty");
+						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.requestFocus();
+					}
+					else if(valueLastName.equals("")||valueLastName.isEmpty()){
+						log("input is empty");
+						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.requestFocus();
+					}
+					else {
+						log("positive button pressed - change user attribute");
+						int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, value, contact.getEmail());
+						if(maFLol!=null){
+							maFLol.setCountUserAttributes(countAttributes);
+						}
+						changeUserAttributeDialog.dismiss();
+					}
+				}
+				else{
+					log("other IME" + actionId);
+				}
+				return false;
+			}
+		});
+		inputMail.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.context_rename));
+
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+
+		changeUserAttributeDialog = builder.create();
+		changeUserAttributeDialog.show();
+		changeUserAttributeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				log("OK BTTN PASSWORD");
+				String valueFirstName = inputFirstName.getText().toString().trim();
+				String valueLastName = inputLastName.getText().toString().trim();
+				String value = inputMail.getText().toString().trim();
+				String emailError = Util.getEmailError(value, managerActivity);
+				if (emailError != null) {
+					inputMail.setError(emailError);
+					inputMail.requestFocus();
+				}
+				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
+					log("input is empty");
+					inputFirstName.setError(getString(R.string.invalid_string));
+					inputFirstName.requestFocus();
+				}
+				else if(valueLastName.equals("")||valueLastName.isEmpty()){
+					log("input is empty");
+					inputLastName.setError(getString(R.string.invalid_string));
+					inputLastName.requestFocus();
+				}
+				else {
+					log("positive button pressed - change user attribute");
+					int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, value, contact.getEmail());
+					if(maFLol!=null){
+						maFLol.setCountUserAttributes(countAttributes);
+					}
+					changeUserAttributeDialog.dismiss();
+				}
+			}
+		});
+		showKeyboardDelayed(inputFirstName);
+	}
 
 	@Override
 	protected void onStop(){
@@ -6473,23 +6637,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (fbFLol != null){
-					if (!(drawerItem == DrawerItem.CLOUD_DRIVE)){
-						return;
-					}
-				}
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					if (drawerItem == DrawerItem.CONTACTS){
-						return;
-					}
-				}
-				if (inSFLol != null){
-					if (drawerItem == DrawerItem.SHARED_ITEMS){
-						return;
-					}
-				}
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
@@ -9171,11 +9318,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
 		}
-		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
-			if (e.getErrorCode() == MegaError.API_OK){
-				nVDisplayName.setText(request.getName());
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("paramType: "+request.getParamType());
 			boolean avatarExists = false;
@@ -9239,19 +9381,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(request.getParamType()==1){
 					log("(1)request.getText(): "+request.getText());
-					nameText=request.getText();
+					firstNameText=request.getText();
 					name=true;
 				}
 				else if(request.getParamType()==2){
 					log("(2)request.getText(): "+request.getText());
-					firstNameText = request.getText();
+					lastNameText = request.getText();
 					firstName = true;
 				}
 				if(name && firstName){
 					log("Name and First Name received!");
-					String fullName = nameText + " " + firstNameText;
+					String fullName = firstNameText + " " + lastNameText;
 					if (fullName.trim().length() > 0){
-						nVDisplayName.setText(nameText+" "+firstNameText);
+						nVDisplayName.setText(firstNameText+" "+lastNameText);
 						name= false;
 						firstName = false;
 
@@ -9268,7 +9410,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(drawerItem==DrawerItem.ACCOUNT){
 						log("Update the account fragment");
 						if(maFLol!=null){
-							maFLol.updateUserName(nameText+" "+firstNameText);
+							maFLol.updateUserName(firstNameText, lastNameText);
 						}
 					}
 				}
@@ -11112,6 +11254,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setVisibility(View.VISIBLE);
 		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		slidingUploadPanel.setVisibility(View.GONE);
+	}
+
+	public void updateUserNameNavigationView(String firstName, String lastName){
+		log("updateUserNameNavigationView");
+		firstNameText= firstName;
+		lastNameText = lastName;
+		String fullName = firstNameText + " " + lastNameText;
+		if (fullName.trim().length() > 0){
+			nVDisplayName.setText(firstNameText+" "+lastNameText);
+
+			String firstLetter = fullName.charAt(0) + "";
+			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			nVPictureProfileTextView.setText(firstLetter);
+			nVPictureProfileTextView.setTextSize(32);
+			nVPictureProfileTextView.setTextColor(Color.WHITE);
+		}
 	}
 
 	public void showFabButton(){

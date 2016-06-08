@@ -94,7 +94,6 @@
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup recovery key</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove recovery key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key is available at the Saved for Offline Section and has been exported into: </string>
     <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The recovery key file has been removed</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support@mega.nz for assistance</string>
@@ -746,4 +745,10 @@
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; bandwidth with a Pro account!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
+
+    <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
+
+    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the account data.</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed succesfully">Your account data has been correctly updated.</string>
 </resources>

@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 
 public class AccountController {
 
@@ -36,6 +37,8 @@ public class AccountController {
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
     MegaPreferences prefs = null;
+
+    static int count = 0;
 
     public AccountController(Context context){
         log("AccountController created");
@@ -251,6 +254,38 @@ public class AccountController {
         }
     }
 
+    public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
+        log("updateUserAttributes");
+        MyAccountFragmentLollipop myAccountFragmentLollipop = ((ManagerActivityLollipop)context).getMyAccountFragment();
+        if(!oldFirstName.equals(newFirstName)){
+            log("Changes in first name");
+            if(myAccountFragmentLollipop!=null){
+                count++;
+                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, myAccountFragmentLollipop);
+            }
+        }
+        if(!oldLastName.equals(newLastName)){
+            log("Changes in last name");
+            if(myAccountFragmentLollipop!=null){
+                count++;
+                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, myAccountFragmentLollipop);
+            }
+        }
+        if(!oldMail.equals(newMail)){
+            log("Changes in mail");
+            count++;
+        }
+        log("The number of attributes to change is: "+count);
+        return count;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    static public void setCount(int countUa) {
+        count = countUa;
+    }
 
     public static void log(String message) {
         Util.log("AccountController", message);
