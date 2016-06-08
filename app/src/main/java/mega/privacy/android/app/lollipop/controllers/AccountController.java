@@ -272,8 +272,8 @@ public class AccountController {
             }
         }
         if(!oldMail.equals(newMail)){
-            log("Changes in mail");
-            count++;
+            log("Changes in mail, new mail: "+newMail);
+            megaApi.changeEmail(newMail, myAccountFragmentLollipop);
         }
         log("The number of attributes to change is: "+count);
         return count;
