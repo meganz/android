@@ -72,6 +72,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	String myEmail;
 	MegaUser myUser;
+
+	int countUserAttributes=0;
+	int errorUserAttibutes=0;
 	
 	TextView typeAccount;
 	TextView infoEmail;
@@ -114,8 +117,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	
 	private boolean name = false;
 	private boolean firstName = false;
-	String nameText;
 	String firstNameText;
+	String lastNameText;
 	
 	long paymentBitSetLong;
 	BitSet paymentBitSet = null;
@@ -200,12 +203,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		nameView.setLayoutParams(nameViewParams);
 
 		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		nameView.setOnClickListener(this);
 
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(myEmail);
 		LinearLayout.LayoutParams infoEmailParams = (LinearLayout.LayoutParams)infoEmail.getLayoutParams();
 		infoEmailParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, Util.scaleHeightPx(26, outMetrics));
 		infoEmail.setLayoutParams(infoEmailParams);
+		infoEmail.setOnClickListener(this);
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
@@ -364,18 +369,35 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	    int avatarTextSize = getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
-	    if (myEmail != null){
-		    if (myEmail.length() > 0){
-		    	log("TEXT: " + myEmail);
-		    	log("TEXT AT 0: " + myEmail.charAt(0));
-		    	String firstLetter = myEmail.charAt(0) + "";
-		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		    	initialLetter.setText(firstLetter);
-		    	initialLetter.setTextSize(40);
-		    	initialLetter.setTextColor(Color.WHITE);
-		    	initialLetter.setVisibility(View.VISIBLE);
-		    }
-	    }
+		boolean setInitialByMail = false;
+		if (firstNameText != null){
+			if (firstNameText.length() > 0){
+				String firstLetter = firstNameText.charAt(0) + "";
+				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				initialLetter.setText(firstLetter);
+				initialLetter.setTextSize(40);
+				initialLetter.setTextColor(Color.WHITE);
+			}else{
+				setInitialByMail=true;
+			}
+		}
+		else{
+			setInitialByMail=true;
+		}
+		if(setInitialByMail){
+			if (myEmail != null){
+				if (myEmail.length() > 0){
+					log("email TEXT: " + myEmail);
+					log("email TEXT AT 0: " + myEmail.charAt(0));
+					String firstLetter = myEmail.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					initialLetter.setText(firstLetter);
+					initialLetter.setTextSize(40);
+					initialLetter.setTextColor(Color.WHITE);
+					initialLetter.setVisibility(View.VISIBLE);
+				}
+			}
+		}
 		
 	    File avatar = null;
 		if (context.getExternalCacheDir() != null){
@@ -482,6 +504,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				aC.logout(context, megaApi, false);
 				break;
 			}
+			case R.id.my_account_name:
+			case R.id.my_account_email:{
+				log("Click user attributes text");
+				((ManagerActivityLollipop)context).showDialogChangeUserAttribute();
+				break;
+			}
 			case R.id.MK_button:{
 				log("Master Key button");
 				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
@@ -582,6 +610,58 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return info;
 	}
 
+	public void updateUserName(String firstName, String lastName){
+		firstNameText = firstName;
+		lastNameText=lastName;
+		updateNameView();
+	}
+
+	public void updateNameView(){
+		log("updateNameView");
+		if (nameView != null){
+			nameView.setText(firstNameText+" "+lastNameText);
+
+		}
+		File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		}
+		boolean setInitialByMail = false;
+		if (!avatar.exists()){
+			if (firstNameText != null){
+				if (firstNameText.length() > 0){
+					String firstLetter = firstNameText.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					initialLetter.setText(firstLetter);
+					initialLetter.setTextSize(40);
+					initialLetter.setTextColor(Color.WHITE);
+				}else{
+					setInitialByMail=true;
+				}
+			}
+			else{
+				setInitialByMail=true;
+			}
+			if(setInitialByMail){
+				if (myEmail != null){
+					if (myEmail.length() > 0){
+						log("email TEXT: " + myEmail);
+						log("email TEXT AT 0: " + myEmail.charAt(0));
+						String firstLetter = myEmail.charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						initialLetter.setText(firstLetter);
+						initialLetter.setTextSize(40);
+						initialLetter.setTextColor(Color.WHITE);
+						initialLetter.setVisibility(View.VISIBLE);
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart: " + request.getRequestString());
@@ -620,33 +700,67 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						}
 					}
 				}
-				else if(request.getParamType()==1){
+				else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 					log("(1)request.getText(): "+request.getText());
-					nameText=request.getText();
+					firstNameText=request.getText();
 					name=true;
 				}
-				else if(request.getParamType()==2){
+				else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 					log("(2)request.getText(): "+request.getText());
-					firstNameText = request.getText();
+					lastNameText = request.getText();
 					firstName = true;
 				}
 				if(name&&firstName){
-					if (nameView != null){
-						nameView.setText(nameText+" "+firstNameText);
-						if (nameText != null){
-							if (nameText.length() > 0){
-								String firstLetter = nameText.charAt(0) + "";
-								firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-//								initialLetter.setText(firstLetter);
-//								initialLetter.setTextSize(100);
-//								initialLetter.setTextColor(Color.WHITE);
-							}
-						}
-					}
+					updateNameView();
 					name= false;
 					firstName = false;
 				}
 				
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
+			log("TYPE_SET_ATTR_USER");
+			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+				log("(1)request.getText(): "+request.getText());
+                countUserAttributes--;
+				firstNameText=request.getText();
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("The first name has changed");
+					updateNameView();
+					((ManagerActivityLollipop) context).updateUserNameNavigationView(firstNameText, lastNameText);
+				}
+				else{
+					log("Error with first name");
+					errorUserAttibutes++;
+				}
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+				log("(2)request.getText(): "+request.getText());
+                countUserAttributes--;
+				lastNameText = request.getText();
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("The last name has changed");
+					updateNameView();
+					((ManagerActivityLollipop) context).updateUserNameNavigationView(firstNameText, lastNameText);
+				}
+				else{
+					log("Error with last name");
+					errorUserAttibutes++;
+				}
+			}
+
+			if(countUserAttributes==0){
+				if(errorUserAttibutes==0){
+					log("All user attributes changed!");
+					((ManagerActivityLollipop) context).showSnackbar(getString(R.string.success_changing_user_attributes));
+				}
+				else{
+					log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
+					((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_changing_user_attributes));
+				}
+				AccountController aC = new AccountController(context);
+				errorUserAttibutes=0;
+				aC.setCount(0);
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
@@ -916,8 +1030,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 	}
-	
-	public void updateUserName(String name){
-		nameView.setText(name);
+
+
+	public int getCountUserAttributes() {
+		return countUserAttributes;
 	}
+
+	public void setCountUserAttributes(int countUserAttributes) {
+		log("setCountUserAttributes: "+countUserAttributes);
+		this.countUserAttributes = countUserAttributes;
+	}
+
 }
