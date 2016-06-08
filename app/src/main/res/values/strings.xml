@@ -751,4 +751,6 @@
 
     <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the account data.</string>
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed succesfully">Your account data has been correctly updated.</string>
+
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
 </resources>

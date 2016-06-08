@@ -2061,7 +2061,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, value, contact.getEmail());
+						int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, contact.getEmail(), value);
 						if(maFLol!=null){
 							maFLol.setCountUserAttributes(countAttributes);
 						}
@@ -2114,7 +2114,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else {
 					log("positive button pressed - change user attribute");
-					int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, value, contact.getEmail());
+					int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, contact.getEmail(), value);
 					if(maFLol!=null){
 						maFLol.setCountUserAttributes(countAttributes);
 					}

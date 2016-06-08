@@ -763,6 +763,22 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				aC.setCount(0);
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
+			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The change link has been sent");
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_pass), getString(R.string.email_verification_title));
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				log("The new mail already exists");
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else{
+				log("Error when asking for change mail link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
 		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
 			log("TYPE_GET_RECOVERY_LINK");
 			if (e.getErrorCode() == MegaError.API_OK){
