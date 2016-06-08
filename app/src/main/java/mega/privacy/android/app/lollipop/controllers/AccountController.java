@@ -78,7 +78,7 @@ public class AccountController {
             out = new BufferedWriter(fileWriter);
             out.write(key);
             out.close();
-            String message = context.getString(R.string.toast_master_key) + " " + path;
+            String message = context.getString(R.string.toast_master_key, path);
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
             if(mAF!=null){
