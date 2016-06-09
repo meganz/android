@@ -195,6 +195,37 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			}
 		}
 
+		// Verify change mail
+		if (url != null && (url.matches("^https://mega.co.nz/#verify.+$"))||(url.matches("^https://mega.nz/#verify.+$"))) {
+			log("verify mail url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				log("Build.VERSION_CODES.LOLLIPOP");
+				MegaNode rootNode = megaApi.getRootNode();
+				if (rootNode == null){
+					log("Not logged");
+					AlertDialog.Builder builder;
+					builder = new AlertDialog.Builder(this);
+					builder.setMessage(R.string.alert_not_logged_in);
+					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									finish();
+								}
+							});
+					builder.show();
+				}
+				else{
+					log("Logged IN");
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+					resetPassIntent.setData(Uri.parse(url));
+					startActivity(resetPassIntent);
+					finish();
+				}
+				return;
+			}
+		}
+
 		// Reset password
 		if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
 			log("reset pass url");
