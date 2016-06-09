@@ -62,6 +62,11 @@ public class AccountController {
         megaApi.confirmCancelAccount(link, pass, mAF);
     }
 
+    public void confirmChangeMail(String link, String pass, MyAccountFragmentLollipop mAF){
+        log("confirmChangeMail");
+        megaApi.confirmChangeEmail(link, pass, mAF);
+    }
+
     public void exportMK(){
         log("exportMK");
         if (!Util.isOnline(context)){

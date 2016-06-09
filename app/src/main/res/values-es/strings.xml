@@ -749,4 +749,11 @@
     <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error al actualizar los nuevos datos de la cuenta.</string>
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed succesfully">Los datos de tu cuenta han sido correctamente actualizados.</string>
 
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. Este correo eléctronico ya está asociado a otra cuenta.</string>
+
+    <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Este es el último paso para cambiar tu correo electrónico. Por favor, introduce tu contraseña.</string>
+    <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Cambiar email</string>
+
+    <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Tu correo eléctrónico ha sido correctamente actualizado.</string>
+
 </resources>

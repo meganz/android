@@ -1362,7 +1362,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (getIntent().getAction() != null){
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 			        	log("Intent to export Master Key - im logged in!");
-						selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+						drawerItem=DrawerItem.ACCOUNT;
+						selectDrawerItemLollipop(drawerItem);
 						if(maFLol!=null){
 							maFLol.showMKLayout();
 						}
@@ -1371,8 +1372,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						String link = getIntent().getDataString();
 						if(link!=null){
 							log("link to cancel: "+link);
-							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
-							showDialogInsertPasswordToCancelAccount(link);
+							drawerItem=DrawerItem.ACCOUNT;
+							selectDrawerItemLollipop(drawerItem);
+							showDialogInsertPassword(link, true);
+						}
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_CHANGE_MAIL)){
+						String link = getIntent().getDataString();
+						if(link!=null){
+							log("link to change mail: "+link);
+							drawerItem=DrawerItem.ACCOUNT;
+							selectDrawerItemLollipop(drawerItem);
+							showDialogInsertPassword(link, false);
 						}
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
@@ -1412,12 +1423,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else if(getIntent().getAction().equals(Constants.ACTION_PASS_CHANGED)){
 						int result = getIntent().getIntExtra("RESULT",-20);
 						if(result==0){
-							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							drawerItem=DrawerItem.ACCOUNT;
+							selectDrawerItemLollipop(drawerItem);
 							log("Show success mesage");
 							Util.showAlert(this, getString(R.string.pass_changed_alert), null);
 						}
 						else{
-							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							drawerItem=DrawerItem.ACCOUNT;
+							selectDrawerItemLollipop(drawerItem);
 							log("Error when changing pass - show error message");
 							Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 						}
@@ -1426,7 +1439,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						String link = getIntent().getDataString();
 						if(link!=null){
 							log("link to resetPass: "+link);
-							selectDrawerItemLollipop(DrawerItem.ACCOUNT);
+							drawerItem=DrawerItem.ACCOUNT;
+							selectDrawerItemLollipop(drawerItem);
 							showConfirmationResetPassword(link);
 						}
 					}
@@ -6753,14 +6767,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void showEmailVerificacionDialog(){
+	public void showDialogInsertPassword(String link, boolean cancelAccount){
+		log("showDialogInsertPassword");
 
-	}
-
-	public void showDialogInsertPasswordToCancelAccount(String link){
-		log("showDialogInsertPasswordToCancelAccount");
-
-		final String linkCancellation = link;
+		final String confirmationLink = link;
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -6777,39 +6787,77 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String pass = input.getText().toString().trim();
-					if(pass.equals("")||pass.isEmpty()){
-						log("input is empty");
-						input.setError(getString(R.string.invalid_string));
-						input.requestFocus();
-					}
-					else {
-						log("action DONE ime - cancel account");
-						aC.confirmDeleteAccount(linkCancellation, pass, maFLol);
-						insertPassDialog.dismiss();
-					}
-				}
-				else{
-					log("other IME" + actionId);
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.context_delete),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.delete_account));
-		builder.setMessage(getString(R.string.delete_account_text_last_step));
-		builder.setPositiveButton(getString(R.string.context_delete),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
+		if(cancelAccount){
+			log("cancelAccount action");
+			input.setOnEditorActionListener(new OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+					if (actionId == EditorInfo.IME_ACTION_DONE) {
+						String pass = input.getText().toString().trim();
+						if(pass.equals("")||pass.isEmpty()){
+							log("input is empty");
+							input.setError(getString(R.string.invalid_string));
+							input.requestFocus();
+						}
+						else {
+							log("action DONE ime - cancel account");
+							aC.confirmDeleteAccount(confirmationLink, pass, maFLol);
+							insertPassDialog.dismiss();
+						}
 					}
-				});
+					else{
+						log("other IME" + actionId);
+					}
+					return false;
+				}
+			});
+			input.setImeActionLabel(getString(R.string.context_delete),EditorInfo.IME_ACTION_DONE);
+			builder.setTitle(getString(R.string.delete_account));
+			builder.setMessage(getString(R.string.delete_account_text_last_step));
+			builder.setPositiveButton(getString(R.string.context_delete),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+
+						}
+					});
+		}
+		else{
+			log("changeMail action");
+			input.setOnEditorActionListener(new OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+					if (actionId == EditorInfo.IME_ACTION_DONE) {
+						String pass = input.getText().toString().trim();
+						if(pass.equals("")||pass.isEmpty()){
+							log("input is empty");
+							input.setError(getString(R.string.invalid_string));
+							input.requestFocus();
+						}
+						else {
+							log("action DONE ime - change mail");
+							aC.confirmChangeMail(confirmationLink, pass, maFLol);
+							insertPassDialog.dismiss();
+						}
+					}
+					else{
+						log("other IME" + actionId);
+					}
+					return false;
+				}
+			});
+			input.setImeActionLabel(getString(R.string.change_pass),EditorInfo.IME_ACTION_DONE);
+			builder.setTitle(getString(R.string.change_mail_title_last_step));
+			builder.setMessage(getString(R.string.change_mail_text_last_step));
+			builder.setPositiveButton(getString(R.string.change_pass),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+
+						}
+					});
+		}
+
 		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
@@ -6824,24 +6872,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setView(layout);
 		insertPassDialog = builder.create();
 		insertPassDialog.show();
-		insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				log("OK BTTN PASSWORD");
-				String pass = input.getText().toString().trim();
-				if(pass.equals("")||pass.isEmpty()){
-					log("input is empty");
-					input.setError(getString(R.string.invalid_string));
-					input.requestFocus();
-//					insertPassDialog.show();
+		if(cancelAccount){
+			insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					log("OK BTTN PASSWORD");
+					String pass = input.getText().toString().trim();
+					if(pass.equals("")||pass.isEmpty()){
+						log("input is empty");
+						input.setError(getString(R.string.invalid_string));
+						input.requestFocus();
+					}
+					else {
+						log("positive button pressed - cancel account");
+						aC.confirmDeleteAccount(confirmationLink, pass, maFLol);
+						insertPassDialog.dismiss();
+					}
 				}
-				else {
-					log("positive button pressed - cancel account");
-					aC.confirmDeleteAccount(linkCancellation, pass, maFLol);
-					insertPassDialog.dismiss();
+			});
+		}
+		else{
+			insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					log("OK BTTN PASSWORD");
+					String pass = input.getText().toString().trim();
+					if(pass.equals("")||pass.isEmpty()){
+						log("input is empty");
+						input.setError(getString(R.string.invalid_string));
+						input.requestFocus();
+					}
+					else {
+						log("positive button pressed - change mail");
+						aC.confirmChangeMail(confirmationLink, pass, maFLol);
+						insertPassDialog.dismiss();
+					}
 				}
-			}
-		});
+			});
+		}
+
 	}
 
 	public void askConfirmationDeleteAccount(){
@@ -11270,6 +11339,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			nVPictureProfileTextView.setTextSize(32);
 			nVPictureProfileTextView.setTextColor(Color.WHITE);
 		}
+	}
+
+	public void updateMailNavigationView(String email){
+		log("updateMailNavigationView: "+email);
+		nVEmail.setText(contact.getEmail());
 	}
 
 	public void showFabButton(){

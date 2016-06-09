@@ -662,6 +662,53 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
+	public void updateMailView(String newMail){
+		log("updateNameView: "+newMail);
+		myEmail=newMail;
+		if (newMail != null){
+			infoEmail.setText(newMail);
+
+		}
+		File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		}
+		boolean setInitialByMail = false;
+		if (!avatar.exists()){
+			if (firstNameText != null){
+				if (firstNameText.length() > 0){
+					String firstLetter = firstNameText.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					initialLetter.setText(firstLetter);
+					initialLetter.setTextSize(40);
+					initialLetter.setTextColor(Color.WHITE);
+				}else{
+					setInitialByMail=true;
+				}
+			}
+			else{
+				setInitialByMail=true;
+			}
+			if(setInitialByMail){
+				if (myEmail != null){
+					if (myEmail.length() > 0){
+						log("email TEXT: " + myEmail);
+						log("email TEXT AT 0: " + myEmail.charAt(0));
+						String firstLetter = myEmail.charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						initialLetter.setText(firstLetter);
+						initialLetter.setTextSize(40);
+						initialLetter.setTextColor(Color.WHITE);
+						initialLetter.setVisibility(View.VISIBLE);
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart: " + request.getRequestString());
@@ -813,6 +860,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			else{
 				log("ERROR when cancelling account: "+e.getErrorString());
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
+			log("TYPE_CONFIRM_CHANGE_EMAIL_LINK request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The mail has been changed");
+				updateMailView(request.getEmail());
+				((ManagerActivityLollipop) context).updateMailNavigationView(request.getEmail());
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.success_changing_user_mail), getString(R.string.change_mail_title_last_step));
+			}
+			else{
+				log("ERROR when changing email: "+e.getErrorString());
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
