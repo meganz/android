@@ -203,14 +203,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		nameView.setLayoutParams(nameViewParams);
 
 		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		nameView.setOnClickListener(this);
+//		nameView.setOnClickListener(this);
 
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(myEmail);
 		LinearLayout.LayoutParams infoEmailParams = (LinearLayout.LayoutParams)infoEmail.getLayoutParams();
 		infoEmailParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, Util.scaleHeightPx(26, outMetrics));
 		infoEmail.setLayoutParams(infoEmailParams);
-		infoEmail.setOnClickListener(this);
+//		infoEmail.setOnClickListener(this);
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
@@ -290,8 +290,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
-		deleteAccountButton.setOnClickListener(this);
-		deleteAccountButton.setVisibility(View.VISIBLE);
+//		deleteAccountButton.setOnClickListener(this);
+		deleteAccountButton.setVisibility(View.INVISIBLE);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
 		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(27, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
@@ -809,7 +809,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				errorUserAttibutes=0;
 				aC.setCount(0);
 			}
-		}
+		}/*
 		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -875,7 +875,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				log("ERROR when changing email: "+e.getErrorString());
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
-		}
+		}*/
 		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				paymentBitSetLong = request.getNumber();
@@ -1066,7 +1066,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public void resetPass(){
-		megaApi.resetPassword(myEmail, true, this);
+//		megaApi.resetPassword(myEmail, true, this);
 	}
 
 	public void hideMKLayout(){

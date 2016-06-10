@@ -4193,7 +4193,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					upgradeAccountMenuItem.setVisible(true);
 					changePass.setVisible(true);
 					logoutMenuItem.setVisible(true);
-					forgotPassMenuItem.setVisible(true);
+					forgotPassMenuItem.setVisible(false);
 
 					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 					log("Exists MK in: "+path);
