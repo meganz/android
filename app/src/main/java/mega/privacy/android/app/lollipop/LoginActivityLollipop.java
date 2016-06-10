@@ -285,7 +285,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		textParamsForgotPass.setMargins(Util.scaleWidthPx(65, outMetrics), 0, 0, Util.scaleHeightPx(20, outMetrics));
 		bForgotPass.setLayoutParams(textParamsForgotPass);
 
-		bForgotPass.setOnClickListener(this);
+//		bForgotPass.setOnClickListener(this);
+		bForgotPass.setVisibility(View.INVISIBLE);
 		
 		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
@@ -946,11 +947,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					} else {
 						if(reset){
 							log("ask for link to reset pass");
-							megaApi.resetPassword(value, true, loginActivity);
+//							megaApi.resetPassword(value, true, loginActivity);
 						}
 						else{
 							log("ask for link to park account");
-							megaApi.resetPassword(value, false, loginActivity);
+//							megaApi.resetPassword(value, false, loginActivity);
 						}
 						insertMailDialog.dismiss();
 					}
@@ -1021,11 +1022,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				} else {
 					if(reset){
 						log("ask for link to reset pass");
-						megaApi.resetPassword(value, true, loginActivity);
+//						megaApi.resetPassword(value, true, loginActivity);
 					}
 					else{
 						log("ask for link to park account");
-						megaApi.resetPassword(value, false, loginActivity);
+//						megaApi.resetPassword(value, false, loginActivity);
 					}
 
 					insertMailDialog.dismiss();
@@ -1382,22 +1383,22 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				megaApi.fetchNodes(loginActivity);
 			}
 		}
-		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
-			log("TYPE_GET_RECOVERY_LINK");
-			if (error.getErrorCode() == MegaError.API_OK){
-				log("The recovery link has been sent");
-				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
-			}
-			else if (error.getErrorCode() == MegaError.API_ENOENT){
-				log("No account with this mail");
-				Util.showAlert(this, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
-			}
-			else{
-				log("Error when asking for recovery pass link");
-				log(error.getErrorString() + "___" + error.getErrorCode());
-				Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
+//		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
+//			log("TYPE_GET_RECOVERY_LINK");
+//			if (error.getErrorCode() == MegaError.API_OK){
+//				log("The recovery link has been sent");
+//				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+//			}
+//			else if (error.getErrorCode() == MegaError.API_ENOENT){
+//				log("No account with this mail");
+//				Util.showAlert(this, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+//			}
+//			else{
+//				log("Error when asking for recovery pass link");
+//				log(error.getErrorString() + "___" + error.getErrorCode());
+//				Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+//			}
+//		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (error.getErrorCode() == MegaError.API_OK){
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
