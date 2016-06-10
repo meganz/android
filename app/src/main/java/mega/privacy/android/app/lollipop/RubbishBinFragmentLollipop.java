@@ -374,7 +374,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					else{
 						log("setContent of the Rubbish Bin");
-						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), (ManagerActivityLollipop)context));
+						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 					}				
 				}
 				else{
@@ -384,7 +384,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					else{
 						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 					}
 				}
 			}
@@ -445,7 +445,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					else{
 						MegaNode infoNode = megaApi.getRubbishNode();
-						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), (ManagerActivityLollipop)context));
+						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 					}				
 				}
 				else{
@@ -455,7 +455,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					else{
 						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 					}
 				}
 			}
@@ -558,7 +558,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				
 				parentHandle = nodes.get(position).getHandle();
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -729,7 +729,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			        }
 			    });
 				adapter.setParentHandle(parentHandle);
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				return 2;
 			}
 			else{
@@ -743,13 +743,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		if (parentHandle == megaApi.getRubbishNode().getHandle()){
 			MegaNode infoNode = megaApi.getRubbishNode();
 			if (infoNode !=  null){
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 			if (infoNode !=  null){
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}
 		}
 	}
