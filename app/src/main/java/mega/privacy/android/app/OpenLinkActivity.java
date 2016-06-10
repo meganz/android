@@ -235,7 +235,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode == null){
 					log("Not logged");
-//					megaApi.queryResetPasswordLink(url, this);
+					megaApi.queryResetPasswordLink(url, this);
 				}
 				else{
 					log("Logged IN");
@@ -282,47 +282,47 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
-//		if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK){
-//			log("TYPE_GET_RECOVERY_LINK");
-//			if (e.getErrorCode() == MegaError.API_OK){
-//				log("The recovery link has been sent");
-//				boolean mk = request.getFlag();
-//				String url = request.getLink();
-//				if(mk){
-//					log("Link with master key");
-//					if(url!=null){
-//						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-//						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
-//						resetPassIntent.setData(Uri.parse(url));
-//						startActivity(resetPassIntent);
-//						finish();
-//					}
-//					else{
-//						log("LINK is null");
-//						log(e.getErrorString() + "___" + e.getErrorCode());
-//						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-//					}
-//				}
-//				else{
-//					log("Link without master key - park account");
-//					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-//					resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
-//					resetPassIntent.setData(Uri.parse(url));
-//					startActivity(resetPassIntent);
-//					finish();
-//				}
-//			}
-//			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
-//				log("Error expired link");
-//				log(e.getErrorString() + "___" + e.getErrorCode());
-//				Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
-//			}
-//			else{
-//				log("Error when asking for recovery pass link");
-//				log(e.getErrorString() + "___" + e.getErrorCode());
-//				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-//			}
-//		}
+		if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK){
+			log("TYPE_GET_RECOVERY_LINK");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The recovery link has been sent");
+				boolean mk = request.getFlag();
+				String url = request.getLink();
+				if(mk){
+					log("Link with master key");
+					if(url!=null){
+						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+						resetPassIntent.setData(Uri.parse(url));
+						startActivity(resetPassIntent);
+						finish();
+					}
+					else{
+						log("LINK is null");
+						log(e.getErrorString() + "___" + e.getErrorCode());
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+				}
+				else{
+					log("Link without master key - park account");
+					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
+					resetPassIntent.setData(Uri.parse(url));
+					startActivity(resetPassIntent);
+					finish();
+				}
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
+				log("Error expired link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
 	}
 
 	@Override

@@ -54,17 +54,17 @@ public class AccountController {
 
     public void deleteAccount(MyAccountFragmentLollipop mAF){
         log("deleteAccount");
-//        megaApi.cancelAccount(mAF);
+        megaApi.cancelAccount(mAF);
     }
 
     public void confirmDeleteAccount(String link, String pass, MyAccountFragmentLollipop mAF){
         log("confirmDeleteAccount");
-//        megaApi.confirmCancelAccount(link, pass, mAF);
+        megaApi.confirmCancelAccount(link, pass, mAF);
     }
 
     public void confirmChangeMail(String link, String pass, MyAccountFragmentLollipop mAF){
         log("confirmChangeMail");
-//        megaApi.confirmChangeEmail(link, pass, mAF);
+        megaApi.confirmChangeEmail(link, pass, mAF);
     }
 
     public void exportMK(){
@@ -278,7 +278,7 @@ public class AccountController {
         }
         if(!oldMail.equals(newMail)){
             log("Changes in mail, new mail: "+newMail);
-//            megaApi.changeEmail(newMail, myAccountFragmentLollipop);
+            megaApi.changeEmail(newMail, myAccountFragmentLollipop);
         }
         log("The number of attributes to change is: "+count);
         return count;
