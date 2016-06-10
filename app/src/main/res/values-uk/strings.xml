@@ -627,4 +627,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Операцію завершено некоректно. Кошти не стягнуто.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Дані кредитної карти не вірні. Кошти не стягнуто.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Додати контакт і поділитися</string>
+    <string name="general_share" context="button">Ділитися</string>
+    <string name="general_remove" context="button">Видалити</string>
+    <string name="general_confirm" context="button">Підтвердження</string>
+    <string name="general_leave" context="button">Залишити</string>
+    <string name="general_decryp" context="button">Розшифровувати</string>
+    <string name="general_export" context="button">Експорт</string>
+    <string name="confirmation_required" context="Alert title before download">Потрібне підтвердження</string>
+    <string name="alert_larger_file" context="Alert text before download">%s буде завантажено. Ви впевнені?</string>
+    <string name="alert_no_app" context="Alert text before download">Ви не маєте додатку здатного відкрити файл %s. Бажаєте продовжити завантаження?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Не показувати більше</string>
+    <string name="lastname_text" context="Last name of the user">Прізвище</string>
+    <string name="error_general_nodes" context="Error getting the root node">Помилка. Будь ласка, спробуйте ще раз.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Переглянути початковий код</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Додати новий контакт, щоб почати обмін</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Внутрішня карта SD</item>
+        <item context="external SD card option">Зовнішня карта SD</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Помилка. Теку не створено</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Кошик для сміття спорожнено</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Помилка. Кошик для сміття не спорожнено</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Власник е-пошти</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Тип PIN коду</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">4-значний PIN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">6-значний PIN</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Абетко-цифровий PIN</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Порожня тека</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Надіслано у вхідні</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Помилка. Не надіслано у вхідні</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Запит надіслано</string>
+    <string name="sortby_creation_date" context="category in sort by action">Дата створення</string>
+    <string name="sortby_modification_date" context="category in sort by action">Дата зміни</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Запрошення</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Бажаєте відправити запрошення %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Запит контакту успішно надіслано %s. Його статус ви можете перевірити у вкладці відправлених запитів.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Будь ласка, вийдіть перед створенням облікового запису</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Журналювання увімкнено</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Журналювання вимкнено</string>
 </resources>
