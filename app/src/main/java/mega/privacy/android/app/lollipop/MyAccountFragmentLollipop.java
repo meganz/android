@@ -69,6 +69,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	ImageView mailIcon;
 	
 	TextView nameView;
+	boolean mKLayoutVisible;
 
 	String myEmail;
 	MegaUser myUser;
@@ -130,12 +131,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
+		log("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-
 		super.onCreate(savedInstanceState);
-		log("onCreate");
 	}
 	
 	public void onDestroy()
@@ -440,6 +440,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
 			}
 		}
+
+		if(mKLayoutVisible){
+			showMKLayout();
+		}
 		
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
@@ -488,9 +492,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	@Override
 	public void onAttach(Activity activity) {
+		log("onAttach");
 		super.onAttach(activity);
 		context = activity;
-	}	
+		aB = ((AppCompatActivity)activity).getSupportActionBar();
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		log("onAttach context");
+		super.onAttach(context);
+		context = context;
+		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+	}
 
 	@Override
 	public void onClick(View v) {
@@ -1054,6 +1068,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	}
 
+	public void setMKLayoutVisible(boolean show){
+		mKLayoutVisible = show;
+	}
+
 	public void showMKLayout(){
 		log("showMKLayout");
 		if (aB == null){
@@ -1062,6 +1080,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		aB.hide();
 		parentLinearLayout.setVisibility(View.GONE);
 		exportMKLayout.setVisibility(View.VISIBLE);
+		mKLayoutVisible=false;
 	}
 
 	public void resetPass(){
@@ -1076,6 +1095,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		aB.show();
 		exportMKLayout.setVisibility(View.GONE);
 		parentLinearLayout.setVisibility(View.VISIBLE);
+		mKLayoutVisible=false;
 	}
 
 	public void updateAvatar(File avatar){

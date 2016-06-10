@@ -794,6 +794,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
     public void onAttach(Activity activity) {
+		log("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();

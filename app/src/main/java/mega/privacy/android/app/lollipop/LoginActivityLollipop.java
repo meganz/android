@@ -163,6 +163,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate");
 		super.onCreate(savedInstanceState);
 
 		loginClicked = false;
@@ -490,6 +491,16 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					}
 					else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						action = intentReceived.getAction();
+					}
+					else if(intentReceived.getAction().equals(Constants.ACTION_CHANGE_MAIL)){
+						log("intent received ACTION_CHANGE_MAIL");
+						action = Constants.ACTION_CHANGE_MAIL;
+						url = intentReceived.getDataString();
+					}
+					else if(intentReceived.getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
+						log("intent received ACTION_CANCEL_ACCOUNT");
+						action = Constants.ACTION_CANCEL_ACCOUNT;
+						url = intentReceived.getDataString();
 					}
 //					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
 //						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
@@ -1400,6 +1411,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (error.getErrorCode() == MegaError.API_OK){
+				log("ok fetch nodes");
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 				gSession = megaApi.dumpSession();
@@ -1429,6 +1441,33 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
 				}
 				else{
+					if(action!=null) {
+						if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
+							log("Action change mail after fetch nodes");
+							Intent changeMailIntent = new Intent(this, ManagerActivityLollipop.class);
+							changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+							changeMailIntent.setData(Uri.parse(url));
+							startActivity(changeMailIntent);
+							finish();
+						}
+						else if(action.equals(Constants.ACTION_RESET_PASS)) {
+							log("Action reset pass after fetch nodes");
+							Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+							resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+							resetPassIntent.setData(Uri.parse(url));
+							startActivity(resetPassIntent);
+							finish();
+						}
+						else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)) {
+							log("Action cancel Account after fetch nodes");
+							Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
+							cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+							cancelAccountIntent.setData(Uri.parse(url));
+							startActivity(cancelAccountIntent);
+							finish();
+						}
+					}
+
 					if (!backWhileLogin){
 
 						if (parentHandle != -1){
