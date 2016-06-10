@@ -613,4 +613,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">該操作尚未正確地完成。信用卡將不會被扣款。</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">信用卡信息不正確。您的信用卡將不會被扣款。</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">您的帳戶無法在應用程式內升級，請連絡support@mega.nz 以升級您的帳戶。</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">增加聯絡人與分享</string>
+    <string name="general_share" context="button">共享</string>
+    <string name="general_remove" context="button">移除</string>
+    <string name="general_confirm" context="button">確認</string>
+    <string name="general_leave" context="button">離開</string>
+    <string name="general_decryp" context="button">解密</string>
+    <string name="general_export" context="button">匯出</string>
+    <string name="confirmation_required" context="Alert title before download">需取得確認信</string>
+    <string name="alert_larger_file" context="Alert text before download">% 將開始下載。您確定嗎？</string>
+    <string name="alert_no_app" context="Alert text before download">您沒有能夠打開 %s 檔案的應用程式。您想繼續下載嗎？</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">請別再顯示</string>
+    <string name="lastname_text" context="Last name of the user">姓</string>
+    <string name="error_general_nodes" context="Error getting the root node">發生錯誤。請再試一次。</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">檢視來源碼</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">新增新連絡人以開始分享</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">內接SD卡</item>
+        <item context="external SD card option">外接SD卡</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">發生錯誤。未創建資料夾。</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">已成功清空垃圾筒</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">發生錯誤。未清空垃圾筒。</string>
+    <string name="sortby_owner_mail" context="category in sort by action">擁有者的電子郵件</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">PIN碼型態</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">四位PIN碼</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">六位PIN碼</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">字母或數字之PIN碼</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">空的資料夾</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">已寄至收件匣</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">發生錯誤。未寄至收件匣。</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">已寄出聯絡人邀請</string>
+    <string name="sortby_creation_date" context="category in sort by action">創建日期</string>
+    <string name="sortby_modification_date" context="category in sort by action">修改日期</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">邀請</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">您想寄發邀請給%s嗎？</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">已成功寄發聯絡人邀請給 %s。您可以於已寄發邀請之選單中確認進度狀況。</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">創建新帳號前，請先登出</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日誌已啟用</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日誌已關閉</string>
 </resources>

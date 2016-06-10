@@ -627,4 +627,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">התהליך לא הסתיים בהצלחה. כרטיס האשראי לא יוחוייב.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">פרטי כרטיס אשראי אינם נכונים. כרטיס האשראי לא יחוייב.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">לא הצלחנו לשדרג את חשבונך מהאפליקציה. אנא צור קשר עם support@mega.nz לשדרג את חשבונך.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">הוסף איש קשר ושתף</string>
+    <string name="general_share" context="button">שתף</string>
+    <string name="general_remove" context="button">מחק</string>
+    <string name="general_confirm" context="button">אשר</string>
+    <string name="general_leave" context="button">עזוב</string>
+    <string name="general_decryp" context="button">פענח</string>
+    <string name="general_export" context="button">ייצא</string>
+    <string name="confirmation_required" context="Alert title before download">אימות נדרש</string>
+    <string name="alert_larger_file" context="Alert text before download">תחל הורדה של %s. האם אתה בטוח?</string>
+    <string name="alert_no_app" context="Alert text before download">לא קיימת אפליקציה לפתיחה הקובץ %s. האם תרצה להמשיך עם ההורדה?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">אל תציג שוב</string>
+    <string name="lastname_text" context="Last name of the user">שם משפחה</string>
+    <string name="error_general_nodes" context="Error getting the root node">שגיאה. אנא, נסה שוב.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">צפה בקוד המקור</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">הוסף איש קשר לתחילת השיתוף</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">כרטיס זכרון פנימי</item>
+        <item context="external SD card option">כרטיס זכרון חיצוני</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">שגיאה: התיקייה לא נוצרה</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">פח האשפה רוקן בהצלחה</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">שגיאה. פח האשפה לא רוקן</string>
+    <string name="sortby_owner_mail" context="category in sort by action">כתובת מייל של הבעלים</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">סוג קוד פתיחה</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">קוד פתיחה בעל 4 ספרות</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">קוד פתיחה בעל 6 ספרות</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">קוד פתיחה בעל אותיות ומספרים</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">תיקייה ריקה</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">נשלח בהצלחה</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">שגיאה: השליחה לא הצליחה</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">בקשה נשלחה</string>
+    <string name="sortby_creation_date" context="category in sort by action">תאריך יצירה</string>
+    <string name="sortby_modification_date" context="category in sort by action">תאריך שינוי</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">הזמן</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">האם תרצה לשלוח הזמנה ל-%s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">בקשת איש קשר נשלחה בהצלחה ל-%s. תוכל לבדוק את סטטוס הבקשה בתוית "בקשות שנשלחו".</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">אנא התנתק טרם יצירת חשבון חדש</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">יצירת לוגים כעת מאופשרת</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">יצירת לוגים כעת לא מאופשרת</string>
 </resources>
