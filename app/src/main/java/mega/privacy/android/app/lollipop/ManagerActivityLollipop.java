@@ -150,6 +150,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView rightUpgradeButton;
 	FloatingActionButton fabButton;
 
+	boolean mkLayoutVisible = false;
+
 	NodeController nC;
 	ContactController cC;
 	AccountController aC;
@@ -1363,10 +1365,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 			        	log("Intent to export Master Key - im logged in!");
 						drawerItem=DrawerItem.ACCOUNT;
+						mkLayoutVisible = true;
 						selectDrawerItemLollipop(drawerItem);
-						if(maFLol!=null){
-							maFLol.showMKLayout();
-						}
+						mkLayoutVisible = false;
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
 						String link = getIntent().getDataString();
@@ -3174,14 +3175,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case ACCOUNT:{
-
+				log("case ACCOUNT");
 //    			tB.setVisibility(View.GONE);
 
     			accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 
     			if (maFLol == null){
+					log("New MyAccountFragment");
     				maFLol = new MyAccountFragmentLollipop();
     				maFLol.setMyEmail(megaApi.getMyUser().getEmail());
+					maFLol.setMKLayoutVisible(mkLayoutVisible);
     			}
 
     			mTabHostContacts.setVisibility(View.GONE);
@@ -3194,6 +3197,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, maFLol, "maF");
     			ft.commit();
+//				getSupportFragmentManager().executePendingTransactions();
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -11451,7 +11455,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			default:{
-				log("default GONE");
+				log("default GONE fabButton");
 				fabButton.setVisibility(View.GONE);
 				break;
 			}

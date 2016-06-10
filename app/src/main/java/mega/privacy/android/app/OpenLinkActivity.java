@@ -29,7 +29,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
-	
+	DatabaseHandler dbH = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -99,20 +99,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				finish();
 			}
 			return;
-		}		
-		
-		// Export Master Key link
-		if (url != null && (url.matches("^https://mega.co.nz/#backup")||url.matches("^https://mega.nz/#backup"))) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {			
-				log("export master key url");			
-				Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
-				exportIntent.setAction(Constants.ACTION_EXPORT_MASTER_KEY);
-				startActivity(exportIntent);
-				finish();
-				return;
-			}			
 		}
-		
+
 		// Folder Download link
 		if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
 			log("folder link url");
@@ -136,114 +124,194 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			return;
 		}
 
-		// Create account invitation
+		// Create account invitation - user must be logged OUT
 		if (url != null && (url.matches("^https://mega.co.nz/#newsignup.+$"))||(url.matches("^https://mega.nz/#newsignup.+$"))) {
 			log("new signup url");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				MegaNode rootNode = megaApi.getRootNode();
-				if (rootNode == null){
-					log("Not logged");
-					Intent createAccountIntent = new Intent(this, CreateAccountActivityLollipop.class);
-//				createAccountIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
-					startActivity(createAccountIntent);
-					finish();
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
-				else{
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.log_out_warning);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+				if (dbH != null) {
+					if (dbH.getCredentials() != null) {
+						log("Logged IN");
+						AlertDialog.Builder builder;
+						builder = new AlertDialog.Builder(this);
+						builder.setMessage(R.string.log_out_warning);
+						builder.setPositiveButton(getString(R.string.cam_sync_ok),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										finish();
+									}
+								});
+						builder.show();
+					}
+					else{
+						log("Not logged");
+						Intent createAccountIntent = new Intent(this, CreateAccountActivityLollipop.class);
+//				createAccountIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
+						startActivity(createAccountIntent);
+						finish();
+					}
 				}
 				return;
 			}
 		}
 
-		// Cancel account
+		// Export Master Key link - user must be logged IN
+		if (url != null && (url.matches("^https://mega.co.nz/#backup")||url.matches("^https://mega.nz/#backup"))) {
+			log("export master key url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				log("Build.VERSION_CODES.LOLLIPOP");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+				if (dbH != null) {
+					if (dbH.getCredentials() != null) {
+						log("Logged IN"); //Check fetch nodes is already done in ManagerActivity
+						Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
+						exportIntent.setAction(Constants.ACTION_EXPORT_MASTER_KEY);
+						startActivity(exportIntent);
+						finish();
+					} else {
+						log("Not logged");
+						AlertDialog.Builder builder;
+						builder = new AlertDialog.Builder(this);
+						builder.setMessage(R.string.alert_not_logged_in);
+						builder.setPositiveButton(getString(R.string.cam_sync_ok),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										finish();
+									}
+								});
+						builder.show();
+					}
+				}
+				return;
+			}
+		}
+
+		// Cancel account  - user must be logged IN
 		if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
 			log("cancel account url");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				MegaNode rootNode = megaApi.getRootNode();
-				if (rootNode == null){
-					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+				log("Build.VERSION_CODES.LOLLIPOP");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
-				else{
-					log("Build.VERSION_CODES.LOLLIPOP");
-					//Check that the link corresponds to this account
-					Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
-					cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
-					cancelAccountIntent.setData(Uri.parse(url));
-					startActivity(cancelAccountIntent);
-					finish();
+				if (dbH != null) {
+					if (dbH.getCredentials() != null) {
+						MegaNode rootNode = megaApi.getRootNode();
+						if (rootNode == null) {
+							log("Go to Login to fetch nodes");
+							Intent cancelAccountIntent = new Intent(this, LoginActivityLollipop.class);
+							cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+							cancelAccountIntent.setData(Uri.parse(url));
+							startActivity(cancelAccountIntent);
+							finish();
+
+						} else {
+							log("Logged IN");
+							Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
+							cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+							cancelAccountIntent.setData(Uri.parse(url));
+							startActivity(cancelAccountIntent);
+							finish();
+						}
+					} else {
+						log("Not logged");
+						AlertDialog.Builder builder;
+						builder = new AlertDialog.Builder(this);
+						builder.setMessage(R.string.alert_not_logged_in);
+						builder.setPositiveButton(getString(R.string.cam_sync_ok),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										finish();
+									}
+								});
+						builder.show();
+					}
 				}
 				return;
 			}
 		}
 
-		// Verify change mail
+		// Verify change mail - user must be logged IN
 		if (url != null && (url.matches("^https://mega.co.nz/#verify.+$"))||(url.matches("^https://mega.nz/#verify.+$"))) {
 			log("verify mail url");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				log("Build.VERSION_CODES.LOLLIPOP");
-				MegaNode rootNode = megaApi.getRootNode();
-				if (rootNode == null){
-					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
-				else{
-					log("Logged IN");
-					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(Constants.ACTION_CHANGE_MAIL);
-					resetPassIntent.setData(Uri.parse(url));
-					startActivity(resetPassIntent);
-					finish();
+				if (dbH != null) {
+					if (dbH.getCredentials() != null) {
+						MegaNode rootNode = megaApi.getRootNode();
+						if (rootNode == null) {
+							log("Go to Login to fetch nodes");
+							Intent changeMailIntent = new Intent(this, LoginActivityLollipop.class);
+							changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+							changeMailIntent.setData(Uri.parse(url));
+							startActivity(changeMailIntent);
+							finish();
+
+						} else {
+							log("Logged IN");
+							Intent changeMailIntent = new Intent(this, ManagerActivityLollipop.class);
+							changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+							changeMailIntent.setData(Uri.parse(url));
+							startActivity(changeMailIntent);
+							finish();
+						}
+					} else {
+						log("Not logged");
+						AlertDialog.Builder builder;
+						builder = new AlertDialog.Builder(this);
+						builder.setMessage(R.string.alert_not_logged_in);
+						builder.setPositiveButton(getString(R.string.cam_sync_ok),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										finish();
+									}
+								});
+						builder.show();
+					}
 				}
 				return;
 			}
 		}
 
-		// Reset password
+		// Reset password - two options: logged IN or OUT
 		if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
 			log("reset pass url");
 			//Check if link with MK or not
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				log("Build.VERSION_CODES.LOLLIPOP");
-				MegaNode rootNode = megaApi.getRootNode();
-				if (rootNode == null){
-					log("Not logged");
-					megaApi.queryResetPasswordLink(url, this);
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
-				else{
-					log("Logged IN");
-					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-					resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
-					resetPassIntent.setData(Uri.parse(url));
-					startActivity(resetPassIntent);
-					finish();
+				if (dbH != null) {
+					if (dbH.getCredentials() != null) {
+						MegaNode rootNode = megaApi.getRootNode();
+						if (rootNode == null) {
+							log("Go to Login to fetch nodes");
+							Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+							resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+							resetPassIntent.setData(Uri.parse(url));
+							startActivity(resetPassIntent);
+							finish();
+
+						} else {
+							log("Logged IN");
+							Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+							resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+							resetPassIntent.setData(Uri.parse(url));
+							startActivity(resetPassIntent);
+							finish();
+						}
+					} else {
+						log("Not logged");
+						megaApi.queryResetPasswordLink(url, this);
+					}
 				}
 				return;
 			}
