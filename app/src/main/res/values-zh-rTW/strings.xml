@@ -622,7 +622,7 @@
     <string name="general_decryp" context="button">解密</string>
     <string name="general_export" context="button">匯出</string>
     <string name="confirmation_required" context="Alert title before download">需取得確認信</string>
-    <string name="alert_larger_file" context="Alert text before download">% 將開始下載。您確定嗎？</string>
+    <string name="alert_larger_file" context="Alert text before download">%s 將開始下載。您確定嗎？</string>
     <string name="alert_no_app" context="Alert text before download">您沒有能夠打開 %s 檔案的應用程式。您想繼續下載嗎？</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">請別再顯示</string>
     <string name="lastname_text" context="Last name of the user">姓</string>
