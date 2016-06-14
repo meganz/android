@@ -120,7 +120,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private boolean firstName = false;
 	String firstNameText;
 	String lastNameText;
-	
+	String fullName;
+
 	long paymentBitSetLong;
 	BitSet paymentBitSet = null;
 	int accountType;
@@ -631,10 +632,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void updateNameView(){
 		log("updateNameView");
-		if (nameView != null){
-			nameView.setText(firstNameText+" "+lastNameText);
-
+		if (firstNameText.trim().length() <= 0){
+			fullName = lastNameText;
 		}
+		else{
+			fullName = firstNameText + " " + lastNameText;
+		}
+
+		if (fullName.trim().length() > 0){
+			if (nameView != null) {
+				nameView.setText(fullName);
+			}
+		}
+
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
 			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
@@ -644,14 +654,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		boolean setInitialByMail = false;
 		if (!avatar.exists()){
-			if (firstNameText != null){
-				if (firstNameText.length() > 0){
-					String firstLetter = firstNameText.charAt(0) + "";
+			if (fullName != null){
+				if (fullName.trim().length() > 0){
+					String firstLetter = fullName.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
 					initialLetter.setTextSize(30);
 					initialLetter.setTextColor(Color.WHITE);
-				}else{
+				}
+				else{
 					setInitialByMail=true;
 				}
 			}
@@ -691,9 +702,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		boolean setInitialByMail = false;
 		if (!avatar.exists()){
-			if (firstNameText != null){
-				if (firstNameText.length() > 0){
-					String firstLetter = firstNameText.charAt(0) + "";
+			if (fullName != null){
+				if (fullName.length() > 0){
+					String firstLetter = fullName.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
 					initialLetter.setTextSize(30);
@@ -776,6 +787,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					firstName = false;
 				}
 				
+			}
+			else{
+				log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
+
+				if(request.getParamType()==1){
+					log("ERROR - (1)request.getText(): "+request.getText());
+					firstNameText = "";
+					name=true;
+				}
+				else if(request.getParamType()==2){
+					log("ERROR - (2)request.getText(): "+request.getText());
+					lastNameText = "";
+					firstName = true;
+				}
+				if(name && firstName){
+					log("Name and First Name received!");
+					updateNameView();
+					name= false;
+					firstName = false;
+				}
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {

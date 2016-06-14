@@ -88,8 +88,9 @@
 								android:id="@+id/my_account_initial_letter"
 								android:layout_width="fill_parent"
 								android:layout_height="fill_parent"
-								android:layout_marginLeft="21dp"
-								android:layout_marginTop="8dp" />
+								android:layout_centerInParent="true"
+								android:gravity="center_horizontal|center_vertical"
+								android:paddingBottom="3dp" />
 						</RelativeLayout>
 
 					</RelativeLayout>
@@ -126,6 +127,8 @@
 					android:textColor="@color/name_my_account"
 					android:layout_centerVertical="true"
 					android:text="@string/action_logout"
+					android:paddingLeft="12dp"
+					android:paddingRight="12dp"
 					android:background="@drawable/white_rounded_corners_button"
 					android:elevation="@dimen/elevation_upgrade_low"
 					android:stateListAnimator="@anim/button_upgrade_elevation" />
