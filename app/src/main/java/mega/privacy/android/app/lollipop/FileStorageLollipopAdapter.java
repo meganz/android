@@ -1,22 +1,11 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.FileDocument;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.lollipop.MegaSharedFolderLollipopAdapter.OnItemClickListener;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +14,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.FileDocument;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.MegaSharedFolderLollipopAdapter.OnItemClickListener;
+import mega.privacy.android.app.utils.Util;
 
 /*
  * Adapter for FilestorageActivity list
@@ -90,7 +89,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+		holder.textViewFileName.getLayoutParams().width = Util.px2dp((260*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 			
 		v.setTag(holder);

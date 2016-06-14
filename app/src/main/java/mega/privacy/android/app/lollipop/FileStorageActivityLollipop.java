@@ -153,15 +153,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    	log("onLongPress");
 	    	
 			if (mode == Mode.PICK_FILE) {
+				log("mode PICK_FILE");
 		        View view = listView.findChildViewUnder(e.getX(), e.getY());
 		        int position = listView.getChildPosition(view);
 
-				adapter.setMultipleSelect(true);
-			
-				actionMode = startSupportActionMode(new ActionBarCallBack());			
+				// handle long press
+				if (!adapter.isMultipleSelect()){
+					adapter.setMultipleSelect(true);
 
-		        itemClick(position);
-	 
+					actionMode = startSupportActionMode(new ActionBarCallBack());
+
+					itemClick(position);
+				}
 		        super.onLongPress(e);
 			}
 	    }
