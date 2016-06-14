@@ -88,8 +88,8 @@
 								android:id="@+id/my_account_initial_letter"
 								android:layout_width="fill_parent"
 								android:layout_height="fill_parent"
-								android:layout_marginLeft="17dp"
-								android:layout_marginTop="2dp" />
+								android:layout_marginLeft="21dp"
+								android:layout_marginTop="8dp" />
 						</RelativeLayout>
 
 					</RelativeLayout>
@@ -115,7 +115,7 @@
 					android:paddingLeft="12dp"
 					android:paddingRight="12dp"
 					android:text="@string/action_export_master_key"
-					android:background="@android:color/white"
+					android:background="@drawable/white_rounded_corners_button"
 					android:elevation="@dimen/elevation_upgrade_low"
 					android:stateListAnimator="@anim/button_upgrade_elevation"/>
 
@@ -126,7 +126,7 @@
 					android:textColor="@color/name_my_account"
 					android:layout_centerVertical="true"
 					android:text="@string/action_logout"
-					android:background="@android:color/white"
+					android:background="@drawable/white_rounded_corners_button"
 					android:elevation="@dimen/elevation_upgrade_low"
 					android:stateListAnimator="@anim/button_upgrade_elevation" />
 			</LinearLayout>
@@ -297,7 +297,7 @@
 					android:textColor="@color/white"
 					android:layout_centerVertical="true"
 					android:text="@string/delete_account"
-					android:background="@color/delete_account"
+					android:background="@drawable/red_rounded_corners_button"
 					android:elevation="@dimen/elevation_upgrade_low"
 					android:stateListAnimator="@anim/button_upgrade_elevation" />
 			</LinearLayout>

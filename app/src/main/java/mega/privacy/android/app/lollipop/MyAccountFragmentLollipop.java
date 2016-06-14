@@ -374,7 +374,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				String firstLetter = firstNameText.charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				initialLetter.setText(firstLetter);
-				initialLetter.setTextSize(40);
+				initialLetter.setTextSize(30);
 				initialLetter.setTextColor(Color.WHITE);
 			}else{
 				setInitialByMail=true;
@@ -391,7 +391,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					String firstLetter = myEmail.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(40);
+					initialLetter.setTextSize(30);
 					initialLetter.setTextColor(Color.WHITE);
 					initialLetter.setVisibility(View.VISIBLE);
 				}
@@ -649,7 +649,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					String firstLetter = firstNameText.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(40);
+					initialLetter.setTextSize(30);
 					initialLetter.setTextColor(Color.WHITE);
 				}else{
 					setInitialByMail=true;
@@ -666,7 +666,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						String firstLetter = myEmail.charAt(0) + "";
 						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 						initialLetter.setText(firstLetter);
-						initialLetter.setTextSize(40);
+						initialLetter.setTextSize(30);
 						initialLetter.setTextColor(Color.WHITE);
 						initialLetter.setVisibility(View.VISIBLE);
 					}
@@ -696,7 +696,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					String firstLetter = firstNameText.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(40);
+					initialLetter.setTextSize(30);
 					initialLetter.setTextColor(Color.WHITE);
 				}else{
 					setInitialByMail=true;
@@ -713,7 +713,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						String firstLetter = myEmail.charAt(0) + "";
 						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 						initialLetter.setText(firstLetter);
-						initialLetter.setTextSize(40);
+						initialLetter.setTextSize(30);
 						initialLetter.setTextColor(Color.WHITE);
 						initialLetter.setVisibility(View.VISIBLE);
 					}
