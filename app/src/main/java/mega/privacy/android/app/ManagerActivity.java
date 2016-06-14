@@ -5805,27 +5805,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				log("avatar user downloaded");
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
-			
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();
-//				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-//				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-//				if (cF != null){
-//					if (drawerItem == DrawerItem.CONTACTS){	
-//						ArrayList<MegaUser> contacts = megaApi.getContacts();
-//						cF.setContacts(contacts);
-//						cF.getListView().invalidateViews();
-//					}
-//				}
-			}
-			log("add contact");
-		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			if (e.getErrorCode() == MegaError.API_OK) {
 				if (tF != null){
@@ -5987,9 +5966,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("get user attribute temporary error");
-		}
-		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
-			log("add contact temporary error");
 		}
 	}
 	
