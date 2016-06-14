@@ -9464,7 +9464,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				if(name && firstName){
 					log("Name and First Name received!");
-					String fullName = firstNameText + " " + lastNameText;
+					String fullName;
+					if (firstNameText.trim().length() <= 0){
+						fullName = lastNameText;
+					}
+					else{
+						fullName = firstNameText + " " + lastNameText;
+					}
 					if (fullName.trim().length() > 0){
 						nVDisplayName.setText(firstNameText+" "+lastNameText);
 						name= false;
@@ -9490,6 +9496,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
+
+				if(request.getParamType()==1){
+					log("ERROR - (1)request.getText(): "+request.getText());
+					firstNameText = "";
+					name=true;
+				}
+				else if(request.getParamType()==2){
+					log("ERROR - (2)request.getText(): "+request.getText());
+					lastNameText = "";
+					firstName = true;
+				}
+				if(name && firstName){
+					log("ERROR - Name and First Name received!");
+					String fullName;
+					if (firstNameText.trim().length() <= 0){
+						fullName = lastNameText;
+					}
+					else{
+						fullName = firstNameText + " " + lastNameText;
+					}
+					
+					if (fullName.trim().length() > 0){
+						nVDisplayName.setText(firstNameText+" "+lastNameText);
+						name= false;
+						firstName = false;
+
+						String firstLetter = fullName.charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						nVPictureProfileTextView.setText(firstLetter);
+						nVPictureProfileTextView.setTextSize(32);
+						nVPictureProfileTextView.setTextColor(Color.WHITE);
+					}
+					name= false;
+					firstName = false;
+
+					//refresh MyAccountFragment if visible
+					if(drawerItem==DrawerItem.ACCOUNT){
+						log("Update the account fragment");
+						if(maFLol!=null){
+							maFLol.updateUserName(firstNameText, lastNameText);
+						}
+					}
+				}
 			}
 
 			log("avatar user downloaded");
