@@ -26,7 +26,7 @@ public class ContactOptionsPanelListener implements View.OnClickListener {
     ContactController cC;
 
     public ContactOptionsPanelListener(Context context){
-        log("NodeOptionsPanelListener created");
+        log("ContactOptionsPanelListener created");
         this.context = context;
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
