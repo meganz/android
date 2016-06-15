@@ -140,8 +140,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	//OVERQUOTA WARNING
 	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	TextView outSpaceButton;
+	TextView outSpaceTextFirst;
+	TextView outSpaceTextSecond;
+	TextView outSpaceButtonUpgrade;
+	TextView outSpaceButtonCancel;
 
 	//GET PRO ACCOUNT PANEL
 	LinearLayout getProLayout=null;
@@ -1251,8 +1253,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
-		outSpaceText =  (TextView) findViewById(R.id.overquota_alert_text);
-		outSpaceButton = (TextView) findViewById(R.id.overquota_alert_btnRight_upgrade);
+		outSpaceTextFirst =  (TextView) findViewById(R.id.overquota_alert_text_first);
+		outSpaceTextSecond =  (TextView) findViewById(R.id.overquota_alert_text_second);
+		outSpaceButtonUpgrade = (TextView) findViewById(R.id.overquota_alert_btnRight_upgrade);
+		outSpaceButtonCancel = (TextView) findViewById(R.id.overquota_alert_btnLeft_cancel);
 
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
@@ -8521,7 +8525,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				getProLayout.setVisibility(View.GONE);
 				break;
 			}
-
+			case R.id.overquota_alert_btnLeft_cancel:{
+				log("outSpace Layout gone!");
+				outSpaceLayout.setVisibility(View.GONE);
+				break;
+			}
 			case R.id.btnRight_upgrade:
 			case R.id.overquota_alert_btnRight_upgrade:{
 				//Add navigation to Upgrade Account
@@ -9269,19 +9277,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showOverquotaAlert");
 
 		//Left and Right margin
-		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)outSpaceText.getLayoutParams();
-		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0);
-		outSpaceText.setLayoutParams(proTextParams);
+		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)outSpaceTextFirst.getLayoutParams();
+		proTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(0, outMetrics));
+		outSpaceTextFirst.setLayoutParams(proTextParams);
 
-		outSpaceButton.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = outSpaceButton.getLayoutParams();
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		outSpaceButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
-//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 		//Left and Right margin
-		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)outSpaceButton.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0);
-		outSpaceButton.setLayoutParams(optionTextParams);
+		LinearLayout.LayoutParams proTextParams2 = (LinearLayout.LayoutParams)outSpaceTextSecond.getLayoutParams();
+		proTextParams2.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(0, outMetrics), Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(23, outMetrics));
+		outSpaceTextSecond.setLayoutParams(proTextParams2);
+
+		outSpaceButtonUpgrade.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = outSpaceButtonUpgrade.getLayoutParams();
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)outSpaceButtonUpgrade.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
+		outSpaceButtonUpgrade.setLayoutParams(optionTextParams);
+
+		outSpaceButtonCancel.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb1 = outSpaceButtonCancel.getLayoutParams();
+		outSpaceButtonCancel.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)outSpaceButtonCancel.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(6, outMetrics), 0);
+		outSpaceButtonCancel.setLayoutParams(cancelTextParams);
+
+//		outSpaceButton.setOnClickListener(this);
+//		android.view.ViewGroup.LayoutParams paramsb2 = outSpaceButton.getLayoutParams();
+//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+//		outSpaceButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
+////		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
+//		//Left and Right margin
+//		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)outSpaceButton.getLayoutParams();
+//		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0);
+//		outSpaceButton.setLayoutParams(optionTextParams);
 
 		outSpaceLayout.setVisibility(View.VISIBLE);
 		outSpaceLayout.bringToFront();
