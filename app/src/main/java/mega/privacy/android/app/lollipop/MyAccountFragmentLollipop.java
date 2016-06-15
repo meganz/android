@@ -191,6 +191,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout.setOnClickListener(this);
 		mailIcon = (ImageView)  v.findViewById(R.id.my_account_email_icon);
 		LinearLayout.LayoutParams mailIconParams = (LinearLayout.LayoutParams)mailIcon.getLayoutParams();
 		mailIconParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(28, outMetrics), 0, 0);
@@ -516,6 +517,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				log("Logout button");
 				AccountController aC = new AccountController(context);
 				aC.logout(context, megaApi, false);
+				break;
+			}
+			case R.id.my_account_relative_layout_avatar:{
+				log("Click layout avatar");
+				((ManagerActivityLollipop)context).showAvatarOptionsPanel();
 				break;
 			}
 			case R.id.my_account_name:

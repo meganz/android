@@ -101,6 +101,7 @@ import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ContactOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
@@ -209,6 +210,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionAccept;
 	public LinearLayout optionDecline;
 	public LinearLayout optionIgnore;
+	////
+
+	//Sliding AVATAR OPTIONS PANEL
+	private SlidingUpPanelLayout slidingAvatarOptionsPanel;
+	public FrameLayout optionsAvatarOutLayout;
+	public LinearLayout optionsAvatarLayout;
+	public LinearLayout optionAvatarChoosePhoto;
+	public LinearLayout optionAvatarTakePhoto;
+	public LinearLayout optionAvatarDelete;
+	private AvatarOptionsPanelListener avatarOptionsPanelListener;
 	////
 
 	DatabaseHandler dbH = null;
@@ -1247,6 +1258,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		slidingContactOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		////
+
+		//Sliding AVATAR OPTIONS panel
+		slidingAvatarOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_avatar_list);
+		optionsAvatarLayout = (LinearLayout) findViewById(R.id.avatar_list_options);
+		optionsAvatarOutLayout = (FrameLayout) findViewById(R.id.avatar_list_out_options);
+		optionAvatarChoosePhoto = (LinearLayout) findViewById(R.id.avatar_list_choose_photo_layout);
+		optionAvatarTakePhoto = (LinearLayout) findViewById(R.id.avatar_list_take_photo_layout);
+		optionAvatarDelete = (LinearLayout) findViewById(R.id.avatar_list_delete_layout);
+
+		avatarOptionsPanelListener = new AvatarOptionsPanelListener(this);
+
+		optionAvatarDelete.setOnClickListener(avatarOptionsPanelListener);
+		optionAvatarTakePhoto.setOnClickListener(avatarOptionsPanelListener);
+		optionAvatarChoosePhoto.setOnClickListener(avatarOptionsPanelListener);
+		optionsAvatarOutLayout.setOnClickListener(avatarOptionsPanelListener);
+
+
+		slidingAvatarOptionsPanel.setVisibility(View.INVISIBLE);
+		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		////
 
 //		slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
@@ -5994,6 +6025,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		log("Sliding UPLOAD options not shown");
 
+		if(slidingAvatarOptionsPanel.getVisibility()==View.VISIBLE){
+			hideAvatarOptionsPanel();
+			return;
+		}
+
+		log("Sliding AVATAR options not shown");
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
@@ -8204,6 +8242,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 		}
+	}
+
+	public void showAvatarOptionsPanel() {
+		log("showAvatarOptionsPanel");
+		slidingAvatarOptionsPanel.setVisibility(View.VISIBLE);
+		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+	}
+
+	public void hideAvatarOptionsPanel() {
+		log("hideAvatarOptionsPanel");
+		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingAvatarOptionsPanel.setVisibility(View.GONE);
 	}
 
 	private void showOverquotaAlert(){

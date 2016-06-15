@@ -762,5 +762,9 @@
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">You\'re running out of space!</string>
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to PRO.</string>
 
+    <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+    <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
+    <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
 
 </resources>

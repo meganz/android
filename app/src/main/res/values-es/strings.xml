@@ -758,4 +758,9 @@
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">Te estás quedando sin espacio libre.</string>
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Saca el máximo provecho a tu cuenta con una cuenta PRO.</string>
+
+    <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editar foto del perfil</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
+    <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Elegir foto</string>
+    <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Borrar foto</string>
 </resources>
