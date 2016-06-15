@@ -759,4 +759,8 @@
 
     <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Your email has been correctly updated.</string>
 
+    <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">You\'re running out of space!</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to PRO.</string>
+
+
 </resources>
