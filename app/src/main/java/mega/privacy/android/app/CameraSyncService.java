@@ -820,27 +820,33 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				if(secondaryEnabled){
 					log("if(secondaryEnabled)");
 					Cursor cursorSecondary = app.getContentResolver().query(uris.get(i), projection, selectionSecondary, selectionArgs, order);
-					log("SecondaryEnabled en initsync COUNT: "+cursorSecondary.getCount());
 					if (cursorSecondary != null){
-						int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATA);
-						int timestampColumn = 0;
-						if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
-							timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
-						}
-						else
-						{
-							timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
-						}
-						while(cursorSecondary.moveToNext()){
-							Media media = new Media();
-							media.filePath = cursorSecondary.getString(dataColumn);
-							media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;
-							log("Check: "+media.filePath+" in localPath: "+localPathSecondary);
-							//Check files of Secondary Media Folder
-							if (checkFile(media,localPathSecondary)){
-								mediaFilesSecondary.add(media);
-								log("-----SECONDARY MEDIA Files added: "+media.filePath+" in localPath: "+localPathSecondary);
+						try {
+							log("SecondaryEnabled en initsync COUNT: "+cursorSecondary.getCount());
+							int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATA);
+							int timestampColumn = 0;
+							if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
+								timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
 							}
+							else
+							{
+								timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+							}
+							while(cursorSecondary.moveToNext()){
+
+								Media media = new Media();
+								media.filePath = cursorSecondary.getString(dataColumn);
+								media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;
+								log("Check: " + media.filePath + " in localPath: " + localPathSecondary);
+								//Check files of Secondary Media Folder
+								if (checkFile(media, localPathSecondary)) {
+									mediaFilesSecondary.add(media);
+									log("-----SECONDARY MEDIA Files added: " + media.filePath + " in localPath: " + localPathSecondary);
+								}
+							}
+						}
+						catch (Exception e){
+							log("Exception cursorSecondary:" + e.getMessage() + "____" + e.getStackTrace());
 						}
 					}
 				}
@@ -923,25 +929,34 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					for (int i=0;i<files.length;i++){
 						switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
 							case MegaPreferences.ONLY_PHOTOS:{
-								if (files[i].getType() != null){
-									if (files[i].getType().startsWith("image/")){
+								String fileType = files[i].getType();
+								if (fileType != null){
+									if (fileType.startsWith("image/")){
 										auxCameraFilesExternalSDCard.add(files[i]);
 									}
 								}
 								break;
 							}
 							case MegaPreferences.ONLY_VIDEOS:{
-								if (files[i].getType() != null){
-									if (files[i].getType().startsWith("video/") || (files[i].getName().endsWith(".mkv"))){
-										auxCameraFilesExternalSDCard.add(files[i]);
+								String fileType = files[i].getType();
+								String fileName = files[i].getName();
+								if (fileType != null){
+									if (fileName != null){
+										if (fileType.startsWith("video/") || (fileName.endsWith(".mkv"))) {
+											auxCameraFilesExternalSDCard.add(files[i]);
+										}
 									}
 								}
 								break;
 							}
 							case MegaPreferences.PHOTOS_AND_VIDEOS:{
-								if (files[i].getType() != null){
-									if (files[i].getType().startsWith("image/") || files[i].getType().startsWith("video/") || (files[i].getName().endsWith(".mkv"))){
-										auxCameraFilesExternalSDCard.add(files[i]);
+								String fileType = files[i].getType();
+								String fileName = files[i].getName();
+								if (fileType != null){
+									if (fileName != null) {
+										if (fileType.startsWith("image/") || fileType.startsWith("video/") || (fileName.endsWith(".mkv"))) {
+											auxCameraFilesExternalSDCard.add(files[i]);
+										}
 									}
 								}
 								break;
