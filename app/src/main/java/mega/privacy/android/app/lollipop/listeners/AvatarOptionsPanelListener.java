@@ -2,12 +2,14 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -39,15 +41,14 @@ public class AvatarOptionsPanelListener implements View.OnClickListener {
             }
             case R.id.avatar_list_choose_photo_layout:{
                 log("option choose photo avatar");
-//                MegaUser selectedUser = ((ManagerActivityLollipop) context).getSelectedUser();
-//
-//                if(selectedUser==null){
-//                    log("The selected user is NULL");
-//                    return;
-//                }
-//                ((ManagerActivityLollipop) context).hideContactOptionsPanel();
-//                List<MegaUser> user = new ArrayList<MegaUser>();
-//                user.add(selectedUser);
+                ((ManagerActivityLollipop) context).hideAvatarOptionsPanel();
+                ((ManagerActivityLollipop)context).hideUploadPanel();
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setType("image/*");
+                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.CHOOSE_PICTURE_PROFILE_CODE);
 
                 break;
             }
@@ -60,17 +61,10 @@ public class AvatarOptionsPanelListener implements View.OnClickListener {
             }
             case R.id.avatar_list_delete_layout:{
                 log("option delete avatar");
-//                MegaUser selectedUser = ((ManagerActivityLollipop) context).getSelectedUser();
-//
-//                if(selectedUser==null){
-//                    log("The selected user is NULL");
-//                    return;
-//                }
-//                ((ManagerActivityLollipop) context).hideContactOptionsPanel();
-//                List<MegaUser> user = new ArrayList<MegaUser>();
-//                user.add(selectedUser);
-//                ContactController cC = new ContactController(context);
-//                cC.pickFolderToShare(user);
+
+                ((ManagerActivityLollipop) context).hideAvatarOptionsPanel();
+                AccountController aC = new AccountController(context);
+                aC.removeAvatar();
                 break;
             }
         }

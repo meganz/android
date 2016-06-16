@@ -108,7 +108,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout parentLinearLayout;
 	
 	DisplayMetrics outMetrics;
-	
+	float density;
 
 //	String userEmail;	
 	
@@ -169,7 +169,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
+		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
@@ -353,96 +353,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		megaApi.getUserAttribute(myUser, 2, this);
 		megaApi.getExtendedAccountDetails(true, false, false, this);
 
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		myAccountImage.setImageBitmap(defaultAvatar);
-
-	    int avatarTextSize = getAvatarTextSize(density);
-	    log("DENSITY: " + density + ":::: " + avatarTextSize);
-		boolean setInitialByMail = false;
-		if (firstNameText != null){
-			if (firstNameText.length() > 0){
-				String firstLetter = firstNameText.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				initialLetter.setText(firstLetter);
-				initialLetter.setTextSize(30);
-				initialLetter.setTextColor(Color.WHITE);
-			}else{
-				setInitialByMail=true;
-			}
-		}
-		else{
-			setInitialByMail=true;
-		}
-		if(setInitialByMail){
-			if (myEmail != null){
-				if (myEmail.length() > 0){
-					log("email TEXT: " + myEmail);
-					log("email TEXT AT 0: " + myEmail.charAt(0));
-					String firstLetter = myEmail.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(30);
-					initialLetter.setTextColor(Color.WHITE);
-					initialLetter.setVisibility(View.VISIBLE);
-				}
-			}
-		}
-		
-	    File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-		}
-
-		Bitmap imBitmap = null;
-		if (avatar.exists()){
-			log("avatar path: "+avatar.getAbsolutePath());
-			if (avatar.length() > 0){
-				log("my avatar exists!");
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (imBitmap == null) {
-					avatar.delete();
-					log("Call to getUserAvatar");
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
-					}
-					else{
-						megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
-					}
-				}
-				else{
-					log("Show my avatar");
-					myAccountImage.setImageBitmap(imBitmap);
-					initialLetter.setVisibility(View.GONE);
-				}
-			}
-		}else{
-			log("my avatar NOT exists!");
-			log("Call to getUserAvatar");
-			if (context.getExternalCacheDir() != null){
-				megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
-			}
-			else{
-				megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
-			}
-		}
+		this.updateAvatar(myUser.getEmail(), true);
 
 		if(mKLayoutVisible){
 			showMKLayout();
@@ -652,45 +563,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-		}
-		boolean setInitialByMail = false;
-		if (!avatar.exists()){
-			if (fullName != null){
-				if (fullName.trim().length() > 0){
-					String firstLetter = fullName.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(30);
-					initialLetter.setTextColor(Color.WHITE);
-				}
-				else{
-					setInitialByMail=true;
-				}
-			}
-			else{
-				setInitialByMail=true;
-			}
-			if(setInitialByMail){
-				if (myEmail != null){
-					if (myEmail.length() > 0){
-						log("email TEXT: " + myEmail);
-						log("email TEXT AT 0: " + myEmail.charAt(0));
-						String firstLetter = myEmail.charAt(0) + "";
-						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						initialLetter.setText(firstLetter);
-						initialLetter.setTextSize(30);
-						initialLetter.setTextColor(Color.WHITE);
-						initialLetter.setVisibility(View.VISIBLE);
-					}
-				}
-			}
-		}
+		updateAvatar(myEmail, false);
 	}
 
 	public void updateMailView(String newMail){
@@ -753,30 +626,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			if (e.getErrorCode() == MegaError.API_OK){
 				if(request.getParamType()==0){
 					log("(0)request");
-					File avatar = null;
-					if (context.getExternalCacheDir() != null){
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-					}
-					else{
-						avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-					}
-					Bitmap imBitmap = null;
-					if (avatar.exists()){
-						if (avatar.length() > 0){
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (imBitmap == null) {
-								avatar.delete();
-							}
-							else{
-								myAccountImage.setImageBitmap(imBitmap);
-								log("initialLetter.setVisibility");
-								initialLetter.setVisibility(View.GONE);
-							}
-						}
-					}
+					this.updateAvatar(myUser.getEmail(), false);
+					return;
 				}
 				else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 					log("(1)request.getText(): "+request.getText());
@@ -798,7 +649,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			else{
 				log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
 
-				if(request.getParamType()==1){
+				if(request.getParamType()==0){
+					log("(0)request");
+					this.updateAvatar(myUser.getEmail(), false);
+					return;
+				}
+				else if(request.getParamType()==1){
 					log("ERROR - (1)request.getText(): "+request.getText());
 					firstNameText = "";
 					name=true;
@@ -1144,17 +1000,100 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		mKLayoutVisible=false;
 	}
 
-	public void updateAvatar(File avatar){
+	public void updateAvatar(String contactEmail, boolean retry){
+		log("updateAvatar: "+contactEmail);
+		File avatar = null;
+		if (getActivity().getExternalCacheDir() != null){
+			avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+		}
+		else{
+			avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+		}
+
 		if(avatar!=null){
-			Bitmap imBitmap = null;
-			if (avatar.exists()){
-				if (avatar.length() > 0){
-					BitmapFactory.Options bOpts = new BitmapFactory.Options();
-					bOpts.inPurgeable = true;
-					bOpts.inInputShareable = true;
-					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-					if (imBitmap == null) {
-						avatar.delete();
+			setProfileAvatar(avatar, retry);
+		}
+		else{
+			setDefaultAvatar();
+		}
+	}
+
+	public void setDefaultAvatar(){
+		log("setDefaultAvatar");
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		myAccountImage.setImageBitmap(defaultAvatar);
+
+		int avatarTextSize = getAvatarTextSize(density);
+		log("DENSITY: " + density + ":::: " + avatarTextSize);
+		boolean setInitialByMail = false;
+
+		if (firstNameText.trim().length() <= 0){
+			fullName = lastNameText;
+		}
+		else{
+			fullName = firstNameText + " " + lastNameText;
+		}
+
+		if (fullName != null){
+			if (fullName.trim().length() > 0){
+				String firstLetter = fullName.charAt(0) + "";
+				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				initialLetter.setText(firstLetter);
+				initialLetter.setTextSize(30);
+				initialLetter.setTextColor(Color.WHITE);
+				initialLetter.setVisibility(View.VISIBLE);
+			}else{
+				setInitialByMail=true;
+			}
+		}
+		else{
+			setInitialByMail=true;
+		}
+		if(setInitialByMail){
+			if (myEmail != null){
+				if (myEmail.length() > 0){
+					log("email TEXT: " + myEmail);
+					log("email TEXT AT 0: " + myEmail.charAt(0));
+					String firstLetter = myEmail.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					initialLetter.setText(firstLetter);
+					initialLetter.setTextSize(30);
+					initialLetter.setTextColor(Color.WHITE);
+					initialLetter.setVisibility(View.VISIBLE);
+				}
+			}
+		}
+	}
+
+	public void setProfileAvatar(File avatar, boolean retry){
+		log("setProfileAvatar");
+
+		Bitmap imBitmap = null;
+		if (avatar.exists()){
+			log("avatar path: "+avatar.getAbsolutePath());
+			if (avatar.length() > 0){
+				log("my avatar exists!");
+				BitmapFactory.Options bOpts = new BitmapFactory.Options();
+				bOpts.inPurgeable = true;
+				bOpts.inInputShareable = true;
+				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				if (imBitmap == null) {
+					avatar.delete();
+					log("Call to getUserAvatar");
+					if(retry){
+						log("Retry!");
 						if (context.getExternalCacheDir() != null){
 							megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
 						}
@@ -1163,11 +1102,31 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						}
 					}
 					else{
-						myAccountImage.setImageBitmap(imBitmap);
-						log("initialLetter.setVisibility2");
-						initialLetter.setVisibility(View.GONE);
+						log("DO NOT Retry!");
+						setDefaultAvatar();
 					}
 				}
+				else{
+					log("Show my avatar");
+					myAccountImage.setImageBitmap(imBitmap);
+					initialLetter.setVisibility(View.GONE);
+				}
+			}
+		}else{
+			log("my avatar NOT exists!");
+			log("Call to getUserAvatar");
+			if(retry){
+				log("Retry!");
+				if (context.getExternalCacheDir() != null){
+					megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+				}
+				else{
+					megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
+				}
+			}
+			else{
+				log("DO NOT Retry!");
+				setDefaultAvatar();
 			}
 		}
 	}

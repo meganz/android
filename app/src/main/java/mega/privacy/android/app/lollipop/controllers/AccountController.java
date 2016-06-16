@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaUser;
 
 public class AccountController {
 
@@ -89,6 +90,29 @@ public class AccountController {
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
         ((ManagerActivityLollipop)context).startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
+    }
+
+    public void removeAvatar(){
+        log("removeAvatar");
+
+        MegaUser myContact = ((ManagerActivityLollipop)context).getContact();
+        String myEmail = myContact.getEmail();
+        if(myEmail!=null){
+            File avatar = null;
+            if (context.getExternalCacheDir() != null){
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+            }
+            else{
+                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+            }
+
+            if (avatar.exists()) {
+                log("avatar to delete: " + avatar.getAbsolutePath());
+                avatar.delete();
+            }
+        }
+
+        megaApi.setAvatar(null);
     }
 
     public void exportMK(){
