@@ -410,6 +410,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		Bitmap imBitmap = null;
 		if (avatar.exists()){
+			log("avatar path: "+avatar.getAbsolutePath());
 			if (avatar.length() > 0){
 				log("my avatar exists!");
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
@@ -845,6 +846,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					errorUserAttibutes++;
 				}
 			}
+			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("Avatar changed!!");
+				}
+				else{
+					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
+				}
+			}
 
 			if(countUserAttributes==0){
 				if(errorUserAttibutes==0){
@@ -1162,7 +1171,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 	}
-
 
 	public int getCountUserAttributes() {
 		return countUserAttributes;

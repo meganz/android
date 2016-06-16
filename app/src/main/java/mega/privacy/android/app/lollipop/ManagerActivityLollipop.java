@@ -1493,7 +1493,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				nVEmail.setVisibility(View.VISIBLE);
 				nVEmail.setText(contact.getEmail());
 //				megaApi.getUserData(this);
+				log("getUserAttribute FirstName");
 				megaApi.getUserAttribute(1, this);
+				log("getUserAttribute LastName");
 				megaApi.getUserAttribute(2, this);
 
 				Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -1906,6 +1908,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				log("Intent take selfie");
     				takePicture();
     			}
+				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
+					log("Intent CHANGE AVATAR");
+					String path = intent.getStringExtra("IMAGE_PATH");
+					log("Path of the avatar: "+path);
+					if(maFLol!=null){
+						megaApi.setAvatar(path, maFLol);
+					}
+				}
     			intent.setAction(null);
 				setIntent(null);
     		}
@@ -2030,8 +2040,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		inputFirstName.setSingleLine();
 		inputFirstName.setText(firstNameText);
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
@@ -7049,6 +7059,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void takePicture(){
+		log("takePicture");
 		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
         File newFolder = new File(path);
         newFolder.mkdirs();
@@ -7063,7 +7074,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
         startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
 	}
 
@@ -9078,6 +9088,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 	    }
+		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
+			log("TAKE_PICTURE_PROFILE_CODE");
+			if(resultCode == Activity.RESULT_OK){
+				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
+				intentPicture.putExtra("PICTURE_PROFILE", 1);
+				startActivity(intentPicture);
+			}
+			else{
+				log("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
+			}
+
+		}
 		else if (requestCode == Constants.REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 
 			if (intent == null) {
@@ -9618,8 +9640,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 			}
-
-			log("avatar user downloaded");
 		}
 		else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
