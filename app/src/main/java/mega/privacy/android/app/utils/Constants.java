@@ -23,6 +23,7 @@ public class Constants {
 	public static int REQUEST_CODE_SELECT_FILE = 1012;
 	public static int SET_PIN = 1013;
 	public static int REQUEST_CODE_TREE = 1014;
+	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
@@ -77,6 +78,7 @@ public class Constants {
 	public static String ACTION_PARK_ACCOUNT = "PARK_ACCOUNT";
 	public static String ACTION_RESET_PASS_FROM_PARK_ACCOUNT = "RESET_PASS_FROM_PARK_ACCOUNT";
 	public static String ACTION_CHANGE_MAIL = "CHANGE_MAIL";
+	public static String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
 
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;

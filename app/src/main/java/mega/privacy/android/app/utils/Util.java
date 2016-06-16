@@ -90,6 +90,7 @@ public class Util {
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";
+	public static String profilePicDIR ="MEGA/MEGA Profile Images";
 	public static String logDIR = "MEGA/MEGA Logs";
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
 	

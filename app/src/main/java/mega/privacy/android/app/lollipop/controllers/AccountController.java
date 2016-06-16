@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.AndroidRuntimeException;
 
 import java.io.BufferedWriter;
@@ -25,6 +27,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.TourActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -65,6 +68,27 @@ public class AccountController {
     public void confirmChangeMail(String link, String pass, MyAccountFragmentLollipop mAF){
         log("confirmChangeMail");
         megaApi.confirmChangeEmail(link, pass, mAF);
+    }
+
+    public void takeProfilePicture(){
+        log("takePicture");
+
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR;
+        File newFolder = new File(path);
+        newFolder.mkdirs();
+
+        String file = path + "/picture.jpg";
+        File newFile = new File(file);
+        try {
+            newFile.createNewFile();
+        } catch (IOException e) {}
+
+        Uri outputFileUri = Uri.fromFile(newFile);
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+        ((ManagerActivityLollipop)context).startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
     }
 
     public void exportMK(){

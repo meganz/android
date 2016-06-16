@@ -26,6 +26,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 
 public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop implements OnClickListener{
@@ -50,6 +51,8 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
     
     String filePath;
 	File imgFile;
+
+	int profilePicture;
 	
 	static SecureSelfiePreviewActivityLollipop secureSelfiePreviewActivity;
     
@@ -77,7 +80,13 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 		secureSelfiePreviewActivity = this;
 		
 		MegaApplication app = (MegaApplication)getApplication();
-		
+
+		Intent intent = getIntent();
+		if(intent!=null){
+			profilePicture = intent.getIntExtra("PICTURE_PROFILE", -1);
+			log("profilePicture set to: "+profilePicture);
+		}
+
 		setContentView(R.layout.activity_secure_selfie_preview);
 		
 		secureSelfieImage = (TouchImageView) findViewById(R.id.secure_selfie_viewer_image);
@@ -112,9 +121,15 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 	    density  = getResources().getDisplayMetrics().density;
 		
 	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);			
-			
-		filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+	    scaleH = Util.getScaleH(outMetrics, density);
+
+		if(profilePicture==1){
+			filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";
+		}
+		else{
+			filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+		}
+
 		imgFile = new File(filePath);
 
 		if(imgFile.exists()){
@@ -180,16 +195,31 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 				break;
 			}
 			case R.id.secure_selfie_viewer_upload:{
-				
+
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-				log("Name: "+name);
-				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;						
-				log("----NEW Name: "+newPath);
-				File newFile = new File(newPath);
-				imgFile.renameTo(newFile);
-				
-				showFileChooser(newPath);		
-				
+				log("Taken picture Name: "+name);
+
+				if(profilePicture==1){
+					log("Change the picture profile");
+					String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
+					log("----NEW Name: "+newPath);
+					File newFile = new File(newPath);
+					MegaUtilsAndroid.createAvatar(imgFile, newFile);
+//					imgFile.renameTo(newFile);
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_CHANGE_AVATAR);
+					intent.putExtra("IMAGE_PATH", newFile.getAbsolutePath());
+					startActivity(intent);
+					finish();
+				}
+				else{
+					String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
+					log("----NEW Name: "+newPath);
+					File newFile = new File(newPath);
+					imgFile.renameTo(newFile);
+					log("Take picture");
+					showFileChooser(newPath);
+				}
 				break;
 			}
 			case R.id.secure_selfie_viewer_image:{
@@ -234,7 +264,7 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 	}
 	
 	public void showFileChooser(String imagePath){
-		log("showMove");
+		log("showFileChooser");
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
 		intent.putExtra("IMAGE_PATH", imagePath);
@@ -256,6 +286,10 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 			imgFile.delete();
 		}			
 		super.onBackPressed();
+	}
+
+	public static void log(String message) {
+		Util.log("SecureSelfiePreviewActivityLollipop", message);
 	}
 	
 //	@Override

@@ -48,22 +48,14 @@ public class AvatarOptionsPanelListener implements View.OnClickListener {
 //                ((ManagerActivityLollipop) context).hideContactOptionsPanel();
 //                List<MegaUser> user = new ArrayList<MegaUser>();
 //                user.add(selectedUser);
-//                ContactController cC = new ContactController(context);
-//                cC.pickFileToSend(user);
+
                 break;
             }
             case R.id.avatar_list_take_photo_layout:{
                 log("option take photo avatar");
-//                MegaUser selectedUser = ((ManagerActivityLollipop) context).getSelectedUser();
-//
-//                if(selectedUser==null){
-//                    log("The selected user is NULL");
-//                    return;
-//                }
-//                ((ManagerActivityLollipop) context).hideContactOptionsPanel();
-//                Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
-//                i.putExtra("name", selectedUser.getEmail());
-//                context.startActivity(i);
+                ((ManagerActivityLollipop) context).hideAvatarOptionsPanel();
+                AccountController aC = new AccountController(context);
+                aC.takeProfilePicture();
                 break;
             }
             case R.id.avatar_list_delete_layout:{
