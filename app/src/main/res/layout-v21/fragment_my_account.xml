@@ -99,40 +99,18 @@
 
 			</LinearLayout>
 
-			<LinearLayout
-				android:id="@+id/buttons_layout"
-				android:layout_width="fill_parent"
+			<Button
+				android:id="@+id/MK_button"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:orientation="horizontal" >
-
-				<Button
-					android:id="@+id/MK_button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textColor="@color/name_my_account"
-					android:layout_centerVertical="true"
-					android:paddingLeft="12dp"
-					android:paddingRight="12dp"
-					android:text="@string/action_export_master_key"
-					android:background="@drawable/white_rounded_corners_button"
-					android:elevation="@dimen/elevation_upgrade_low"
-					android:stateListAnimator="@anim/button_upgrade_elevation"/>
-
-				<Button
-					android:id="@+id/logout_button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textColor="@color/name_my_account"
-					android:layout_centerVertical="true"
-					android:text="@string/action_logout"
-					android:paddingLeft="12dp"
-					android:paddingRight="12dp"
-					android:background="@drawable/white_rounded_corners_button"
-					android:elevation="@dimen/elevation_upgrade_low"
-					android:stateListAnimator="@anim/button_upgrade_elevation" />
-			</LinearLayout>
+				android:textColor="@color/name_my_account"
+				android:layout_centerVertical="true"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:text="@string/action_export_master_key"
+				android:background="@drawable/white_rounded_corners_button"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation"/>
 
 			<RelativeLayout
 				android:id="@+id/my_account_account_type_layout"
@@ -279,31 +257,34 @@
 					android:visibility="invisible" />
 			</LinearLayout>
 
-			<LinearLayout
-				android:id="@+id/delete_account__layout"
+			<Button
+				android:id="@+id/logout_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:orientation="horizontal" >
+				android:textColor="@color/name_my_account"
+				android:layout_centerVertical="true"
+				android:text="@string/action_logout"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:background="@drawable/white_rounded_corners_button"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation" />
 
-				<Button
-					android:id="@+id/delete_account_button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:layout_marginRight="15dp"
-					android:paddingLeft="20dp"
-					android:paddingRight="20dp"
-					android:paddingTop="5dp"
-					android:paddingBottom="5dp"
-					android:textColor="@color/white"
-					android:layout_centerVertical="true"
-					android:text="@string/delete_account"
-					android:background="@drawable/red_rounded_corners_button"
-					android:elevation="@dimen/elevation_upgrade_low"
-					android:stateListAnimator="@anim/button_upgrade_elevation" />
-			</LinearLayout>
+			<Button
+				android:id="@+id/delete_account_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:textColor="@color/white"
+				android:layout_centerVertical="true"
+				android:text="@string/delete_account"
+				android:background="@drawable/red_rounded_corners_button"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation" />
+
+
 		</LinearLayout>
 
 		<include
