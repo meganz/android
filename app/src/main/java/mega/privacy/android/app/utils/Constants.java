@@ -24,6 +24,7 @@ public class Constants {
 	public static int SET_PIN = 1013;
 	public static int REQUEST_CODE_TREE = 1014;
 	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
+	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;

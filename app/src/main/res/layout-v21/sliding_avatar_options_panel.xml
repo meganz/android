@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_send_file" />
+                android:src="@drawable/ic_upload_pick_file" />
 
             <TextView
                 android:id="@+id/avatars_list_option_choose_photo_text"
@@ -110,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_share" />
+                android:src="@drawable/ic_camera" />
 
             <TextView
                 android:id="@+id/avatar_list_option_take_photo_text"
@@ -138,7 +138,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_share" />
+                android:src="@drawable/ic_remove" />
 
             <TextView
                 android:id="@+id/avatar_list_option_delete_text"
