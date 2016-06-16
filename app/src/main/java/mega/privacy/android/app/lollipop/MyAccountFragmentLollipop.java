@@ -84,7 +84,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView lastSession;
 	TextView connections;
 
-	LinearLayout buttonsLayout;
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
@@ -222,8 +221,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
 
-		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
@@ -241,14 +238,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		else{
 			mkButton.setText(getString(R.string.action_export_master_key));
 		}
-
-		logoutButton = (Button) v.findViewById(R.id.logout_button);
-		logoutButton.setOnClickListener(this);
-		logoutButton.setVisibility(View.VISIBLE);
-
-		LinearLayout.LayoutParams logoutButtonParams = (LinearLayout.LayoutParams)logoutButton.getLayoutParams();
-		logoutButtonParams.setMargins(Util.scaleWidthPx(18, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
-		logoutButton.setLayoutParams(logoutButtonParams);
 
 		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
 		LinearLayout.LayoutParams typeLayoutParams = (LinearLayout.LayoutParams)typeLayout.getLayoutParams();
@@ -291,11 +280,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
+		logoutButton = (Button) v.findViewById(R.id.logout_button);
+		logoutButton.setOnClickListener(this);
+		logoutButton.setVisibility(View.VISIBLE);
+
+		LinearLayout.LayoutParams logoutButtonParams = (LinearLayout.LayoutParams)logoutButton.getLayoutParams();
+		logoutButtonParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(0, outMetrics));
+		logoutButton.setLayoutParams(logoutButtonParams);
+
 		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
 		deleteAccountButton.setOnClickListener(this);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(27, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
 		typeLayout.setVisibility(View.GONE);
