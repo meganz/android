@@ -613,4 +613,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Verksamheten har inte avslutat korrekt. Kreditkortet debiteras inte.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Informationen kreditkort är inte korrekt. Kreditkortet debiteras inte.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Ditt konto kan inte uppgraderas från appen, var vänlig kontakta support@mega.nz för hjälp. </string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Lägg till kontakt och dela</string>
+    <string name="general_share" context="button">Dela</string>
+    <string name="general_remove" context="button">Radera</string>
+    <string name="general_confirm" context="button">Bekräfta</string>
+    <string name="general_leave" context="button">Lämna</string>
+    <string name="general_decryp" context="button">Dekryptera</string>
+    <string name="general_export" context="button">Exportera</string>
+    <string name="confirmation_required" context="Alert title before download">Bekräftelse krävs</string>
+    <string name="alert_larger_file" context="Alert text before download">%s kommer laddas ned. Är du säker?</string>
+    <string name="alert_no_app" context="Alert text before download">Det finns inget kompatibelt program för att öppna filen %s. Vill du fortsätta nedladdningen?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Visa inte detta igen</string>
+    <string name="lastname_text" context="Last name of the user">Efternamn</string>
+    <string name="error_general_nodes" context="Error getting the root node">Fel: Försök igen</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Visa källkod</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Lägg till ny kontakt för att börja dela </string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Internt SD kort</item>
+        <item context="external SD card option">Externt SD kort</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Fel: Mapp ej skapad</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Papperskorgen tömdes </string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Fel: Papperskorgen tömdes ej</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Ägares E-mail</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">PIN kods typ</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">4 siffrig kod</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">6 siffrig kod</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Alphanumerisk PIN</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Tom mapp</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Skickat till inbox</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Fel: Inte skickad till inboxen</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Förfrågan skickad</string>
+    <string name="sortby_creation_date" context="category in sort by action">Skapad </string>
+    <string name="sortby_modification_date" context="category in sort by action">Modifierad den</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Bjud in</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Skicka inbjudan till %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Kontaktförfrågan skickades till%s Du kan se status under fliken Skickade förfrågningar.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Var vänlig logga ut innan skapandet av kontot</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Loggning påslagen</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Loggning är avslagen</string>
 </resources>

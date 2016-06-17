@@ -277,7 +277,7 @@ public class AccountController {
 
         if (!confirmAccount){
             if(context != null)	{
-                Intent intent = new Intent(((ManagerActivityLollipop)context), TourActivityLollipop.class);
+                Intent intent = new Intent(context, TourActivityLollipop.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 ((ManagerActivityLollipop)context).startActivity(intent);
@@ -303,12 +303,7 @@ public class AccountController {
             }
         }
         else{
-            if (context != null){
-                ((ManagerActivityLollipop)context).finish();
-            }
-            else{
-                ((Activity)context).finish();
-            }
+            ((Activity)context).finish();
         }
     }
 

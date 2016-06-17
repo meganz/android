@@ -422,7 +422,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 			else{
 
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 
 			return v;
@@ -501,7 +501,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{
-					contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 				}
 //				aB.setTitle(getString(R.string.section_shared_items));
 //				log("aB.setHomeAsUpIndicator_59");
@@ -514,7 +514,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					showProgressBar();
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				};
 				aB.setTitle(infoNode.getName());
 			}						
@@ -596,11 +596,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		else{
 			if(deepBrowserTree==0){
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			else{
 				if(parentNode!=null){
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				}
 
 			}
@@ -638,11 +638,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		progressBar.setVisibility(View.GONE);
 		transferArrow.setVisibility(View.GONE);
 		if (deepBrowserTree == 0){
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 		}
 		contentTextLayout.setOnClickListener(null);
 	}
@@ -715,7 +715,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					showProgressBar();
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				adapter.setParentHandle(parentHandle);
@@ -847,7 +847,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 		}
 		else{
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
 	}
 
@@ -967,7 +967,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				showProgressBar();
 			}
 			else{
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			((ManagerActivityLollipop) context).showFabButton();
 
@@ -985,7 +985,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				showProgressBar();
 			}
 			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
 
 			if (parentNode != null){

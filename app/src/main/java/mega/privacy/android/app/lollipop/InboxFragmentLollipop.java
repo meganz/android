@@ -379,7 +379,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 			}			
 			
 			setNodes(nodes);
@@ -454,7 +454,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 			}
 			
 			setNodes(nodes);
@@ -497,7 +497,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		downloadInProgress = false;
 		progressBar.setVisibility(View.GONE);	
 		transferArrow.setVisibility(View.GONE);
-		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, (ManagerActivityLollipop)context));
+		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 		contentTextLayout.setOnClickListener(null);
 	}
 	
@@ -563,7 +563,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					showProgressBar();
 				}
 				else{
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 //				((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 				adapter.setParentHandle(parentHandle);
@@ -752,7 +752,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					showProgressBar();
 				}
 				else{
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				}
 				return 2;
 			}
