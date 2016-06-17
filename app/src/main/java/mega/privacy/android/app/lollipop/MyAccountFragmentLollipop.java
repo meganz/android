@@ -227,10 +227,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		mkButton.setVisibility(View.VISIBLE);
 
 		LinearLayout.LayoutParams mkButtonParams = (LinearLayout.LayoutParams)mkButton.getLayoutParams();
-		mkButtonParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
+		mkButtonParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
 		mkButton.setLayoutParams(mkButtonParams);
 
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 		log("Exists MK in: "+path);
 		File file= new File(path);
 		if(file.exists()){
@@ -512,7 +512,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.MK_button:{
 				log("Master Key button");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 				log("Exists MK in: "+path);
 				File file= new File(path);
 				if(file.exists()){
@@ -554,7 +554,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void updateMKButton(){
 		log("updateMKButton");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 		log("update MK Button - Exists MK in: "+path);
 		File file= new File(path);
 		if(file.exists()){

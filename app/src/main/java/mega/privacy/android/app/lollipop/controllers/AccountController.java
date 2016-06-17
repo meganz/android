@@ -79,8 +79,7 @@ public class AccountController {
         BufferedWriter out;
         try {
 
-            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-            final File f = new File(path);
+            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
             log("Export in: "+path);
             FileWriter fileWriter= new FileWriter(path);
             out = new BufferedWriter(fileWriter);
@@ -92,13 +91,50 @@ public class AccountController {
             if(mAF!=null){
                 mAF.updateMKButton();
             }
-            Util.showAlert(((ManagerActivityLollipop) context), message, "MasterKey exported!");
+            Util.showAlert(((ManagerActivityLollipop) context), message, null);
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
         }catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+//    public void updateMK(){
+//        log("updateMK");
+//
+//        String key = megaApi.exportMasterKey();
+//        BufferedWriter out;
+//        try {
+//
+//            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+//            log("Export in: "+path);
+//            FileWriter fileWriter= new FileWriter(path);
+//            out = new BufferedWriter(fileWriter);
+//            if(out==null){
+//                log("Error!!!");
+//                return;
+//            }
+//            out.write(key);
+//            out.close();
+//
+//        }catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void renameMK(){
+        log("renameMK");
+
+        final String oldPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+        File oldMKFile = new File(oldPath);
+
+        final String newPath = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+        File newMKFile = new File(newPath);
+
+        oldMKFile.renameTo(newMKFile);
     }
 
     public void copyMK(){
@@ -112,9 +148,18 @@ public class AccountController {
 
     public void removeMK() {
         log("removeMK");
-        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+        final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
         final File f = new File(path);
         f.delete();
+
+        //Check if old MK file exists
+        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+        final File fOldMK = new File(pathOldMK);
+        if(fOldMK.exists()){
+            log("The old file of MK was also removed");
+            f.delete();
+        }
+
         String message = context.getString(R.string.toast_master_key_removed);
         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
@@ -171,9 +216,17 @@ public class AccountController {
             Util.deleteFolderAndSubfolders(context, cacheDir);
         } catch (IOException e) {}
 
-        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+        final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+        final File fMKOld = new File(pathOldMK);
+        if (fMKOld.exists()){
+            log("Old MK file removed!");
+            fMKOld.delete();
+        }
+
+        final String pathMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
         final File fMK = new File(pathMK);
         if (fMK.exists()){
+            log("MK file removed!");
             fMK.delete();
         }
 
