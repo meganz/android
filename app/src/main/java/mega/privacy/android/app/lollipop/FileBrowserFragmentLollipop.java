@@ -464,7 +464,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}
 			else{
@@ -475,7 +475,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}						
 			
@@ -560,7 +560,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}
 			else{
@@ -570,7 +570,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}						
 			
@@ -1017,7 +1017,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			showProgressBar();
 		}
 		else{
-			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 		}
 		((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 		adapter.setParentHandle(parentHandle);
@@ -1209,7 +1209,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							showProgressBar();
 						}
 						else{					
-							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 						}
 						log("return 2");
 						return 2;
@@ -1279,7 +1279,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							showProgressBar();
 						}
 						else{					
-							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 						}						
 						return 2;
 					}
@@ -1444,14 +1444,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("in ROOT node");
 				MegaNode infoNode = megaApi.getRootNode();
 				if (infoNode !=  null){
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 	//				aB.setTitle(getString(R.string.section_cloud_drive));
 				}
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				if (infoNode !=  null){
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 	//				aB.setTitle(infoNode.getName());
 				}
 			}

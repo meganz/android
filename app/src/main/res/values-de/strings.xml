@@ -613,4 +613,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Die Operation ist fehlgeschlagen. Die Kreditkarte wurde nicht belastet.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Die Kreditkarteninformationen sind nicht korrekt. Die Karte wird nicht belastet.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Mit neuem Kontakt teilen</string>
+    <string name="general_share" context="button">Freigeben</string>
+    <string name="general_remove" context="button">Entfernen</string>
+    <string name="general_confirm" context="button">Bestätigung</string>
+    <string name="general_leave" context="button">Verlassen</string>
+    <string name="general_decryp" context="button">Entschlüsseln</string>
+    <string name="general_export" context="button">Exportieren</string>
+    <string name="confirmation_required" context="Alert title before download">Bestätigung erforderlich</string>
+    <string name="alert_larger_file" context="Alert text before download">%s will be downloaded. Are you sure?</string>
+    <string name="alert_no_app" context="Alert text before download">You do not have an application capable of opening the file %s. Do you want to continue with the download?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Nicht mehr anzeigen</string>
+    <string name="lastname_text" context="Last name of the user">Familienname</string>
+    <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Quellcode ansehen</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to begin sharing</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Interne SD-Karte</item>
+        <item context="external SD card option">Externe SD-Karte</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Error. Folder not created</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish Bin emptied successfully</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The Rubbish Bin was not emptied</string>
+    <string name="sortby_owner_mail" context="category in sort by action">E-Mail des Eigentümers</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">PIN-Art</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">Vierstellige PIN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">Sechsstellige PIN</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Alphanumerische PIN</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Leerer Ordner</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">In Inbox abgelegt</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Error. Not sent to Inbox</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Anfrage versandt</string>
+    <string name="sortby_creation_date" context="category in sort by action">Erstellungsdatum</string>
+    <string name="sortby_modification_date" context="category in sort by action">Änderungsdatum</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Einladen</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Contact request successfully sent to %s. You can check the status in the Sent Requests tab.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Please log out before creating the account</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logging aktiviert</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logging deaktiviert</string>
 </resources>

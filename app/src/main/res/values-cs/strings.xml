@@ -620,4 +620,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operace nebyla správně dokončena. Z platební karty nebude strženo.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Informace o platební kartě nejsou správné. Z platební karty nebude strženo.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Váš účet nemůže být upgradován z aplikace. Obraťte se na support@mega.nz kvůli upgradu vašeho účtu.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Přidat kontakt a sdílet</string>
+    <string name="general_share" context="button">Sdílet</string>
+    <string name="general_remove" context="button">Odebrat</string>
+    <string name="general_confirm" context="button">Potvrdit</string>
+    <string name="general_leave" context="button">Opustit</string>
+    <string name="general_decryp" context="button">Dešifrovat</string>
+    <string name="general_export" context="button">Exportovat</string>
+    <string name="confirmation_required" context="Alert title before download">Vyžadováno potvrzení</string>
+    <string name="alert_larger_file" context="Alert text before download">%s bude staženo. Opravdu to chcete?</string>
+    <string name="alert_no_app" context="Alert text before download">Nemáte aplikaci schopnou otevřít soubor %s. Chcete pokračovat ve stahování?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Znovu nezobrazovat</string>
+    <string name="lastname_text" context="Last name of the user">Příjmení</string>
+    <string name="error_general_nodes" context="Error getting the root node">Chyba. Zkuste to znovu.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Zobrazit zdrojový kód</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Přidat nový kontak pro zahájení sdílení</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Vnitřní karta SD</item>
+        <item context="external SD card option">Externí karta SD</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Chyba. Složka nebyla vytvořena</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Koš úspěšně vysypán</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Chyba. Koš nebyl vysypán</string>
+    <string name="sortby_owner_mail" context="category in sort by action">E-mail vlastníka</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Typ kódu PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">Čtyřčíselný PIN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">Šestičíselný PIN</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Alfanumerický PIN</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Prázdná složka</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Odesláno do složky Doručené</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Chyba. Neodesláno do sůožky Doručené</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Požadavek odeslán</string>
+    <string name="sortby_creation_date" context="category in sort by action">Datum vytvoření</string>
+    <string name="sortby_modification_date" context="category in sort by action">Datum změny</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Pozvat</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Chcete poslat pozvánku kontaktu %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Požadavek úspěšně odeslán kontaktu %s. Stav můžete zkontrolovat na kartě Odeslané požadavky.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Před vytvpřením účtu se odhlaste</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Protokoly jsou nyní povoleny</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Protokoly jsou nyní zakázány</string>
 </resources>
