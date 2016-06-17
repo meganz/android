@@ -1301,7 +1301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		if(versionApp<=49){
+		if(versionApp<=51){
 			final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
 			final File fMKOld = new File(pathOldMK);
 			if (fMKOld.exists()){
