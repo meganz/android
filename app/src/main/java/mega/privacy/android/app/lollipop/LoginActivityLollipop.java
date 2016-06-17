@@ -1400,7 +1400,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
 			}
 			else if (error.getErrorCode() == MegaError.API_ENOENT){
-				log("No account with this mail");
+				log("No account with this mail: "+error.getErrorString()+" "+error.getErrorCode());
 				Util.showAlert(this, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
 			}
 			else{
