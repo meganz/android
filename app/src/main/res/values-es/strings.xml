@@ -763,4 +763,6 @@
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Elegir foto</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Borrar foto</string>
+
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clave maestra introducida no es correcta. Por favor, pruebe otra vez.</string>
 </resources>

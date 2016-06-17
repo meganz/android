@@ -506,7 +506,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
 					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-					resetPassIntent.putExtra("RESULT", -1);
+
+					if(e.getErrorCode()==MegaError.API_EARGS){
+						resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
+					}
+					else{
+						resetPassIntent.putExtra("RESULT", -1);
+					}
+
 					startActivity(resetPassIntent);
 					finish();
 				}
