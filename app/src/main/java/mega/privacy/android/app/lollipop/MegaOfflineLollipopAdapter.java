@@ -167,7 +167,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		//Check if it's the Master Key file
 		MegaOffline currentNode = (MegaOffline) getItem(pos);
         if(currentNode.getHandle().equals("0")){
-        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			if(file.exists()){
 				notifyItemChanged(pos);
@@ -261,7 +261,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					if(!mOffList.isEmpty()) {
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
-							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 							log("Export in: "+path);
 							File file= new File(path);
 							if(file.exists()){
@@ -271,7 +271,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						}	
 					}
 					else{
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
@@ -422,7 +422,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.currentPosition = position;
 			holder.textViewFileName.setText(currentNode.getName());
 			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			long nodeSize;
 			if(file.exists()){
@@ -572,7 +572,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.currentPosition = position;
 			holder.textViewFileName.setText(currentNode.getName());
 			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			long nodeSize;
 			if(file.exists()){

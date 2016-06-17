@@ -113,7 +113,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	        int position = recyclerView.getChildPosition(view);
 	        MegaOffline currentNode = (MegaOffline) adapter.getItem(position);
 	        if(currentNode.getHandle().equals("0")){
-	        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+	        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 				File file= new File(path);
 				if(file.exists()){
 					return;
@@ -1307,7 +1307,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		//Check if the file MarterKey is exported
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 		log("Export in: "+path);
 		File file= new File(path);
 		if(file.exists()){
@@ -1345,7 +1345,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		//Check if the node is the Master Key file
         if(selectedNode.getHandle().equals("0")){
-        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			if(file.exists()){
 				optionShare.setVisibility(View.GONE);			
@@ -1508,7 +1508,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				slidingOptionsPanel.setVisibility(View.GONE);
 				
 				if(selectedNode.getHandle().equals("0")){
-		        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 					File file= new File(path);
 					if(file.exists()){
 						file.delete();	
@@ -1663,7 +1663,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			if(currentNode.getHandle().equals("0")){
 				log("click on Master Key");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 				openFile(new File(path));
 //				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
 //				((ManagerActivityLollipop)context).clickOnMasterKeyFile();

@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -92,6 +94,8 @@ public class Util {
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";
 	public static String logDIR = "MEGA/MEGA Logs";
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
+	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
+	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
 	
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
@@ -1551,6 +1555,15 @@ public class Util {
 		bld.setPositiveButton("OK",null);
 		log("Showing alert dialog: " + message);
 		bld.create().show();
+	}
+
+	public static int getVersion(Context context) {
+		try {
+			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+			return pInfo.versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			return 0;
+		}
 	}
 
 	private static void log(String message) {
