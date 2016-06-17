@@ -767,4 +767,6 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
 
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The recovery key is not correct. Please, try again.</string>
+
 </resources>
