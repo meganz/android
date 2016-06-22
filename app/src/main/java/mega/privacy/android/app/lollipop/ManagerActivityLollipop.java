@@ -6095,8 +6095,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		return;
     	}
 
+		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
+			log("slidingUploadPanel()!=PanelState.HIDDEN");
+			hideUploadPanel();
+			return;
+		}
+
+		log("Sliding UPLOAD options not shown");
+
 		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
-			log("getPanelState()!=PanelState.HIDDEN");
+			log("slidingOptionsPanel()!=PanelState.HIDDEN");
 			hideOptionsPanel();
 			return;
 		}
@@ -6111,15 +6119,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		log("Sliding CONTACT options not shown");
 
-
-		if(slidingUploadPanel.getVisibility()==View.VISIBLE){
-			hideUploadPanel();
-			return;
-		}
-
-		log("Sliding UPLOAD options not shown");
-
-		if(slidingAvatarOptionsPanel.getVisibility()==View.VISIBLE){
+		if(slidingAvatarOptionsPanel.getVisibility()==View.VISIBLE||slidingAvatarOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
 			hideAvatarOptionsPanel();
 			return;
 		}
