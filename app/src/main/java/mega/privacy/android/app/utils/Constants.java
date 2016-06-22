@@ -80,7 +80,7 @@ public class Constants {
 	public static String ACTION_RESET_PASS_FROM_PARK_ACCOUNT = "RESET_PASS_FROM_PARK_ACCOUNT";
 	public static String ACTION_CHANGE_MAIL = "CHANGE_MAIL";
 	public static String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
-
+	public static String ACTION_IPC = "IPC";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

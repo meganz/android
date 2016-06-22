@@ -316,6 +316,49 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				return;
 			}
 		}
+
+		// Pending contacts
+		if (url != null && (url.matches("^https://mega.co.nz/#fm/ipc"))||(url.matches("^https://mega.nz/#fm/ipc"))) {
+			log("pending contacts url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				log("Build.VERSION_CODES.LOLLIPOP");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+				if (dbH != null) {
+					if (dbH.getCredentials() != null) {
+						MegaNode rootNode = megaApi.getRootNode();
+						if (rootNode == null) {
+							log("Go to Login to fetch nodes");
+							Intent ipcIntent = new Intent(this, LoginActivityLollipop.class);
+							ipcIntent.setAction(Constants.ACTION_IPC);
+							startActivity(ipcIntent);
+							finish();
+
+						} else {
+							log("Logged IN");
+							Intent ipcIntent = new Intent(this, ManagerActivityLollipop.class);
+							ipcIntent.setAction(Constants.ACTION_IPC);
+							startActivity(ipcIntent);
+							finish();
+						}
+					} else {
+						log("Not logged");
+						AlertDialog.Builder builder;
+						builder = new AlertDialog.Builder(this);
+						builder.setMessage(R.string.alert_not_logged_in);
+						builder.setPositiveButton(getString(R.string.cam_sync_ok),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										finish();
+									}
+								});
+						builder.show();
+					}
+				}
+				return;
+			}
+		}
 		
 		log("wrong url");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

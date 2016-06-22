@@ -523,6 +523,9 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 						action = Constants.ACTION_EXPORT_MASTER_KEY;
 					}
+					else if (intentReceived.getAction().equals(Constants.ACTION_IPC)){
+						action = Constants.ACTION_IPC;
+					}
 
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){

@@ -1480,6 +1480,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							showConfirmationResetPassword(link);
 						}
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
+						log("IPC link - go to received request in Contacts");
+						drawerItem=DrawerItem.CONTACTS;
+						indexContacts=2;
+						selectDrawerItemLollipop(drawerItem);
+					}
 				}
 	        }
 
@@ -3053,21 +3059,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					textViewSent.setGravity(Gravity.CENTER);
 					textViewReceived.setGravity(Gravity.CENTER);
 
+					log("The index of the TAB CONTACTS is: " + indexContacts);
 					if(indexContacts!=-1) {
-						log("The index of the TAB CONTACTS is: " + indexContacts);
 						if (viewPagerContacts != null) {
 							switch (indexContacts){
-								case 0:{
-									viewPagerContacts.setCurrentItem(0);
-									log("Select Contacts TAB");
-									textViewContacts.setTypeface(null, Typeface.BOLD);
-									textViewSent.setTypeface(null, Typeface.NORMAL);
-									textViewReceived.setTypeface(null, Typeface.NORMAL);
-									textViewContacts.setTextColor(getResources().getColor(R.color.white));
-									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
-									textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
-									break;
-								}
 								case 1:{
 									viewPagerContacts.setCurrentItem(1);
 									log("Select Sent Requests TAB");
@@ -3088,6 +3083,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
 									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
 									textViewReceived.setTextColor(getResources().getColor(R.color.white));
+									break;
+								}
+								default:{
+									viewPagerContacts.setCurrentItem(0);
+									log("Select Contacts TAB");
+									textViewContacts.setTypeface(null, Typeface.BOLD);
+									textViewSent.setTypeface(null, Typeface.NORMAL);
+									textViewReceived.setTypeface(null, Typeface.NORMAL);
+									textViewContacts.setTextColor(getResources().getColor(R.color.white));
+									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
 									break;
 								}
 							}
@@ -3112,6 +3118,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				sharesTag = getFragmentTag(R.id.contact_tabs_pager, 2);
     				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
+					if(indexContacts!=-1) {
+						log("The index of the TAB CONTACTS is: " + indexContacts);
+						if (viewPagerContacts != null) {
+							switch (indexContacts) {
+
+								case 1: {
+									viewPagerContacts.setCurrentItem(1);
+									log("Select Sent Requests TAB");
+									textViewContacts.setTypeface(null, Typeface.NORMAL);
+									textViewSent.setTypeface(null, Typeface.BOLD);
+									textViewReceived.setTypeface(null, Typeface.NORMAL);
+									textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewSent.setTextColor(getResources().getColor(R.color.white));
+									textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									break;
+								}
+								case 2: {
+									viewPagerContacts.setCurrentItem(2);
+									log("Select Received Request TAB");
+									textViewContacts.setTypeface(null, Typeface.NORMAL);
+									textViewSent.setTypeface(null, Typeface.NORMAL);
+									textViewReceived.setTypeface(null, Typeface.BOLD);
+									textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewReceived.setTextColor(getResources().getColor(R.color.white));
+									break;
+								}
+								default: {
+									viewPagerContacts.setCurrentItem(0);
+									log("Select Contacts TAB");
+									textViewContacts.setTypeface(null, Typeface.BOLD);
+									textViewSent.setTypeface(null, Typeface.NORMAL);
+									textViewReceived.setTypeface(null, Typeface.NORMAL);
+									textViewContacts.setTextColor(getResources().getColor(R.color.white));
+									textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+									break;
+								}
+							}
+						}
+					}
     			}
 
     			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
@@ -11471,36 +11518,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		ManagerActivityLollipop.drawerItem = drawerItem;
 	}
 
-	public int getIndexCloud(){
+	public int getTabItemCloud(){
 		if(viewPagerCDrive!=null){
 			return viewPagerCDrive.getCurrentItem();
 		}
 		return -1;
 	}
 
-	public int getIndexShares(){
+	public int getTabItemShares(){
 		if(viewPagerShares!=null){
 			return viewPagerShares.getCurrentItem();
 		}
 		return -1;
 	}
 
-	public int getIndexContacts(){
+	public int getTabItemContacts(){
 		if(viewPagerContacts!=null){
 			return viewPagerContacts.getCurrentItem();
 		}
 		return -1;
 	}
 
-	public void setIndexCloud(int index){
+	public void setTabItemCloud(int index){
 		viewPagerCDrive.setCurrentItem(index);
 	}
 
-	public void setIndexShares(int index){
+	public void setTabItemShares(int index){
 		viewPagerShares.setCurrentItem(index);
 	}
 
-	public void setIndexContacts(int index){
+	public void setTabItemContacts(int index){
 		viewPagerContacts.setCurrentItem(index);
 	}
 
@@ -11554,7 +11601,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
 				log("Cloud Drive SECTION");
-				int indexCloud = getIndexCloud();
+				int indexCloud = getTabItemCloud();
 				switch(indexCloud){
 					case 0:{
 						log("cloud TAB");
@@ -11575,7 +11622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case SHARED_ITEMS:{
 				log("Shared Items SECTION");
-				int indexShares = getIndexShares();
+				int indexShares = getTabItemShares();
 				switch(indexShares){
 					case 0:{
 						log("INCOMING TAB");
@@ -11639,7 +11686,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case CONTACTS:{
-				int indexContacts = getIndexContacts();
+				int indexContacts = getTabItemContacts();
 				switch(indexContacts){
 					case 0:
 					case 1:{
