@@ -460,8 +460,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		if (node.isFolder()) {
 			holder.transferProgressBar.setVisibility(View.GONE);		
-			holder.textViewFileSize.setVisibility(View.VISIBLE);			
-			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			holder.textViewFileSize.setVisibility(View.VISIBLE);
+
+			if(type==Constants.FOLDER_LINK_ADAPTER){
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+			}else{
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			}
 			
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
@@ -778,7 +783,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.transferProgressBar.setVisibility(View.GONE);		
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
-			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			if(type==Constants.FOLDER_LINK_ADAPTER){
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+			}else{
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			}
 			
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
