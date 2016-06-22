@@ -85,12 +85,12 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
 
                 drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
                 if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
-                    if(((ManagerActivityLollipop) context).getIndexShares()==0){
+                    if(((ManagerActivityLollipop) context).getTabItemShares()==0){
                         i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
                     }
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
-                    if(((ManagerActivityLollipop) context).getIndexShares()==0){
+                    if(((ManagerActivityLollipop) context).getTabItemShares()==0){
                         i.putExtra("from", FilePropertiesActivityLollipop.FROM_INBOX);
                     }
                 }
