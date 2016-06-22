@@ -769,4 +769,6 @@
 
     <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The recovery key is not correct. Please, try again.</string>
 
+    <string name="camera_uploads_empty" context="Text that indicates that no picture has been uploaded to the Camera Uploads section">No pictures uploaded</string>
+
 </resources>

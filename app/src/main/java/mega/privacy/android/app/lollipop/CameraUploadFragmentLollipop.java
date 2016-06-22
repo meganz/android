@@ -599,11 +599,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.media_empty_image);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			emptyTextView.setText(R.string.camera_uploads_empty);
 			
 			emptyImageView.setVisibility(View.VISIBLE);			
-			emptyTextView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 			
 			if (megaApi.getRootNode() == null){
@@ -769,11 +769,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.media_empty_image);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			emptyTextView.setText(R.string.camera_uploads_empty);
 			
 			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 			
 			if (megaApi.getRootNode() == null){
@@ -1640,9 +1640,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						listView.setVisibility(View.GONE);
 					}					
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.GONE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextView.setVisibility(View.VISIBLE);
 				}
 				else{
 					if (listView != null){
@@ -1848,7 +1846,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				Toast.makeText(context, context.getString(R.string.camera_uploads_created), Toast.LENGTH_LONG).show();
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyImageView.setOnClickListener(this);
-				emptyTextView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 		}
