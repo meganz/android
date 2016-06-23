@@ -256,8 +256,7 @@
 	<string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string>
 
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Añade un nuevo contacto para compartir</string>
-	
-	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
+
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link sin clave de cifrado</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Clave de cifrado</string>
 	    
@@ -755,5 +754,5 @@
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Cambiar email</string>
 
     <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Tu correo eléctrónico ha sido correctamente actualizado.</string>
-
+    <string name="option_full_link" context="Alert Dialog to get link">Link con clave de cifrado</string>
 </resources>

@@ -580,6 +580,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proLiteMonthly;
 	        		}
             	}
+				log("PRO LITE MONTHLY (JSON): __*" + proLiteMonthly.getOriginalJson() + "*__");
         	}
 
             if (proLiteYearly != null){
@@ -589,6 +590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proLiteYearly;
 	        		}
             	}
+				log("PRO LITE ANNUALY (JSON): __*" + proLiteYearly.getOriginalJson() + "*__");
         	}
 
             if (proIMonthly != null){
@@ -598,6 +600,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIMonthly;
 	        		}
             	}
+				log("PRO I MONTHLY (JSON): __*" + proIMonthly.getOriginalJson() + "*__");
         	}
 
             if (proIYearly != null){
@@ -607,6 +610,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIYearly;
 	        		}
             	}
+				log("PRO I ANNUALY (JSON): __*" + proIYearly.getOriginalJson() + "*__");
         	}
 
             if (proIIMonthly != null){
@@ -616,6 +620,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIMonthly;
 	        		}
             	}
+				log("PRO II MONTHLY (JSON): __*" + proIIMonthly.getOriginalJson() + "*__");
             }
 
             if (proIIYearly != null){
@@ -625,6 +630,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIYearly;
 	        		}
             	}
+				log("PRO II ANNUALY (JSON): __*" + proIIYearly.getOriginalJson() + "*__");
         	}
 
             if (proIIIMonthly != null){
@@ -634,6 +640,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIIMonthly;
 	        		}
             	}
+				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
             }
 
             if (proIIIYearly != null){
@@ -643,9 +650,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIIYearly;
 	        		}
             	}
+				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
         	}
 
             inventoryFinished = true;
+
+			log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; ACCOUNTDETAILSFINISHED: " + accountDetailsFinished);
 
             if (accountDetailsFinished){
             	if (levelInventory > levelAccountDetails){
@@ -9506,6 +9516,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 				}
+
+				log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
 
 				if (inventoryFinished){
 					if (levelAccountDetails < levelInventory){

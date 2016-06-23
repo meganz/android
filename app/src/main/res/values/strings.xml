@@ -260,8 +260,7 @@
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 	
 	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
-	
-	<string name="option_full_link" context="Alert Dialog to get link">Full link</string>
+
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
 	
@@ -759,4 +758,5 @@
 
     <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Your email has been correctly updated.</string>
 
+    <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
 </resources>
