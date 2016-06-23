@@ -8290,6 +8290,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showAvatarOptionsPanel() {
 		log("showAvatarOptionsPanel");
+		if(aC.existsAvatar()){
+			optionAvatarDelete.setVisibility(View.VISIBLE);
+		}
+		else{
+			optionAvatarDelete.setVisibility(View.GONE);
+		}
 		slidingAvatarOptionsPanel.setVisibility(View.VISIBLE);
 		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 	}

@@ -92,6 +92,26 @@ public class AccountController {
         ((ManagerActivityLollipop)context).startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
     }
 
+    public boolean existsAvatar(){
+        MegaUser myContact = ((ManagerActivityLollipop)context).getContact();
+        String myEmail = myContact.getEmail();
+        if(myEmail!=null){
+            File avatar = null;
+            if (context.getExternalCacheDir() != null){
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+            }
+            else{
+                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+            }
+
+            if (avatar.exists()) {
+                log("avatar exists in: " + avatar.getAbsolutePath());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void removeAvatar(){
         log("removeAvatar");
 
