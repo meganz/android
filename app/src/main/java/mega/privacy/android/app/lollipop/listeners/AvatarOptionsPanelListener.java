@@ -34,7 +34,7 @@ public class AvatarOptionsPanelListener implements View.OnClickListener {
         log("onClick AvatarOptionsPanelListener");
 
         switch(v.getId()){
-            case R.id.contact_list_out_options:{
+            case R.id.avatar_list_out_options:{
                 log("contact_list_out_options");
                 ((ManagerActivityLollipop) context).hideAvatarOptionsPanel();
                 break;
