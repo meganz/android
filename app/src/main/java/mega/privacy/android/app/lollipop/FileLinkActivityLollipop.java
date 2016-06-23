@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -25,10 +27,14 @@ import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -66,12 +72,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	Toolbar tB;
     ActionBar aB;
-	
+	DisplayMetrics outMetrics;
 	String url;
-	
+	Handler handler;
 	ProgressDialog statusDialog;
-	
-    RelativeLayout fragmentContainer;
+	AlertDialog decryptionKeyDialog;
+
+	RelativeLayout fragmentContainer;
 	ImageView iconView;
 	TextView nameView;
 	RelativeLayout nameLayout;
@@ -103,7 +110,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		super.onCreate(savedInstanceState);
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 		
@@ -228,17 +235,107 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		Intent intent = getIntent();
 		if (intent != null){
-			url = intent.getDataString();		
-		}
-		
-		if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+			url = intent.getDataString();
+
 			try{
 				statusDialog.dismiss();
 			}
 			catch(Exception e){	}
-			
-			importLink(url);
-		}	
+
+			int counter = url.split("!").length - 1;
+			log("Counter !: "+counter);
+			if(counter<2){
+				//Ask for decryption key
+				log("Ask for decryption key");
+				askForDecryptionKeyDialog();
+			}
+			else{
+				//Decryption key included!
+				if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+					log("link ok, call to import link");
+					importLink(url);
+				}
+			}
+		}
+	}
+
+	public void askForDecryptionKeyDialog(){
+		log("askForDecryptionKeyDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.alert_decryption_key));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					url=url+value;
+					importLink(url);
+					decryptionKeyDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.alert_decryption_key));
+		builder.setMessage(getString(R.string.message_decryption_key));
+		builder.setPositiveButton(getString(R.string.general_decryp),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						url=url+value;
+						importLink(url);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						finish();
+					}
+				});
+		builder.setView(layout);
+		decryptionKeyDialog = builder.create();
+		decryptionKeyDialog.show();
+	}
+
+	private void showKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
+		handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
 	}
 
 	@Override
