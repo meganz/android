@@ -596,6 +596,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proLiteMonthly;
 	        		}
             	}
+				log("PRO LITE MONTHLY (JSON): __*" + proLiteMonthly.getOriginalJson() + "*__");
         	}
 
             if (proLiteYearly != null){
@@ -605,6 +606,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proLiteYearly;
 	        		}
             	}
+				log("PRO LITE ANNUALY (JSON): __*" + proLiteYearly.getOriginalJson() + "*__");
         	}
 
             if (proIMonthly != null){
@@ -614,6 +616,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIMonthly;
 	        		}
             	}
+				log("PRO I MONTHLY (JSON): __*" + proIMonthly.getOriginalJson() + "*__");
         	}
 
             if (proIYearly != null){
@@ -623,6 +626,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIYearly;
 	        		}
             	}
+				log("PRO I ANNUALY (JSON): __*" + proIYearly.getOriginalJson() + "*__");
         	}
 
             if (proIIMonthly != null){
@@ -632,6 +636,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIMonthly;
 	        		}
             	}
+				log("PRO II MONTHLY (JSON): __*" + proIIMonthly.getOriginalJson() + "*__");
             }
 
             if (proIIYearly != null){
@@ -641,6 +646,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIYearly;
 	        		}
             	}
+				log("PRO II ANNUALY (JSON): __*" + proIIYearly.getOriginalJson() + "*__");
         	}
 
             if (proIIIMonthly != null){
@@ -650,6 +656,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIIMonthly;
 	        		}
             	}
+				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
             }
 
             if (proIIIYearly != null){
@@ -659,9 +666,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			maxP = proIIIYearly;
 	        		}
             	}
+				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
         	}
 
             inventoryFinished = true;
+
+			log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; ACCOUNTDETAILSFINISHED: " + accountDetailsFinished);
 
             if (accountDetailsFinished){
             	if (levelInventory > levelAccountDetails){
@@ -1124,7 +1134,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			orderContacts = megaApi.ORDER_DEFAULT_ASC;
 			orderOthers = megaApi.ORDER_DEFAULT_ASC;
 		}
-
 		getOverflowMenu();
 
 		handler = new Handler();
@@ -1335,6 +1344,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
 
         dbH.setAttrOnline(true);
+
+		///Check the MK file
+		int versionApp = Util.getVersion(this);
+		log("-------------------Version app: "+versionApp);
+		if(versionApp<=51){
+			final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+			final File fMKOld = new File(pathOldMK);
+			if (fMKOld.exists()){
+				log("Old MK file need to be renamed!");
+				aC.renameMK();
+			}
+		}
 
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
@@ -4328,7 +4349,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					logoutMenuItem.setVisible(true);
 					forgotPassMenuItem.setVisible(true);
 
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 					log("Exists MK in: "+path);
 					File file= new File(path);
 					if(file.exists()){
@@ -5900,30 +5921,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        case R.id.action_menu_remove_MK:{
 				log("remove MK option selected");
 				showConfirmationRemoveMK();
-//	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-//				    @Override
-//				    public void onClick(DialogInterface dialog, int which) {
-//				        switch (which){
-//				        case DialogInterface.BUTTON_POSITIVE:
-//
-//							final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-//							final File f = new File(path);
-//				        	f.delete();
-//				        	removeMK.setVisible(false);
-//				        	exportMK.setVisible(true);
-//				            break;
-//
-//				        case DialogInterface.BUTTON_NEGATIVE:
-//				            //No button clicked
-//				            break;
-//				        }
-//				    }
-//				};
-//
-//				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getString(R.string.confirmation_alert));
-//				builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
-//				    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 				return true;
 	        }
 	        case R.id.action_menu_export_MK:{
@@ -5931,53 +5928,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if(maFLol!=null){
 					maFLol.showMKLayout();
 				}
-
-//	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-//				    @Override
-//				    public void onClick(DialogInterface dialog, int which) {
-//				        switch (which){
-//				        case DialogInterface.BUTTON_POSITIVE:
-//				        	String key = megaApi.exportMasterKey();
-//
-//							BufferedWriter out;
-//							try {
-//
-//								final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-//								final File f = new File(path);
-//								log("Export in: "+path);
-//								FileWriter fileWriter= new FileWriter(path);
-//								out = new BufferedWriter(fileWriter);
-//								out.write(key);
-//								out.close();
-//								String message = getString(R.string.toast_master_key) + " " + path;
-////				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
-//
-//				    			showAlert(message, "MasterKey exported!");
-//								removeMK.setVisible(true);
-//					        	exportMK.setVisible(false);
-//
-//							}catch (FileNotFoundException e) {
-//							 e.printStackTrace();
-//							}catch (IOException e) {
-//							 e.printStackTrace();
-//							}
-//
-//				            break;
-//
-//				        case DialogInterface.BUTTON_NEGATIVE:
-//				            //No button clicked
-//				            break;
-//				        }
-//				    }
-//				};
-//
-//				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getString(R.string.confirmation_alert));
-//				builder.setMessage(R.string.export_key_confirmation);
-//				builder.setPositiveButton(R.string.general_yes, dialogClickListener);
-//				builder.setNegativeButton(R.string.general_no, dialogClickListener);
-//				AlertDialog dialog = builder.create();
-//				dialog.show();
 	        	return true;
 	        }
 	        case R.id.action_menu_logout:{
@@ -9654,24 +9604,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				if(name && firstName){
 					log("Name and First Name received!");
-					String fullName;
-					if (firstNameText.trim().length() <= 0){
-						fullName = lastNameText;
-					}
-					else{
-						fullName = firstNameText + " " + lastNameText;
-					}
-					if (fullName.trim().length() > 0){
-						nVDisplayName.setText(firstNameText+" "+lastNameText);
-						name= false;
-						firstName = false;
 
-						String firstLetter = fullName.charAt(0) + "";
-				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				    	nVPictureProfileTextView.setText(firstLetter);
-				    	nVPictureProfileTextView.setTextSize(32);
-				    	nVPictureProfileTextView.setTextColor(Color.WHITE);
-					}
+					updateUserNameNavigationView(firstNameText, lastNameText);
+
 					name= false;
 					firstName = false;
 
@@ -9816,6 +9751,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 				}
+
+				log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
 
 				if (inventoryFinished){
 					if (levelAccountDetails < levelInventory){
@@ -11580,8 +11517,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		firstNameText= firstName;
 		lastNameText = lastName;
 		String fullName = firstNameText + " " + lastNameText;
+		if (fullName.trim().length() <= 0){
+			log("Put email as fullname");
+			String email = contact.getEmail();
+			String[] splitEmail = email.split("[@._]");
+			fullName = splitEmail[0];
+		}
+
 		if (fullName.trim().length() > 0){
-			nVDisplayName.setText(firstNameText+" "+lastNameText);
+			log("FullName ok");
+			nVDisplayName.setText(fullName);
 
 			String firstLetter = fullName.charAt(0) + "";
 			firstLetter = firstLetter.toUpperCase(Locale.getDefault());

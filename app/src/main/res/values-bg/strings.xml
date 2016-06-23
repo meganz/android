@@ -613,4 +613,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Операцията не е завършила правилно. Кредитната карта няма да бъде таксувана.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Информацията за кредитната карта не е правилна. Кредитната карта няма да бъде таксувана.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Вашият профил не може да бъде надстроен от приложението. Моля, свържете се с support@mega.nz за да надстроите профила си.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Добави контакт и сподели</string>
+    <string name="general_share" context="button">Сподели</string>
+    <string name="general_remove" context="button">Изтрий</string>
+    <string name="general_confirm" context="button">Потвърди</string>
+    <string name="general_leave" context="button">Остави</string>
+    <string name="general_decryp" context="button">Разшифровай</string>
+    <string name="general_export" context="button">Експортирай</string>
+    <string name="confirmation_required" context="Alert title before download">Изисква се Потвърждение</string>
+    <string name="alert_larger_file" context="Alert text before download">%s ще бъде изтеглен. Сигурен ли сте?</string>
+    <string name="alert_no_app" context="Alert text before download">Нямате приложение, което може да отвори файла %s. Искате ли да продължите с изтеглянето?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Не показвай отново</string>
+    <string name="lastname_text" context="Last name of the user">Фамилия</string>
+    <string name="error_general_nodes" context="Error getting the root node">Грешка. Моля, опитайте отново.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Виж изходния код</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Добави нов контакт за да започнеш споделяне</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Вътрешна SD карта</item>
+        <item context="external SD card option">Външна SD карта</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Грешка. Папката не беше създадена</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Кошчето беше изпразнено успешно</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Грешка. Кошчето не беше изпразнено</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Имейл на Притежателя</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Тип PIN Код</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">4 цифрен PIN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">6 цифрен PIN</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Буквено-числов PIN</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Празна папка</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Изпратен във Входящи</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Грешка. Не беше изпратено във Входящи </string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Заявката е изпратена</string>
+    <string name="sortby_creation_date" context="category in sort by action">Дата на Създаване</string>
+    <string name="sortby_modification_date" context="category in sort by action">Дата на промяна</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Покани</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Искате ли да изпратите покана до %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Поканата за контакт беше изпратена успешно на %s. Можете да проверите състоянието в раздела Изпратени покани.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Моля, излезте, преди създаване на профил</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Логовете сега са включени</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Логовете сега са изключени</string>
 </resources>

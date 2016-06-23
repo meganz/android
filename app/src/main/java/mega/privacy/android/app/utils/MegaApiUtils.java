@@ -120,6 +120,39 @@ public class MegaApiUtils {
         return info;
     }
 
+    public static String getInfoFolder(MegaNode n, Context context, MegaApiAndroid megaApi) {
+        log("getInfoFolder with megaApi");
+        if(megaApi==null){
+            return "";
+        }
+
+        int numFolders = megaApi.getNumChildFolders(n);
+        int numFiles = megaApi.getNumChildFiles(n);
+        log("numFolders, numFiles: "+numFolders+ " " + numFiles);
+        String info = "";
+        if (numFolders > 0) {
+            info = numFolders
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_folders, numFolders);
+            if (numFiles > 0) {
+                info = info
+                        + ", "
+                        + numFiles
+                        + " "
+                        + context.getResources().getQuantityString(
+                        R.plurals.general_num_files, numFiles);
+            }
+        } else {
+            info = numFiles
+                    + " "
+                    + context.getResources().getQuantityString(
+                    R.plurals.general_num_files, numFiles);
+        }
+
+        return info;
+    }
+
     /*
  * If there is an application that can manage the Intent, returns true. Otherwise, false.
  */

@@ -620,4 +620,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Operaţia a eşuat. Nu ţi se va retrage nicio sumă de pe cardul de credit.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Informaţiile cardului de credit nu sunt corecte. Nu ţi se va retrage nicio sumă de pe cardul de credit.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Contul tău nu poate fi upgradat din aplicaţie. Te rugăm să contactezi support@mega.nz pentru a upgrada contul.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Adaugă un contact şi partajează</string>
+    <string name="general_share" context="button">Partajează</string>
+    <string name="general_remove" context="button">Elimină</string>
+    <string name="general_confirm" context="button">Confirmă</string>
+    <string name="general_leave" context="button">Părăseşte</string>
+    <string name="general_decryp" context="button">Decriptează</string>
+    <string name="general_export" context="button">Exportă</string>
+    <string name="confirmation_required" context="Alert title before download">Confirmare necesară</string>
+    <string name="alert_larger_file" context="Alert text before download">%s va fii descărcat. Eşti sigur?</string>
+    <string name="alert_no_app" context="Alert text before download">Nu ai o aplicaţie capabilă de a deschide fişierul %s. Doreşti să continui cu descărcarea?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Nu afişa din nou</string>
+    <string name="lastname_text" context="Last name of the user">Nume</string>
+    <string name="error_general_nodes" context="Error getting the root node">Eroate. Te rugăm să încerci din nou.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Vezi codul sursă</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Adaugă un contact nou pentru a începe să partajezi</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Card SD intern</item>
+        <item context="external SD card option">Card SD extern</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Eroare. Folderul nu a fost creat</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Coşul de gunoi golit cu succes</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Eroare. Coşul de gunoi nu a fost golit</string>
+    <string name="sortby_owner_mail" context="category in sort by action">E-mailul proprietarului</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Tipul codului PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">PIN de 4 cifre</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">PIN de 6 cifre</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alfanumeric</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Folder gol</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Trimis în Mesaje primite.</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Eroare. Nu a fost trimis în Mesaje primite</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Cerere trimisă</string>
+    <string name="sortby_creation_date" context="category in sort by action">Data creării</string>
+    <string name="sortby_modification_date" context="category in sort by action">Data modificării</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invită</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Doreşti să trimiţi o invitaţie la %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Cererea de contact trimisă cu succes la %s. Poţi verifica starea în fila Cereri trimise.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Te rugăm să te deconectezi înainte de a crea contul</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Jurnalele sunt acum activate</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Jurnalele sunt acum dezactivate</string>
 </resources>
