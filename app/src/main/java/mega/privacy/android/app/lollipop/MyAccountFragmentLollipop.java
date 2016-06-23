@@ -618,8 +618,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void updateNameView(){
 		log("updateNameView");
+
+		String fullName = firstNameText + " " + lastNameText;
+		if (fullName.trim().length() <= 0){
+			log("Put email as fullname");
+			String email = myEmail;
+			String[] splitEmail = email.split("[@._]");
+			fullName = splitEmail[0];
+		}
+
 		if (nameView != null){
-			nameView.setText(firstNameText+" "+lastNameText);
+			nameView.setText(fullName);
 
 		}
 		File avatar = null;
@@ -631,9 +640,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		boolean setInitialByMail = false;
 		if (!avatar.exists()){
-			if (firstNameText != null){
-				if (firstNameText.length() > 0){
-					String firstLetter = firstNameText.charAt(0) + "";
+			if (fullName != null){
+				if (fullName.length() > 0){
+					String firstLetter = fullName.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
 					initialLetter.setTextSize(40);
@@ -663,7 +672,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public void updateMailView(String newMail){
-		log("updateNameView: "+newMail);
+		log("updateMailView: "+newMail);
 		myEmail=newMail;
 		if (newMail != null){
 			infoEmail.setText(newMail);

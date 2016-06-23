@@ -9410,18 +9410,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				if(name && firstName){
 					log("Name and First Name received!");
-					String fullName = firstNameText + " " + lastNameText;
-					if (fullName.trim().length() > 0){
-						nVDisplayName.setText(firstNameText+" "+lastNameText);
-						name= false;
-						firstName = false;
+					updateUserNameNavigationView(firstNameText, lastNameText);
 
-						String firstLetter = fullName.charAt(0) + "";
-				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				    	nVPictureProfileTextView.setText(firstLetter);
-				    	nVPictureProfileTextView.setTextSize(32);
-				    	nVPictureProfileTextView.setTextColor(Color.WHITE);
-					}
 					name= false;
 					firstName = false;
 
@@ -11282,8 +11272,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		firstNameText= firstName;
 		lastNameText = lastName;
 		String fullName = firstNameText + " " + lastNameText;
+		if (fullName.trim().length() <= 0){
+			log("Put email as fullname");
+			String email = contact.getEmail();
+			String[] splitEmail = email.split("[@._]");
+			fullName = splitEmail[0];
+		}
+
 		if (fullName.trim().length() > 0){
-			nVDisplayName.setText(firstNameText+" "+lastNameText);
+			log("FullName ok");
+			nVDisplayName.setText(fullName);
 
 			String firstLetter = fullName.charAt(0) + "";
 			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
