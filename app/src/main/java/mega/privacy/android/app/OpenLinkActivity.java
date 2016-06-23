@@ -53,7 +53,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		log("url " + url);
 		
 		// Download link
-		if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+		if (url != null && (url.matches("^https://mega.co.nz/#!.+$") || url.matches("^https://mega.nz/#!.+$"))) {
 			log("open link url");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				log("Build.VERSION_CODES.LOLLIPOP");
@@ -67,12 +67,16 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			}
 			else{
 //				Intent openIntent = new Intent(this, ManagerActivity.class);
-				Intent openFileIntent = new Intent(this, FileLinkActivity.class);
-				openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
-				openFileIntent.setData(Uri.parse(url));
-				startActivity(openFileIntent);
-				finish();
+				log("NOT lollipop");
+				if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+					log("link with decrytion key");
+					Intent openFileIntent = new Intent(this, FileLinkActivity.class);
+					openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+					openFileIntent.setData(Uri.parse(url));
+					startActivity(openFileIntent);
+					finish();
+				}
 			}
 			return;
 		}
