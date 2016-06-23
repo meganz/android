@@ -606,13 +606,6 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
-		
-		if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
-				log("add contact");
-			}
-		}
 	}
 
 	@Override

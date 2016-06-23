@@ -256,8 +256,7 @@
 	<string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string>
 
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Añade un nuevo contacto para compartir</string>
-	
-	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
+
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link sin clave de cifrado</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Clave de cifrado</string>
 	    
@@ -767,4 +766,7 @@
     <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clave maestra introducida no es correcta. Por favor, pruebe otra vez.</string>
 
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Ninguna imagen subida</string>
+
+    <string name="option_full_link" context="Alert Dialog to get link">Link con clave de cifrado</string>
+
 </resources>

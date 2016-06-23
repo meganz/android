@@ -430,7 +430,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}			
 			return v;
 		}
@@ -505,7 +505,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{
-					contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 				}
 			}
 			else{
@@ -514,7 +514,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					showProgressBar();
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}				
 				aB.setTitle(infoNode.getName());
 			}						
@@ -563,7 +563,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			showProgressBar();
 		}
 		else{					
-			contentText.setText(MegaApiUtils.getInfoFolder(n, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 		}
 		
 		adapter.setParentHandle(parentHandle);
@@ -651,11 +651,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		progressBar.setVisibility(View.GONE);	
 		transferArrow.setVisibility(View.GONE);
 		if (deepBrowserTree == 0){
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 		}
 		contentTextLayout.setOnClickListener(null);
 	}
@@ -726,7 +726,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					showProgressBar();
 				}
 				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 
 				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentHandle);
@@ -1045,7 +1045,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				showProgressBar();
 			}
 			else{
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			
 			recyclerView.setVisibility(View.VISIBLE);
@@ -1064,7 +1064,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				showProgressBar();
 			}
 			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
 			
 			if (parentNode != null){

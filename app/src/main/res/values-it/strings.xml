@@ -611,5 +611,45 @@
     <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account aggiornato con successo!</string>
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">L\'operazione non è terminata correttamente. Non sarà addebitato sulla carta di credito.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">I dati della carta di credito non sono corretto. Non sarà addebitato sulla carta di credito.</string>
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Il tuo account non può essere aggiornato dall\'app. Per favore, contatta support@mega.nz per aggiornare il tuo account.</string>
+    <string name="not_upgrade_is_possible" context="Message shown when the user wnts to upgrade an account that cannot be upgraded">Il tuo account non può essere aggiornato dall\'app. Per favore, contatta support@mega.nz per aggiornare il tuo account.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Aggiungi un contatto e condividi</string>
+    <string name="general_share" context="button">Condividi</string>
+    <string name="general_remove" context="button">Rimuovi</string>
+    <string name="general_confirm" context="button">Conferma</string>
+    <string name="general_leave" context="button">Lascia</string>
+    <string name="general_decryp" context="button">Decritta</string>
+    <string name="general_export" context="button">Esporta</string>
+    <string name="confirmation_required" context="Alert title before download">Conferma richiesta</string>
+    <string name="alert_larger_file" context="Alert text before download">%s sarà scaricato. Sei sicuro?</string>
+    <string name="alert_no_app" context="Alert text before download">Non hai nessuna applicazione capace di aprire il file %s. Vuoi continuare il download lo stesso?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Non visualizzare più</string>
+    <string name="lastname_text" context="Last name of the user">Cognome</string>
+    <string name="error_general_nodes" context="Error getting the root node">Errore. Per favore, riprova.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Vedi codice sorgente</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Aggiungi un nuovo contatto per iniziare a condividere</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">SD interna</item>
+        <item context="external SD card option">SD esterna</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Errore. Cartella non creata</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Cestino pulisto con successo</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Errore. Il Cestino non è stato svuotato</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Email del proprietario</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Tipo del PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">PIN a 4 cifre</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">PIN a 6 cifre</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alfanumerico</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Cartella vuota</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Invia alla Posta in arrivo</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Errore. Non inviata nella Posta in arrivo</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Richiesta inviata</string>
+    <string name="sortby_creation_date" context="category in sort by action">Data di creazione</string>
+    <string name="sortby_modification_date" context="category in sort by action">Data di modifica</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invita</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Vuoi inviare in invito a %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Richiesta di contatto inviata con successo a %s. Puoi controllare lo stato della richiesta nella sezione Richieste Inviate.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Per favore esci prima di creare l\'account</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">I log ora sono attivati</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">I log ora sono disattivati</string>
 </resources>

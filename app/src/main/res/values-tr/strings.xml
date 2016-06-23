@@ -613,4 +613,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">İşlem doğru bir şekilde bitmedi. Kredi kartından ödeme alınmayacaktır.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Kredi kartı bilgileri doğru değil. Kredi kartından ödeme alınmayacaktır.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Hesabınız uygulama üzerinden yükseltilemez. Hesabınızı yükseltmek için support@mega.nz ile irtibata geçiniz.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Kişi ekle ve paylaş</string>
+    <string name="general_share" context="button">Paylaş</string>
+    <string name="general_remove" context="button">Sil</string>
+    <string name="general_confirm" context="button">Onayla</string>
+    <string name="general_leave" context="button">Ayrıl</string>
+    <string name="general_decryp" context="button">Şifre çöz</string>
+    <string name="general_export" context="button">Dışa aktar</string>
+    <string name="confirmation_required" context="Alert title before download">Onay gerekli</string>
+    <string name="alert_larger_file" context="Alert text before download">%s indirilecektir. Emin misiniz?</string>
+    <string name="alert_no_app" context="Alert text before download">%s dosyasını açabilecek uygulama şu anda yüklü değil. İndirmeye devam et?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Tekrar gösterme</string>
+    <string name="lastname_text" context="Last name of the user">Soyadınız</string>
+    <string name="error_general_nodes" context="Error getting the root node">Hata. Lütfen, tekrar deneyin.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Kaynak kodu görüntüle</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Paylaşmaya başlamak için yeni kişi ekleyin</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Dahili SD kart</item>
+        <item context="external SD card option">Harici SD Kart</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Hata. Klasör oluşturulamadı</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Çöp Kutusu başarıyla boşaltıldı</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Hata. Çöp Kutusu boşaltılamadı</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Sahibin E-postası</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">PİN Kodu Türü</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">4 basamaklı PİN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">6 basamaklı PİN</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Alfanümerik PİN</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Boş Klasör</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Gelen Kutusu\'na Gönderildi</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Hata. Gelen kutusuna gönderilemedi</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">İstek gönderildi</string>
+    <string name="sortby_creation_date" context="category in sort by action">Oluşturma Tarihi</string>
+    <string name="sortby_modification_date" context="category in sort by action">Değiştirilme tarihi</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Davet et</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">%s kişisine istek göndermek istediğinizden emin misiniz?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">%s kişisine istek başarıyla gönderildi. Durumu Gönderilen İstekler sekmesinden kontrol edebilirsin.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Hesap oluşturmadan önce lütfen çıkış yapın</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Günlükler aktif</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Günlük devre dışı</string>
 </resources>

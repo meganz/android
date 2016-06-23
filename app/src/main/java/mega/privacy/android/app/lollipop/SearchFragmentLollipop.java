@@ -435,7 +435,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
 				
-				contentText.setText(MegaApiUtils.getInfoFolder(n, (ManagerActivityLollipop)context));
+				contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 				
 				aB.setTitle(n.getName());
 				log("aB.setHomeAsUpIndicator_51");
@@ -640,7 +640,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				log("levels > 0");
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 				if (parentNode != null){
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, (ManagerActivityLollipop)context));
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 					recyclerView.setVisibility(View.VISIBLE);
 					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
