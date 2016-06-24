@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.util.DisplayMetrics;
@@ -34,6 +33,7 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Util;
@@ -73,7 +73,6 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 	
 	int orderContacts;
 
-	LayoutManager mLayoutManager;
 	MegaUser selectedUser = null;
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -303,7 +302,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			recyclerView.setHasFixedSize(true);
-		    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+			MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);			
 		    recyclerView.addOnItemTouchListener(this);
 		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 			
