@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
@@ -16,7 +17,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -123,7 +123,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-		mLayoutManager = new LinearLayoutManager(context);
+		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());		
