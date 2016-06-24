@@ -417,14 +417,14 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
 //					holder.optionsLayout.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 //					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					//				holder.arrowSelection.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 //					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			} 
@@ -432,7 +432,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				//			holder.arrowSelection.setVisibility(View.GONE);
 				
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 //				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 	
@@ -446,7 +446,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			else{
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		}
 		

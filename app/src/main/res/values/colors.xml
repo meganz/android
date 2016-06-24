@@ -38,6 +38,8 @@
  	<color name="adapters_background">#333333</color>
  	<color name="file_properties_bottom">#292929</color>
 
+    <color name="new_background_fragment">#F7F7F7</color>
+
  	<color name="lollipop_primary_color">#d90007</color>
  	<color name="lollipop_dark_primary_color">#b4070c</color>
  	<color name="lollipop_dark_primary_color_file_properties">#2284b1</color>
