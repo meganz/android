@@ -19,7 +19,6 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -54,6 +53,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -439,7 +439,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
-		mLayoutManager = new LinearLayoutManager(this);
+		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.addOnItemTouchListener(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 

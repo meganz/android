@@ -22,7 +22,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -64,6 +63,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
@@ -314,7 +314,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
-		mLayoutManager = new LinearLayoutManager(this);
+		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -562,7 +562,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		if (megaApiFolder != null){
 			megaApiFolder.removeRequestListener(this);
-			megaApiFolder.logout();
+//			megaApiFolder.logout();
 		}
 		super.onDestroy();
 	}
@@ -1530,6 +1530,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	        	else{
 	        		log("rootNode null!!");
 	        	}
+				finish();
 				break;		
 			}
 			case R.id.folder_link_list_out_options:{

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Util;
@@ -17,7 +18,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -98,7 +98,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 		
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-		mLayoutManager = new LinearLayoutManager(context);
+		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 		

@@ -8,7 +8,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactsGridAdapter;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -94,7 +94,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment{
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
 
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new LinearLayoutManager(context);
+			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			//Just onClick implemented
 //			listView.addOnItemTouchListener(this);
