@@ -5111,14 +5111,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				managerActivity = null;
 			}
 			else{
-//				Intent intent = new Intent (context, TourActivity.class);
-//				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-//		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//				context.startActivity(intent);
-//				if (context instanceof Activity){
-//					((Activity)context).finish();
-//				}
-//				context = null;
+				Intent intent = new Intent (context, LauncherActivity.class);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				if (context instanceof Activity){
+					context.startActivity(intent);
+					((Activity)context).finish();
+				}
+				else{
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					context.startActivity(intent);
+				}
+				context = null;
 			}
 		}
 		else{

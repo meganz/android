@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.ContactsExplorerAdapter.OnItemCheckClickListener;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
@@ -34,7 +35,6 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -152,7 +152,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		
 		listView = (RecyclerView) findViewById(R.id.contacts_explorer_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
-		mLayoutManager = new LinearLayoutManager(this);
+		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);		
 		
 		emptyImageView = (ImageView) findViewById(R.id.contact_explorer_list_empty_image);

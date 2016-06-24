@@ -92,6 +92,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
+	MegaApiAndroid megaApiFolder;
 	
 	WifiLock lock;
 	WakeLock wl;
@@ -134,7 +135,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		
+		megaApiFolder = app.getMegaApiFolder();
+
 		successCount = 0;
 		
 		totalToDownload = 0;
@@ -268,12 +270,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			pathFileToOpen=null;
 		}
 		
-		if (isFolderLink){
-			megaApi = app.getMegaApiFolder();
-		}
-		else{
+//		if (isFolderLink){
+//			megaApi = app.getMegaApiFolder();
+//		}
+//		else{
 			megaApi = app.getMegaApi();
-		}
+//		}
 		
 		currentDocument = megaApi.getNodeByHandle(hash);		
 	
@@ -355,6 +357,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							log("Delete the old version");
 							currentFile.delete();					
 						}	
+					}
+				}
+
+				if (currentDocument.isFolder()){
+					log("IS FOLDER_:_");
+				}
+				else{
+					log("IS FILE_:_");
+				}
+
+				if (isFolderLink){
+					if (currentDocument.isFolder()){
+						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+						return;
+					}
+					else{
+						currentDocument = megaApiFolder.authorizeNode(currentDocument);
+						if (currentDocument == null){
+							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+							return;
+						}
 					}
 				}
 
