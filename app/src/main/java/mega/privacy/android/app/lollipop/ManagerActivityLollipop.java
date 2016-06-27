@@ -1602,9 +1602,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        else{
 	        	log("DRAWERITEM NOT NULL1: " + drawerItem);
-	        	if (getIntent() != null){
-	        		if (getIntent().getAction() != null){
-	        			if (getIntent().getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
+				Intent intentRec = getIntent();
+	        	if (intentRec != null){
+					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", false);
+					if (firstTimeCam) {
+						log("intent firstTimeCam2==true");
+						firstTimeCam = true;
+						drawerItem = DrawerItem.CAMERA_UPLOADS;
+						setIntent(null);
+					}
+
+	        		if (intentRec.getAction() != null){
+	        			if (intentRec.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
 	        				setIntent(null);
 	        			}
