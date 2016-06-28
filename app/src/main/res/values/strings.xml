@@ -772,4 +772,6 @@
 
     <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
 
+    <string name="recovering_info" context="Message shown meanwhile the app is waiting for a request">Recovering info&#8230;</string>
+
 </resources>
