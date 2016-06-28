@@ -493,35 +493,51 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             log("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
             if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
                 log("PRO I Monthly subscription purchased.");
-                Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
                 log("PRO I Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Yearly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
                 log("PRO II Monthly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
                 log("PRO II Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Yearly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
                 log("PRO III Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Yearly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
                 log("PRO LITE Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Yearly!", null);
+				}
             }
 
             if (managerActivity != null){
@@ -590,82 +606,82 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
 
             if (proLiteMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;
 	        			maxP = proLiteMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO LITE MONTHLY (JSON): __*" + proLiteMonthly.getOriginalJson() + "*__");
         	}
 
             if (proLiteYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;
 	        			maxP = proLiteYearly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO LITE ANNUALY (JSON): __*" + proLiteYearly.getOriginalJson() + "*__");
         	}
 
             if (proIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;
 	        			maxP = proIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO I MONTHLY (JSON): __*" + proIMonthly.getOriginalJson() + "*__");
         	}
 
             if (proIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;
 	        			maxP = proIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO I ANNUALY (JSON): __*" + proIYearly.getOriginalJson() + "*__");
         	}
 
             if (proIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO II MONTHLY (JSON): __*" + proIIMonthly.getOriginalJson() + "*__");
             }
 
             if (proIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO II ANNUALY (JSON): __*" + proIIYearly.getOriginalJson() + "*__");
         	}
 
             if (proIIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;
 	        			maxP = proIIIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
             }
 
             if (proIIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;
 	        			maxP = proIIIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
 				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
         	}
 
@@ -1348,10 +1364,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		if(versionApp<=51){
-			final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-			final File fMKOld = new File(pathOldMK);
-			if (fMKOld.exists()){
+		final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+		final File fMKOld = new File(pathOldMK);
+		if (fMKOld != null) {
+			if (fMKOld.exists()) {
 				log("Old MK file need to be renamed!");
 				aC.renameMK();
 			}
