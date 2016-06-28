@@ -159,6 +159,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	NodeController nC;
 	ContactController cC;
 	AccountController aC;
+	AccountAttributes accountAttributes;
 
 	MegaNode selectedNode;
 	MegaUser selectedUser;
@@ -325,12 +326,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
-	private int usedPerc = 0;
-	int accountType = -1;
-	MegaAccountDetails accountInfo = null;
-	BitSet paymentBitSet = null;
-	long numberOfSubscriptions = -1;
-	long usedGbStorage = -1;
+
 	private List<ShareInfo> filePreparedInfos;
 	boolean megaContacts = true;
 	String feedback;
@@ -462,12 +458,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     Purchase proIIIYearly;
     Purchase maxP;
 
-    int levelInventory = -1;
-    int levelAccountDetails = -1;
-
-    boolean inventoryFinished = false;
-    boolean accountDetailsFinished = false;
-
  // Callback for when a purchase is finished
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
         public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
@@ -592,7 +582,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proLiteMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 0;
+	        			accountAttributes.setLevelInventory(0);
 	        			maxP = proLiteMonthly;
 	        		}
             	}
@@ -602,7 +592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proLiteYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 0;
+						accountAttributes.setLevelInventory(0);
 	        			maxP = proLiteYearly;
 	        		}
             	}
@@ -612,7 +602,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 1;
+						accountAttributes.setLevelInventory(1);
 	        			maxP = proIMonthly;
 	        		}
             	}
@@ -622,7 +612,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 1;
+						accountAttributes.setLevelInventory(1);
 	        			maxP = proIYearly;
 	        		}
             	}
@@ -632,7 +622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 2;
+						accountAttributes.setLevelInventory(2);
 	        			maxP = proIIMonthly;
 	        		}
             	}
@@ -642,7 +632,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 2;
+						accountAttributes.setLevelInventory(2);
 	        			maxP = proIIYearly;
 	        		}
             	}
@@ -652,7 +642,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 3;
+						accountAttributes.setLevelInventory(3);
 	        			maxP = proIIIMonthly;
 	        		}
             	}
@@ -662,19 +652,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIIYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			levelInventory = 3;
+						accountAttributes.setLevelInventory(3);
 	        			maxP = proIIIYearly;
 	        		}
             	}
 				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
         	}
 
-            inventoryFinished = true;
+			accountAttributes.setInventoryFinished(true);
 
-			log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; ACCOUNTDETAILSFINISHED: " + accountDetailsFinished);
+			log("LEVELACCOUNTDETAILS: " + accountAttributes.getLevelAccountDetails() + "; LEVELINVENTORY: " + accountAttributes.getLevelInventory() + "; ACCOUNTDETAILSFINISHED: " + accountAttributes.isAccountDetailsFinished());
 
-            if (accountDetailsFinished){
-            	if (levelInventory > levelAccountDetails){
+            if (accountAttributes.isAccountDetailsFinished()){
+            	if (accountAttributes.getLevelInventory() > accountAttributes.getLevelAccountDetails()){
             		if (maxP != null){
             			log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
             			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
@@ -988,6 +978,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
+		accountAttributes = new AccountAttributes();
 
 		File thumbDir;
 		if (getExternalCacheDir() != null){
@@ -3446,8 +3437,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh, BitSet paymentBitSet){
 
 		if (paymentBitSet == null){
-			if (this.paymentBitSet != null){
-				paymentBitSet = this.paymentBitSet;
+			if (accountAttributes.getPaymentBitSet() != null){
+				paymentBitSet = accountAttributes.getPaymentBitSet();
 			}
 		}
 
@@ -3493,6 +3484,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void updateInfoNumberOfSubscriptions(){
+        if (cancelSubscription != null){
+            cancelSubscription.setVisible(false);
+        }
+        if (accountAttributes.getNumberOfSubscriptions() > 0){
+            if (cancelSubscription != null){
+                if (drawerItem == DrawerItem.ACCOUNT){
+                    if (maFLol != null){
+                        cancelSubscription.setVisible(true);
+                    }
+                }
+            }
+        }
+    }
+
 	public void showFortumo(){
 		accountFragment = Constants.FORTUMO_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);
@@ -3533,8 +3539,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showmyF");
 
 		if (paymentBitSet == null){
-			if (this.paymentBitSet != null){
-				paymentBitSet = this.paymentBitSet;
+			if (accountAttributes.getPaymentBitSet() != null){
+				paymentBitSet = accountAttributes.getPaymentBitSet();
 			}
 		}
 
@@ -3569,8 +3575,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showpF");
 
 		if (paymentBitSet == null){
-			if (this.paymentBitSet != null){
-				paymentBitSet = this.paymentBitSet;
+			if (accountAttributes.getPaymentBitSet() != null){
+				paymentBitSet = accountAttributes.getPaymentBitSet();
 			}
 		}
 
@@ -3631,8 +3637,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //        fragTransaction.commit();
 
 		if (paymentBitSet == null){
-			if (this.paymentBitSet != null){
-				paymentBitSet = this.paymentBitSet;
+			if (accountAttributes.getPaymentBitSet() != null){
+				paymentBitSet = accountAttributes.getPaymentBitSet();
 			}
 		}
 
@@ -4389,10 +4395,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
 
-					if (numberOfSubscriptions > 0) {
+					if (accountAttributes.getNumberOfSubscriptions() > 0) {
 						cancelSubscription.setVisible(true);
 					}
-
 
 					gridSmallLargeMenuItem.setVisible(false);
 				}
@@ -8464,22 +8469,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public long getNumberOfSubscriptions(){
-		if (cancelSubscription != null){
-			cancelSubscription.setVisible(false);
-		}
-		if (numberOfSubscriptions > 0){
-			if (cancelSubscription != null){
-				if (drawerItem == DrawerItem.ACCOUNT){
-					if (maFLol != null){
-						cancelSubscription.setVisible(true);
-					}
-				}
-			}
-		}
-		return numberOfSubscriptions;
-	}
-
 	public void showStatusDialog(String text){
 		ProgressDialog temp = null;
 		try{
@@ -8512,7 +8501,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public int getUsedPerc(){
-		return usedPerc;
+		if(accountAttributes!=null){
+			return accountAttributes.getUsedPerc();
+		}
+		return 0;
 	}
 
 	public long getParentHandleBrowser() {
@@ -9694,83 +9686,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
 
-				accountInfo = request.getMegaAccountDetails();
-
-				accountDetailsFinished = true;
-
-				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();;
-				boolean totalGb = false;
-
-		        usedPerc = 0;
-		        if (totalStorage != 0){
-		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
-		        }
-		        usedSpacePB.setProgress(usedPerc);
-
-				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
-				String total = "";
-				if (totalStorage >= 1024){
-					totalStorage = totalStorage / 1024;
-					total = total + totalStorage + " TB";
-				}
-				else{
-					 total = total + totalStorage + " GB";
-					 totalGb = true;
+				if(accountAttributes==null){
+					accountAttributes=new AccountAttributes();
 				}
 
-				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
-				String used = "";
-				if(totalGb){
-					usedGbStorage = usedStorage;
-					used = used + usedStorage + " GB";
-				}
-				else{
-					if (usedStorage >= 1024){
-						usedGbStorage = usedStorage;
-						usedStorage = usedStorage / 1024;
+				accountAttributes.setAccountInfo(request.getMegaAccountDetails());
 
-						used = used + usedStorage + " TB";
-					}
-					else{
-						usedGbStorage = usedStorage;
-						used = used + usedStorage + " GB";
-					}
-				}
+
+				accountAttributes.setAccountDetails();
+
+		        usedSpacePB.setProgress(accountAttributes.getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-				usedSpaceTV.setText(used);
-				totalSpaceTV.setText(total);
+				usedSpaceTV.setText(accountAttributes.getUsedFormatted());
+				totalSpaceTV.setText(accountAttributes.getTotalFormatted());
 
-				accountType = accountInfo.getProLevel();
-
-				switch (accountType){
-					case 0:{
-						levelAccountDetails = -1;
-						break;
-					}
-					case 1:{
-						levelAccountDetails = 1;
-						break;
-					}
-					case 2:{
-						levelAccountDetails = 2;
-						break;
-					}
-					case 3:{
-						levelAccountDetails = 3;
-						break;
-					}
-					case 4:{
-						levelAccountDetails = 0;
-						break;
-					}
-				}
-
-				log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
-
-				if (inventoryFinished){
-					if (levelAccountDetails < levelInventory){
+				if (accountAttributes.isInventoryFinished()){
+					if (accountAttributes.getLevelAccountDetails() < accountAttributes.getLevelInventory()){
 						if (maxP != null){
 							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
 							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
@@ -9779,12 +9711,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 //				usedPerc=96;
-				if(usedPerc>=95){
+				if(accountAttributes.getUsedPerc()>=95){
 					showOverquotaPanel();
 				}
 				else{
 					outSpaceLayout.setVisibility(View.GONE);
-					if(accountType==0){
+					if(accountAttributes.getAccountType()==0){
 						log("usedSpacePerc<95");
 						if(Util.showMessageRandom()){
 				    		log("Random: TRUE");
@@ -9793,19 +9725,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 
-		        if (usedPerc < 90){
+		        if (accountAttributes.getUsedPerc() < 90){
 		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
 		        }
-		        else if ((usedPerc >= 90) && (usedPerc <= 95)){
+		        else if ((accountAttributes.getUsedPerc() >= 90) && (accountAttributes.getUsedPerc() <= 95)){
 		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        	usedSpaceWarning.setVisibility(View.VISIBLE);
 		        }
 		        else{
-		        	if (usedPerc > 100){
-			        	usedPerc = 100;
+		        	if (accountAttributes.getUsedPerc() > 100){
+						accountAttributes.setUsedPerc(100);
 			        }
 		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -9817,10 +9749,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 3, used.length() + 3 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        usedSpaceTV.setText(wordtoSpan);
 
-		        log("onRequest TYPE_ACCOUNT_DETAILS: "+usedPerc);
+		        log("onRequest TYPE_ACCOUNT_DETAILS: "+accountAttributes.getUsedPerc());
 
 		        if(drawerItem==DrawerItem.CLOUD_DRIVE){
-		        	if (usedPerc > 95){
+		        	if (accountAttributes.getUsedPerc() > 95){
 		        		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 						ft.detach(fbFLol);
 						ft.attach(fbFLol);
@@ -9831,17 +9763,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
 			if (e.getErrorCode() == MegaError.API_OK){
-				paymentBitSet = Util.convertToBitSet(request.getNumber());
+				accountAttributes.setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
-				numberOfSubscriptions = request.getNumber();
-				log("NUMBER OF SUBS: " + numberOfSubscriptions);
+				accountAttributes.setNumberOfSubscriptions(request.getNumber());
+				log("NUMBER OF SUBS: " + accountAttributes.getNumberOfSubscriptions());
 				if (cancelSubscription != null){
 					cancelSubscription.setVisible(false);
 				}
-				if (numberOfSubscriptions > 0){
+				if (accountAttributes.getNumberOfSubscriptions() > 0){
 					if (cancelSubscription != null){
 						if (drawerItem == DrawerItem.ACCOUNT){
 							if (maFLol != null){
@@ -11374,11 +11306,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public MegaAccountDetails getAccountInfo() {
-		return accountInfo;
+		if(accountAttributes!=null){
+			return accountAttributes.getAccountInfo();
+		}
+		return null;
 	}
 
 	public void setAccountInfo(MegaAccountDetails accountInfo) {
-		this.accountInfo = accountInfo;
+		if(accountAttributes!=null){
+			accountAttributes.setAccountInfo(accountInfo);
+		}
 	}
 
 	public boolean isList() {

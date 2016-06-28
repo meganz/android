@@ -285,14 +285,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logoutButton.setVisibility(View.VISIBLE);
 
 		LinearLayout.LayoutParams logoutButtonParams = (LinearLayout.LayoutParams)logoutButton.getLayoutParams();
-		logoutButtonParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(0, outMetrics));
+		logoutButtonParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(0, outMetrics));
 		logoutButton.setLayoutParams(logoutButtonParams);
 
 		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
 		deleteAccountButton.setOnClickListener(this);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
 		typeLayout.setVisibility(View.GONE);
