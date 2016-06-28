@@ -1,14 +1,28 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -16,26 +30,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener{		
 	
@@ -43,6 +37,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
+	public MyAccountInfo myAccountInfo;
 	
 	private RelativeLayout proLiteLayout;
 	private RelativeLayout pro1Layout;
@@ -83,12 +78,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	private TextView pro3BandwidthTb;
 	
 	Context context;
-	MegaUser myUser;
-	
-	BitSet paymentBitSet = null;
-	int accountType = -1;
-	long usedStorage = -1;
-	
+
 	@Override
 	public void onDestroy(){				
 		if(megaApi != null)
@@ -110,12 +100,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
-	
-	public void setInfo (BitSet paymentBitSet){
-		this.paymentBitSet = paymentBitSet;
-	}
-	
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -202,8 +187,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		pro3BandwidthInteger = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwidth_value_integer);
 		pro3BandwidthTb = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwith_value_tb);
 		
-		if (paymentBitSet == null){
-			megaApi.getPaymentMethods(this);
+		if (myAccountInfo.getPaymentBitSet() == null){
+			megaApi.getPaymentMethods(myAccountInfo);
 		}
 		
 		megaApi.getPricing(this);
@@ -214,8 +199,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	
 	public void checkAvailableAccount(){
 		
-		log("usedStorage: "+usedStorage);
-		switch(accountType){		
+		log("usedStorage: "+myAccountInfo.getUsedGbStorage());
+		switch(myAccountInfo.getAccountType()){
 			case 1:{
 				hideProLite();
 				break;
@@ -239,26 +224,26 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	}
 
 	public void onUpgrade1Click() {
-		if (paymentBitSet != null){
-			((ManagerActivityLollipop)context).showpF(1, accounts, paymentBitSet);
+		if (myAccountInfo.getPaymentBitSet() != null){
+			((ManagerActivityLollipop)context).showpF(1, accounts, myAccountInfo.getPaymentBitSet());
 		}
 	}
 
 	public void onUpgrade2Click() {
-		if (paymentBitSet != null){
-			((ManagerActivityLollipop)context).showpF(2, accounts, paymentBitSet);
+		if (myAccountInfo.getPaymentBitSet() != null){
+			((ManagerActivityLollipop)context).showpF(2, accounts, myAccountInfo.getPaymentBitSet());
 		}
 	}
 
 	public void onUpgrade3Click() {
-		if (paymentBitSet != null){
-			((ManagerActivityLollipop)context).showpF(3, accounts, paymentBitSet);
+		if (myAccountInfo.getPaymentBitSet() != null){
+			((ManagerActivityLollipop)context).showpF(3, accounts, myAccountInfo.getPaymentBitSet());
 		}
 	}
 	
 	public void onUpgradeLiteClick(){
-		if (paymentBitSet != null){
-			((ManagerActivityLollipop)context).showpF(4, accounts, paymentBitSet);
+		if (myAccountInfo.getPaymentBitSet() != null){
+			((ManagerActivityLollipop)context).showpF(4, accounts, myAccountInfo.getPaymentBitSet());
 		}
 	}
 
@@ -278,11 +263,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		DecimalFormat df = new DecimalFormat("#.##");
 
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				paymentBitSet = Util.convertToBitSet(request.getNumber());
-			}
-		}
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 			MegaPricing p = request.getPricing();
 //			usedStorage = 501;
@@ -294,7 +274,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 
 				if(account.getLevel()==1&&account.getMonths()==1){
 					log("PRO1: "+account.getStorage());
-					if(usedStorage>account.getStorage()){
+					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
 						hideProI();
 					}
 
@@ -325,7 +305,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 				}
 				else if(account.getLevel()==2&&account.getMonths()==1){
 					log("PRO2: "+account.getStorage());
-					if(usedStorage>account.getStorage()){
+					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
 						hideProII();
 					}
 					
@@ -356,7 +336,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 				}
 				else if(account.getLevel()==3&&account.getMonths()==1){	                	 
 					log("PRO3: "+account.getStorage());
-					if(usedStorage>account.getStorage()){
+					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
 						hideProIII();
 					}
 					
@@ -387,7 +367,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 				}
 				else if (account.getLevel()==4&&account.getMonths()==1){
 					log("Lite: "+account.getStorage());
-					if(usedStorage>account.getStorage()){
+					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
 						hideProLite();
 					}
 					double price = account.getAmount()/100.00;
@@ -431,8 +411,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 
 				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
 
-				accountType = accountInfo.getProLevel();
-				switch(accountType){				
+				switch(accountInfo.getProLevel()){
 	
 					case 1:{
 						hideProLite();
@@ -506,11 +485,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	public ArrayList<Product> getAccounts(){
 		return accounts;
 	}
-	
-	public BitSet getPaymentBitSet(){
-		return paymentBitSet;
-	}
-	
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -519,9 +494,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	}
 	
 	public static void log(String log) {
-		Util.log("UpgradeAccountFragment", log);
+		Util.log("UpgradeAccountFragmentLollipop", log);
 	}
 
+	public MyAccountInfo getMyAccountInfo() {
+		return myAccountInfo;
+	}
+
+	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
+		this.myAccountInfo = myAccountInfo;
+	}
 
 	@Override
 	public void onClick(View v) {

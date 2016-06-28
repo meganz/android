@@ -928,6 +928,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void updateAvatar(String contactEmail, boolean retry){
 		log("updateAvatar: "+contactEmail);
 		File avatar = null;
+		if(getActivity()==null){
+			log("the activity is null");
+			return;
+		}
 		if (getActivity().getExternalCacheDir() != null){
 			avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
 		}
