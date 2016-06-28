@@ -159,7 +159,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	NodeController nC;
 	ContactController cC;
 	AccountController aC;
-	AccountAttributes accountAttributes;
+	MyAccountInfo myAccountInfo;
 
 	MegaNode selectedNode;
 	MegaUser selectedUser;
@@ -582,7 +582,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proLiteMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			accountAttributes.setLevelInventory(0);
+	        			myAccountInfo.setLevelInventory(0);
 	        			maxP = proLiteMonthly;
 	        		}
             	}
@@ -592,7 +592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proLiteYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(0);
+						myAccountInfo.setLevelInventory(0);
 	        			maxP = proLiteYearly;
 	        		}
             	}
@@ -602,7 +602,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(1);
+						myAccountInfo.setLevelInventory(1);
 	        			maxP = proIMonthly;
 	        		}
             	}
@@ -612,7 +612,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(1);
+						myAccountInfo.setLevelInventory(1);
 	        			maxP = proIYearly;
 	        		}
             	}
@@ -622,7 +622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(2);
+						myAccountInfo.setLevelInventory(2);
 	        			maxP = proIIMonthly;
 	        		}
             	}
@@ -632,7 +632,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(2);
+						myAccountInfo.setLevelInventory(2);
 	        			maxP = proIIYearly;
 	        		}
             	}
@@ -642,7 +642,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIIMonthly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(3);
+						myAccountInfo.setLevelInventory(3);
 	        			maxP = proIIIMonthly;
 	        		}
             	}
@@ -652,19 +652,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (proIIIYearly != null){
             	if (megaApi.getMyUser().getEmail() != null){
 	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						accountAttributes.setLevelInventory(3);
+						myAccountInfo.setLevelInventory(3);
 	        			maxP = proIIIYearly;
 	        		}
             	}
 				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
         	}
 
-			accountAttributes.setInventoryFinished(true);
+			myAccountInfo.setInventoryFinished(true);
 
-			log("LEVELACCOUNTDETAILS: " + accountAttributes.getLevelAccountDetails() + "; LEVELINVENTORY: " + accountAttributes.getLevelInventory() + "; ACCOUNTDETAILSFINISHED: " + accountAttributes.isAccountDetailsFinished());
+			log("LEVELACCOUNTDETAILS: " + myAccountInfo.getLevelAccountDetails() + "; LEVELINVENTORY: " + myAccountInfo.getLevelInventory() + "; ACCOUNTDETAILSFINISHED: " + myAccountInfo.isAccountDetailsFinished());
 
-            if (accountAttributes.isAccountDetailsFinished()){
-            	if (accountAttributes.getLevelInventory() > accountAttributes.getLevelAccountDetails()){
+            if (myAccountInfo.isAccountDetailsFinished()){
+            	if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()){
             		if (maxP != null){
             			log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
             			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
@@ -978,7 +978,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
-		accountAttributes = new AccountAttributes();
+		myAccountInfo = new MyAccountInfo(this);
 
 		File thumbDir;
 		if (getExternalCacheDir() != null){
@@ -1521,8 +1521,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				this.setProfileAvatar();
 			}
 
-			megaApi.getPaymentMethods(this);
-	        megaApi.getAccountDetails(this);
+
+			if(myAccountInfo==null){
+				myAccountInfo=new MyAccountInfo(this);
+			}
+			megaApi.getPaymentMethods(myAccountInfo);
+
+	        megaApi.getAccountDetails(myAccountInfo);
 	        megaApi.creditCardQuerySubscriptions(this);
 
 			if(savedInstanceState==null) {
@@ -3334,6 +3339,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("New MyAccountFragment");
     				maFLol = new MyAccountFragmentLollipop();
     				maFLol.setMyEmail(megaApi.getMyUser().getEmail());
+					maFLol.setMyAccountInfo(myAccountInfo);
 					maFLol.setMKLayoutVisible(mkLayoutVisible);
     			}
 
@@ -3437,8 +3443,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh, BitSet paymentBitSet){
 
 		if (paymentBitSet == null){
-			if (accountAttributes.getPaymentBitSet() != null){
-				paymentBitSet = accountAttributes.getPaymentBitSet();
+			if (myAccountInfo.getPaymentBitSet() != null){
+				paymentBitSet = myAccountInfo.getPaymentBitSet();
 			}
 		}
 
@@ -3488,7 +3494,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         if (cancelSubscription != null){
             cancelSubscription.setVisible(false);
         }
-        if (accountAttributes.getNumberOfSubscriptions() > 0){
+        if (myAccountInfo.getNumberOfSubscriptions() > 0){
             if (cancelSubscription != null){
                 if (drawerItem == DrawerItem.ACCOUNT){
                     if (maFLol != null){
@@ -3539,8 +3545,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showmyF");
 
 		if (paymentBitSet == null){
-			if (accountAttributes.getPaymentBitSet() != null){
-				paymentBitSet = accountAttributes.getPaymentBitSet();
+			if (myAccountInfo.getPaymentBitSet() != null){
+				paymentBitSet = myAccountInfo.getPaymentBitSet();
 			}
 		}
 
@@ -3575,8 +3581,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showpF");
 
 		if (paymentBitSet == null){
-			if (accountAttributes.getPaymentBitSet() != null){
-				paymentBitSet = accountAttributes.getPaymentBitSet();
+			if (myAccountInfo.getPaymentBitSet() != null){
+				paymentBitSet = myAccountInfo.getPaymentBitSet();
 			}
 		}
 
@@ -3637,8 +3643,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //        fragTransaction.commit();
 
 		if (paymentBitSet == null){
-			if (accountAttributes.getPaymentBitSet() != null){
-				paymentBitSet = accountAttributes.getPaymentBitSet();
+			if (myAccountInfo.getPaymentBitSet() != null){
+				paymentBitSet = myAccountInfo.getPaymentBitSet();
 			}
 		}
 
@@ -4395,7 +4401,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
 
-					if (accountAttributes.getNumberOfSubscriptions() > 0) {
+					if (myAccountInfo.getNumberOfSubscriptions() > 0) {
 						cancelSubscription.setVisible(true);
 					}
 
@@ -8368,6 +8374,74 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void updateAccountDetailsVisibleInfo(){
+		log("updateAccountDetailsVisibleInfo");
+
+		usedSpacePB.setProgress(myAccountInfo.getUsedPerc());
+
+//				String usedSpaceString = getString(R.string.used_space, used, total);
+		usedSpaceTV.setText(myAccountInfo.getUsedFormatted());
+		totalSpaceTV.setText(myAccountInfo.getTotalFormatted());
+
+		usedSpacePB.setProgress(myAccountInfo.getUsedPerc());
+
+//				String usedSpaceString = getString(R.string.used_space, used, total);
+		usedSpaceTV.setText(myAccountInfo.getUsedFormatted());
+		totalSpaceTV.setText(myAccountInfo.getTotalFormatted());
+
+		if (myAccountInfo.isInventoryFinished()){
+			if (myAccountInfo.getLevelAccountDetails() < myAccountInfo.getLevelInventory()){
+				if (maxP != null){
+					log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
+					megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
+				}
+			}
+		}
+
+//				usedPerc=96;
+		if(myAccountInfo.getUsedPerc()>=95){
+			showOverquotaPanel();
+		}
+		else{
+			outSpaceLayout.setVisibility(View.GONE);
+			if(myAccountInfo.getAccountType()==0){
+				log("usedSpacePerc<95");
+				if(Util.showMessageRandom()){
+					log("Random: TRUE");
+					showProPanel();
+				}
+			}
+		}
+
+		if (getUsedPerc() < 90){
+			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
+//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
+		}
+		else if ((getUsedPerc() >= 90) && (getUsedPerc() <= 95)){
+			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
+//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//		        	usedSpaceWarning.setVisibility(View.VISIBLE);
+		}
+		else{
+			if (getUsedPerc() > 100){
+				myAccountInfo.setUsedPerc(100);
+			}
+			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
+//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//		        	usedSpaceWarning.setVisibility(View.VISIBLE);
+		}
+
+		if(drawerItem==DrawerItem.CLOUD_DRIVE){
+			if (myAccountInfo.getUsedPerc() > 95){
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.detach(fbFLol);
+				ft.attach(fbFLol);
+				ft.commitAllowingStateLoss();
+			}
+		}
+	}
+
 	public void selectSortByContacts(int _orderContacts){
 		log("selectSortByContacts");
 
@@ -8501,8 +8575,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public int getUsedPerc(){
-		if(accountAttributes!=null){
-			return accountAttributes.getUsedPerc();
+		if(myAccountInfo!=null){
+			return myAccountInfo.getUsedPerc();
 		}
 		return 0;
 	}
@@ -9682,98 +9756,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
-			log ("account_details request");
-			if (e.getErrorCode() == MegaError.API_OK){
-
-				if(accountAttributes==null){
-					accountAttributes=new AccountAttributes();
-				}
-
-				accountAttributes.setAccountInfo(request.getMegaAccountDetails());
-
-
-				accountAttributes.setAccountDetails();
-
-		        usedSpacePB.setProgress(accountAttributes.getUsedPerc());
-
-//				String usedSpaceString = getString(R.string.used_space, used, total);
-				usedSpaceTV.setText(accountAttributes.getUsedFormatted());
-				totalSpaceTV.setText(accountAttributes.getTotalFormatted());
-
-				if (accountAttributes.isInventoryFinished()){
-					if (accountAttributes.getLevelAccountDetails() < accountAttributes.getLevelInventory()){
-						if (maxP != null){
-							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
-							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
-						}
-					}
-				}
-
-//				usedPerc=96;
-				if(accountAttributes.getUsedPerc()>=95){
-					showOverquotaPanel();
-				}
-				else{
-					outSpaceLayout.setVisibility(View.GONE);
-					if(accountAttributes.getAccountType()==0){
-						log("usedSpacePerc<95");
-						if(Util.showMessageRandom()){
-				    		log("Random: TRUE");
-				    		showProPanel();
-						}
-					}
-				}
-
-		        if (accountAttributes.getUsedPerc() < 90){
-		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
-//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
-		        }
-		        else if ((accountAttributes.getUsedPerc() >= 90) && (accountAttributes.getUsedPerc() <= 95)){
-		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
-//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        	usedSpaceWarning.setVisibility(View.VISIBLE);
-		        }
-		        else{
-		        	if (accountAttributes.getUsedPerc() > 100){
-						accountAttributes.setUsedPerc(100);
-			        }
-		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
-//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        	usedSpaceWarning.setVisibility(View.VISIBLE);
-		        }
-
-//		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 3, used.length() + 3 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        usedSpaceTV.setText(wordtoSpan);
-
-		        log("onRequest TYPE_ACCOUNT_DETAILS: "+accountAttributes.getUsedPerc());
-
-		        if(drawerItem==DrawerItem.CLOUD_DRIVE){
-		        	if (accountAttributes.getUsedPerc() > 95){
-		        		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-						ft.detach(fbFLol);
-						ft.attach(fbFLol);
-						ft.commitAllowingStateLoss();
-		        	}
-		        }
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				accountAttributes.setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
-			}
-		}
 		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
-				accountAttributes.setNumberOfSubscriptions(request.getNumber());
-				log("NUMBER OF SUBS: " + accountAttributes.getNumberOfSubscriptions());
+				myAccountInfo.setNumberOfSubscriptions(request.getNumber());
+				log("NUMBER OF SUBS: " + myAccountInfo.getNumberOfSubscriptions());
 				if (cancelSubscription != null){
 					cancelSubscription.setVisible(false);
 				}
-				if (accountAttributes.getNumberOfSubscriptions() > 0){
+				if (myAccountInfo.getNumberOfSubscriptions() > 0){
 					if (cancelSubscription != null){
 						if (drawerItem == DrawerItem.ACCOUNT){
 							if (maFLol != null){
@@ -11306,15 +11296,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public MegaAccountDetails getAccountInfo() {
-		if(accountAttributes!=null){
-			return accountAttributes.getAccountInfo();
+		if(myAccountInfo!=null){
+			return myAccountInfo.getAccountInfo();
 		}
 		return null;
 	}
 
 	public void setAccountInfo(MegaAccountDetails accountInfo) {
-		if(accountAttributes!=null){
-			accountAttributes.setAccountInfo(accountInfo);
+		if(myAccountInfo!=null){
+			myAccountInfo.setAccountInfo(accountInfo);
 		}
 	}
 

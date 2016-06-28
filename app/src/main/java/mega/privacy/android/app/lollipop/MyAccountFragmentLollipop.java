@@ -13,7 +13,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -28,21 +27,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -62,6 +54,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	Context context;
 	ActionBar aB;
+	MyAccountInfo myAccountInfo;
 
 	RelativeLayout avatarLayout;
 	TextView initialLetter;
@@ -121,13 +114,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	String lastNameText;
 	String fullName;
 
-	long paymentBitSetLong;
-	BitSet paymentBitSet = null;
-	int accountType;
-	MegaAccountDetails accountInfo = null;
-	
-	boolean getPaymentMethodsBoolean = false;
-	boolean accountDetailsBoolean = false;
+//	boolean getPaymentMethodsBoolean = false;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -295,9 +282,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
-		typeLayout.setVisibility(View.GONE);
 		expirationLayout.setVisibility(View.GONE);
-		lastSessionLayout.setVisibility(View.GONE);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
@@ -348,7 +333,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		firstName=false;
 		megaApi.getUserAttribute(myUser, 1, this);
 		megaApi.getUserAttribute(myUser, 2, this);
-		megaApi.getExtendedAccountDetails(true, false, false, this);
 
 		this.updateAvatar(myUser.getEmail(), true);
 
@@ -366,10 +350,105 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}		
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
-		
-		megaApi.getAccountDetails(this);
-		megaApi.getPaymentMethods(this);
+
+		setAccountDetails();
+
+		//Check if the call is recently
+
+//		megaApi.getAccountDetails(myAccountInfo);
+//
+//		megaApi.getPaymentMethods(myAccountInfo);
+
+		megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
 		return v;
+	}
+
+	public void setAccountDetails(){
+		log("setAccountDetails");
+		//Set account details
+		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
+			typeAccount.setText(getString(R.string.recovering_info));
+		}
+		else{
+			switch(myAccountInfo.getAccountType()){
+
+				case 0:{
+					typeAccount.setText(R.string.my_account_free);
+					expirationLayout.setVisibility(View.GONE);
+					break;
+				}
+
+				case 1:{
+					typeAccount.setText(getString(R.string.my_account_pro1));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+				case 2:{
+					typeAccount.setText(getString(R.string.my_account_pro2));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+				case 3:{
+					typeAccount.setText(getString(R.string.my_account_pro3));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+				case 4:{
+					typeAccount.setText(getString(R.string.my_account_prolite));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+			}
+		}
+
+
+//		if (getPaymentMethodsBoolean == true){
+//			if (upgradeButton != null){
+//				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+//					Time now = new Time();
+//					now.setToNow();
+//					if (myAccountInfo.getAccountType() != 0){
+//						if (now.toMillis(false) >= (myAccountInfo.getAccountInfo().getProExpiration()*1000)){
+//							if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//								upgradeButton.setVisibility(View.VISIBLE);
+//							}
+//						}
+//					}
+//					else{
+//						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//							upgradeButton.setVisibility(View.VISIBLE);
+//						}
+//					}
+//				}
+//			}
+//		}
+		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
+			usedSpace.setText(getString(R.string.recovering_info));
+		}
+		else{
+			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
+			usedSpace.setText(usedSpaceString);
+		}
+
+		if(myAccountInfo.getLastSessionFormattedDate()!=null) {
+			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
+				lastSession.setText(getString(R.string.recovering_info));
+			} else {
+				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
+			}
+		}
+		else{
+			lastSession.setText(getString(R.string.recovering_info));
+		}
+		///////////
 	}
 
 	private int getAvatarTextSize (float density){
@@ -798,167 +877,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				paymentBitSetLong = request.getNumber();
-				paymentBitSet = Util.convertToBitSet(request.getNumber());
-				getPaymentMethodsBoolean = true;
-				if (accountDetailsBoolean == true){
-					if (upgradeButton != null){
-						if (accountInfo != null){
-							if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-								Time now = new Time();
-								now.setToNow();
-								if (accountType != 0){
-									if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-										if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-											upgradeButton.setVisibility(View.VISIBLE);
-										}
-									}
-								}
-								else{
-									if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-										upgradeButton.setVisibility(View.VISIBLE);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
-			log ("account_details request");
-			if (e.getErrorCode() == MegaError.API_OK && typeAccount != null)
-			{
-				accountInfo = request.getMegaAccountDetails();
-
-				accountType = accountInfo.getProLevel();
-				accountDetailsBoolean = true;
-				typeLayout.setVisibility(View.VISIBLE);
-				switch(accountType){
-
-					case 0:{
-
-						typeAccount.setText(R.string.my_account_free);
-						expirationLayout.setVisibility(View.GONE);
-						break;
-					}
-
-					case 1:{
-						typeAccount.setText(getString(R.string.my_account_pro1));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-					case 2:{
-						typeAccount.setText(getString(R.string.my_account_pro2));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-					case 3:{
-						typeAccount.setText(getString(R.string.my_account_pro3));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-					case 4:{
-						typeAccount.setText(getString(R.string.my_account_prolite));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-				}
-
-				if (getPaymentMethodsBoolean == true){
-					if (upgradeButton != null){
-						if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-							Time now = new Time();
-							now.setToNow();
-							if (accountType != 0){
-								if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-									if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-										upgradeButton.setVisibility(View.VISIBLE);
-									}
-								}
-							}
-							else{
-								if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-									upgradeButton.setVisibility(View.VISIBLE);
-								}
-							}
-						}
-					}
-				}
-
-				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();
-
-		        int usedPerc = 0;
-		        if (totalStorage != 0){
-		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
-		        }
-
-				boolean totalGb = false;
-
-				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
-				String total = "";
-				if (totalStorage >= 1024){
-					totalStorage = totalStorage / 1024;
-					total = total + totalStorage + " TB";
-				}
-				else{
-					 total = total + totalStorage + " GB";
-					 totalGb = true;
-				}
-
-				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
-				String used = "";
-				if(totalGb){
-
-					used = used + usedStorage + " GB";
-
-				}
-				else{
-					if (usedStorage >= 1024){
-						usedStorage = usedStorage / 1024;
-						used = used + usedStorage + " TB";
-					}
-					else{
-						used = used + usedStorage + " GB";
-					}
-				}
-
-				String usedSpaceString = used + " " + getString(R.string.general_x_of_x) + " " + total;
-		        usedSpace.setText(usedSpaceString);
-				typeLayout.setVisibility(View.VISIBLE);
-			}
-			if(request.getMegaAccountDetails()!=null){
-				log("getMegaAccountDetails not Null");
-
-				MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
-
-				if(megaAccountSession!=null){
-					log("getMegaAccountSESSION not Null");
-					long mostRecentSession = megaAccountSession.getMostRecentUsage();
-					log("The last session: "+mostRecentSession);
-					java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.MEDIUM,Locale.getDefault());
-					Date date = new Date(mostRecentSession * 1000);
-					Calendar cal = Calendar.getInstance();
-					TimeZone tz = cal.getTimeZone();
-					df.setTimeZone(tz);
-					String formattedDate = df.format(date);
-					log("Formatted date: "+formattedDate);
-					lastSession.setText(formattedDate);
-					lastSessionLayout.setVisibility(View.VISIBLE);
-				}
-			}
-		}
 	}
 
 	@Override
@@ -1152,6 +1070,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void setCountUserAttributes(int countUserAttributes) {
 		log("setCountUserAttributes: "+countUserAttributes);
 		this.countUserAttributes = countUserAttributes;
+	}
+
+
+	public MyAccountInfo getMyAccountInfo() {
+		return myAccountInfo;
+	}
+
+	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
+		this.myAccountInfo = myAccountInfo;
 	}
 
 }

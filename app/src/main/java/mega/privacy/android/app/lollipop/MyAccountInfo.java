@@ -1,14 +1,24 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.BitSet;
+import android.content.Context;
 
+import java.text.SimpleDateFormat;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaAccountSession;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
-/**
- * Created by carol on 6/28/16.
- */
-public class AccountAttributes {
+public class MyAccountInfo implements MegaRequestListenerInterface {
 
     int usedPerc = 0;
     int accountType = -1;
@@ -23,6 +33,21 @@ public class AccountAttributes {
 
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
+    boolean getPaymentMethodsBoolean = false;
+
+    String lastSessionFormattedDate;
+
+    DatabaseHandler dbH;
+    Context context;
+
+    public MyAccountInfo(Context context){
+        log("AccountController created");
+
+        this.context = context;
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context);
+        }
+    }
 
     public void setAccountDetails(){
         long totalStorage = accountInfo.getStorageMax();
@@ -35,6 +60,7 @@ public class AccountAttributes {
         }
 
         totalStorage = ((totalStorage / 1024) / 1024) / 1024;
+        totalFormatted="";
 
         if (totalStorage >= 1024){
             totalStorage = totalStorage / 1024;
@@ -46,6 +72,7 @@ public class AccountAttributes {
         }
 
         usedStorage = ((usedStorage / 1024) / 1024) / 1024;
+        usedFormatted="";
 
         if(totalGb){
             usedGbStorage = usedStorage;
@@ -192,7 +219,84 @@ public class AccountAttributes {
         this.inventoryFinished = inventoryFinished;
     }
 
+    public String getLastSessionFormattedDate() {
+        return lastSessionFormattedDate;
+    }
+
+    public void setLastSessionFormattedDate(String lastSessionFormattedDate) {
+        this.lastSessionFormattedDate = lastSessionFormattedDate;
+    }
+
     public static void log(String message) {
-        Util.log("AccountAttributes", message);
+        Util.log("MyAccountInfo", message);
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish: " + request.getRequestString());
+
+        if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+            log ("account_details request");
+            if (e.getErrorCode() == MegaError.API_OK){
+
+                dbH.setAccountDetailsTimeStamp();
+
+                setAccountInfo(request.getMegaAccountDetails());
+
+                setAccountDetails();
+
+                ((ManagerActivityLollipop)context).updateAccountDetailsVisibleInfo();
+
+                if(request.getMegaAccountDetails()!=null){
+                    log("getMegaAccountDetails not Null");
+
+                    MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
+
+                    if(megaAccountSession!=null){
+                        log("getMegaAccountSESSION not Null");
+                        long mostRecentSession = megaAccountSession.getMostRecentUsage();
+                        log("The last session: "+mostRecentSession);
+                        java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.MEDIUM, Locale.getDefault());
+                        Date date = new Date(mostRecentSession * 1000);
+                        Calendar cal = Calendar.getInstance();
+                        TimeZone tz = cal.getTimeZone();
+                        df.setTimeZone(tz);
+                        lastSessionFormattedDate = df.format(date);
+                        log("Formatted date: "+lastSessionFormattedDate);
+                    }
+                }
+
+                //Check if myAccount section is visible
+                MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                if(mAF!=null){
+                    mAF.setAccountDetails();
+                }
+
+                log("onRequest TYPE_ACCOUNT_DETAILS: "+getUsedPerc());
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+            log ("payment methods request");
+            getPaymentMethodsBoolean=true;
+            if (e.getErrorCode() == MegaError.API_OK){
+                dbH.setPaymentMethodsTimeStamp();
+                setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
     }
 }
