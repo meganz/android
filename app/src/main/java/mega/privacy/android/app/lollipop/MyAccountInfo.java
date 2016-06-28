@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAccountSession;
@@ -278,10 +279,12 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
                 //Check if myAccount section is visible
                 MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                if(mAF!=null){
-                    mAF.setAccountDetails();
+                ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                if((drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT)&&(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT)){
+                    if(mAF!=null){
+                        mAF.setAccountDetails();
+                    }
                 }
-
                 log("onRequest TYPE_ACCOUNT_DETAILS: "+getUsedPerc());
             }
         }
@@ -291,6 +294,14 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
             if (e.getErrorCode() == MegaError.API_OK){
                 dbH.setPaymentMethodsTimeStamp();
                 setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
+            }
+        }
+        else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
+            if (e.getErrorCode() == MegaError.API_OK){
+                dbH.setCreditCardTimestamp();
+                setNumberOfSubscriptions(request.getNumber());
+                log("NUMBER OF SUBS: " + getNumberOfSubscriptions());
+                ((ManagerActivityLollipop) context).updateCancelSubscriptions();
             }
         }
     }

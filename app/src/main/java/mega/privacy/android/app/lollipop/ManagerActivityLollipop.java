@@ -1526,9 +1526,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				myAccountInfo=new MyAccountInfo(this);
 			}
 			megaApi.getPaymentMethods(myAccountInfo);
-
 	        megaApi.getAccountDetails(myAccountInfo);
-	        megaApi.creditCardQuerySubscriptions(this);
+	        megaApi.creditCardQuerySubscriptions(myAccountInfo);
 
 			if(savedInstanceState==null) {
 				log("Run async task to check offline files");
@@ -3660,12 +3659,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if(upAFL==null){
 			upAFL = new UpgradeAccountFragmentLollipop();
-			upAFL.setInfo(paymentBitSet);
+			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commit();
 		}
 		else{
-			upAFL.setInfo(paymentBitSet);
+			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commit();
 		}
@@ -8732,9 +8731,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					hidden.setChecked(true);
 				}
 				selectDrawerItemLollipop(drawerItem);
-//				Intent myAccountIntent = new Intent(this, MyAccountMainActivityLollipop.class);
-//    			startActivity(myAccountIntent);
-//    			drawerLayout.closeDrawer(Gravity.LEFT);
 				break;
 			}
 //			case R.id.top_control_bar:{
@@ -9551,6 +9547,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		handler.postDelayed(r,10000);
 	}
 
+	public void updateCancelSubscriptions(){
+		log("updateCancelSubscriptions");
+		if (cancelSubscription != null){
+			cancelSubscription.setVisible(false);
+		}
+		if (myAccountInfo.getNumberOfSubscriptions() > 0){
+			if (cancelSubscription != null){
+				if (drawerItem == DrawerItem.ACCOUNT){
+					if (maFLol != null){
+						cancelSubscription.setVisible(true);
+					}
+				}
+			}
+		}
+	}
+
 	/*
 	 * Handle processed upload intent
 	 */
@@ -9756,24 +9768,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				myAccountInfo.setNumberOfSubscriptions(request.getNumber());
-				log("NUMBER OF SUBS: " + myAccountInfo.getNumberOfSubscriptions());
-				if (cancelSubscription != null){
-					cancelSubscription.setVisible(false);
-				}
-				if (myAccountInfo.getNumberOfSubscriptions() > 0){
-					if (cancelSubscription != null){
-						if (drawerItem == DrawerItem.ACCOUNT){
-							if (maFLol != null){
-								cancelSubscription.setVisible(true);
-							}
-						}
-					}
-				}
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_LONG).show();
@@ -9781,7 +9775,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
 			}
-			megaApi.creditCardQuerySubscriptions(this);
+			megaApi.creditCardQuerySubscriptions(myAccountInfo);
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
@@ -11649,5 +11643,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setContact(MegaUser contact) {
 		this.contact = contact;
+	}
+
+	public int getAccountFragment() {
+		return accountFragment;
+	}
+
+	public void setAccountFragment(int accountFragment) {
+		this.accountFragment = accountFragment;
 	}
 }
