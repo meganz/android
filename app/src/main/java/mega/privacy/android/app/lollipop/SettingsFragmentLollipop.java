@@ -886,6 +886,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 							numberOfClicksSDK = 0;
 							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 							Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+							log("App Version: " + Util.getVersion(context));
 						}
 						else{
 							dbH.setFileLogger(false);
