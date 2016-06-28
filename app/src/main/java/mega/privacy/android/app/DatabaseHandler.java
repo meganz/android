@@ -19,7 +19,7 @@ import nz.mega.sdk.MegaApiJava;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 21;
+	private static final int DATABASE_VERSION = 22;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -73,6 +73,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
 	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
 	private static final String KEY_FILE_LOGGER = "filelogger";
+
+	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
+	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
+	private static final String KEY_CREDIT_CARD_TIMESTAMP = "creditcardstimestamp";
     
     private static DatabaseHandler instance;
     
@@ -127,7 +131,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
-        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER +" TEXT " + ")";
+        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
+				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_CREDIT_CARD_TIMESTAMP +" TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
         
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -311,6 +316,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + " = '" + encrypt("false") + "';");
+		}
+
+		if(oldVersion <= 21){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_ACCOUNT_DETAILS_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ACCOUNT_DETAILS_TIMESTAMP + " = '" + encrypt("") + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_PAYMENT_METHODS_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PAYMENT_METHODS_TIMESTAMP + " = '" + encrypt("") + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_CREDIT_CARD_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_CREDIT_CARD_TIMESTAMP + " = '" + encrypt("") + "';");
 		}
 	} 
 	
@@ -510,6 +526,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
 		values.put(KEY_FILE_LOGGER, encrypt(attr.getFileLogger()));
+		values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getAccountDetailsTimeStamp()));
+		values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(attr.getPaymentMethodsTimeStamp()));
+		values.put(KEY_CREDIT_CARD_TIMESTAMP, encrypt(attr.getCreditCardTimeStamp()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -525,11 +544,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String askSizeDownload = decrypt(cursor.getString(3));
 			String askNoAppDownload = decrypt(cursor.getString(4));
 			String fileLogger = decrypt(cursor.getString(5));
+			String accountDetailsTimeStamp = decrypt(cursor.getString(6));
+			String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
+			String creditCardTimeStamp = decrypt(cursor.getString(8));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, creditCardTimeStamp);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, creditCardTimeStamp);
 			}
 		}
 		cursor.close();
@@ -1469,7 +1491,61 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
-	
+
+	public void setAccountDetailsTimeStamp (){
+		Long accountDetailsTimeStamp = System.currentTimeMillis()/1000;
+
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ACCOUNT_DETAILS_TIMESTAMP + "= '" + encrypt(accountDetailsTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_ATTRIBUTE_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(accountDetailsTimeStamp + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setPaymentMethodsTimeStamp (){
+		Long paymentMethodsTimeStamp = System.currentTimeMillis()/1000;
+
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PAYMENT_METHODS_TIMESTAMP + "= '" + encrypt(paymentMethodsTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_ATTRIBUTE_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(paymentMethodsTimeStamp + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setCreditCardTimestamp (){
+		Long creditCardTimestamp = System.currentTimeMillis()/1000;
+
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_CREDIT_CARD_TIMESTAMP + "= '" + encrypt(creditCardTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_ATTRIBUTE_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_CREDIT_CARD_TIMESTAMP, encrypt(creditCardTimestamp + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
 	public void setCamSyncTimeStamp (long camSyncTimeStamp){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
