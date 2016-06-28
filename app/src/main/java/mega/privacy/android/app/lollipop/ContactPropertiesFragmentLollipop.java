@@ -35,7 +35,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -55,6 +57,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	RelativeLayout mainLayout;
 	RelativeLayout imageLayout;
 	RelativeLayout optionsBackLayout;
+	RelativeLayout colorAvatar;
 	ImageView toolbarBack;
 	ImageView toolbarOverflow;
 	RelativeLayout overflowMenuLayout;
@@ -75,26 +78,28 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	RelativeLayout sharedLayout;
 	TextView sharedFoldersButton;	
 	TextView sharedFoldersLabel;
-	String userEmail;	
+	String userEmail;
+
 	Context context;
 	ActionBar aB;
-	
+	DatabaseHandler dbH;
+
 	//	private ListView overflowMenuList;
 	private boolean overflowVisible = false; 
-	private boolean name = false;
-	private boolean firstName = false;
-	String nameText;
 	String firstNameText;
+	String lastNameText;
 	
 	MegaApiAndroid megaApi;
 	MegaUser contact;
+
+	float density;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-
+		dbH = DatabaseHandler.getDbHandler(context);
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -123,7 +128,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
+		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
@@ -147,7 +152,6 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			{
 				return null;
 			}
-			
 			sV = (ParallaxScrollView) v.findViewById(R.id.contact_properties_scroll_view);
 			sV.post(new Runnable() { 
 		        public void run() { 
@@ -190,7 +194,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			createOverflowMenu(overflowMenuList);
 			overflowMenuList.setOnItemClickListener(this);
-			
+
+			colorAvatar = (RelativeLayout) v.findViewById(R.id.color_avatar_layout);
 			contactPropertiesImage = (ImageView) v.findViewById(R.id.contact_properties_toolbar_image);
 			initialLetter = (TextView) v.findViewById(R.id.contact_properties_toolbar_initial_letter);
 			
@@ -226,11 +231,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			separator.setLayoutParams(paramsDivider);
 
 			infoEmail.setText(userEmail);		
-			name=false;
-			firstName=false;
-			megaApi.getUserAttribute(contact, 1, this);
-			megaApi.getUserAttribute(contact, 2, this);
-			
+
 			//Shared Layout
 			sharedLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_shared_folders_layout);
 			sharedLayout.setOnClickListener(this);
@@ -249,63 +250,154 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 //			sharedFoldersButton.setOnClickListener(this);
 			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
 
-			Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
-			Canvas c = new Canvas(defaultAvatar);
-			Paint p = new Paint();
-			p.setAntiAlias(true);
-			p.setColor(Color.TRANSPARENT);
-			c.drawPaint(p);
-			contactPropertiesImage.setImageBitmap(defaultAvatar);
-			
-		    int avatarTextSize = getAvatarTextSize(density);
-		    log("DENSITY: " + density + ":::: " + avatarTextSize);
-		    if (userEmail != null){
-			    if (userEmail.length() > 0){
-			    	log("TEXT: " + userEmail);
-			    	log("TEXT AT 0: " + userEmail.charAt(0));
-			    	String firstLetter = userEmail.charAt(0) + "";
-			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			    	initialLetter.setText(firstLetter);
-			    	initialLetter.setTextSize(100);
-			    	initialLetter.setTextColor(Color.WHITE);
-			    	initialLetter.setVisibility(View.VISIBLE);
-			    }
-		    }
-		    
-			File avatar = null;
-			if (context.getExternalCacheDir() != null){
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+			if(contactDB!=null){
+
+				firstNameText = contactDB.getName();
+				lastNameText = contactDB.getLastName();
+
+				String fullName;
+
+				if (firstNameText.trim().length() <= 0){
+					fullName = lastNameText;
+				}
+				else{
+					fullName = firstNameText + " " + lastNameText;
+				}
+
+				if (fullName.trim().length() <= 0){
+					log("Put email as fullname");
+					String email = contact.getEmail();
+					String[] splitEmail = email.split("[@._]");
+					fullName = splitEmail[0];
+				}
+
+				nameView.setText(fullName);
 			}
 			else{
-				avatar = new File(context.getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+				log("The contactDB is null: ");
 			}
 
-			Bitmap imBitmap = null;
-			if (avatar.exists()){
-				if (avatar.length() > 0){
-					BitmapFactory.Options bOpts = new BitmapFactory.Options();
-					bOpts.inPurgeable = true;
-					bOpts.inInputShareable = true;
-					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-					if (imBitmap == null) {
-						avatar.delete();
-						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
-						}
-						else{
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
-						}
-					}
-					else{
-						contactPropertiesImage.setImageBitmap(imBitmap);
-						initialLetter.setVisibility(View.GONE);
-					}
-				}
-			}
-			//infoAdded.setText(contact.getTimestamp()+"");
+			setDefaultAvatar();
+
+			setAvatar();
 		}
 
 		return v;
+	}
+
+	public void setAvatar(){
+		log("setAvatar");
+		File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+		}
+
+		if(avatar!=null){
+			setProfileAvatar(avatar);
+		}
+	}
+
+	public void setProfileAvatar(File avatar){
+		log("setProfileAvatar");
+		Bitmap imBitmap = null;
+		if (avatar.exists()){
+			if (avatar.length() > 0){
+				BitmapFactory.Options bOpts = new BitmapFactory.Options();
+				bOpts.inPurgeable = true;
+				bOpts.inInputShareable = true;
+				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				if (imBitmap == null) {
+					avatar.delete();
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+					}
+					else{
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+					}
+				}
+				else{
+					contactPropertiesImage.setImageBitmap(imBitmap);
+					initialLetter.setVisibility(View.GONE);
+				}
+			}
+		}
+	}
+
+	public void setDefaultAvatar(){
+		log("setDefaultAvatar");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(Color.TRANSPARENT);
+		c.drawPaint(p);
+
+		String color = megaApi.getUserAvatarColor(contact);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			colorAvatar.setBackgroundColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			colorAvatar.setBackgroundColor(context.getResources().getColor(R.color.lollipop_primary_color));
+		}
+
+		contactPropertiesImage.setImageBitmap(defaultAvatar);
+
+		int avatarTextSize = getAvatarTextSize(density);
+		log("DENSITY: " + density + ":::: " + avatarTextSize);
+
+		String fullName;
+		boolean setInitialByMail = false;
+
+		if (firstNameText.trim().length() <= 0){
+			fullName = lastNameText;
+		}
+		else{
+			fullName = firstNameText + " " + lastNameText;
+		}
+
+		if (fullName.trim().length() <= 0){
+			log("Put email as fullname");
+			String email = userEmail;
+			String[] splitEmail = email.split("[@._]");
+			fullName = splitEmail[0];
+		}
+
+		if (fullName != null){
+			if (fullName.trim().length() > 0){
+				String firstLetter = fullName.charAt(0) + "";
+				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				initialLetter.setText(firstLetter);
+				initialLetter.setTextSize(100);
+				initialLetter.setTextColor(Color.WHITE);
+				initialLetter.setVisibility(View.VISIBLE);
+			}else{
+				setInitialByMail=true;
+			}
+		}
+		else{
+			setInitialByMail=true;
+		}
+		if(setInitialByMail){
+			if (userEmail != null){
+				if (userEmail.length() > 0){
+					log("email TEXT: " + userEmail);
+					log("email TEXT AT 0: " + userEmail.charAt(0));
+					String firstLetter = userEmail.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					initialLetter.setText(firstLetter);
+					initialLetter.setTextSize(100);
+					initialLetter.setTextColor(Color.WHITE);
+					initialLetter.setVisibility(View.VISIBLE);
+				}
+			}
+		}
 	}
 	
 	@SuppressLint("NewApi")
@@ -464,33 +556,6 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 						}
 					}
 				}
-				if(request.getParamType()==1){
-					log("(1)request.getText(): "+request.getText());
-					nameText=request.getText();
-					name=true;
-				}
-				else if(request.getParamType()==2){
-					log("(2)request.getText(): "+request.getText());
-					firstNameText = request.getText();
-					firstName = true;
-				}
-				if(name&&firstName){
-					if (nameView != null){
-						nameView.setText(nameText+" "+firstNameText);
-						if (nameText != null){
-							if (nameText.length() > 0){
-								String firstLetter = nameText.charAt(0) + "";
-								firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-								initialLetter.setText(firstLetter);
-								initialLetter.setTextSize(100);
-								initialLetter.setTextColor(Color.WHITE);
-							}
-						}
-					}
-					name= false;
-					firstName = false;
-				}
-				
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA) {

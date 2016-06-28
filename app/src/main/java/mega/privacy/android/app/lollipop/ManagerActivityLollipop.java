@@ -2046,7 +2046,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		String color = megaApi.getUserAvatarColor(contact);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		}
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

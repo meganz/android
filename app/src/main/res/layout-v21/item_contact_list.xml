@@ -20,14 +20,15 @@
             android:layout_centerInParent="true"
             rounded:border_color="@color/border_file_properties"
             rounded:border_width="0dp"
-            rounded:corner_radius="27dp" />
+            rounded:corner_radius="20dp" />
 
         <TextView
             android:id="@+id/contact_list_initial_letter"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="-5dp" />
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal|center_vertical"
+            android:paddingBottom="3dp" />
     </RelativeLayout>
 
     <TextView
