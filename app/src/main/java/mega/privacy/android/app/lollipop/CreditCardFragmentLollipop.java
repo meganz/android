@@ -1,21 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.Product;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -39,6 +23,21 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.Product;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class CreditCardFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener, OnItemSelectedListener{
 	
@@ -765,7 +764,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				log("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
 				Toast.makeText(context, getString(R.string.credit_card_information_error) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
-				((ManagerActivityLollipop)context).getNumberOfSubscriptions();
+				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 		}
@@ -775,14 +774,14 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				log("OK payment!!!");
 				Toast.makeText(context, getString(R.string.account_successfully_upgraded), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
-				((ManagerActivityLollipop)context).getNumberOfSubscriptions();
+				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 			else{
 				log("NOOOOOOOOO___" + e.getErrorCode() + "___" + e.getErrorString());
 				Toast.makeText(context, getString(R.string.account_error_upgraded) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
-				((ManagerActivityLollipop)context).getNumberOfSubscriptions();
+				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 		}
