@@ -553,7 +553,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_account_type_button:{
 				log("Upgrade Account button");
-				((ManagerActivityLollipop)context).showUpAF(null);
+				((ManagerActivityLollipop)context).showUpAF();
 
 				break;
 			}

@@ -89,7 +89,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OldPreferences;
-import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SettingsActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -1527,6 +1526,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			megaApi.getPaymentMethods(myAccountInfo);
 	        megaApi.getAccountDetails(myAccountInfo);
+			megaApi.getPricing(myAccountInfo);
 	        megaApi.creditCardQuerySubscriptions(myAccountInfo);
 
 			if(savedInstanceState==null) {
@@ -1560,25 +1560,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							case 1:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(1, null, paymentBitSet);
+								showpF(1);
 								return;
 							}
 							case 2:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(2, null, paymentBitSet);
+								showpF(2);
 								return;
 							}
 							case 3:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(3, null, paymentBitSet);
+								showpF(3);
 								return;
 							}
 							case 4:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(4, null, paymentBitSet);
+								showpF(4);
 								return;
 							}
 						}
@@ -3439,13 +3439,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh, BitSet paymentBitSet){
-
-		if (paymentBitSet == null){
-			if (myAccountInfo.getPaymentBitSet() != null){
-				paymentBitSet = myAccountInfo.getPaymentBitSet();
-			}
-		}
+	public void showCC(int type, MyAccountInfo myAccountInfo, int payMonth, boolean refresh){
 
 		accountFragment = Constants.CC_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);
@@ -3456,12 +3450,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (!refresh){
 			if (ccFL == null){
 				ccFL = new CreditCardFragmentLollipop();
-				ccFL.setInfo(type, accounts, payMonth, paymentBitSet);
+				ccFL.setInfo(type, myAccountInfo, payMonth);
 				ft.replace(R.id.fragment_container, ccFL, "ccF");
 				ft.commit();
 			}
 			else{
-				ccFL.setInfo(type, accounts, payMonth, paymentBitSet);
+				ccFL.setInfo(type, myAccountInfo, payMonth);
 				ft.replace(R.id.fragment_container, ccFL, "ccF");
 				ft.commit();
 			}
@@ -3476,12 +3470,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				if (ccFL == null){
 					ccFL = new CreditCardFragmentLollipop();
-					ccFL.setInfo(type, accounts, payMonth, paymentBitSet);
+					ccFL.setInfo(type, myAccountInfo, payMonth);
 					ft.replace(R.id.fragment_container, ccFL, "ccF");
 					ft.commit();
 				}
 				else{
-					ccFL.setInfo(type, accounts, payMonth, paymentBitSet);
+					ccFL.setInfo(type, myAccountInfo, payMonth);
 					ft.replace(R.id.fragment_container, ccFL, "ccF");
 					ft.commit();
 				}
@@ -3540,14 +3534,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showmyF(int paymentMethod, int type, ArrayList<Product> accounts, BitSet paymentBitSet){
+	public void showmyF(int paymentMethod, int type){
 		log("showmyF");
-
-		if (paymentBitSet == null){
-			if (myAccountInfo.getPaymentBitSet() != null){
-				paymentBitSet = myAccountInfo.getPaymentBitSet();
-			}
-		}
 
 		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
 
@@ -3561,29 +3549,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (myFL == null){
 			myFL = new MonthlyAnnualyFragmentLollipop();
-			myFL.setInfo(paymentMethod, type, accounts, paymentBitSet);
+			myFL.setInfo(paymentMethod, type, myAccountInfo);
 			ft.replace(R.id.fragment_container, myFL, "myF");
 			ft.commit();
 		}
 		else{
-			myFL.setInfo(paymentMethod, type, accounts, paymentBitSet);
+			myFL.setInfo(paymentMethod, type, myAccountInfo);
 			ft.replace(R.id.fragment_container, myFL, "myF");
 			ft.commit();
 		}
 	}
 
-	public void showpF(int type, ArrayList<Product> accounts, BitSet paymentBitSet){
-		showpF(type, accounts, false, paymentBitSet);
+	public void showpF(int type){
+		log("showpF without refresh");
+
+		showpF(type, false);
 	}
 
-	public void showpF(int type, ArrayList<Product> accounts, boolean refresh, BitSet paymentBitSet){
+	public void showpF(int type, boolean refresh){
 		log("showpF");
-
-		if (paymentBitSet == null){
-			if (myAccountInfo.getPaymentBitSet() != null){
-				paymentBitSet = myAccountInfo.getPaymentBitSet();
-			}
-		}
 
 		accountFragment=Constants.PAYMENT_FRAGMENT;
 
@@ -3597,12 +3581,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (!refresh){
 			if(pFL==null){
 				pFL = new PaymentFragmentLollipop();
-				pFL.setInfo(type, accounts, paymentBitSet);
+				pFL.setInfo(type, myAccountInfo);
 				ft.replace(R.id.fragment_container, pFL, "pF");
 				ft.commit();
 			}
 			else{
-				pFL.setInfo(type, accounts, paymentBitSet);
+				pFL.setInfo(type, myAccountInfo);
 				ft.replace(R.id.fragment_container, pFL, "pF");
 				ft.commit();
 			}
@@ -3617,12 +3601,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				if(pFL==null){
 					pFL = new PaymentFragmentLollipop();
-					pFL.setInfo(type, accounts, paymentBitSet);
+					pFL.setInfo(type, myAccountInfo);
 					ft.replace(R.id.fragment_container, pFL, "pF");
 					ft.commit();
 				}
 				else{
-					pFL.setInfo(type, accounts, paymentBitSet);
+					pFL.setInfo(type, myAccountInfo);
 					ft.replace(R.id.fragment_container, pFL, "pF");
 					ft.commit();
 				}
@@ -3630,7 +3614,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showUpAF(BitSet paymentBitSet){
+	public void showUpAF(){
 
 //		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
 //        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -3640,12 +3624,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //        fragTransaction = getSupportFragmentManager().beginTransaction();
 //        fragTransaction.attach(currentFragment);
 //        fragTransaction.commit();
-
-		if (paymentBitSet == null){
-			if (myAccountInfo.getPaymentBitSet() != null){
-				paymentBitSet = myAccountInfo.getPaymentBitSet();
-			}
-		}
 
 		accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 
@@ -5919,7 +5897,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
-	        	showUpAF(null);
+	        	showUpAF();
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
@@ -6371,12 +6349,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		case Constants.CC_FRAGMENT:{
 	    			if (ccFL != null){
 	    				int parameterType = ccFL.getParameterType();
-	    				ArrayList<Product> accounts = ccFL.getAccounts();
-	    				BitSet paymentBitSet = ccFL.getPaymentBitSet();
-	    				showpF(parameterType, accounts, paymentBitSet);
+	    				showpF(parameterType);
 	    			}
 	    			else{
-	    				showUpAF(null);
+	    				showUpAF();
 	    			}
 	    			return;
 	    		}
@@ -8717,7 +8693,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				outSpaceLayout.setVisibility(View.GONE);
 				getProLayout.setVisibility(View.GONE);
-				showUpAF(null);
+				showUpAF();
 				break;
 			}
 
@@ -11608,6 +11584,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return maFLol;
 	}
 
+	public UpgradeAccountFragmentLollipop getUpgradeAccountFragment() {
+		return upAFL;
+	}
+
+	public PaymentFragmentLollipop getPaymentFragment() {
+		return pFL;
+	}
+
+	public MonthlyAnnualyFragmentLollipop getMonthlyAnnualyFragment() {
+		return myFL;
+	}
+
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
 		this.cFLol = cFLol;
 	}
@@ -11652,4 +11640,5 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setAccountFragment(int accountFragment) {
 		this.accountFragment = accountFragment;
 	}
+
 }

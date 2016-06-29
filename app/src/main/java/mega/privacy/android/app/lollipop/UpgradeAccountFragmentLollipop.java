@@ -23,18 +23,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener{		
+public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickListener{
 	
-	public ArrayList<Product> accounts;
-	
+
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	public MyAccountInfo myAccountInfo;
@@ -81,11 +74,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 
 	@Override
 	public void onDestroy(){				
-		if(megaApi != null)
-		{	
-			megaApi.removeRequestListener(this);
-		}
-		
+
 		super.onDestroy();
 	}
 	
@@ -95,8 +84,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		accounts = new ArrayList<Product>();
-		
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -190,33 +177,148 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		if (myAccountInfo.getPaymentBitSet() == null){
 			megaApi.getPaymentMethods(myAccountInfo);
 		}
-		
-		megaApi.getPricing(this);
-		checkAvailableAccount();
-		
+
+		//Check if called recently
+//		megaApi.getPricing(myAccountInfo);
+		setPricing();
+		showAvailableAccount();
 		return v;
-	}	
+	}
+
+	public void setPricing(){
+		log("setPricing");
+
+		DecimalFormat df = new DecimalFormat("#.##");
+
+		if(myAccountInfo!=null){
+			ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
+
+			for (int i = 0; i < productAccounts.size(); i++) {
+				Product account = productAccounts.get(i);
+				if (account.getLevel() == 1 && account.getMonths() == 1) {
+					log("PRO1: " + account.getStorage());
+					double price = account.getAmount() / 100.00;
+					String priceString = df.format(price);
+					String[] s = priceString.split("\\.");
+					if (s.length == 1) {
+						String[] s1 = priceString.split(",");
+						if (s1.length == 1) {
+							pro1PriceInteger.setText(s1[0]);
+							pro1PriceDecimal.setText("");
+						} else if (s1.length == 2) {
+							pro1PriceInteger.setText(s1[0]);
+							pro1PriceDecimal.setText("." + s1[1] + " €");
+						}
+					} else if (s.length == 2) {
+						pro1PriceInteger.setText(s[0]);
+						pro1PriceDecimal.setText("." + s[1] + " €");
+					}
+
+					pro1StorageInteger.setText("" + account.getStorage());
+					pro1StorageGb.setText(" GB");
+
+					pro1BandwidthInteger.setText("" + account.getTransfer() / 1024);
+					pro1BandwidthTb.setText(" TB");
+				} else if (account.getLevel() == 2 && account.getMonths() == 1) {
+					log("PRO2: " + account.getStorage());
+
+					double price = account.getAmount() / 100.00;
+					String priceString = df.format(price);
+					String[] s = priceString.split("\\.");
+					if (s.length == 1) {
+						String[] s1 = priceString.split(",");
+						if (s1.length == 1) {
+							pro2PriceInteger.setText(s1[0]);
+							pro2PriceDecimal.setText("");
+						} else if (s1.length == 2) {
+							pro2PriceInteger.setText(s1[0]);
+							pro2PriceDecimal.setText("." + s1[1] + " €");
+						}
+					} else if (s.length == 2) {
+						pro2PriceInteger.setText(s[0]);
+						pro2PriceDecimal.setText("." + s[1] + " €");
+					}
+
+					pro2StorageInteger.setText(sizeTranslation(account.getStorage(), 0));
+					pro2StorageGb.setText(" TB");
+
+					pro2BandwidthInteger.setText("" + account.getTransfer() / 1024);
+					pro2BandwidthTb.setText(" TB");
+				} else if (account.getLevel() == 3 && account.getMonths() == 1) {
+					log("PRO3: " + account.getStorage());
+
+					double price = account.getAmount() / 100.00;
+					String priceString = df.format(price);
+					String[] s = priceString.split("\\.");
+					if (s.length == 1) {
+						String[] s1 = priceString.split(",");
+						if (s1.length == 1) {
+							pro3PriceInteger.setText(s1[0]);
+							pro3PriceDecimal.setText("");
+						} else if (s1.length == 2) {
+							pro3PriceInteger.setText(s1[0]);
+							pro3PriceDecimal.setText("." + s1[1] + " €");
+						}
+					} else if (s.length == 2) {
+						pro3PriceInteger.setText(s[0]);
+						pro3PriceDecimal.setText("." + s[1] + " €");
+					}
+
+					pro3StorageInteger.setText(sizeTranslation(account.getStorage(), 0));
+					pro3StorageGb.setText(" TB");
+
+					pro3BandwidthInteger.setText("" + account.getTransfer() / 1024);
+					pro3BandwidthTb.setText(" TB");
+				} else if (account.getLevel() == 4 && account.getMonths() == 1) {
+					log("Lite: " + account.getStorage());
+
+					double price = account.getAmount() / 100.00;
+					String priceString = df.format(price);
+					String[] s = priceString.split("\\.");
+					if (s.length == 1) {
+						String[] s1 = priceString.split(",");
+						if (s1.length == 1) {
+							proLitePriceInteger.setText(s1[0]);
+							proLitePriceDecimal.setText("");
+						} else if (s1.length == 2) {
+							proLitePriceInteger.setText(s1[0]);
+							proLitePriceDecimal.setText("." + s1[1] + " €");
+						}
+					} else if (s.length == 2) {
+						proLitePriceInteger.setText(s[0]);
+						proLitePriceDecimal.setText("." + s[1] + " €");
+					}
+
+					proLiteStorageInteger.setText("" + account.getStorage());
+					proLiteStorageGb.setText(" GB");
+
+					proLiteBandwidthInteger.setText("" + account.getTransfer() / 1024);
+					proLiteBandwidthTb.setText(" TB");
+				}
+			}
+		}
+	}
 	
-	public void checkAvailableAccount(){
-		
-		log("usedStorage: "+myAccountInfo.getUsedGbStorage());
+	public void showAvailableAccount(){
+		log("checkAvailableAccount: "+myAccountInfo.getAccountType());
+
 		switch(myAccountInfo.getAccountType()){
+
 			case 1:{
 				hideProLite();
 				break;
-			}	
+			}
 			case 2:{
 				hideProLite();
 				hideProI();
 				break;
-			}	
+			}
 			case 3:{
 				hideProLite();
 				hideProI();
 				hideProII();
 				break;
 			}
-			
 			case 4:{
 				break;
 			}
@@ -225,218 +327,28 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 
 	public void onUpgrade1Click() {
 		if (myAccountInfo.getPaymentBitSet() != null){
-			((ManagerActivityLollipop)context).showpF(1, accounts, myAccountInfo.getPaymentBitSet());
+			((ManagerActivityLollipop)context).showpF(1);
 		}
 	}
 
 	public void onUpgrade2Click() {
 		if (myAccountInfo.getPaymentBitSet() != null){
-			((ManagerActivityLollipop)context).showpF(2, accounts, myAccountInfo.getPaymentBitSet());
+			((ManagerActivityLollipop)context).showpF(2);
 		}
 	}
 
 	public void onUpgrade3Click() {
 		if (myAccountInfo.getPaymentBitSet() != null){
-			((ManagerActivityLollipop)context).showpF(3, accounts, myAccountInfo.getPaymentBitSet());
+			((ManagerActivityLollipop)context).showpF(3);
 		}
 	}
 	
 	public void onUpgradeLiteClick(){
 		if (myAccountInfo.getPaymentBitSet() != null){
-			((ManagerActivityLollipop)context).showpF(4, accounts, myAccountInfo.getPaymentBitSet());
+			((ManagerActivityLollipop)context).showpF(4);
 		}
 	}
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		DecimalFormat df = new DecimalFormat("#.##");
-
-		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-			MegaPricing p = request.getPricing();
-//			usedStorage = 501;
-
-			for (int i=0;i<p.getNumProducts();i++){
-				log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
-
-				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-
-				if(account.getLevel()==1&&account.getMonths()==1){
-					log("PRO1: "+account.getStorage());
-					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
-						hideProI();
-					}
-
-					double price = account.getAmount()/100.00;
-					String priceString = df.format(price);
-					String [] s = priceString.split("\\.");
-					if (s.length == 1){
-						String [] s1 = priceString.split(",");
-						if (s1.length == 1){
-							pro1PriceInteger.setText(s1[0]);
-							pro1PriceDecimal.setText("");
-						}
-						else if (s1.length == 2){
-							pro1PriceInteger.setText(s1[0]);
-							pro1PriceDecimal.setText("." + s1[1] + " €");
-						}
-					}
-					else if (s.length == 2){
-						pro1PriceInteger.setText(s[0]);
-						pro1PriceDecimal.setText("." + s[1] + " €");
-					}
-					
-					pro1StorageInteger.setText(""+account.getStorage());
-					pro1StorageGb.setText(" GB");
-					
-					pro1BandwidthInteger.setText(""+account.getTransfer()/1024);
-					pro1BandwidthTb.setText(" TB");
-				}
-				else if(account.getLevel()==2&&account.getMonths()==1){
-					log("PRO2: "+account.getStorage());
-					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
-						hideProII();
-					}
-					
-					double price = account.getAmount()/100.00;
-					String priceString = df.format(price);
-					String [] s = priceString.split("\\.");
-					if (s.length == 1){
-						String [] s1 = priceString.split(",");
-						if (s1.length == 1){
-							pro2PriceInteger.setText(s1[0]);
-							pro2PriceDecimal.setText("");
-						}
-						else if (s1.length == 2){
-							pro2PriceInteger.setText(s1[0]);
-							pro2PriceDecimal.setText("." + s1[1] + " €");
-						}
-					}
-					else if (s.length == 2){
-						pro2PriceInteger.setText(s[0]);
-						pro2PriceDecimal.setText("." + s[1] + " €");
-					}
-					
-					pro2StorageInteger.setText(sizeTranslation(account.getStorage(),0));
-					pro2StorageGb.setText(" TB");
-					
-					pro2BandwidthInteger.setText(""+account.getTransfer()/1024);
-					pro2BandwidthTb.setText(" TB");
-				}
-				else if(account.getLevel()==3&&account.getMonths()==1){	                	 
-					log("PRO3: "+account.getStorage());
-					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
-						hideProIII();
-					}
-					
-					double price = account.getAmount()/100.00;
-					String priceString = df.format(price);
-					String [] s = priceString.split("\\.");
-					if (s.length == 1){
-						String [] s1 = priceString.split(",");
-						if (s1.length == 1){
-							pro3PriceInteger.setText(s1[0]);
-							pro3PriceDecimal.setText("");
-						}
-						else if (s1.length == 2){
-							pro3PriceInteger.setText(s1[0]);
-							pro3PriceDecimal.setText("." + s1[1] + " €");
-						}
-					}
-					else if (s.length == 2){
-						pro3PriceInteger.setText(s[0]);
-						pro3PriceDecimal.setText("." + s[1] + " €");
-					}
-					
-					pro3StorageInteger.setText(sizeTranslation(account.getStorage(),0));
-					pro3StorageGb.setText(" TB");
-					
-					pro3BandwidthInteger.setText(""+account.getTransfer()/1024);
-					pro3BandwidthTb.setText(" TB");
-				}
-				else if (account.getLevel()==4&&account.getMonths()==1){
-					log("Lite: "+account.getStorage());
-					if(myAccountInfo.getUsedGbStorage()>account.getStorage()){
-						hideProLite();
-					}
-					double price = account.getAmount()/100.00;
-					String priceString = df.format(price);
-					String [] s = priceString.split("\\.");
-					if (s.length == 1){
-						String [] s1 = priceString.split(",");
-						if (s1.length == 1){
-							proLitePriceInteger.setText(s1[0]);
-							proLitePriceDecimal.setText("");
-						}
-						else if (s1.length == 2){
-							proLitePriceInteger.setText(s1[0]);
-							proLitePriceDecimal.setText("." + s1[1] + " €");
-						}
-					}
-					else if (s.length == 2){
-						proLitePriceInteger.setText(s[0]);
-						proLitePriceDecimal.setText("." + s[1] + " €");
-					}
-					
-					proLiteStorageInteger.setText(""+account.getStorage());
-					proLiteStorageGb.setText(" GB");
-					
-					proLiteBandwidthInteger.setText(""+account.getTransfer()/1024);
-					proLiteBandwidthTb.setText(" TB");
-				}
-				accounts.add(account);
-			}    
-//			/*RESULTS
-//	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
-//        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
-//        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
-//        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
-//        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
-//        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-		}
-		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
-			log ("account_details request");
-			if (e.getErrorCode() == MegaError.API_OK){
-
-				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
-
-				switch(accountInfo.getProLevel()){
-	
-					case 1:{
-						hideProLite();
-						break;
-					}	
-					case 2:{
-						hideProLite();
-						hideProI();
-						break;
-					}	
-					case 3:{
-						hideProLite();
-						hideProI();
-						hideProII();
-						break;
-					}
-					
-					case 4:{
-						break;
-					}
-				}
-			}
-		}
-	}
-	
 	private void hideProLite(){
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
 	}
@@ -473,17 +385,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		}
 		return null;
 	      
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public ArrayList<Product> getAccounts(){
-		return accounts;
 	}
 
 	@Override

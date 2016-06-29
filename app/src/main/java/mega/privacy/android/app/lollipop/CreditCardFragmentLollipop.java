@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -142,11 +141,11 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
-	ArrayList<Product> accounts;
+//	ArrayList<Product> accounts;
+	MyAccountInfo myAccountInfo;
 	CreditCardFragmentLollipop paymentFragment = this;
 	int paymentMonth = -1;
-	BitSet paymentBitSet = null;
-	
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -385,10 +384,12 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 //		paymentCreditCard.setOnClickListener(this);
 //		paymentFortumo.setOnClickListener(this);
 //		paymentGoogleWallet.setOnClickListener(this);
-//		
+
+		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 		switch (parameterType) {
+
 			case 1:{
-				
+
 				for (int i=0;i<accounts.size();i++){
 	
 					Product account = accounts.get(i);
@@ -709,25 +710,15 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 ////		}
 	}
 	
-	public void setInfo (int _type, ArrayList<Product> _accounts, int _paymentMonth, BitSet _paymentBitSet){
-		this.accounts = _accounts;
+	public void setInfo (int _type, MyAccountInfo _myAccountInfo, int _paymentMonth){
 		this.parameterType = _type;
+		this.myAccountInfo = _myAccountInfo;
 		this.paymentMonth = _paymentMonth;
-		this.paymentBitSet = _paymentBitSet;
 	}
-	
-	public ArrayList<Product> getAccounts(){
-		return accounts;
-	}
-	
+
 	public int getParameterType(){
 		return parameterType;
 	}
-	
-	public BitSet getPaymentBitSet(){
-		return paymentBitSet;
-	}
-	
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
@@ -745,12 +736,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
 		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			if (e.getErrorCode() == MegaError.API_OK){
-				
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_STORE){
+		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_STORE){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("API_OK!!");
 				log("VOY A PAGAR CON ESTE PRODUCTHANDLE: " + productHandleLong);
@@ -830,7 +816,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	
 	public int onBackPressed(){
 //		((ManagerActivity)context).showpF(parameterType, accounts);
-		((ManagerActivityLollipop)context).showpF(parameterType, accounts, true, paymentBitSet);
+		((ManagerActivityLollipop)context).showpF(parameterType, true);
 		return 3;
 	}
 	
@@ -861,6 +847,9 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 //				countryString = "ES";
 //				Toast.makeText(context, address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString, Toast.LENGTH_LONG).show();
 				log(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
+
+				ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
+
 				for (int i=0;i<accounts.size();i++){
 					Product account = accounts.get(i);
 					
