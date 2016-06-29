@@ -5871,7 +5871,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				selectDrawerItem(drawerItem);
 			}
 			else{
-				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
+				log("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
+//				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
