@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.content.Context;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,12 +11,14 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.Product;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
@@ -40,6 +43,8 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     DatabaseHandler dbH;
     Context context;
+
+    public ArrayList<Product> productAccounts;
 
     public MyAccountInfo(Context context){
         log("AccountController created");
@@ -278,11 +283,19 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                 }
 
                 //Check if myAccount section is visible
-                MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
                 ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                if((drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT)&&(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT)){
-                    if(mAF!=null){
-                        mAF.setAccountDetails();
+                if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                    if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                        if(mAF!=null){
+                            mAF.setAccountDetails();
+                        }
+                    }
+                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
+                        UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
+                        if(upAFL!=null){
+                            upAFL.showAvailableAccount();
+                        }
                     }
                 }
                 log("onRequest TYPE_ACCOUNT_DETAILS: "+getUsedPerc());
@@ -295,6 +308,16 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                 dbH.setPaymentMethodsTimeStamp();
                 setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
             }
+            //Check if myAccount section is visible
+            ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+            if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
+                    PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
+                    if(pFL!=null){
+                        pFL.setPaymentMethods();
+                    }
+                }
+            }
         }
         else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
             if (e.getErrorCode() == MegaError.API_OK){
@@ -304,10 +327,62 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                 ((ManagerActivityLollipop) context).updateCancelSubscriptions();
             }
         }
+        if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+            MegaPricing p = request.getPricing();
+            productAccounts = new ArrayList<Product>();
+//			usedStorage = 501;
+            if (e.getErrorCode() == MegaError.API_OK) {
+                for (int i = 0; i < p.getNumProducts(); i++) {
+                    log("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+
+                    Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+
+                    productAccounts.add(account);
+                }
+                //			/*RESULTS
+                //	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
+                //        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
+                //        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
+                //        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
+                //        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
+                //        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
+            }
+            //Check if myAccount section is visible
+            ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+            if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
+                    UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
+                    if(upAFL!=null){
+                        upAFL.setPricing();
+                    }
+                }
+                else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MONTHLY_YEARLY_FRAGMENT) {
+                    MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
+                    if(myFL!=null){
+                        myFL.setPricing();
+                    }
+                }
+                else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
+                    PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
+                    if(pFL!=null){
+                        pFL.setPricing();
+                    }
+                }
+            }
+
+        }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+    public ArrayList<Product> getProductAccounts() {
+        return productAccounts;
+    }
+
+    public void setProductAccounts(ArrayList<Product> productAccounts) {
+        this.productAccounts = productAccounts;
     }
 }

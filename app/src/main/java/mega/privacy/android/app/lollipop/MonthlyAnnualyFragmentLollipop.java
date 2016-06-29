@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
@@ -26,13 +25,8 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener{
+public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickListener{
 	
 	public static int MY_ACCOUNT_FRAGMENT = 5000;
 	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -72,10 +66,10 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 	int parameterType=-1;	
 	MegaApiAndroid megaApi;
 	Context context;
-	ArrayList<Product> accounts;
+	MyAccountInfo myAccountInfo;
 	int paymentMethod = -1;
 	MonthlyAnnualyFragmentLollipop monthlyAnnualyFragment = this;
-	BitSet paymentBitSet = null;
+
 	
 	@Override
 	public void onDestroy(){
@@ -104,10 +98,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		
-		if (paymentBitSet == null){
-			megaApi.getPaymentMethods(this);
 		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -157,764 +147,372 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 		bandwidthTb = (TextView) v.findViewById(R.id.monthly_annualy_bandwith_value_tb);
 		
 		selectMonthYear = (TextView) v.findViewById(R.id.monthly_annualy_select);
-		
-		if(paymentBitSet == null){
-			megaApi.getPaymentMethods(this);
-		}
-		
-		if(accounts == null){
-			megaApi.getPricing(this);
-		}
-		else{			
-			switch(parameterType){
-				case 1:{
-					
-					for (int i=0;i<accounts.size();i++){
-		
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==1 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");		
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(""+account.getStorage());
-							storageGb.setText(" GB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.pro1_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-						}
-						if (account.getLevel()==1 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
-					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-		
-					break;
-				}
-				case 2:{
 
-					for (int i=0;i<accounts.size();i++){
-		
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==2 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(sizeTranslation(account.getStorage(),0));
-							storageGb.setText(" TB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.pro2_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-						}
-						if (account.getLevel()==2 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
-					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-		
-					break;
-				}
-				case 3:{
-					
-					for (int i=0;i<accounts.size();i++){
-		
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==3 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(sizeTranslation(account.getStorage(),0));
-							storageGb.setText(" TB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.pro3_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-						}
-						if (account.getLevel()==3 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
-					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-					
-					break;
-				}
-				case 4:{
-					for (int i=0;i<accounts.size();i++){
-						
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==4 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(""+account.getStorage());
-							storageGb.setText(" GB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.prolite_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-						}
-						if (account.getLevel()==4 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
-					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							priceSeparator.setVisibility(View.GONE);
-							priceAnnualyLayout.setVisibility(View.GONE);
-							subscribeSeparator.setVisibility(View.GONE);
-							subscribeAnnualyLayout.setVisibility(View.GONE);
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							priceSeparator.setVisibility(View.GONE);
-							priceAnnualyLayout.setVisibility(View.GONE);
-							subscribeSeparator.setVisibility(View.GONE);
-							subscribeAnnualyLayout.setVisibility(View.GONE);
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-					
-					break;
-				}
-			}
-		}	
+		setPricing();
+
+		megaApi.getPaymentMethods(myAccountInfo);
+		megaApi.getPricing(myAccountInfo);
 
 		return v;
-	}	
-
-	public void setInfo (int _paymentMethod, int _type, ArrayList<Product> _accounts, BitSet paymentBitSet){
-		this.paymentMethod = _paymentMethod;
-		this.accounts = _accounts;
-		this.parameterType = _type;
-		this.paymentBitSet = paymentBitSet;
-	}
-	
-
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
 	}
 
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		
-		log("onRequestFinish: " + request.getRequestString());
-		
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+	public void setPricing(){
+		log("setPricing");
 
-			paymentBitSet = Util.convertToBitSet(request.getNumber()); 
-		}		
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT ID: " + request.getLink());
-		}
-		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-			MegaPricing p = request.getPricing();
-			DecimalFormat df = new DecimalFormat("#.##"); 
-			
-			accounts = new ArrayList<Product>(); 
+		DecimalFormat df = new DecimalFormat("#.##");
 
-			for (int i=0;i<p.getNumProducts();i++){
-				log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
-				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-				accounts.add(account);				
-			}    
-			
-			switch(parameterType){
-				case 1:{
-					
-					for (int i=0;i<accounts.size();i++){
-		
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==1 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
+		switch(parameterType){
+			case 1:{
+
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==1 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("");
 							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
+							else if (s1.length == 2){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("." + s1[1] + " €");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("." + s1[1] + " €");
 							}
-							
-							storageInteger.setText(""+account.getStorage());
-							storageGb.setText(" GB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.pro1_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
-						if (account.getLevel()==1 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
+						else if (s.length == 2){
+							priceInteger.setText(s[0]);
+							priceDecimal.setText("." + s[1] + " €");
+							priceMonthlyInteger.setText(s[0]);
+							priceMonthlyDecimal.setText("." + s[1] + " €");
+						}
+
+						storageInteger.setText(""+account.getStorage());
+						storageGb.setText(" GB");
+
+						bandwidthInteger.setText(""+account.getTransfer()/1024);
+						bandwidthTb.setText(" TB");
+
+						title.setText(getString(R.string.pro1_account));
+
+						storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+					}
+					if (account.getLevel()==1 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("");
 							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
+							else if (s1.length == 2){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("." + s1[1] + " €");
 							}
+						}
+						else if (s.length == 2){
+							priceAnnualyInteger.setText(s[0]);
+							priceAnnualyDecimal.setText("." + s[1] + " €");
 						}
 					}
-		
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-					
-					break;
 				}
-				case 2:{
-	
-					for (int i=0;i<accounts.size();i++){
-		
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==2 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(sizeTranslation(account.getStorage(),0));
-							storageGb.setText(" TB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.pro2_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-						}
-						if (account.getLevel()==2 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						break;
 					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						break;
 					}
-		
-					break;
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						break;
+					}
 				}
-				case 3:{
-					
-					for (int i=0;i<accounts.size();i++){
-		
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==3 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(sizeTranslation(account.getStorage(),0));
-							storageGb.setText(" TB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.pro3_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
-						}
-						if (account.getLevel()==3 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
-					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-					
-					break;
-				}
-				case 4:{
-					for (int i=0;i<accounts.size();i++){
-						
-						Product account = accounts.get(i);
-		
-						if(account.getLevel()==4 && account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceInteger.setText(s1[0]);
-									priceDecimal.setText("." + s1[1] + " €");
-									priceMonthlyInteger.setText(s1[0]);
-									priceMonthlyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceInteger.setText(s[0]);
-								priceDecimal.setText("." + s[1] + " €");
-								priceMonthlyInteger.setText(s[0]);
-								priceMonthlyDecimal.setText("." + s[1] + " €");
-							}
-							
-							storageInteger.setText(""+account.getStorage());
-							storageGb.setText(" GB");
-							
-							bandwidthInteger.setText(""+account.getTransfer()/1024);
-							bandwidthTb.setText(" TB");
-							
-							title.setText(getString(R.string.prolite_account));
-							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-						}
-						if (account.getLevel()==4 && account.getMonths()==12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("");
-								}
-								else if (s1.length == 2){
-									priceAnnualyInteger.setText(s1[0]);
-									priceAnnualyDecimal.setText("." + s1[1] + " €");
-								}
-							}
-							else if (s.length == 2){
-								priceAnnualyInteger.setText(s[0]);
-								priceAnnualyDecimal.setText("." + s[1] + " €");
-							}
-						}
-					}
-					
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							priceSeparator.setVisibility(View.GONE);
-							priceAnnualyLayout.setVisibility(View.GONE);
-							subscribeSeparator.setVisibility(View.GONE);
-							subscribeAnnualyLayout.setVisibility(View.GONE);
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							priceSeparator.setVisibility(View.GONE);
-							priceAnnualyLayout.setVisibility(View.GONE);
-							subscribeSeparator.setVisibility(View.GONE);
-							subscribeAnnualyLayout.setVisibility(View.GONE);
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-					
-					break;
-				}
+
+				break;
 			}
-			
+			case 2:{
+
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==2 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("");
+							}
+							else if (s1.length == 2){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("." + s1[1] + " €");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("." + s1[1] + " €");
+							}
+						}
+						else if (s.length == 2){
+							priceInteger.setText(s[0]);
+							priceDecimal.setText("." + s[1] + " €");
+							priceMonthlyInteger.setText(s[0]);
+							priceMonthlyDecimal.setText("." + s[1] + " €");
+						}
+
+						storageInteger.setText(sizeTranslation(account.getStorage(),0));
+						storageGb.setText(" TB");
+
+						bandwidthInteger.setText(""+account.getTransfer()/1024);
+						bandwidthTb.setText(" TB");
+
+						title.setText(getString(R.string.pro2_account));
+
+						storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+					}
+					if (account.getLevel()==2 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("");
+							}
+							else if (s1.length == 2){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("." + s1[1] + " €");
+							}
+						}
+						else if (s.length == 2){
+							priceAnnualyInteger.setText(s[0]);
+							priceAnnualyDecimal.setText("." + s[1] + " €");
+						}
+					}
+				}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						break;
+					}
+				}
+
+				break;
+			}
+			case 3:{
+
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==3 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("");
+							}
+							else if (s1.length == 2){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("." + s1[1] + " €");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("." + s1[1] + " €");
+							}
+						}
+						else if (s.length == 2){
+							priceInteger.setText(s[0]);
+							priceDecimal.setText("." + s[1] + " €");
+							priceMonthlyInteger.setText(s[0]);
+							priceMonthlyDecimal.setText("." + s[1] + " €");
+						}
+
+						storageInteger.setText(sizeTranslation(account.getStorage(),0));
+						storageGb.setText(" TB");
+
+						bandwidthInteger.setText(""+account.getTransfer()/1024);
+						bandwidthTb.setText(" TB");
+
+						title.setText(getString(R.string.pro3_account));
+
+						storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+						perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+					}
+					if (account.getLevel()==3 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("");
+							}
+							else if (s1.length == 2){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("." + s1[1] + " €");
+							}
+						}
+						else if (s.length == 2){
+							priceAnnualyInteger.setText(s[0]);
+							priceAnnualyDecimal.setText("." + s[1] + " €");
+						}
+					}
+				}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						break;
+					}
+				}
+
+				break;
+			}
+			case 4:{
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==4 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("");
+							}
+							else if (s1.length == 2){
+								priceInteger.setText(s1[0]);
+								priceDecimal.setText("." + s1[1] + " €");
+								priceMonthlyInteger.setText(s1[0]);
+								priceMonthlyDecimal.setText("." + s1[1] + " €");
+							}
+						}
+						else if (s.length == 2){
+							priceInteger.setText(s[0]);
+							priceDecimal.setText("." + s[1] + " €");
+							priceMonthlyInteger.setText(s[0]);
+							priceMonthlyDecimal.setText("." + s[1] + " €");
+						}
+
+						storageInteger.setText(""+account.getStorage());
+						storageGb.setText(" GB");
+
+						bandwidthInteger.setText(""+account.getTransfer()/1024);
+						bandwidthTb.setText(" TB");
+
+						title.setText(getString(R.string.prolite_account));
+
+						storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+						storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+						bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+						bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+						perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+					}
+					if (account.getLevel()==4 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("");
+							}
+							else if (s1.length == 2){
+								priceAnnualyInteger.setText(s1[0]);
+								priceAnnualyDecimal.setText("." + s1[1] + " €");
+							}
+						}
+						else if (s.length == 2){
+							priceAnnualyInteger.setText(s[0]);
+							priceAnnualyDecimal.setText("." + s[1] + " €");
+						}
+					}
+				}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						priceSeparator.setVisibility(View.GONE);
+						priceAnnualyLayout.setVisibility(View.GONE);
+						subscribeSeparator.setVisibility(View.GONE);
+						subscribeAnnualyLayout.setVisibility(View.GONE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						priceSeparator.setVisibility(View.GONE);
+						priceAnnualyLayout.setVisibility(View.GONE);
+						subscribeSeparator.setVisibility(View.GONE);
+						subscribeAnnualyLayout.setVisibility(View.GONE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						break;
+					}
+				}
+
+				break;
+			}
+		}
+
 //			/*RESULTS
 //	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
 //        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
@@ -922,9 +520,15 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 //        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
 //        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
 //        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-		}
+
 	}
-	
+
+	public void setInfo (int _paymentMethod, int _type, MyAccountInfo _myAccountInfo){
+		this.paymentMethod = _paymentMethod;
+		this.myAccountInfo = _myAccountInfo;
+		this.parameterType = _type;
+	}
+
 	public String sizeTranslation(long size, int type) {
 		switch(type){
 			case 0:{
@@ -941,15 +545,8 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 	      
 	}
 
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public int onBackPressed(){
-		((ManagerActivityLollipop)context).showpF(parameterType, accounts, paymentBitSet);
+		((ManagerActivityLollipop)context).showpF(parameterType);
 		
 		return 3;
 	}
@@ -974,7 +571,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 1:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_MONTH, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -993,7 +590,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 2:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_MONTH, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1012,7 +609,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 3:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_MONTH, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1031,7 +628,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 4:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_MONTH, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_MONTH, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1058,7 +655,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 1:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_YEAR, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1077,7 +674,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 2:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_YEAR, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1096,7 +693,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 3:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_YEAR, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1115,7 +712,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 					case 4:{
 						switch (paymentMethod){
 							case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-								((ManagerActivityLollipop)context).showCC(parameterType, accounts, PAYMENT_CC_YEAR, true, paymentBitSet);
+								((ManagerActivityLollipop)context).showCC(parameterType, myAccountInfo, PAYMENT_CC_YEAR, true);
 								break;
 							}
 							case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
