@@ -193,10 +193,10 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
-				Toast.makeText(this, "SIIIIIIIIIIIIIIIIII", Toast.LENGTH_LONG).show();
+//				Toast.makeText(this, "SIIIIIIIIIIIIIIIIII", Toast.LENGTH_LONG).show();
 			}
 			else{
-				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
+//				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}
