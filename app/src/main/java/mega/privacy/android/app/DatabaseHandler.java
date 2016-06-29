@@ -76,7 +76,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
-	private static final String KEY_CREDIT_CARD_TIMESTAMP = "creditcardstimestamp";
+	private static final String KEY_PRICING_TIMESTAMP = "pricingtimestamp";
+	private static final String KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp";
     
     private static DatabaseHandler instance;
     
@@ -132,7 +133,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
         		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
-				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_CREDIT_CARD_TIMESTAMP +" TEXT" + ")";
+				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
         
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -325,8 +326,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_PAYMENT_METHODS_TIMESTAMP + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PAYMENT_METHODS_TIMESTAMP + " = '" + encrypt("") + "';");
 
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_CREDIT_CARD_TIMESTAMP + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_CREDIT_CARD_TIMESTAMP + " = '" + encrypt("") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_PRICING_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PRICING_TIMESTAMP + " = '" + encrypt("") + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " = '" + encrypt("") + "';");
 		}
 	} 
 	
@@ -528,7 +532,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_FILE_LOGGER, encrypt(attr.getFileLogger()));
 		values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getAccountDetailsTimeStamp()));
 		values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(attr.getPaymentMethodsTimeStamp()));
-		values.put(KEY_CREDIT_CARD_TIMESTAMP, encrypt(attr.getCreditCardTimeStamp()));
+		values.put(KEY_PRICING_TIMESTAMP, encrypt(attr.getPricingTimeStamp()));
+		values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getExtendedAccountDetailsTimeStamp()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -546,12 +551,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String fileLogger = decrypt(cursor.getString(5));
 			String accountDetailsTimeStamp = decrypt(cursor.getString(6));
 			String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
-			String creditCardTimeStamp = decrypt(cursor.getString(8));
+			String pricingTimeStamp = decrypt(cursor.getString(8));
+			String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, creditCardTimeStamp);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, creditCardTimeStamp);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp);
 			}
 		}
 		cursor.close();
@@ -1493,6 +1499,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setAccountDetailsTimeStamp (){
+		log("setAccountDetailsTimeStamp");
 		Long accountDetailsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -1511,6 +1518,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPaymentMethodsTimeStamp (){
+		log("setPaymentMethodsTimeStamp");
 		Long paymentMethodsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -1528,19 +1536,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setCreditCardTimestamp (){
+	public void setPricingTimestamp (){
+		log("setPricingTimestamp");
 		Long creditCardTimestamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_CREDIT_CARD_TIMESTAMP + "= '" + encrypt(creditCardTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PRICING_TIMESTAMP + "= '" + encrypt(creditCardTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
 			db.execSQL(UPDATE_ATTRIBUTE_TABLE);
 //			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
 		}
 		else{
-			values.put(KEY_CREDIT_CARD_TIMESTAMP, encrypt(creditCardTimestamp + ""));
+			values.put(KEY_PRICING_TIMESTAMP, encrypt(creditCardTimestamp + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setExtendedAccountDetailsTimestamp (){
+		log("setExtendedAccountDetailsTimestamp");
+		Long extendedAccountDetailsTimestamp = System.currentTimeMillis()/1000;
+
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + "= '" + encrypt(extendedAccountDetailsTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_ATTRIBUTE_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(extendedAccountDetailsTimestamp + ""));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();

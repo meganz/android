@@ -270,6 +270,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
                     if(megaAccountSession!=null){
                         log("getMegaAccountSESSION not Null");
+                        dbH.setExtendedAccountDetailsTimestamp();
                         long mostRecentSession = megaAccountSession.getMostRecentUsage();
                         log("The last session: "+mostRecentSession);
                         java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.MEDIUM, Locale.getDefault());
@@ -321,7 +322,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
         }
         else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
             if (e.getErrorCode() == MegaError.API_OK){
-                dbH.setCreditCardTimestamp();
                 setNumberOfSubscriptions(request.getNumber());
                 log("NUMBER OF SUBS: " + getNumberOfSubscriptions());
                 ((ManagerActivityLollipop) context).updateCancelSubscriptions();
@@ -330,8 +330,9 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
         if (request.getType() == MegaRequest.TYPE_GET_PRICING){
             MegaPricing p = request.getPricing();
             productAccounts = new ArrayList<Product>();
-//			usedStorage = 501;
+
             if (e.getErrorCode() == MegaError.API_OK) {
+                dbH.setPricingTimestamp();
                 for (int i = 0; i < p.getNumProducts(); i++) {
                     log("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 

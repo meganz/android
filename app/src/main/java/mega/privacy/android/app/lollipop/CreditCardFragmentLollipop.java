@@ -123,7 +123,6 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	//	private TextView perMonth;
 //	private TextView perYear;
 	private TextView pricingFrom;
-	private ArrayList<Long> handleUrl;
 	private TextView storageTitle;
 	private TextView bandwithTitle;
 //	private TextView selectMemberShip;
@@ -141,7 +140,6 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
-//	ArrayList<Product> accounts;
 	MyAccountInfo myAccountInfo;
 	CreditCardFragmentLollipop paymentFragment = this;
 	int paymentMonth = -1;
@@ -161,8 +159,6 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		handleUrl=new ArrayList<Long>();
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
