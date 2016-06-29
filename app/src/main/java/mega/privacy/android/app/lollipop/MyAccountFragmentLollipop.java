@@ -413,7 +413,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onAttach(Context context) {
 		log("onAttach context");
 		super.onAttach(context);
-		context = context;
+		this.context = context;
 		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
 	}
 
@@ -1010,11 +1010,31 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void updateAvatar(String contactEmail, boolean retry){
 		log("updateAvatar: "+contactEmail);
 		File avatar = null;
-		if (getActivity().getExternalCacheDir() != null){
-			avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+		if(context!=null){
+			log("context is not null");
+
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+			}
+			else{
+				avatar = new File(context.getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+			}
 		}
 		else{
-			avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+			log("context is null!!!");
+			if(getActivity()!=null){
+				log("getActivity is not null");
+				if (getActivity().getExternalCacheDir() != null){
+					avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+				}
+				else{
+					avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+				}
+			}
+			else{
+				log("getActivity is ALSOOO null");
+				return;
+			}
 		}
 
 		if(avatar!=null){
