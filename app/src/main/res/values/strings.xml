@@ -772,4 +772,6 @@
 
     <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
 
+    <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">Your new email address needs to be validated. Please check your email to proceed.</string>
+
 </resources>
