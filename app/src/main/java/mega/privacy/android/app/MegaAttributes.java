@@ -9,9 +9,10 @@ public class MegaAttributes {
 	String fileLogger = "false";
 	String accountDetailsTimeStamp="";
 	String paymentMethodsTimeStamp="";
-	String creditCardTimeStamp="";
+	String pricingTimeStamp ="";
+	String extendedAccountDetailsTimeStamp="";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String creditCardTimeStamp) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -19,7 +20,8 @@ public class MegaAttributes {
 		this.fileLogger = fileLogger;
 		this.accountDetailsTimeStamp = accountDetailsTimeStamp;
 		this.paymentMethodsTimeStamp = paymentMethodsTimeStamp;
-		this.creditCardTimeStamp = creditCardTimeStamp;
+		this.pricingTimeStamp = pricingTimeStamp;
+		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
 	}
 	
 	public String getOnline(){
@@ -70,12 +72,12 @@ public class MegaAttributes {
 		this.accountDetailsTimeStamp = accountDetailsTimeStamp;
 	}
 
-	public String getCreditCardTimeStamp() {
-		return creditCardTimeStamp;
+	public String getPricingTimeStamp() {
+		return pricingTimeStamp;
 	}
 
-	public void setCreditCardTimeStamp(String creditCardTimeStamp) {
-		this.creditCardTimeStamp = creditCardTimeStamp;
+	public void setPricingTimeStamp(String pricingTimeStamp) {
+		this.pricingTimeStamp = pricingTimeStamp;
 	}
 
 	public String getPaymentMethodsTimeStamp() {
@@ -84,6 +86,14 @@ public class MegaAttributes {
 
 	public void setPaymentMethodsTimeStamp(String paymentMethodsTimeStamp) {
 		this.paymentMethodsTimeStamp = paymentMethodsTimeStamp;
+	}
+
+	public String getExtendedAccountDetailsTimeStamp() {
+		return extendedAccountDetailsTimeStamp;
+	}
+
+	public void setExtendedAccountDetailsTimeStamp(String extendedAccountDetailsTimeStamp) {
+		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
 	}
 
 }
