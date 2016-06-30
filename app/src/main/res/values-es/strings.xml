@@ -771,4 +771,6 @@
 
     <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">La nueva dirección de correo eléctronico debe validarse. Por favor, comprueba tu correo electrónico para proceder.</string>
 
+    <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">Your picture profile will be deleted. Do you want to proceed?</string>
+    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
 </resources>
