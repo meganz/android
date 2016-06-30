@@ -87,7 +87,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
@@ -1556,6 +1556,20 @@ public class Util {
 		bld.setPositiveButton("OK",null);
 		log("Showing alert dialog: " + message);
 		bld.create().show();
+	}
+
+	public static long calculateTimestampMinDifference(String timeStamp) {
+		log("calculateTimestampDifference");
+
+		Long actualTimestamp = System.currentTimeMillis()/1000;
+
+		Long oldTimestamp = Long.parseLong(timeStamp);
+
+		Long difference = actualTimestamp - oldTimestamp;
+
+		difference = difference/60;
+
+		return difference;
 	}
 
 	public static int getVersion(Context context) {

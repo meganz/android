@@ -1543,6 +1543,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        megaApi.getAccountDetails(myAccountInfo);
 			megaApi.getPricing(myAccountInfo);
 	        megaApi.creditCardQuerySubscriptions(myAccountInfo);
+			dbH.resetExtendedAccountDetailsTimestamp();
 
 			if(savedInstanceState==null) {
 				log("Run async task to check offline files");

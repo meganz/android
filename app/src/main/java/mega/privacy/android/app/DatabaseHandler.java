@@ -1500,7 +1500,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void setAccountDetailsTimeStamp (){
 		log("setAccountDetailsTimeStamp");
-		Long accountDetailsTimeStamp = System.currentTimeMillis()/1000;
+		long accountDetailsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
@@ -1519,7 +1519,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void setPaymentMethodsTimeStamp (){
 		log("setPaymentMethodsTimeStamp");
-		Long paymentMethodsTimeStamp = System.currentTimeMillis()/1000;
+		long paymentMethodsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
@@ -1538,7 +1538,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void setPricingTimestamp (){
 		log("setPricingTimestamp");
-		Long creditCardTimestamp = System.currentTimeMillis()/1000;
+		long creditCardTimestamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
@@ -1557,7 +1557,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void setExtendedAccountDetailsTimestamp (){
 		log("setExtendedAccountDetailsTimestamp");
-		Long extendedAccountDetailsTimestamp = System.currentTimeMillis()/1000;
+		long extendedAccountDetailsTimestamp = System.currentTimeMillis()/1000;
+
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + "= '" + encrypt(extendedAccountDetailsTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_ATTRIBUTE_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(extendedAccountDetailsTimestamp + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void resetExtendedAccountDetailsTimestamp (){
+		log("resetExtendedAccountDetailsTimestamp");
+		long extendedAccountDetailsTimestamp = -1;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();

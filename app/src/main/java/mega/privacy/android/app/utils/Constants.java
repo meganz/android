@@ -98,4 +98,9 @@ public class Constants {
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
 
+	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
+	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
+	final public static int PRICING_MIN_DIFFERENCE = 720;
+	final public static int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
+
 }
