@@ -2101,7 +2101,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			node = megaApi.getNodeByHandle(handle);
 		}
 		supportInvalidateOptionsMenu();
-		
+
+		if (node == null){
+			return;
+		}
+
 		if(node.isExported()){
 			log("Node HAS public link");
 			publicLink=true;

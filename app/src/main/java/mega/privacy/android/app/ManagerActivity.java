@@ -496,9 +496,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             }
             
             if (managerActivity != null){
+				log("ORIGINAL JSON3:" + purchase.getOriginalJson() + ":::");
             	megaApi.submitPurchaseReceipt(purchase.getOriginalJson(), managerActivity);
             }
             else{
+				log("ORIGINAL JSON4:" + purchase.getOriginalJson() + ":::");
             	megaApi.submitPurchaseReceipt(purchase.getOriginalJson());
             }
         }
@@ -568,82 +570,93 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR); 
            
             if (proLiteMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;	
 	        			maxP = proLiteMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO LITE MONTHLY (JSON): __*" + proLiteMonthly.getOriginalJson() + "*__");
         	}
             
             if (proLiteYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;
 	        			maxP = proLiteYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO LITE ANNUALY (JSON): __*" + proLiteYearly.getOriginalJson() + "*__");
         	}
             
             if (proIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;	
 	        			maxP = proIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO I MONTHLY (JSON): __*" + proIMonthly.getOriginalJson() + "*__");
         	}
             
             if (proIYearly!= null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;
 	        			maxP = proIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO I ANNUALY (JSON): __*" + proIYearly.getOriginalJson() + "*__");
         	}
             
             if (proIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO II MONTHLY (JSON): __*" + proIIMonthly.getOriginalJson() + "*__");
             }
             
             if (proIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO II ANNUALY (JSON): __*" + proIIYearly.getOriginalJson() + "*__");
             }
             
             if (proIIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;	
 	        			maxP = proIIIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
             }
             
             if (proIIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;
 	        			maxP = proIIIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
             }
             
             inventoryFinished = true;
+
+			log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; ACCOUNTDETAILSFINISHED: " + accountDetailsFinished);
             
             if (accountDetailsFinished){
             	if (levelInventory > levelAccountDetails){
             		if (maxP != null){
+						log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
             			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
             		}
             	}
@@ -5209,10 +5222,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 
 				accountDetailsFinished = true;
+
+				log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
 				
 				if (inventoryFinished){
 					if (levelAccountDetails < levelInventory){
 						if (maxP != null){
+							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
 							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
 						}
 					}
@@ -5855,7 +5871,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				selectDrawerItem(drawerItem);
 			}
 			else{
-				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
+				log("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
+//				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
