@@ -239,7 +239,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
+        log("onRequestStart: " + request.getRequestString());
     }
 
     @Override
@@ -308,14 +308,15 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
             if (e.getErrorCode() == MegaError.API_OK){
                 dbH.setPaymentMethodsTimeStamp();
                 setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
-            }
-            //Check if myAccount section is visible
-            ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-            if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
-                    PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
-                    if(pFL!=null){
-                        pFL.setPaymentMethods();
+
+                //Check if myAccount section is visible
+                ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                    if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
+                        PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
+                        if(pFL!=null){
+                            pFL.setPaymentMethods();
+                        }
                     }
                 }
             }
@@ -347,26 +348,27 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                 //        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
                 //        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
                 //        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-            }
-            //Check if myAccount section is visible
-            ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-            if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
-                    UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
-                    if(upAFL!=null){
-                        upAFL.setPricing();
+
+                //Check if myAccount section is visible
+                ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                    if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
+                        UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
+                        if(upAFL!=null){
+                            upAFL.setPricing();
+                        }
                     }
-                }
-                else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MONTHLY_YEARLY_FRAGMENT) {
-                    MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
-                    if(myFL!=null){
-                        myFL.setPricing();
+                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MONTHLY_YEARLY_FRAGMENT) {
+                        MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
+                        if(myFL!=null){
+                            myFL.setPricing();
+                        }
                     }
-                }
-                else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
-                    PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
-                    if(pFL!=null){
-                        pFL.setPricing();
+                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
+                        PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
+                        if(pFL!=null){
+                            pFL.setPricing();
+                        }
                     }
                 }
             }

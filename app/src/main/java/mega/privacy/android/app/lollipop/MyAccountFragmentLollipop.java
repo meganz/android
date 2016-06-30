@@ -30,10 +30,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -113,7 +116,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	String firstNameText;
 	String lastNameText;
 	String fullName;
-
+	DatabaseHandler dbH;
+	MegaAttributes attributes;
 //	boolean getPaymentMethodsBoolean = false;
 
 	@Override
@@ -122,6 +126,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
+
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -353,14 +360,109 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		setAccountDetails();
 
-		//Check if the call is recently
+		refreshAccountInfo();
 
-//		megaApi.getAccountDetails(myAccountInfo);
-//
-//		megaApi.getPaymentMethods(myAccountInfo);
-
-		megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
 		return v;
+	}
+
+	public void refreshAccountInfo(){
+		log("refreshAccountInfo");
+
+		//Check if the call is recently
+		log("Check the last call to getAccountDetails");
+		if(dbH!=null){
+			attributes = dbH.getAttributes();
+			if(attributes!=null){
+				String oldTimestamp = attributes.getAccountDetailsTimeStamp();
+				if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
+					long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
+					log("Last call made: "+ timestampMinDifference + " min ago");
+					if(timestampMinDifference > Constants.ACCOUNT_DETAILS_MIN_DIFFERENCE){
+						log("API call getAccountDetails");
+						megaApi.getAccountDetails(myAccountInfo);
+					}
+					else{
+						log("NOT call getAccountDetails");
+					}
+				}
+			}
+			else{
+				log("Attributes is NULL - API call getAccountDetails");
+				megaApi.getAccountDetails(myAccountInfo);
+			}
+
+		}else{
+			log("DatabaseHandler is NULL - API call getAccountDetails");
+			megaApi.getAccountDetails(myAccountInfo);
+		}
+
+		log("Check the last call to getExtendedAccountDetails");
+		if(dbH!=null){
+			attributes = dbH.getAttributes();
+			if(attributes!=null){
+				String oldTimestamp = attributes.getExtendedAccountDetailsTimeStamp();
+				if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
+					if(oldTimestamp.equals("-1")){
+						log("First call!! - API call getExtendedAccountDetails");
+						megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+					}
+					else{
+						long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
+						log("Last call made: "+ timestampMinDifference + " min ago");
+						if(timestampMinDifference > Constants.EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE){
+							log("API call getExtendedAccountDetails");
+							megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+						}
+						else{
+							log("NOT call getExtendedAccountDetails");
+						}
+					}
+				}
+				else{
+					log("Not valid value - API call getExtendedAccountDetails");
+					megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+				}
+			}
+			else{
+				log("Attributes is NULL - API call getExtendedAccountDetails");
+				megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+			}
+
+		}else{
+			log("DatabaseHandler is NULL - API call getExtendedAccountDetails");
+			megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+		}
+
+		log("Check the last call to getPaymentMethods");
+		if(dbH!=null){
+			attributes = dbH.getAttributes();
+			if(attributes!=null){
+				String oldTimestamp = attributes.getPaymentMethodsTimeStamp();
+				if((oldTimestamp!=null)&&(oldTimestamp.trim()!="")&&(!oldTimestamp.isEmpty())){
+					long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
+					log("Last call made: "+ timestampMinDifference + " min ago");
+					if(timestampMinDifference > Constants.PAYMENT_METHODS_MIN_DIFFERENCE){
+						log("API call getPaymentMethods");
+						megaApi.getPaymentMethods(myAccountInfo);
+					}
+					else{
+						log("NOT call getPaymentMethods");
+					}
+				}
+				else{
+					log("Not valid value - API call getPaymentMethods");
+					megaApi.getPaymentMethods(myAccountInfo);
+				}
+			}
+			else{
+				log("Attributes is NULL - API call getPaymentMethods");
+				megaApi.getPaymentMethods(myAccountInfo);
+			}
+
+		}else{
+			log("DatabaseHandler is NULL - API call getPaymentMethods");
+			megaApi.getPaymentMethods(myAccountInfo);
+		}
 	}
 
 	public void setAccountDetails(){
