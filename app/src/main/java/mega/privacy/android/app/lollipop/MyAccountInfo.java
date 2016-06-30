@@ -370,6 +370,18 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                             pFL.setPricing();
                         }
                     }
+                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.CENTILI_FRAGMENT) {
+                        CentiliFragmentLollipop ctFL = ((ManagerActivityLollipop) context).getCentiliFragment();
+                        if(ctFL!=null){
+                            ctFL.getPaymentId();
+                        }
+                    }
+                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.FORTUMO_FRAGMENT) {
+                        FortumoFragmentLollipop fFL = ((ManagerActivityLollipop) context).getFortumoFragment();
+                        if(fFL!=null){
+                            fFL.getPaymentId();
+                        }
+                    }
                 }
             }
 

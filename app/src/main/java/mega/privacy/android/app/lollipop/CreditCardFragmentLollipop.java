@@ -528,7 +528,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 			}
 		}
 //
-//		//		megaApi.getPricing(this);	
+//		//		megaApi.getPricing(myAccountInfo);
 
 		return v;
 	}	

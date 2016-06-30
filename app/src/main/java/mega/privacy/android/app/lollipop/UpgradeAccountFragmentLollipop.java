@@ -22,6 +22,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -174,15 +175,28 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		pro3BandwidthInteger = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwidth_value_integer);
 		pro3BandwidthTb = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwith_value_tb);
 		
-		if (myAccountInfo.getPaymentBitSet() == null){
-			megaApi.getPaymentMethods(myAccountInfo);
-		}
 
-		//Check if called recently
-//		megaApi.getPricing(myAccountInfo);
 		setPricing();
 		showAvailableAccount();
+
+		refreshAccountInfo();
 		return v;
+	}
+
+	public void refreshAccountInfo(){
+		log("refreshAccountInfo");
+
+		log("Check the last call to callToPricing");
+		if(DBUtil.callToPricing(context)){
+			log("megaApi.getPricing SEND");
+			megaApi.getPricing(myAccountInfo);
+		}
+
+		log("Check the last call to callToPaymentMethods");
+		if(DBUtil.callToPaymentMethods(context)){
+			log("megaApi.getPaymentMethods SEND");
+			megaApi.getPaymentMethods(myAccountInfo);
+		}
 	}
 
 	public void setPricing(){

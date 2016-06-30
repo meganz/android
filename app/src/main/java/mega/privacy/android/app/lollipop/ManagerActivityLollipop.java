@@ -3531,10 +3531,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (fFL == null){
 			fFL = new FortumoFragmentLollipop();
+			fFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container,  fFL, "fF");
 			ft.commit();
 		}
 		else{
+			fFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, fFL, "fF");
 			ft.commit();
 		}
@@ -3549,10 +3551,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (ctFL == null){
 			ctFL = new CentiliFragmentLollipop();
+			ctFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container,  ctFL, "ctF");
 			ft.commit();
 		}
 		else{
+			ctFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, ctFL, "ctF");
 			ft.commit();
 		}
@@ -5322,6 +5326,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			}
 		        	}
 		        	case ACCOUNT:{
+						//Refresh all the info of My Account
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
@@ -9181,11 +9186,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
+			log("Resfresh DONE onActivityResult");
 
 			if (intent == null) {
 				log("Return.....");
 				return;
 			}
+
+			if(myAccountInfo==null){
+				myAccountInfo = new MyAccountInfo(this);
+			}
+
+			megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+			megaApi.getPaymentMethods(myAccountInfo);
+			megaApi.getPricing(myAccountInfo);
 
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
@@ -11649,6 +11663,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public MonthlyAnnualyFragmentLollipop getMonthlyAnnualyFragment() {
 		return myFL;
+	}
+
+	public CentiliFragmentLollipop getCentiliFragment() {
+		return ctFL;
+	}
+
+	public FortumoFragmentLollipop getFortumoFragment() {
+		return fFL;
 	}
 
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {

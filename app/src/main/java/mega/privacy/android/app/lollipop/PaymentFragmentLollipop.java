@@ -23,6 +23,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -139,11 +140,24 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 				
 		setPricing();
 
-		megaApi.getPaymentMethods(myAccountInfo);
-		megaApi.getPricing(myAccountInfo);
+		refreshAccountInfo();
 
 		return v;
-	}	
+	}
+
+	public void refreshAccountInfo(){
+		log("refreshAccountInfo");
+
+		if(DBUtil.callToPricing(context)){
+			log("megaApi.getPricing SEND");
+			megaApi.getPricing(myAccountInfo);
+		}
+
+		if(DBUtil.callToPaymentMethods(context)){
+			log("megaApi.getPaymentMethods SEND");
+			megaApi.getPaymentMethods(myAccountInfo);
+		}
+	}
 	
 	/*
 	public void payYear() {
