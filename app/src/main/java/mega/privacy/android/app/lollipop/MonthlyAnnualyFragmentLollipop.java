@@ -23,6 +23,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -70,7 +71,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	int paymentMethod = -1;
 	MonthlyAnnualyFragmentLollipop monthlyAnnualyFragment = this;
 
-	
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
@@ -82,7 +82,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -150,10 +149,25 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		setPricing();
 
-		megaApi.getPaymentMethods(myAccountInfo);
-		megaApi.getPricing(myAccountInfo);
+		refreshAccountInfo();
 
 		return v;
+	}
+
+	public void refreshAccountInfo(){
+		log("refreshAccountInfo");
+
+		log("Check the last call to callToPricing");
+		if(DBUtil.callToPricing(context)){
+			log("megaApi.getPricing SEND");
+			megaApi.getPricing(myAccountInfo);
+		}
+
+		log("Check the last call to callToPaymentMethods");
+		if(DBUtil.callToPaymentMethods(context)){
+			log("megaApi.getPaymentMethods SEND");
+			megaApi.getPaymentMethods(myAccountInfo);
+		}
 	}
 
 	public void setPricing(){
