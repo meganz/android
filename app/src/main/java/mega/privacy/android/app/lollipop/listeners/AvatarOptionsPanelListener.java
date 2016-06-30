@@ -63,8 +63,8 @@ public class AvatarOptionsPanelListener implements View.OnClickListener {
                 log("option delete avatar");
 
                 ((ManagerActivityLollipop) context).hideAvatarOptionsPanel();
-                AccountController aC = new AccountController(context);
-                aC.removeAvatar();
+                ((ManagerActivityLollipop) context).showConfirmationDeleteAvatar();
+
                 break;
             }
         }
