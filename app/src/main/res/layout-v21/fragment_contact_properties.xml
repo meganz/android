@@ -28,10 +28,10 @@
                 android:fitsSystemWindows="true" >
 
                 <RelativeLayout
+                    android:id="@+id/color_avatar_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_collapseMode="parallax"
-                    android:background="@color/lollipop_primary_color"
                     android:fitsSystemWindows="true" >
 
                     <TextView

@@ -492,7 +492,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onAttach(Context context) {
 		log("onAttach context");
 		super.onAttach(context);
-		context = context;
+		this.context = context;
 		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
 	}
 
@@ -813,7 +813,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The change link has been sent");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_pass), getString(R.string.email_verification_title));
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				log("The new mail already exists");
@@ -928,15 +928,32 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void updateAvatar(String contactEmail, boolean retry){
 		log("updateAvatar: "+contactEmail);
 		File avatar = null;
-		if(getActivity()==null){
-			log("the activity is null");
-			return;
-		}
-		if (getActivity().getExternalCacheDir() != null){
-			avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+
+		if(context!=null){
+			log("context is not null");
+
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+			}
+			else{
+				avatar = new File(context.getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+			}
 		}
 		else{
-			avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+			log("context is null!!!");
+			if(getActivity()!=null){
+				log("getActivity is not null");
+				if (getActivity().getExternalCacheDir() != null){
+					avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+				}
+				else{
+					avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
+				}
+			}
+			else{
+				log("getActivity is ALSOOO null");
+				return;
+			}
 		}
 
 		if(avatar!=null){
@@ -953,7 +970,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+
+		String color = megaApi.getUserAvatarColor(myUser);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+		}
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

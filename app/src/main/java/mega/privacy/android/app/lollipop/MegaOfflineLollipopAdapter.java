@@ -265,7 +265,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 							log("Export in: "+path);
 							File file= new File(path);
 							if(file.exists()){
-								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
 								mOffList.add(masterKeyFile);
 							}
 						}	
@@ -275,7 +275,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}

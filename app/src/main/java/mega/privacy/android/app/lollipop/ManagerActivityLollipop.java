@@ -482,35 +482,51 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             log("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
             if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
                 log("PRO I Monthly subscription purchased.");
-                Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
                 log("PRO I Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO I Yearly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
                 log("PRO II Monthly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_II_YEAR)) {
                 log("PRO II Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO II Yearly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_III_YEAR)) {
                 log("PRO III Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO III Yearly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Monthly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Monthly!", null);
+				}
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
                 log("PRO LITE Yearly subscription purchased.");
-				Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Yearly!", null);
+				if (managerActivity != null){
+					Util.showAlert(managerActivity, "Thank you for subscribing to PRO LITE Yearly!", null);
+				}
             }
 
             if (managerActivity != null){
@@ -553,146 +569,145 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         return true;
     }
-    // Listener that's called when we finish querying the items and subscriptions we own
-    IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-            log("Query inventory finished.");
+	// Listener that's called when we finish querying the items and subscriptions we own
+	IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+			log("Query inventory finished.");
 
-            // Have we been disposed of in the meantime? If so, quit.
-            if (mHelper == null) return;
+			// Have we been disposed of in the meantime? If so, quit.
+			if (mHelper == null) return;
 
-            // Is it a failure?
-            if (result.isFailure()) {
-                log("Failed to query inventory: " + result);
-                return;
-            }
+			// Is it a failure?
+			if (result.isFailure()) {
+				log("Failed to query inventory: " + result);
+				return;
+			}
 
-            log("Query inventory was successful.");
+			log("Query inventory was successful.");
 
-            proLiteMonthly = inventory.getPurchase(SKU_PRO_LITE_MONTH);
-            proLiteYearly = inventory.getPurchase(SKU_PRO_LITE_YEAR);
-            proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
-            proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
-            proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
-            proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR);
-            proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
-            proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
+			proLiteMonthly = inventory.getPurchase(SKU_PRO_LITE_MONTH);
+			proLiteYearly = inventory.getPurchase(SKU_PRO_LITE_YEAR);
+			proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
+			proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
+			proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
+			proIIYearly = inventory.getPurchase(SKU_PRO_II_YEAR);
+			proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
+			proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR);
 
-            if (proLiteMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-	        			myAccountInfo.setLevelInventory(0);
-	        			maxP = proLiteMonthly;
-	        		}
-            	}
+			if (proLiteMonthly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(0);
+				maxP = proLiteMonthly;
+//	        		}
+//            	}
 				log("PRO LITE MONTHLY (JSON): __*" + proLiteMonthly.getOriginalJson() + "*__");
-        	}
+			}
 
-            if (proLiteYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(0);
-	        			maxP = proLiteYearly;
-	        		}
-            	}
+			if (proLiteYearly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(0);
+				maxP = proLiteYearly;
+//	        		}
+//            	}
 				log("PRO LITE ANNUALY (JSON): __*" + proLiteYearly.getOriginalJson() + "*__");
-        	}
+			}
 
-            if (proIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(1);
-	        			maxP = proIMonthly;
-	        		}
-            	}
+			if (proIMonthly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(1);
+				maxP = proIMonthly;
+//	        		}
+//            	}
 				log("PRO I MONTHLY (JSON): __*" + proIMonthly.getOriginalJson() + "*__");
-        	}
+			}
 
-            if (proIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(1);
-	        			maxP = proIYearly;
-	        		}
-            	}
+			if (proIYearly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(1);
+				maxP = proIYearly;
+//	        		}
+//            	}
 				log("PRO I ANNUALY (JSON): __*" + proIYearly.getOriginalJson() + "*__");
-        	}
+			}
 
-            if (proIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(2);
-	        			maxP = proIIMonthly;
-	        		}
-            	}
+			if (proIIMonthly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(2);
+				maxP = proIIMonthly;
+//	        		}
+//            	}
 				log("PRO II MONTHLY (JSON): __*" + proIIMonthly.getOriginalJson() + "*__");
-            }
+			}
 
-            if (proIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(2);
-	        			maxP = proIIYearly;
-	        		}
-            	}
+			if (proIIYearly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(2);
+				maxP = proIIYearly;
+//	        		}
+//            	}
 				log("PRO II ANNUALY (JSON): __*" + proIIYearly.getOriginalJson() + "*__");
-        	}
+			}
 
-            if (proIIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(3);
-	        			maxP = proIIIMonthly;
-	        		}
-            	}
+			if (proIIIMonthly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(3);
+				maxP = proIIIMonthly;
+//	        		}
+//            	}
 				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
-            }
+			}
 
-            if (proIIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-						myAccountInfo.setLevelInventory(3);
-	        			maxP = proIIIYearly;
-	        		}
-            	}
+			if (proIIIYearly != null){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+				myAccountInfo.setLevelInventory(3);
+				maxP = proIIIYearly;
+//	        		}
+//            	}
 				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
-        	}
+			}
 
 			myAccountInfo.setInventoryFinished(true);
 
 			log("LEVELACCOUNTDETAILS: " + myAccountInfo.getLevelAccountDetails() + "; LEVELINVENTORY: " + myAccountInfo.getLevelInventory() + "; ACCOUNTDETAILSFINISHED: " + myAccountInfo.isAccountDetailsFinished());
 
-            if (myAccountInfo.isAccountDetailsFinished()){
-            	if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()){
-            		if (maxP != null){
-            			log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
-            			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
-            		}
-            	}
-            }
+			if (myAccountInfo.isAccountDetailsFinished()){
+				if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()){
+					if (maxP != null){
+						log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
+						megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
+					}
+				}
+			}
 
+			boolean isProLiteMonthly = false;
+			if (proLiteMonthly != null){
+				isProLiteMonthly = true;
+			}
+			if (isProLiteMonthly){
+				log("PRO LITE IS SUBSCRIPTED: ORDERID: ***____" + proLiteMonthly.getOrderId() + "____*****");
+			}
+			else{
+				log("PRO LITE IS NOT SUBSCRIPTED");
+			}
 
-            boolean isProLiteMonthly = false;
-            if (proLiteMonthly != null){
-            	isProLiteMonthly = true;
-            }
-            if (isProLiteMonthly){
-            	log("PRO LITE IS SUBSCRIPTED: ORDERID: ***____" + proLiteMonthly.getOrderId() + "____*****");
-            }
-            else{
-            	log("PRO LITE IS NOT SUBSCRIPTED");
-            }
+			if (!mHelper.subscriptionsSupported()) {
+				log("SUBSCRIPTIONS NOT SUPPORTED");
+			}
+			else{
+				log("SUBSCRIPTIONS SUPPORTED");
+			}
 
-            if (!mHelper.subscriptionsSupported()) {
-            	log("SUBSCRIPTIONS NOT SUPPORTED");
-            }
-            else{
-            	log("SUBSCRIPTIONS SUPPORTED");
-            }
-
-            log("Initial inventory query finished.");
-        }
-    };
+			log("Initial inventory query finished.");
+		}
+	};
 
     void launchPayment(String productId){
     	/* TODO: for security, generate your payload here for verification. See the comments on
@@ -1338,10 +1353,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
 		log("-------------------Version app: "+versionApp);
-		if(versionApp<=51){
-			final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
-			final File fMKOld = new File(pathOldMK);
-			if (fMKOld.exists()){
+		final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
+		final File fMKOld = new File(pathOldMK);
+		if (fMKOld != null) {
+			if (fMKOld.exists()) {
 				log("Old MK file need to be renamed!");
 				aC.renameMK();
 			}
@@ -2025,7 +2040,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		String color = megaApi.getUserAvatarColor(contact);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		}
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -2202,12 +2225,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return false;
 			}
 		});
-		inputMail.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.context_rename));
+		builder.setTitle(getString(R.string.title_edit_profile_info));
 
-		builder.setPositiveButton(getString(R.string.context_rename),
+		builder.setPositiveButton(getString(R.string.title_edit_profile_info),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -8772,6 +8795,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationDeleteAvatar(){
+		log("showConfirmationDeleteAvatar");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						AccountController aC = new AccountController(managerActivity);
+						aC.removeAvatar();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+		builder.setMessage(R.string.confirmation_delete_avatar).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		log("-------------------onActivityResult "+requestCode + "____" + resultCode);
@@ -10493,7 +10546,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				selectDrawerItemLollipop(drawerItem);
 			}
 			else{
-				Snackbar.make(fragmentContainer, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
+				log("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
+//				Snackbar.make(fragmentContainer, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
