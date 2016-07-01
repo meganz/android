@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 public class MyAccountInfo implements MegaRequestListenerInterface {
 
@@ -39,10 +40,18 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
 
+    String firstNameText = "";
+    String lastNameText = "";
+    boolean lastName = false;
+    boolean firstName = false;
+    String firstLetter;
+    String fullName = "";
+
     String lastSessionFormattedDate;
 
     DatabaseHandler dbH;
     Context context;
+    MegaUser myUser = null;
 
     public ArrayList<Product> productAccounts;
 
@@ -247,11 +256,153 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     }
 
+    public void setFullName(){
+        log("setFullName");
+        if (firstNameText.trim().length() <= 0){
+            fullName = lastNameText;
+        }
+        else{
+            fullName = firstNameText + " " + lastNameText;
+        }
+
+        if (fullName.trim().length() <= 0){
+            log("Put email as fullname");
+            String email = myUser.getEmail();
+            String[] splitEmail = email.split("[@._]");
+            fullName = splitEmail[0];
+        }
+
+        if (fullName.trim().length() > 0){
+            log("FullName ok");
+        }
+        else{
+            fullName = "User Name";
+        }
+
+        firstLetter = fullName.charAt(0) + "";
+        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+    }
+
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestFinish: " + request.getRequestString());
 
-        if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+        if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+            log("paramType: "+request.getParamType());
+            boolean avatarExists = false;
+            if (e.getErrorCode() == MegaError.API_OK){
+                if(request.getParamType()==0){
+                    log("(0)request avatar");
+                    ((ManagerActivityLollipop) context).setProfileAvatar();
+
+                    //refresh MyAccountFragment if visible
+                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                        log("Update the account fragment");
+                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                            if(mAF!=null){
+                                mAF.updateAvatar(myUser.getEmail(), false);
+                            }
+                        }
+                    }
+                }
+                else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+                    log("(1)request.getText(): "+request.getText());
+                    firstNameText=request.getText();
+                    firstName=true;
+                }
+                else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+                    log("(2)request.getText(): "+request.getText());
+                    lastNameText = request.getText();
+                    lastName = true;
+                }
+                if(firstName && lastName){
+                    log("Name and First Name received!");
+
+                    setFullName();
+                    ((ManagerActivityLollipop) context).updateUserNameNavigationView(fullName, firstLetter);
+
+                    firstName= false;
+                    lastName = false;
+
+                    //refresh MyAccountFragment if visible
+                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                        log("Update the account fragment");
+                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                            if(mAF!=null){
+                                mAF.updateNameView(fullName);
+                            }
+                        }
+                    }
+                }
+            }
+            else{
+                log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
+
+                if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+                    log("ERROR - (1)request.getText(): "+request.getText());
+                    firstNameText = "";
+                    firstName=true;
+                }
+                else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+                    log("ERROR - (2)request.getText(): "+request.getText());
+                    lastNameText = "";
+                    lastName = true;
+                }
+                else if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR) {
+                    if(e.getErrorCode()==MegaError.API_ENOENT) {
+                        ((ManagerActivityLollipop) context).setDefaultAvatar();
+                    }
+
+                    if(e.getErrorCode()==MegaError.API_EARGS){
+                        log("Error changing avatar: ");
+                        if(request.getFile()!=null){
+                            log("DESTINATION FILE: "+request.getFile());
+                            log("email: "+request.getEmail());
+                        }
+                    }
+
+                    //refresh MyAccountFragment if visible
+                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                        log("Update the account fragment");
+                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                            if(mAF!=null){
+                                mAF.updateAvatar(myUser.getEmail(), false);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+                if(firstName && lastName){
+                    log("ERROR - Name and First Name received!");
+
+                    setFullName();
+                    ((ManagerActivityLollipop) context).updateUserNameNavigationView(fullName, firstLetter);
+
+                    firstName= false;
+                    lastName = false;
+
+                    //refresh MyAccountFragment if visible
+                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                        log("Update the account fragment");
+                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                            if(mAF!=null){
+                                mAF.updateNameView(fullName);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
             log ("account_details request");
             if (e.getErrorCode() == MegaError.API_OK){
 
@@ -328,7 +479,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                 ((ManagerActivityLollipop) context).updateCancelSubscriptions();
             }
         }
-        if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+        else if (request.getType() == MegaRequest.TYPE_GET_PRICING){
             MegaPricing p = request.getPricing();
             productAccounts = new ArrayList<Product>();
 
@@ -399,5 +550,65 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     public void setProductAccounts(ArrayList<Product> productAccounts) {
         this.productAccounts = productAccounts;
+    }
+
+
+    public boolean isFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(boolean firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getFirstNameText() {
+        return firstNameText;
+    }
+
+    public void setFirstNameText(String firstNameText) {
+        this.firstNameText = firstNameText;
+        setFullName();
+    }
+
+    public boolean isLastName() {
+        return lastName;
+    }
+
+    public void setLastName(boolean lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getLastNameText() {
+        return lastNameText;
+    }
+
+    public void setLastNameText(String lastNameText) {
+        this.lastNameText = lastNameText;
+        setFullName();
+    }
+
+    public MegaUser getMyUser() {
+        return myUser;
+    }
+
+    public void setMyUser(MegaUser myUser) {
+        this.myUser = myUser;
+    }
+
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFirstLetter() {
+        return firstLetter;
+    }
+
+    public void setFirstLetter(String firstLetter) {
+        this.firstLetter = firstLetter;
     }
 }

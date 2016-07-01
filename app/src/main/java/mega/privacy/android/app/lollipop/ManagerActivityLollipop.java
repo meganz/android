@@ -299,7 +299,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	MegaUser contact = null;
 	String searchQuery = null;
 	boolean isSearching = false;
 	ArrayList<MegaNode> searchNodes;
@@ -308,11 +307,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	boolean sendToInbox = false;
 //	long handleToDownload=0;
 	long lastTimeOnTransferUpdate = -1;
-
-	String firstNameText = "";
-	String lastNameText = "";
-	boolean name = false;
-	boolean firstName = false;
 
 	private int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
 	private int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -1520,15 +1514,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
 
-			contact = megaApi.getMyUser();
-			if (contact != null){
+			if(myAccountInfo==null){
+				myAccountInfo = new MyAccountInfo(this);
+			}
+
+			myAccountInfo.setMyUser(megaApi.getMyUser());
+			if (myAccountInfo.getMyUser() != null){
 				nVEmail.setVisibility(View.VISIBLE);
-				nVEmail.setText(contact.getEmail());
+				nVEmail.setText(myAccountInfo.getMyUser().getEmail());
 //				megaApi.getUserData(this);
 				log("getUserAttribute FirstName");
-				megaApi.getUserAttribute(1, this);
+				myAccountInfo.setFirstName(false);
+				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
 				log("getUserAttribute LastName");
-				megaApi.getUserAttribute(2, this);
+				myAccountInfo.setLastName(false);
+				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
 
 				this.setDefaultAvatar();
 
@@ -1968,10 +1968,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("setProfileAvatar");
 		File avatar = null;
 		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			avatar = new File(getExternalCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + ".jpg");
 		}
 		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			avatar = new File(getCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + ".jpg");
 		}
 		Bitmap imBitmap = null;
 		if (avatar.exists()){
@@ -1990,10 +1990,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (imBitmap == null) {
 					avatar.delete();
 					if (getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 					}
 					else{
-						megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 					}
 				}
 				else{
@@ -2017,19 +2017,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				if (getExternalCacheDir() != null){
-					megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 				}
 				else{
-					megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 				}
 			}
 		}
 		else{
 			if (getExternalCacheDir() != null){
-				megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 			}
 			else{
-				megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 			}
 		}
 	}
@@ -2041,7 +2041,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(contact);
+		String color = megaApi.getUserAvatarColor(myAccountInfo.getMyUser());
 		if(color!=null){
 			log("The color to set the avatar is "+color);
 			p.setColor(Color.parseColor(color));
@@ -2063,45 +2063,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int avatarTextSize = Util.getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		boolean setInitialByMail = false;
-		String fullName;
-
-		if (firstNameText.trim().length() <= 0){
-			fullName = lastNameText;
-		}
-		else{
-			fullName = firstNameText + " " + lastNameText;
-		}
-
-		if (fullName != null){
-			if (fullName.trim().length() > 0){
-				String firstLetter = fullName.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				nVPictureProfileTextView.setText(firstLetter);
-				nVPictureProfileTextView.setTextSize(32);
-				nVPictureProfileTextView.setTextColor(Color.WHITE);
-				nVPictureProfileTextView.setVisibility(View.VISIBLE);
-			}else{
-				setInitialByMail=true;
-			}
-		}
-		else{
-			setInitialByMail=true;
-		}
-		if(setInitialByMail){
-			if (contact.getEmail() != null){
-				if (contact.getEmail().length() > 0){
-					log("email TEXT: " + contact.getEmail());
-					log("email TEXT AT 0: " + contact.getEmail().charAt(0));
-					String firstLetter = contact.getEmail().charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					nVPictureProfileTextView.setText(firstLetter);
-					nVPictureProfileTextView.setTextSize(32);
-					nVPictureProfileTextView.setTextColor(Color.WHITE);
-					nVPictureProfileTextView.setVisibility(View.VISIBLE);
-				}
-			}
-		}
+		String firstLetter = myAccountInfo.getFirstLetter();
+		nVPictureProfileTextView.setText(firstLetter);
+		nVPictureProfileTextView.setTextSize(32);
+		nVPictureProfileTextView.setTextColor(Color.WHITE);
+		nVPictureProfileTextView.setVisibility(View.VISIBLE);
 	}
 
 //	@Override
@@ -2130,7 +2096,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		layout.addView(inputMail, params);
 
 		inputFirstName.setSingleLine();
-		inputFirstName.setText(firstNameText);
+		inputFirstName.setText(myAccountInfo.getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
 		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -2156,7 +2122,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 		inputFirstName.setImeActionLabel(getString(R.string.next_ime_action),EditorInfo.IME_ACTION_NEXT);
 		inputLastName.setSingleLine();
-		inputLastName.setText(lastNameText);
+		inputLastName.setText(myAccountInfo.getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputLastName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
@@ -2184,7 +2150,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		inputLastName.setImeActionLabel(getString(R.string.next_ime_action),EditorInfo.IME_ACTION_NEXT);
 
 		inputMail.setSingleLine();
-		inputMail.setText(contact.getEmail());
+		inputMail.setText(myAccountInfo.getMyUser().getEmail());
 		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2213,7 +2179,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, contact.getEmail(), value);
+						int countAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
 						if(maFLol!=null){
 							maFLol.setCountUserAttributes(countAttributes);
 						}
@@ -2266,7 +2232,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else {
 					log("positive button pressed - change user attribute");
-					int countAttributes = aC.updateUserAttributes(firstNameText, valueFirstName, lastNameText, valueLastName, contact.getEmail(), value);
+					int countAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
 					if(maFLol!=null){
 						maFLol.setCountUserAttributes(countAttributes);
 					}
@@ -9715,103 +9681,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
 		}
-		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-			log("paramType: "+request.getParamType());
-			boolean avatarExists = false;
-			if (e.getErrorCode() == MegaError.API_OK){
-				if(request.getParamType()==0){
-					setProfileAvatar();
-
-					if(drawerItem==DrawerItem.ACCOUNT){
-						log("Update the account fragment");
-						if(maFLol!=null){
-							maFLol.updateAvatar(contact.getEmail(), false);
-						}
-					}
-				}
-				else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-					log("(1)request.getText(): "+request.getText());
-					firstNameText=request.getText();
-					name=true;
-				}
-				else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-					log("(2)request.getText(): "+request.getText());
-					lastNameText = request.getText();
-					firstName = true;
-				}
-				if(name && firstName){
-					log("Name and First Name received!");
-
-					updateUserNameNavigationView(firstNameText, lastNameText);
-
-					name= false;
-					firstName = false;
-
-					//refresh MyAccountFragment if visible
-					if(drawerItem==DrawerItem.ACCOUNT){
-						log("Update the account fragment");
-						if(maFLol!=null){
-							maFLol.updateUserName(firstNameText, lastNameText);
-						}
-					}
-				}
-			}
-			else{
-				log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
-
-				if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-					log("ERROR - (1)request.getText(): "+request.getText());
-					firstNameText = "";
-					name=true;
-				}
-				else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-					log("ERROR - (2)request.getText(): "+request.getText());
-					lastNameText = "";
-					firstName = true;
-				}
-				else if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR) {
-					if(e.getErrorCode()==MegaError.API_ENOENT) {
-						setDefaultAvatar();
-					}
-					if(maFLol!=null){
-						maFLol.updateAvatar(contact.getEmail(), false);
-					}
-					return;
-				}
-				if(name && firstName){
-					log("ERROR - Name and First Name received!");
-					String fullName;
-					if (firstNameText.trim().length() <= 0){
-						fullName = lastNameText;
-					}
-					else{
-						fullName = firstNameText + " " + lastNameText;
-					}
-					
-					if (fullName.trim().length() > 0){
-						nVDisplayName.setText(firstNameText+" "+lastNameText);
-						name= false;
-						firstName = false;
-
-						String firstLetter = fullName.charAt(0) + "";
-						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						nVPictureProfileTextView.setText(firstLetter);
-						nVPictureProfileTextView.setTextSize(32);
-						nVPictureProfileTextView.setTextColor(Color.WHITE);
-					}
-					name= false;
-					firstName = false;
-
-					//refresh MyAccountFragment if visible
-					if(drawerItem==DrawerItem.ACCOUNT){
-						log("Update the account fragment");
-						if(maFLol!=null){
-							maFLol.updateUserName(firstNameText, lastNameText);
-						}
-					}
-				}
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_LONG).show();
@@ -10595,20 +10464,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("The user: "+user.getEmail()+"changed his first name");
 					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my first name");
-						megaApi.getUserAttribute(user, 1, this);
+						myAccountInfo.setFirstName(false);
+						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
 					}
 					else{
-						megaApi.getUserAttribute(user, 1, new ContactNameListener(this));
+						myAccountInfo.setFirstName(false);
+						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
 					}
 				}
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
 					log("The user: "+user.getEmail()+"changed his last name");
 					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my last name");
-						megaApi.getUserAttribute(user, 2, this);
+						myAccountInfo.setLastName(false);
+						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
 					}
 					else{
-						megaApi.getUserAttribute(user, 2, new ContactNameListener(this));
+						myAccountInfo.setLastName(false);
+						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
 					}
 				}
 				if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
@@ -10629,10 +10502,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my avatar");
 						if (getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+							megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 						}
 						else{
-							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+							megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 						}
 					}
 				}
@@ -11493,33 +11366,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingUploadPanel.setVisibility(View.GONE);
 	}
 
-	public void updateUserNameNavigationView(String firstName, String lastName){
+	public void updateUserNameNavigationView(String fullName, String firstLetter){
 		log("updateUserNameNavigationView");
-		firstNameText= firstName;
-		lastNameText = lastName;
-		String fullName = firstNameText + " " + lastNameText;
-		if (fullName.trim().length() <= 0){
-			log("Put email as fullname");
-			String email = contact.getEmail();
-			String[] splitEmail = email.split("[@._]");
-			fullName = splitEmail[0];
-		}
 
-		if (fullName.trim().length() > 0){
-			log("FullName ok");
-			nVDisplayName.setText(fullName);
+		nVDisplayName.setText(fullName);
 
-			String firstLetter = fullName.charAt(0) + "";
-			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			nVPictureProfileTextView.setText(firstLetter);
-			nVPictureProfileTextView.setTextSize(32);
-			nVPictureProfileTextView.setTextColor(Color.WHITE);
-		}
+		nVPictureProfileTextView.setText(firstLetter);
+		nVPictureProfileTextView.setTextSize(32);
+		nVPictureProfileTextView.setTextColor(Color.WHITE);
 	}
 
 	public void updateMailNavigationView(String email){
 		log("updateMailNavigationView: "+email);
-		nVEmail.setText(contact.getEmail());
+		nVEmail.setText(myAccountInfo.getMyUser().getEmail());
 	}
 
 	public void showFabButton(){
@@ -11702,14 +11561,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.selectedRequest = selectedRequest;
 	}
 
-	public MegaUser getContact() {
-		return contact;
-	}
-
-	public void setContact(MegaUser contact) {
-		this.contact = contact;
-	}
-
 	public int getAccountFragment() {
 		return accountFragment;
 	}
@@ -11718,4 +11569,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.accountFragment = accountFragment;
 	}
 
+	public MyAccountInfo getMyAccountInfo() {
+		return myAccountInfo;
+	}
+
+	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
+		this.myAccountInfo = myAccountInfo;
+	}
 }
