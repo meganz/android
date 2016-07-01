@@ -712,6 +712,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 //				log("onClick: "+path.getAbsolutePath());
 				dbH.setLastUploadFolder(path.getAbsolutePath());
 				if (mode == Mode.PICK_FOLDER) {
+					log("Mode.PICK_FOLDER");
 					Intent intent = new Intent();
 					intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
 					intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);

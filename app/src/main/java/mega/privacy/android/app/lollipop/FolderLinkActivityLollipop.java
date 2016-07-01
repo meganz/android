@@ -1525,13 +1525,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					rootNode = megaApiFolder.getRootNode();
 				}
 	        	if(rootNode!=null){
-	        		onFolderClick(rootNode.getHandle(),rootNode.getSize());	
+					MegaNode parentNode = megaApiFolder.getNodeByHandle(parentHandle);
+					if (parentNode != null){
+						onFolderClick(parentNode.getHandle(),parentNode.getSize());
+					}
+					else{
+						onFolderClick(rootNode.getHandle(),rootNode.getSize());
+					}
 	        	}
 	        	else{
 	        		log("rootNode null!!");
 	        	}
-				finish();
-				break;		
+				break;
 			}
 			case R.id.folder_link_list_out_options:{
 				log("Out Panel");
