@@ -1618,8 +1618,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", false);
 					if (firstTimeCam) {
 						log("intent firstTimeCam2==true");
-						firstTimeCam = true;
-						drawerItem = DrawerItem.CAMERA_UPLOADS;
+						if (prefs != null){
+							if (prefs.getCamSyncEnabled() != null){
+								firstTimeCam = false;
+							}
+							else{
+								firstTimeCam = true;
+								drawerItem = DrawerItem.CAMERA_UPLOADS;
+							}
+						}
+						else{
+							firstTimeCam = true;
+							drawerItem = DrawerItem.CAMERA_UPLOADS;
+						}
+
 						setIntent(null);
 					}
 
