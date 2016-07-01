@@ -12,6 +12,7 @@ import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.Product;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -272,11 +273,9 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
             fullName = splitEmail[0];
         }
 
-        if (fullName.trim().length() > 0){
-            log("FullName ok");
-        }
-        else{
-            fullName = "User Name";
+        if (fullName.trim().length() <= 0){
+            fullName = context.getString(R.string.name_text)+" "+context.getString(R.string.lastname_text);
+            log("Full name set by default: "+fullName);
         }
 
         firstLetter = fullName.charAt(0) + "";
