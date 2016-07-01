@@ -93,7 +93,7 @@ public class AccountController {
     }
 
     public boolean existsAvatar(){
-        MegaUser myContact = ((ManagerActivityLollipop)context).getContact();
+        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
         String myEmail = myContact.getEmail();
         if(myEmail!=null){
             File avatar = null;
@@ -115,7 +115,7 @@ public class AccountController {
     public void removeAvatar(){
         log("removeAvatar");
 
-        MegaUser myContact = ((ManagerActivityLollipop)context).getContact();
+        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
         String myEmail = myContact.getEmail();
         if(myEmail!=null){
             File avatar = null;
