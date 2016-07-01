@@ -60,12 +60,16 @@ import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
@@ -6735,6 +6739,154 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
+	public void showGetLinkPanel(final String link){
+		log("showGetLinkPanel");
+
+		AlertDialog getLinkDialog;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		            builder.setMessage(link);
+		builder.setTitle(getString(R.string.context_get_link_menu));
+
+		LayoutInflater inflater = getLayoutInflater();
+		View dialoglayout = inflater.inflate(R.layout.panel_get_link, null);
+
+		final CheckedTextView linkWithoutKeyCheck = (CheckedTextView) dialoglayout.findViewById(R.id.link_without_key);
+		linkWithoutKeyCheck.setChecked(true);
+		linkWithoutKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		linkWithoutKeyCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams linkWOK = (ViewGroup.MarginLayoutParams) linkWithoutKeyCheck.getLayoutParams();
+		linkWOK.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(14, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		final CheckedTextView linkDecryptionKeyCheck = (CheckedTextView) dialoglayout.findViewById(R.id.link_decryption_key);
+		linkDecryptionKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		linkDecryptionKeyCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams linkDecry = (ViewGroup.MarginLayoutParams) linkDecryptionKeyCheck.getLayoutParams();
+		linkDecry.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		final CheckedTextView linkWithKeyCheck = (CheckedTextView) dialoglayout.findViewById(R.id.link_with_key);
+		linkWithKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		linkWithKeyCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams linkWK = (ViewGroup.MarginLayoutParams) linkWithKeyCheck.getLayoutParams();
+		linkWK.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		RelativeLayout expiryDateLayout = (RelativeLayout) dialoglayout.findViewById(R.id.expiry_date_layout);
+
+		LinearLayout.LayoutParams paramsDateLayout = (LinearLayout.LayoutParams)expiryDateLayout.getLayoutParams();
+		paramsDateLayout.setMargins(Util.scaleWidthPx(26, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, 0);
+		expiryDateLayout.setLayoutParams(paramsDateLayout);
+		TextView expiryDateTitle = (TextView) dialoglayout.findViewById(R.id.title_set_expiry_date);
+		expiryDateTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		TextView expiryDateSubtitle = (TextView) dialoglayout.findViewById(R.id.subtitle_set_expiry_date);
+		expiryDateSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+
+		final Button expiryDate = (Button) dialoglayout.findViewById(R.id.expiry_date);
+		LinearLayout.LayoutParams paramsExpiryDate = (LinearLayout.LayoutParams)expiryDate.getLayoutParams();
+		paramsExpiryDate.setMargins(Util.scaleWidthPx(2, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics));
+		expiryDate.setLayoutParams(paramsExpiryDate);
+
+		TextView linkText = (TextView) dialoglayout.findViewById(R.id.link);
+		linkWithoutKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+		LinearLayout.LayoutParams paramsLink = (LinearLayout.LayoutParams)linkText.getLayoutParams();
+		paramsLink.setMargins(Util.scaleWidthPx(26, outMetrics), 0, Util.scaleWidthPx(16, outMetrics), 0);
+		linkText.setLayoutParams(paramsLink);
+		linkText.setText(link);
+
+		Switch switchGetLink = (Switch) dialoglayout.findViewById(R.id.switch_set_expiry_date);
+		RelativeLayout.LayoutParams paramsSwitch = (RelativeLayout.LayoutParams)switchGetLink.getLayoutParams();
+		paramsSwitch.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
+		switchGetLink.setLayoutParams(paramsSwitch);
+
+		switchGetLink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if(isChecked){
+					expiryDate.setVisibility(View.VISIBLE);
+				}
+				else{
+					expiryDate.setVisibility(View.GONE);
+				}
+			}
+		});
+
+		builder.setView(dialoglayout);
+
+/*
+		// Create TextView
+		final TextView input = new TextView (this);
+		input.setGravity(Gravity.CENTER);
+
+		final CharSequence[] items = {getString(R.string.option_full_link), getString(R.string.option_link_without_key), getString(R.string.option_decryption_key)};
+
+		android.content.DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+
+				switch(item) {
+					case 0:{
+						input.setText(link);
+						break;
+					}
+					case 1:{
+						String urlString="";
+						String [] s = link.split("!");
+						if (s.length == 3){
+							urlString = s[0] + "!" + s[1];
+						}
+						input.setText(urlString);
+						break;
+					}
+					case 2:{
+						String keyString="";
+						String [] s = link.split("!");
+						if (s.length == 3){
+							keyString = s[2];
+						}
+						input.setText(keyString);
+						break;
+					}
+				}
+			}
+		};
+
+		builder.setSingleChoiceItems(items, 0, dialogListener);*/
+//
+		builder.setPositiveButton(getString(R.string.context_send), new android.content.DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Intent intent = new Intent(Intent.ACTION_SEND);
+				intent.setType("text/plain");
+//				intent.putExtra(Intent.EXTRA_TEXT, input.getText());
+				startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+			}
+		});
+
+		builder.setNegativeButton(getString(R.string.context_copy), new android.content.DialogInterface.OnClickListener() {
+
+			@SuppressLint("NewApi")
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+					android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+					clipboard.setText(link);
+				} else {
+					android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//					android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", input.getText());
+//					clipboard.setPrimaryClip(clip);
+				}
+				Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
+			}
+		});
+
+		getLinkDialog = builder.create();
+		getLinkDialog.create();
+//		FrameLayout.LayoutParams lpPL = new FrameLayout.LayoutParams(input.getLayoutParams());
+//		lpPL.setMargins(Util.scaleWidthPx(15, outMetrics), 0, Util.scaleWidthPx(15, outMetrics), 0);
+//		input.setLayoutParams(lpPL);
+		getLinkDialog.show();
+
+	}
+
 	/*
 	 * Display keyboard
 	 */
@@ -10159,87 +10311,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				if (isGetLink){
 					final String link = request.getLink();
-
-					AlertDialog getLinkDialog;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		            builder.setMessage(link);
-					builder.setTitle(getString(R.string.context_get_link_menu));
-
-					// Create TextView
-					final TextView input = new TextView (this);
-					input.setGravity(Gravity.CENTER);
-
-					final CharSequence[] items = {getString(R.string.option_full_link), getString(R.string.option_link_without_key), getString(R.string.option_decryption_key)};
-
-					android.content.DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-
-							switch(item) {
-			                    case 0:{
-			                    	input.setText(link);
-			                    	break;
-			                    }
-			                    case 1:{
-			                    	String urlString="";
-			    					String [] s = link.split("!");
-			    					if (s.length == 3){
-			    						urlString = s[0] + "!" + s[1];
-			    					}
-			                    	input.setText(urlString);
-			                        break;
-			                    }
-			                    case 2:{
-			                    	String keyString="";
-			    					String [] s = link.split("!");
-			    					if (s.length == 3){
-			    						keyString = s[2];
-			    					}
-			                    	input.setText(keyString);
-			                        break;
-			                    }
-			                }
-						}
-					};
-
-					builder.setSingleChoiceItems(items, 0, dialogListener);
-//
-					builder.setPositiveButton(getString(R.string.context_send), new android.content.DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Intent intent = new Intent(Intent.ACTION_SEND);
-							intent.setType("text/plain");
-							intent.putExtra(Intent.EXTRA_TEXT, input.getText());
-							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-						}
-					});
-
-					builder.setNegativeButton(getString(R.string.context_copy), new android.content.DialogInterface.OnClickListener() {
-
-						@SuppressLint("NewApi")
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-							    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-							    clipboard.setText(link);
-							} else {
-							    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", input.getText());
-					            clipboard.setPrimaryClip(clip);
-							}
-							Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
-						}
-					});
-
-					input.setText(link);
-					builder.setView(input);
-
-					getLinkDialog = builder.create();
-					getLinkDialog.create();
-					FrameLayout.LayoutParams lpPL = new FrameLayout.LayoutParams(input.getLayoutParams());
-					lpPL.setMargins(Util.scaleWidthPx(15, outMetrics), 0, Util.scaleWidthPx(15, outMetrics), 0);
-					input.setLayoutParams(lpPL);
-					getLinkDialog.show();
+					showGetLinkPanel(link);
 				}
 			}
 			else{
