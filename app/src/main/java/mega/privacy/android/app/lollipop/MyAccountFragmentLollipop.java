@@ -777,6 +777,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("TYPE_CONFIRM_CHANGE_EMAIL_LINK request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The mail has been changed");
+				myAccountInfo.setMyUser(megaApi.getMyUser());
 				updateMailView(request.getEmail());
 				((ManagerActivityLollipop) context).updateMailNavigationView(request.getEmail());
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.success_changing_user_mail), getString(R.string.change_mail_title_last_step));

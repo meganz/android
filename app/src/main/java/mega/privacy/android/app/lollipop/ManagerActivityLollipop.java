@@ -10502,9 +10502,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 						log("I change my avatar");
 						if (getExternalCacheDir() != null){
-							megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+							String destinationPath = null;
+							destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+							if(destinationPath!=null){
+								log("The destination of the avatar is: "+destinationPath);
+								megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+							}
+							else{
+								log("ERROR! Destination PATH is NULL");
+							}
 						}
 						else{
+							log("getExternalCacheDir() is NULL");
 							megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 						}
 					}
