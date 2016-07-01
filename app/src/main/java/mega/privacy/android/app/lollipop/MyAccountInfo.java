@@ -361,6 +361,8 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                         log("Error changing avatar: ");
                         if(request.getFile()!=null){
                             log("DESTINATION FILE: "+request.getFile());
+                        }
+                        if(request.getEmail()!=null){
                             log("email: "+request.getEmail());
                         }
                     }
