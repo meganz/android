@@ -203,6 +203,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Cancel intent");
 				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+				megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
 				return START_NOT_STICKY;
 			}
 		}
@@ -274,10 +275,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 //			megaApi = app.getMegaApiFolder();
 //		}
 //		else{
-			megaApi = app.getMegaApi();
+//			megaApi = app.getMegaApi();
 //		}
-		
-		currentDocument = megaApi.getNodeByHandle(hash);		
+
+		megaApi = app.getMegaApi();
+
+		if (isFolderLink){
+			currentDocument = megaApiFolder.getNodeByHandle(hash);
+		}
+		else{
+			currentDocument = megaApi.getNodeByHandle(hash);
+		}
 	
 		if((currentDocument == null) && (url == null)){
 			log("Node not found");
@@ -337,8 +345,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("currentDir is not a directory");
 			}	
 			storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
-			
-			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+
+			if (isFolderLink){
+				megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+			}
+			else{
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+			}
 		}
 		else{
 			if (currentDir.isDirectory()){
@@ -373,14 +386,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						return;
 					}
 					else{
+//						if (dbH == null){
+//							dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//						}
+//
+//						if (dbH == null){
+//							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//							log("dBH is null");
+//							return;
+//						}
+//
+//						if (dbH.getCredentials() == null){
+//							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//							log("No credentials");
+//							return;
+//						}
+//
+						if (megaApi.getRootNode() == null){
+							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+							log("Root node is null");
+							return;
+						}
+
+						log("Root node is not null");
 						currentDocument = megaApiFolder.authorizeNode(currentDocument);
 						if (currentDocument == null){
+							log("CurrentDocument is null");
 							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 							return;
 						}
 					}
 				}
 
+				log("CurrentDocument is not null");
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 							
 			}
