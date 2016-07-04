@@ -755,6 +755,17 @@ public class NodeController {
         megaApi.exportNode(document, ((ManagerActivityLollipop) context));
     }
 
+    public void exportLinkTimestamp(MegaNode document, int timestamp){
+        log("exportLinkTimestamp: "+timestamp);
+        if (!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+        ((ManagerActivityLollipop) context).setIsGetLink(true);
+        ((ManagerActivityLollipop) context).setExpiredDateLink(true);
+        megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
+    }
+
 
     public void selectContactToShareFolders(ArrayList<Long> handleList){
         log("shareFolders ArrayListLong");
