@@ -6828,6 +6828,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("The is user is not PRO");
+			switchGetLink.setEnabled(false);
 		}
 
 		linkWithoutKeyCheck.setOnClickListener(new OnClickListener() {
