@@ -297,11 +297,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		}
-		
-		createDefaultAvatar(holder, contact);
-		
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
-	
+
 		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
 		if(contactDB!=null){
 
@@ -327,9 +323,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holder.textViewContactName.setText(fullName);
 		}
 		else{
-			log("The contactDB is null: ");
-		}		
-		
+			String email = contact.getEmail();
+			String[] splitEmail = email.split("[@._]");
+			String fullName = splitEmail[0];
+			holder.textViewContactName.setText(fullName);
+		}
+
+		createDefaultAvatar(holder, contact);
+
+		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
 			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
@@ -543,95 +546,86 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	        
 			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 			((ViewHolderContactsList)holder).imageView.setImageBitmap(defaultAvatar);
-						
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = context.getResources().getDisplayMetrics().density;
 
-			String fullName;
-
-			if (holder.firstNameText.trim().length() <= 0){
-				fullName = holder.lastNameText;
-			}
-			else{
-				fullName = holder.firstNameText + " " + holder.lastNameText;
-			}
-
-			if (fullName.trim().length() <= 0){
-				log("Put email as fullname");
-				String email = contact.getEmail();
-				String[] splitEmail = email.split("[@._]");
-				fullName = splitEmail[0];
-			}
-
-		    int avatarTextSize = getAvatarTextSize(density);
-		    log("DENSITY: " + density + ":::: " + avatarTextSize);
-			boolean setInitialByMail = false;
-
-			if (fullName != null){
-				if (fullName.trim().length() > 0){
-					String firstLetter = fullName.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					holder.contactInitialLetter.setText(firstLetter);
-					holder.contactInitialLetter.setTextSize(24);
-					holder.contactInitialLetter.setTextColor(Color.WHITE);
-					holder.contactInitialLetter.setVisibility(View.VISIBLE);
-				}else{
-					setInitialByMail=true;
-				}
-			}
-			else{
-				setInitialByMail=true;
-			}
-			if(setInitialByMail){
-				if (holder.contactMail != null){
-					if (holder.contactMail.length() > 0){
-						log("email TEXT: " + holder.contactMail);
-						log("email TEXT AT 0: " + holder.contactMail.charAt(0));
-						String firstLetter = holder.contactMail.charAt(0) + "";
-						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						holder.contactInitialLetter.setText(firstLetter);
-						holder.contactInitialLetter.setTextSize(24);
-						holder.contactInitialLetter.setTextColor(Color.WHITE);
-						holder.contactInitialLetter.setVisibility(View.VISIBLE);
-					}
-				}
-			}
 		}
 		else if (holder instanceof ViewHolderContactsGrid){
 			Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 			Canvas c = new Canvas(defaultAvatar);
 			Paint p = new Paint();
 			p.setAntiAlias(true);
+			String color = megaApi.getUserAvatarColor(contact);
+			if(color!=null){
+				log("The color to set the avatar is "+color);
+				p.setColor(Color.parseColor(color));
+			}
+			else{
+				log("Default color to the avatar");
+				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			}
+
 			p.setStyle(Paint.Style.FILL);
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
-	        
+
 	        c.drawRect(0, 0, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, p);
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(defaultAvatar);
-						
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = context.getResources().getDisplayMetrics().density;
-		    
-		    int avatarTextSize = getAvatarTextSize(density);
-		    log("DENSITY: " + density + ":::: " + avatarTextSize);
-		    if (holder.contactMail != null){
-			    if (holder.contactMail.length() > 0){
-			    	String firstLetter = holder.contactMail.charAt(0) + "";
-			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
-			    	holder.contactInitialLetter.setText(firstLetter);
-			    	if (adapterType == ITEM_VIEW_TYPE_LIST){							
-						holder.contactInitialLetter.setTextSize(32);
-					}
-					else if (adapterType == ITEM_VIEW_TYPE_GRID){
-						holder.contactInitialLetter.setTextSize(64);
-					}
-			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
-			    }
-		    }
+		}
+
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+		display.getMetrics(outMetrics);
+		float density  = context.getResources().getDisplayMetrics().density;
+
+		String fullName;
+
+		if (holder.firstNameText.trim().length() <= 0){
+			fullName = holder.lastNameText;
+		}
+		else{
+			fullName = holder.firstNameText + " " + holder.lastNameText;
+		}
+
+		if (fullName.trim().length() <= 0){
+			log("Put email as fullname");
+			String email = contact.getEmail();
+			String[] splitEmail = email.split("[@._]");
+			fullName = splitEmail[0];
+		}
+
+		int avatarTextSize = getAvatarTextSize(density);
+		log("DENSITY: " + density + ":::: " + avatarTextSize);
+		boolean setInitialByMail = false;
+
+		if (fullName != null){
+			if (fullName.trim().length() > 0){
+				String firstLetter = fullName.charAt(0) + "";
+				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				holder.contactInitialLetter.setText(firstLetter);
+				holder.contactInitialLetter.setTextColor(Color.WHITE);
+				holder.contactInitialLetter.setVisibility(View.VISIBLE);
+			}else{
+				setInitialByMail=true;
+			}
+		}
+		else{
+			setInitialByMail=true;
+		}
+		if(setInitialByMail){
+			if (holder.contactMail != null){
+				if (holder.contactMail.length() > 0){
+					log("email TEXT: " + holder.contactMail);
+					log("email TEXT AT 0: " + holder.contactMail.charAt(0));
+					String firstLetter = holder.contactMail.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					holder.contactInitialLetter.setText(firstLetter);
+					holder.contactInitialLetter.setTextColor(Color.WHITE);
+					holder.contactInitialLetter.setVisibility(View.VISIBLE);
+				}
+			}
+		}
+		if (adapterType == ITEM_VIEW_TYPE_LIST){
+			holder.contactInitialLetter.setTextSize(24);
+		}
+		else if (adapterType == ITEM_VIEW_TYPE_GRID){
+			holder.contactInitialLetter.setTextSize(64);
 		}
 	}
 		
