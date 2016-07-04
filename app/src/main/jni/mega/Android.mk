@@ -15,7 +15,7 @@ LOCAL_MODULE    := megasdk
 LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DDEBUG
 LOCAL_SRC_FILES := $(CPP_SOURCES) $(C_SOURCES) $(C_WRAPPER_SOURCES)
 LOCAL_C_INCLUDES += $(local_c_includes)
-LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite
+LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite libuv
 include $(BUILD_STATIC_LIBRARY)
 
 
