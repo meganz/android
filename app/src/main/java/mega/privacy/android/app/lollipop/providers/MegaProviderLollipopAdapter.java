@@ -1,19 +1,5 @@
 package mega.privacy.android.app.lollipop.providers;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter;
-import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
-import mega.privacy.android.app.lollipop.MegaOfflineLollipopAdapter.ViewHolderOfflineList;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,6 +13,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 
 public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProviderLollipopAdapter.ViewHolderLollipopProvider> implements OnClickListener{
@@ -140,7 +137,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		Util.setViewAlpha(holder.imageView, 1);
 		holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));		
 		if (node.isFolder()){
-			holder.textViewFileSize.setText(getInfoFolder(node));
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 		}
 		else{
@@ -192,25 +189,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			}
 		}
 	}
-	
-	private String getInfoFolder (MegaNode n){
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		
-		return info;
-	}
-	
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");

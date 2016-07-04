@@ -20,9 +20,10 @@
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
         android:textColor="@color/file_list_first_row"
+        android:maxLines="2"
         android:ellipsize="end"
-        android:textSize="16sp"
-        android:maxLines="1" />
+        android:singleLine="false"
+        android:textSize="14sp" />
     
     <TextView
         android:id="@+id/offline_list_filesize"

@@ -1,37 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaStreamingService;
-import mega.privacy.android.app.MimeTypeThumbnail;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUtilsAndroid;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -52,6 +27,26 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 
 public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid> {
@@ -91,7 +86,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	Object fragment;
-	int type = ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER;
+	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	private ActionMode actionMode;
 	
@@ -110,7 +105,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -120,7 +116,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToCopyNodes(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -130,14 +127,16 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(documents.get(0));
+						NodeController nC = new NodeController(context);
+						nC.exportLink(documents.get(0));
 					}
 					break;
 				}
@@ -148,7 +147,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -324,6 +323,9 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	 */
 	void hideMultipleSelect() {
 		this.multipleSelect = false;
+
+		clearSelections();
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -337,6 +339,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				checkedItems.append(i, true);
 			}
 		}
+		if (actionMode == null){
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		}
+
 		updateActionModeTitle();
 		notifyDataSetChanged();
 	}
@@ -388,7 +394,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", positionInNodes);
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-						intent.putExtra("adapterType", ManagerActivityLollipop.PHOTO_SYNC_ADAPTER);
+						intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						context.startActivity(intent);
 					}
@@ -410,20 +416,22 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+				  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 				  			context.startActivity(mediaIntent);
 				  		}
 				  		else{
 				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 				  			ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(n.getHandle());
-							((ManagerActivityLollipop) context).onFileClick(handleList);
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
 				  		}						
 					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(n.getHandle());
-						((ManagerActivityLollipop) context).onFileClick(handleList);
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
 					}	
 					notifyDataSetChanged();
 				}
@@ -451,9 +459,12 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		log("onNodeLongClick");
 		if (!multipleSelect){
 			clearSelections();
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			checkedItems.append(positionInNodes, true);
+
 			this.multipleSelect = true;
+			checkedItems.append(positionInNodes, true);
+
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
 			updateActionModeTitle();
 			notifyDataSetChanged();
 		}

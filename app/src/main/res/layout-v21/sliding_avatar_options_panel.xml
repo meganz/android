@@ -1,0 +1,155 @@
+<mega.privacy.android.app.components.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sliding_layout_avatar_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    sothree:umanoDragView="@+id/dragView"
+    sothree:umanoOverlay="true"
+    sothree:umanoPanelHeight="120dp"
+    sothree:umanoParallaxOffset="100dp"
+    sothree:umanoShadowHeight="4dp"
+    android:elevation="16dp">
+
+    <!-- MAIN CONTENT -->
+
+    <FrameLayout
+        android:id="@+id/avatar_list_out_options"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:focusable="false"
+            android:focusableInTouchMode="true"
+            android:gravity="center" />
+    </FrameLayout>
+
+    <!-- SLIDING LAYOUT -->
+
+    <LinearLayout
+        android:id="@+id/avatar_list_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="0dp" >
+
+        <LinearLayout
+            android:id="@+id/avatar_list_option_title_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/avatar_list_option_title"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:visibility="invisible"
+                android:src="@drawable/info_ic" />
+
+            <TextView
+                android:id="@+id/avatar_list_option_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:text="@string/title_options_avatar_panel"
+                android:textColor="@color/transparent_black"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/avatar_list_choose_photo_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/avatar_list_option_choose_photo"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_choose_photo" />
+
+            <TextView
+                android:id="@+id/avatars_list_option_choose_photo_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:text="@string/choose_photo_avatar_panel"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/avatar_list_take_photo_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/avatar_list_option_take_photo"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_take_photo" />
+
+            <TextView
+                android:id="@+id/avatar_list_option_take_photo_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:text="@string/take_photo_avatar_panel"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/avatar_list_delete_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/avatar_list_delete"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_remove" />
+
+            <TextView
+                android:id="@+id/avatar_list_option_delete_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:text="@string/delete_avatar_panel"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</mega.privacy.android.app.components.SlidingUpPanelLayout>

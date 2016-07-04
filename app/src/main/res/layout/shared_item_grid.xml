@@ -179,7 +179,7 @@
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/contact_share_item_layout"
-	    android:background="@color/photo_sync_month_layout"
+	    android:background="@color/white"
 	    android:layout_below="@+id/file_share_item_layout"	    
 	    android:longClickable="false"
 		android:clickable="false">

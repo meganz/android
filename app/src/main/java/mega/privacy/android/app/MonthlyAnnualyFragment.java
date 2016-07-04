@@ -1,17 +1,5 @@
 package mega.privacy.android.app;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -28,6 +16,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.BitSet;
+
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaPricing;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
 	
@@ -263,25 +263,25 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							aB.setTitle(getString(R.string.pro1_account));
 		
 							storage.setText(account.getStorage()+"GB");	
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
-								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perYear.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
-								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -315,25 +315,25 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							aB.setTitle(getString(R.string.pro2_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
-								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perYear.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
-								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -368,25 +368,25 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							aB.setTitle(getString(R.string.pro3_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");            
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
-								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perYear.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
-								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -544,25 +544,25 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							aB.setTitle(getString(R.string.pro1_account));
 		
 							storage.setText(account.getStorage()+"GB");	
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
-								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perYear.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
-								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -596,25 +596,25 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							aB.setTitle(getString(R.string.pro2_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
-								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perYear.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
-								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -649,25 +649,25 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							aB.setTitle(getString(R.string.pro3_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");            
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
 								String perYearString =df.format(perYearF);
 		
 								perYear.setText(perYearString+" €");
-								perYear.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perYear.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 							else if(account.getMonths()==1){
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
 		
 								perMonth.setText(perMonthString+" €");
-								perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}

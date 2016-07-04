@@ -1,29 +1,13 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.ExifInterface;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
@@ -36,21 +20,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener {
@@ -178,7 +167,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		//Check if it's the Master Key file
 		MegaOffline currentNode = (MegaOffline) getItem(pos);
         if(currentNode.getHandle().equals("0")){
-        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			if(file.exists()){
 				notifyItemChanged(pos);
@@ -272,21 +261,21 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					if(!mOffList.isEmpty()) {
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
-							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 							log("Export in: "+path);
 							File file= new File(path);
 							if(file.exists()){
-								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
 								mOffList.add(masterKeyFile);
 							}
 						}	
 					}
 					else{
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}
@@ -327,7 +316,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_list_filename);
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp(210, outMetrics);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_list_three_dots);
 			
@@ -352,8 +341,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_grid_item_layout);
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_grid_filename);
-			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
@@ -402,17 +389,17 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 				}
 			} 
 			else {
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		} 
 		else {
@@ -424,7 +411,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 			else{
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		}
 				
@@ -435,7 +422,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.currentPosition = position;
 			holder.textViewFileName.setText(currentNode.getName());
 			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			long nodeSize;
 			if(file.exists()){
@@ -585,7 +572,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.currentPosition = position;
 			holder.textViewFileName.setText(currentNode.getName());
 			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			long nodeSize;
 			if(file.exists()){
@@ -773,7 +760,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						notifyDataSetChanged();
 					}
 				}				
-				((ManagerActivityLollipop) context).showOptionsPanel(mOff);
+				((ManagerActivityLollipop) context).showNodeOptionsPanel(mOff);
 				break;
 			}
 		}		

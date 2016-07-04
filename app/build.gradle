@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 9
         targetSdkVersion 23
-        versionCode 39
-        versionName "3.0.7.official"
+        versionCode 54
+        versionName "3.0.11.1"
     }
 
     sourceSets.main {
@@ -23,12 +23,12 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //  minifyEnabled false
+            //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //  minifyEnabled false
+            //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -58,10 +58,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.google.android.gms:play-services-wallet:8.4.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.google.android.gms:play-services-wallet:9.0.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
 }

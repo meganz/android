@@ -4,6 +4,12 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Logger.LogLevel;
 //import com.google.android.gms.analytics.Tracker;
 
+import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.utils.Util;
@@ -17,17 +23,12 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
-import android.app.Application;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.util.Log;
 
 
 public class MegaApplication extends Application implements MegaListenerInterface
 {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.0.6.official";
+	static final String USER_AGENT = "MEGAAndroid/3.0.11.1";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -69,7 +70,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
-			log("onRequestFinish: " + request.getRequestString());
+			log("onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 			if (e.getErrorCode() == MegaError.API_ESID){
 				if (request.getType() == MegaRequest.TYPE_LOGOUT){
 					log("type_logout");
@@ -78,6 +79,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				else{
 					log("calling ManagerActivity.logout");
 //					ManagerActivity.logout(getApplicationContext(), megaApi, false);
+				}
+			}
+			else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+				if (e.getErrorCode() == MegaError.API_OK){
+					if (megaApi != null){
+						log("enableTransferResumption ");
+						log("enableTransferResumption - Session: " + megaApi.dumpSession());
+//						megaApi.enableTransferResumption();
+					}
 				}
 			}
 		}
@@ -95,10 +105,33 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
+
+		Util.setContext(getApplicationContext());
+		DatabaseHandler dbH;
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		boolean fileLogger = false;
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null) {
+				if (attrs.getFileLogger() != null) {
+					try {
+						fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
+					} catch (Exception e) {
+						fileLogger = false;
+					}
+				} else {
+					fileLogger = false;
+				}
+			} else {
+				fileLogger = false;
+			}
+		}
+
+		Util.setFileLogger(fileLogger);
 		
 //		initializeGA();
 		
@@ -227,7 +260,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
-			log("type_logout");
+			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
 			if (e.getErrorCode() == MegaError.API_ESID){
 				log("calling ManagerActivity.logout");
 				ManagerActivity.logout(getApplicationContext(), megaApi, false);

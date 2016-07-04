@@ -1,24 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.BitSet;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.billing.IabHelper;
-import mega.privacy.android.app.utils.billing.IabResult;
-import mega.privacy.android.app.utils.billing.Inventory;
-import mega.privacy.android.app.utils.billing.Purchase;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
@@ -26,6 +9,21 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import java.util.BitSet;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.billing.IabHelper;
+import mega.privacy.android.app.utils.billing.IabResult;
+import mega.privacy.android.app.utils.billing.Inventory;
+import mega.privacy.android.app.utils.billing.Purchase;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 public class MyAccountMainActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface {
@@ -142,36 +140,6 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 		selectMyAccountFragment(currentFragment);
 	}
 
-	/*@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		log("onPrepareOptionsMenu----------------------------------");
-
-		if(maF != null){
-			if(maF.isVisible()){
-				logoutFromAllDevicesMenuItem.setVisible(true);
-				changePasswordMenuItem.setVisible(true);
-				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(true);
-				logoutMenuItem.setVisible(true);
-				
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-    			log("Export in: "+path);
-    			File file= new File(path);
-    			if(file.exists()){
-    				exportMasterKeyMenuItem.setVisible(false); 
-	    			removeMasterKeyMenuItem.setVisible(true); 
-    			}
-    			else{
-    				exportMasterKeyMenuItem.setVisible(true); 
-	    			removeMasterKeyMenuItem.setVisible(false); 		
-    			}
-			}
-		}
-
-		return super.onPrepareOptionsMenu(menu);
-
-	}*/
-
 	@Override
 	public void onBackPressed() {
 		/*if (cflF != null){
@@ -225,10 +193,10 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
-				Toast.makeText(this, "SIIIIIIIIIIIIIIIIII", Toast.LENGTH_LONG).show();
+//				Toast.makeText(this, "SIIIIIIIIIIIIIIIIII", Toast.LENGTH_LONG).show();
 			}
 			else{
-				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
+//				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}

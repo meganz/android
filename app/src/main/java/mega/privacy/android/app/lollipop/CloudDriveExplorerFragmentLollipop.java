@@ -1,6 +1,20 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -9,32 +23,11 @@ import mega.privacy.android.app.LauncherFileExplorerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 
 public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnClickListener{
@@ -131,7 +124,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-		mLayoutManager = new LinearLayoutManager(context);
+		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
@@ -270,7 +263,26 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		adapter.setPositionClicked(-1);		
 		
-		listView.setAdapter(adapter);		
+		listView.setAdapter(adapter);
+
+		//If folder has no files
+		if (adapter.getItemCount() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			if (megaApi.getRootNode().getHandle()==parentHandle) {
+				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
 		
 		return v;
 	}
@@ -312,15 +324,20 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
 				}
+				break;
 			}
 			case R.id.cancel_text:{
 				if (context instanceof LauncherFileExplorerActivity){
+					log("Cancel back to Cloud");
+					((LauncherFileExplorerActivity) context).backToCloud(-1);
 					((LauncherFileExplorerActivity) context).finish();
+
 				}
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).finish();
 				}
 			}
+			break;
 		}
 	}
 
@@ -447,6 +464,24 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 * Disable nodes from the list
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
+
+		if (adapter == null){
+			log("Adapter is NULL");
+			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
+
+			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
+
+				@Override
+				public void onItemClick(View view, int position) {
+					itemClick(view, position);
+				}
+			});
+		}
+//		else{
+//			adapter.setParentHandle(parentHandle);
+//			adapter.setNodes(nodes);
+//			adapter.setSelectFile(selectFile);
+//		}
 		adapter.setDisableNodes(disabledNodes);
 	}
 	

@@ -121,7 +121,11 @@
             android:key="settings_about_terms_of_service"
         	android:title="@string/settings_about_terms_of_service"
         	android:summary="" />
-		
+
+		<Preference
+			android:key="settings_about_code_link"
+			android:title="@string/settings_about_code_link_title" />
+
         <Preference
             android:key="settings_about_sdk_version"
         	android:title="@string/settings_about_sdk_version"
@@ -131,5 +135,7 @@
             android:key="settings_about_app_version"
         	android:title="@string/settings_about_app_version"
         	android:summary="@string/app_version" />
+
+
 	</PreferenceCategory>
 </PreferenceScreen>

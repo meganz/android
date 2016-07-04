@@ -1,19 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Locale;
-
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,16 +17,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 public class ContactPropertiesFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
@@ -161,7 +155,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			Canvas c = new Canvas(defaultAvatar);
 			Paint p = new Paint();
 			p.setAntiAlias(true);
-			p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
 			
 			int radius; 
 	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

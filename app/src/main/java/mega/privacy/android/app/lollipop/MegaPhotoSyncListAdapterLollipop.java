@@ -1,31 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.lollipop.CameraUploadFragmentLollipop.PhotoSyncHolder;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaUtilsAndroid;
-
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -38,6 +16,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.CameraUploadFragmentLollipop.PhotoSyncHolder;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaNode;
 
 
 public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener {
@@ -74,7 +66,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	Object fragment;
-	int type = ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER;
+	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	/*public static view holder class*/
     public class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
@@ -152,7 +144,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		
 		switch (v.getId()){
 			case R.id.photo_sync_list_item_layout:{
-				if (type == ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER){
+				if (type == Constants.CAMERA_UPLOAD_ADAPTER){
 					((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition);
 				}
 				break;

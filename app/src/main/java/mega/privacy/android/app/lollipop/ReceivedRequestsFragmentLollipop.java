@@ -1,17 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactsGridAdapter;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -20,23 +8,28 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemLongClickListener;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContactsGridAdapter;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 
 
-public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClickListener{
+public class ReceivedRequestsFragmentLollipop extends Fragment{
 	
 	public static int GRID_WIDTH =400;
 	
@@ -63,15 +56,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 	ArrayList<MegaContactRequest> contacts;
 //	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
-	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;	
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionAccept;
-	public LinearLayout optionDecline;
-	public LinearLayout optionIgnore;
+	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,7 +94,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
 
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new LinearLayoutManager(context);
+			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			//Just onClick implemented
 //			listView.addOnItemTouchListener(this);
@@ -119,7 +104,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);			
 			
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -142,55 +127,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_request_list_out_options);
-			optionAccept = (LinearLayout) v.findViewById(R.id.contact_list_option_accept_layout);
-			optionDecline = (LinearLayout) v.findViewById(R.id.contact_list_option_decline_layout);
-			optionIgnore = (LinearLayout) v.findViewById(R.id.contact_list_option_ignore_layout);
-			
-			optionAccept.setOnClickListener(this);
-			optionDecline.setOnClickListener(this);
-			optionIgnore.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });			
 						
 			return v;
     	}
@@ -201,70 +137,15 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
     	}		
 
     }
-    
-	public void showOptionsPanel(MegaContactRequest request){		
-		log("showOptionsPanel");	
-		
-		this.selectedRequest = request;		
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapterList.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-	}
-    
+
 	private static void log(String log) {
 		Util.log("ReceivedRequestsFragmentLollipop", log);
 	}
 
-	@Override
-	public void onClick(View v) {
-		log("onClick");
-		switch(v.getId()){
-			case R.id.contact_list_option_accept_layout:{
-				log("option Accept");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).acceptInvitationContact(selectedRequest);			
-				break;
-			}
-			case R.id.contact_list_option_decline_layout:{
-				log("Remove Invitation");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).declineInvitationContact(selectedRequest);
-				break;
-			}
-			case R.id.contact_list_option_ignore_layout:{
-				log("Ignore Invitation");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).ignoreInvitationContact(selectedRequest);
-				break;
-			}
-			case R.id.contact_request_list_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-		}			
-	}
-	
-	
 	public void updateView(){
 		contacts = megaApi.getIncomingContactRequests();
 		if (adapterList == null){
-			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
+			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			listView.setAdapter(adapterList);
 		}
 		else{
@@ -329,8 +210,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
     		else
     		{
     			log("adapter==NULL");
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
-    		} 
+    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
+    		}
     		
     		if (adapterList.getItemCount() == 0){				
 				log("adapterList.getCount() == 0");
@@ -350,41 +231,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 	}
 	
 	public int onBackPressed(){
-		
-		log("onBackPressed");	
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			hideOptionsPanel();
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
-		
-//		if (adapterList.isMultipleSelect()){
-//			adapterList.hideMultipleSelect();
-//			return 2;
-//		}
-		
+		log("onBackPressed");
+
 		if (adapterList.getPositionClicked() != -1){
 			adapterList.setPositionClicked(-1);
 			adapterList.notifyDataSetChanged();
@@ -401,5 +249,12 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapterList!=null){
+			adapterList.setPositionClicked(-1);
+		}
+	}
 
 }

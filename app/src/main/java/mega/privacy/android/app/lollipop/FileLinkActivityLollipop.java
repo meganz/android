@@ -1,5 +1,48 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.StatFs;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.text.format.Formatter;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.KeyEvent;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
@@ -10,53 +53,17 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.StatFs;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.text.format.Formatter;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -65,15 +72,17 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	Toolbar tB;
     ActionBar aB;
-	
+	DisplayMetrics outMetrics;
 	String url;
-	
+	Handler handler;
 	ProgressDialog statusDialog;
-	
-    RelativeLayout fragmentContainer;
+	AlertDialog decryptionKeyDialog;
+
+	RelativeLayout fragmentContainer;
 	ImageView iconView;
 	TextView nameView;
 	RelativeLayout nameLayout;
+	ScrollView scrollView;
 	TextView sizeTextView;
 	TextView sizeTitleView;
 	TextView importButton;
@@ -101,7 +110,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		super.onCreate(savedInstanceState);
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 		
@@ -129,8 +138,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		fragmentContainer = (RelativeLayout) findViewById(R.id.file_link_fragment_container);
 		
 		infoLayout = (RelativeLayout) findViewById(R.id.file_link_layout);
-		
-		RelativeLayout.LayoutParams infoLayoutParams = (RelativeLayout.LayoutParams)infoLayout.getLayoutParams();
+
+		scrollView = (ScrollView) findViewById(R.id.file_link_scroll_layout);
+
+		FrameLayout.LayoutParams infoLayoutParams = (FrameLayout.LayoutParams)infoLayout.getLayoutParams();
 		infoLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(80, outMetrics)); 		
 		infoLayout.setLayoutParams(infoLayoutParams);
 		
@@ -183,13 +194,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		sizeTextView.setLayoutParams(sizeTextParams);		
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_file_link_layout);
+
 		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
 		downloadButton.setOnClickListener(this);
 		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
-		downloadButton.setLayoutParams(paramsb1);
+//		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();
+//		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
+//		downloadButton.setLayoutParams(paramsb1);
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
 		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
@@ -198,14 +210,18 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
 		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
 		importButton.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
-		importButton.setLayoutParams(paramsb2);
+//		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();
+//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
+//		importButton.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)importButton.getLayoutParams();
 		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
 		importButton.setLayoutParams(optionTextParams);
+
+//		RelativeLayout.LayoutParams paramsScroll = (RelativeLayout.LayoutParams) scrollView.getLayoutParams();
+//		paramsScroll.height =  fragmentContainer.getHeight()-tB.getHeight()-optionsBar.getHeight();
+//		scrollView.setLayoutParams(paramsScroll);
 				
 //		iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
 //		((LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
@@ -219,19 +235,109 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		Intent intent = getIntent();
 		if (intent != null){
-			url = intent.getDataString();		
-		}
-		
-		if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+			url = intent.getDataString();
+
 			try{
 				statusDialog.dismiss();
 			}
 			catch(Exception e){	}
-			
-			importLink(url);
-		}	
+
+			int counter = url.split("!").length - 1;
+			log("Counter !: "+counter);
+			if(counter<2){
+				//Ask for decryption key
+				log("Ask for decryption key");
+				askForDecryptionKeyDialog();
+			}
+			else{
+				//Decryption key included!
+				if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
+					log("link ok, call to import link");
+					importLink(url);
+				}
+			}
+		}
 	}
-	
+
+	public void askForDecryptionKeyDialog(){
+		log("askForDecryptionKeyDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.alert_decryption_key));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					url=url+value;
+					importLink(url);
+					decryptionKeyDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.alert_decryption_key));
+		builder.setMessage(getString(R.string.message_decryption_key));
+		builder.setPositiveButton(getString(R.string.general_decryp),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						url=url+value;
+						importLink(url);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						finish();
+					}
+				});
+		builder.setView(layout);
+		decryptionKeyDialog = builder.create();
+		decryptionKeyDialog.show();
+	}
+
+	private void showKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
+		handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
+
 	@Override
 	protected void onResume() {
     	super.onResume();
@@ -240,7 +346,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
     	
     	if (intent != null){
     		if (intent.getAction() != null){
-    			if (intent.getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
+    			if (intent.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
     				importNode();
     			}
     			intent.setAction(null);
@@ -374,7 +480,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					log("OVERQUOTA ERROR: "+e.getErrorCode());					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 					startActivity(intent);
 					finish();
 
@@ -425,7 +531,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		if (megaApi.getRootNode() == null){
 			Intent intent = new Intent(this, ManagerActivityLollipop.class);
-			intent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
+			intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 			intent.setData(Uri.parse(url));
 			startActivity(intent);
 			finish();
@@ -433,7 +539,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		else{
 			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
-			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER);	
+			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 		}		
 	}
 	
@@ -481,7 +587,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 				this.urlM = url;
 				this.sizeM = size;
 				this.hashesM = new long[hashes.length];
@@ -508,7 +614,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -533,7 +639,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -567,7 +673,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -576,7 +682,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}	
 			return;
 		}
@@ -607,7 +713,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -632,7 +738,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -666,7 +772,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -675,7 +781,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}
 		}
 		else{
@@ -704,7 +810,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			return;
 		}
 		
-		if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
@@ -715,7 +821,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			downloadTo (parentPath, url, size, hashes);
 			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
-		else if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
@@ -782,12 +888,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
@@ -859,7 +965,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -884,7 +990,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -918,7 +1024,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -927,7 +1033,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}	
 			return;
 		}
@@ -958,7 +1064,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-						startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
 						Dialog downloadLocationDialog;
@@ -983,7 +1089,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-										startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
 									case 1:{
@@ -1017,7 +1123,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-					startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
 			else{
@@ -1026,7 +1132,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-				startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}
 		}
 		else{
@@ -1038,7 +1144,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+        	case Constants.REQUEST_WRITE_STORAGE:{
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					downloadWithPermissions();

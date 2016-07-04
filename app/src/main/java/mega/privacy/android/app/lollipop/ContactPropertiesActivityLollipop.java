@@ -1,5 +1,35 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.StatFs;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.text.format.Time;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +46,8 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.utils.FixedCenterCrop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -30,43 +61,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.StatFs;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.text.format.Time;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 
 public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
@@ -115,6 +109,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate");
 		super.onCreate(savedInstanceState);
 
 		if (megaApi == null){
@@ -473,7 +468,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		
@@ -543,13 +538,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)),
 									MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								intentShare.setDataAndType(Uri.fromFile(new File(localPath)),
 										MimeTypeList.typeForName(tempNode.getName()).getType());
-								if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
@@ -1196,7 +1191,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public static void log(String log) {
-		Util.log("ContactPropertiesMainActivity", log);
+		Util.log("ContactPropertiesActivityLollipop", log);
 	}
 
 	@Override

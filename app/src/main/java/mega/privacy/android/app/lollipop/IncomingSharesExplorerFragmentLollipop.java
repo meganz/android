@@ -1,25 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
-import mega.privacy.android.app.LauncherFileExplorerActivity;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -28,14 +12,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Locale;
+
+import mega.privacy.android.app.LauncherFileExplorerActivity;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends Fragment implements OnClickListener{
@@ -132,7 +126,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-		mLayoutManager = new LinearLayoutManager(context);
+		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
@@ -213,10 +207,16 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			nodes = megaApi.getChildren(parentNode);
 		}	
 
-		if (deepBrowserTree != 0){		
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-		}						
-	
+		log("deepBrowserTree value: "+deepBrowserTree);
+		if (deepBrowserTree <= 0){
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
+		}
+		else{
+			separator.setVisibility(View.VISIBLE);
+			optionsBar.setVisibility(View.VISIBLE);
+		}
+
 		adapter.setPositionClicked(-1);		
 		
 		listView.setAdapter(adapter);		
@@ -226,6 +226,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	public void findNodes(){
 		deepBrowserTree=0;
+
+		separator.setVisibility(View.GONE);
+		optionsBar.setVisibility(View.GONE);
+
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		ArrayList<Long> disabledNodes = new ArrayList<Long>();
 		nodes.clear();
@@ -285,14 +289,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
 				}
+				break;
 			}
 			case R.id.cancel_text:{
 				if (context instanceof LauncherFileExplorerActivity){
+					log("Cancel back to Cloud");
+					((LauncherFileExplorerActivity) context).backToCloud(-1);
 					((LauncherFileExplorerActivity) context).finish();
 				}
 				else if (context instanceof FileExplorerActivityLollipop){
 					((FileExplorerActivityLollipop) context).finish();
 				}
+				break;
 			}
 		}
 	}
@@ -303,6 +311,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (nodes.get(position).isFolder()){
 					
 			deepBrowserTree = deepBrowserTree+1;
+			log("deepBrowserTree value: "+deepBrowserTree);
+			if (deepBrowserTree <= 0){
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
+			}
+			else{
+				separator.setVisibility(View.VISIBLE);
+				optionsBar.setVisibility(View.VISIBLE);
+			}
 			
 			MegaNode n = nodes.get(position);			
 			
@@ -386,6 +403,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
+
 			return 3;
 		}
 		else if (deepBrowserTree>0){
@@ -407,13 +427,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				listView.scrollToPosition(0);
 				adapter.setParentHandle(parentHandle);
 				return 2;
-			}	
+			}
+
+			separator.setVisibility(View.VISIBLE);
+			optionsBar.setVisibility(View.VISIBLE);
 			return 2;
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
 			deepBrowserTree=0;
 			return 0;
 		}

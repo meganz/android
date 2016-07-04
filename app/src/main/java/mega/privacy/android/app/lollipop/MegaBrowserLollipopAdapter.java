@@ -1,25 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -35,26 +15,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUser;
 
 public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
-	
-	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
-	static int FROM_OFFLINE= 15;
-		
+
 	Context context;
 	MegaApiAndroid megaApi;
 
@@ -73,9 +67,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	HashMap<Long, MegaTransfer> mTHash = null;
 	MegaTransfer currentTransfer = null;
 	boolean incoming = false;
+	boolean inbox = false;
 	DatabaseHandler dbH = null;
 	boolean multipleSelect;
-	int type = ManagerActivityLollipop.FILE_BROWSER_ADAPTER;
+	int type = Constants.FILE_BROWSER_ADAPTER;
 	int adapterType;
 
 //	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -191,33 +186,39 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		dbH = DatabaseHandler.getDbHandler(context);
 		
 		switch (type) {
-			case ManagerActivityLollipop.FILE_BROWSER_ADAPTER: {
+			case Constants.FILE_BROWSER_ADAPTER: {
 				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);			
 				break;
 			}
-			case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
+			case Constants.CONTACT_FILE_ADAPTER: {
 				((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
 				break;
 			}
-			case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER: {
+			case Constants.RUBBISH_BIN_ADAPTER: {
 				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
 				break;
 			}		
-			case ManagerActivityLollipop.FOLDER_LINK_ADAPTER: {
+			case Constants.FOLDER_LINK_ADAPTER: {
 				megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
 				break;
 			}
-			case ManagerActivityLollipop.SEARCH_ADAPTER: {
+			case Constants.SEARCH_ADAPTER: {
 				((ManagerActivityLollipop) context).setParentHandleSearch(parentHandle);
 				break;
 			}
-			case ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleOutgoing(-1);
+			case Constants.OUTGOING_SHARES_ADAPTER: {
+//				((ManagerActivityLollipop) context).setParentHandleOutgoing(parentHandle);
 				break;
 			}
-			case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
+			case Constants.INCOMING_SHARES_ADAPTER: {
 				incoming=true;
-				((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
+				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
+				break;
+			}
+			case Constants.INBOX_ADAPTER: {
+				log("onCreate INBOX_ADAPTER");
+				inbox=true;
+				((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
 				break;
 			}
 			default: {
@@ -416,14 +417,14 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
 //					holder.optionsLayout.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 //					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					//				holder.arrowSelection.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 //					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			} 
@@ -431,7 +432,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				//			holder.arrowSelection.setVisibility(View.GONE);
 				
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 //				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 	
@@ -445,7 +446,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			else{
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		}
 		
@@ -459,10 +460,15 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		if (node.isFolder()) {
 			holder.transferProgressBar.setVisibility(View.GONE);		
-			holder.textViewFileSize.setVisibility(View.VISIBLE);			
-			holder.textViewFileSize.setText(getInfoFolder(node));
+			holder.textViewFileSize.setVisibility(View.VISIBLE);
+
+			if(type==Constants.FOLDER_LINK_ADAPTER){
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+			}else{
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			}
 			
-			if(type==ManagerActivityLollipop.INCOMING_SHARES_ADAPTER){
+			if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 				//Show the owner of the shared folder
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -491,7 +497,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}				
 				}
 			}
-			else if (type==ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER){
+			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
@@ -633,6 +639,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		//Find in the database
 		MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
 		if(offlineNode!=null){
+			log("Node found OFFLINE: "+offlineNode.getName());
 			if(incoming){
 				log("Incoming tab: MegaBrowserGridAdapter: "+node.getHandle());				
 				//Find in the filesystem
@@ -645,6 +652,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				
 			}
+			else if(inbox){
+				String pathMega = megaApi.getNodePath(node);
+				pathMega = pathMega.replace("/in", "");
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +pathMega+offlineNode.getName());
+				}
+				else{
+					offlineFile = context.getFilesDir();
+				}
+			}
 			else{
 				//Find in the filesystem
 				if (Environment.getExternalStorageDirectory() != null){
@@ -654,7 +671,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					offlineFile = context.getFilesDir();
 				}
 			}	
-		}		
+		}
+		else{
+			log("Node NOT found OFFLINE: "+node.getName());
+		}
 		
 		if (offlineFile!=null){
 			if (offlineFile.exists()){
@@ -763,9 +783,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.transferProgressBar.setVisibility(View.GONE);		
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
-			holder.textViewFileSize.setText(getInfoFolder(node));
+			if(type==Constants.FOLDER_LINK_ADAPTER){
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+			}else{
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			}
 			
-			if(type==ManagerActivityLollipop.INCOMING_SHARES_ADAPTER){
+			if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 				//Show the owner of the shared folder
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -794,7 +818,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}				
 				}
 			}
-			else if (type==ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER){
+			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
@@ -978,6 +1002,18 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				
 			}
+			else if(inbox){
+				log("In Inbox");
+				String pathMega = megaApi.getNodePath(node);
+				pathMega = pathMega.replace("/in", "");
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +pathMega);
+					log("The path to find is: "+offlineFile.getPath());
+				}
+				else{
+					offlineFile = context.getFilesDir();
+				}
+			}
 			else{
 				log("CLOUD tab: MegaBrowserListAdapter: "+node.getHandle());
 				//Find in the filesystem
@@ -1004,34 +1040,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else{
 			holder.savedOffline.setVisibility(View.INVISIBLE);
 		}
-	}
-	
-	private String getInfoFolder(MegaNode n) {
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		return info;
 	}
 
 //	public boolean isEnabled(int position) {
@@ -1110,39 +1118,39 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						notifyDataSetChanged();
 					}
 				}
-				if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
+				if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
 				}
-				else if(type==ManagerActivityLollipop.FOLDER_LINK_ADAPTER){
+				else if(type==Constants.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).showOptionsPanel(n);
 				}
 				else{
-					((ManagerActivityLollipop) context).showOptionsPanel(n);
+					((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
 				}				
 				
 				break;
 			}
 			case R.id.file_list_item_layout:
 			case R.id.file_grid_item_layout:{
-				if(type==ManagerActivityLollipop.RUBBISH_BIN_ADAPTER){
+				if(type==Constants.RUBBISH_BIN_ADAPTER){
 					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else if(type==ManagerActivityLollipop.INBOX_ADAPTER){
+				else if(type==Constants.INBOX_ADAPTER){
 					((InboxFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else if(type==ManagerActivityLollipop.INCOMING_SHARES_ADAPTER){
+				else if(type==Constants.INCOMING_SHARES_ADAPTER){
 					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else if(type==ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER){
+				else if(type==Constants.OUTGOING_SHARES_ADAPTER){
 					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
+				else if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else if(type==ManagerActivityLollipop.FOLDER_LINK_ADAPTER){
+				else if(type==Constants.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).itemClick(currentPosition);
 				}
-				else if(type==ManagerActivityLollipop.SEARCH_ADAPTER){
+				else if(type==Constants.SEARCH_ADAPTER){
 					((SearchFragmentLollipop) fragment).itemClick(currentPosition);
 				}
 				else{
@@ -1173,43 +1181,42 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public void setParentHandle(long parentHandle) {
 		this.parentHandle = parentHandle;
 		switch (type) {
-		case ManagerActivityLollipop.FILE_BROWSER_ADAPTER: {
+		case Constants.FILE_BROWSER_ADAPTER: {
 			log("setParentHandleBrowser -FILE_BROWSER_ADAPTER");
 			((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
 			break;
 		}
-		case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
+		case Constants.CONTACT_FILE_ADAPTER: {
 			((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
 			break;
 		}
-		case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER: {
+		case Constants.RUBBISH_BIN_ADAPTER: {
 			((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
 			break;
 		}
-		case ManagerActivityLollipop.FOLDER_LINK_ADAPTER: {
+		case Constants.FOLDER_LINK_ADAPTER: {
 			break;
 		}
-		case ManagerActivityLollipop.SEARCH_ADAPTER: {
+		case Constants.SEARCH_ADAPTER: {
 			((ManagerActivityLollipop) context).setParentHandleSearch(parentHandle);
 			break;
 		}
-		case ManagerActivityLollipop.INBOX_ADAPTER: {
+		case Constants.INBOX_ADAPTER: {
+			log("setParentHandleBrowser -INBOX_ADAPTER");
 			((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
 			break;
 		}
-		case ManagerActivityLollipop.INCOMING_SHARES_ADAPTER: {
-			//TODO necesito algo?
+		case Constants.INCOMING_SHARES_ADAPTER: {
 			((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
 			break;
 		}
-		case ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER: {
-			log("setParentHandleBrowser -ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER");
-			//TODO necesito algo?
+		case Constants.OUTGOING_SHARES_ADAPTER: {
+			log("setParentHandleOutgoing -ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER");
 			((ManagerActivityLollipop) context).setParentHandleOutgoing(parentHandle);
 			break;
 		}
 		default: {
-			log("setParentHandleBrowser -default");
+			log("setParentHandle -default");
 //			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
 			break;
 		}
@@ -1250,7 +1257,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 		}
 
-		if (type == ManagerActivityLollipop.SHARED_WITH_ME_ADAPTER){
+		if (type == Constants.SHARED_WITH_ME_ADAPTER){
 			notifyDataSetChanged();
 		}
 	}   

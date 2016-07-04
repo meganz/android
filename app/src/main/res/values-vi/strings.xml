@@ -613,4 +613,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">Quá trình chưa hoàn tất một cách chính xác. Giao dịch chưa thể diễn ra.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Thông tin thẻ tín dụng bạn vừa nhập không chính xác. Giao dịch chưa thể diễn ra.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Tài khoản của quý khách không thể nâng cấp được từ app. Xin liên lạc với support@mega.nz để được nâng cấp.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Thêm vào danh bạ và chia sẻ</string>
+    <string name="general_share" context="button">Chia sẻ</string>
+    <string name="general_remove" context="button">Xóa</string>
+    <string name="general_confirm" context="button">Xác nhận</string>
+    <string name="general_leave" context="button">Rời khỏi</string>
+    <string name="general_decryp" context="button">Giải khóa mã</string>
+    <string name="general_export" context="button">Xuất</string>
+    <string name="confirmation_required" context="Alert title before download">Yêu cầu xác thực</string>
+    <string name="alert_larger_file" context="Alert text before download">Mục %s sẽ được tải xuống. Có chắc chắn không?</string>
+    <string name="alert_no_app" context="Alert text before download">Bạn không có chương trình có thể đọc được tệp %s trong máy. Bạn vẫn muốn tải về tệp tin này chứ?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Không hiện nữa</string>
+    <string name="lastname_text" context="Last name of the user">Họ</string>
+    <string name="error_general_nodes" context="Error getting the root node">Lỗi. Xin vui lòng, thử lại.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Xem mã nguồn</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Thêm một tên liên lạc mới để bắt đầu chia sẻ</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">Thẻ nhớ SD trong</item>
+        <item context="external SD card option">Thẻ nhớ SD ngoài</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Lỗi. Không tạo được thư mục</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Thùng Rác đã được dọn sạch sẽ</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Lỗi. Thùng Rác chưa được dọn sạch</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Email Của Chủ Sở Hữu</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Dạng Mã PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">Mã PIN 4 số</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">Mã PIN 6 số</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">Mã PIN Chữ và Số</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Thư Mục Rỗng</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Đã gửi vào Hộp Thư</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Lỗi. Chưa gửi được tới Hộp Thư</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Đã gửi thư mời</string>
+    <string name="sortby_creation_date" context="category in sort by action">Ngày Tạo</string>
+    <string name="sortby_modification_date" context="category in sort by action">Ngày Chỉnh Sửa</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Mời</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Bạn có chắc muốn gửi lời mời tới %s không?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Lời mời thêm tên liên lạc đã được gửi tới %s thành công. Bây giờ bạn có thể theo dõi trạng thái trong mục Yêu Cầu gửi Đi.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Xin đăng xuất trước khi tạo tài khoản mới</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Bản ghi chép đã được bật</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Bản ghi chép đã được tắt</string>
 </resources>

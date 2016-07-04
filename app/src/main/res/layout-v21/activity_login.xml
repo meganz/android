@@ -1,24 +1,24 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_secondary"
+    android:background="@color/background_create_account"
     android:stackFromBottom="true"
-    tools:context=".LoginActivityLollipop" >
+    tools:context=".LoginActivityLollipop">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:gravity="left"
+        android:background="@color/white"
         android:orientation="vertical" >
 
         <LinearLayout
             android:id="@+id/login_login_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background"
+            android:layout_height="match_parent"
+            android:background="@color/white"
             android:orientation="vertical" >
 
             <TextView
@@ -28,8 +28,8 @@
                 android:layout_gravity="left"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/login_text"
-                android:textColor="@color/mega_text"
-                android:textSize="14sp" />
+                android:textColor="@color/lollipop_primary_color"
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/login_email_text"
@@ -87,6 +87,15 @@
                 android:textColor="@color/accentColor"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/button_forgot_pass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp" />
+
             <include
                 android:id="@+id/login_delimiter"
                 layout="@layout/delimiter" />
@@ -95,7 +104,7 @@
                 android:id="@+id/login_create_account_layout"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-                android:background="@color/background_secondary"
+                android:background="@color/background_create_account"
                 android:gravity="left"
                 android:orientation="vertical" >
 
@@ -123,7 +132,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:background="@color/white">
 
             <ImageView
                 android:id="@+id/login_mega_logo"
@@ -189,7 +199,26 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/login_servers_busy_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/servers_busy" />
         </LinearLayout>
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/forgot_password_layout"
+            android:visibility="gone"/>
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/park_account_layout"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </ScrollView>

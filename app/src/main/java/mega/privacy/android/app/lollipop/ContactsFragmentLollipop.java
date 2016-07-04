@@ -1,33 +1,10 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.ContactPropertiesMainActivity;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
-import mega.privacy.android.app.MegaContactsGridAdapter;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.lollipop.FileBrowserFragmentLollipop.RecyclerViewOnGestureListener;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -35,31 +12,35 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class ContactsFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaUser;
+
+public class ContactsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 
 	public static int GRID_WIDTH =400;
 	
@@ -74,7 +55,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	MegaContactsLollipopAdapter adapter;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-    ImageButton fabButton;
 	private ActionMode actionMode;
 
 //	DatabaseHandler dbH = null;
@@ -93,17 +73,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	
 	int orderContacts;
 
-	LayoutManager mLayoutManager;
 	MegaUser selectedUser = null;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionProperties;
-	public LinearLayout optionSendFile;
-	public LinearLayout optionShare;
-	public LinearLayout optionRemove;
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -131,15 +101,15 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaUser> users = adapter.getSelectedUsers();
-			final List<MegaUser> multipleContacts = users;;
-			
+			ArrayList<MegaUser> users = adapter.getSelectedUsers();
+
 			switch(item.getItemId()){
 				case R.id.cab_menu_share_folder:{
 					clearSelections();
 					hideMultipleSelect();
 					if (users.size()>0){
-						((ManagerActivityLollipop) context).pickFolderToShare(users);
+						ContactController cC = new ContactController(context);
+						cC.pickFolderToShare(users);
 					}										
 					break;
 				}
@@ -147,36 +117,16 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 					clearSelections();
 					hideMultipleSelect();
 					if (users.size()>0){
-						((ManagerActivityLollipop) context).pickFileToSend(users);
+						ContactController cC = new ContactController(context);
+						cC.pickFileToSend(users);
 					}										
 					break;
 				}
 				case R.id.cab_menu_delete:{
 					clearSelections();
 					hideMultipleSelect();
-					if (users.size()>0){
-						DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-						    @Override
-						    public void onClick(DialogInterface dialog, int which) {
-						        switch (which){
-						        case DialogInterface.BUTTON_POSITIVE:						        	
-						        	((ManagerActivityLollipop) context).removeMultipleContacts(multipleContacts);		        	
-						            break;
-			
-						        case DialogInterface.BUTTON_NEGATIVE:
-						            //No button clicked
-						            break;
-						        }
-						    }
-						};
-			
-						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-						builder.setMessage(getResources().getString(R.string.confirmation_remove_multiple_contacts)).setPositiveButton(R.string.general_remove, dialogClickListener)
-						    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-						
-					}	
-					//TODO remove contact
-					
+					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
+
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -342,6 +292,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		orderContacts = ((ManagerActivityLollipop)context).getOrderContacts();
 		
 		if (isList){
+			log("isList");
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
@@ -351,17 +302,14 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			recyclerView.setHasFixedSize(true);
-		    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+			MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);			
 		    recyclerView.addOnItemTouchListener(this);
 		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 			
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
-			fabButton.setOnClickListener(this);
-			
+
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -386,58 +334,19 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_contacts_list);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_list_out_options);
-			optionProperties = (LinearLayout) v.findViewById(R.id.contact_list_option_properties_layout);
-			optionShare = (LinearLayout) v.findViewById(R.id.contact_list_option_share_layout);
-			optionSendFile = (LinearLayout) v.findViewById(R.id.contact_list_option_send_file_layout);
-			optionRemove = (LinearLayout) v.findViewById(R.id.contact_list_option_remove_layout);		
-			
-			optionRemove.setOnClickListener(this);
-			optionShare.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionSendFile.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
 
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
+			if (aB != null){
+				aB.setTitle(getString(R.string.section_contacts));
+			}
+			else{
+				if (context != null) {
+					aB = ((AppCompatActivity) context).getSupportActionBar();
+					if (aB != null) {
+						aB.setTitle(getString(R.string.section_contacts));
+					}
+				}
+			}
 
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });					
-			
 			return v;
 		}
 		else{
@@ -462,10 +371,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
-			
-			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button_grid);
-			fabButton.setOnClickListener(this);
-			
+
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -490,78 +396,21 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_contacts_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_grid_out_options);
-			optionProperties = (LinearLayout) v.findViewById(R.id.contact_grid_option_properties_layout);
-			optionShare = (LinearLayout) v.findViewById(R.id.contact_grid_option_share_layout);
-			optionSendFile = (LinearLayout) v.findViewById(R.id.contact_grid_option_send_file_layout);
-			optionRemove = (LinearLayout) v.findViewById(R.id.contact_grid_option_remove_layout);		
-			
-			optionRemove.setOnClickListener(this);
-			optionShare.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionSendFile.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
 
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
+			if (aB != null){
+				aB.setTitle(getString(R.string.section_contacts));
+			}
+			else{
+				if (context != null) {
+					aB = ((AppCompatActivity) context).getSupportActionBar();
+					if (aB != null) {
+						aB.setTitle(getString(R.string.section_contacts));
+					}
+				}
+			}
 
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });	
-			
 			return v;
 		}			
-	}
-	
-	public void showOptionsPanel(MegaUser user){		
-		log("showOptionsPanel");	
-		
-		this.selectedUser = user;
-		fabButton.setVisibility(View.GONE);					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapter.setPositionClicked(-1);
-		fabButton.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
 	}
 	
 	public void setContacts(ArrayList<MegaUser> contacts){
@@ -584,60 +433,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
 
-		switch(v.getId()){
-			case R.id.contact_list_out_options:
-			case R.id.contact_grid_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-			case R.id.invite_contact_button:
-			case R.id.invite_contact_button_grid:{
-				((ManagerActivityLollipop)context).chooseAddContactDialog();
-				break;
-			}
-			case R.id.contact_list_option_send_file_layout:
-			case R.id.contact_grid_option_send_file_layout:{
-				log("optionSendFile");
-				hideOptionsPanel();
-				List<MegaUser> user = new ArrayList<MegaUser>();
-				user.add(selectedUser);
-				((ManagerActivityLollipop) context).pickFileToSend(user);
-				break;
-			}
-			case R.id.contact_list_option_properties_layout:
-			case R.id.contact_grid_option_properties_layout:{
-				log("optionProperties");
-//				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
-				log("optionSendFile");
-				hideOptionsPanel();
-				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
-				i.putExtra("name", selectedUser.getEmail());
-				context.startActivity(i);			
-				break;
-			}
-			case R.id.contact_list_option_share_layout:
-			case R.id.contact_grid_option_share_layout:{
-				log("optionShare");
-				hideOptionsPanel();
-				List<MegaUser> user = new ArrayList<MegaUser>();
-				user.add(selectedUser);
-				((ManagerActivityLollipop) context).pickFolderToShare(user);
-				break;
-			}
-			case R.id.contact_list_option_remove_layout:
-			case R.id.contact_grid_option_remove_layout:{
-				log("Remove contact");
-				hideOptionsPanel();
-				((ManagerActivityLollipop) context).removeContact(selectedUser);
-				break;
-			}
-		}
-	}
-			
     public void itemClick(int position) {
 					
 		if (adapter.isMultipleSelect()){
@@ -660,36 +456,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
     }
 	
 	public int onBackPressed(){
-		
 		log("onBackPressed");	
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			hideOptionsPanel();
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
-		
+
 		if (adapter.isMultipleSelect()){
 			hideMultipleSelect();
 			return 2;
@@ -846,5 +614,12 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapter!=null){
+			adapter.setPositionClicked(-1);
+		}
 	}
 }

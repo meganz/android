@@ -1,5 +1,40 @@
 package mega.privacy.android.app;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
+import android.support.v7.app.ActionBar;
+import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,45 +49,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUtilsAndroid;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
-import android.support.v7.app.ActionBar;
-import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
@@ -1018,7 +1014,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionRemoveTotal.setVisibility(View.GONE);
 					holder.optionClearShares.setVisibility(View.GONE);
 					holder.optionMoveTo.setVisibility(View.GONE);
-
+					holder.optionMore.setVisibility(View.GONE);
 //					holder.optionDownload.getLayoutParams().width = Util.px2dp(
 //							(335 * scaleW), outMetrics);
 //					((RelativeLayout.LayoutParams) holder.optionDownload
@@ -1114,7 +1110,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public int getCount() {
-		return nodes.size();
+		if (nodes != null){
+			return nodes.size();
+		}
+		else{
+			return 0;
+		}
 	}
 
 	@Override

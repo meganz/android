@@ -1,14 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.Locale;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.TourImageAdapter;
-import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.components.LoopViewPager;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,11 +13,20 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout.LayoutParams;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.util.Locale;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.TourImageAdapter;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 
 
 public class TourActivityLollipop extends Activity implements OnClickListener {
@@ -44,6 +44,7 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	TextView tourText2;
 	private LinearLayout tourLoginCreate;
 	private LinearLayout optionsLayout;
+	ScrollView scrollView;
 //	int heightGrey = 0;
 	
 	@SuppressLint("NewApi")
@@ -56,7 +57,8 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
 		
-		setContentView(R.layout.activity_tour);		
+		setContentView(R.layout.activity_tour);
+		scrollView = (ScrollView) findViewById(R.id.scroll_view_tour);
 		viewPager = (LoopViewPager) findViewById(R.id.pager);
 		bar1 = (LinearLayout) findViewById(R.id.bar_tour_layout_1);
 		bar2 = (LinearLayout) findViewById(R.id.bar_tour_layout_2);
@@ -190,33 +192,36 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 														}
 													}
 												});
-	    
-//	    String cadena;
-//	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_heightPix" + metrics.heightPixels;
-//	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
-	    
+		//Set the scroll at the end of the screen
+		scrollView.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				scrollView.scrollTo(0, scrollView.getBottom());
+			}
+		},100);
+
 	    Intent intent = getIntent();
 	    
 	    if (intent != null){
 	    	if (intent.getAction() != null){
-	    		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    		if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    			log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 	    			Intent tempIntent = null;
 	    			String title = null;
 	    			String text = null;
-	    			if(intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD)){
+	    			if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
 	    				tempIntent = new Intent(this, UploadService.class);
 	    				tempIntent.setAction(UploadService.ACTION_CANCEL);
 	    				title = getString(R.string.upload_uploading);
 	    				text = getString(R.string.upload_cancel_uploading);
 	    			} 
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
 	    				tempIntent = new Intent(this, DownloadService.class);
 	    				tempIntent.setAction(DownloadService.ACTION_CANCEL);
 	    				title = getString(R.string.download_downloading);
 	    				text = getString(R.string.download_cancel_downloading);
 	    			}
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    				tempIntent = new Intent(this, CameraSyncService.class);
 	    				tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
 	    				title = getString(R.string.cam_sync_syncing);
@@ -256,24 +261,24 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	    
 	    if (intent != null){
 	    	if (intent.getAction() != null){
-	    		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    		if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    			log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 	    			Intent tempIntent = null;
 	    			String title = null;
 	    			String text = null;
-	    			if(intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD)){
+	    			if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
 	    				tempIntent = new Intent(this, UploadService.class);
 	    				tempIntent.setAction(UploadService.ACTION_CANCEL);
 	    				title = getString(R.string.upload_uploading);
 	    				text = getString(R.string.upload_cancel_uploading);
 	    			} 
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
 	    				tempIntent = new Intent(this, DownloadService.class);
 	    				tempIntent.setAction(DownloadService.ACTION_CANCEL);
 	    				title = getString(R.string.download_downloading);
 	    				text = getString(R.string.download_cancel_downloading);
 	    			}
-	    			else if (intent.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
+	    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 	    				tempIntent = new Intent(this, CameraSyncService.class);
 	    				tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
 	    				title = getString(R.string.cam_sync_syncing);

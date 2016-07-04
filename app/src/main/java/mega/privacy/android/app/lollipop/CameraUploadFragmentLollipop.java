@@ -1,31 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.CreateThumbPreviewService;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -49,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -66,7 +39,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -75,6 +47,35 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
@@ -93,11 +94,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	RecyclerView listView;
 	GestureDetectorCompat detector;
 	private RecyclerView.LayoutManager mLayoutManager;
-	ImageButton fabButton;
-	SlidingUpPanelLayout slidingOptionsPanel;
-	//UPLOAD PANEL
-	private SlidingUpPanelLayout slidingUploadPanel;
-	
+
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	RelativeLayout contentTextLayout;
@@ -214,7 +211,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -232,7 +230,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToCopyNodes(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -251,7 +250,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -260,13 +260,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if(adapterList!=null){
 						if (documentsList.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
-							((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+							NodeController nC = new NodeController(context);
+							nC.exportLink(n);
 						}
 					}
 					else if(adapterGrid != null){
 						if (documentsGrid.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
-							((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+							NodeController nC = new NodeController(context);
+							nC.exportLink(n);
 						}
 					}
 					
@@ -287,7 +289,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -552,20 +554,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new LinearLayoutManager(context);
+			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
-			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
-			fabButton.setVisibility(View.GONE);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			
-			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
-			slidingUploadPanel.setVisibility(View.GONE);			
-			
+
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
@@ -606,11 +599,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.media_empty_image);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			emptyTextView.setText(R.string.camera_uploads_empty);
 			
 			emptyImageView.setVisibility(View.VISIBLE);			
-			emptyTextView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 			
 			if (megaApi.getRootNode() == null){
@@ -666,14 +659,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
 				
-				if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, photosyncHandle);
-						context.startService(intent);
-					}
-				}
-				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;
 				int year = 0;
@@ -722,7 +707,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			
 			if (adapterList == null){
-				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER);
+				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			}
 			else{
 				adapterList.setNodes(nodesArray, nodes);
@@ -741,20 +726,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 //			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new LinearLayoutManager(context);
+			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
-			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
-			fabButton.setVisibility(View.GONE);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			
-			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
-			slidingUploadPanel.setVisibility(View.GONE);
-			
+
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
@@ -793,11 +769,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.media_empty_image);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			emptyTextView.setText(R.string.camera_uploads_empty);
 			
 			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 			
 			if (megaApi.getRootNode() == null){
@@ -878,14 +854,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
 				
-				if (Util.CREATE_THUMB_PREVIEW_SERVICE){
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, photosyncHandle);
-						context.startService(intent);
-					}
-				}
-				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;
 				int year = 0;
@@ -952,7 +920,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-				adapterGrid = new MegaPhotoSyncGridAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER);
+				adapterGrid = new MegaPhotoSyncGridAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
@@ -990,11 +958,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				else{
 					adapterGrid.setMultipleSelect(true);
 					adapterGrid.selectAll();
-					
-					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());	
 				}
-				
-				updateActionModeTitle();
 			}
 		}
 	}
@@ -1246,7 +1210,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //		        	}
 //		        	break;
 //	        	}	
-		        case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+		        case Constants.REQUEST_WRITE_STORAGE:{
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 //		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 //		        		if (hasCameraPermission){
@@ -1280,14 +1244,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 					}
 
 					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 	        		if (!hasCameraPermission){
 	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.CAMERA},
-				                ManagerActivityLollipop.REQUEST_CAMERA);
+								Constants.REQUEST_CAMERA);
 	        		}
 					
 					if (hasStoragePermission){
@@ -1306,14 +1270,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 					}
 					
 					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 	        		if (!hasCameraPermission){
 	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.CAMERA},
-				                ManagerActivityLollipop.REQUEST_CAMERA);
+								Constants.REQUEST_CAMERA);
 	        		}
 
 					if (hasStoragePermission){
@@ -1364,7 +1328,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							}
 							Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 							intent.putExtra("position", positionInNodes);
-							intent.putExtra("adapterType", ManagerActivityLollipop.FILE_BROWSER_ADAPTER);
+							intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 							intent.putExtra("isFolderLink", false);
 							if (megaApi.getParentNode(psHMegaNode).getType() == MegaNode.TYPE_ROOT){
 								intent.putExtra("parentNodeHandle", -1L);
@@ -1393,7 +1357,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					  		
 					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					  		if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+					  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 					  			startActivity(mediaIntent);
 					  		}
 					  		else{
@@ -1401,14 +1365,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					  			adapterList.notifyDataSetChanged();
 								ArrayList<Long> handleList = new ArrayList<Long>();
 								handleList.add(psHMegaNode.getHandle());
-								((ManagerActivityLollipop) context).onFileClick(handleList);
+								NodeController nC = new NodeController(context);
+								nC.prepareForDownload(handleList);
 					  		}
 						}
 						else{
 							adapterList.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(psHMegaNode.getHandle());
-							((ManagerActivityLollipop) context).onFileClick(handleList);
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
 						}
 					}
 				}
@@ -1674,9 +1640,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						listView.setVisibility(View.GONE);
 					}					
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.GONE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextView.setVisibility(View.VISIBLE);
 				}
 				else{
 					if (listView != null){
@@ -1692,7 +1656,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (outMetrics == null){
 				outMetrics = new DisplayMetrics ();
 			}
-			
+
+			if (listView == null){
+				return;
+			}
+
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);			
@@ -1878,7 +1846,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				Toast.makeText(context, context.getString(R.string.camera_uploads_created), Toast.LENGTH_LONG).show();
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyImageView.setOnClickListener(this);
-				emptyTextView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 		}

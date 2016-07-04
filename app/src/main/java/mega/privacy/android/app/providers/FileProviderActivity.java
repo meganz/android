@@ -1,39 +1,8 @@
 package mega.privacy.android.app.providers;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.PinActivity;
-import mega.privacy.android.app.TabsAdapter;
-import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.MySwitch;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
-import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUser;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -52,7 +21,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -87,6 +55,36 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.TabsAdapter;
+import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.MySwitch;
+import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
+import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi") 
@@ -335,9 +333,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
 
 				//Create tabs
-				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
-
-				mTabHostProvider.setVisibility(View.VISIBLE);  
+				mTabHostProvider.setVisibility(View.VISIBLE);
 				mTabHostProvider.getTabWidget().setDividerDrawable(null);
 
 				if (mTabsAdapterProvider == null){
@@ -958,7 +954,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		

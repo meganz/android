@@ -1,19 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -48,6 +34,21 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 public class MegaContactsGridAdapter extends BaseAdapter{
@@ -727,7 +728,7 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 		int radius; 
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

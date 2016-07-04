@@ -92,12 +92,13 @@
         android:id="@+id/file_list_public_link_multiselect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_public_link_list"
-		android:background="@null" 
-        android:layout_marginTop="15dp"
-        android:paddingRight="7dp" 
-       	android:layout_alignParentRight="true"/> 
-                     
+        android:src="@drawable/link_ic"
+		android:background="@null"
+		android:tint="@color/transparency_white"
+        android:layout_marginRight="10dp"
+		android:layout_centerVertical="true"
+		android:layout_alignParentRight="true"/>
+
     
      <ProgressBar
 	    android:id="@+id/transfers_list__browser_bar"

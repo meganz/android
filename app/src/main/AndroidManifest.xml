@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="39"
-    android:versionName="3.0.7" >
+    android:versionCode="54"
+    android:versionName="3.0.11.1" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -54,9 +54,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTop" 
             android:theme="@style/login_activity"
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" >
+            android:windowSoftInputMode="stateHidden">
         </activity>
         
         <activity
@@ -71,10 +69,9 @@
        <activity
             android:name="mega.privacy.android.app.lollipop.LoginActivityLollipop"
             android:theme="@style/login_activity"
-            android:label="@string/login_text" 
+            android:label="@string/login_text"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" >            
+            android:windowSoftInputMode="stateAlwaysHidden">
         </activity> 
         
          <activity
@@ -89,8 +86,7 @@
             android:name="mega.privacy.android.app.lollipop.ChooseAccountActivityLollipop"
             android:label="@string/choose_account_activity" 
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" >            
+            android:windowSoftInputMode="stateHidden">
         </activity>
          
         <activity
@@ -107,15 +103,13 @@
             android:label="@string/create_account_text"
             android:theme="@style/login_activity"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" >
+            android:windowSoftInputMode="stateHidden">
         </activity> 
         
         <activity
             android:name="LauncherActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" > 
+            android:launchMode="singleTop">
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -141,8 +135,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" >   
+            android:launchMode="singleTop">
             
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -163,7 +156,7 @@
             android:name="mega.privacy.android.app.lollipop.OfflineActivityLollipop"
             android:label="@string/section_saved_for_offline"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" >            
+            android:configChanges="orientation|screenSize">
         </activity>
         
         <activity android:name="OpenLinkActivity" android:launchMode="singleTask" android:screenOrientation="portrait" >
@@ -232,7 +225,6 @@
             android:name="mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop"
             android:label="@string/file_properties_activity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Megaactionbar.Properties">            
         </activity>
         
@@ -247,16 +239,15 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop"
             android:label="@string/contact_properties_activity"
-            android:launchMode="singleTop" 
-            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Megaactionbar.Properties">            
         </activity>
         
         <activity
             android:name="mega.privacy.android.app.lollipop.MyAccountMainActivityLollipop"
             android:label="@string/section_account"
-            android:launchMode="singleTop" 
-            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Megaactionbar.Properties">            
         </activity>
         
@@ -282,14 +273,12 @@
             android:name="mega.privacy.android.app.lollipop.FileContactListActivityLollipop"
             android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait">            
+           android:configChanges="orientation|screenSize">
         </activity>
         
        <activity 
             android:name="LauncherFileExplorerActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -315,12 +304,11 @@
         
         <activity 
             android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name">
         </activity>
         
-        <activity android:screenOrientation="portrait"
-                android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
+        <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
                 android:label="@string/app_name">                
        </activity>
        
@@ -369,7 +357,7 @@
        <activity
             android:name="mega.privacy.android.app.lollipop.FileStorageActivityLollipop"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+           android:configChanges="orientation|screenSize">
         </activity>
         
         <activity
@@ -381,14 +369,12 @@
         
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactsExplorerActivityLollipop"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:label="@string/app_name">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.PhoneContactsActivityLollipop"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:label="@string/app_name">
         </activity>
         
         <activity
@@ -400,7 +386,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.FolderLinkActivityLollipop"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:configChanges="orientation|screenSize">
         </activity>
         
         <activity
@@ -414,7 +400,7 @@
             android:name="mega.privacy.android.app.lollipop.FileLinkActivityLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">            
+            android:configChanges="orientation|screenSize">
         </activity>
         
         <activity
@@ -433,8 +419,7 @@
         
         <activity
             android:name="mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop"
-            android:label="@string/my_account_change_password" 
-            android:screenOrientation="portrait">
+            android:label="@string/my_account_change_password">
         </activity>
         
         <activity
@@ -464,8 +449,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
-            android:windowSoftInputMode="stateVisible"
-            android:screenOrientation="portrait" >
+            android:windowSoftInputMode="stateVisible">
         </activity>
         
         <activity
@@ -483,7 +467,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
             android:label="@string/zip_browser_activity"
-            android:screenOrientation="portrait" >
+            android:configChanges="orientation|screenSize" >
         </activity>
         
         <service
@@ -505,12 +489,7 @@
             android:name="MegaStreamingService"
             android:exported="false" >
         </service>
-        
-        <service
-            android:name="CreateThumbPreviewService"
-            android:exported="false" >
-        </service>
-        
+
         <!-- Used for Google Play Store Campaign Measurement-->
 		<service 
 		    android:name="com.google.android.gms.analytics.CampaignTrackingService" />

@@ -1,34 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.FileStorageActivity;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -51,7 +22,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -65,17 +35,48 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 	
@@ -177,7 +178,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions(folderLinkActivityLollipop,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+									Constants.REQUEST_WRITE_STORAGE);
 							
 							handleListM.clear();
 							for (int i=0;i<documents.size();i++){
@@ -313,7 +314,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
-		mLayoutManager = new LinearLayoutManager(this);
+		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -351,7 +352,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		Intent intent = getIntent();
     	
     	if (intent != null) {
-    		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
+    		if (intent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
     			if (parentHandle == -1){
     				url = intent.getDataString();
     				int counter = url.split("!").length - 1;
@@ -510,7 +511,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	}
 	
 	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 		optionsBar.setVisibility(View.GONE);
 		separator.setVisibility(View.GONE);
 		
@@ -561,7 +562,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		if (megaApiFolder != null){
 			megaApiFolder.removeRequestListener(this);
-			megaApiFolder.logout();
+//			megaApiFolder.logout();
 		}
 		super.onDestroy();
 	}
@@ -822,7 +823,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		
@@ -922,7 +923,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			downloadTo (parentPath, url, size, hashes);
 			Snackbar.make(fragmentContainer, getResources().getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
-		else if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			log("REQUEST_CODE_SELECT_IMPORT_FOLDER");
 			if(!Util.isOnline(this)){
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
@@ -1017,7 +1018,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					log("OVERQUOTA ERROR: "+e.getErrorCode());
 					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 					startActivity(intent);
 					finish();
 				}
@@ -1052,7 +1053,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					supportInvalidateOptionsMenu();
 					
 					if (adapterList == null){
-						adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, ManagerActivityLollipop.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+						adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 					}
 					else{
 						adapterList.setParentHandle(parentHandle);
@@ -1263,7 +1264,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivityLollipop.FOLDER_LINK_ADAPTER);
+					intent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
 					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -1292,7 +1293,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-			  		if (ManagerActivityLollipop.isIntentAvailable(this, mediaIntent)){
+			  		if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
 			  			startActivity(mediaIntent);
 			  		}
 			  		else{
@@ -1310,7 +1311,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions(this,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+									Constants.REQUEST_WRITE_STORAGE);
 							
 							handleListM.clear();
 							handleListM.add(nodes.get(position).getHandle());
@@ -1333,7 +1334,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+        	case Constants.REQUEST_WRITE_STORAGE:{
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					if (downloadCompleteFolder){
@@ -1496,7 +1497,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //		else{
 			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
-			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER);	
+			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 //		}		
 	}
 
@@ -1511,7 +1512,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 						
 						downloadCompleteFolder = true;
 						
@@ -1524,12 +1525,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					rootNode = megaApiFolder.getRootNode();
 				}
 	        	if(rootNode!=null){
-	        		onFolderClick(rootNode.getHandle(),rootNode.getSize());	
+					MegaNode parentNode = megaApiFolder.getNodeByHandle(parentHandle);
+					if (parentNode != null){
+						onFolderClick(parentNode.getHandle(),parentNode.getSize());
+					}
+					else{
+						onFolderClick(rootNode.getHandle(),rootNode.getSize());
+					}
 	        	}
 	        	else{
 	        		log("rootNode null!!");
 	        	}
-				break;		
+				break;
 			}
 			case R.id.folder_link_list_out_options:{
 				log("Out Panel");
@@ -1547,7 +1554,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-				                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+								Constants.REQUEST_WRITE_STORAGE);
 						
 						handleListM.clear();
 						handleListM.add(selectedNode.getHandle());

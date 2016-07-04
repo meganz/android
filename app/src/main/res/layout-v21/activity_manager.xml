@@ -20,25 +20,20 @@
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             tools:context=".ManagerActivityLollipop" />
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
+        <android.support.design.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:background="@color/white"
             android:layout_width="match_parent"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar" />
+            android:layout_below="@id/toolbar"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            layout="@layout/layout_get_pro_account"
-            android:visibility="gone" />
-
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            layout="@layout/layout_overquota_alert"
-            android:visibility="gone" />
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar" />
 
         <!-- THE Cloud Drive TABS -->
 
@@ -147,7 +142,66 @@
                     android:layout_weight="1" />
             </LinearLayout>
         </TabHost>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floating_button"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:background="@drawable/ripple"
+                android:elevation="@dimen/elevation_low"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add_white"
+                android:stateListAnimator="@anim/button_elevation"
+                android:tint="@android:color/white"
+                android:layout_gravity="bottom|right|end"/>
+
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:elevation="@dimen/elevation_high"
+            layout="@layout/layout_overquota_alert"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"/>
+
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            layout="@layout/layout_get_pro_account"
+            android:visibility="gone" />
     </RelativeLayout>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_upload_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_options_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_contact_options_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_avatar_options_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
 
     <!--
     The navigation drawer 
