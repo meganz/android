@@ -453,6 +453,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if(node.isExported()){
 			//Node has public link			
 			holder.publicLinkImage.setVisibility(View.VISIBLE);
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				holder.publicLinkImage.setVisibility(View.GONE);
+			}
 		}
 		else{
 			holder.publicLinkImage.setVisibility(View.GONE);
@@ -755,14 +759,21 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		if(node.isExported()){
 			//Node has public link
-			if(multipleSelect){
-				holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 				holder.publicLinkImage.setVisibility(View.GONE);
 			}
-			else
-			{
-				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-				holder.publicLinkImage.setVisibility(View.VISIBLE);
+			else{
+				if(multipleSelect){
+					holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+					holder.publicLinkImage.setVisibility(View.GONE);
+				}
+				else
+				{
+					holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+					holder.publicLinkImage.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 		else{

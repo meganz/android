@@ -53,6 +53,8 @@ import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -62,6 +64,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1580,6 +1583,27 @@ public class Util {
 			return 0;
 		}
 	}
+
+	public static long calculateTimestamp(String time)
+	{
+		log("calculateTimestamp: "+time);
+		long unixtime;
+		DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
+		dfm.setTimeZone( TimeZone.getDefault());//Specify your timezone
+		try
+		{
+			unixtime = dfm.parse(time).getTime();
+			unixtime=unixtime/1000;
+			return unixtime;
+		}
+		catch (ParseException e)
+		{
+			log("ParseException!!!");
+		}
+		return 0;
+	}
+
+
 
 	private static void log(String message) {
 		log("Util", message);
