@@ -1,5 +1,80 @@
 package mega.privacy.android.app;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Shader.TileMode;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.StatFs;
+import android.provider.MediaStore;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
+import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils.TruncateAt;
+import android.text.format.Time;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewConfiguration;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckedTextView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TableLayout;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,86 +113,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Shader.TileMode;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.StatFs;
-import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.text.InputType;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.TextUtils.TruncateAt;
-import android.text.format.Time;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.util.DisplayMetrics;
-import android.util.SparseArray;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewConfiguration;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CheckedTextView;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
-import android.widget.ImageButton;
 
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 	
@@ -327,6 +322,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private boolean moveToRubbish = false;
     private boolean sendToInbox = false;
     private boolean isClearRubbishBin = false;
+
+	String nameText;
+	String firstNameText;
+
+	boolean name = false;
+	boolean firstName = false;
     
     ProgressDialog statusDialog;
     
@@ -495,9 +496,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             }
             
             if (managerActivity != null){
+				log("ORIGINAL JSON3:" + purchase.getOriginalJson() + ":::");
             	megaApi.submitPurchaseReceipt(purchase.getOriginalJson(), managerActivity);
             }
             else{
+				log("ORIGINAL JSON4:" + purchase.getOriginalJson() + ":::");
             	megaApi.submitPurchaseReceipt(purchase.getOriginalJson());
             }
         }
@@ -567,82 +570,93 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             proIIIYearly = inventory.getPurchase(SKU_PRO_III_YEAR); 
            
             if (proLiteMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;	
 	        			maxP = proLiteMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO LITE MONTHLY (JSON): __*" + proLiteMonthly.getOriginalJson() + "*__");
         	}
             
             if (proLiteYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 0;
 	        			maxP = proLiteYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO LITE ANNUALY (JSON): __*" + proLiteYearly.getOriginalJson() + "*__");
         	}
             
             if (proIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;	
 	        			maxP = proIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO I MONTHLY (JSON): __*" + proIMonthly.getOriginalJson() + "*__");
         	}
             
             if (proIYearly!= null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 1;
 	        			maxP = proIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO I ANNUALY (JSON): __*" + proIYearly.getOriginalJson() + "*__");
         	}
             
             if (proIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO II MONTHLY (JSON): __*" + proIIMonthly.getOriginalJson() + "*__");
             }
             
             if (proIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 2;
 	        			maxP = proIIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO II ANNUALY (JSON): __*" + proIIYearly.getOriginalJson() + "*__");
             }
             
             if (proIIIMonthly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;	
 	        			maxP = proIIIMonthly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
             }
             
             if (proIIIYearly != null){
-            	if (megaApi.getMyUser().getEmail() != null){
-	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
+//            	if (megaApi.getMyUser().getEmail() != null){
+//	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 	        			levelInventory = 3;
 	        			maxP = proIIIYearly;
-	        		}
-            	}
+//	        		}
+//            	}
+				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
             }
             
             inventoryFinished = true;
+
+			log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; ACCOUNTDETAILSFINISHED: " + accountDetailsFinished);
             
             if (accountDetailsFinished){
             	if (levelInventory > levelAccountDetails){
             		if (maxP != null){
+						log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
             			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
             		}
             	}
@@ -795,9 +809,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 
 		app = (MegaApplication)getApplication();
-		
-		initGooglePlayPayments();
-		
+
 //		// Get tracker.
 //		Tracker t = app.getTracker(TrackerName.APP_TRACKER);
 //		// Enable Advertising Features.
@@ -969,7 +981,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			return;
 		}
 		else{
-			log("rootNode != null");		
+			log("rootNode != null");
+
+			initGooglePlayPayments();
+			
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
 			
@@ -985,13 +1000,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //					userName.setVisibility(View.VISIBLE);
 //					userName.setText(userNameString);
 //				}
-				megaApi.getUserData(this);
+				megaApi.getUserAttribute(1, this);
+				megaApi.getUserAttribute(2, this);
 				
 				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 				Canvas c = new Canvas(defaultAvatar);
 				Paint p = new Paint();
 				p.setAntiAlias(true);
-				p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+				p.setColor(getResources().getColor(R.color.lollipop_primary_color));
 				
 				int radius; 
 		        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -5108,14 +5124,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				managerActivity = null;
 			}
 			else{
-//				Intent intent = new Intent (context, TourActivity.class);
-//				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-//		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//				context.startActivity(intent);
-//				if (context instanceof Activity){
-//					((Activity)context).finish();
-//				}
-//				context = null;
+				Intent intent = new Intent (context, LauncherActivity.class);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				if (context instanceof Activity){
+					context.startActivity(intent);
+					((Activity)context).finish();
+				}
+				else{
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					context.startActivity(intent);
+				}
+				context = null;
 			}
 		}
 		else{
@@ -5201,10 +5222,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 
 				accountDetailsFinished = true;
+
+				log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
 				
 				if (inventoryFinished){
 					if (levelAccountDetails < levelInventory){
 						if (maxP != null){
+							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
 							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
 						}
 					}
@@ -5334,11 +5358,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //					ManagerActivity.logout(managerActivity, app, megaApi, false);
 //				}
 //			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
-			if (e.getErrorCode() == MegaError.API_OK){
-				userName.setText(request.getName());
-			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
@@ -5739,80 +5758,73 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			boolean avatarExists = false;
-			if (e.getErrorCode() == MegaError.API_OK){
-				
-				File avatar = null;
-				if (getExternalCacheDir() != null){
-					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				else{
-					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				Bitmap imBitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options options = new BitmapFactory.Options();
-						options.inJustDecodeBounds = true;
-						BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-						int imageHeight = options.outHeight;
-						int imageWidth = options.outWidth;
-						String imageType = options.outMimeType;
-						
-						// Calculate inSampleSize
-					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
-					    
-					    // Decode bitmap with inSampleSize set
-					    options.inJustDecodeBounds = false;
+			if (e.getErrorCode() == MegaError.API_OK) {
 
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-						if (imBitmap == null) {
-							avatar.delete();
-						}
-						else{
-							avatarExists = true;
-							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-							
-							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-					        Paint paint = new Paint();
-					        paint.setShader(shader);
-					
-					        Canvas c = new Canvas(circleBitmap);
-					        int radius; 
-					        if (imBitmap.getWidth() < imBitmap.getHeight())
-					        	radius = imBitmap.getWidth()/2;
-					        else
-					        	radius = imBitmap.getHeight()/2;
-					        
-						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-					        imageProfile.setImageBitmap(circleBitmap);
-					        textViewProfile.setVisibility(View.GONE);
+				if (request.getParamType() == 1) {
+					log("(1)request.getText(): " + request.getText());
+					nameText = request.getText();
+					name = true;
+				} else if (request.getParamType() == 2) {
+					log("(2)request.getText(): " + request.getText());
+					firstNameText = request.getText();
+					firstName = true;
+				}
+				if (name && firstName) {
+					userName.setText(nameText + " " + firstNameText);
+					name = false;
+					firstName = false;
+				}
+
+				if (request.getParamType() == 0) {
+					File avatar = null;
+					if (getExternalCacheDir() != null) {
+						avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					} else {
+						avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					}
+					Bitmap imBitmap = null;
+					if (avatar.exists()) {
+						if (avatar.length() > 0) {
+							BitmapFactory.Options options = new BitmapFactory.Options();
+							options.inJustDecodeBounds = true;
+							BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+							int imageHeight = options.outHeight;
+							int imageWidth = options.outWidth;
+							String imageType = options.outMimeType;
+
+							// Calculate inSampleSize
+							options.inSampleSize = calculateInSampleSize(options, 250, 250);
+
+							// Decode bitmap with inSampleSize set
+							options.inJustDecodeBounds = false;
+
+							imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+							if (imBitmap == null) {
+								avatar.delete();
+							} else {
+								avatarExists = true;
+								Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+								BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
+								Paint paint = new Paint();
+								paint.setShader(shader);
+
+								Canvas c = new Canvas(circleBitmap);
+								int radius;
+								if (imBitmap.getWidth() < imBitmap.getHeight())
+									radius = imBitmap.getWidth() / 2;
+								else
+									radius = imBitmap.getHeight() / 2;
+
+								c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
+								imageProfile.setImageBitmap(circleBitmap);
+								textViewProfile.setVisibility(View.GONE);
+							}
 						}
 					}
 				}
+				log("avatar user downloaded");
 			}
-			
-			log("avatar user downloaded");
-		}
-		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
-			
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();
-//				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-//				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-//				if (cF != null){
-//					if (drawerItem == DrawerItem.CONTACTS){	
-//						ArrayList<MegaUser> contacts = megaApi.getContacts();
-//						cF.setContacts(contacts);
-//						cF.getListView().invalidateViews();
-//					}
-//				}
-			}
-			log("add contact");
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -5859,7 +5871,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				selectDrawerItem(drawerItem);
 			}
 			else{
-				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
+				log("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
+//				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
@@ -5975,9 +5988,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("get user attribute temporary error");
-		}
-		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
-			log("add contact temporary error");
 		}
 	}
 	
@@ -7373,7 +7383,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        else {
 	            log("onActivityResult handled by IABUtil.");
-	            drawerItem = DrawerItem.CLOUD_DRIVE;
+	            drawerItem = DrawerItem.ACCOUNT;
 //	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }
@@ -7571,14 +7581,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					outSF.refresh(this.parentHandleOutgoing);				
 				}
 			}
-			else{			
+			else{
 				//InCOMING
 				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
 				log("Tag: "+ cFTag1);
 				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSF != null){					
-					aB.setTitle(getString(R.string.section_shared_items));	
-					inSF.refresh(this.parentHandleIncoming);			
+				if (inSF != null){
+					aB.setTitle(getString(R.string.section_shared_items));
+					inSF.refresh(this.parentHandleIncoming);
 				}				
 			}	
 		}

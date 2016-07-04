@@ -48,7 +48,7 @@
     <string name="error_general_nodes" context="Error getting the root node">Error. Por favor, inténtelo otra vez.</string>
     
     <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">La carpeta secundaria no existe, por favor, elija una nueva.</string>   
-    <string name="no_external_SD_card_detected" context="when no external card exists">Ninguna tarjeta externa SD detectada</string>
+    <string name="no_external_SD_card_detected" context="when no external card exists">Ningún dispositivo de almacenamiento externo detectado</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">La carpeta es sólo de lectura. No tiene permisos para subir contenido.</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
@@ -57,7 +57,7 @@
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">¿Quieres enviar una invitación a %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borrar estos %d contactos?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Está seguro de que desea enviar estos elementos a la Papelera?</string>
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Borrar de MEGA</string>
@@ -66,7 +66,8 @@
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
-        
+
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
     <string name="action_add" context="Menu item">Subir</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
@@ -89,10 +90,9 @@
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar Clave Maestra</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar la Clave Maestra</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar subscripción</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clave Maestra ha sido exportada en:</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La subscripción ha sido cancelada correctamente</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">Ha habido algún problema cancelando la subscripción. Por favor, contacta con support\@mega.co.nz para cancelar la subscripción</string>
-    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar todas las sesiones</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar el resto de sesiones</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">El resto de sesiones se han cerrado con éxito</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error al cerrar las sesiones abiertas</string> 
     <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">El fichero con la Clave Maestra fue eliminado</string>
@@ -254,9 +254,9 @@
 	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">No hay contactos en la cuenta. Añádelos en la pantalla de Contactos</string>
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
 	<string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string>
+
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Añade un nuevo contacto para compartir</string>
-	
-	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
+
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link sin clave de cifrado</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Clave de cifrado</string>
 	    
@@ -434,16 +434,14 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Espacio de almacenamiento</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Espacio Libre</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espacio utilizado</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">¡Hazte PRO!</string>
     <string name="my_account_change_password" context="menu item">Cambiar contraseña</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Te estás quedando sin espacio libre.\n ¿Quieres mejorar tu cuenta?</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Podrías ser un usuario PRO.\n ¿Quieres mejorar tu cuenta?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">¡Alerta! ¡Superada la cuota de almacenamiento!</string>
     <string name="overquota_alert_text" context="Dialod text overquota error">Operación no permitida, excederá el límite de almacenamiento de su cuenta. ¿Desea mejorar su tipo de cuenta?</string>
     
     <string name="op_not_allowed" context="Dialod text overquota error">Operación no permitida</string>
-    <string name="my_account_last_session" context="when did the last session happen">Última sesión:</string>
-    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones:</string>
+    <string name="my_account_last_session" context="when did the last session happen">Última sesión</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones</string>
     
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Cambiando contraseña</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Contraseña actual</string>
@@ -475,6 +473,8 @@
     <string name="file_properties_remove_link" context="the user can remove the public link">El enlace se ha eliminado correctamente.</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">La vista previa aún no ha sido descargada. Por favor espere.</string>
+
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor, cierre la sesión antes de crear la cuenta</string>
     
     <string name="import_correct" context="success message after import a file">Importado correctamente</string>
     
@@ -511,13 +511,13 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Mostrar dispositivos avanzados (SD externa)</string>
     
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
-        <item context="internal SD card option">Tarjeta SD interna</item>
-        <item context="external SD card option">Tarjeta SD externa</item>
+        <item context="internal storage option">Almacenamiento interno</item>
+        <item context="external storage option">Almacenamiento externo</item>
     </string-array>
 
     <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
         <item context="write option">Introducir el email</item>
-        <item context="import from phone option">Importar desde la agenda</item>
+        <item context="import from phone option">Importar desde el dispositivo</item>
     </string-array>
     
     <string name="settings_camera_upload_on" context="settings option">Activar Subidas de la Cámara</string>
@@ -563,7 +563,7 @@
     <string name="settings_reset_lock_code" context="settings of the pin lock">Restaurar PIN</string> 
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueo con PIN</string>
     
-    <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
+    <string name="pin_lock_enter" context="Button after the pin code input field">Introducir</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Los ficheros locales serán eliminados y se cerrará la sesión tras 10 intentos fallidos</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez.</string>
     <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Código PIN incorrecto, por favor inténtelo otra vez. Le quedan %2d intentos.</string>
@@ -579,7 +579,9 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Términos de uso</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versión de App</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">Versión del SDK de MEGA</string>
-    
+
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Ver código fuente</string>
+
     <string name="january">Enero</string>
     <string name="february">Febrero</string>
     <string name="march">Marzo</string>
@@ -657,5 +659,118 @@
 	<string name="pin_lock_type" context="title to choose the type of PIN code">Tipo de código</string>
     <string name="four_pin_lock" context="PIN with 4 digits">Código de 4 dígitos</string>
     <string name="six_pin_lock" context="PIN with 6 digits">Código de 6 dígitos</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">Código alfanumércio</string>  
+    <string name="AN_pin_lock" context="PIN alphanumeric">Código alfanumérico</string>
+
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Los logs están ahora activados</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Los logs están ahora desactivados</string>
+
+    <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Abrir ubicación</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servidores ocupados, por favor, espere.</string>
+
+    <string name="my_account_free" context="Label in My Account section to show user account type">Cuenta gratis</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cuenta Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
+
+    <string name="backup_title" context="Title of the screen to backup the master key">Haz copia de tu clave principal de cifrado</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Tu contraseña desbloquea tu clave maestra</string>
+
+    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Tus datos sólo se pueden leer a través de una cadena de operaciones de descifrado que comienza con tu clave maestra de cifrado, que se guardará cifrada con su contraseña. Esto significa que si pierdes tu contraseña, tu clave maestra ya no puede ser descifrada, y tu no puedes descifrar los datos.</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exportar la clave maestra y guardarla en un lugar seguro te permite establecer otra contraseña sin perdida de datos.</string>
+    <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacante desde el exterior no puede acceder a tu cuenta solo con tu clave. Un restablecimiento de contraseña requiere tanto la clave principal como el acceso a tu correo electrónico.</string>
+    <string name="backup_action" context="Sentence to inform the user. the available actions in the screen to backup the master key">Copia la clave maestra o guárdala en un fichero de texto</string>
+
+    <string name="save_action" context="Action of the button to save the master key as a text file">Guardar</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clave maestra se ha copiado satisfactoriamente</string>
+
+    <string name="change_pass" context="Button to change the password">Cambiar</string>
+
+    <string name="general_positive_button" context="Positive button to perform a general action">SI</string>
+    <string name="general_negative_button" context="Negative button to perform a general action">NO</string>
+
+    <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">Contraseña olvidada?</string>
+    <string name="forgot_pass" context="Button in the Login screen to reset the password">¿Has olvidado tu contraseña?</string>
+    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Si tienes una copia de respaldo de tu clave principal de cifrado, puedes resetear tu contraseña eligiendo la opción SI. Ningún dato se perderá en el proceso.</string>
+    <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">Puedes todavía exportar la clave maestra si tienes una sesión de MEGA activa en un navegador en este o en otro ordenador. Si no es así, ya no puedes descifrar tu cuenta existente, pero puedes empezar una nueva cuenta con la misma dirección de correo electrónico seleccionando NO.</string>
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">¿Tienes copia de seguridad de tu clave maestra?</string>
+    <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">Si no es así, todavía puedes exportar la clave maestra en esta sesión de MEGA. Por favor, vuelve a la pantalla anterior y exporta tu clave maestra.</string>
+
+
+    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">¡Bien!</string>
+    <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">escribe aquí tu email</string>
+    <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace de recuperación que te permitirá enviar tu clave maestra y restablecer su contraseña.</string>
+
+    <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">escribe aquí la clave</string>
+
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si borras tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
+    <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">escribe aquí la contraseña</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancelation of an account">Este es el último paso para cancelar la cuenta. Perderás toda la información almacenada en la nube. Por favor, introduce tu contraseña.</string>
+
+    <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Verificación necesaria</string>
+    <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Por favor, comprueba tu correo electrónico para proceder.</string>
+    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">Ocurrió un error. Por favor, inténtalo de nuevo.</string>
+
+    <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Debes haber iniciado sesión para realizar esta operación.</string>
+    <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrecto</string>
+
+    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Correo electrónico no válido</string>
+    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Por favor, comprueba el correo y prueba otra vez.</string>
+    <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">No se puede realizar esta acción con una sesión abierta.</string>
+
+    <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Reestablecer contraseña</string>
+    <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Por favor, escribe tu clave maestra.</string>
+
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Contraseña modificada!</string>
+
+    <string name="park_account_dialog_title" context="Button to park an account">Aparcar cuenta</string>
+    <string name="park_account_title" context="Title of the screen to park an account">Ups!</string>
+    <string name="park_account_button" context="Button to park an account">Aparcar</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Debido a nuestro paradigma de cifrado end-to-end no podrás acceder a tus datos sin tu contraseña o una copia de seguridad de la clave maestra.</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Puedes aparcar tu cuenta existente y empezar con una nueva usando la misma dirección de correo electrónico. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
+
+    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace que te permitirá aparcar la cuenta.</string>
+    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">Este es el último paso para aparcar tu cuenta, debes establecer una nueva contraseña. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
+
+    <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Escribe la nueva contraseña</string>
+    <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">El enlace ha caducado, por favor, inténtalo de nuevo.</string>
+
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu clave maestra se utilizará para resetear tu contraseña. Por favor, establece tu nueva contraseña.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás en tu correo electrónico un link que te permitirá resetear tu contraseña. Por favor, comprueba tu correo electrónico para proceder.</string>
+
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
+    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta Pro!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave Maestra ha sido exportada en: %s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Disponible Sin Conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
+
+    <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string>
+
+    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error al actualizar los nuevos datos de la cuenta.</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed succesfully">Los datos de tu cuenta han sido correctamente actualizados.</string>
+
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. Este correo eléctronico ya está asociado a otra cuenta.</string>
+
+    <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Este es el último paso para cambiar tu correo electrónico. Por favor, introduce tu contraseña.</string>
+    <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Cambiar email</string>
+
+    <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Tu correo eléctrónico ha sido correctamente actualizado.</string>
+
+    <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">Te estás quedando sin espacio libre.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Saca el máximo provecho a tu cuenta con una cuenta PRO.</string>
+
+    <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editar foto del perfil</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
+    <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Elegir foto</string>
+    <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Borrar foto</string>
+
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clave maestra introducida no es correcta. Por favor, pruebe otra vez.</string>
+
+    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Ninguna imagen subida</string>
+
+    <string name="option_full_link" context="Alert Dialog to get link">Link con clave de cifrado</string>
+
+    <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">La nueva dirección de correo eléctronico debe validarse. Por favor, comprueba tu correo electrónico para proceder.</string>
+
+    <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">Your picture profile will be deleted. Do you want to proceed?</string>
+    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
 </resources>

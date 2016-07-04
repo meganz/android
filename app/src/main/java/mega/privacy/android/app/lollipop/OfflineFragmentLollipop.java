@@ -1,5 +1,38 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,55 +44,21 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class OfflineFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 	
-	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
 
 	MegaPreferences prefs;
@@ -79,9 +78,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
-	long parentHandle = -1;
 	boolean isList = true;
-	boolean gridNavigation=false;
 	int orderGetChildren;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -116,7 +113,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	        int position = recyclerView.getChildPosition(view);
 	        MegaOffline currentNode = (MegaOffline) adapter.getItem(position);
 	        if(currentNode.getHandle().equals("0")){
-	        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+	        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 				File file= new File(path);
 				if(file.exists()){
 					return;
@@ -157,8 +154,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).onFileClick(handleList);
-					
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -186,7 +183,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						{
 							break;
 						}
-						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
+						NodeController nC = new NodeController(context);
+						nC.exportLink(n);
 					}
 					
 					break;
@@ -205,7 +203,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);					
+					NodeController nC = new NodeController(context);
+					nC.selectContactToShareFolders(handleList);
 					break;
 				}
 				case R.id.cab_menu_move:{					
@@ -221,7 +220,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -237,7 +237,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToCopyNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -558,12 +559,41 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
-		
-		aB.setTitle(getString(R.string.section_saved_for_offline));	
+
 		if (context instanceof ManagerActivityLollipop){
-			log("aB.setHomeAsUpIndicator_30");
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+
+
+			String pathNavigationOffline = ((ManagerActivityLollipop)context).getPathNavigationOffline();
+			if(pathNavigationOffline!=null){
+				pathNavigation = pathNavigationOffline;
+			}
+
+			if(pathNavigation!=null){
+
+				log("AFTER PathNavigation is: "+pathNavigation);
+				if (pathNavigation.equals("/")){
+					aB.setTitle(getString(R.string.section_saved_for_offline));
+					log("aB.setHomeAsUpIndicator_30");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				}
+				else{
+					log("The pathNavigation is: "+pathNavigation);
+					String title = pathNavigation;
+					int index=title.lastIndexOf("/");
+					title=title.substring(0,index);
+					index=title.lastIndexOf("/");
+					title=title.substring(index+1,title.length());
+					aB.setTitle(title);
+					log("aB.setHomeAsUpIndicator_36");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				}
+			}
+			else{
+				log("PathNavigation is NULL");
+			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		    isList = ((ManagerActivityLollipop)context).isList();
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
@@ -603,7 +633,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new LinearLayoutManager(context);
+			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
@@ -667,6 +697,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			if (adapter == null){
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				contentText.setText(getInfoFolder(mOffList));
+				adapter.setNodes(mOffList);
+				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				contentText.setText(getInfoFolder(mOffList));
@@ -855,6 +888,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			if (adapter == null){
 
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				contentText.setText(getInfoFolder(mOffList));
+				adapter.setNodes(mOffList);
+				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				contentText.setText(getInfoFolder(mOffList));
@@ -979,7 +1015,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			handleList.add(node.getHandle());
 			log("download "+node.getName());
 			if (context instanceof ManagerActivityLollipop){
-				((ManagerActivityLollipop) context).onFileClick(handleList);
+				NodeController nC = new NodeController(context);
+				nC.prepareForDownload(handleList);
 			}
 			else{
 				//TODO toast no connection
@@ -1167,9 +1204,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		{
 			return;
 		}
-		
-		((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
-
+		NodeController nC = new NodeController(context);
+		nC.exportLink(n);
 	}
 	
 	public void shareFolder (String path){
@@ -1178,8 +1214,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		{
 			return;
 		}
-		
-		((ManagerActivityLollipop) context).shareFolderLollipop(n);
+		NodeController nC = new NodeController(context);
+		nC.selectContactToShareFolder(n);
 	}
 	
 	public void rename (String path){
@@ -1200,8 +1236,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(n.getHandle());									
-		((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+		handleList.add(n.getHandle());
+		NodeController nC = new NodeController(context);
+		nC.chooseLocationToMoveNodes(handleList);
 	}
 	
 	public void copy (String path){
@@ -1212,8 +1249,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(n.getHandle());									
-		((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+		handleList.add(n.getHandle());
+		NodeController nC = new NodeController(context);
+		nC.chooseLocationToCopyNodes(handleList);
 	}
 	
 	public boolean isFolder(String path){
@@ -1269,7 +1307,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		//Check if the file MarterKey is exported
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 		log("Export in: "+path);
 		File file= new File(path);
 		if(file.exists()){
@@ -1301,13 +1339,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}
 	
 	public void showOptionsPanel(MegaOffline sNode){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 		
 		this.selectedNode = sNode;
 		
 		//Check if the node is the Master Key file
         if(selectedNode.getHandle().equals("0")){
-        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 			File file= new File(path);
 			if(file.exists()){
 				optionShare.setVisibility(View.GONE);			
@@ -1406,7 +1444,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(Long.parseLong(selectedNode.getHandle()));
-				((ManagerActivityLollipop) context).onFileClick(handleList);
+				NodeController nC = new NodeController(context);
+				nC.prepareForDownload(handleList);
 				break;
 			}
 			case R.id.offline_list_option_move_layout:
@@ -1469,7 +1508,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				slidingOptionsPanel.setVisibility(View.GONE);
 				
 				if(selectedNode.getHandle().equals("0")){
-		        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 					File file= new File(path);
 					if(file.exists()){
 						file.delete();	
@@ -1624,7 +1663,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			if(currentNode.getHandle().equals("0")){
 				log("click on Master Key");
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 				openFile(new File(path));
 //				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
 //				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
@@ -1728,7 +1767,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivityLollipop.OFFLINE_ADAPTER);
+						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
@@ -1746,13 +1785,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
     public void openFile (File currentFile){
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 		viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-		if (ManagerActivityLollipop.isIntentAvailable(context, viewIntent)){
+		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){
 			context.startActivity(viewIntent);
 		}
 		else{
 			Intent intentShare = new Intent(Intent.ACTION_SEND);
 			intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-			if (ManagerActivityLollipop.isIntentAvailable(context, intentShare)){
+			if (MegaApiUtils.isIntentAvailable(context, intentShare)){
 				context.startActivity(intentShare);
 			}
 		}
@@ -2129,7 +2168,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}	
 	
 	public void setPathNavigation(String _pathNavigation){
-		log("setPathNavigation");
+		log("setPathNavigation: "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
 		if (adapter != null){	
 //			contentText.setText(getInfoFolder(mOffList));

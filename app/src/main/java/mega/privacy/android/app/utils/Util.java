@@ -1,5 +1,44 @@
 package mega.privacy.android.app.utils;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.BatteryManager;
+import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Video;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.format.Formatter;
+import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +62,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -33,44 +74,6 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.IntentFilter;
-import android.content.res.Resources;
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.BatteryManager;
-import android.os.Build;
-import android.os.Environment;
-import android.os.StatFs;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images;
-import android.provider.MediaStore.Video;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
-import android.text.style.StyleSpan;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class Util {
@@ -84,16 +87,16 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
-	
-	// CreateThumbPreviewService (true=enabled; false=disabled)
-	public static boolean CREATE_THUMB_PREVIEW_SERVICE = false;
-	
-	public static String offlineDIR = "MEGA/MEGA Offline"; 
+	public static boolean DEBUG = false;
+
+	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";
+	public static String profilePicDIR ="MEGA/MEGA Profile Images";
 	public static String logDIR = "MEGA/MEGA Logs";
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
+	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
+	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
 	
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
@@ -108,6 +111,8 @@ public class Util {
 	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
 	*/
 	public static DatabaseHandler dbH;
+	public static boolean fileLogger = false;
+	public static Context context;
 
 	public static HashMap<String, String> countryCodeDisplay;
 	
@@ -182,6 +187,21 @@ public class Util {
 	
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+	}
+
+	public static int countMatches(Pattern pattern, String string)
+	{
+		Matcher matcher = pattern.matcher(string);
+
+		int count = 0;
+		int pos = 0;
+		while (matcher.find(pos))
+		{
+			count++;
+			pos = matcher.start() + 1;
+		}
+
+		return count;
 	}
 	
 	public static boolean showMessageRandom(){
@@ -523,7 +543,10 @@ public class Util {
     	log("getCacheSize");
     	File cacheIntDir = context.getCacheDir();
     	File cacheExtDir = context.getExternalCacheDir();
-    	
+
+		if(cacheIntDir!=null){
+			log("Path to check internal: "+cacheIntDir.getAbsolutePath());
+		}
     	long size = getDirSize(cacheIntDir)+getDirSize(cacheExtDir);    	
     	
     	String sizeCache = getSizeString(size);
@@ -571,49 +594,60 @@ public class Util {
 		
 		return dateString;
 	}
+
+	public static void setContext(Context c){
+		context = c;
+	}
+
+	public static void setDBH(DatabaseHandler d){
+		dbH = d;
+	}
+
+	public static void setFileLogger(boolean fL){
+		fileLogger = fL;
+	}
 	
 	/*
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
-//		File logFile=null;
+		File logFile=null;
 		if (DEBUG) {
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
-			
+		}
+
+		if (fileLogger) {
 			//Send the log to a file
-			/*
-			String dir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/";
-//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
+
+			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
+			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
 			File dirFile = new File(dir);
-			if(!dirFile.exists()){
+			if (!dirFile.exists()) {
 				dirFile.mkdirs();
 				logFile = new File(dirFile, "log.txt");
-				if(!logFile.exists()){
+				if (!logFile.exists()) {
 					try {
 						logFile.createNewFile();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}				
-			}
-			else{
+				}
+			} else {
 				logFile = new File(dirFile, "log.txt");
-				if(!logFile.exists()){
+				if (!logFile.exists()) {
 					try {
 						logFile.createNewFile();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}		
+				}
 			}
 
-			if(logFile!=null&&logFile.exists()){
-				appendStringToFile(origin+": "+message+"\n", logFile);
-			}*/
-				
-//			Log.e(origin, message + "");
+			if (logFile != null && logFile.exists()) {
+				appendStringToFile(origin + ": " + message + "\n", logFile);
+			}
 		}
 	}
 	
@@ -801,7 +835,7 @@ public class Util {
 	 */
 	public static void deleteIfLocal(Context context, File file) {
 		if (isLocal(context, file) && file.exists()) {
-			log("delete!");
+			log("delete");
 			file.delete();
 		}
 	}
@@ -1471,6 +1505,66 @@ public class Util {
 			log("CATCH EXCEPTION!!!: "+e.getMessage());
 			return false;
 		}	    
+	}
+
+	/*
+	 * Validate email
+	 */
+	public static String getEmailError(String value, Context context) {
+		log("getEmailError");
+		if (value.length() == 0) {
+			return context.getString(R.string.error_enter_email);
+		}
+		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+			return context.getString(R.string.error_invalid_email);
+		}
+		return null;
+	}
+
+	public static int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
+		}
+
+		return (int)textSize;
+	}
+
+	public static void showAlert(Context context, String message, String title) {
+		log("showAlert");
+		android.support.v7.app.AlertDialog.Builder bld = new android.support.v7.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+		bld.setMessage(message);
+		if(title!=null){
+			bld.setTitle(title);
+		}
+		bld.setPositiveButton("OK",null);
+		log("Showing alert dialog: " + message);
+		bld.create().show();
+	}
+
+	public static int getVersion(Context context) {
+		try {
+			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+			return pInfo.versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			return 0;
+		}
 	}
 
 	private static void log(String message) {

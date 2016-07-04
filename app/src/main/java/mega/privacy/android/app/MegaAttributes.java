@@ -6,12 +6,14 @@ public class MegaAttributes {
 	int attemps = 0;
 	String askSizeDownload = "true";
 	String askNoAppDownload = "true";
+	String fileLogger = "false";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
 		this.askSizeDownload = askSizeDownload;
+		this.fileLogger = fileLogger;
 	}
 	
 	public String getOnline(){
@@ -44,6 +46,14 @@ public class MegaAttributes {
 
 	public void setAskNoAppDownload(String askNoAppDownload) {
 		this.askNoAppDownload = askNoAppDownload;
+	}
+
+	public String getFileLogger(){
+		return fileLogger;
+	}
+
+	public void setFileLogger(String fileLogger){
+		this.fileLogger = fileLogger;
 	}
 
 }

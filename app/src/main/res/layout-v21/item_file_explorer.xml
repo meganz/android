@@ -10,18 +10,19 @@
         android:layout_height="48dp"
         android:layout_centerVertical="true"
         android:scaleType="fitCenter" />
-    
+
     <TextView
         android:id="@+id/file_explorer_filename"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
         android:textColor="@color/file_list_first_row"
+        android:maxLines="2"
         android:ellipsize="end"
-        android:textSize="16sp"
-        android:maxLines="1"/>
+        android:singleLine="false"
+        android:textSize="14sp"/>
     
     <TextView
         android:id="@+id/file_explorer_filesize"

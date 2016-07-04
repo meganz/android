@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.0.6.official</string>
-    <string name="sdk_version" context="Not translate">0436c0e</string>
+    <string name="app_version" context="Not translate">3.0.11.1</string>
+    <string name="sdk_version" context="Not translate">27e7492</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -53,16 +53,16 @@
     <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
  
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder</string>   
-    <string name="no_external_SD_card_detected" context="when no external card exists">No external SD card detected</string>
+    <string name="no_external_SD_card_detected" context="when no external card exists">No external storage detected</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload</string>
     
-    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are removing the exported master key file</string>  
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are removing the exported recovery key file</string>
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove this %d contacts?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
@@ -71,7 +71,8 @@
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
-    
+
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
@@ -90,14 +91,13 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export master key</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove master key</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup recovery key</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove recovery key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The master key has been exported into: </string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The master key file has been removed</string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The recovery key file has been removed</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support@mega.nz for assistance</string>
-    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close all sessions</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close other sessions</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been closed</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
     
@@ -164,7 +164,7 @@
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please log in to share with MEGA</string>
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
-    
+
     <string name="tour_space_title">MEGA SPACE</string>
     <string name="tour_speed_title">MEGA SPEED</string>
     <string name="tour_privacy_title">MEGA PRIVACY</string>
@@ -260,8 +260,7 @@
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 	
 	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
-	
-	<string name="option_full_link" context="Alert Dialog to get link">Full link</string>
+
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
 	
@@ -310,7 +309,7 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     <string name="context_download_to" context="Menu item">Save to</string>
     <string name="context_clear_rubbish" context="Menu option title">Empty Rubbish Bin</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All the elements of the Rubbish Bin will be removed.</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside Rubbish Bin will be deleted.</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_send" context="get the link and send it">Send</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>
@@ -439,16 +438,14 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Storage Space</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade now!</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">You can be a PRO user!\n Do you want to upgrade your account?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
      <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
     
     <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
-    <string name="my_account_last_session" context="when did the last session happen">Last session:</string>
-    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections:</string>
+    <string name="my_account_last_session" context="when did the last session happen">Last session</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections</string>
     
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Changing password</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Current password</string>
@@ -480,6 +477,8 @@
     <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait</string>
+
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Please, log out before creating the account</string>
     
     <string name="import_correct" context="success message after import a file">Imported successfully</string>
     
@@ -516,13 +515,13 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
     
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
-        <item context="internal SD card option">Internal SD card</item>
-        <item context="external SD card option">External SD card</item>
+        <item context="internal storage option">Internal storage</item>
+        <item context="external storage option">External storage</item>
     </string-array>
 
     <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
         <item context="write option">Write the user\'s e-mail</item>
-        <item context="import from phone option">Import from phone</item>
+        <item context="import from phone option">Import from device</item>
     </string-array>
     
     <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
@@ -584,7 +583,8 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">MEGA SDK version</string>
-    
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">View source code</string>
+
     <string name="january">January</string>
     <string name="february">February</string>
     <string name="march">March</string>
@@ -662,6 +662,118 @@
     <string name="pin_lock_type" context="title to choose the type of PIN code">PIN Code Type</string>
     <string name="four_pin_lock" context="PIN with 4 digits">4 digits PIN</string>
     <string name="six_pin_lock" context="PIN with 6 digits">6 digits PIN</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">Alphanumeric PIN</string>    
+    <string name="AN_pin_lock" context="PIN alphanumeric">Alphanumeric PIN</string>
 
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
+
+    <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servers are too busy. Please wait.</string>
+
+    <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
+
+    <string name="backup_title" context="Title of the screen to backup the master key">Backup your recovery key</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Your password unlocks your recovery key</string>
+
+    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
+    <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your e-mail.</string>
+    <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copy the recovery key to clipboard or save it as text file</string>
+
+    <string name="save_action" context="Action of the button to save the master key as a text file">Save</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The recovery has been successfully copied</string>
+
+    <string name="change_pass" context="Button to change the password">Change</string>
+
+    <string name="general_positive_button" context="Positive button to perform a general action">YES</string>
+    <string name="general_negative_button" context="Negative button to perform a general action">NO</string>
+
+    <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">Forgot password?</string>
+    <string name="forgot_pass" context="Button in the Login screen to reset the password">Forgot your password?</string>
+    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">If you have a backup of your recovery crypto key, you can reset your password by selecting YES. No data will be lost.</string>
+    <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">You can still export your recovery key now if you have an active MEGA session in any other browser on this or any other computer. If you don\&apos;t, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.</string>
+    <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">If you don\&apos;t, you can still export your recovery key now in this MEGA session. Please, go back and backup your recovery key.</string>
+
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Do you have a backup of your recovery key?</string>
+
+    <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Great!</string>
+    <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">email goes here</string>
+    <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your recovery key and reset your password.</string>
+
+    <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">recovery key goes here</string>
+
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
+    <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password goes here</string>
+    <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+
+    <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Email verification</string>
+    <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Please check your email to proceed.</string>
+    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">An error occurred, please try again.</string>
+
+    <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">You must be logged in to perform this action.</string>
+    <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrect</string>
+
+    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Invalid email address</string>
+    <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Please check the e-mail address and try again.</string>
+    <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">You must be logged out to perform this action.</string>
+
+    <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Password reset</string>
+    <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Please write below your recovery key.</string>
+
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Password changed!</string>
+
+    <string name="park_account_dialog_title" context="Title of the dialog to park an account">Park account</string>
+    <string name="park_account_button" context="Button to park an account">Park</string>
+    <string name="park_account_title" context="Title of the screen to park an account">Oops!</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your recovery key.</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">You can park your existing account and start a fresh one under the same e-mail address. Your data will be retained for at least 60 days. In case that you recall your parked account\'s password, please contact support&#64;mega.nz</string>
+
+    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Please enter you e-mail address below. You will receive a recovery link that will allow you to park your account.</string>
+    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. In case that you recall your parked account\'s password, please contact support&#64;mega.nz</string>
+
+    <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Enter new password</string>
+    <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">This recovery link has expired, please try again.</string>
+
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Your recovery key is going to be used to reset your password. Please, enter your new password.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.</string>
+
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
+    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; bandwidth with a Pro account!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
+
+    <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
+
+    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the account data.</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your account data has been correctly updated.</string>
+
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
+
+    <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
+    <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Change email</string>
+
+    <string name="success_changing_user_mail" context="Message when the user email has been changed successfully">Your email has been correctly updated.</string>
+
+    <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">You\'re running out of space!</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to PRO.</string>
+
+    <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+    <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
+    <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
+
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The recovery key is not correct. Please, try again.</string>
+
+    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No pictures uploaded</string>
+
+    <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
+
+    <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">Your new email address needs to be validated. Please check your email to proceed.</string>
+
+    <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">Your picture profile will be deleted. Do you want to proceed?</string>
+    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
 </resources>

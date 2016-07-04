@@ -1,12 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.List;
-import java.util.zip.ZipEntry;
-
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -17,9 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,6 +18,13 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.List;
+import java.util.zip.ZipEntry;
+
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 
 
 public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListener {
@@ -40,12 +38,15 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 	
 	/* public static view holder class */
 	public class ViewHolderBrowserList {
-		CheckBox checkbox;
+//		CheckBox checkbox;
 		ImageView imageView;
 		TextView textViewFileName;
 		TextView textViewFileSize;
 		ImageButton imageButtonThreeDots;
 		RelativeLayout itemLayout;
+
+		public ImageView publicLinkImage;
+		public ImageView publicLinkImageMultiselect;
 		//ImageView arrowSelection;
 		LinearLayout optionsLayout;
 		//ImageView optionDownload;
@@ -57,6 +58,8 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 		//ImageView optionPublicLink;
 		//ImageView optionDelete;
 		int currentPosition;
+
+		public ImageView savedOffline;
 		long document;
 	}
 	
@@ -98,8 +101,9 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
 			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
-			
-			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
+			holder.publicLinkImageMultiselect = (ImageView) convertView.findViewById(R.id.file_list_public_link_multiselect);
+			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
+			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
 
@@ -107,6 +111,12 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 		} else {
 			holder = (ViewHolderBrowserList) convertView.getTag();
 		}
+
+		holder.savedOffline.setVisibility(View.INVISIBLE);
+		holder.transferProgressBar.setVisibility(View.GONE);
+		holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+		holder.publicLinkImage.setVisibility(View.GONE);
+		holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 		ZipEntry zipNode = (ZipEntry) getItem(position);		
 		
@@ -142,13 +152,11 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 				
 		if (positionClicked == -1){
 			//holder.arrowSelection.setVisibility(View.GONE);
-			LayoutParams params = holder.optionsLayout.getLayoutParams();
-			params.height = 0;
+//			LinearLayout.LayoutParams params = holder.optionsLayout.getLayoutParams();
+//			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			holder.transferProgressBar.setVisibility(View.GONE);
 			//holder.arrowSelection.setVisibility(View.GONE);
-			holder.checkbox.setVisibility(View.GONE);
 		}
 
 		return convertView;

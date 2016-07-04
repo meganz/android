@@ -3,7 +3,7 @@
     android:id="@+id/file_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grid_background">
+    android:background="@color/white">
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/file_grid_item_layout"
@@ -46,13 +46,10 @@
 
     <View
         android:id="@+id/file_grid_separator"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/file_grid_thumbnail"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="6dp"
-        android:background="@color/grid_item_separator"
-        android:scaleType="fitCenter" />
+        android:background="@color/new_background_fragment"/>
 
     <ImageButton
         android:id="@+id/file_grid_three_dots"

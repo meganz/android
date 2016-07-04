@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".InitialCamSyncActivity"
-    android:background="@color/fragment_background" >
+    android:background="@color/white" >
     <ScrollView
         android:id="@+id/cam_sync_scroll_view"
         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
       		android:layout_height="48dp"
       		android:layout_weight="1"
             android:background="@drawable/grey_btn_default_holo_light"
-            android:textColor="@color/button_text"
+            android:textColor="@color/white"
             android:text="@string/cam_sync_skip" />
         
         <Button
@@ -90,7 +90,7 @@
       		android:layout_height="48dp"
       		android:layout_weight="1"
             android:background="@drawable/btn_default_holo_light_without_corners"
-            android:textColor="@color/button_text"
+            android:textColor="@color/white"
             android:text="@string/cam_sync_ok" />
      </LinearLayout>
 </RelativeLayout>
@@ -118,7 +118,7 @@
             android:orientation="vertical"
             android:paddingBottom="0dp"
             android:paddingTop="0dp" 
-            android:background="@color/background" >
+            android:background="@color/white" >
 	       
 	       <mega.privacy.android.app.components.LoopViewPager
 	           android:id="@+id/cam_sync_pager"

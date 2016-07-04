@@ -17,9 +17,9 @@
 
     <ListView
         android:id="@+id/zip_list_view_browser"
+		android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </ListView>
-        
 
 </RelativeLayout>

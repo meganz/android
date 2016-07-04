@@ -1,21 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
-
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ContentProviderClient;
@@ -27,6 +11,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.utils.Util;
 
 
 /*
@@ -325,6 +327,39 @@ public class ShareInfo {
 		}
 		else{
 			log("inputStream is NULL");
+			String path = uri.getPath();
+			log("PATH: " + path);
+			if (path != null){
+				String [] s = path.split("file://");
+				if (s.length > 1){
+					String p = s[1];
+					String [] s1 = p.split("/ORIGINAL");
+					if (s1.length > 1){
+						path = s1[0];
+//						path.replaceAll("%20", " ");
+						try {
+							path = URLDecoder.decode(path, "UTF-8");
+						} catch (UnsupportedEncodingException e) {
+							path.replaceAll("%20", " ");
+						}
+					}
+				}
+			}
+			log("REAL PATH: " + path);
+
+			file = null;
+			try{
+				file = new File(path);
+			}
+			catch(Exception e){
+				log("error when creating File!");
+//					log(e.getMessage());
+			}
+			if((file != null) && file.exists() && file.canRead()) {
+				size = file.length();
+				log("The file is accesible!");
+				return;
+			}
 		}
 		log("END processUri");
 	}
@@ -343,16 +378,26 @@ public class ShareInfo {
 		} catch (RemoteException e1) {
 			log("cursor EXCEPTION!!!");
 		}
-		if(cursor.getCount()==0) return;
+		if(cursor!=null){
+			if(cursor.getCount()==0){
+				return;
+			}
+		}
+		else{
+			return;
+		}
 		cursor.moveToFirst();
 		int displayIndex = cursor.getColumnIndex("_display_name");
 		if(displayIndex != -1)
 			title = cursor.getString(displayIndex);
 		int sizeIndex = cursor.getColumnIndex("_size");
 		if (sizeIndex != -1) {
-			long size = Long.valueOf(cursor.getString(sizeIndex));
-			if (size > 0) {
-				this.size = size;
+			String sizeString = cursor.getString(sizeIndex);
+			if(sizeString!=null){
+				long size = Long.valueOf(sizeString);
+				if (size > 0) {
+					this.size = size;
+				}
 			}
 		}
 
@@ -360,6 +405,9 @@ public class ShareInfo {
 			int dataIndex = cursor.getColumnIndex("_data");
 			if (dataIndex != -1) {
 				String data = cursor.getString(dataIndex);
+				if (data == null){
+					return;
+				}
 				File dataFile = new File(data);
 				if (dataFile.exists() && dataFile.canRead()) {
 					if (size == -1) {

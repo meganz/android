@@ -1,21 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Locale;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.Product;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -31,6 +15,22 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Locale;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.Product;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaPricing;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class PaymentFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener{
 	
@@ -191,11 +191,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							
 							title.setText(getString(R.string.pro1_account));
 							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
 					}
 		
@@ -257,11 +257,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							
 							title.setText(getString(R.string.pro2_account));
 							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
 					}
 					
@@ -323,11 +323,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							
 							title.setText(getString(R.string.pro3_account));
 							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
 					}
 					
@@ -706,11 +706,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							
 							title.setText(getString(R.string.pro1_account));
 							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
 					}
 		
@@ -772,11 +772,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							
 							title.setText(getString(R.string.pro2_account));
 							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
 					}
 					
@@ -838,11 +838,11 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							
 							title.setText(getString(R.string.pro3_account));
 							
-							storageInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storageInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							storageGb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							bandwidthTb.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
+							perMonth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 						}
 					}
 					

@@ -1,46 +1,21 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.view.GestureDetector;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,19 +24,30 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
 
 
 public class RubbishBinFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
@@ -101,15 +87,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRemoveTotal;
-	public LinearLayout optionMoveTo;
-	public TextView propertiesText;
 	////
 		
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -145,7 +122,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -155,7 +133,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -271,58 +249,63 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
+		if (megaApi.getRootNode() == null){
+			return null;
+		}
+
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+		display.getMetrics(outMetrics);
+		density  = getResources().getDisplayMetrics().density;
+
 		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		isList = ((ManagerActivityLollipop)context).isList();
-		
+
 		if (parentHandle == -1){
-			if (megaApi.getRubbishNode() != null){
-				parentHandle = megaApi.getRubbishNode().getHandle();
-				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-				
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				log("aB.setHomeAsUpIndicator_43");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+			long parentHandleRubbish = ((ManagerActivityLollipop)context).getParentHandleRubbish();
+			if(parentHandleRubbish!=-1){
+				log("After consulting... the parentRubbish is: "+parentHandleRubbish);
+				parentHandle = parentHandleRubbish;
 			}
+		}
+
+		if (parentHandle == -1||parentHandle==megaApi.getRubbishNode().getHandle()){
+
+			if(aB!=null){
+				aB.setTitle(getString(R.string.section_rubbish_bin));
+				log("indicator_arrow_back_445");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+			}
+
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			
-			if (parentNode == null){
-				parentNode = megaApi.getRubbishNode();
-				if (parentNode != null){
-					parentHandle = parentNode.getHandle();
-					((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-				}
-			}
-			
+
 			if (parentNode != null){
+				log("The parent node is: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-//				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-//					log("aB.setHomeAsUpIndicator_44");
-//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//				}
-//				else{
-//					aB.setTitle(parentNode.getName());
-//					log("aB.setHomeAsUpIndicator_45");
-//					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-//				}
-//				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			}			
+
+				if(aB!=null){
+					aB.setTitle(parentNode.getName());
+					log("indicator_arrow_back_035");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				}
+				else {
+					log("AB still is NULL");
+				}
+
+			}
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
-		
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
 
 		if (isList){
 			log("isList View");
@@ -332,7 +315,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new LinearLayoutManager(context);
+			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
@@ -356,14 +339,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			contentText.setLayoutParams(contentTextParams);
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
-			
+
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 
@@ -384,14 +367,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			}
 			
 			if(megaApi.getRubbishNode()!=null){
-				if (parentHandle == megaApi.getRubbishNode().getHandle()){
+				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
 					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 						showProgressBar();
 						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 					}
 					else{
-						MegaNode infoNode = megaApi.getRubbishNode();
-						contentText.setText(getInfoFolder(infoNode));
+						log("setContent of the Rubbish Bin");
+						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 					}				
 				}
 				else{
@@ -401,65 +384,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					else{
 						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-						contentText.setText(getInfoFolder(infoNode));
+						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 					}
 				}
-			}			
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.rubbishbin_list_out_options);
-			
-			optionProperties = (LinearLayout) v.findViewById(R.id.rubbishbin_list_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.rubbishbin_list_option_properties_text);			
-		
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.rubbishbin_list_option_remove_layout);
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-	
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.rubbishbin_list_option_move_layout);		
-
-			optionProperties.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });
+			}
 			
 			return v;
 		}
@@ -501,23 +429,23 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			contentText.setLayoutParams(contentTextParams);			
 			
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
-			
+
 			if(megaApi.getRubbishNode()!=null){
-				if (parentHandle == megaApi.getRubbishNode().getHandle()){
+				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
 					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 						showProgressBar();
 						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 					}
 					else{
 						MegaNode infoNode = megaApi.getRubbishNode();
-						contentText.setText(getInfoFolder(infoNode));
+						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 					}				
 				}
 				else{
@@ -527,7 +455,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 					else{
 						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-						contentText.setText(getInfoFolder(infoNode));
+						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 					}
 				}
 			}
@@ -550,92 +478,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.rubbishbin_grid_out_options);
-			
-			optionProperties = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.rubbishbin_grid_option_properties_text);			
-		
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_remove_layout);
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-	
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_move_layout);		
-
-			optionProperties.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });
-			
-			return v;			
+			return v;
 		}
-	}
-	
-	public void showOptionsPanel(MegaNode sNode){
-		log("showOptionsPanel");
-		
-		this.selectedNode = sNode;
-		
-		if (selectedNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-		}
-		
-		optionProperties.setVisibility(View.VISIBLE);				
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionRemoveTotal.setVisibility(View.VISIBLE);
-					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapter.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
 	}
 	
 	public void showProgressBar(){
@@ -665,13 +509,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			progressBar.setProgress(progress);
 		}
 	}
-	
-	public PanelState getPanelState ()
-	{
-		log("getPanelState: "+slidingOptionsPanel.getPanelState());
-		return slidingOptionsPanel.getPanelState();
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -690,58 +528,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
 				}				
-				break;
-			}
-			case R.id.rubbishbin_list_out_options:
-			case R.id.rubbishbin_grid_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-			case R.id.rubbishbin_list_option_move_layout:
-			case R.id.rubbishbin_grid_option_move_layout:{
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-				((ManagerActivityLollipop) context).showMoveLollipop(handleList);	
-				break;
-			}
-			case R.id.rubbishbin_list_option_properties_layout: 
-			case R.id.rubbishbin_grid_option_properties_layout: {
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
-				i.putExtra("handle", selectedNode.getHandle());
-				
-				if (selectedNode.isFolder()) {
-					if (megaApi.isShared(selectedNode)){
-						i.putExtra("imageId", R.drawable.folder_shared_mime);	
-					}
-					else{
-						i.putExtra("imageId", R.drawable.folder_mime);
-					}
-				} 
-				else {
-					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
-				}
-				i.putExtra("name", selectedNode.getName());
-				context.startActivity(i);
-				notifyDataSetChanged();
-				break;
-			}
-			case R.id.rubbishbin_list_option_remove_layout: 
-			case R.id.rubbishbin_grid_option_remove_layout: {
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).moveToTrash(handleList);
 				break;
 			}
 		}
@@ -765,14 +551,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				MegaNode n = nodes.get(position);
 				
 				aB.setTitle(n.getName());
-				log("aB.setHomeAsUpIndicator_46");
+				log("indicator_arrow_back_190");
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				
 				parentHandle = nodes.get(position).getHandle();
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(getInfoFolder(infoNode));
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -802,7 +588,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
+					intent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -817,7 +603,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
 				}
 			}
 		}
@@ -885,35 +672,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public int onBackPressed(){
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
-		
+
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 		
@@ -945,7 +704,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				}
 				else{
 					aB.setTitle(parentNode.getName());
-					log("aB.setHomeAsUpIndicator_48");
+					log("indicator_arrow_back_191");
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				}
@@ -970,7 +729,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			        }
 			    });
 				adapter.setParentHandle(parentHandle);
-				contentText.setText(getInfoFolder(parentNode));
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				return 2;
 			}
 			else{
@@ -979,51 +738,24 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		}
 	}
 	
-	private String getInfoFolder(MegaNode n) {
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ context.getResources().getQuantityString(
-								R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ context.getResources().getQuantityString(
-							R.plurals.general_num_files, numFiles);
-		}
-
-		return info;
-	}
-	
 	public void setContentText(){
 		log("setContentText");
 		if (parentHandle == megaApi.getRubbishNode().getHandle()){
 			MegaNode infoNode = megaApi.getRubbishNode();
 			if (infoNode !=  null){
-				contentText.setText(getInfoFolder(infoNode));
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 			if (infoNode !=  null){
-				contentText.setText(getInfoFolder(infoNode));
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}
 		}
 	}
 	
 	public void setIsList(boolean isList){
+		log("setIsList");
 		this.isList = isList;
 	}
 	
@@ -1148,6 +880,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapter!=null){
+			adapter.setPositionClicked(-1);
+		}
 	}
 	
 	public int getItemCount(){

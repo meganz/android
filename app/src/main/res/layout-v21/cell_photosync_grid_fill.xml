@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="7dp"
-    android:background="@color/grid_background">
+    android:background="@color/white">
     
     <ImageButton
      android:id="@+id/cell_photosync_grid_thumbnail"
@@ -11,7 +11,7 @@
      android:layout_height="110dp"
      android:scaleType="fitCenter"
      android:layout_margin="3dp"
-     android:background="@color/grid_background"
+     android:background="@color/white"
      android:layout_centerHorizontal="true"/>
     
     <ImageView
@@ -58,7 +58,7 @@
     	android:id="@+id/cell_photosync_item_layout_empty"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:background="@color/grid_background">
+    	android:background="@color/white">
 	</RelativeLayout>
         
 </RelativeLayout>

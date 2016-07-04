@@ -1,29 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -33,10 +9,8 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
@@ -55,6 +29,32 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
 
@@ -410,7 +410,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
-			mLayoutManager = new LinearLayoutManager(this);
+			mLayoutManager = new MegaLinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 			
@@ -513,7 +513,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	
 	public void showOptionsPanel(MegaShare sShare){
-		log("showOptionsPanel");
+		log("showNodeOptionsPanel");
 		
 //		fabButton.setVisibility(View.GONE);
 		
@@ -827,7 +827,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
-				i.setAction(ManagerActivityLollipop.ACTION_REFRESH_PARENTHANDLE_BROWSER);
+				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
 				i.putExtra("parentHandle", node.getHandle());
 				startActivity(i);
 				finish();

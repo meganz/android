@@ -1,12 +1,5 @@
 package mega.privacy.android.app;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiJava;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +8,13 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.util.Base64;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiJava;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -72,6 +72,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud";
 	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
 	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
+	private static final String KEY_FILE_LOGGER = "filelogger";
     
     private static DatabaseHandler instance;
     
@@ -126,7 +127,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
-        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN"+")";
+        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER +" TEXT " + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
         
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -307,6 +308,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CLOUD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + " = '" + encrypt("false") + "';");
 		}
 	} 
 	
@@ -505,6 +509,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
+		values.put(KEY_FILE_LOGGER, encrypt(attr.getFileLogger()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -519,11 +524,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String intents =  decrypt(cursor.getString(2));
 			String askSizeDownload = decrypt(cursor.getString(3));
 			String askNoAppDownload = decrypt(cursor.getString(4));
+			String fileLogger = decrypt(cursor.getString(5));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger);
 			}
 		}
 		cursor.close();
@@ -612,7 +618,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public long setOfflineFile (MegaOffline offline){
-		
+		log("setOfflineFile");
         ContentValues values = new ContentValues();
         
         MegaOffline checkInsert = null;
@@ -1634,6 +1640,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attemp) + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setFileLogger (boolean fileLogger){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + "='" + encrypt(fileLogger + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_FILE_LOGGER, encrypt(fileLogger + ""));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();

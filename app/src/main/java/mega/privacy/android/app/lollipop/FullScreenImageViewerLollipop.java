@@ -1,35 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.security.spec.MGF1ParameterSpec;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.FileStorageActivity;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.ExtendedViewPager;
-import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -39,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,14 +22,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
@@ -71,12 +37,40 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.ExtendedViewPager;
+import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
 	
@@ -223,7 +217,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		MegaNode parentNode;		
 		
 		adapterType = intent.getIntExtra("adapterType", 0);
-		if (adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER){
+		if (adapterType == Constants.OFFLINE_ADAPTER){
 			mOffList = new ArrayList<MegaOffline>();
 			
 			String pathNavigation = intent.getStringExtra("pathNavigation");
@@ -276,21 +270,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if(!mOffList.isEmpty()) {
 					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 					if(!(lastItem.getHandle().equals("0"))){
-						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}	
 				}
 				else{
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
 					log("Export in: "+path);
 					File file= new File(path);
 					if(file.exists()){
-						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
 						mOffList.add(masterKeyFile);
 					}
 				}
@@ -351,7 +345,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 			}			
 		}				
-		else if (adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
+		else if (adapterType == Constants.ZIP_ADAPTER){
 			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 		
 			File offlineDirectory = new File(offlinePathDirectory);
@@ -401,7 +395,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			if(adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
+			if(adapterType == Constants.ZIP_ADAPTER){
 				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(fullScreenImageViewer, paths, true);
 			}
 			
@@ -433,11 +427,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
 		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		}
-		else if(adapterType == ManagerActivityLollipop.SEARCH_ADAPTER){
+		else if(adapterType == Constants.SEARCH_ADAPTER){
 			ArrayList<MegaNode> nodes = null;
 			if (parentNodeHandle == -1){
 				String query = intent.getStringExtra("searchQuery");
-				nodes = megaApi.search(megaApi.getRootNode(), query, true);
+				nodes = megaApi.search(query);
 			}
 			else{
 				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
@@ -532,19 +526,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (parentNodeHandle == -1){
 	
 				switch(adapterType){
-					case ManagerActivityLollipop.FILE_BROWSER_ADAPTER:{
+					case Constants.FILE_BROWSER_ADAPTER:{
 						parentNode = megaApi.getRootNode();
 						break;
 					}
-					case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER:{
+					case Constants.RUBBISH_BIN_ADAPTER:{
 						parentNode = megaApi.getRubbishNode();
 						break;
 					}
-					case ManagerActivityLollipop.SHARED_WITH_ME_ADAPTER:{
+					case Constants.SHARED_WITH_ME_ADAPTER:{
 						parentNode = megaApi.getInboxNode();
 						break;
 					}
-					case ManagerActivityLollipop.FOLDER_LINK_ADAPTER:{
+					case Constants.FOLDER_LINK_ADAPTER:{
 						parentNode = megaApi.getRootNode();
 						break;
 					}
@@ -873,7 +867,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = newPosition;
 				
 				try{
-					if ((adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER) || (adapterType == ManagerActivityLollipop.ZIP_ADAPTER)){
+					if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
 						
 					}
 					else{
@@ -893,7 +887,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onClick(View v) {
 		
-		if (adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER){
+		if (adapterType == Constants.OFFLINE_ADAPTER){
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
 					finish();
@@ -925,7 +919,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		else if (adapterType == ManagerActivityLollipop.ZIP_ADAPTER){
+		else if (adapterType == Constants.ZIP_ADAPTER){
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
 					finish();
@@ -1013,7 +1007,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions(this,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+									Constants.REQUEST_WRITE_STORAGE);
 							
 							handleListM.add(node.getHandle());
 							
@@ -1038,7 +1032,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
-        	case ManagerActivityLollipop.REQUEST_WRITE_STORAGE:{
+        	case Constants.REQUEST_WRITE_STORAGE:{
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					downloadNode(handleListM);
@@ -1170,7 +1164,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		super.onSaveInstanceState(savedInstanceState);
 
 		savedInstanceState.putInt("adapterType", adapterType);
-		if ((adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER) || (adapterType == ManagerActivityLollipop.ZIP_ADAPTER)){
+		if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
 			
 		}
 		else{
@@ -1185,7 +1179,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		
 		adapterType = savedInstanceState.getInt("adapterType");
 		
-		if ((adapterType == ManagerActivityLollipop.OFFLINE_ADAPTER) || (adapterType == ManagerActivityLollipop.ZIP_ADAPTER)){
+		if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
 			
 		}
 		else{
@@ -1246,7 +1240,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void showRenameDialog(){
 		
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-		input.setId(EDIT_TEXT_ID);
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setText(node.getName());
 
@@ -1815,7 +1809,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		
@@ -1856,12 +1850,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String message = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();

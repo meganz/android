@@ -1,31 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiJava;
-
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,6 +21,28 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiJava;
 
 
 public class ZipBrowserActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
@@ -303,7 +303,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			
 		}
 		else{
-			
 			aB.setTitle("ZIP "+currentFolder);
 			//currentFolder="";
 			
@@ -335,19 +334,19 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 
 				e.printStackTrace();
 			} 	
-		}			
+		}
 		
-			/*			
+
 		if (adapterList == null){
 			adapterList = new ZipListAdapterLollipop(this, listView, aB, zipNodes, currentFolder);
 			
 		}
 		else{
-			//adapterList.setParentHandle(parentHandle);
-			//adapterList.setNodes(nodes);
+//			adapterList.setParentHandle(parentHandle);
+//			adapterList.setNodes(nodes);
 		}		
 
-		listView.setAdapter(adapterList);*/		
+		listView.setAdapter(adapterList);
 	}
 	
 	@Override
@@ -356,7 +355,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				finish();
+				onBackPressed();
 				return true;
 			}
 		}
@@ -365,7 +364,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 	
 	public void openFile(int position) {
 		log("openFile");
-	
 		
 		if (dbH == null){
 //			dbH = new DatabaseHandler(getApplicationContext());
@@ -387,19 +385,23 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		}		
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
-		 if(!folderzipped){			 
-			 int index = pathZip.lastIndexOf(".");
-			 absolutePath = pathZip.substring(0, index);		
-			 absolutePath = absolutePath +"/"+currentPath;
-		 }
-		
+		if(!folderzipped){
+			log("folderzipped = "+folderzipped);
+			int index = pathZip.lastIndexOf(".");
+			absolutePath = pathZip.substring(0, index);
+			absolutePath = absolutePath +"/"+currentPath;
+		}
+		else{
+			log("folderzipped = "+folderzipped);
+		}
 		
 		log("The absolutePath of the file to open is: "+absolutePath);
 		 
 		if (MimeTypeList.typeForName(absolutePath).isImage()){
+			log("isImage");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra("position", position);
-			intent.putExtra("adapterType", ManagerActivityLollipop.ZIP_ADAPTER);
+			intent.putExtra("adapterType", Constants.ZIP_ADAPTER);
 			intent.putExtra("parentNodeHandle", -1L);			
 			File currentFile = new File(absolutePath);			
 			intent.putExtra("offlinePathDirectory", currentFile.getParent());
@@ -417,15 +419,16 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 //			this.startActivity(intentPdf);
 //			
 //		}
-		else{							
+		else{
+			log("NOT Image");
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
-			if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+			if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 				startActivity(viewIntent);
 			else{
 				Intent intentShare = new Intent(Intent.ACTION_SEND);
 				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
-				if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+				if (MegaApiUtils.isIntentAvailable(this, intentShare))
 					startActivity(intentShare);
 				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;
 				Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();

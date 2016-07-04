@@ -4,7 +4,7 @@
     android:id="@+id/contact_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grid_background"
+    android:background="@color/white"
     android:layout_centerHorizontal="true">
     
     <RelativeLayout 
@@ -185,6 +185,6 @@
     	android:id="@+id/contact_cell_item_layout_empty"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:background="@color/grid_background">
+    	android:background="@color/white">
 	</RelativeLayout>
 </RelativeLayout>

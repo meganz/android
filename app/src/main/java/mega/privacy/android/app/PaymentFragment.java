@@ -1,6 +1,22 @@
 package mega.privacy.android.app;
 
-import java.io.File;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -12,35 +28,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class PaymentFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
 	
@@ -283,7 +270,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							aB.setTitle(getString(R.string.pro1_account));
 		
 							storage.setText(account.getStorage()+"GB");		            
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
@@ -297,9 +284,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 								perMonth.setText(perMonthString+" €");
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -334,7 +321,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							aB.setTitle(getString(R.string.pro2_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");	
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
@@ -348,9 +335,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 								perMonth.setText(perMonthString+" €");
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -385,7 +372,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							aB.setTitle(getString(R.string.pro3_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");        
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
@@ -399,9 +386,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 								perMonth.setText(perMonthString+" €");
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -738,7 +725,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							aB.setTitle(getString(R.string.pro1_account));
 		
 							storage.setText(account.getStorage()+"GB");	
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
@@ -752,9 +739,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 								perMonth.setText(perMonthString+" €");
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -797,7 +784,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							aB.setTitle(getString(R.string.pro2_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");		            
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
@@ -811,9 +798,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 								perMonth.setText(perMonthString+" €");
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}
@@ -856,7 +843,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							aB.setTitle(getString(R.string.pro3_account));
 		
 							storage.setText(account.getStorage()/1024+"TB");     
-							storage.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							storage.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		
 							if(account.getMonths()==12){
 								double perYearF=account.getAmount()/100.00;
@@ -870,9 +857,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 								perMonth.setText(perMonthString+" €");
 								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-								bandwidth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								bandwidth.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-								pricingFrom.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+								pricingFrom.setTextColor(context.getResources().getColor(R.color.lollipop_primary_color));
 							}
 						}
 					}

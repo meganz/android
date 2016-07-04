@@ -2,7 +2,7 @@
     android:id="@+id/offline_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grid_background">
+    android:background="@color/new_background_fragment">
     
     <RelativeLayout 
         android:layout_width="172dp"
@@ -25,12 +25,9 @@
         
         <View
 	        android:id="@+id/offline_grid_separator"
-	 		android:layout_width="wrap_content"
+	 		android:layout_width="match_parent"
 	 		android:layout_height="1dp"
-	 		android:background="@color/grid_item_separator"
-	        android:scaleType="fitCenter"
-	        android:layout_marginLeft="6dp"
-	        android:layout_centerHorizontal="true"
+	 		android:background="@color/new_background_fragment"
 	        android:layout_below="@id/offline_grid_thumbnail"
 	 		 />
         

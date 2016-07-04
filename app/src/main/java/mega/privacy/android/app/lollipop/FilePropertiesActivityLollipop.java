@@ -1,39 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import com.nirhart.parallaxscroll.views.ParallaxScrollView;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -66,28 +32,58 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ListView;
-import android.widget.RelativeLayout.LayoutParams;
-import android.widget.TextView.OnEditorActionListener;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import com.nirhart.parallaxscroll.views.ParallaxScrollView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi")
@@ -97,8 +93,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	static int TYPE_EXPORT_REMOVE = 1;
 	static int TYPE_EXPORT_MANAGE = 2;
 	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
+	static public int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
+	static public int FROM_INBOX= 16;
 	
 	RelativeLayout imageLayout;
 	ImageView toolbarBack;
@@ -164,7 +161,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	TextView ownerInfo;	
 	ImageView ownerIcon;
 
-	ArrayList<MegaNode> dTreeList = null;
+//	ArrayList<MegaNode> dTreeList = null;
 	
 	MegaNode node;
 	long handle;
@@ -528,7 +525,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	private void refreshProperties(){		
-		log("refresh");
+		log("refreshProperties");
 	
 		boolean result=true;
 		
@@ -602,7 +599,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			contentTextView.setVisibility(View.VISIBLE);
 			contentTitleTextView.setVisibility(View.VISIBLE);
 			
-			contentTextView.setText(getInfoFolder(node));
+			contentTextView.setText(MegaApiUtils.getInfoFolder(node, this));
 			
 			long sizeFile=megaApi.getSize(node);				
 			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));				
@@ -788,8 +785,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				} else {
 					log("NOT INCOMING");
 					//Find in the filesystem
+					//Path MEGA
+					String pathMega = megaApi.getNodePath(node);
+					if(from==FROM_INBOX){
+						pathMega = pathMega.replace("/in", "");
+					}
 					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + pathMega);
 						log("offline File: " + offlineFile.getAbsolutePath());
 					} else {
 						offlineFile = this.getFilesDir();
@@ -902,7 +904,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		    		File destination = null;
 					File offlineFile = null;
 					if (Environment.getExternalStorageDirectory() != null){
-						destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+						destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 					}
 					else{
 						destination = new File(getFilesDir(), node.getHandle()+"");
@@ -931,7 +933,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					}
 		    		Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
-					if (ManagerActivityLollipop.isIntentAvailable(this, intent)){
+					if (MegaApiUtils.isIntentAvailable(this, intent)){
 						startActivity(intent);
 					}
 					else{
@@ -974,11 +976,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				availableOfflineBoolean = true;
 				offlineSwitch.setChecked(true);	
 				
-				log("Path destination: "+Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+				log("Path destination: "+Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 				
 				File destination = null;
 				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 				}
 				else{
 					destination = getFilesDir();
@@ -1025,7 +1027,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						log("ParentHandleIncoming: "+megaNode.getName());
 					}
 					String handleString = Long.toString(result);
-					String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+createStringTree(node);
+					String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+MegaApiUtils.createStringTree(node, this);
 					log("Not owner path destination: "+destinationPath);
 					
 					File destination = null;
@@ -1078,7 +1080,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 
@@ -2064,79 +2066,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 	}
-	
-	private String getInfoFolder (MegaNode n){
-		int numFolders = megaApi.getNumChildFolders(n);
-		int numFiles = megaApi.getNumChildFiles(n);
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		
-		return info;
-	}
-	
-	private String createStringTree (MegaNode node){
-		log("createStringTree");
-		dTreeList = new ArrayList<MegaNode>();
-		MegaNode parentNode = null;
-		MegaNode nodeTemp = node;
-		StringBuilder dTree = new StringBuilder();
-		String s;
-		
-		dTreeList.add(node);
-		
-		if(node.getType() != MegaNode.TYPE_ROOT){
-			parentNode=megaApi.getParentNode(nodeTemp);
-			
-//			if(parentNode!=null){
-//				while (parentNode.getType() != MegaNode.TYPE_ROOT){
-//					if(parentNode!=null){
-//						dTreeList.add(parentNode);
-//						dTree.insert(0, parentNode.getName()+"/");	
-//						nodeTemp=parentNode;
-//						parentNode=megaApi.getParentNode(nodeTemp);
-//					}					
-//				}
-//			}
-			
-			if(parentNode!=null){
-				
-				if(parentNode.getType() != MegaNode.TYPE_ROOT){					
-					do{
-						
-						dTreeList.add(parentNode);
-						dTree.insert(0, parentNode.getName()+"/");	
-						nodeTemp=parentNode;
-						parentNode=megaApi.getParentNode(nodeTemp);
-						if(parentNode==null){
-							break;
-						}					
-					}while (parentNode.getType() != MegaNode.TYPE_ROOT);
-				
-				}				
-			}
-		
-		}			
-		
-		if(dTree.length()>0){
-			s = dTree.toString();
-		}
-		else{
-			s="";
-		}
-			
-		log("createStringTree: "+s);
-		return s;
-	}
-	
+
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");		
@@ -2171,7 +2101,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			node = megaApi.getNodeByHandle(handle);
 		}
 		supportInvalidateOptionsMenu();
-		
+
+		if (node == null){
+			return;
+		}
+
 		if(node.isExported()){
 			log("Node HAS public link");
 			publicLink=true;
@@ -2334,7 +2268,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-		                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
+						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 		
@@ -2374,12 +2308,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
+							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Snackbar.make(container, toastMessage, Snackbar.LENGTH_LONG).show();
@@ -2466,7 +2400,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	    		File destination = null;
 				File offlineFile = null;
 				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
 				}
 				else{
 					destination = new File(getFilesDir(), node.getHandle()+"");
@@ -2495,7 +2429,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				}
 	    		Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
-				if (ManagerActivityLollipop.isIntentAvailable(this, intent)){
+				if (MegaApiUtils.isIntentAvailable(this, intent)){
 					startActivity(intent);
 				}
 				else{

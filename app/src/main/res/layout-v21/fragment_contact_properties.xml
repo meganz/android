@@ -17,7 +17,8 @@
             android:id="@+id/contact_properties_main_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:background="@color/white">
 
             <RelativeLayout
                 android:id="@+id/contact_properties_image_layout"
@@ -27,10 +28,10 @@
                 android:fitsSystemWindows="true" >
 
                 <RelativeLayout
+                    android:id="@+id/color_avatar_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_collapseMode="parallax"
-                    android:background="@color/lollipop_primary_color"
                     android:fitsSystemWindows="true" >
 
                     <TextView
@@ -54,7 +55,8 @@
             <RelativeLayout
                 android:id="@+id/contact_properties_name_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" 
+                android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:layout_below="@id/contact_properties_image_layout">
 
                 <ImageView
@@ -78,7 +80,7 @@
             
             <RelativeLayout
                 android:id="@+id/contact_properties_email_layout"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/contact_properties_name_layout"
                 android:background="@color/white"
@@ -93,7 +95,7 @@
 
                 <RelativeLayout
                     android:id="@+id/contact_properties_email_text_layout"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:layout_centerVertical="true"
@@ -112,16 +114,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/contact_properties_email_label"
-                        android:textColor="@color/file_properties_info_menu" />
+                        android:textColor="@color/grey_info_menu" />
                 </RelativeLayout>
             </RelativeLayout>
 
-            <View
-                android:id="@+id/divider_shared_layout"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:layout_below="@id/contact_properties_email_layout"
-                android:background="@color/separator_grey" />
+                android:id="@+id/divider_shared_layout_rl">
+
+                <View
+                    android:id="@+id/divider_shared_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grid_item_separator" />
+            </RelativeLayout>
 
             <!-- SHARED LAYOUT -->
 
@@ -129,7 +138,8 @@
                 android:id="@+id/contact_properties_shared_folders_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/divider_shared_layout" >
+                android:background="@color/white"
+                android:layout_below="@id/divider_shared_layout_rl" >
 
                 <ImageView
                     android:id="@+id/contact_properties_shared_folder_icon"

@@ -106,6 +106,8 @@
         <item name="android:textColorPrimary">@color/text_secondary</item>
         <item name="android:background">@color/white</item>
         <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
     </style>
     
 </resources>

@@ -16,16 +16,26 @@
         android:background="@color/delimiterColor" />
 
     <TextView
-        android:id="@+id/overquota_alert_text"
+        android:id="@+id/overquota_alert_text_first"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:gravity="center"
-        android:text="@string/warning_out_space"
-        android:textColor="@color/black"
+        android:gravity="left"
+        android:text="@string/title_new_warning_out_space"
+        android:textColor="@color/name_my_account"
         android:textSize="16sp"
         android:textStyle="bold" />
-       
+
+    <TextView
+        android:id="@+id/overquota_alert_text_second"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="left"
+        android:text="@string/new_warning_out_space"
+        android:textColor="@color/name_my_account"
+        android:textSize="16sp"/>
+
     <LinearLayout
         android:id="@+id/overquota_alert_buttons_layout"
         android:layout_width="fill_parent"
@@ -35,13 +45,35 @@
         android:background="@color/white"
         android:orientation="horizontal" >
 
-        <TextView
+        <Button
+            android:id="@+id/overquota_alert_btnLeft_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="14sp"
+            android:textColor="@color/accentColor"
+            android:text="@string/general_cancel"
+            android:background="@color/white"/>
+
+        <Button
             android:id="@+id/overquota_alert_btnRight_upgrade"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_vertical|center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="14sp"
             android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:text="@string/my_account_upgrade_pro_panel"
+            android:background="@color/white"/>
     </LinearLayout>
+
 </LinearLayout>

@@ -64,7 +64,7 @@
         <item name="android:layout_height">wrap_content</item>
                 
         <item name="android:background">@drawable/btn_default_holo_light</item>
-	    <item name="android:textColor">@color/button_text</item>
+	    <item name="android:textColor">@color/white</item>
     </style>
         
     <style name="CheckBox_MEGA">
@@ -85,7 +85,7 @@
         <item name="android:layout_height">wrap_content</item>
                 
         <item name="android:background">@drawable/btn_default_holo_light_inverse</item>
-	    <item name="android:textColor">@color/button_text</item>
+	    <item name="android:textColor">@color/white</item>
     </style>
     
     <style name="checkbox_MEGA" parent="android:Widget.CompoundButton.CheckBox">

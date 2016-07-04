@@ -754,12 +754,16 @@ public class ThumbnailUtilsLollipop {
 		if (thumbDir == null) {
 			if (context.getExternalCacheDir() != null){
 				thumbDir = new File (context.getExternalCacheDir(), "thumbnailsMEGA");
-				thumbDir.mkdirs();
 			}
 			else{
 				thumbDir = context.getDir("thumbnailsMEGA", 0);
 			}
 		}
+
+		if (thumbDir != null){
+			thumbDir.mkdirs();
+		}
+
 		log("getThumbFolder(): thumbDir= " + thumbDir);
 		return thumbDir;
 	}

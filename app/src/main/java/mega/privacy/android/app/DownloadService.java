@@ -1,5 +1,27 @@
 package mega.privacy.android.app;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
+import android.os.Environment;
+import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.support.v4.app.NotificationCompat;
+import android.text.format.Formatter;
+import android.util.SparseArray;
+import android.widget.RemoteViews;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,10 +30,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -23,34 +47,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.database.Cursor;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
-import android.os.IBinder;
-import android.os.ParcelFileDescriptor;
-import android.os.PowerManager;
-import android.os.StatFs;
-import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
-import android.support.v4.app.NotificationCompat;
-import android.text.format.Formatter;
-import android.util.SparseArray;
-import android.view.View;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 
 /*
@@ -96,6 +92,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
+	MegaApiAndroid megaApiFolder;
 	
 	WifiLock lock;
 	WakeLock wl;
@@ -138,7 +135,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		
+		megaApiFolder = app.getMegaApiFolder();
+
 		successCount = 0;
 		
 		totalToDownload = 0;
@@ -205,6 +203,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Cancel intent");
 				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+				megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
 				return START_NOT_STICKY;
 			}
 		}
@@ -272,14 +271,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			pathFileToOpen=null;
 		}
 		
+//		if (isFolderLink){
+//			megaApi = app.getMegaApiFolder();
+//		}
+//		else{
+//			megaApi = app.getMegaApi();
+//		}
+
+		megaApi = app.getMegaApi();
+
 		if (isFolderLink){
-			megaApi = app.getMegaApiFolder();
+			currentDocument = megaApiFolder.getNodeByHandle(hash);
 		}
 		else{
-			megaApi = app.getMegaApi();
+			currentDocument = megaApi.getNodeByHandle(hash);
 		}
-		
-		currentDocument = megaApi.getNodeByHandle(hash);		
 	
 		if((currentDocument == null) && (url == null)){
 			log("Node not found");
@@ -339,8 +345,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("currentDir is not a directory");
 			}	
 			storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
-			
-			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+
+			if (isFolderLink){
+				megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+			}
+			else{
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+			}
 		}
 		else{
 			if (currentDir.isDirectory()){
@@ -362,6 +373,52 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 				}
 
+				if (currentDocument.isFolder()){
+					log("IS FOLDER_:_");
+				}
+				else{
+					log("IS FILE_:_");
+				}
+
+				if (isFolderLink){
+					if (currentDocument.isFolder()){
+						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+						return;
+					}
+					else{
+//						if (dbH == null){
+//							dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//						}
+//
+//						if (dbH == null){
+//							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//							log("dBH is null");
+//							return;
+//						}
+//
+//						if (dbH.getCredentials() == null){
+//							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//							log("No credentials");
+//							return;
+//						}
+//
+						if (megaApi.getRootNode() == null){
+							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+							log("Root node is null");
+							return;
+						}
+
+						log("Root node is not null");
+						currentDocument = megaApiFolder.authorizeNode(currentDocument);
+						if (currentDocument == null){
+							log("CurrentDocument is null");
+							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+							return;
+						}
+					}
+				}
+
+				log("CurrentDocument is not null");
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 							
 			}
@@ -499,23 +556,35 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Download success of zip file!");				
 					
 					if(pathFileToOpen!=null){
-//						Intent intentZip = new Intent(this, ZipBrowserActivity.class);
-//						intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
-//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//						intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-//						intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-//						intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-//						startActivity(intentZip);
-						
+						Intent intentZip;
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+							intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+						}
+						else{
+							intentZip = new Intent(this, ZipBrowserActivity.class);
+							intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+						}
+
+						if(intentZip!=null){
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intentZip);
+						}
 					}
 					else{
 						Intent intentZip = null;
 						
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
 							intentZip = new Intent(this, ManagerActivityLollipop.class);
-							intentZip.setAction(ManagerActivityLollipop.ACTION_EXPLORE_ZIP);
+							intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
 							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							intentZip.putExtra(ManagerActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
 						}
 						else{
 							intentZip = new Intent(this, ManagerActivity.class);
@@ -539,7 +608,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -567,7 +636,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -596,7 +665,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							.getType());
 					
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-						if (!ManagerActivityLollipop.isIntentAvailable(DownloadService.this, intent)){
+						if (!MegaApiUtils.isIntentAvailable(DownloadService.this, intent)){
 							intent.setAction(Intent.ACTION_SEND);
 							intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 									.getType());
@@ -689,10 +758,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());	
 			}
 			if (dbH.getCredentials() == null){
-				intent.setAction(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD);
+				intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
 			}
 			else{
-				intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
+				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 			}
 		}
 		else{
@@ -1009,12 +1078,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (megaApi.checkAccess(nodeToInsert, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 				
 				if(megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT){
-					
+
 					parentNode = megaApi.getParentNode(nodeToInsert);
 					log("ParentNode: "+parentNode.getName());
 					log("PARENT NODE nooot ROOT");
 
-					path = createStringTree(nodeToInsert);
+					path = MegaApiUtils.createStringTree(nodeToInsert, this);
 					if(path==null){
 						path="/";
 					}
@@ -1078,7 +1147,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				parentNode = megaApi.getParentNode(nodeToInsert);
 				log("ParentNode: "+parentNode.getName());
 
-				path = createStringTree(nodeToInsert);
+				path = MegaApiUtils.createStringTree(nodeToInsert, this);
 				if(path==null){
 					path="/";
 				}
@@ -1159,7 +1228,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("insertIncomingParentDB: Check SaveOffline: "+parentNode.getName());
 		
 		MegaOffline mOffParentParent = null;
-		String path=createStringTree(parentNode);
+		String path=MegaApiUtils.createStringTree(parentNode, this);
 		if(path==null){
 			path="/";
 		}
@@ -1260,7 +1329,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("insertParentDB: Check SaveOffline: "+parentNode.getName());
 		
 		MegaOffline mOffParentParent = null;
-		String path=createStringTree(parentNode);
+		String path=MegaApiUtils.createStringTree(parentNode, this);
 		if(path==null){
 			path="/";
 		}
@@ -1270,21 +1339,42 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		MegaNode parentparentNode = megaApi.getParentNode(parentNode);
 		if(parentparentNode==null){
+			log("return insertParentDB");
 			return;
 		}		
 		
 		if(parentparentNode.getType() != MegaNode.TYPE_ROOT){
+
+
+			if(parentparentNode.getHandle()==megaApi.getInboxNode().getHandle()){
+				log("En algun momento!!!");
+				log("---------------PARENT NODE INBOX------");
+				if(parentNode.isFile()){
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, false, "-1");
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert M: "+checkInsert);
+				}
+				else{
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, false, "-1");
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert N: "+checkInsert);
+				}
+				return;
+			}
 			
 			mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
-			if(mOffParentParent==null){						
+			if(mOffParentParent==null){
+				log("mOffParentParent==null");
 				insertParentDB(megaApi.getParentNode(parentNode));
 				//Insert the parent node
 				mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
-				if(mOffParentParent==null){						
+				if(mOffParentParent==null){
+					log("call again");
 					insertParentDB(megaApi.getParentNode(parentNode));						
 					
 				}
-				else{			
+				else{
+					log("second check NOOOTTT mOffParentParent==null");
 					if(parentNode.isFile()){
 						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false, "-1");
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
@@ -1298,7 +1388,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}	
 			}
 			else{
-
+				log("NOOOTTT mOffParentParent==null");
 				if(parentNode.isFile()){
 					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false, "-1");
 					long checkInsert=dbH.setOfflineFile(mOffInsert);
@@ -1323,63 +1413,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				long checkInsert=dbH.setOfflineFile(mOffInsert);
 				log("Test insert N: "+checkInsert);
 			}						
-		}			
-		
-	}
+		}
 
-	
-	private String createStringTree (MegaNode node){
-		log("createStringTree");
-		dTreeList = new ArrayList<MegaNode>();
-		MegaNode parentNode = null;
-		MegaNode nodeTemp = node;
-		StringBuilder dTree = new StringBuilder();
-		String s;
-		
-		dTreeList.add(node);
-		
-		if(node.getType() != MegaNode.TYPE_ROOT){
-			parentNode=megaApi.getParentNode(nodeTemp);
-	
-//			if(parentNode!=null){
-//				while (parentNode.getType() != MegaNode.TYPE_ROOT){
-//					if(parentNode!=null){
-//						dTreeList.add(parentNode);
-//						dTree.insert(0, parentNode.getName()+"/");	
-//						nodeTemp=parentNode;
-//						parentNode=megaApi.getParentNode(nodeTemp);
-//					}					
-//				}
-//			}
-			
-			if(parentNode!=null){
-				
-				if(parentNode.getType() != MegaNode.TYPE_ROOT){					
-					do{
-						
-						dTreeList.add(parentNode);
-						dTree.insert(0, parentNode.getName()+"/");	
-						nodeTemp=parentNode;
-						parentNode=megaApi.getParentNode(nodeTemp);
-						if(parentNode==null){
-							break;
-						}					
-					}while (parentNode.getType() != MegaNode.TYPE_ROOT);
-				
-				}				
-			}	
-			
-		}			
-		
-		if(dTree.length()>0){
-			s = dTree.toString();
-		}
-		else{
-			s="";
-		}
-			
-		log("createStringTree: "+s);
-		return s;
 	}
 
 	@Override

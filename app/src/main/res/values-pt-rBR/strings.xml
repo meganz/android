@@ -612,4 +612,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">A operação não tenha terminado correctamente. O cartão de crédito não será cobrado.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">As informações do cartão de crédito não está correto. O cartão de crédito não será cobrado.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Sua conta não pode ser atualizado a partir do aplicativo. Entre em contato com support@mega.nz para atualizar a sua conta.</string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Adicionar contato e compartilhar</string>
+    <string name="general_share" context="button">Partilhar</string>
+    <string name="general_remove" context="button">Remover</string>
+    <string name="general_confirm" context="button">Confirmar</string>
+    <string name="general_leave" context="button">Sair</string>
+    <string name="general_decryp" context="button">Descriptografar</string>
+    <string name="general_export" context="button">Exportar</string>
+    <string name="confirmation_required" context="Alert title before download">Confirmação obrigatória</string>
+    <string name="alert_larger_file" context="Alert text before download">%s será baixado. Você tem certeza?</string>
+    <string name="alert_no_app" context="Alert text before download">Você não tem o aplicativo capaz de abrir o arquivo %s. Você quer continuar com o download?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Não mostrar novamente</string>
+    <string name="lastname_text" context="Last name of the user">Último nome</string>
+    <string name="error_general_nodes" context="Error getting the root node">Erro. Por favor, tente novamente.</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">Exibir código fonte</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Adicionar um novo contato para iniciar o compartilhamento</string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">cartão SD interno</item>
+        <item context="external SD card option">cartão SD externo</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">Erro. Pasta não foi criada</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Lixeira esvaziada com êxito</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Erro. A lixeira não foi esvaziada</string>
+    <string name="sortby_owner_mail" context="category in sort by action">Email do proprietário</string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">Tipo de código PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">PIN de 4 dígitos</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">PIN de 6 dígitos</string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alfanumérico</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Pasta vazia</string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Envie para Inbox</string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">Erro. Não enviados a Caixa de entrada</string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">pedido enviado</string>
+    <string name="sortby_creation_date" context="category in sort by action">Data de criação</string>
+    <string name="sortby_modification_date" context="category in sort by action">Data de modificação</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invitar</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Você quer enviar um convite para %s?</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">solicitação de contato enviada com sucesso para %s. Você pode verificar o status na guia pedidos enviados.</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Faça logout antes de criar a conta</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs agora estão habilitados</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs agora estão desabilitados</string>
 </resources>

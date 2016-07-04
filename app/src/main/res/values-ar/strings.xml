@@ -641,4 +641,44 @@
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation has not finished correctly. The credit card will not be charged.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">معلومات بطاقة الائتمان غير صحيحة. لن يتم تحصيل رسوم من بطاقة الائتمان.</string>
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">حسابك لايمكن ترقيته من التطبيق. الرجاء الاتصال support@mega.nz لترقية حسابك </string>
+
+    <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">أضف جهة اتصال وشارك </string>
+    <string name="general_share" context="button">مشاركة</string>
+    <string name="general_remove" context="button">حذف</string>
+    <string name="general_confirm" context="button">تأكيد</string>
+    <string name="general_leave" context="button">ترك</string>
+    <string name="general_decryp" context="button">فك التشفير</string>
+    <string name="general_export" context="button">تصدير</string>
+    <string name="confirmation_required" context="Alert title before download">مطلوب تأكيد البريد الاليكتروني</string>
+    <string name="alert_larger_file" context="Alert text before download">%s سيتم تحميلهم، هل أنت متأكد؟ </string>
+    <string name="alert_no_app" context="Alert text before download">ليس لديك تطبيق قابل لفتح الملف %s؟. هل تريد الاستمرار في التحميل؟</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">لا تظهر مرة أخرى</string>
+    <string name="lastname_text" context="Last name of the user">اسم العائلة</string>
+    <string name="error_general_nodes" context="Error getting the root node">خطأ، الرجاء المحاولة ثانية</string>
+    <string name="settings_about_code_link_title" context="Link to the public code of the app">عرض مصدر الكود </string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">أضف جهة اتصال جديدة لبدء المشاركة </string>
+    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
+        <item context="internal SD card option">ذاكرة SD داخلية</item>
+        <item context="external SD card option">ذاكرة SD خارجية</item>
+    </string-array>
+    <string name="context_folder_no_created" context="error message when creating a folder">خطأ، لم ينشأ المجلد </string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">تم إفراغ سلة المحذوفات بنجاح </string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">خطأ. لم يتم إفراغ سلة المحذوفات </string>
+    <string name="sortby_owner_mail" context="category in sort by action">رسائل بريد المالك </string>
+    <string name="pin_lock_type" context="title to choose the type of PIN code">نوع  كود PIN</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">كود PIN من أربعة أرقام </string>
+    <string name="six_pin_lock" context="PIN with 6 digits">كود PIN من ستة أرقام </string>
+    <string name="AN_pin_lock" context="PIN alphanumeric">كود PIN مكون من أرقام وأحرف</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">مجلد فارغ </string>
+    <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">تم الإرسال لصندوق الوارد </string>
+    <string name="context_no_sent_node" context="error message when sending a node to Inbox">خطأ، لم ترسل لصندوق الوارد </string>
+    <string name="context_contact_invitation_sent" context="success message when sending a contact request">تم إرسال الطلب</string>
+    <string name="sortby_creation_date" context="category in sort by action">تاريخ الإنشاء </string>
+    <string name="sortby_modification_date" context="category in sort by action">تاريخ التعديل </string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">دعوة</string>
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">هل تريد إرسال دعوة إلى %s؟</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">تم بنجاح إرسال طلب جهة اتصال إلى %s؟. تستطيع مراجعة الحالة في بند "الطلبات المرسلة"</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">الرجاء تسجيل الخروج قبل إنشاء الحساب </string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">السجلات تم تفعيلها </string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">السجلات تم إيقافها </string>
 </resources>
