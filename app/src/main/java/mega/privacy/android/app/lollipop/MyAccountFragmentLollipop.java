@@ -371,6 +371,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setAccountDetails(){
 		log("setAccountDetails");
+
+		if(context==null){
+			log("Context is NULL");
+			return;
+		}
 		//Set account details
 		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
 			typeAccount.setText(getString(R.string.recovering_info));
@@ -783,7 +788,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.success_changing_user_mail), getString(R.string.change_mail_title_last_step));
 			}
 			else{
-				log("ERROR when changing email: "+e.getErrorString());
+				log("ERROR when changing email: "+e.getErrorString()+ " "+e.getErrorCode());
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}

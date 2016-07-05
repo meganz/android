@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -31,6 +32,7 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -177,7 +179,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			super(v);
 		}
     	ImageView imageView;
-    	public View separator;
     }
     
 	ViewHolderContactsList holderList = null;
@@ -229,8 +230,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderGrid.textViewContactName = (TextView) v.findViewById(R.id.contact_grid_name);
 		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
-		    
-		    holderGrid.separator = (View) v.findViewById(R.id.contact_grid_separator);
 
 		    holderGrid.itemLayout.setTag(holderGrid);
 		    holderGrid.itemLayout.setOnClickListener(this);
@@ -272,17 +271,14 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
-				}
+									}
 			} 
 			else {
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		} 
 		else {
@@ -290,11 +286,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
-				holder.separator.setBackgroundColor(Color.WHITE);
 			}
 			else{
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		}
 
@@ -347,6 +341,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				bOpts.inPurgeable = true;
 				bOpts.inInputShareable = true;
 				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
 				if (bitmap == null) {
 					avatar.delete();
 					if (context.getExternalCacheDir() != null){
@@ -565,7 +560,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			p.setStyle(Paint.Style.FILL);
 
-	        c.drawRect(0, 0, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, p);
+			Path path = ThumbnailUtilsLollipop.getRoundedRect(0, 0, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT , Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, 10, 10,true, true, false, false);
+
+			c.drawPath(path,p);
+
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(defaultAvatar);
 		}
 
