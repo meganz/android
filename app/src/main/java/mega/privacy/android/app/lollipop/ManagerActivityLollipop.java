@@ -6803,7 +6803,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		expiryDateButton = (Button) dialoglayout.findViewById(R.id.expiry_date);
 		LinearLayout.LayoutParams paramsExpiryDate = (LinearLayout.LayoutParams)expiryDateButton.getLayoutParams();
-		paramsExpiryDate.setMargins(Util.scaleWidthPx(22, outMetrics), 0, 0, 0);
+		paramsExpiryDate.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, 0);
 		expiryDateButton.setLayoutParams(paramsExpiryDate);
 
 		final TextView linkText = (TextView) dialoglayout.findViewById(R.id.link);
@@ -6949,10 +6949,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		expiryDateButton.setText(formattedDate);
 		expiryDateButton.setVisibility(View.VISIBLE);
 
+		cal.add(Calendar.DATE, 1);
+		date = cal.getTime();
 		SimpleDateFormat dfTimestamp = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
 		String dateString = dfTimestamp.format(date);
 		log("the date string is: "+dateString);
-		dateString = dateString + "2359";
+		dateString = dateString + "0000";
 		int timestamp = (int) Util.calculateTimestamp(dateString);
 		log("the TIMESTAMP is: "+timestamp);
 		nC.exportLinkTimestamp(selectedNode, timestamp);
@@ -10621,11 +10623,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				MegaUser user=users.get(i);
 				if(user!=null){
 
-					if(user.isOwnChange()!=0){
+					if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
+						log("Avatar changed!!!");
+					}
+
+					if(user.isOwnChange()>0){
 						log("isOwnChange!!!: "+user.isOwnChange());
 						continue;
 					}
 					log("NOT OWN change: "+user.isOwnChange());
+					log("user: "+user.getEmail());
+					log("change: "+user.getChanges());
+
 					if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
 						log("The user: "+user.getEmail()+"changed his first name");
 						if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
@@ -10708,6 +10717,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else{
+					log("Continue...");
 					continue;
 				}
 			}
