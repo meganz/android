@@ -703,6 +703,21 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
+					if (context.getExternalCacheDir() != null){
+						String destinationPath = null;
+						destinationPath = context.getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+						if(destinationPath!=null){
+							log("The destination of the avatar is: "+destinationPath);
+							megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+						}
+						else{
+							log("ERROR! Destination PATH is NULL");
+						}
+					}
+					else{
+						log("getExternalCacheDir() is NULL");
+						megaApi.getUserAvatar(myAccountInfo.getMyUser(), context.getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+					}
 				}
 				else{
 					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());

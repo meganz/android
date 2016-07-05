@@ -132,7 +132,13 @@ public class AccountController {
             }
         }
 
-        megaApi.setAvatar(null);
+        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+        if(mAF!=null){
+            megaApi.setAvatar(null, mAF);
+        }
+        else{
+            megaApi.setAvatar(null);
+        }
     }
 
     public void exportMK(){
