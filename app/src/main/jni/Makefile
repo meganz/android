@@ -186,6 +186,9 @@ clean: clean_mega
 	rm -rf $(SODIUM)/$(SODIUM_SOURCE_FOLDER)
 	rm -rf $(SODIUM)/$(SODIUM)
 	rm -rf $(SODIUM_BUILT)
+	rm -rf $(LIBUV)/$(LIBUV_SOURCE_FOLDER)
+	rm -rf $(LIBUV)/$(LIBUV)
+	rm -rf $(LIBUV_BUILT)
 	rm -rf ../obj/local/armeabi/
 	rm -rf ../obj/local/x86
 
@@ -196,4 +199,4 @@ veryclean: clean
 	rm -rf $(CURL)/$(ARES_SOURCE_FILE) $(ARES_VERIFIED_SOURCES)
 	rm -rf $(OPENSSL)/$(OPENSSL_SOURCE_FILE) $(OPENSSL_VERIFIED_SOURCES)
 	rm -rf $(SODIUM)/$(SODIUM_SOURCE_FILE) $(SODIUM_VERIFIED_SOURCES)
-
+	rm -rf $(LIBUV)/$(LIBUV_SOURCE_FILE) $(LIBUV_VERIFIED_SOURCES)
