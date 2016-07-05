@@ -72,7 +72,7 @@ MEGA_JAVA_OUTPUT_PATH=$(JNI_PATH)/../java
 MEGA_CONFIGURED=java_wrap.cxx
 MEGA_WRAPPER=sdk/bindings/megaapi.i
 
-all: $(CRYPTOPP) $(CURL) $(SQLITE) $(MEGA)
+all: $(CRYPTOPP) $(CURL) $(SQLITE) $(LIBUV) $(MEGA)
 	$(NDK_BUILD)
 
 $(OPENSSL): $(OPENSSL_CONFIGURED)
