@@ -781,4 +781,6 @@
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Set expiry date</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(PRO ONLY)</string>
+
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">The current password you have provided is incorrect.</string>
 </resources>

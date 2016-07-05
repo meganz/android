@@ -1497,6 +1497,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("Show success mesage");
 							Util.showAlert(this, getString(R.string.pass_changed_alert), null);
 						}
+						else if(result==MegaError.API_EARGS){
+							drawerItem=DrawerItem.ACCOUNT;
+							selectDrawerItemLollipop(drawerItem);
+							log("Error when changing pass - the current password is not correct");
+							Util.showAlert(this,getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
+						}
 						else{
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
@@ -10607,92 +10613,102 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		log("onUsersUpdateLollipop");
+		log("onUsersUpdateLollipop-----------------------------------------------");
 
 		if (users != null){
 			log("users.size(): "+users.size());
 			for(int i=0; i<users.size();i++){
 				MegaUser user=users.get(i);
+				if(user!=null){
 
-				if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
-					log("The user: "+user.getEmail()+"changed his first name");
-					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-						log("I change my first name");
-						myAccountInfo.setFirstName(false);
-						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+					if(user.isOwnChange()!=0){
+						log("isOwnChange!!!: "+user.isOwnChange());
+						continue;
 					}
-					else{
-						myAccountInfo.setFirstName(false);
-						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
+					log("NOT OWN change: "+user.isOwnChange());
+					if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
+						log("The user: "+user.getEmail()+"changed his first name");
+						if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+							log("I change my first name");
+							myAccountInfo.setFirstName(false);
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+						}
+						else{
+							myAccountInfo.setFirstName(false);
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
+						}
 					}
-				}
-				if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
-					log("The user: "+user.getEmail()+"changed his last name");
-					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-						log("I change my last name");
-						myAccountInfo.setLastName(false);
-						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+					if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
+						log("The user: "+user.getEmail()+"changed his last name");
+						if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+							log("I change my last name");
+							myAccountInfo.setLastName(false);
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+						}
+						else{
+							myAccountInfo.setLastName(false);
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
+						}
 					}
-					else{
-						myAccountInfo.setLastName(false);
-						megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
-					}
-				}
-				if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
-					log("The user: "+user.getEmail()+"changed his AVATAR");
+					if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
+						log("The user: "+user.getEmail()+"changed his AVATAR");
 
-					File avatar = null;
-					if (this.getExternalCacheDir() != null){
-						avatar = new File(this.getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-					}
-					else{
-						avatar = new File(this.getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-					}
-					Bitmap bitmap = null;
-					if (avatar.exists()){
-						avatar.delete();
-					}
+						File avatar = null;
+						if (this.getExternalCacheDir() != null){
+							avatar = new File(this.getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
+						}
+						else{
+							avatar = new File(this.getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
+						}
+						Bitmap bitmap = null;
+						if (avatar.exists()){
+							avatar.delete();
+						}
 
-					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-						log("I change my avatar");
-						if (getExternalCacheDir() != null){
-							String destinationPath = null;
-							destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
-							if(destinationPath!=null){
-								log("The destination of the avatar is: "+destinationPath);
-								megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+						if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+							log("I change my avatar");
+							if (getExternalCacheDir() != null){
+								String destinationPath = null;
+								destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								if(destinationPath!=null){
+									log("The destination of the avatar is: "+destinationPath);
+									megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+								}
+								else{
+									log("ERROR! Destination PATH is NULL");
+								}
 							}
 							else{
-								log("ERROR! Destination PATH is NULL");
+								log("getExternalCacheDir() is NULL");
+								megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 							}
 						}
+					}
+					if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
+						log("CHANGE_TYPE_EMAIL");
+						if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+							log("I change my mail");
+							nVEmail.setText(user.getEmail());
+						}
 						else{
-							log("getExternalCacheDir() is NULL");
-							megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+							log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
+							if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
+								log("The contact NOT exists -> DB inconsistency! -> Clear!");
+								if (dbH.getContactsSize() != megaApi.getContacts().size()){
+									dbH.clearContacts();
+									FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
+									fillDBContactsTask.execute();
+								}
+							}
+							else{
+								log("The contact already exists -> update");
+								dbH.setContactMail(user.getHandle(),user.getEmail());
+							}
 						}
 					}
 				}
-				if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
-					log("CHANGE_TYPE_EMAIL");
-					if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-						log("I change my mail");
-						nVEmail.setText(user.getEmail());
-					}
-					else{
-						log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
-						if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-							log("The contact NOT exists -> DB inconsistency! -> Clear!");
-							if (dbH.getContactsSize() != megaApi.getContacts().size()){
-								dbH.clearContacts();
-								FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
-								fillDBContactsTask.execute();
-							}
-						}
-						else{
-							log("The contact already exists -> update");
-							dbH.setContactMail(user.getHandle(),user.getEmail());
-						}
-					}
+				else{
+					continue;
 				}
 			}
 		}
