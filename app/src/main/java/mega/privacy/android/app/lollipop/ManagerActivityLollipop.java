@@ -145,6 +145,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public int accountFragment;
 
 	Button expiryDateButton;
+	Switch switchGetLink;
 
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
@@ -399,6 +400,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog downloadConfirmationDialog;
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
+	private AlertDialog getLinkDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -6756,10 +6758,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void showGetLinkPanel(final String link){
+	public void showGetLinkPanel(final String link, long expirationTimestamp){
 		log("showGetLinkPanel: "+link);
 
-		final AlertDialog getLinkDialog;
 		final Calendar c = Calendar.getInstance();
 		int year = c.get(Calendar.YEAR);
 		int month = c.get(Calendar.MONTH);
@@ -6814,32 +6815,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		paramsLink.setMargins(Util.scaleWidthPx(26, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(6, outMetrics));
 		linkText.setLayoutParams(paramsLink);
 
-		final Switch switchGetLink = (Switch) dialoglayout.findViewById(R.id.switch_set_expiry_date);
+		switchGetLink = (Switch) dialoglayout.findViewById(R.id.switch_set_expiry_date);
 		RelativeLayout.LayoutParams paramsSwitch = (RelativeLayout.LayoutParams)switchGetLink.getLayoutParams();
 		paramsSwitch.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
 		switchGetLink.setLayoutParams(paramsSwitch);
-
-		if(myAccountInfo.getAccountType()>0){
-			log("The user is PRO - enable expiration date");
-
-			log(selectedNode.getName()+" EXPIRATION TIME: "+selectedNode.getExpirationTime());
-			switchGetLink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					if(switchGetLink.isChecked()){
-						expiryDateButton.setVisibility(View.VISIBLE);
-						datePickerDialog.show();
-					}
-					else{
-						expiryDateButton.setVisibility(View.INVISIBLE);
-						nC.exportLink(selectedNode);
-					}
-				}
-			});
-		}
-		else{
-			log("The is user is not PRO");
-			switchGetLink.setEnabled(false);
-		}
 
 		linkWithoutKeyCheck.setOnClickListener(new OnClickListener() {
 
@@ -6933,34 +6912,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 
 		getLinkDialog = builder.create();
-		getLinkDialog.create();
-		getLinkDialog.show();
 
+		if(myAccountInfo.getAccountType()>0){
+			log("The user is PRO - enable expiration date");
+
+			if(expirationTimestamp<=0){
+				switchGetLink.setChecked(false);
+				expiryDateButton.setVisibility(View.INVISIBLE);
+			}
+			else{
+				switchGetLink.setChecked(true);
+				java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
+				Calendar cal = Util.calculateDateFromTimestamp(expirationTimestamp);
+				TimeZone tz = cal.getTimeZone();
+				df.setTimeZone(tz);
+				Date date = cal.getTime();
+				String formattedDate = df.format(date);
+				expiryDateButton.setText(formattedDate);
+				expiryDateButton.setVisibility(View.VISIBLE);
+			}
+
+			switchGetLink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if(switchGetLink.isChecked()){
+						datePickerDialog.show();
+					}
+					else{
+						isExpiredDateLink=true;
+						nC.exportLink(selectedNode);
+					}
+				}
+			});
+		}
+		else{
+			log("The is user is not PRO");
+			switchGetLink.setEnabled(false);
+			expiryDateButton.setVisibility(View.INVISIBLE);
+		}
+
+		getLinkDialog.show();
 	}
 
 	@Override
 	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 		log("onDateSet: "+year+monthOfYear+dayOfMonth);
 
-		java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
 		Calendar cal = Calendar.getInstance();
 		cal.set(year, monthOfYear, dayOfMonth);
-		TimeZone tz = cal.getTimeZone();
-		df.setTimeZone(tz);
 		Date date = cal.getTime();
-		String formattedDate = df.format(date);
-
-		expiryDateButton.setText(formattedDate);
-		expiryDateButton.setVisibility(View.VISIBLE);
-
-		cal.add(Calendar.DATE, 1);
-		date = cal.getTime();
 		SimpleDateFormat dfTimestamp = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
 		String dateString = dfTimestamp.format(date);
+		dateString = dateString + "2359";
 		log("the date string is: "+dateString);
-		dateString = dateString + "0000";
 		int timestamp = (int) Util.calculateTimestamp(dateString);
 		log("the TIMESTAMP is: "+timestamp);
+		isExpiredDateLink=true;
 		nC.exportLinkTimestamp(selectedNode, timestamp);
 	}
 
@@ -10426,9 +10432,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 
 				if (isGetLink){
-					if(!isExpiredDateLink){
-						final String link = request.getLink();
-						showGetLinkPanel(link);
+					final String link = request.getLink();
+					MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+					log("EXPIRATION DATE: "+node.getExpirationTime());
+					if(isExpiredDateLink){
+						log("change the expiration date");
+
+						if(node.getExpirationTime()<=0){
+							switchGetLink.setChecked(false);
+							expiryDateButton.setVisibility(View.INVISIBLE);
+						}
+						else{
+							switchGetLink.setChecked(true);
+							java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
+							Calendar cal = Util.calculateDateFromTimestamp(node.getExpirationTime());
+							TimeZone tz = cal.getTimeZone();
+							df.setTimeZone(tz);
+							Date date = cal.getTime();
+							String formattedDate = df.format(date);
+							expiryDateButton.setText(formattedDate);
+							expiryDateButton.setVisibility(View.VISIBLE);
+						}
+					}
+					else{
+						showGetLinkPanel(link, node.getExpirationTime());
 					}
 				}
 				log("link: "+request.getLink());
