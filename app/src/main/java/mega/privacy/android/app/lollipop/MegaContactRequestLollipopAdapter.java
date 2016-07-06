@@ -281,7 +281,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 		    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
 		    	holder.contactInitialLetter.setText(firstLetter);
-		    	holder.contactInitialLetter.setTextSize(32);
+		    	holder.contactInitialLetter.setTextSize(24);
 		    	holder.contactInitialLetter.setTextColor(Color.WHITE);
 		    }
 	    }
