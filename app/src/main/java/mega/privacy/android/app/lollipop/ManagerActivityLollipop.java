@@ -206,6 +206,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionCopyTo;
 	public LinearLayout optionOpenFolder;
 	public TextView propertiesText;
+	public TextView optionPublicLinkText;
 	private NodeOptionsPanelListener nodeOptionsPanelListener;
 	////
 
@@ -1210,6 +1211,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		propertiesText = (TextView) findViewById(R.id.file_list_option_properties_text);
 
 		optionPublicLink = (LinearLayout) findViewById(R.id.file_list_option_public_link_layout);
+		optionPublicLinkText = (TextView) findViewById(R.id.file_list_option_public_link_text);
 //				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
 //				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
@@ -6819,6 +6821,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(myAccountInfo.getAccountType()>0){
 			log("The user is PRO - enable expiration date");
+
+			log(selectedNode.getName()+" EXPIRATION TIME: "+selectedNode.getExpirationTime());
 			switchGetLink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if(switchGetLink.isChecked()){
@@ -7855,7 +7859,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){
-
+		log("showConfirmationRemoveContact");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -7879,7 +7883,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showConfirmationRemoveContacts(final ArrayList<MegaUser> c){
-
+		log("showConfirmationRemoveContactssssss");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -7895,8 +7899,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		};
 
+		String message="";
 		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_remove_multiple_contacts,c.size());
+		if(c.size()==1){
+			message= getResources().getString(R.string.confirmation_remove_contact,c.get(0).getEmail());
+		}else{
+			message= getResources().getString(R.string.confirmation_remove_multiple_contacts,c.size());
+		}
+
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
@@ -8224,6 +8234,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionProperties.setVisibility(View.VISIBLE);
 		optionDelete.setVisibility(View.VISIBLE);
 		optionPublicLink.setVisibility(View.VISIBLE);
+		if(sNode.isExported()){
+			optionPublicLinkText.setText(R.string.edit_link_option);
+		}
+		else{
+			optionPublicLinkText.setText(R.string.context_get_link_menu);
+		}
 		optionDelete.setVisibility(View.VISIBLE);
 		optionRename.setVisibility(View.VISIBLE);
 		optionMoveTo.setVisibility(View.VISIBLE);
@@ -8283,6 +8299,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionPublicLink.setVisibility(View.VISIBLE);
+		if(sNode.isExported()){
+			optionPublicLinkText.setText(R.string.edit_link_option);
+		}
+		else{
+			optionPublicLinkText.setText(R.string.context_get_link_menu);
+		}
 		optionOpenFolder.setVisibility(View.VISIBLE);
 
 		//Hide
@@ -10621,19 +10643,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("users.size(): "+users.size());
 			for(int i=0; i<users.size();i++){
 				MegaUser user=users.get(i);
-				if(user!=null){
 
-					if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
-						log("Avatar changed!!!");
-					}
+				if(user!=null){
 
 					if(user.isOwnChange()>0){
 						log("isOwnChange!!!: "+user.isOwnChange());
 						continue;
 					}
 					log("NOT OWN change: "+user.isOwnChange());
-					log("user: "+user.getEmail());
-					log("change: "+user.getChanges());
 
 					if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
 						log("The user: "+user.getEmail()+"changed his first name");
@@ -10692,6 +10709,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
 							}
 						}
+						else{
+							log("Update de ContactsFragment");
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (cFLol != null) {
+								if (drawerItem == DrawerItem.CONTACTS) {
+									cFLol.updateView();
+								}
+							}
+						}
 					}
 					if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
 						log("CHANGE_TYPE_EMAIL");
@@ -10719,28 +10746,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					log("Continue...");
 					continue;
-				}
-			}
-		}
-
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cFLol != null){
-			if (drawerItem == DrawerItem.CONTACTS){
-				cFLol.updateView();
-			}
-			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
-			if (sRFLol != null){
-				if (drawerItem == DrawerItem.CONTACTS){
-					sRFLol.updateView();
-				}
-			}
-			String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);
-			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
-			if (rRFLol != null){
-				if (drawerItem == DrawerItem.CONTACTS){
-					rRFLol.updateView();
 				}
 			}
 		}

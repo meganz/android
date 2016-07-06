@@ -779,6 +779,7 @@
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Fecha de caducidad</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(SOLO PRO)</string>
 
+    <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Editar link</string>
 
     <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">La contraseña actual introducida es incorrecta.</string>
 </resources>

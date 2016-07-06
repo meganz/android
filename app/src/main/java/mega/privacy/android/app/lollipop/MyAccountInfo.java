@@ -377,7 +377,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                             }
                         }
                     }
-
                     return;
                 }
                 if(firstName && lastName){

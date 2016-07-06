@@ -62,7 +62,7 @@
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove this %d contacts?</string>
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these %d contacts?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
@@ -781,6 +781,8 @@
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Set expiry date</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(PRO ONLY)</string>
+
+    <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Edit link</string>
 
     <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">The current password you have provided is incorrect.</string>
 </resources>

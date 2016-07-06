@@ -118,7 +118,6 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:text="@string/context_get_link_menu"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="bold" />

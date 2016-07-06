@@ -191,8 +191,8 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		RoundedImageView imageView;
 		RelativeLayout contactImageLayout;
 		TextView initialLetter;
-		long contactId;
-		String contactName;
+		String lastNameText;
+		String firstNameText;
 		String contactMail;
 		String phoneNumber;
 		int currentPosition;
@@ -261,24 +261,44 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 //				}
 //			});
 //		}
-		
-		createDefaultAvatar(holder, true);
-		
-		UserAvatarListenerExplorer listener = new UserAvatarListenerExplorer(mContext, holder, this);
-		
+
+
 		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
 		if(contactDB!=null){
-			if(!contactDB.getName().equals("")){
-				holder.contactNameTextView.setText(contactDB.getName()+" "+contactDB.getLastName());
+
+			holder.firstNameText = contactDB.getName();
+			holder.lastNameText = contactDB.getLastName();
+
+			String fullName;
+
+			if (holder.firstNameText.trim().length() <= 0){
+				fullName = holder.lastNameText;
 			}
 			else{
-				holder.contactNameTextView.setText(contact.getEmail());
+				fullName = holder.firstNameText + " " + holder.lastNameText;
 			}
+
+			if (fullName.trim().length() <= 0){
+				log("Put email as fullname");
+				String email = contact.getEmail();
+				String[] splitEmail = email.split("[@._]");
+				fullName = splitEmail[0];
+			}
+
+			holder.contactNameTextView.setText(fullName);
 		}
 		else{
 			log("The contactDB is null: ");
+			String email = contact.getEmail();
+			String[] splitEmail = email.split("[@._]");
+			String fullName = splitEmail[0];
+			holder.contactNameTextView.setText(fullName);
 		}
-		
+
+		createDefaultAvatar(holder, true, contact);
+
+		UserAvatarListenerExplorer listener = new UserAvatarListenerExplorer(mContext, holder, this);
+
 		holder.phoneEmailTextView.setText(holder.contactMail);
 		
 		File avatar = null;
@@ -332,7 +352,7 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		}
 	}
 	
-	public void createDefaultAvatar(ViewHolderContactsExplorerLollipop holder, boolean isMegaContact){
+	public void createDefaultAvatar(ViewHolderContactsExplorerLollipop holder, boolean isMegaContact, MegaUser contact){
 		log("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -340,7 +360,15 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 		if (isMegaContact){
-			p.setColor(mContext.getResources().getColor(R.color.lollipop_primary_color));
+			String color = megaApi.getUserAvatarColor(contact);
+			if(color!=null){
+				log("The color to set the avatar is "+color);
+				p.setColor(Color.parseColor(color));
+			}
+			else{
+				log("Default color to the avatar");
+				p.setColor(mContext.getResources().getColor(R.color.lollipop_primary_color));
+			}
 		}
 		else{
 			p.setColor(mContext.getResources().getColor(R.color.color_default_avatar_phone));
@@ -364,28 +392,67 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 	    int avatarTextSize = getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (isMegaContact){
-		    if (holder.contactMail != null){
-			    if (holder.contactMail.length() > 0){
-			    	String firstLetter = holder.contactMail.charAt(0) + "";
-			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			    	holder.initialLetter.setVisibility(View.VISIBLE);
-			    	holder.initialLetter.setText(firstLetter);
-			    	holder.initialLetter.setTextSize(32);
-			    	holder.initialLetter.setTextColor(Color.WHITE);
-			    }
-		    }
+			String fullName;
+
+			if (holder.firstNameText.trim().length() <= 0){
+				fullName = holder.lastNameText;
+			}
+			else{
+				fullName = holder.firstNameText + " " + holder.lastNameText;
+			}
+
+			if (fullName.trim().length() <= 0){
+				log("Put email as fullname");
+				String email = contact.getEmail();
+				String[] splitEmail = email.split("[@._]");
+				fullName = splitEmail[0];
+			}
+
+			boolean setInitialByMail = false;
+
+			if (fullName != null){
+				if (fullName.trim().length() > 0){
+					String firstLetter = fullName.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					holder.initialLetter.setText(firstLetter);
+					holder.initialLetter.setTextSize(24);
+					holder.initialLetter.setTextColor(Color.WHITE);
+					holder.initialLetter.setVisibility(View.VISIBLE);
+				}else{
+					setInitialByMail=true;
+				}
+			}
+			else{
+				setInitialByMail=true;
+			}
+			if(setInitialByMail){
+				if (holder.contactMail != null){
+					if (holder.contactMail.length() > 0){
+						log("email TEXT: " + holder.contactMail);
+						log("email TEXT AT 0: " + holder.contactMail.charAt(0));
+						String firstLetter = holder.contactMail.charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						holder.initialLetter.setText(firstLetter);
+						holder.initialLetter.setTextSize(24);
+						holder.initialLetter.setTextColor(Color.WHITE);
+						holder.initialLetter.setVisibility(View.VISIBLE);
+					}
+				}
+			}
 	    }
 	    else{
-	    	if (holder.contactName != null){
-	    		if (holder.contactName.length() > 0){
-	    			String firstLetter = holder.contactName.charAt(0) + "";
-			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			    	holder.initialLetter.setVisibility(View.VISIBLE);
-			    	holder.initialLetter.setText(firstLetter);
-			    	holder.initialLetter.setTextSize(32);
-			    	holder.initialLetter.setTextColor(Color.WHITE);
-	    		}
-	    	}
+			if (holder.contactMail != null){
+				if (holder.contactMail.length() > 0){
+					log("email TEXT: " + holder.contactMail);
+					log("email TEXT AT 0: " + holder.contactMail.charAt(0));
+					String firstLetter = holder.contactMail.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					holder.initialLetter.setText(firstLetter);
+					holder.initialLetter.setTextSize(32);
+					holder.initialLetter.setTextColor(Color.WHITE);
+					holder.initialLetter.setVisibility(View.VISIBLE);
+				}
+			}
 	    }
 	}
 	
