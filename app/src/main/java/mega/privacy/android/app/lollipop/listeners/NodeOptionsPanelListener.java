@@ -124,7 +124,13 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
             case R.id.file_list_option_public_link_layout: {
                 log("Public link option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
-                nC.exportLink(selectedNode);
+                if(selectedNode.isExported()){
+                    log("node is already exported: "+selectedNode.getName());
+                    ((ManagerActivityLollipop) context).showGetLinkPanel(selectedNode.getPublicLink());
+                }
+                else{
+                    nC.exportLink(selectedNode);
+                }
                 break;
             }
 
