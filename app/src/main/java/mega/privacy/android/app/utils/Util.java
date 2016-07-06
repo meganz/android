@@ -1603,7 +1603,13 @@ public class Util {
 		return 0;
 	}
 
-
+	public static Calendar calculateDateFromTimestamp (long timestamp){
+		log("calculateTimestamp: "+timestamp);
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timestamp*1000);
+		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
+		return cal;
+	}
 
 	private static void log(String message) {
 		log("Util", message);
