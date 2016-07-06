@@ -126,6 +126,8 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 if(selectedNode.isExported()){
                     log("node is already exported: "+selectedNode.getName());
+                    MegaNode nodeNuevo = megaApi.getNodeByHandle(selectedNode.getHandle());
+                    log("node link: "+nodeNuevo.getPublicLink());
                     ((ManagerActivityLollipop) context).showGetLinkPanel(selectedNode.getPublicLink());
                 }
                 else{

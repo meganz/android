@@ -6757,7 +6757,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showGetLinkPanel(final String link){
-		log("showGetLinkPanel");
+		log("showGetLinkPanel: "+link);
 
 		final AlertDialog getLinkDialog;
 		final Calendar c = Calendar.getInstance();
@@ -9832,6 +9832,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void updateContactsView(boolean contacts, boolean sentRequests, boolean receivedRequests){
+		log("updateContactsView");
+
+		if(contacts){
+			log("Update Contacts Fragment");
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if (cFLol != null){
+				if (drawerItem == DrawerItem.CONTACTS){
+					cFLol.updateView();
+				}
+			}
+		}
+
+		if(sentRequests){
+			log("Update SentRequests Fragment");
+			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
+			if (sRFLol != null){
+				if (drawerItem == DrawerItem.CONTACTS){
+					sRFLol.updateView();
+				}
+			}
+		}
+
+		if(receivedRequests){
+			log("Update ReceivedRequest Fragment");
+			String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);
+			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
+			if (rRFLol != null){
+				if (drawerItem == DrawerItem.CONTACTS){
+					rRFLol.updateView();
+				}
+			}
+		}
+	}
+
 	/*
 	 * Handle processed upload intent
 	 */
@@ -9963,18 +10000,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
 			if (e.getErrorCode() == MegaError.API_OK){
-
-				if(drawerItem==DrawerItem.CONTACTS){
-					if (cFLol != null){
-						cFLol.notifyDataSetChanged();
-					}
-				}
 				Snackbar.make(fragmentContainer, getString(R.string.context_contact_removed), Snackbar.LENGTH_LONG).show();
 			}
 			else{
 				log("Error deleting contact");
 				Snackbar.make(fragmentContainer, getString(R.string.context_contact_not_removed), Snackbar.LENGTH_LONG).show();
 			}
+			updateContactsView(true, false, false);
 		}
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
 			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
@@ -9984,14 +10016,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			catch (Exception ex) {}
 
-			//Update the fragments
-			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);
-			log("Tag: "+ sRFTag1);
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-			if (sRFLol != null){
-				log("sRFLol != null");
-				sRFLol.setContactRequests();
-			}
 
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
 				Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_resent), Snackbar.LENGTH_LONG).show();
@@ -10007,10 +10031,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					{
 						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_deleted), Snackbar.LENGTH_LONG).show();
 					}
-//					else
-//					{
-//						Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();
-//					}
 				}
 				else{
 					log("Code: "+e.getErrorString());
@@ -10645,7 +10665,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				MegaUser user=users.get(i);
 
 				if(user!=null){
-
 					if(user.isOwnChange()>0){
 						log("isOwnChange!!!: "+user.isOwnChange());
 						continue;
@@ -10995,26 +11014,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(requests!=null){
 			for(int i=0; i<requests.size();i++){
 				MegaContactRequest req = requests.get(i);
-				log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
-				if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
-					cC.addContactDB(req.getTargetEmail());
+				if(req.isOutgoing()){
+					log("SENT REQUEST");
+					updateContactsView(true, true, false);
 				}
-			}
-		}
-
-		if (drawerItem == DrawerItem.CONTACTS){
-			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);
-			log("Tag: "+ sRFTag1);
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-			if (sRFLol != null){
-				log("sRFLol != null");
-				sRFLol.setContactRequests();
-			}
-			String rRFTag2 = getFragmentTag(R.id.contact_tabs_pager, 2);
-			log("Tag: "+ rRFTag2);
-			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rRFTag2);
-			if (rRFLol != null){
-				rRFLol.setContactRequests();
+				else{
+					log("RECEIVED REQUEST");
+					log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
+						cC.addContactDB(req.getTargetEmail());
+					}
+					updateContactsView(true, false, true);
+				}
 			}
 		}
 	}
