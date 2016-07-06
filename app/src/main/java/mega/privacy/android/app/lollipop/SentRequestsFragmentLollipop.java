@@ -71,33 +71,35 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}	
     }
-	
-	public void updateView(){
-		contacts = megaApi.getOutgoingContactRequests();
-		if (adapterList == null){
-			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
-			listView.setAdapter(adapterList);
-		}
-		else{
-			adapterList.setContacts(contacts);
-		}	
-		adapterList.setPositionClicked(-1);
-							
-		if (adapterList.getItemCount() == 0){				
-			log("adapterList.getItemCount() == 0");
-			emptyImageView.setImageResource(R.drawable.sent_requests_empty);
-			emptyTextView.setText(R.string.sent_requests_empty);
-			listView.setVisibility(View.GONE);
 
-			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
+	public void updateView(){
+		log("updateView");
+
+		contacts = megaApi.getOutgoingContactRequests();
+		if(contacts!=null) {
+			log("Sent requests: "+contacts.size());
+			if (adapterList == null) {
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+				listView.setAdapter(adapterList);
+			} else {
+				adapterList.setContacts(contacts);
+			}
+			adapterList.setPositionClicked(-1);
+
+			if (adapterList.getItemCount() == 0) {
+				log("adapterList.getItemCount() == 0");
+				emptyImageView.setImageResource(R.drawable.sent_requests_empty);
+				emptyTextView.setText(R.string.sent_requests_empty);
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			} else {
+				log("adapterList.getItemCount() NOT = 0");
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
 		}
-		else{
-			log("adapterList.getItemCount() NOT = 0");
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-		}			
 	}
 
     @Override
@@ -182,66 +184,12 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		Util.log("SentRequestsFragmentLollipop", log);
 	}
 
-
-//	@Override
-//	public void onItemClick(AdapterView<?> parent, View view, int position,
-//			long id) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-	
-//	public RecyclerView getListView(){
-//		return listView;
-//	}
-//	
-//	public void updateListView(){
-//		log("updateListView");
-//		if(adapterList!=null)
-//		{
-////			adapterList.notifyDataSetInvalidated();
-//			adapterList.notifyDataSetChanged();
-//		}
-//	}
-	
-	public void setContactRequests()
-	{
-		log("setContactRequests");
-		contacts = megaApi.getOutgoingContactRequests();
-    	if(contacts!=null)
-    	{
-    		log("Sent requests: "+contacts.size());
-    		if(adapterList!=null){
-    			log("adapter!=NULL");
-    			adapterList.setContacts(contacts);
-        		adapterList.notifyDataSetChanged();
-    		}
-    		else{
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
-    		}
-    		
-    		if (adapterList.getItemCount() == 0){				
-				log("adapterList.getItemCount() == 0");
-				emptyImageView.setImageResource(R.drawable.sent_requests_empty);
-				emptyTextView.setText(R.string.sent_requests_empty);
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
-				log("adapterList.getItemCount() NOT = 0");
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}    		
-		}
-	}
 	
 	public void setPositionClicked(int positionClicked){
 
 		if (adapterList != null){
 			adapterList.setPositionClicked(positionClicked);
 		}
-
 	}
 	
 	public void notifyDataSetChanged(){

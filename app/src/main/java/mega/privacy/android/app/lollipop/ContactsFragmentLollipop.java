@@ -13,7 +13,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -515,12 +514,11 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 			emptyTextView.setText(R.string.contacts_list_empty_text);
 		}
 		else{
-			log("CONTACTS SIZE != 0");
+			log("CONTACTS SIZE != 0 ---> "+visibleContacts.size());
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-		}	
-		
+		}
 	}
 	
 	public void updateShares(){
