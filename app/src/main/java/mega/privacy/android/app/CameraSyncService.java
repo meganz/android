@@ -925,6 +925,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					pickedDir = DocumentFile.fromTreeUri(getApplicationContext(), uri);
 					log("PICKEDDIR: " + pickedDir.getName());
 					DocumentFile[] files = pickedDir.listFiles();
+					if(files!=null){
+						log("The number of files is: "+files.length);
+					}
+					else{
+						log("files is NULL!");
+					}
 					ArrayList<DocumentFile> auxCameraFilesExternalSDCard = new ArrayList<DocumentFile>();
 					for (int i=0;i<files.length;i++){
 						switch(Integer.parseInt(prefs.getCamSyncFileUpload())){

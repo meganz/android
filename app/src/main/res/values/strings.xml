@@ -312,7 +312,7 @@
     <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside Rubbish Bin will be deleted.</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_send" context="get the link and send it">Send</string>
-    <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Send to contact</string>
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Remove from Offline</string>
@@ -328,7 +328,6 @@
     <string name="context_delete" context="menu item">Delete</string>
     <string name="context_more" context="menu item">More</string>
     <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
-    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
     <string name="context_contact_request_sent" context="success message when sending a contact request">Request correctly sent to %s. The status can be consulted in the Sent Requests tab.</string>
@@ -356,7 +355,7 @@
     <string name="number_incorrectly_moved" context="success message when moving a node">%d items are not moved successfully</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the Rubbish Bin successfully</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the Rubbish Bin successfully</string>
-    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d items are not sent successfully</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items are not sent successfully</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Shared successfully</string>
     <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process of the sharing is not completed</string>
@@ -786,4 +785,13 @@
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Edit link</string>
 
     <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">The current password you have provided is incorrect.</string>
+
+    <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d reinvite requests sent successfully. </string>
+
+    <string name="number_correctly_delete_contact_request" context="success message when reinviting multiple contacts">%d requests deleted successfully. </string>
+    <string name="number_no_delete_contact_request" context="error message when reinviting multiple contacts">%1$d requests deleted successfully but %2$d requests were not deleted.</string>
+
+    <string name="confirmation_delete_contact_request" context="confirmation message before removing a contact request.">Do you want to delete the invitation request to %s?</string>
+    <string name="confirmation_remove_multiple_contact_request" context="confirmation message before removing mutiple contact request">Do you want to delete these %d invitation requests?</string>
+
 </resources>

@@ -643,7 +643,6 @@
     <string name="empty_inbox" context="Text that indicates that Inbox is empty">Pasta Vazia</string>
     <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Enviado para a Caixa de Entrada</string>
     <string name="context_no_sent_node" context="error message when sending a node to Inbox">Erro. Falha ao enviar para a Caixa de Entrada</string>
-    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Pedido enviado</string>
     <string name="sortby_creation_date" context="category in sort by action">Data de criação</string>
     <string name="sortby_modification_date" context="category in sort by action">Data de Modificação</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Convidar</string>

@@ -7925,6 +7925,60 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
+	public void showConfirmationRemoveContactRequest(final MegaContactRequest r){
+		log("showConfirmationRemoveContactRequest");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						cC.removeInvitationContact(r);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
+		String message= getResources().getString(R.string.confirmation_delete_contact_request,r.getTargetEmail());
+		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+	}
+
+	public void showConfirmationRemoveContactRequests(final List<MegaContactRequest> r){
+		log("showConfirmationRemoveContactRequests");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						cC.deleteMultipleSentRequestContacts(r);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		String message="";
+		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
+		if(r.size()==1){
+			message= getResources().getString(R.string.confirmation_delete_contact_request,r.get(0).getTargetEmail());
+		}else{
+			message= getResources().getString(R.string.confirmation_remove_multiple_contact_request,r.size());
+		}
+
+		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+	}
+
 	public void showConfirmationLeaveMultipleShares (final ArrayList<Long> handleList){
 		log("showConfirmationleaveMultipleShares");
 
@@ -10038,7 +10092,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("OK INVITE CONTACT: ");
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_sent), Snackbar.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_request_sent, request.getEmail()), Snackbar.LENGTH_LONG).show();
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
 					{

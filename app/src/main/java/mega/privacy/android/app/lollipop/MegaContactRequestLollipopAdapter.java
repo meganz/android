@@ -110,6 +110,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		MegaContactRequest contact = (MegaContactRequest) getItem(position);
 		
 		if (!multipleSelect) {
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			if (positionClicked != -1){
 				if (positionClicked == position){
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
@@ -123,17 +124,15 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 		} else {
+			log("Multiselect ON");
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
-			if (positionClicked == -1){
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+			if(this.isItemChecked(position)){
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 			}
 			else{
-				if(this.isItemChecked(position)){
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
+				log("NOT selected");
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 		}
 						
@@ -224,6 +223,9 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
 			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
 			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+
+			holder.itemLayout.setOnClickListener(this);
+
 			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 			v.setTag(holder);	
 		}
@@ -420,6 +422,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
     }
     
     public void setPositionClicked(int p){
+		log("setPositionClicked: "+p);
     	positionClicked = p;
 		notifyDataSetChanged();
     }
@@ -447,6 +450,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 					}
 				}
 				((ManagerActivityLollipop) context).showContactOptionsPanel(null, c);
+				break;
+			}
+			case R.id.contact_request_list_item_layout:{
+				((SentRequestsFragmentLollipop) fragment).itemClick(currentPosition);
 				break;
 			}
 		}
