@@ -434,6 +434,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
     }
 
     public void itemClick(int position) {
+		log("itemClick");
 					
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);

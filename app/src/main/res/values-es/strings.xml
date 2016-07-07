@@ -308,7 +308,7 @@
     <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Todos los elementos de la papelera se eliminarán.</string>
     <string name="context_send_link" context="get the link and send it">Enviar enlace</string>
     <string name="context_send" context="get the link and send it">Enviar</string>
-    <string name="context_send_file_inbox" context="send the file to inbox">Enviar al buzón</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Enviar a un contacto</string>
     <string name="context_copy_link" context="get the link and copy it">Copiar enlace</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Eliminar</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Eliminar sin conexión</string>
@@ -324,7 +324,6 @@
     <string name="context_delete" context="menu item">Borrar</string>
     <string name="context_more" context="menu item">Más</string>
     <string name="context_contact_added" context="success message when adding a contact">Invitación enviada</string>
-    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Invitación enviada</string>
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Invitación eliminada</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Invitación reenviada</string>
     <string name="context_contact_request_sent" context="success message when sending a contact request">Invitación correctamente enviada a %s. El estado puede consultarse en la pestaña de Solicitudes enviadas.</string>

@@ -119,7 +119,8 @@ public class ContactOptionsPanelListener implements View.OnClickListener {
                     return;
                 }
                 ((ManagerActivityLollipop) context).hideContactOptionsPanel();
-                cC.removeInvitationContact(selectedRequest);
+                ((ManagerActivityLollipop)context).showConfirmationRemoveContactRequest(selectedRequest);
+
                 break;
             }
             case R.id.contact_list_option_accept_layout:{

@@ -677,6 +677,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 
 	public void setPositionClicked(int p) {
+		log("setPositionClicked: "+p);
 		positionClicked = p;
 		notifyDataSetChanged();
 	}
