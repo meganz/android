@@ -429,8 +429,12 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						Util.showAlert(this, getString(R.string.pass_changed_alert), null);
 					}
 					else if(result==MegaError.API_EARGS){
+						log("Incorrect arguments!");
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+					else if(result==MegaError.API_EKEY){
 						log("Incorrect MK when changing pass");
-						Util.showAlert(this, getString(R.string.incorrect_MK), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.incorrect_MK), getString(R.string.incorrect_MK_title));
 					}
 					else{
 						log("Error when changing pass - show error message");
