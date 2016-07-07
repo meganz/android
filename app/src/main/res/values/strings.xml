@@ -766,7 +766,8 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The recovery key is not correct. Please, try again.</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The key you supplied does not match this account. Please make sure you use the correct recovery key and try again.</string>
+    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Invalid recovery key</string>
 
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No pictures uploaded</string>
 

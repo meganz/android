@@ -518,6 +518,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					if(e.getErrorCode()==MegaError.API_EARGS){
 						resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
 					}
+					else if(e.getErrorCode()==MegaError.API_EKEY){
+						resetPassIntent.putExtra("RESULT", MegaError.API_EKEY);
+					}
 					else{
 						resetPassIntent.putExtra("RESULT", -1);
 					}
