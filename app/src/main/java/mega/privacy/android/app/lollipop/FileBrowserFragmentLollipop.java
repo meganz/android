@@ -955,6 +955,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					return;
 				}
 			}
+			else{
+				if(n.getName().equals("Camera Uploads")){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					dbH.setCamSyncHandle(n.getHandle());
+					log("FOUND Camera Uploads!!----> "+n.getHandle());
+					((ManagerActivityLollipop)context).cameraUploadsClicked();
+					return;
+				}
+			}
 		}
 		else{
 			if(n.getName().equals("Camera Uploads")){
