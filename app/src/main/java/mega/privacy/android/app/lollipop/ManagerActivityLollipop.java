@@ -6913,6 +6913,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		getLinkDialog = builder.create();
 
+		expiryDateButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				datePickerDialog.show();
+			}
+		});
+
 		if(myAccountInfo.getAccountType()>0){
 			log("The user is PRO - enable expiration date");
 
