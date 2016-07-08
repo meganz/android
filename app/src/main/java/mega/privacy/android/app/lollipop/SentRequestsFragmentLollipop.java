@@ -72,7 +72,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 	
 	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	public class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+	private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
 		public void onLongPress(MotionEvent e) {
 			View view = listView.findChildViewUnder(e.getX(), e.getY());
@@ -188,7 +188,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 		Resources res = getResources();
 		String format = "%d %s";
 
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_contacts, users.size())));
+		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_request, users.size())));
 
 		try {
 			actionMode.invalidate();
@@ -429,6 +429,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 			log("nothing, not multiple select");
 		}
 	}
+
 	@Override
 	public void onLongPress(MotionEvent e) {
 
