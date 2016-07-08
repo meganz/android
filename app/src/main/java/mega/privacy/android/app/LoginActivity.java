@@ -43,6 +43,7 @@ import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 
 public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
@@ -109,6 +110,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	Bundle extras = null;
 	Uri uriData = null;
 
+	int numberOfClicks = 0;
+	DatabaseHandler dbH;
+
 	/*
 	 * Task to process email and password
 	 */
@@ -153,7 +157,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		scaleH = Util.getScaleH(outMetrics, density);
 
 //	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		MegaPreferences prefs = dbH.getPreferences();
 		if (prefs == null){
@@ -198,6 +202,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 
 		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(28*scaleH);
+		loginTitle.setOnClickListener(this);
 
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
@@ -544,6 +549,43 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				log("case R.id.button_create_account_login:");
 				onRegisterClick(v);
 				break;
+			case R.id.login_text_view:{
+				numberOfClicks++;
+				if (numberOfClicks == 5){
+					MegaAttributes attrs = dbH.getAttributes();
+					if (attrs.getFileLogger() != null){
+						try {
+							if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+								dbH.setFileLogger(true);
+								Util.setFileLogger(true);
+								numberOfClicks = 0;
+								MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+								Toast.makeText(this, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+								log("App Version: " + Util.getVersion(this));
+							}
+							else{
+								dbH.setFileLogger(false);
+								Util.setFileLogger(false);
+								numberOfClicks = 0;
+								MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+								Toast.makeText(this, getString(R.string.settings_disable_logs), Toast.LENGTH_LONG).show();
+							}
+						}
+						catch(Exception e){
+							dbH.setFileLogger(true);
+							Util.setFileLogger(true);
+							numberOfClicks = 0;
+							Toast.makeText(this, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+						}
+					}
+					else{
+						dbH.setFileLogger(true);
+						Util.setFileLogger(true);
+						numberOfClicks = 0;
+						Toast.makeText(this, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
+					}
+				}
+			}
 		}
 	}
 
