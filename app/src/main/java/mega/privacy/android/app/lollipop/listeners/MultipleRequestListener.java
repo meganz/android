@@ -173,6 +173,17 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     }
                     break;
                 }
+                case MegaRequest.TYPE_REPLY_CONTACT_REQUEST:{
+                    log("multiple reply request sent");
+
+                    if(error>0){
+                        message = context.getString(R.string.number_incorrectly_invitation_reply_sent, max_items-error, error);
+                    }
+                    else{
+                        message = context.getString(R.string.number_correctly_invitation_reply_sent, max_items);
+                    }
+                    break;
+                }
                 case MegaRequest.TYPE_SHARE:{
                     log("multiple share request finished");
                     if(actionListener==Constants.MULTIPLE_REMOVE_SHARING_CONTACTS){

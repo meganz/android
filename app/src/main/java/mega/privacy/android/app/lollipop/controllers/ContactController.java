@@ -166,6 +166,69 @@ public class ContactController {
         }
     }
 
+    public void acceptMultipleReceivedRequest(final List<MegaContactRequest> requests){
+        log("acceptMultipleReceivedRequest");
+
+        MultipleRequestListener acceptMultipleListener = null;
+        if(requests.size()>1){
+            log("accept multiple request");
+            acceptMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_ACCEPT, acceptMultipleListener);
+            }
+        }
+        else{
+            log("accept one request");
+
+            final MegaContactRequest request= requests.get(0);
+            acceptInvitationContact(request);
+        }
+    }
+
+    public void declineMultipleReceivedRequest(final List<MegaContactRequest> requests){
+        log("declineMultipleReceivedRequest");
+
+        MultipleRequestListener declineMultipleListener = null;
+        if(requests.size()>1){
+            log("decline multiple request");
+            declineMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_DENY, declineMultipleListener);
+            }
+        }
+        else{
+            log("decline one request");
+
+            final MegaContactRequest request= requests.get(0);
+            declineInvitationContact(request);
+        }
+    }
+
+    public void ignoreMultipleReceivedRequest(final List<MegaContactRequest> requests){
+        log("ignoreMultipleReceivedRequest");
+
+        MultipleRequestListener ignoreMultipleListener = null;
+        if(requests.size()>1){
+            log("ignore multiple request");
+            ignoreMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_IGNORE, ignoreMultipleListener);
+            }
+        }
+        else{
+            log("ignore one request");
+
+            final MegaContactRequest request= requests.get(0);
+            ignoreInvitationContact(request);
+        }
+    }
+
     public void inviteContact(String contactEmail){
         log("inviteContact");
 

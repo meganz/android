@@ -574,11 +574,26 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		String fullName;
 
-		if (holder.firstNameText.trim().length() <= 0){
-			fullName = holder.lastNameText;
+		if(holder.firstNameText!=null){
+			if (holder.firstNameText.trim().length() <= 0){
+				fullName = holder.lastNameText;
+			}
+			else{
+				if(holder.lastNameText!=null){
+					fullName = holder.firstNameText + " " + holder.lastNameText;
+				}
+				else{
+					fullName = holder.firstNameText;
+				}
+			}
 		}
 		else{
-			fullName = holder.firstNameText + " " + holder.lastNameText;
+			if(holder.lastNameText!=null){
+				fullName = holder.lastNameText;
+			}
+			else{
+				fullName="";
+			}
 		}
 
 		if (fullName.trim().length() <= 0){
