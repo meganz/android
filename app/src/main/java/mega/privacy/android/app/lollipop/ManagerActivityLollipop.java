@@ -3363,9 +3363,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("New MyAccountFragment");
     				maFLol = new MyAccountFragmentLollipop();
     				maFLol.setMyEmail(megaApi.getMyUser().getEmail());
-					maFLol.setMyAccountInfo(myAccountInfo);
+					if(myAccountInfo==null){
+						log("Not possibleeeeeee!!");
+					}
+					else{
+						maFLol.setMyAccountInfo(myAccountInfo);
+					}
 					maFLol.setMKLayoutVisible(mkLayoutVisible);
     			}
+				else{
+					log("MyAccountFragment is not null");
+					maFLol.setMyEmail(megaApi.getMyUser().getEmail());
+					if(myAccountInfo==null){
+						log("Not possibleeeeeee!!");
+					}
+					else{
+						maFLol.setMyAccountInfo(myAccountInfo);
+					}
+
+					maFLol.setMKLayoutVisible(mkLayoutVisible);
+				}
 
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);

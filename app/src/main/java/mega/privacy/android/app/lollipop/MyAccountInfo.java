@@ -57,7 +57,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     public ArrayList<Product> productAccounts;
 
     public MyAccountInfo(Context context){
-        log("AccountController created");
+        log("MyAccountInfo created");
 
         this.context = context;
         if (dbH == null){

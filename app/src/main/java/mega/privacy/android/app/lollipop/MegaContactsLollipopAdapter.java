@@ -162,9 +162,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
         RelativeLayout itemLayout;
         int currentPosition;
         String contactMail;
-    	String lastNameText;
-    	String firstNameText;
-		String colorAvatar;
+    	String lastNameText="";
+    	String firstNameText="";
     }
     
     public class ViewHolderContactsList extends ViewHolderContacts{

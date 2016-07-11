@@ -319,8 +319,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		saveMK.setLayoutParams(saveMKParams);
 		saveMK.setOnClickListener(this);
 
+		if(myAccountInfo==null){
+			log("MyAccountInfo is NULL");
+			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+		}
+
 		myAccountInfo.setFirstName(false);
 		myAccountInfo.setLastName(false);
+
 		megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
 		megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
 
@@ -998,6 +1004,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
+		log("setMyAccountInfo");
 		this.myAccountInfo = myAccountInfo;
 	}
 
