@@ -1,24 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import mega.privacy.android.app.MegaBrowserListAdapter.ViewHolderBrowserList;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUtilsAndroid;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,7 +8,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -36,10 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,7 +25,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -59,9 +35,26 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 
 public class MegaBrowserNewGridAdapter extends BaseAdapter {
@@ -651,6 +644,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
     	public ArrayList<TextView> fileSizeViews;
     	public ArrayList<ProgressBar> progressBars;
     	public ArrayList<ImageButton> threeDots;
+		public ArrayList<ImageView> publicLinks;
     	
     	public ArrayList<ImageView> optionsDownload;
     	public ArrayList<ImageView> optionsProperties;
@@ -687,6 +681,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			holder.optionsOverflow = new ArrayList<ImageView>();
 						
 			holder.documents = new ArrayList<Long>();
+
+			holder.publicLinks = new ArrayList<ImageView>();
 			
 			convertView = inflater.inflate(R.layout.item_file_grid_list, parent, false);
 			
@@ -741,7 +737,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				
 				ProgressBar pB = (ProgressBar) rLView.findViewById(R.id.cell__browser_bar);
 				holder.progressBars.add(pB);
-				
+
+				ImageView pL = (ImageView) rLView.findViewById(R.id.cell_public_link);
+				holder.publicLinks.add(pL);
+
 				holder.documents.add(-1l);
 			}
 			
@@ -796,7 +795,29 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 //				}
 //				else{
 //					holder.documents.add(i, node.getHandle());
-//				}				
+//				}
+
+				if(node.isExported()){
+					//Node has public link
+					if(node.isExpired()){
+						log("Node exported but expired!!");
+						holder.publicLinks.get(i).setVisibility(View.GONE);
+					}
+					else{
+						if(multipleSelect){
+							holder.publicLinks.get(i).setVisibility(View.GONE);
+						}
+						else
+						{
+							holder.publicLinks.get(i).setVisibility(View.VISIBLE);
+						}
+					}
+				}
+				else{
+					holder.publicLinks.get(i).setVisibility(View.GONE);
+				}
+
+
 				holder.fileNameViews.get(i).setText(node.getName());
 				if (nodes.get(totalPosition).isFolder()){
 					if (megaApi.isShared(node)){
