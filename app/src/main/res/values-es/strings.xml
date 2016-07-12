@@ -798,4 +798,6 @@
         <item quantity="one" context="referring to a invitation request in the Contacts section">invitación</item>
         <item quantity="other" context="referring to a invitation request in the Contacts section">invitaciones</item>
     </plurals>
+
+    <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">¿Dejar de compartir la carpeta?</string>
 </resources>

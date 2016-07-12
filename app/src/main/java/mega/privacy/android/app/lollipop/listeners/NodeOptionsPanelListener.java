@@ -161,7 +161,7 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 log("Clear shares");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 ArrayList<MegaShare> shareList = megaApi.getOutShares(selectedNode);
-                nC.removeAllSharingContacts(shareList, selectedNode);
+                ((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(shareList, selectedNode);
                 break;
             }
 

@@ -603,15 +603,23 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					if(Util.isVideoFile(transfer.getPath())){
 						log("Is video!!!");					
 						ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-						MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-						retriever.setDataSource(transfer.getPath());
-						String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-						long timeInmillisec = Long.parseLong( time );
-						long duration = timeInmillisec / 1000;
-						long hours = duration / 3600;
-						long minutes = (duration - hours * 3600) / 60;
-						long seconds = duration - (hours * 3600 + minutes * 60);
-						log("The duration is: "+hours+" "+minutes+" "+seconds);
+
+						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+						if(node!=null){
+							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+							retriever.setDataSource(transfer.getPath());
+							String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+							int seconds = Integer.parseInt(time);
+							log("The duration is: "+seconds);
+
+//							megaApi.setNodeDuration(node, seconds, null);
+
+//							long timeInmillisec = Long.parseLong(time);
+//							int seconds = (int) (timeInmillisec / 1000) % 60 ;
+//							int minutes = (int) ((timeInmillisec / (1000*60)) % 60);
+//							int hours   = (int) ((timeInmillisec / (1000*60*60)) % 24);
+//							log("The duration is: "+hours+" "+minutes+" "+seconds);
+						}
 					}
 					else{
 						log("NOT video!");
