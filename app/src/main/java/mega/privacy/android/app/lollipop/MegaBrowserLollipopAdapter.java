@@ -779,8 +779,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else{
 			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 			holder.publicLinkImage.setVisibility(View.GONE);
-			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-			holder.publicLinkImage.setVisibility(View.GONE);
 		}
 		
 		if (node.isFolder()) {

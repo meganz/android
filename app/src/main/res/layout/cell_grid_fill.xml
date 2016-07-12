@@ -15,7 +15,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:descendantFocusability="blocksDescendants" >
-        
+
         <ImageButton
 	        android:id="@+id/cell_thumbnail"
 	        android:layout_width="157dp"
@@ -24,8 +24,8 @@
 	        android:scaleType="fitCenter"
 	        android:background="@null"
 	        android:padding="7dp"/>
-        
-        <LinearLayout
+
+		<LinearLayout
             android:id="@+id/cell_menu_long_click_unselected"
             android:layout_width="172dp"
             android:layout_height="157dp"
@@ -121,6 +121,15 @@
 	        android:layout_centerHorizontal="true"
 	        android:layout_below="@id/cell_thumbnail"
 	 		 />
+
+		<ImageView
+			android:id="@+id/cell_public_link"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_public_link_list"
+			android:layout_marginTop="5dp"
+			android:layout_centerHorizontal="true"
+			android:layout_above="@id/cell_separator"/>
         
         <TextView
 	        android:id="@+id/cell_filename"

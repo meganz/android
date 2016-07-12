@@ -1,38 +1,11 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import mega.privacy.android.app.FileStorageActivity.Mode;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.MySwitch;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -57,12 +30,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -70,6 +42,28 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import mega.privacy.android.app.FileStorageActivity.Mode;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.MySwitch;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class FilePropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
@@ -135,8 +129,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	public FilePropertiesActivity filePropertiesActivity;
 	
 	ProgressDialog statusDialog;
-	boolean publicLink=false;
-	
+
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 	
@@ -305,6 +298,20 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			permissionInfo.setVisibility(View.GONE);
 
 			File offlineFile = null;
+
+			if(node.isExported()){
+				//Node has public link
+				if(node.isExpired()){
+					log("Node exported but expired!!");
+					publicLinkImage.setVisibility(View.GONE);
+				}
+				else{
+					publicLinkImage.setVisibility(View.VISIBLE);
+				}
+			}
+			else{
+				publicLinkImage.setVisibility(View.GONE);
+			}
 			
 			if (node.isFile()){				
 				
@@ -340,16 +347,6 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						i++;
 					}
 				}
-
-				sl = megaApi.getOutShares(node);		
-
-				if (sl != null){
-					
-					if (sl.size() != 0){
-						publicLink=true;
-						publicLinkImage.setVisibility(View.VISIBLE);
-					}
-				}				
 				
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);	
 				
@@ -494,50 +491,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						}
 						
 					}
-					else{		
-						publicLink=false;
-						for(int i=0; i<sl.size();i++){
-
-							//Check if one of the ShareNodes is the public link
-
-							if(sl.get(i).getUser()==null){
-								//Public link + users								
-								publicLink=true;
-								publicLinkImage.setVisibility(View.VISIBLE);
-								break;
-
-							}
-						}
-						if(publicLink){
-//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-//	
-//							publicLinkTextView.setVisibility(View.VISIBLE);
-							
-							if(sl.size()>1){
-								//It is public and shared
-								imageView.setImageResource(R.drawable.folder_shared_mime);
-								sharedWithButton.setVisibility(View.VISIBLE);
-								publicLinkImage.setVisibility(View.VISIBLE);
-								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-							}
-							else{
-								//It is just public
-								imageView.setImageResource(R.drawable.folder_mime);
-								sharedWithButton.setVisibility(View.GONE);
-								publicLinkImage.setVisibility(View.VISIBLE);
-//								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
-							}
-							
-						}
-						else{
-//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-							//It is private and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
-							publicLinkImage.setVisibility(View.GONE);
-							sharedWithButton.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-						}
-						
+					else{
+						imageView.setImageResource(R.drawable.folder_shared_mime);
+						sharedWithButton.setVisibility(View.VISIBLE);
+						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 					}
 					
 					
@@ -663,50 +620,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					}
 					
 				}
-				else{		
-					publicLink=false;
-					for(int i=0; i<sl.size();i++){
-
-						//Check if one of the ShareNodes is the public link
-
-						if(sl.get(i).getUser()==null){
-							//Public link + users								
-							publicLink=true;
-							break;
-
-						}
-					}
-					if(publicLink){
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-//
-//						publicLinkTextView.setVisibility(View.VISIBLE);
-						
-						if(sl.size()>1){
-							//It is public and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
-							publicLinkImage.setVisibility(View.VISIBLE);
-							sharedWithButton.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
-						}
-						else{
-							//It is just public
-							imageView.setImageResource(R.drawable.folder_mime);
-							sharedWithButton.setVisibility(View.GONE);
-
-							publicLinkImage.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
-						}
-						
-					}
-					else{
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-						//It is private and shared
-						imageView.setImageResource(R.drawable.folder_shared_mime);
-						sharedWithButton.setVisibility(View.VISIBLE);
-						publicLinkImage.setVisibility(View.GONE);
-						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-					}
-					
+				else{
+					imageView.setImageResource(R.drawable.folder_shared_mime);
+					sharedWithButton.setVisibility(View.VISIBLE);
+					sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 				}
 			}
 			else{
@@ -760,6 +677,19 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					}
 				}
 			}
+		}
+		if(node.isExported()){
+			//Node has public link
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				publicLinkImage.setVisibility(View.GONE);
+			}
+			else{
+				publicLinkImage.setVisibility(View.VISIBLE);
+			}
+		}
+		else{
+			publicLinkImage.setVisibility(View.GONE);
 		}
 	}
 		
@@ -1447,7 +1377,6 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	public void showRenameDialog(){
 		
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setText(node.getName());
 
@@ -1606,19 +1535,20 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    else
 	    {
 	    	onBackPressed();
-	    }	   
-	    
-	    if(publicLink){
-	    	getLinkMenuItem.setVisible(false);
-	    	removeLinkMenuItem.setVisible(true);
-	    	manageLinkMenuItem.setVisible(true);
 	    }
-	    else{
-	    	getLinkMenuItem.setVisible(true);
-	    	removeLinkMenuItem.setVisible(false);
-	    	manageLinkMenuItem.setVisible(false);
-	    }   
-	    
+
+		if(node.isExported()){
+			//Node has public link
+			getLinkMenuItem.setVisible(false);
+			removeLinkMenuItem.setVisible(true);
+			manageLinkMenuItem.setVisible(true);
+		}
+		else{
+			getLinkMenuItem.setVisible(true);
+			removeLinkMenuItem.setVisible(false);
+			manageLinkMenuItem.setVisible(false);
+		}
+
 		MegaNode parent = megaApi.getNodeByHandle(handle);
 		while (megaApi.getParentNode(parent) != null){
 			parent = megaApi.getParentNode(parent);
@@ -1804,7 +1734,6 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				{		
 					
 					publicLinkImage.setVisibility(View.GONE);
-					publicLink=false;
 					invalidateOptionsMenu();
 					Toast.makeText(this, getString(R.string.file_properties_remove_link), Toast.LENGTH_LONG).show();
 				}					
@@ -2240,54 +2169,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					}
 					
 				}
-				else{	
+				else{
+					imageView.setImageResource(R.drawable.folder_shared_mime);
+					sharedWithButton.setVisibility(View.VISIBLE);
+					publicLinkImage.setVisibility(View.GONE);
+					sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 
-					publicLink=false;
-					for(int i=0; i<sl.size();i++){
-
-						//Check if one of the ShareNodes is the public link
-
-						if(sl.get(i).getUser()==null){
-							//Public link + users
-							log(sl.get(i).getUser());
-							publicLink=true;
-							break;
-
-						}
-					}
-					if(publicLink){
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-//
-//						publicLinkTextView.setVisibility(View.VISIBLE);
-						
-						if(sl.size()>1){
-							//It is public and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
-							publicLinkImage.setVisibility(View.VISIBLE);
-							sharedWithButton.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
-						}
-						else{
-							//It is just public
-							imageView.setImageResource(R.drawable.folder_mime);
-							sharedWithButton.setVisibility(View.GONE);
-
-							publicLinkImage.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
-						}
-						
-					}
-					else{
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-						//It is private and shared
-						imageView.setImageResource(R.drawable.folder_shared_mime);
-						sharedWithButton.setVisibility(View.VISIBLE);
-						publicLinkImage.setVisibility(View.GONE);
-						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-					}
-					
 				}
-
 
 				if (node.getCreationTime() != 0){
 					try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
@@ -2307,17 +2195,18 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 //			iconView.setImageResource(imageId);
 		}
-		else
-		{
-			sl = megaApi.getOutShares(node);
-
-			if (sl != null){
-				
-				if (sl.size() != 0){
-					publicLink=true;
-					publicLinkImage.setVisibility(View.VISIBLE);
-				}
+		if(node.isExported()){
+			//Node has public link
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				publicLinkImage.setVisibility(View.GONE);
 			}
+			else{
+				publicLinkImage.setVisibility(View.VISIBLE);
+			}
+		}
+		else{
+			publicLinkImage.setVisibility(View.GONE);
 		}
 	}
 

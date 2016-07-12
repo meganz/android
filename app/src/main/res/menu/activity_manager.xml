@@ -78,12 +78,12 @@
 		android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	
-		<item
-	    android:id="@+id/action_import_link"
-	    android:orderInCategory="110"
-	    android:title="@string/action_open_link"
-		android:icon="@drawable/ic_action_bar_null"
-	    MEGA:showAsAction="never" />
+	<item
+	android:id="@+id/action_import_link"
+	android:orderInCategory="110"
+	android:title="@string/action_open_link"
+	android:icon="@drawable/ic_action_bar_null"
+	MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_select"
