@@ -801,4 +801,6 @@
         <item quantity="one" context="referring to a invitation request in the Contacts section">request</item>
         <item quantity="other" context="referring to a invitation request in the Contacts section">requests</item>
     </plurals>
+
+    <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">Remove shares?</string>
 </resources>
