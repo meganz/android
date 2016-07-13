@@ -326,6 +326,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		super.onSaveInstanceState(outState);
 	}
 
+	public static FileBrowserFragmentLollipop newInstance() {
+		log("newInstance");
+		FileBrowserFragmentLollipop fragment = new FileBrowserFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");

@@ -30,6 +30,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -107,6 +108,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -306,9 +308,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     private TabHost mTabHostShares;
 	TabsAdapter mTabsAdapterShares;
     ViewPager viewPagerShares;
+
     //Tabs in Cloud
-    private TabHost mTabHostCDrive;
-	TabsAdapter mTabsAdapterCDrive;
+	TabLayout tabLayoutCloud;
+	LinearLayout cloudSectionLayout;
+	CloudDrivePagerAdapter mTabsAdapterCDrive;
     ViewPager viewPagerCDrive;
 
 	boolean firstTime = true;
@@ -1333,9 +1337,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         totalSpaceTV = (TextView) findViewById(R.id.navigation_drawer_total_space);
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
 
-        mTabHostCDrive = (TabHost)findViewById(R.id.tabhost_cloud_drive);
-        mTabHostCDrive.setup();
-        mTabHostCDrive.getTabWidget().setDividerDrawable(null);
+		cloudSectionLayout= (LinearLayout)findViewById(R.id.tabhost_cloud_drive);
+		tabLayoutCloud =  (TabLayout) findViewById(R.id.sliding_tabs_cloud_drive);
+		viewPagerCDrive = (ViewPager) findViewById(R.id.cloud_drive_tabs_pager);
 
 //        BackgroundColor(getResources().getColor(R.color.tab_text_color));
 
@@ -1349,7 +1353,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
         viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);
-        viewPagerCDrive = (ViewPager) findViewById(R.id.cloud_drive_tabs_pager);
+
 
         if (!Util.isOnline(this)){
         	log("No network: intent to OfflineActivityLollipop");
@@ -2316,32 +2320,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			mTabHostShares.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
 
-    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-    			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-    			}
+//    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+//    			if (currentFragment != null){
+//    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+//    			}
 
     			if (mTabsAdapterCDrive == null){
     				log("mTabsAdapterCloudDrive == null");
-    				mTabHostCDrive.setVisibility(View.VISIBLE);
+    				cloudSectionLayout.setVisibility(View.VISIBLE);
         			viewPagerCDrive.setVisibility(View.VISIBLE);
-        	        mTabHostCDrive.getTabWidget().setDividerDrawable(null);
-
-    				mTabsAdapterCDrive= new TabsAdapter(this, mTabHostCDrive, viewPagerCDrive);
-
-        			TabHost.TabSpec tabSpec5 = mTabHostCDrive.newTabSpec("fbFLol");
-        			String titleTab5 = getString(R.string.section_cloud_drive);
-        			tabSpec5.setIndicator(getTabIndicator(mTabHostCDrive.getContext(), titleTab5.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-        	        TabHost.TabSpec tabSpec6 = mTabHostCDrive.newTabSpec("rBFLol");
-        	        String titleTab6 = getString(R.string.section_rubbish_bin);
-        	        tabSpec6.setIndicator(getTabIndicator(mTabHostCDrive.getContext(), titleTab6.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-
-        	        mTabsAdapterCDrive.addTab(tabSpec5, FileBrowserFragmentLollipop.class, null);
-        	        mTabsAdapterCDrive.addTab(tabSpec6, RubbishBinFragmentLollipop.class, null);
-
-					log("TABS added to Cloud Drive");
-        			textViewBrowser = (TextView) mTabHostCDrive.getTabWidget().getChildAt(0).findViewById(R.id.textView);
-        			textViewRubbish = (TextView) mTabHostCDrive.getTabWidget().getChildAt(1).findViewById(R.id.textView);
+					mTabsAdapterCDrive = new CloudDrivePagerAdapter(getSupportFragmentManager(),this);
+					viewPagerCDrive.setAdapter(mTabsAdapterCDrive);
+					tabLayoutCloud.setupWithViewPager(viewPagerCDrive);
 
 					//Force on CreateView, addTab do not execute onCreateView
 					if(indexCloud!=-1){
@@ -2360,10 +2350,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 											.commit();
 								}
 								viewPagerCDrive.setCurrentItem(0);
-								textViewBrowser.setTypeface(null, Typeface.BOLD);
-								textViewRubbish.setTypeface(null, Typeface.NORMAL);
-								textViewBrowser.setTextColor(getResources().getColor(R.color.white));
-								textViewRubbish.setTextColor(getResources().getColor(R.color.text_tab_alpha));
 							}
 							else{
 								log("after creating tab in RUBBISH TAB: "+parentHandleRubbish);
@@ -2379,25 +2365,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 											.commit();
 								}
 								viewPagerCDrive.setCurrentItem(1);
-								textViewBrowser.setTypeface(null, Typeface.NORMAL);
-								textViewRubbish.setTypeface(null, Typeface.BOLD);
-								textViewBrowser.setTextColor(getResources().getColor(R.color.text_tab_alpha));
-								textViewRubbish.setTextColor(getResources().getColor(R.color.white));
 							}
 						}
 						indexCloud=-1;
 					}
 					else{
 						//No bundle, no change of orientation
-						textViewBrowser.setTypeface(null, Typeface.BOLD);
-						textViewRubbish.setTypeface(null, Typeface.NORMAL);
-						textViewBrowser.setTextColor(getResources().getColor(R.color.white));
-						textViewRubbish.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+						log("indexCloud is NOT -1");
 					}
    				}
     			else{
     				log("mTabsAdapterCloudDrive NOT null");
-        			mTabHostCDrive.setVisibility(View.VISIBLE);
+        			cloudSectionLayout.setVisibility(View.VISIBLE);
         			viewPagerCDrive.setVisibility(View.VISIBLE);
 
         			String sharesTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
@@ -2427,7 +2406,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         							firstNavigationLevel = false;
         						}
         					}
-        					else{
+        				else{
         						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
         						parentNode = megaApi.getRootNode();
         						aB.setTitle(getString(R.string.section_rubbish_bin));
@@ -2508,79 +2487,62 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
     			}
 
-    			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){
-                    @Override
-                    public void onTabChanged(String tabId) {
-                    	log("onTabChanged TabId :"+ tabId);
-                    	supportInvalidateOptionsMenu();
-                        if(tabId.compareTo("fbFLol") == 0){
-                        	String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-            				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-                			if (fbFLol != null){
-                				textViewBrowser.setTypeface(null, Typeface.BOLD);
-                				textViewRubbish.setTypeface(null, Typeface.NORMAL);
-                				textViewBrowser.setTextColor(getResources().getColor(R.color.white));
-                				textViewRubbish.setTextColor(getResources().getColor(R.color.text_tab_alpha));
-                				log("parentHandleCloud: "+ parentHandleBrowser);
-                				if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
-                					log("aB.setTitle2");
-                					aB.setTitle(getResources().getString(R.string.section_cloud_drive));
-                					log("aB.setHomeAsUpIndicator_11");
-                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-                					fbFLol.setNodes(megaApi.getChildren(megaApi.getRootNode(), orderCloud));
-                					firstNavigationLevel = true;
-                				}
-                				else {
-	                				MegaNode node = megaApi.getNodeByHandle(parentHandleBrowser);
-	            					aB.setTitle(node.getName());
+				viewPagerCDrive.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+					public void onPageScrollStateChanged(int state) {}
+					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+					public void onPageSelected(int position) {
+						log("onTabChanged TabId :"+ position);
+						supportInvalidateOptionsMenu();
+						if(position == 0){
+							String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (fbFLol != null){
+								log("parentHandleCloud: "+ parentHandleBrowser);
+								if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
+									log("aB.setTitle2");
+									aB.setTitle(getResources().getString(R.string.section_cloud_drive));
+									log("aB.setHomeAsUpIndicator_11");
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									fbFLol.setNodes(megaApi.getChildren(megaApi.getRootNode(), orderCloud));
+									firstNavigationLevel = true;
+								}
+								else {
+									MegaNode node = megaApi.getNodeByHandle(parentHandleBrowser);
+									aB.setTitle(node.getName());
 									log("indicator_arrow_back_891");
-	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-	            					fbFLol.setNodes(megaApi.getChildren(node, orderCloud));
-	            					firstNavigationLevel = false;
-            					}
-                			}
-                        }
-                        else if(tabId.compareTo("rBFLol") == 0){
-                        	String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-                        	rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-                        	if (rbFLol != null){
-                        		textViewBrowser.setTypeface(null, Typeface.NORMAL);
-                				textViewRubbish.setTypeface(null, Typeface.BOLD);
-                				textViewBrowser.setTextColor(getResources().getColor(R.color.text_tab_alpha));
-                				textViewRubbish.setTextColor(getResources().getColor(R.color.white));
-                        		log("parentHandleRubbish: "+ parentHandleRubbish);
-                        		if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
-                        			aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
-                        			log("aB.setHomeAsUpIndicator_13");
-                        			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-                        			rbFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
-                    				firstNavigationLevel = true;
-                        		}
-                        		else{
-                        			MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-                					aB.setTitle(node.getName());
-									log("indicator_arrow_back_892");
-                					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-                					rbFLol.setNodes(megaApi.getChildren(node, orderCloud));
-                					firstNavigationLevel = false;
-            					}
-                			}
-
-                        }
-						showFabButton();
-                     }
-    			});
-
-    			for (int i=0;i<mTabsAdapterCDrive.getCount();i++){
-					final int index = i;
-					mTabHostCDrive.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							viewPagerCDrive.setCurrentItem(index);
+									aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+									fbFLol.setNodes(megaApi.getChildren(node, orderCloud));
+									firstNavigationLevel = false;
+								}
+							}
 						}
-					});
-				}
+						else if(position == 1){
+							String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+							rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (rbFLol != null){
+								log("parentHandleRubbish: "+ parentHandleRubbish);
+								if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
+									aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+									log("aB.setHomeAsUpIndicator_13");
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									rbFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
+									firstNavigationLevel = true;
+								}
+								else{
+									MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
+									aB.setTitle(node.getName());
+									log("indicator_arrow_back_892");
+									aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+									rbFLol.setNodes(megaApi.getChildren(node, orderCloud));
+									firstNavigationLevel = false;
+								}
+							}
+
+						}
+						showFabButton();
+					}
+				});
 
     			if (!firstTime){
     				log("Its NOT first time");
@@ -2626,7 +2588,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				oFLol.setIsList(isList);
     			}
 
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -2658,7 +2620,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					cuFL.setFirstTimeCam(firstTimeCam);
 				}
 
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -2713,7 +2675,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					muFLol.setIsLargeGrid(isLargeGridCameraUploads);
 				}
 
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -2773,7 +2735,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -2805,7 +2767,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -3074,7 +3036,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			mTabHostShares.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -3274,7 +3236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -3339,7 +3301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			sFLol.setParentHandle(parentHandleSearch);
     			sFLol.setLevels(levelsSearch);
 
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -3388,7 +3350,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -3421,7 +3383,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
     			mTabHostShares.setVisibility(View.GONE);
-    			mTabHostCDrive.setVisibility(View.GONE);
+    			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
 
     			if (tFLol == null){
@@ -3585,7 +3547,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
 
-		mTabHostCDrive.setVisibility(View.GONE);
+		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
 		mTabHostContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
@@ -3617,7 +3579,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		accountFragment=Constants.PAYMENT_FRAGMENT;
 
-		mTabHostCDrive.setVisibility(View.GONE);
+		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
 		mTabHostContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
@@ -3677,7 +3639,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerContacts.setVisibility(View.GONE);
 		mTabHostShares.setVisibility(View.GONE);
 		viewPagerShares.setVisibility(View.GONE);
-		mTabHostCDrive.setVisibility(View.GONE);
+		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
