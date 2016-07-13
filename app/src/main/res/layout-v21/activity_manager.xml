@@ -37,39 +37,28 @@
 
         <!-- THE Cloud Drive TABS -->
 
-        <TabHost
+        <LinearLayout
             android:id="@+id/tabhost_cloud_drive"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar"
-            android:background="@color/mega" >
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical" >
-
-                <TabWidget
-                    android:id="@android:id/tabs"
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_cloud_drive"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/mega" >
-                </TabWidget>
-
-                <FrameLayout
-                    android:id="@android:id/tabcontent"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="0" />
+                    android:background="@color/mega"
+                    style="@style/MyCustomTabLayout"/>
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/cloud_drive_tabs_pager"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1" />
-            </LinearLayout>
-        </TabHost>
+                    android:layout_weight="1"/>
+        </LinearLayout>
+
 
         <!-- THE CONTACTS TABS -->
 
