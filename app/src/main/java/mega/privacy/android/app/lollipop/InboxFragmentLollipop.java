@@ -476,6 +476,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}
 		}
 		setNodes(nodes);
+		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 		if(adapter != null){				
 			adapter.notifyDataSetChanged();
 		}		
