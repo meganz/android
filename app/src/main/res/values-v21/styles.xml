@@ -33,6 +33,8 @@
         <item name="tabIndicatorHeight">2dp</item>
         <item name="tabBackground">@color/mega</item>
         <item name="tabSelectedTextColor">@color/white</item>
+        <item name="tabPaddingStart">12dp</item>
+        <item name="tabPaddingEnd">12dp</item>
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
     </style>
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
