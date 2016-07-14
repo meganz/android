@@ -609,16 +609,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 							retriever.setDataSource(transfer.getPath());
 							String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-							int seconds = Integer.parseInt(time);
-							log("The duration is: "+seconds);
+							if(time!=null){
+								double seconds = Double.parseDouble(time)/1000;
+								log("The original duration is: "+seconds);
+								int secondsAprox = (int) Math.ceil(seconds);
+								log("The duration aprox is: "+secondsAprox);
 
-//							megaApi.setNodeDuration(node, seconds, null);
+								megaApi.setNodeDuration(node, secondsAprox, null);
+							}
 
-//							long timeInmillisec = Long.parseLong(time);
-//							int seconds = (int) (timeInmillisec / 1000) % 60 ;
-//							int minutes = (int) ((timeInmillisec / (1000*60)) % 60);
-//							int hours   = (int) ((timeInmillisec / (1000*60*60)) % 24);
-//							log("The duration is: "+hours+" "+minutes+" "+seconds);
 						}
 					}
 					else{
