@@ -612,7 +612,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							if(time!=null){
 								double seconds = Double.parseDouble(time)/1000;
 								log("The original duration is: "+seconds);
-								int secondsAprox = (int) Math.ceil(seconds);
+								int secondsAprox = (int) Math.round(seconds);
 								log("The duration aprox is: "+secondsAprox);
 
 								megaApi.setNodeDuration(node, secondsAprox, null);

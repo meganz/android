@@ -572,6 +572,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				}
 			}
 			else{
+				log("monthPic.monthYearString != null and not empty string");
 				holder.textRelativeLayout.setVisibility(View.GONE);
 				for (int i=0;i<numberOfCells;i++){
 					if (monthPic.nodeHandles.size() > i){
@@ -607,6 +608,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						Bitmap thumb = null;						
 						holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());	
 						if (n.hasThumbnail()){
+							log(n.getName()+" has ThUMB!!");
 							thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
 							if (thumb != null){
 								holder.imageViews.get(i).setImageBitmap(thumb);
@@ -631,27 +633,58 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 								}
 							}
 						}
+						else{
+							log(n.getName()+" NO ThUMB!!");
+						}
 
-						MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
-						if(Util.isVideoFile(nodeToCheck.getName())){
+						if(Util.isVideoFile(n.getName())){
+							log("IS VIDEO!");
+							holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
 							holder.videoIcons.get(i).setVisibility(View.VISIBLE);
-							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
-								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);	
-								RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-								lp.setMargins(3, 0, 0, 3);								
-								holder.videoIcons.get(i).setLayoutParams(lp);
+
+							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);
+								log(n.getName()+" DURATION: "+n.getDuration());
+								int duration = n.getDuration();
+								if(duration>0){
+									int hours = duration / 3600;
+									int minutes = (duration % 3600) / 60;
+									int seconds = duration % 60;
+
+									String timeString;
+									if(hours>0){
+										timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+									}
+									else{
+										timeString = String.format("%d:%02d", minutes, seconds);
+									}
+
+									log("The duration is: "+hours+" "+minutes+" "+seconds);
+
+									holder.videoDuration.get(i).setText(timeString);
+									RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+									relativeParams.bottomMargin=Util.scaleWidthPx(3, outMetrics);
+									relativeParams.leftMargin=Util.scaleWidthPx(3, outMetrics);
+									holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+									holder.videoDuration.get(i).setVisibility(View.VISIBLE);
+								}
+								else{
+									holder.videoDuration.get(i).setVisibility(View.GONE);
+								}
 							}
 							else{
-								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
-								RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-								lp.setMargins(1, 0, 0, 1);								
-								holder.videoIcons.get(i).setLayoutParams(lp);
-							}							
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);
+								holder.videoIcons.get(i).setVisibility(View.VISIBLE);
+								RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+								relativeParams.bottomMargin=Util.scaleWidthPx(1, outMetrics);
+								relativeParams.leftMargin=Util.scaleWidthPx(1, outMetrics);
+								holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+								holder.videoDuration.get(i).setVisibility(View.GONE);
+							}
 						}
 						else{
 							holder.videoIcons.get(i).setVisibility(View.GONE);
+							holder.videoDuration.get(i).setVisibility(View.GONE);
 						}
 					}
 					else{
@@ -712,6 +745,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					Bitmap thumb = null;					
 					holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
 					if (n.hasThumbnail()){
+						log(n.getName()+" has ThUMB!!");
 						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
 						if (thumb != null){
 							holder.imageViews.get(i).setImageBitmap(thumb);
@@ -736,42 +770,56 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							}
 						}
 					}
+					else{
+						log(n.getName()+" NO ThUMB!!");
+					}
 
-					MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
-					if(Util.isVideoFile(nodeToCheck.getName())){
+					if(Util.isVideoFile(n.getName())){
 						holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
 						holder.videoIcons.get(i).setVisibility(View.VISIBLE);
-						holder.videoDuration.get(i).setVisibility(View.VISIBLE);
+
 						if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
 							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);
-							log("DURATION: "+n.getDuration());
+							log(n.getName()+" DURATION: "+n.getDuration());
 							int duration = n.getDuration();
+							if(duration>0){
+								int hours = duration / 3600;
+								int minutes = (duration % 3600) / 60;
+								int seconds = duration % 60;
 
-							int hours = duration / 3600;
-							int minutes = (duration % 3600) / 60;
-							int seconds = duration % 60;
+								String timeString;
+								if(hours>0){
+									timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+								}
+								else{
+									timeString = String.format("%d:%02d", minutes, seconds);
+								}
 
-							String timeString = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-							log("The duration is: "+hours+" "+minutes+" "+seconds);
+								log("The duration is: "+hours+" "+minutes+" "+seconds);
 
-
-
-							holder.videoDuration.get(i).setText(timeString);
-//							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-//							lp.setMargins(3, 0, 0, 3);
-//							holder.videoIcons.get(i).setLayoutParams(lp);
+								holder.videoDuration.get(i).setText(timeString);
+								RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+								relativeParams.bottomMargin=Util.scaleWidthPx(3, outMetrics);
+								relativeParams.leftMargin=Util.scaleWidthPx(3, outMetrics);
+								holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+								holder.videoDuration.get(i).setVisibility(View.VISIBLE);
+							}
+							else{
+								holder.videoDuration.get(i).setVisibility(View.GONE);
+							}
 						}
 						else{
 							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
-//							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//							lp.setMargins(1, 0, 0, 1);
-//							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-//							holder.videoIcons.get(i).setLayoutParams(lp);
+							RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+							relativeParams.bottomMargin=Util.scaleWidthPx(1, outMetrics);
+							relativeParams.leftMargin=Util.scaleWidthPx(1, outMetrics);
+							holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+							holder.videoDuration.get(i).setVisibility(View.GONE);
 						}
 					}
 					else{
 						holder.videoIcons.get(i).setVisibility(View.GONE);
+						holder.videoDuration.get(i).setVisibility(View.GONE);
 					}
 				}
 				else{

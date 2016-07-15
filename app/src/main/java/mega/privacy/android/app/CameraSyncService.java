@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -2172,6 +2173,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				if(Util.isVideoFile(transfer.getPath())){
 					log("Is video!!!");
 					ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+
+					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+					if(node!=null){
+						MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+						retriever.setDataSource(transfer.getPath());
+						String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+						if(time!=null){
+							double seconds = Double.parseDouble(time)/1000;
+							log("The original duration is: "+seconds);
+							int secondsAprox = (int) Math.round(seconds);
+							log("The duration aprox is: "+secondsAprox);
+
+							megaApi.setNodeDuration(node, secondsAprox, null);
+						}
+					}
 				}
 				else{
 					log("NOT video!");

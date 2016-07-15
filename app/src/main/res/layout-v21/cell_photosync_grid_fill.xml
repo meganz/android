@@ -29,14 +29,15 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:textColor="@color/white"
+            android:visibility="gone"
             android:textSize="14sp"/>
 
         <ImageView
             android:id="@+id/cell_photosync_grid_video_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
             android:src="@drawable/ic_play_arrow_white_24dp"
+            android:visibility="gone"
             android:background="@null" />
 
      </RelativeLayout>
