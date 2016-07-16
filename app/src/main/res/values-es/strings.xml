@@ -152,7 +152,6 @@
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Se ha cerrado la sesión de este dispositivo desde otra ubicación</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculando las claves de encriptación</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Conectando al servidor</string>
-    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Correo electrónico o contraseña incorrectos. ¿Has confirmado tu cuenta?</string>    
     <string name="download_updating_filelist" context="Status text when updating the file manager">Actualizando lista de archivos</string>
     <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Confirmar cuenta</string>
     <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Comprobando el enlace de validación</string>
@@ -800,4 +799,9 @@
     </plurals>
 
     <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">¿Dejar de compartir la carpeta?</string>
+
+    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">El correo electrónico o la contraseña introducidas no son correctas. Por favor, pruebe otra vez.</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.co.nz</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Demasiados intentos incorrectos para iniciar sesión, por favor, espere una hora.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">La cuenta no ha sido validada todavía. Por favor, compruebe su correo electrónico.</string>
 </resources>

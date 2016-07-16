@@ -608,7 +608,6 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						Bitmap thumb = null;						
 						holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());	
 						if (n.hasThumbnail()){
-							log(n.getName()+" has ThUMB!!");
 							thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
 							if (thumb != null){
 								holder.imageViews.get(i).setImageBitmap(thumb);
@@ -745,7 +744,6 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					Bitmap thumb = null;					
 					holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
 					if (n.hasThumbnail()){
-						log(n.getName()+" has ThUMB!!");
 						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
 						if (thumb != null){
 							holder.imageViews.get(i).setImageBitmap(thumb);
