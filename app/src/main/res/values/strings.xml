@@ -156,7 +156,6 @@
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
-    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Incorrect email or password. Have you validated your email account?</string>    
     <string name="download_updating_filelist" context="Status text when updating the file manager">Updating file list</string>
     <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Confirm account</string>
     <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Checking validation link</string>
@@ -803,4 +802,9 @@
     </plurals>
 
     <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">Remove shares?</string>
+
+    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Invalid e-mail and/or password. Please try again.</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many attempts to login, please wait for an hour.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please, check your e-mail.</string>
 </resources>

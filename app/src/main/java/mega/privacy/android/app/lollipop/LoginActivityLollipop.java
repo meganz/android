@@ -1327,11 +1327,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				if (error.getErrorCode() == MegaError.API_ENOENT) {
 					errorMessage = getString(R.string.error_incorrect_email_or_password);
 				}
-				else if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_server_connection_problem);
-				}
 				else if (error.getErrorCode() == MegaError.API_ESID){
 					errorMessage = getString(R.string.error_server_expired_session);
+				}
+				else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+					errorMessage = getString(R.string.too_many_attempts_login);
+				}
+				else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+					errorMessage = getString(R.string.account_not_validated_login);
+				}
+				else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+					errorMessage = getString(R.string.error_account_suspended);
 				}
 				else{
 					errorMessage = error.getErrorString();
