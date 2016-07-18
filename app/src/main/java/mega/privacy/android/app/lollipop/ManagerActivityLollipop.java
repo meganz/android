@@ -174,6 +174,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MyAccountInfo myAccountInfo;
 
 	MegaNode selectedNode;
+	MegaOffline selectedOfflineNode;
 	MegaUser selectedUser;
 	MegaContactRequest selectedRequest;
 
@@ -207,6 +208,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;
 	public LinearLayout optionOpenFolder;
+	public LinearLayout optionDeleteOffline;
 	public TextView propertiesText;
 	public TextView optionPublicLinkText;
 	private NodeOptionsPanelListener nodeOptionsPanelListener;
@@ -1233,6 +1235,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionCopyTo = (LinearLayout) findViewById(R.id.file_list_option_copy_layout);
 		optionSendToInbox = (LinearLayout) findViewById(R.id.file_list_option_send_inbox_layout);
 		optionOpenFolder = (LinearLayout) findViewById(R.id.file_list_option_open_folder_layout);
+		optionDeleteOffline = (LinearLayout) findViewById(R.id.offline_list_option_delete_layout);
 
 		nodeOptionsPanelListener = new NodeOptionsPanelListener(this);
 
@@ -1252,6 +1255,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
 		optionLeaveShare.setOnClickListener(nodeOptionsPanelListener);
 		optionOpenFolder.setOnClickListener(nodeOptionsPanelListener);
+		optionDeleteOffline.setOnClickListener(nodeOptionsPanelListener);
 
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -8245,6 +8249,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				sFLol.resetAdapter();
 				break;
 			}
+			case SAVED_FOR_OFFLINE:{
+				oFLol.resetAdapter();
+				break;
+			}
 		}
 
 	}
@@ -8263,6 +8271,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int accessLevel = megaApi.getAccess(selectedNode);
 		log("Node: "+sNode.getName()+" "+accessLevel);
 		optionOpenFolder.setVisibility(View.GONE);
+		optionDeleteOffline.setVisibility(View.GONE);
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionPermissions.setVisibility(View.GONE);
@@ -8352,6 +8361,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionPublicLink.setVisibility(View.GONE);
 		optionLeaveShare.setVisibility(View.GONE);
 		optionOpenFolder.setVisibility(View.GONE);
+		optionDeleteOffline.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -8393,6 +8403,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionPermissions.setVisibility(View.GONE);
 		optionLeaveShare.setVisibility(View.GONE);
 		optionOpenFolder.setVisibility(View.GONE);
+		optionDeleteOffline.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -8423,6 +8434,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionSendToInbox.setVisibility(View.GONE);
 		optionLeaveShare.setVisibility(View.GONE);
 		optionOpenFolder.setVisibility(View.GONE);
+		optionDeleteOffline.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -8463,6 +8475,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionCopyTo.setVisibility(View.GONE);
 		optionSendToInbox.setVisibility(View.GONE);
 		optionShare.setVisibility(View.GONE);
+		optionDeleteOffline.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -8496,6 +8509,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDownload.setVisibility(View.GONE);
 		optionPublicLink.setVisibility(View.GONE);
 		optionOpenFolder.setVisibility(View.GONE);
+		optionDeleteOffline.setVisibility(View.GONE);
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -8551,12 +8565,93 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showNodeOptionsPanel(MegaOffline node){
+	public void showOptionsPanel(MegaOffline sNode){
 		log("showNodeOptionsPanel-Offline");
 
-		if (oFLol != null){
-			oFLol.showOptionsPanel(node);
+		//Check if the node is the Master Key file
+		if(sNode.getHandle().equals("0")){
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+			File file= new File(path);
+			if(file.exists()){
+				optionMoveTo.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionProperties.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionPermissions.setVisibility(View.GONE);
+				optionLeaveShare.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionCopyTo.setVisibility(View.GONE);
+				optionSendToInbox.setVisibility(View.GONE);
+				optionShare.setVisibility(View.GONE);
+				optionDownload.setVisibility(View.GONE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRemoveLink.setVisibility(View.GONE);
+				optionOpenFolder.setVisibility(View.GONE);
+				optionDeleteOffline.setVisibility(View.VISIBLE);
+
+				slidingOptionsPanel.setVisibility(View.VISIBLE);
+				slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+				log("Show the slidingPanel");
+
+				return;
+			}
 		}
+
+		long handle = Long.parseLong(sNode.getHandle());
+		this.selectedNode = megaApi.getNodeByHandle(handle);
+		this.selectedOfflineNode = sNode;
+
+		if(selectedNode!=null){
+			if (selectedNode.isFolder()) {
+				propertiesText.setText(R.string.general_folder_info);
+			}else{
+				propertiesText.setText(R.string.general_file_info);
+			}
+
+			optionDownload.setVisibility(View.VISIBLE);
+			optionProperties.setVisibility(View.VISIBLE);
+			optionDeleteOffline.setVisibility(View.VISIBLE);
+			optionRemoveLink.setVisibility(View.GONE);
+			optionMoveTo.setVisibility(View.GONE);
+			optionRemoveTotal.setVisibility(View.GONE);
+			optionClearShares.setVisibility(View.GONE);
+			optionPermissions.setVisibility(View.GONE);
+			optionLeaveShare.setVisibility(View.GONE);
+			optionDelete.setVisibility(View.GONE);
+			optionRename.setVisibility(View.GONE);
+			optionCopyTo.setVisibility(View.GONE);
+			optionSendToInbox.setVisibility(View.GONE);
+			optionShare.setVisibility(View.GONE);
+			optionPublicLink.setVisibility(View.GONE);
+			optionRemoveLink.setVisibility(View.GONE);
+			optionOpenFolder.setVisibility(View.GONE);
+		}
+		else{
+			//No node handle
+			log("node not found with handle");
+			optionMoveTo.setVisibility(View.GONE);
+			optionRemoveTotal.setVisibility(View.GONE);
+			optionProperties.setVisibility(View.GONE);
+			optionClearShares.setVisibility(View.GONE);
+			optionPermissions.setVisibility(View.GONE);
+			optionLeaveShare.setVisibility(View.GONE);
+			optionDelete.setVisibility(View.GONE);
+			optionRename.setVisibility(View.GONE);
+			optionCopyTo.setVisibility(View.GONE);
+			optionSendToInbox.setVisibility(View.GONE);
+			optionShare.setVisibility(View.GONE);
+			optionDownload.setVisibility(View.GONE);
+			optionPublicLink.setVisibility(View.GONE);
+			optionRemoveLink.setVisibility(View.GONE);
+			optionOpenFolder.setVisibility(View.GONE);
+			optionDeleteOffline.setVisibility(View.VISIBLE);
+
+		}
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+		log("Show the slidingPanel offline");
 	}
 
 	public void showContactOptionsCF(){
@@ -9972,6 +10067,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						cancelSubscription.setVisible(true);
 					}
 				}
+			}
+		}
+	}
+
+	public void updateOfflineView(MegaOffline mOff){
+		if(oFLol!=null){
+			if(mOff==null){
+				oFLol.refresh();
+			}
+			else{
+				oFLol.refreshPaths(mOff);
 			}
 		}
 	}
@@ -11956,5 +12062,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setExpiredDateLink(boolean expiredDateLink) {
 		isExpiredDateLink = expiredDateLink;
+	}
+
+
+	public MegaOffline getSelectedOfflineNode() {
+		return selectedOfflineNode;
+	}
+
+	public void setSelectedOfflineNode(MegaOffline selectedOfflineNode) {
+		this.selectedOfflineNode = selectedOfflineNode;
 	}
 }

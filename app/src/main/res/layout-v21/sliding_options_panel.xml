@@ -460,5 +460,33 @@
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp"/>
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/offline_list_option_delete_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/offline_list_option_delete"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_remove" />
+
+            <TextView
+                android:id="@+id/offline_list_option_delete_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/context_delete_offline"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+        </LinearLayout>
     </LinearLayout>
 </mega.privacy.android.app.components.SlidingUpPanelLayout>

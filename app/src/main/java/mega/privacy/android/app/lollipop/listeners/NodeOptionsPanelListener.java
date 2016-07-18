@@ -8,6 +8,7 @@ import android.view.View;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
@@ -191,6 +192,15 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop) context).hideOptionsPanel();
                 nC.openFolderFromSearch(selectedNode.getHandle());
                 break;
+            }
+            case R.id.offline_list_option_delete_layout:{
+                log("Delete Offline");
+                ((ManagerActivityLollipop) context).hideOptionsPanel();
+                String pathNavigation = ((ManagerActivityLollipop) context).getPathNavigationOffline();
+                MegaOffline mOff = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
+                nC.deleteOffline(mOff, pathNavigation);
+                break;
+
             }
         }
 
