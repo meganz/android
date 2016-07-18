@@ -20,6 +20,7 @@ import java.io.IOException;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.LauncherFileExplorerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
@@ -354,8 +355,11 @@ public class AccountController {
                 Intent intent = new Intent(context, TourActivityLollipop.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                ((ManagerActivityLollipop)context).startActivity(intent);
-                ((ManagerActivityLollipop)context).finish();
+
+                context.startActivity(intent);
+                if (context instanceof Activity) {
+                    ((Activity) context).finish();
+                }
                 context = null;
             }
             else{
