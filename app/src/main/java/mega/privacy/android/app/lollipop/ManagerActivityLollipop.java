@@ -196,6 +196,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionProperties;
 	public LinearLayout optionRename;
 	public LinearLayout optionPublicLink;
+	public LinearLayout optionRemoveLink;
 	public LinearLayout optionShare;
 	public LinearLayout optionPermissions;
 	public LinearLayout optionDelete;
@@ -1217,6 +1218,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
 //				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
+		optionRemoveLink = (LinearLayout) findViewById(R.id.file_list_option_remove_link_layout);
 		optionShare = (LinearLayout) findViewById(R.id.file_list_option_share_layout);
 		optionPermissions = (LinearLayout) findViewById(R.id.file_list_option_permissions_layout);
 
@@ -1243,6 +1245,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDelete.setOnClickListener(nodeOptionsPanelListener);
 		optionRemoveTotal.setOnClickListener(nodeOptionsPanelListener);
 		optionPublicLink.setOnClickListener(nodeOptionsPanelListener);
+		optionRemoveLink.setOnClickListener(nodeOptionsPanelListener);
 		optionMoveTo.setOnClickListener(nodeOptionsPanelListener);
 		optionCopyTo.setOnClickListener(nodeOptionsPanelListener);
 		optionSendToInbox.setOnClickListener(nodeOptionsPanelListener);
@@ -8049,6 +8052,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationRemovePublicLink (final MegaNode n){
+		log("showConfirmationRemovePublicLink");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						nC.removeLink(n);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.context_remove_link_warning_text);
+		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+		}
+
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		log("showConfirmationLeaveIncomingShare");
 
@@ -8348,9 +8376,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionPublicLink.setVisibility(View.VISIBLE);
 		if(sNode.isExported()){
 			optionPublicLinkText.setText(R.string.edit_link_option);
+			optionRemoveLink.setVisibility(View.VISIBLE);
 		}
 		else{
 			optionPublicLinkText.setText(R.string.context_get_link_menu);
+			optionRemoveLink.setVisibility(View.GONE);
 		}
 		optionDelete.setVisibility(View.VISIBLE);
 		optionRename.setVisibility(View.VISIBLE);
@@ -8413,9 +8443,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionPublicLink.setVisibility(View.VISIBLE);
 		if(sNode.isExported()){
 			optionPublicLinkText.setText(R.string.edit_link_option);
+			optionRemoveLink.setVisibility(View.VISIBLE);
 		}
 		else{
 			optionPublicLinkText.setText(R.string.context_get_link_menu);
+			optionRemoveLink.setVisibility(View.GONE);
 		}
 		optionOpenFolder.setVisibility(View.VISIBLE);
 

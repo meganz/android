@@ -2457,8 +2457,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	    	shareIt = false;
 	    	AlertDialog removeLinkDialog;
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			builder.setTitle(getString(R.string.context_remove_link_menu));
-			
+
 			LayoutInflater inflater = getLayoutInflater();
 			View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
 			TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);

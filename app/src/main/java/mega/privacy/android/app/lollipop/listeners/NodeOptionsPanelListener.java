@@ -135,6 +135,13 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 break;
             }
 
+            case R.id.file_list_option_remove_link_layout: {
+                log("REMOVE public link option");
+                ((ManagerActivityLollipop) context).hideOptionsPanel();
+                ((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(selectedNode);
+                break;
+            }
+
             case R.id.file_list_option_rename_layout:{
                 log("Rename option");
                 ((ManagerActivityLollipop) context).hideOptionsPanel();

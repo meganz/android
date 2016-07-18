@@ -766,6 +766,15 @@ public class NodeController {
         megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
     }
 
+    public void removeLink(MegaNode document){
+        log("removeLink");
+        if (!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+        megaApi.disableExport(document, ((ManagerActivityLollipop) context));
+    }
+
 
     public void selectContactToShareFolders(ArrayList<Long> handleList){
         log("shareFolders ArrayListLong");
