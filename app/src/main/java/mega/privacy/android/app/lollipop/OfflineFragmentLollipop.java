@@ -25,11 +25,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -43,12 +40,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -57,7 +51,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-public class OfflineFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class OfflineFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 	
 	static int FROM_OFFLINE= 15;
 
@@ -88,22 +82,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;
-	public LinearLayout optionShare;
-	public LinearLayout optionDelete;
-	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
-	public TextView propertiesText;
-	////
-	
+
 	private ActionMode actionMode;
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -242,9 +221,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					break;
 				}
 				case R.id.cab_menu_delete:{
-					
-					for (int i=0;i<documents.size();i++){						
-						deleteOffline(context, documents.get(i));
+					NodeController nC = new NodeController(context);
+					for (int i=0;i<documents.size();i++){
+						nC.deleteOffline(documents.get(i), pathNavigation);
 					}					
 					clearSelections();
 					hideMultipleSelect();
@@ -355,159 +334,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public void setIsListDB(boolean isList){
 		dbH.setPreferredViewList(isList);
 	}
-	
-	public int deleteOffline(Context context,MegaOffline node){
-		
-		log("deleteOffline");
 
-//		dbH = new DatabaseHandler(context);
-		dbH = DatabaseHandler.getDbHandler(context);
-
-		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
-		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
-		MegaOffline parentNode = null;	
-		
-		//Delete children
-		mOffListChildren=dbH.findByParentId(node.getId());
-		if(mOffListChildren.size()>0){
-			//The node have childrens, delete
-			deleteChildrenDB(mOffListChildren);			
-		}
-		
-		log("Remove the node physically");
-		//Remove the node physically
-		File destination = null;								
-		//Check if the node is incoming
-		if(node.isIncoming()){
-			if (Environment.getExternalStorageDirectory() != null){
-				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + node.getHandleIncoming() + node.getPath());
-			}
-			else{
-				destination = context.getFilesDir();
-			}						
-		}
-		else{
-			if (Environment.getExternalStorageDirectory() != null){
-				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
-			}
-			else{
-				destination = context.getFilesDir();
-			}
-		}
-
-		try{
-			File offlineFile = new File(destination, node.getName());	
-			log("Delete in phone: "+node.getName());
-			Util.deleteFolderAndSubfolders(context, offlineFile);
-		}
-		catch(Exception e){
-			log("EXCEPTION: deleteOffline - adapter");
-		};		
-		
-		dbH.removeById(node.getId());
-		
-		//Check if the parent has to be deleted
-		
-		int parentId = node.getParentId();
-		parentNode = dbH.findById(parentId);
-	
-		if(parentNode != null){
-			log("Parent to check: "+parentNode.getName());
-			checkParentDeletion(parentNode);			
-		}	
-		
-		return 1;		
-	}
-	
-	public void checkParentDeletion (MegaOffline parentToDelete){
-		log("checkParentDeletion: "+parentToDelete.getName());
-		
-		ArrayList<MegaOffline> mOffListChildren=dbH.findByParentId(parentToDelete.getId());
-		File destination = null;	
-		if(mOffListChildren.size()<=0){
-			log("The parent has NO children");
-			//The node have NO childrens, delete it
-			
-			dbH.removeById(parentToDelete.getId());
-			if(parentToDelete.isIncoming()){
-				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming() + parentToDelete.getPath());
-				}
-				else{
-					destination = context.getFilesDir();
-				}						
-			}
-			else{
-				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + parentToDelete.getPath());
-				}
-				else{
-					destination = context.getFilesDir();
-				}
-			}
-			
-			try{
-				File offlineFile = new File(destination, parentToDelete.getName());	
-				log("Delete in phone: "+parentToDelete.getName());
-				Util.deleteFolderAndSubfolders(context, offlineFile);
-			}
-			catch(Exception e){
-				log("EXCEPTION: deleteOffline - adapter");
-			};				
-	
-			int parentId = parentToDelete.getParentId();
-			if(parentId==-1){
-				File rootIncomingFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming());
-				
-				if(rootIncomingFile.list().length==0){
-					try{
-						rootIncomingFile.delete();
-					}
-					catch(Exception e){
-						log("EXCEPTION: deleteParentIncoming: "+destination);
-					};
-				}				
-			}
-			else{
-				//Check if the parent has to be deleted	
-				
-				parentToDelete = dbH.findById(parentId);			
-				if(parentToDelete != null){
-					log("Parent to check: "+parentToDelete.getName());
-					checkParentDeletion(parentToDelete);
-						
-				}
-			}
-
-		}
-		else{
-			log("The parent has children!!! RETURN!!");
-			return;
-		}
-		
-	}
-
-	public void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
-
-		log("deleteChildenDB: "+mOffListChildren.size());
-		MegaOffline mOffDelete=null;
-
-		for(int i=0; i<mOffListChildren.size(); i++){	
-
-			mOffDelete=mOffListChildren.get(i);
-
-			log("Children "+i+ ": "+ mOffDelete.getName());
-			ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
-			if(mOffListChildren2.size()>0){
-				//The node have children, delete				
-				deleteChildrenDB(mOffListChildren2);				
-			}	
-
-			int lines = dbH.removeById(mOffDelete.getId());		
-			log("Borradas; "+lines);
-		}		
-	}
-	
 	public void selectAll(){
 		log("selectAll");
 		if (adapter != null){
@@ -733,79 +560,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				contentText.setText(getInfoFolder(mOffList));
-			}			
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.offline_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.offline_list_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.offline_list_option_rename_layout);
-			optionRename.setVisibility(View.GONE);
-			
-			optionDownload = (LinearLayout) v.findViewById(R.id.offline_list_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.offline_list_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.offline_list_option_properties_text);			
-
-			optionPublicLink = (LinearLayout) v.findViewById(R.id.offline_list_option_public_link_layout);
-//				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-			optionShare = (LinearLayout) v.findViewById(R.id.offline_list_option_share_layout);			
-			optionDelete = (LinearLayout) v.findViewById(R.id.offline_list_option_delete_layout);			
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.offline_list_option_move_layout);	
-			optionMoveTo.setVisibility(View.GONE);
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.offline_list_option_copy_layout);			
-			optionCopyTo.setVisibility(View.GONE);
-			
-			optionDownload.setOnClickListener(this);
-			optionShare.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionRename.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
-			optionPublicLink.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);
-			optionCopyTo.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });			
+			}
 		
 			return v;
 		}
@@ -924,109 +679,12 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				contentText.setText(getInfoFolder(mOffList));
-			}			
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_offline_grid);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.offline_grid_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.offline_grid_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.offline_grid_option_rename_layout);
-			optionRename.setVisibility(View.GONE);
-			
-			optionDownload = (LinearLayout) v.findViewById(R.id.offline_grid_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.offline_grid_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.offline_grid_option_properties_text);			
+			}
 
-			optionPublicLink = (LinearLayout) v.findViewById(R.id.offline_grid_option_public_link_layout);
-//				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-			optionShare = (LinearLayout) v.findViewById(R.id.offline_grid_option_share_layout);			
-			optionDelete = (LinearLayout) v.findViewById(R.id.offline_grid_option_delete_layout);			
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.offline_grid_option_move_layout);	
-			optionMoveTo.setVisibility(View.GONE);
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.offline_grid_option_copy_layout);			
-			optionCopyTo.setVisibility(View.GONE);
-			
-			optionDownload.setOnClickListener(this);
-			optionShare.setOnClickListener(this);
-			optionProperties.setOnClickListener(this);
-			optionRename.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
-			optionPublicLink.setOnClickListener(this);
-			optionMoveTo.setOnClickListener(this);
-			optionCopyTo.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-	            @Override
-	            public void onPanelSlide(View panel, float slideOffset) {
-	            	log("onPanelSlide, offset " + slideOffset);
-//	            	if(slideOffset==0){
-//	            		hideOptionsPanel();
-//	            	}
-	            }
-
-	            @Override
-	            public void onPanelExpanded(View panel) {
-	            	log("onPanelExpanded");
-
-	            }
-
-	            @Override
-	            public void onPanelCollapsed(View panel) {
-	            	log("onPanelCollapsed");
-	            	
-
-	            }
-
-	            @Override
-	            public void onPanelAnchored(View panel) {
-	            	log("onPanelAnchored");
-	            }
-
-	            @Override
-	            public void onPanelHidden(View panel) {
-	                log("onPanelHidden");                
-	            }
-	        });			
-		
 			return v;
 		}		
 	}
-	
-	public void download (String path){
-		
-		if (Util.isOnline(context)){
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			MegaNode node = megaApi.getNodeByPath(path);
-			if(node == null)
-			{
-				return;
-			}
-			
-			handleList.add(node.getHandle());
-			log("download "+node.getName());
-			if (context instanceof ManagerActivityLollipop){
-				NodeController nC = new NodeController(context);
-				nC.prepareForDownload(handleList);
-			}
-			else{
-				//TODO toast no connection
-			}			
-		}
-		else{
-			//TODO toast no connection
-		}
-	}
-	
+
 	public void sortByNameDescending(){
 		
 		ArrayList<String> foldersOrder = new ArrayList<String>();
@@ -1169,91 +827,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 //		this.setNodes(mOffList);
 //	}
 //	
-	public void showProperties (String path, String handle){
-		log("showProperties: "+path);
-		
-		MegaNode n = megaApi.getNodeByHandle(Long.valueOf(handle));		
-		if(n == null)
-		{
-			return;
-		}
-		
-		Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
-		i.putExtra("handle", Long.valueOf(handle));
-		i.putExtra("from", FROM_OFFLINE);
 
-		if (n.isFolder()) {
-			if (megaApi.isShared(n)){
-				i.putExtra("imageId", R.drawable.folder_shared_mime);	
-			}
-			else{
-				i.putExtra("imageId", R.drawable.folder_mime);
-			}
-
-		} 
-		else {
-			i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
-		}
-		i.putExtra("name", n.getName());
-		context.startActivity(i);
-	}
-	
-	public void getLink (String path){
-		MegaNode n = megaApi.getNodeByPath(path);
-		if(n == null)
-		{
-			return;
-		}
-		NodeController nC = new NodeController(context);
-		nC.exportLink(n);
-	}
-	
-	public void shareFolder (String path){
-		MegaNode n = megaApi.getNodeByPath(path);
-		if(n == null)
-		{
-			return;
-		}
-		NodeController nC = new NodeController(context);
-		nC.selectContactToShareFolder(n);
-	}
-	
-	public void rename (String path){
-		MegaNode n = megaApi.getNodeByPath(path);
-		if(n == null)
-		{
-			return;
-		}
-		
-		((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
-	}
-	
-	public void move (String path){
-		MegaNode n = megaApi.getNodeByPath(path);
-		if(n == null)
-		{
-			return;
-		}
-		
-		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(n.getHandle());
-		NodeController nC = new NodeController(context);
-		nC.chooseLocationToMoveNodes(handleList);
-	}
-	
-	public void copy (String path){
-		MegaNode n = megaApi.getNodeByPath(path);
-		if(n == null)
-		{
-			return;
-		}
-		
-		ArrayList<Long> handleList = new ArrayList<Long>();
-		handleList.add(n.getHandle());
-		NodeController nC = new NodeController(context);
-		nC.chooseLocationToCopyNodes(handleList);
-	}
-	
 	public boolean isFolder(String path){
 		MegaNode n = megaApi.getNodeByPath(path);
 		if(n == null)
@@ -1337,87 +911,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		log(info);
 		return info;
 	}
-	
-	public void showOptionsPanel(MegaOffline sNode){
-		log("showNodeOptionsPanel");
-		
-		this.selectedNode = sNode;
-		
-		//Check if the node is the Master Key file
-        if(selectedNode.getHandle().equals("0")){
-        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				optionShare.setVisibility(View.GONE);			
-				optionDownload.setVisibility(View.GONE);
-				optionProperties.setVisibility(View.GONE);				
-				optionDelete.setVisibility(View.VISIBLE);
-				optionPublicLink.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				optionCopyTo.setVisibility(View.GONE);
-				
-				slidingOptionsPanel.setVisibility(View.VISIBLE);
-				slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-				log("Show the slidingPanel");
-				
-				return;
-			}
-        }
-		
-		//Check connection or not connection
-		
-		if (Util.isOnline(context)){
-			//With connection
-			
-			if (selectedNode.getType().equals(DB_FOLDER)) {
-				propertiesText.setText(R.string.general_folder_info);
-				optionShare.setVisibility(View.VISIBLE);
-			}else{
-				propertiesText.setText(R.string.general_file_info);
-				optionShare.setVisibility(View.GONE);
-			}
-			
-			optionDownload.setVisibility(View.VISIBLE);
-			optionProperties.setVisibility(View.VISIBLE);				
-			optionDelete.setVisibility(View.VISIBLE);
-			optionPublicLink.setVisibility(View.VISIBLE);
-			optionRename.setVisibility(View.GONE);
-			optionMoveTo.setVisibility(View.GONE);
-			optionCopyTo.setVisibility(View.GONE);				
-				
-		}
-		else{
-			//No connection
-			optionShare.setVisibility(View.GONE);			
-			optionDownload.setVisibility(View.GONE);
-			optionProperties.setVisibility(View.GONE);				
-			optionDelete.setVisibility(View.VISIBLE);
-			optionPublicLink.setVisibility(View.GONE);
-			optionRename.setVisibility(View.GONE);
-			optionMoveTo.setVisibility(View.GONE);
-			optionCopyTo.setVisibility(View.GONE);
-		}
-					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapter.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-	}
-	
-	public PanelState getPanelState ()
-	{
-		log("getPanelState: "+slidingOptionsPanel.getPanelState());
-		return slidingOptionsPanel.getPanelState();
-	}
-		
+
 	@Override
     public void onAttach(Activity activity) {
 		log("onAttach");
@@ -1425,223 +919,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
-		log("onClick");
-		switch(v.getId()){
-			case R.id.offline_list_out_options:
-			case R.id.offline_grid_out_options:{
-				hideOptionsPanel();
-				break;
-			}
-			case R.id.offline_list_option_download_layout: 
-			case R.id.offline_grid_option_download_layout: {
-				log("Download option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(Long.parseLong(selectedNode.getHandle()));
-				NodeController nC = new NodeController(context);
-				nC.prepareForDownload(handleList);
-				break;
-			}
-			case R.id.offline_list_option_move_layout:
-			case R.id.offline_grid_option_move_layout:{
-				log("Move option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();			
-				if (Util.isOnline(context)){
-					String path = selectedNode.getPath() + selectedNode.getName();
-					move(path);
-				}
-				break;
-			}
-			case R.id.offline_list_option_copy_layout: 
-			case R.id.offline_grid_option_copy_layout: {
-				log("Copy option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				if (Util.isOnline(context)){
-					String path = selectedNode.getPath() + selectedNode.getName();
-					copy(path);
-				}
-				break;
-			}
-			case R.id.offline_list_option_properties_layout:
-			case R.id.offline_grid_option_properties_layout:{
-				log("Properties option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				if (Util.isOnline(context)){
-					String path = selectedNode.getPath() + selectedNode.getName();
-					String handle = selectedNode.getHandle();
-					showProperties(path, handle);
-				}
-				break;
-			}
-			case R.id.offline_list_option_public_link_layout:
-			case R.id.offline_grid_option_public_link_layout:{
-				log("Get link");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				if (Util.isOnline(context)){
-					String path = selectedNode.getPath() + selectedNode.getName();
-					getLink(path);
-				}					
-				break;
-			}
-			case R.id.offline_list_option_delete_layout:
-			case R.id.offline_grid_option_delete_layout:{
-				log("Delete Offline");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				
-				if(selectedNode.getHandle().equals("0")){
-		        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-					File file= new File(path);
-					if(file.exists()){
-						file.delete();	
-						
-						mOffList=dbH.findByPath(pathNavigation);
-						
-						log("Number of elements: "+mOffList.size());
-												
-						for(int i=0; i<mOffList.size();i++){
-							
-							MegaOffline checkOffline = mOffList.get(i);
-							
-							if(!checkOffline.isIncoming()){				
-								log("NOT isIncomingOffline");
-								File offlineDirectory = null;
-								if (Environment.getExternalStorageDirectory() != null){
-									offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-								}
-								else{
-									offlineDirectory = context.getFilesDir();
-								}	
-								
-								if (!offlineDirectory.exists()){
-									log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-									//dbH.removeById(mOffList.get(i).getId());
-									mOffList.remove(i);		
-									i--;
-								}	
-							}
-							else{
-								log("isIncomingOffline");
-								File offlineDirectory = null;
-								if (Environment.getExternalStorageDirectory() != null){
-									offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-									log("offlineDirectory: "+offlineDirectory);
-								}
-								else{
-									offlineDirectory = context.getFilesDir();
-								}	
-								
-								if (!offlineDirectory.exists()){
-									log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-									//dbH.removeById(mOffList.get(i).getId());
-									mOffList.remove(i);
-									i--;
-								}	
-								
-							}
-						}
-						
-						if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-							sortByNameDescending();
-						}
-						else{
-							sortByNameAscending();
-						}
-						
-						
-						if (adapter.getItemCount() == 0){
-							recyclerView.setVisibility(View.GONE);
-							emptyImageView.setVisibility(View.VISIBLE);
-							emptyTextView.setVisibility(View.VISIBLE);
-							contentTextLayout.setVisibility(View.GONE);
-							emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-							emptyTextView.setText(R.string.file_browser_empty_folder);
-						}
-						else{
-							recyclerView.setVisibility(View.VISIBLE);
-							contentTextLayout.setVisibility(View.VISIBLE);
-							emptyImageView.setVisibility(View.GONE);
-							emptyTextView.setVisibility(View.GONE);
-							contentText.setText(getInfoFolder(mOffList));
-						}					
-						
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						break;
-					}
-		        }
-				else{
-					deleteOffline(context, selectedNode);								
-					refreshPaths(selectedNode);
-					
-					if (adapter.getItemCount() == 0){
-						recyclerView.setVisibility(View.GONE);
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-						contentTextLayout.setVisibility(View.GONE);
-						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
-					else{
-						recyclerView.setVisibility(View.VISIBLE);
-						contentTextLayout.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-						contentText.setText(getInfoFolder(mOffList));
-					}					
-					
-					setPositionClicked(-1);
-					notifyDataSetChanged();
-					break;
-				}
-			}
-			case R.id.offline_list_option_share_layout: 
-			case R.id.offline_grid_option_share_layout: {
-				log("Share option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				if (Util.isOnline(context)){
-					String path = selectedNode.getPath() + selectedNode.getName();
-					shareFolder(path);
-				}
-				break;
-			}	
-			case R.id.offline_list_option_rename_layout: 
-			case R.id.offline_grid_option_rename_layout: {
-				log("Rename option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				if (Util.isOnline(context)){
-					String path = selectedNode.getPath() + selectedNode.getName();
-					rename(path);
-				}
-				break;
-			}	
-		}
-	}
-	
+
     public void itemClick(int position) {
 		log("onItemClick");
 		if (adapter.isMultipleSelect()){
@@ -1884,35 +1162,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			return 4;
-		}
-		
-		log("Sliding not shown");
-		
+
 		if (adapter == null){
 			return 0;
 		}
@@ -2042,6 +1292,35 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
 		}
+	}
+
+	public void refresh(){
+		log("refresh");
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
+
+		if (adapter.getItemCount() == 0){
+			recyclerView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
+			emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
+		}
+		else{
+			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			contentText.setText(getInfoFolder(mOffList));
+		}
+
+		setPositionClicked(-1);
+		notifyDataSetChanged();
 	}
 	
 	public void refreshPaths(){
@@ -2253,5 +1532,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 
 	public String getPathNavigation() {
 		return pathNavigation;
+	}
+
+
+	public void resetAdapter(){
+		log("resetAdapter");
+		if(adapter!=null){
+			adapter.setPositionClicked(-1);
+		}
 	}
 }

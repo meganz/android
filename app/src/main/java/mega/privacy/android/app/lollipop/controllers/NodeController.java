@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,6 +25,7 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -1176,6 +1178,212 @@ public class NodeController {
     public void cleanRubbishBin(){
         log("cleanRubbishBin");
         megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
+    }
+
+    public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
+        log("deleteOffline");
+        if(selectedNode.getHandle().equals("0")){
+            log("Delete RK");
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+            File file= new File(path);
+            if(file.exists()){
+                file.delete();
+
+                ArrayList<MegaOffline> mOffList=dbH.findByPath(pathNavigation);
+
+                log("Number of elements: "+mOffList.size());
+
+                for(int i=0; i<mOffList.size();i++){
+
+                    MegaOffline checkOffline = mOffList.get(i);
+
+                    if(!checkOffline.isIncoming()){
+                        log("NOT isIncomingOffline");
+                        File offlineDirectory = null;
+                        if (Environment.getExternalStorageDirectory() != null){
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+                        }
+                        else{
+                            offlineDirectory = context.getFilesDir();
+                        }
+
+                        if (!offlineDirectory.exists()){
+                            log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+                            //dbH.removeById(mOffList.get(i).getId());
+                            mOffList.remove(i);
+                            i--;
+                        }
+                    }
+                    else{
+                        log("isIncomingOffline");
+                        File offlineDirectory = null;
+                        if (Environment.getExternalStorageDirectory() != null){
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+                            log("offlineDirectory: "+offlineDirectory);
+                        }
+                        else{
+                            offlineDirectory = context.getFilesDir();
+                        }
+
+                        if (!offlineDirectory.exists()){
+                            log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+                            //dbH.removeById(mOffList.get(i).getId());
+                            mOffList.remove(i);
+                            i--;
+                        }
+
+                    }
+                }
+
+                ((ManagerActivityLollipop)context).updateOfflineView(null);
+            }
+        }
+        else{
+            log("deleteOffline node");
+            dbH = DatabaseHandler.getDbHandler(context);
+
+            ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
+            ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();
+            MegaOffline parentNode = null;
+
+            //Delete children
+            mOffListChildren=dbH.findByParentId(selectedNode.getId());
+            if(mOffListChildren.size()>0){
+                //The node have childrens, delete
+                deleteChildrenDB(mOffListChildren);
+            }
+
+            log("Remove the node physically");
+            //Remove the node physically
+            File destination = null;
+            //Check if the node is incoming
+            if(selectedNode.isIncoming()){
+                if (Environment.getExternalStorageDirectory() != null){
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + selectedNode.getHandleIncoming() + selectedNode.getPath());
+                }
+                else{
+                    destination = context.getFilesDir();
+                }
+            }
+            else{
+                if (Environment.getExternalStorageDirectory() != null){
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + selectedNode.getPath());
+                }
+                else{
+                    destination = context.getFilesDir();
+                }
+            }
+
+            try{
+                File offlineFile = new File(destination, selectedNode.getName());
+                log("Delete in phone: "+selectedNode.getName());
+                Util.deleteFolderAndSubfolders(context, offlineFile);
+            }
+            catch(Exception e){
+                log("EXCEPTION: deleteOffline - adapter");
+            };
+
+            dbH.removeById(selectedNode.getId());
+
+            //Check if the parent has to be deleted
+
+            int parentId = selectedNode.getParentId();
+            parentNode = dbH.findById(parentId);
+
+            if(parentNode != null){
+                log("Parent to check: "+parentNode.getName());
+                checkParentDeletion(parentNode);
+            }
+        }
+    }
+
+    public void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
+
+        log("deleteChildenDB: "+mOffListChildren.size());
+        MegaOffline mOffDelete=null;
+
+        for(int i=0; i<mOffListChildren.size(); i++){
+
+            mOffDelete=mOffListChildren.get(i);
+
+            log("Children "+i+ ": "+ mOffDelete.getName());
+            ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
+            if(mOffListChildren2.size()>0){
+                //The node have children, delete
+                deleteChildrenDB(mOffListChildren2);
+            }
+
+            int lines = dbH.removeById(mOffDelete.getId());
+            log("Borradas; "+lines);
+        }
+    }
+
+    public void checkParentDeletion (MegaOffline parentToDelete){
+        log("checkParentDeletion: "+parentToDelete.getName());
+
+        ArrayList<MegaOffline> mOffListChildren=dbH.findByParentId(parentToDelete.getId());
+        File destination = null;
+        if(mOffListChildren.size()<=0){
+            log("The parent has NO children");
+            //The node have NO childrens, delete it
+
+            dbH.removeById(parentToDelete.getId());
+            if(parentToDelete.isIncoming()){
+                if (Environment.getExternalStorageDirectory() != null){
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming() + parentToDelete.getPath());
+                }
+                else{
+                    destination = context.getFilesDir();
+                }
+            }
+            else{
+                if (Environment.getExternalStorageDirectory() != null){
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + parentToDelete.getPath());
+                }
+                else{
+                    destination = context.getFilesDir();
+                }
+            }
+
+            try{
+                File offlineFile = new File(destination, parentToDelete.getName());
+                log("Delete in phone: "+parentToDelete.getName());
+                Util.deleteFolderAndSubfolders(context, offlineFile);
+            }
+            catch(Exception e){
+                log("EXCEPTION: deleteOffline - adapter");
+            };
+
+            int parentId = parentToDelete.getParentId();
+            if(parentId==-1){
+                File rootIncomingFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming());
+
+                if(rootIncomingFile.list().length==0){
+                    try{
+                        rootIncomingFile.delete();
+                    }
+                    catch(Exception e){
+                        log("EXCEPTION: deleteParentIncoming: "+destination);
+                    };
+                }
+            }
+            else{
+                //Check if the parent has to be deleted
+
+                parentToDelete = dbH.findById(parentId);
+                if(parentToDelete != null){
+                    log("Parent to check: "+parentToDelete.getName());
+                    checkParentDeletion(parentToDelete);
+
+                }
+            }
+
+        }
+        else{
+            log("The parent has children!!! RETURN!!");
+            return;
+        }
+
     }
 
     public static void log(String message) {
