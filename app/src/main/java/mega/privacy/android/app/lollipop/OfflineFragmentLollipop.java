@@ -1339,7 +1339,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
-		log("refreshPaths(MegaOffline mOff)");
+		log("refreshPaths(MegaOffline mOff): "+mOff.getName());
 		int index=0;
 //		MegaOffline retFindPath = null;
 		

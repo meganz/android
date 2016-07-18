@@ -155,10 +155,10 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/general_download"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
             
             <LinearLayout
@@ -184,9 +184,9 @@
                     android:text="@string/general_import"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
             
             <LinearLayout
@@ -213,9 +213,9 @@
                     android:text="@string/general_import"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
         </LinearLayout>
