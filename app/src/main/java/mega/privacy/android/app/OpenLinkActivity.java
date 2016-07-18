@@ -15,6 +15,7 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -48,6 +49,14 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		url.replace(' ', '+');
 		if(url.startsWith("mega://")){
 			url = url.replace("mega://", "https://mega.co.nz/");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")){
+			url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")){
+			url = url.replace("https://www.mega.nz", "https://mega.nz");
 		}
 		
 		log("url " + url);
@@ -362,6 +371,27 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				}
 				return;
 			}
+		}
+
+		if (url != null && (url.matches("^https://mega.co.nz/#blog.+$") || url.matches("^https://mega.nz/#blog.+$"))) {
+			log("blog link url");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				log("Build.VERSION_CODES.LOLLIPOP");
+				Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
+				openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				openBlogIntent.setData(Uri.parse(url));
+				startActivity(openBlogIntent);
+				finish();
+			}
+			else{
+				Intent openBlogIntent = new Intent(this, WebViewActivity.class);
+				openBlogIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				openBlogIntent.setData(Uri.parse(url));
+				startActivity(openBlogIntent);
+				finish();
+			}
+
+			return;
 		}
 		
 		log("wrong url");
