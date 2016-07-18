@@ -63,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/title_options_avatar_panel"
                 android:textColor="@color/transparent_black"
                 android:textSize="16sp"/>
@@ -90,10 +91,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/choose_photo_avatar_panel"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -119,9 +120,9 @@
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 android:text="@string/take_photo_avatar_panel"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -146,10 +147,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/delete_avatar_panel"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
     </LinearLayout>
 </mega.privacy.android.app.components.SlidingUpPanelLayout>

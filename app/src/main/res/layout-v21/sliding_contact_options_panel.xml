@@ -62,10 +62,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/contact_properties_activity"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -90,10 +90,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/context_send_file"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -118,10 +118,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/context_share_folder"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -145,10 +145,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
-                android:text="@string/context_delete"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/context_remove"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <!-- Options Sent Requests-->
@@ -174,10 +175,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/contact_reinvite"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -202,10 +203,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:text="@string/context_delete"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_marginLeft="10dp"
+                android:text="@string/context_remove"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <!-- Options Received Requests-->
@@ -231,10 +232,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/contact_accept"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -259,10 +260,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/contact_ignore"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -287,10 +288,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/contact_decline"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
     </LinearLayout>

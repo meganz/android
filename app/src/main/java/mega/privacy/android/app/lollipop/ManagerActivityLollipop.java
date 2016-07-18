@@ -7971,7 +7971,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
 		String message= getResources().getString(R.string.confirmation_delete_contact_request,r.getTargetEmail());
-		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 	}
@@ -8001,7 +8001,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			message= getResources().getString(R.string.confirmation_remove_multiple_contact_request,r.size());
 		}
 
-		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 	}
