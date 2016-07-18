@@ -6104,7 +6104,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		log("Sliding UPLOAD options not shown");
 
-		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
+		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
 			log("slidingOptionsPanel()!=PanelState.HIDDEN");
 			hideOptionsPanel();
 			return;
@@ -10072,6 +10072,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void updateOfflineView(MegaOffline mOff){
+		log("updateOfflineView");
 		if(oFLol!=null){
 			if(mOff==null){
 				oFLol.refresh();
