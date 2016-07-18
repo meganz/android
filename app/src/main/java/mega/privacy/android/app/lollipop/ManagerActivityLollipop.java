@@ -10734,7 +10734,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				log("TYPE_CREATE_FOLDER ERROR: "+e.getErrorCode()+" "+e.getErrorString());
-				Snackbar.make(fragmentContainer, getString(R.string.context_folder_no_created), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_folder_no_created));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
@@ -10746,19 +10746,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("OK MegaRequest.TYPE_SHARE");
 				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-					Snackbar.make(fragmentContainer, getString(R.string.context_remove_sharing), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_remove_sharing));
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_shared), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_correctly_shared));
 				}
 			}
 			else{
 //				log("ERROR MegaRequest.TYPE_SHARE: "+request.getEmail()+" : "+request.getName());
 				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_removed_shared), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_no_removed_shared));
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_shared), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_no_shared));
 				}
 			}
 		}
@@ -10776,10 +10776,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
-				Snackbar.make(fragmentContainer, getString(R.string.rubbish_bin_emptied), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.rubbish_bin_emptied));
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.rubbish_bin_no_emptied), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.rubbish_bin_no_emptied));
 			}
 		}
 	}
