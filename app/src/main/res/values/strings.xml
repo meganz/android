@@ -790,8 +790,8 @@
     <string name="number_correctly_delete_contact_request" context="success message when reinviting multiple contacts">%d requests deleted successfully. </string>
     <string name="number_no_delete_contact_request" context="error message when reinviting multiple contacts">%1$d requests successfully deleted but %2$d requests were not deleted.</string>
 
-    <string name="confirmation_delete_contact_request" context="confirmation message before removing a contact request.">Do you want to delete the invitation request to %s?</string>
-    <string name="confirmation_remove_multiple_contact_request" context="confirmation message before removing mutiple contact request">Do you want to delete these %d invitation requests?</string>
+    <string name="confirmation_delete_contact_request" context="confirmation message before removing a contact request.">Do you want to remove the invitation request to %s?</string>
+    <string name="confirmation_remove_multiple_contact_request" context="confirmation message before removing mutiple contact request">Do you want to remove these %d invitation requests?</string>
 
     <string name="number_correctly_invitation_reply_sent" context="success message when replying to multiple received request">%d request replies sent.</string>
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
