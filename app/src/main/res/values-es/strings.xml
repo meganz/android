@@ -33,8 +33,6 @@
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Ancho de Banda</string>
     <string name="general_error_word" context="It will be followed by the error message">Error</string> 
-    <string name="general_error_file_not_found" context="Message shown when a file don't exist">Enlace de fichero no existente</string>
-    <string name="general_error_folder_not_found" context="Message shown when a folder don't exist">Enlace de carpeta no existente</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Todavía no implementado</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Suscribir</string>
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continuar</string> 
@@ -804,4 +802,13 @@
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.co.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Demasiados intentos incorrectos para iniciar sesión, por favor, espere una hora.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">La cuenta no ha sido validada todavía. Por favor, compruebe su correo electrónico.</string>
+
+    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">Enlace de carpeta no disponible</string>
+    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">La carpeta ha sido eliminada por una violación de los TdS/PUA.</string>
+
+    <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Enlace de fichero no disponible</string>
+    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">La fichero ha sido eliminado por una violación de los TdS/PUA.</string>
+
+    <string name="folder_link_unavaible_by_user" context="Error message shown when opening a folder link which has been disabled by the owner">El enlace a la carpeta ha sido eliminado por el usuario.</string>
+    <string name="file_link_unavaible_by_user" context="Error message shown when opening a file link which has been disabled by the owner">El enlace al fichero ha sido eliminado por el usuario.</string>
 </resources>

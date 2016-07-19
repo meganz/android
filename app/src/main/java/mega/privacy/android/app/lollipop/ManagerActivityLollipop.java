@@ -6870,10 +6870,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(true);
 				linkWithKeyCheck.setChecked(false);
-				String keyString="";
+				String keyString="!";
 				String [] s = link.split("!");
 				if (s.length == 3){
-					keyString = s[2];
+					keyString = keyString+s[2];
 				}
 				linkText.setText(keyString);
 			}
