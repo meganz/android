@@ -1300,6 +1300,13 @@ public class NodeController {
                 log("Parent to check: "+parentNode.getName());
                 checkParentDeletion(parentNode);
             }
+
+            if(context instanceof ManagerActivityLollipop){
+                ((ManagerActivityLollipop)context).updateOfflineView(null);
+            }
+            else{
+                ((OfflineActivityLollipop)context).updateOfflineView(null);
+            }
         }
     }
 
@@ -1364,13 +1371,22 @@ public class NodeController {
             if(parentId==-1){
                 File rootIncomingFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + parentToDelete.getHandleIncoming());
 
-                if(rootIncomingFile.list().length==0){
-                    try{
-                        rootIncomingFile.delete();
+                if(rootIncomingFile!=null){
+
+                    String[] fileList = rootIncomingFile.list();
+                    if(fileList!=null){
+                        if(rootIncomingFile.list().length==0){
+                            try{
+                                rootIncomingFile.delete();
+                            }
+                            catch(Exception e){
+                                log("EXCEPTION: deleteParentIncoming: "+destination);
+                            };
+                        }
                     }
-                    catch(Exception e){
-                        log("EXCEPTION: deleteParentIncoming: "+destination);
-                    };
+                }
+                else{
+                    log("rootIncomingFile is NULL");
                 }
             }
             else{
