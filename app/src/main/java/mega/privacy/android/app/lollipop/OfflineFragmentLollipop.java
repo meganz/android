@@ -1296,6 +1296,20 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 
 	public void refresh(){
 		log("refresh");
+
+		mOffList=dbH.findByPath(pathNavigation);
+
+		if (adapter == null){
+			adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			contentText.setText(getInfoFolder(mOffList));
+			adapter.setNodes(mOffList);
+			adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+		}
+		else{
+			contentText.setText(getInfoFolder(mOffList));
+			adapter.setNodes(mOffList);
+		}
+
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 			sortByNameDescending();
 		}
