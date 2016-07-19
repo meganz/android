@@ -114,7 +114,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
-	
+
+	boolean decryptionIntroduced=false;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -355,17 +356,23 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     		if (intent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
     			if (parentHandle == -1){
     				url = intent.getDataString();
-    				int counter = url.split("!").length - 1;
-    				log("Counter !: "+counter);
-    				if(counter<2){
-    					//Ask for decryption key
-    					log("Ask for decryption key");
-    					askForDecryptionKeyDialog();
-    				}
-    				else{
-    					//Decryption key included!
-    					megaApiFolder.loginToFolder(url, this);
-    				}    				
+					if(url!=null){
+						megaApiFolder.loginToFolder(url, this);
+					}
+					else{
+						log("url NULL");
+					}
+//    				int counter = url.split("!").length - 1;
+//    				log("Counter !: "+counter);
+//    				if(counter<2){
+//    					//Ask for decryption key
+//    					log("Ask for decryption key");
+//    					askForDecryptionKeyDialog();
+//    				}
+//    				else{
+//    					//Decryption key included!
+//
+//    				}
     			}
     		}
     	}
@@ -395,39 +402,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		optionsOutLayout.setOnClickListener(this);
 		
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
-		
-		slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-            	log("onPanelSlide, offset " + slideOffset);
-//            	if(slideOffset==0){
-//            		hideOptionsPanel();
-//            	}
-            }
-
-            @Override
-            public void onPanelExpanded(View panel) {
-            	log("onPanelExpanded");
-
-            }
-
-            @Override
-            public void onPanelCollapsed(View panel) {
-            	log("onPanelCollapsed");            	
-
-            }
-
-            @Override
-            public void onPanelAnchored(View panel) {
-            	log("onPanelAnchored");
-            }
-
-            @Override
-            public void onPanelHidden(View panel) {
-                log("onPanelHidden");                
-            }
-        });			
+		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
     }
 	
 	public void askForDecryptionKeyDialog(){
@@ -441,7 +416,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);		
 		
-		input.setId(1);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.alert_decryption_key));
@@ -455,7 +429,15 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (value.length() == 0) {
 						return true;
 					}
-					url=url+value;
+					if(value.startsWith("!")){
+						log("Decryption key with exclamation!");
+						url=url+value;
+					}
+					else{
+						url=url+"!"+value;
+					}
+					log("Folder link to import: "+url);
+					decryptionIntroduced=true;
 					megaApiFolder.loginToFolder(url, folderLinkActivity);
 					decryptionKeyDialog.dismiss();
 					return true;
@@ -483,7 +465,15 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						if (value.length() == 0) {
 							return;
 						}
-						url=url+value;
+						if(value.startsWith("!")){
+							log("Decryption key with exclamation!");
+							url=url+value;
+						}
+						else{
+							url=url+"!"+value;
+						}
+						log("Folder link to import: "+url);
+						decryptionIntroduced=true;
 						megaApiFolder.loginToFolder(url, folderLinkActivity);
 					}
 				});
@@ -977,13 +967,58 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				megaApiFolder.fetchNodes(this);	
 			}
 			else{
-				try{
-					log("no link - show alert dialog");
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);					
-		            builder.setMessage(getString(R.string.general_error_folder_not_found));
-					builder.setTitle(getString(R.string.general_error_word));					
-					
-					builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
+				log("Error: "+e.getErrorCode());
+				if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
+					decryptionIntroduced=false;
+					askForDecryptionKeyDialog();
+					return;
+				}
+				else if(e.getErrorCode() == MegaError.API_EARGS){
+					if(decryptionIntroduced){
+						log("incorrect key, ask again!");
+						decryptionIntroduced=false;
+						askForDecryptionKeyDialog();
+						return;
+					}
+					else{
+						try{
+							log("API_EARGS - show alert dialog");
+							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							builder.setMessage(getString(R.string.general_error_folder_not_found));
+							builder.setTitle(getString(R.string.general_error_word));
+
+							builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent;
+									if(folderLinkActivity != null)
+										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+									else
+										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+
+									startActivity(backIntent);
+									finish();
+								}
+							});
+
+							AlertDialog dialog = builder.create();
+							dialog.show();
+						}
+						catch(Exception ex){
+							Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+							finish();
+						}
+					}
+				}
+				else{
+					try{
+						log("no link - show alert dialog");
+						AlertDialog.Builder builder = new AlertDialog.Builder(this);
+						builder.setMessage(getString(R.string.general_error_folder_not_found));
+						builder.setTitle(getString(R.string.general_error_word));
+
+						builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.dismiss();
@@ -992,18 +1027,19 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 									backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
 								else
 									backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
-								
+
 								startActivity(backIntent);
-				    			finish();
+								finish();
 							}
 						});
-									
-					AlertDialog dialog = builder.create();
-					dialog.show(); 
-				}
-				catch(Exception ex){
-					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
-	    			finish();
+
+						AlertDialog dialog = builder.create();
+						dialog.show();
+					}
+					catch(Exception ex){
+						Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+						finish();
+					}
 				}
 			}
 		}
@@ -1042,8 +1078,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //				finish();
 			}			
 		}
-		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES)
-		{		
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+
 			if (e.getErrorCode() == MegaError.API_OK) {
 				MegaNode rootNode = megaApiFolder.getRootNode();
 				if (rootNode != null){
@@ -1093,30 +1129,41 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 			}
 			else{
-				//TODO: Links without keys (APIE_INCOMPLETE) Ask for key
-				try{ 
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);					
-		            builder.setMessage(getString(R.string.general_error_folder_not_found));
-					builder.setTitle(getString(R.string.general_error_word));
-					
+				log("Error: "+e.getErrorCode()+" "+e.getErrorString());
+				try{
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+					if(e.getErrorCode() == MegaError.API_ETOOMANY){
+						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));
+						builder.setTitle(getString(R.string.general_error_folder_not_found));
+					}
+					else if(e.getErrorCode() == MegaError.API_ENOENT){
+						builder.setMessage(getString(R.string.folder_link_unavaible_by_user));
+						builder.setTitle(getString(R.string.general_error_folder_not_found));
+					}
+					else{
+						builder.setMessage(getString(R.string.general_error_folder_not_found));
+						builder.setTitle(getString(R.string.general_error_word));
+					}
+
 					builder.setPositiveButton(
-						getString(android.R.string.ok),
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-								Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-				    			startActivity(backIntent);
-				    			finish();
-							}
-						});
-									
+							getString(android.R.string.ok),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+									startActivity(backIntent);
+									finish();
+								}
+							});
+
 					AlertDialog dialog = builder.create();
-					dialog.show(); 
+					dialog.show();
 				}
 				catch(Exception ex){
 					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
-	    			finish();
+					finish();
 				}
 			}
 		}

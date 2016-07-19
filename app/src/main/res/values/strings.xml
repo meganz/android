@@ -39,9 +39,7 @@
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandwidth</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>  
-    <string name="general_error_word" context="It will be followed by the error message">Error</string> 
-    <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">File link not found</string>
-    <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">Folder link not found</string>
+    <string name="general_error_word" context="It will be followed by the error message">Error</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
     <string name="error_no_selection" context="when any file or folder is selected">No file or folder selected</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Already downloaded</string>
@@ -406,7 +404,7 @@
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
-    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please include the decryption key for the link</string>
+    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please enter the decryption key for the link</string>
         
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -807,4 +805,14 @@
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many attempts to login, please wait for an hour.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please, check your e-mail.</string>
+
+    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">Folder link unavailable</string>
+    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">The folder link has been removed because of a ToS/AUP violation.</string>
+
+    <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">File link unavailable</string>
+    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">The file link has been removed because of a ToS/AUP violation.</string>
+
+    <string name="folder_link_unavaible_by_user" context="Error message shown when opening a folder link which has been disabled by the owner">The folder link has been disabled by the user.</string>
+    <string name="file_link_unavaible_by_user" context="Error message shown when opening a file link which has been disabled by the owner">The file link has been disabled by the user.</string>
+
 </resources>
