@@ -808,7 +808,4 @@
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Enlace de fichero no disponible</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">La fichero ha sido eliminado por una violación de los TdS/PUA.</string>
-
-    <string name="folder_link_unavaible_by_user" context="Error message shown when opening a folder link which has been disabled by the owner">El enlace a la carpeta ha sido eliminado por el usuario.</string>
-    <string name="file_link_unavaible_by_user" context="Error message shown when opening a file link which has been disabled by the owner">El enlace al fichero ha sido eliminado por el usuario.</string>
 </resources>

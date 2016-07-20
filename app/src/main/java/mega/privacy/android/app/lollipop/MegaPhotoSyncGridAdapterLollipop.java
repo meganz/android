@@ -247,6 +247,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public ArrayList<RelativeLayout> relativeLayoutsComplete;
     	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
 		public ArrayList<RelativeLayout> relativeLayoutsVideoInfo;
+		public ArrayList<LinearLayout> relativeLayoutsGradientVideo;
     	public ArrayList<ImageView> imageViews;
     	public ArrayList<ImageView> videoIcons;
 		public ArrayList<TextView> videoDuration;
@@ -639,6 +640,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						if(Util.isVideoFile(n.getName())){
 							log("IS VIDEO!");
 							holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
+							holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.VISIBLE);
 							holder.videoIcons.get(i).setVisibility(View.VISIBLE);
 
 							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){
@@ -682,6 +684,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							}
 						}
 						else{
+							holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.GONE);
 							holder.videoIcons.get(i).setVisibility(View.GONE);
 							holder.videoDuration.get(i).setVisibility(View.GONE);
 						}
@@ -774,6 +777,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 					if(Util.isVideoFile(n.getName())){
 						holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
+						holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.VISIBLE);
 						holder.videoIcons.get(i).setVisibility(View.VISIBLE);
 
 						if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
@@ -816,6 +820,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						}
 					}
 					else{
+						holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.GONE);
 						holder.videoIcons.get(i).setVisibility(View.GONE);
 						holder.videoDuration.get(i).setVisibility(View.GONE);
 					}
@@ -911,6 +916,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		holder.longClickLayoutsSelected = new ArrayList<LinearLayout>();
 		holder.longClickLayoutsUnselected = new ArrayList<LinearLayout>();
 		holder.relativeLayoutsVideoInfo = new ArrayList<RelativeLayout>();
+		holder.relativeLayoutsGradientVideo = new ArrayList<LinearLayout>();
 		holder.videoIcons = new ArrayList<ImageView>();
 		holder.videoDuration = new ArrayList<TextView>();
 		holder.documents = new ArrayList<Long>();
@@ -943,6 +949,9 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 			RelativeLayout rLVdI = (RelativeLayout) rLView.findViewById(R.id.cell_photosync_grid_video_info_layout);
 			holder.relativeLayoutsVideoInfo.add(rLVdI);
+
+			LinearLayout rLVgra = (LinearLayout) rLView.findViewById(R.id.cell_photosync_gradient_effect);
+			holder.relativeLayoutsGradientVideo.add(rLVgra);
 			
 			ImageView vI = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_video_icon);
 			holder.videoIcons.add(vI);
