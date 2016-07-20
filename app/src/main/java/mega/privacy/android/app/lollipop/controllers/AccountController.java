@@ -356,8 +356,8 @@ public class AccountController {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                context.startActivity(intent);
                 if (context instanceof Activity) {
+                    ((Activity) context).startActivity(intent);
                     ((Activity) context).finish();
                 }
                 context = null;

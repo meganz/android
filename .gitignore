@@ -33,4 +33,4 @@ captures
 ## File-based project format:
 *.ipr
 *.iws
-
+/app/src/main/java/nz/mega/sdk/MegaStringMap.java
