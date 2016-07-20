@@ -1137,10 +1137,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));
 						builder.setTitle(getString(R.string.general_error_folder_not_found));
 					}
-					else if(e.getErrorCode() == MegaError.API_ENOENT){
-						builder.setMessage(getString(R.string.folder_link_unavaible_by_user));
-						builder.setTitle(getString(R.string.general_error_folder_not_found));
-					}
 					else{
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));

@@ -14,6 +14,18 @@
      android:background="@color/white"
      android:layout_centerHorizontal="true"/>
 
+    <LinearLayout
+        android:id="@+id/cell_photosync_gradient_effect"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@drawable/gradient_cam_uploads"
+        android:layout_margin="1dp"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+    </LinearLayout>
+
     <RelativeLayout android:id="@+id/cell_photosync_grid_video_info_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,6 +53,7 @@
             android:background="@null" />
 
      </RelativeLayout>
+
 
      
     <LinearLayout

@@ -436,10 +436,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_ToS_violation));
 					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
 				}
-				else if(e.getErrorCode() == MegaError.API_ENOENT){
-					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_by_user));
-					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
-				}
 				else if(e.getErrorCode() == MegaError.API_EARGS){
 					if(decryptionIntroduced){
 						log("incorrect key, ask again!");
