@@ -4,14 +4,12 @@
         <item
         android:id="@+id/cab_menu_select_all"
         android:orderInCategory="100"
-        android:showAsAction="never"
         android:title="@string/action_select_all"
         MEGA:showAsAction="never" />   
         
    <item
         android:id="@+id/cab_menu_unselect_all"
         android:orderInCategory="100"
-        android:showAsAction="never"
         android:title="@string/action_unselect_all"
         MEGA:showAsAction="never" /> 
     
@@ -19,7 +17,6 @@
         android:id="@+id/cab_menu_download"
         android:icon="@drawable/ic_menu_download_dark"
         android:orderInCategory="105"
-        android:showAsAction="never"
         android:title="@string/general_download"
         MEGA:showAsAction="never" />
     
@@ -27,7 +24,6 @@
         android:id="@+id/cab_menu_share"
         android:icon="@drawable/ic_menu_download_dark"
         android:orderInCategory="105"
-        android:showAsAction="never"
         android:title="@string/context_share_folder"
         android:visible="false"
         MEGA:showAsAction="never" />
@@ -35,7 +31,6 @@
    <item
         android:id="@+id/cab_menu_send_file"
         android:orderInCategory="105"
-        android:showAsAction="never"
         android:title="@string/file_properties_send_file_select_contact"
         android:visible="false"
         MEGA:showAsAction="never" />
@@ -44,14 +39,12 @@
         android:id="@+id/cab_menu_rename"
         android:icon="@drawable/ic_menu_rename_dark"
         android:orderInCategory="110"
-        android:showAsAction="never"
         android:title="@string/context_rename"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_copy"
         android:orderInCategory="115"
-        android:showAsAction="never"
         android:icon="@drawable/ic_menu_copy_dark"
         android:title="@string/general_copy_to"
         MEGA:showAsAction="never" />
@@ -59,7 +52,6 @@
     <item
         android:id="@+id/cab_menu_move"
         android:orderInCategory="120"
-        android:showAsAction="never"
         android:icon="@drawable/ic_menu_move_dark"
         android:title="@string/general_move_to"
         MEGA:showAsAction="never" />
@@ -67,7 +59,6 @@
     <item
         android:id="@+id/cab_menu_share_link"
         android:orderInCategory="125"
-        android:showAsAction="never"
         android:icon="@drawable/ic_menu_download_link_dark"
         android:title="@string/context_get_link_menu"
         MEGA:showAsAction="never" />
@@ -75,7 +66,6 @@
      <item
         android:id="@+id/cab_menu_leave_multiple_share"
         android:orderInCategory="130"
-        android:showAsAction="never"
         android:icon="@drawable/leave_share_ic"
         android:title="@string/context_leave_menu"
         MEGA:showAsAction="never" />
@@ -84,7 +74,6 @@
         android:id="@+id/cab_menu_trash"
         android:icon="@drawable/ic_rubbish_bin"
         android:orderInCategory="130"
-        android:showAsAction="never"
         android:title="@string/context_move_to_trash"
         MEGA:showAsAction="never" />   
 
