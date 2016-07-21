@@ -15,6 +15,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +38,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -79,12 +81,12 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	TextView unlockText;
 	EditText passwordText;
 	TextView warningText;
-	EditText passFirstLetter;
-	EditText passSecondLetter;
-	EditText passThirdLetter;
-	EditText passFourthLetter;
-	EditText passFifthLetter;
-	EditText passSixthLetter;
+	EditTextPIN passFirstLetter;
+	EditTextPIN passSecondLetter;
+	EditTextPIN passThirdLetter;
+	EditTextPIN passFourthLetter;
+	EditTextPIN passFifthLetter;
+	EditTextPIN passSixthLetter;
 	Switch passwordSwitch;
 	final StringBuilder sbFirst=new StringBuilder();
 	final StringBuilder sbSecond=new StringBuilder();
@@ -294,7 +296,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		warningParams.addRule(RelativeLayout.BELOW, sixPinLayout.getId());
 
 		//PIN
-		passFirstLetter = (EditText) findViewById(R.id.six_pass_first);
+		passFirstLetter = (EditTextPIN) findViewById(R.id.six_pass_first);
 		passFirstLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb1 = passFirstLetter.getLayoutParams();
 		paramsb1.width = Util.scaleWidthPx(40, outMetrics);
@@ -304,7 +306,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams.setMargins(Util.scaleWidthPx(0, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passFirstLetter.setLayoutParams(textParams);
 
-		passSecondLetter = (EditText) findViewById(R.id.six_pass_second);
+		passSecondLetter = (EditTextPIN) findViewById(R.id.six_pass_second);
 		passSecondLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb2 = passSecondLetter.getLayoutParams();
 		paramsb2.width = Util.scaleWidthPx(40, outMetrics);
@@ -313,8 +315,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passSecondLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passSecondLetter.setLayoutParams(textParams);
+		passSecondLetter.setEt(passFirstLetter);
 
-		passThirdLetter = (EditText) findViewById(R.id.six_pass_third);
+		passThirdLetter = (EditTextPIN) findViewById(R.id.six_pass_third);
 		passThirdLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb3 = passThirdLetter.getLayoutParams();
 		paramsb3.width = Util.scaleWidthPx(40, outMetrics);
@@ -323,8 +326,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passThirdLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passThirdLetter.setLayoutParams(textParams);
+		passThirdLetter.setEt(passSecondLetter);
 
-		passFourthLetter = (EditText) findViewById(R.id.six_pass_fourth);
+		passFourthLetter = (EditTextPIN) findViewById(R.id.six_pass_fourth);
 		passFourthLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb4 = passFourthLetter.getLayoutParams();
 		paramsb4.width = Util.scaleWidthPx(40, outMetrics);
@@ -333,8 +337,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passFourthLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passFourthLetter.setLayoutParams(textParams);
+		passFourthLetter.setEt(passThirdLetter);
 
-		passFifthLetter = (EditText) findViewById(R.id.six_pass_fifth);
+		passFifthLetter = (EditTextPIN) findViewById(R.id.six_pass_fifth);
 		passFifthLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb5 = passFifthLetter.getLayoutParams();
 		paramsb5.width = Util.scaleWidthPx(40, outMetrics);
@@ -343,8 +348,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passFifthLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passFifthLetter.setLayoutParams(textParams);
+		passFifthLetter.setEt(passFourthLetter);
 
-		passSixthLetter = (EditText) findViewById(R.id.six_pass_sixth);
+		passSixthLetter = (EditTextPIN) findViewById(R.id.six_pass_sixth);
 		passSixthLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb6 = passSixthLetter.getLayoutParams();
 		paramsb6.width = Util.scaleWidthPx(40, outMetrics);
@@ -353,6 +359,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passSixthLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passSixthLetter.setLayoutParams(textParams);
+		passSixthLetter.setEt(passFifthLetter);
 
 		passFirstLetter.requestFocus();
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -366,6 +373,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("6passFirstLetter: afterTextChanged");
             	if(passFirstLetter.length()!=0){
                 	passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
@@ -384,6 +392,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("6passSecondLetter: afterTextChanged");
             	 if(passSecondLetter.length()!=0){
                      passThirdLetter.requestFocus();
                      passThirdLetter.setCursorVisible(true);
@@ -400,6 +409,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("6passThirdLetter: afterTextChanged");
             	if(passThirdLetter.length()!=0){
                 	passFourthLetter.requestFocus();
                 	passFourthLetter.setCursorVisible(true);
@@ -415,6 +425,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("6passFourthLetter: afterTextChanged");
             	if(passFourthLetter.length()!=0){
                 	passFifthLetter.requestFocus();
                 	passFifthLetter.setCursorVisible(true);
@@ -430,6 +441,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("6passFifthLetter: afterTextChanged");
             	if(passFifthLetter.length()!=0){
                 	passSixthLetter.requestFocus();
                 	passSixthLetter.setCursorVisible(true);
@@ -441,6 +453,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		passSixthLetter.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
+				log("6passSixthLetter: afterTextChanged");
             	if(passSixthLetter.length()!=0){
             		passFirstLetter.setCursorVisible(false);
             		passFirstLetter.requestFocus();
@@ -576,7 +589,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		warningParams.addRule(RelativeLayout.BELOW, fourPinLayout.getId());
 
 		//PIN
-		passFirstLetter = (EditText) findViewById(R.id.pass_first);
+		passFirstLetter = (EditTextPIN) findViewById(R.id.pass_first);
 		passFirstLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb1 = passFirstLetter.getLayoutParams();
 		paramsb1.width = Util.scaleWidthPx(40, outMetrics);
@@ -586,7 +599,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams.setMargins(Util.scaleWidthPx(0, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passFirstLetter.setLayoutParams(textParams);
 
-		passSecondLetter = (EditText) findViewById(R.id.pass_second);
+		passSecondLetter = (EditTextPIN) findViewById(R.id.pass_second);
 		passSecondLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb2 = passSecondLetter.getLayoutParams();
 		paramsb2.width = Util.scaleWidthPx(40, outMetrics);
@@ -595,8 +608,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passSecondLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passSecondLetter.setLayoutParams(textParams);
+		passSecondLetter.setEt(passFirstLetter);
 
-		passThirdLetter = (EditText) findViewById(R.id.pass_third);
+		passThirdLetter = (EditTextPIN) findViewById(R.id.pass_third);
 		passThirdLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb3 = passThirdLetter.getLayoutParams();
 		paramsb3.width = Util.scaleWidthPx(40, outMetrics);
@@ -605,12 +619,14 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		textParams = (LinearLayout.LayoutParams)passThirdLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		passThirdLetter.setLayoutParams(textParams);
+		passThirdLetter.setEt(passSecondLetter);
 
-		passFourthLetter = (EditText) findViewById(R.id.pass_fourth);
+		passFourthLetter = (EditTextPIN) findViewById(R.id.pass_fourth);
 		passFourthLetter.setGravity(Gravity.CENTER_HORIZONTAL);
 		android.view.ViewGroup.LayoutParams paramsb4 = passFourthLetter.getLayoutParams();
 		paramsb4.width = Util.scaleWidthPx(40, outMetrics);
 		passFourthLetter.setLayoutParams(paramsb4);
+		passFourthLetter.setEt(passThirdLetter);
 		//Margins
 		textParams = (LinearLayout.LayoutParams)passFourthLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
@@ -628,6 +644,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("4passFirstLetter: afterTextChanged");
             	if(passFirstLetter.length()!=0){
                 	passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
@@ -646,6 +663,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("4passSecondLetter: afterTextChanged");
             	 if(passSecondLetter.length()!=0){
                      passThirdLetter.requestFocus();
                      passThirdLetter.setCursorVisible(true);
@@ -662,6 +680,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void afterTextChanged(Editable s) {
+				log("4passThirdLetter: afterTextChanged");
             	if(passThirdLetter.length()!=0){
                 	passFourthLetter.requestFocus();
                 	passFourthLetter.setCursorVisible(true);
@@ -673,6 +692,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		passFourthLetter.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
+				log("4passFourthLetter: afterTextChanged");
             	if(passFourthLetter.length()!=0){
             		passFirstLetter.setCursorVisible(false);
             		passFirstLetter.requestFocus();
