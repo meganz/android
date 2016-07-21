@@ -4279,11 +4279,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if (index == 1){
 				log("createOptions TAB SENT requests");
 				//Show
+				selectMenuItem.setVisible(true);
 				addContactMenuItem.setVisible(true);
 				upgradeAccountMenuItem.setVisible(true);
 
 				//Hide
-				selectMenuItem.setVisible(false);
 				sortByMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
@@ -4313,12 +4313,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("createOptions TAB RECEIVED requests");
 				//Show
+				selectMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
 
     			//Hide
 				searchMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-				selectMenuItem.setVisible(false);
 				sortByMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);

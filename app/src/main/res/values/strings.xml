@@ -812,4 +812,5 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">File link unavailable</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">The file link has been removed because of a ToS/AUP violation.</string>
 
+    <string name="action_unselect_one" context="Menu item to unselect all the elements of a list">Unselect</string>
 </resources>

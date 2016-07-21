@@ -81,8 +81,8 @@
     <string name="action_help" context="Menu item">Ayuda</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Ampliar cuenta</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Realizando pago</string>
-    <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar Todo</string>
-    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar Todo</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar todo</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar todo</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista miniaturas</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Ver como lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar Clave Maestra</string>
@@ -808,4 +808,6 @@
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Enlace de fichero no disponible</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">La fichero ha sido eliminado por una violación de los TdS/PUA.</string>
+
+    <string name="action_unselect_one" context="Menu item to unselect all the elements of a list">Deseleccionar</string>
 </resources>
