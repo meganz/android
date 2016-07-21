@@ -206,13 +206,31 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-			
-			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
-				showRename = true;
-			}
-			
-			if (selected.size() > 0) {
+
+			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
+			if (selected.size() != 0) {
+
+				if(selected.size()==adapter.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
+
+					if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) {
+						showRename = true;
+					}
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
@@ -225,7 +243,11 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 				}
 			}
-			
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);

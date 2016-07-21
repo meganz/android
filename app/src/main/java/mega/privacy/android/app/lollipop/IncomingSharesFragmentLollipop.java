@@ -212,14 +212,25 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
-					
+			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
 			if (selected.size() != 0) {
 				showMove = false;
 				showCopy = true;
-				
-				// Rename
-				if(selected.size() == 1) {
-					
+
+				if(selected.size()==adapter.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+					showRename = false;
+					showMove = false;
+					showLink = false;
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
+
 					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
 						showMove = true;
 						showRename = true;
@@ -229,29 +240,24 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 						showMove = false;
 						showRename = true;
 						showLink = true;
-					}		
+					}
 				}
 				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
 					showRename = false;
 					showMove = false;
 					showLink = false;
 				}
-				
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showMove = false;
 						break;
 					}
 				}
-				
-				if(selected.size()==adapter.getItemCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}	
+
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
