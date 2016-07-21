@@ -965,6 +965,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		holder.textRelativeLayout = (RelativeLayout) v.findViewById(R.id.cell_photosync_grid_month_layout);
 		
 		holder.textView = (TextView) v.findViewById(R.id.cell_photosync_grid_month_name);
+//		//Margins
+//		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)holder.textView.getLayoutParams();
+//		contentTextParams.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics));
+//		holder.textView.setLayoutParams(contentTextParams);
 		
 		v.setTag(holder);
 		
