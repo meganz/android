@@ -344,9 +344,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
-			emptyImageView.setImageResource(R.drawable.inbox_empty);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
-			
+
 			progressBar = (ProgressBar) v.findViewById(R.id.inbox_list_download_progress_bar);
 			transferArrow = (ImageView) v.findViewById(R.id.inbox_list_transfer_arrow);
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
@@ -383,6 +381,26 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}			
 			
 			setNodes(nodes);
+
+			if (adapter.getItemCount() == 0){
+
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+					emptyImageView.setImageResource(R.drawable.inbox_empty);
+					emptyTextView.setText(R.string.empty_inbox);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+			}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
 
 			return v;
 		}
@@ -458,6 +476,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}
 			
 			setNodes(nodes);
+
+			if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+				emptyImageView.setImageResource(R.drawable.inbox_empty);
+				emptyTextView.setText(R.string.empty_inbox);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
 
 			return v;	
 		}
@@ -575,7 +601,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 
-					if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
+					if (megaApi.getInboxNode().getHandle()==n.getHandle()||parentHandle==-1) {
 						emptyImageView.setImageResource(R.drawable.inbox_empty);
 						emptyTextView.setText(R.string.empty_inbox);
 					} else {
@@ -796,7 +822,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getInboxNode().getHandle()==parentHandle) {
+				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 					emptyTextView.setText(R.string.empty_inbox);
 				} else {

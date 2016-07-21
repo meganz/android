@@ -322,9 +322,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
-			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
-			
+
 			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_list_download_progress_bar);
 			transferArrow = (ImageView) v.findViewById(R.id.rubbishbin_list_transfer_arrow);
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
@@ -359,6 +357,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					emptyTextView.setText(R.string.empty_rubbish_bin);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -472,6 +478,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					emptyTextView.setText(R.string.empty_rubbish_bin);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -570,9 +584,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
+					if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+						emptyTextView.setText(R.string.empty_rubbish_bin);
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextView.setText(R.string.file_browser_empty_folder);
@@ -793,12 +807,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRubbishNode().getHandle()==parentHandle) {
+				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
 					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					emptyTextView.setText(R.string.empty_rubbish_bin);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.empty_rubbish_bin);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{
