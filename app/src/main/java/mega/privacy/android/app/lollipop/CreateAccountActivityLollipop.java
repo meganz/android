@@ -399,22 +399,26 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 	
 	@SuppressLint("NewApi")
 	private void onRegister() {
-		android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Intent intent = new Intent(CreateAccountActivityLollipop.this, TourActivityLollipop.class);
-				startActivity(intent);
-				finish();
-			}
-		};
-	
-        AlertDialog.Builder alert = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        alert.setMessage(getString(R.string.create_account_confirm));
-        alert.setTitle(getString(R.string.create_account_confirm_title));
-        alert.setPositiveButton(getString(R.string.cam_sync_ok), listener);
-        alert.setCancelable(false);
-		alert.create().show();
+//		android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				dialog.dismiss();
+//				Intent intent = new Intent(CreateAccountActivityLollipop.this, TourActivityLollipop.class);
+//				startActivity(intent);
+//				finish();
+//			}
+//		};
+//
+//        AlertDialog.Builder alert = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//        alert.setMessage(getString(R.string.create_account_confirm));
+//        alert.setTitle(getString(R.string.create_account_confirm_title));
+//        alert.setPositiveButton(getString(R.string.cam_sync_ok), listener);
+//        alert.setCancelable(false);
+//		alert.create().show();
+
+		Intent intent = new Intent(CreateAccountActivityLollipop.this, ConfirmEmailActivityLollipop.class);
+		startActivity(intent);
+		finish();
 	}
 
 	@Override
