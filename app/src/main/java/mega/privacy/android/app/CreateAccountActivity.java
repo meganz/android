@@ -342,23 +342,27 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	}
 	
 	private void onRegister() {
-		android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Intent intent = new Intent(CreateAccountActivity.this, TourActivity.class);
-				startActivity(intent);
-				finish();
-			}
-		};
+//		android.content.DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				dialog.dismiss();
+//				Intent intent = new Intent(CreateAccountActivity.this, TourActivity.class);
+//				startActivity(intent);
+//				finish();
+//			}
+//		};
+//
+//		AlertDialog.Builder alert = Util
+//				.getCustomAlertBuilder(this,
+//						getString(R.string.create_account_confirm_title),
+//						getString(R.string.create_account_confirm), null)
+//				.setPositiveButton(getString(android.R.string.ok), listener)
+//				.setCancelable(false);
+//		alert.show();
 
-		AlertDialog.Builder alert = Util
-				.getCustomAlertBuilder(this,
-						getString(R.string.create_account_confirm_title),
-						getString(R.string.create_account_confirm), null)
-				.setPositiveButton(getString(android.R.string.ok), listener)
-				.setCancelable(false);
-		alert.show();
+		Intent intent = new Intent(CreateAccountActivity.this, ConfirmEmailActivity.class);
+		startActivity(intent);
+		finish();
 	}
 
 	@Override
