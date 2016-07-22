@@ -338,6 +338,7 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	
 	public void onLoginClick(View v){
 		Intent intent = new Intent(this, LoginActivityLollipop.class);
+		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		startActivity(intent);
 		finish();
 	}

@@ -97,9 +97,10 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
 				log("Build.VERSION_CODES.LOLLIPOP");
 				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+				confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 				confirmIntent.putExtra(LoginActivity.EXTRA_CONFIRMATION, url);
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				confirmIntent.setAction(LoginActivityLollipop.ACTION_CONFIRM);
+				confirmIntent.setAction(Constants.ACTION_CONFIRM);
 				startActivity(confirmIntent);
 				finish();
 			}
@@ -217,6 +218,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						if (rootNode == null) {
 							log("Go to Login to fetch nodes");
 							Intent cancelAccountIntent = new Intent(this, LoginActivityLollipop.class);
+							cancelAccountIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 							cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
 							cancelAccountIntent.setData(Uri.parse(url));
 							startActivity(cancelAccountIntent);
@@ -262,6 +264,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						if (rootNode == null) {
 							log("Go to Login to fetch nodes");
 							Intent changeMailIntent = new Intent(this, LoginActivityLollipop.class);
+							changeMailIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 							changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
 							changeMailIntent.setData(Uri.parse(url));
 							startActivity(changeMailIntent);
@@ -308,6 +311,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						if (rootNode == null) {
 							log("Go to Login to fetch nodes");
 							Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+							resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 							resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
 							resetPassIntent.setData(Uri.parse(url));
 							startActivity(resetPassIntent);
@@ -344,6 +348,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						if (rootNode == null) {
 							log("Go to Login to fetch nodes");
 							Intent ipcIntent = new Intent(this, LoginActivityLollipop.class);
+							ipcIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 							ipcIntent.setAction(Constants.ACTION_IPC);
 							startActivity(ipcIntent);
 							finish();
@@ -437,6 +442,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					log("Link with master key");
 					if(url!=null){
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+						resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
@@ -451,6 +457,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				else{
 					log("Link without master key - park account");
 					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 					resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
 					resetPassIntent.setData(Uri.parse(url));
 					startActivity(resetPassIntent);

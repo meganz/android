@@ -1,22 +1,8 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.Locale;
-
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,6 +20,19 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.util.Locale;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class CreateAccountActivityLollipop extends Activity implements OnClickListener, MegaRequestListenerInterface{
 	
@@ -239,6 +238,7 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 	
 	public void onLoginClick(View v){
 		Intent intent = new Intent(this, LoginActivityLollipop.class);
+		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		startActivity(intent);
 		finish();
 	}
@@ -379,7 +379,8 @@ public class CreateAccountActivityLollipop extends Activity implements OnClickLi
 			String message = e.getErrorString();
 			if (e.getErrorCode() == MegaError.API_EEXIST) {
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.setAction(LoginActivityLollipop.ACTION_CREATE_ACCOUNT_EXISTS);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setAction(Constants.ACTION_CREATE_ACCOUNT_EXISTS);
 				startActivity(intent);
 				finish();
 				return;
