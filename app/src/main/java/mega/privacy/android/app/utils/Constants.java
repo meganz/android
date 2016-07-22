@@ -26,6 +26,11 @@ public class Constants {
 	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
 	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
 
+	public static String ACTION_REFRESH = "ACTION_REFRESH";
+	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
+	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
+	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
+
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
 	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
@@ -50,10 +55,15 @@ public class Constants {
 	final public static int MONTHLY_YEARLY_FRAGMENT = 5006;
 	final public static int CENTILI_FRAGMENT = 5007;
 
+	final public static int TOUR_FRAGMENT = 6000;
+	final public static int LOGIN_FRAGMENT = 6001;
+	final public static int CONFIRMATION_FRAGMENT = 6002;
+	final public static int CHOOSE_ACCOUNT_FRAGMENT = 6003;
+	final public static int CREATE_ACCOUNT_FRAGMENT = 604;
+
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;
-
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";

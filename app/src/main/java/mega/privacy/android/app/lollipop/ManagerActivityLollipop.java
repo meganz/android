@@ -1061,6 +1061,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    if (dbH.getCredentials() == null){
 	    	if (OldPreferences.getOldCredentials(this) != null){
 	    		Intent loginWithOldCredentials = new Intent(this, LoginActivityLollipop.class);
+				loginWithOldCredentials.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 	    		startActivity(loginWithOldCredentials);
 	    		finish();
 	    		return;
@@ -1387,6 +1388,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -1396,6 +1398,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_MEGA_LINK)){
 						Intent intent = new Intent(managerActivity, FileLinkActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -1405,6 +1408,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -1414,6 +1418,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
 						startActivity(intent);
@@ -1422,6 +1427,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
 						startActivity(intent);
@@ -1431,6 +1437,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -1725,7 +1732,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					log("intent with ACTION: "+intent.getAction());
     					if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
     						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
-    						exportIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+							exportIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     						exportIntent.setAction(getIntent().getAction());
     						startActivity(exportIntent);
     						finish();
@@ -1773,6 +1781,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
 					log("ACTION_IMPORT_LINK_FETCH_NODES");
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
+					intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
 					loginIntent.setData(Uri.parse(getIntent().getDataString()));
@@ -5308,14 +5317,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	switch(drawerItem){
 		        	case CLOUD_DRIVE:{
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			    		intent.setAction(Constants.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 		        		break;
 		        	}
 		        	case CONTACTS:{
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			    		intent.setAction(Constants.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 			    		break;
@@ -5330,7 +5341,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
 		    				if (outSFLol != null){
 		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-					    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
+								intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+					    		intent.setAction(Constants.ACTION_REFRESH);
 					    		intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
 					    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 					    		break;
@@ -5343,7 +5355,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 		    				if (inSFLol != null){
 		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-					    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
+								intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+					    		intent.setAction(Constants.ACTION_REFRESH);
 					    		intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
 					    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 					    		break;
@@ -5353,7 +5366,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        	case ACCOUNT:{
 						//Refresh all the info of My Account
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			    		intent.setAction(Constants.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 			    		break;

@@ -237,6 +237,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			aC.logout(this, megaApi, false);
 			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
 			/*if (intent != null){
 				if(intent.getExtras() != null)
