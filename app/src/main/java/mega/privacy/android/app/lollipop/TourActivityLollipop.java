@@ -51,6 +51,7 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate");
 		super.onCreate(savedInstanceState);
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -239,8 +240,8 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	    					});
 	    			builder.setNegativeButton(getString(R.string.general_no), null);
 	    			final AlertDialog dialog = builder.create();
-	    			try {
-	    				dialog.show(); 
+					dialog.show();
+					try {
 	    			}
 	    			catch(Exception ex)	{ 
 	    				startService(cancelIntent); 
@@ -331,12 +332,12 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	}
 
 	public void onRegisterClick(View v){
-		Intent intent = new Intent(this, CreateAccountActivityLollipop.class);
-		startActivity(intent);
-		finish();
+		log("onRegisterClick");
+//		((LoginActivityLollipop)context).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT);
 	}
 	
 	public void onLoginClick(View v){
+		log("onLoginClick");
 		Intent intent = new Intent(this, LoginActivityLollipop.class);
 		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		startActivity(intent);
