@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import mega.privacy.android.app.lollipop.CreateAccountActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -161,8 +160,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					}
 					else{
 						log("Not logged");
-						Intent createAccountIntent = new Intent(this, CreateAccountActivityLollipop.class);
-//				createAccountIntent.setAction(ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY);
+						Intent createAccountIntent = new Intent(this, LoginActivityLollipop.class);
+						createAccountIntent.putExtra("visibleFragment", Constants.CREATE_ACCOUNT_FRAGMENT);
 						startActivity(createAccountIntent);
 						finish();
 					}

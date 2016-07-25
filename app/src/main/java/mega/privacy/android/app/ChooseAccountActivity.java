@@ -1,39 +1,27 @@
 package mega.privacy.android.app;
 
-import java.security.Principal;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.View.OnClickListener;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TabHost;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.TabHost.OnTabChangeListener;
 
 public class ChooseAccountActivity extends PinActivity implements MegaRequestListenerInterface, OnClickListener{
 	
@@ -128,7 +116,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();		
 	
-		setContentView(R.layout.activity_choose_account);   		
+		setContentView(R.layout.fragment_choose_account);
 		
 //		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
 		

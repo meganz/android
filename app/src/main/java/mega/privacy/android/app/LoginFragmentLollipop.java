@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -45,6 +46,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
@@ -123,6 +125,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private boolean backWhileLogin;
     private boolean loginClicked = false;
+
+    Intent intentReceived = null;
+    Bundle extras = null;
+    Uri uriData = null;
+    String action = null;
+    String url = null;
+    private long parentHandle = -1;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -401,6 +410,243 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
+        intentReceived = ((LoginActivityLollipop) context).getIntent();
+        if(intentReceived!=null){
+            action = intentReceived.getAction();
+            if(action!=null) {
+                log("action is: "+action);
+                if (Constants.ACTION_CONFIRM.equals(action)) {
+                    handleConfirmationIntent(intentReceived);
+                    return v;
+                } else if (Constants.ACTION_CREATE_ACCOUNT_EXISTS.equals(action)) {
+                    String message = getString(R.string.error_email_registered);
+                    Snackbar.make(scrollView, message, Snackbar.LENGTH_LONG).show();
+                    return v;
+                } else if (action.equals(Constants.ACTION_RESET_PASS)) {
+                    String link = intentReceived.getDataString();
+                    if (link != null) {
+                        log("link to resetPass: " + link);
+                        showDialogInsertMKToChangePass(link);
+                        return v;
+                    }
+                } else if (action.equals(Constants.ACTION_PASS_CHANGED)) {
+                    int result = intentReceived.getIntExtra("RESULT", -20);
+                    if (result == 0) {
+                        log("Show success mesage");
+                        Util.showAlert(context, getString(R.string.pass_changed_alert), null);
+                        return v;
+                    } else if (result == MegaError.API_EARGS) {
+                        log("Incorrect arguments!");
+                        Util.showAlert(context, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                        return v;
+                    } else if (result == MegaError.API_EKEY) {
+                        log("Incorrect MK when changing pass");
+                        Util.showAlert(context, getString(R.string.incorrect_MK), getString(R.string.incorrect_MK_title));
+                        return v;
+                    } else {
+                        log("Error when changing pass - show error message");
+                        Util.showAlert(context, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                        return v;
+                    }
+                } else if (action.equals(Constants.ACTION_PARK_ACCOUNT)) {
+                    String link = intentReceived.getDataString();
+                    if (link != null) {
+                        log("link to parkAccount: " + link);
+                        showConfirmationParkAccount(link);
+                        return v;
+                    } else {
+                        log("Error when parking account - show error message");
+                        Util.showAlert(context, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                        return v;
+                    }
+                }
+            }
+            else{
+                log("ACTION NULL");
+            }
+        }
+        else{
+            log("No INTENT");
+        }
+
+        if (credentials != null){
+            log("Credentials NOT null");
+            if ((intentReceived != null) && (intentReceived.getAction() != null)){
+                if (intentReceived.getAction().equals(Constants.ACTION_REFRESH)){
+                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+                    startLoginInProcess();
+                    return v;
+                }
+                else{
+                    if(intentReceived.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
+                        action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+                        url = intentReceived.getDataString();
+                    }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
+                        action = Constants.ACTION_OPEN_MEGA_LINK;
+                        url = intentReceived.getDataString();
+                    }
+                    else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+                        action = intentReceived.getAction();
+                    }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_CHANGE_MAIL)){
+                        log("intent received ACTION_CHANGE_MAIL");
+                        action = Constants.ACTION_CHANGE_MAIL;
+                        url = intentReceived.getDataString();
+                    }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
+                        log("intent received ACTION_CANCEL_ACCOUNT");
+                        action = Constants.ACTION_CANCEL_ACCOUNT;
+                        url = intentReceived.getDataString();
+                    }
+//					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
+//						uriData = intentReceived.getData();
+//						log("URI: "+uriData);
+//						extras = intentReceived.getExtras();
+//						url = null;
+//						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
+//					}
+                    else if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)){
+                        action = Constants.ACTION_FILE_PROVIDER;
+                        uriData = intentReceived.getData();
+                        extras = intentReceived.getExtras();
+                        url = null;
+                    }
+                    else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
+                        action = Constants.ACTION_EXPORT_MASTER_KEY;
+                    }
+                    else if (intentReceived.getAction().equals(Constants.ACTION_IPC)){
+                        action = Constants.ACTION_IPC;
+                    }
+
+                    MegaNode rootNode = megaApi.getRootNode();
+                    if (rootNode != null){
+                        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                        if (action != null){
+//							if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//								intent = new Intent(this, FileExplorerActivityLollipop.class);
+//								if(extras != null)
+//								{
+//									intent.putExtras(extras);
+//								}
+//								intent.setData(uriData);
+//							}
+                            if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                                intent = new Intent(context, FileProviderActivity.class);
+                                if(extras != null)
+                                {
+                                    intent.putExtras(extras);
+                                }
+                                intent.setData(uriData);
+                            }
+                            intent.setAction(action);
+                            if (url != null){
+                                intent.setData(Uri.parse(url));
+                            }
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        }
+
+                        ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+
+                        this.startActivity(intent);
+                        ((LoginActivityLollipop) context).finish();
+                    }
+                    else{
+                        startFastLogin();
+                        return v;
+                    }
+                }
+            }
+            else{
+                MegaNode rootNode = megaApi.getRootNode();
+                if (rootNode != null){
+
+                    log("rootNode != null");
+                    Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                    if (action != null){
+//						if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//							intent = new Intent(this, FileExplorerActivityLollipop.class);
+//							if(extras != null)
+//							{
+//								intent.putExtras(extras);
+//							}
+//							intent.setData(uriData);
+//						}
+                        if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                            intent = new Intent(context, FileProviderActivity.class);
+                            if(extras != null)
+                            {
+                                intent.putExtras(extras);
+                            }
+                            intent.setData(uriData);
+                        }
+                        intent.setAction(action);
+                        if (url != null){
+                            intent.setData(Uri.parse(url));
+                        }
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    }
+
+                    MegaPreferences prefs = dbH.getPreferences();
+                    prefs = dbH.getPreferences();
+                    if(prefs!=null)
+                    {
+                        if (prefs.getCamSyncEnabled() != null){
+                            if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+                                ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                            }
+                        }
+                    }
+                    this.startActivity(intent);
+                    ((LoginActivityLollipop) context).finish();
+                }
+                else{
+                    log("rootNode == null");
+                    startFastLogin();
+                    return v;
+                }
+            }
+        }
+        else {
+            log("Credentials IS NULL");
+            if ((intentReceived != null)) {
+                log("INTENT NOT NULL");
+                if (intentReceived.getAction() != null) {
+                    log("ACTION NOT NULL");
+                    Intent intent;
+                    if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)) {
+                        intent = new Intent(context, FileProviderActivity.class);
+                        if (extras != null) {
+                            intent.putExtras(extras);
+                        }
+                        intent.setData(uriData);
+
+                        intent.setAction(action);
+
+                        action = Constants.ACTION_FILE_PROVIDER;
+                    } else if (intentReceived.getAction().equals(Constants.ACTION_FILE_EXPLORER_UPLOAD)) {
+                        action = Constants.ACTION_FILE_EXPLORER_UPLOAD;
+                        //					uriData = intentReceived.getData();
+                        //					log("URI: "+uriData);
+                        //					extras = intentReceived.getExtras();
+                        //					url = null;
+                        Snackbar.make(scrollView, getString(R.string.login_before_share), Snackbar.LENGTH_LONG).show();
+                    } else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)) {
+                        log("ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY");
+                        action = Constants.ACTION_EXPORT_MASTER_KEY;
+                    }
+                }
+            }
+            if (OldPreferences.getOldCredentials(context) != null) {
+                oldCredentialsLogin();
+            }
+        }
+        log("END onCreateView");
         return v;
     }
 
@@ -614,9 +860,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     public void onRegisterClick(View v){
         //Change fragmentVisible in the activity
-//        Intent intent = new Intent(this, CreateAccountActivityLollipop.class);
-//        startActivity(intent);
-//        finish();
+        ((LoginActivityLollipop)context).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT);
     }
 
     /*
@@ -995,6 +1239,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if(confirmLink==null){
                 log("confirmLink==null");
                 if (error.getErrorCode() != MegaError.API_OK) {
+                    log("Error fetch nodes");
                     String errorMessage;
                     if (error.getErrorCode() == MegaError.API_ESID){
                         errorMessage = getString(R.string.error_server_expired_session);
@@ -1030,8 +1275,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     snackbar.show();
                 }
                 else{
-                    String action = ((LoginActivityLollipop) context).getAction();
-                    String url = ((LoginActivityLollipop) context).getUrl();
+                    log("OK fetch nodes");
                     if((action!=null)&&(url!=null)) {
                         if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
                             log("Action change mail after fetch nodes");
@@ -1060,10 +1304,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if (!backWhileLogin){
-
-                        if (((LoginActivityLollipop) context).getParentHandle() != -1){
+                        log("NOT backWhileLogin");
+                        if (parentHandle != -1){
                             Intent intent = new Intent();
-                            intent.putExtra("PARENT_HANDLE", ((LoginActivityLollipop) context).getParentHandle());
+                            intent.putExtra("PARENT_HANDLE", parentHandle);
                             ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
                             ((LoginActivityLollipop) context).finish();
                         }
@@ -1090,11 +1334,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 if (prefs != null){
                                     if (prefs.getCamSyncEnabled() != null){
                                         if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                            ((LoginActivityLollipop) context).startCameraSyncService(false);
+                                            ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
                                         }
                                     }
                                     else{
-                                        ((LoginActivityLollipop) context).startCameraSyncService(true);
+                                        ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
                                         initialCam = true;
                                     }
                                 }
@@ -1119,13 +1363,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //										}
                                         if (action.equals(Constants.ACTION_FILE_PROVIDER)){
                                             intent = new Intent(context, FileProviderActivity.class);
-                                            if(((LoginActivityLollipop) context).getExtras() != null)
+                                            if(extras != null)
                                             {
-                                                intent.putExtras(((LoginActivityLollipop) context).getExtras());
+                                                intent.putExtras(extras);
                                             }
-                                            if(((LoginActivityLollipop) context).getUriData() != null)
+                                            if(uriData != null)
                                             {
-                                                intent.setData(((LoginActivityLollipop) context).getUriData());
+                                                intent.setData(uriData);
                                             }
                                         }
                                         intent.setAction(action);
@@ -1136,6 +1380,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 }
                                 else{
                                     log("initialCam YESSSS");
+                                    intent = new Intent(context,ManagerActivityLollipop.class);
                                     if (action != null){
                                         log("The action is: "+action);
                                         intent.setAction(action);
@@ -1145,17 +1390,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             }
 
                             startActivity(intent);
-                            ((LoginActivityLollipop) context).finish();
+                            ((LoginActivityLollipop)context).finish();
                         }
                     }
                 }
             }
             else{
-                //Change fragment to ChooseAccountActivityLollipop
-//                Intent intent = new Intent();
-//                intent = new Intent(this,ChooseAccountActivityLollipop.class);
-//                startActivity(intent);
-//;
+                log("Go to ChooseAccountFragment");
+                ((LoginActivityLollipop)context).showFragment(Constants.CHOOSE_ACCOUNT_FRAGMENT);
             }
 
         }
