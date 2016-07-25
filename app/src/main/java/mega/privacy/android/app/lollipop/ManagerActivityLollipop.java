@@ -718,6 +718,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("SUBSCRIPTIONS SUPPORTED");
 			}
 
+
 			log("Initial inventory query finished.");
 		}
 	};
@@ -1645,25 +1646,73 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	log("DRAWERITEM NOT NULL1: " + drawerItem);
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
+					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", false);
-					if (firstTimeCam) {
-						log("intent firstTimeCam2==true");
-						if (prefs != null){
-							if (prefs.getCamSyncEnabled() != null){
-								firstTimeCam = false;
+					if(upgradeAccount){
+						log("upgradeAccount true");
+						drawerLayout.closeDrawer(Gravity.LEFT);
+						int accountType = getIntent().getIntExtra("accountType", 0);
+						log("accountType: "+accountType);
+						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
+						BitSet paymentBitSet = Util.convertToBitSet(paymentBitSetLong);;
+						switch (accountType){
+							case 0:{
+								log("intent firstTime==true");
+								firstTimeCam = true;
+								drawerItem = DrawerItem.CAMERA_UPLOADS;
+								setIntent(null);
+								return;
+							}
+							case 1:{
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItemLollipop(drawerItem);
+								showpF(1);
+								return;
+							}
+							case 2:{
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItemLollipop(drawerItem);
+								showpF(2);
+								return;
+							}
+							case 3:{
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItemLollipop(drawerItem);
+								showpF(3);
+								return;
+							}
+							case 4:{
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItemLollipop(drawerItem);
+								showpF(4);
+								return;
+							}
+						}
+					}
+					else{
+						log("upgradeAccount false");
+						if (firstTimeCam) {
+							log("intent firstTimeCam2==true");
+							if (prefs != null){
+								if (prefs.getCamSyncEnabled() != null){
+									firstTimeCam = false;
+								}
+								else{
+									firstTimeCam = true;
+									drawerItem = DrawerItem.CAMERA_UPLOADS;
+								}
 							}
 							else{
 								firstTimeCam = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
-						}
-						else{
-							firstTimeCam = true;
-							drawerItem = DrawerItem.CAMERA_UPLOADS;
-						}
 
-						setIntent(null);
+							setIntent(null);
+						}
 					}
+
+
+
 
 	        		if (intentRec.getAction() != null){
 	        			if (intentRec.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
