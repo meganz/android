@@ -1,24 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUtilsAndroid;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +19,26 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface  {
@@ -294,7 +295,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
 		if (node == null){
-			Intent intent = new Intent(activity, TourActivityLollipop.class);
+			Intent intent = new Intent(activity, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
 	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 	        activity.startActivity(intent);

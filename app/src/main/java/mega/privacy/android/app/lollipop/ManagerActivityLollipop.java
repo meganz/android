@@ -1075,7 +1075,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-		    			Intent cancelTourIntent = new Intent(this, TourActivityLollipop.class);
+						Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
+						cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
+						cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		    			cancelTourIntent.setAction(newIntent.getAction());
 		    			startActivity(cancelTourIntent);
 		    			finish();
@@ -1446,6 +1448,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("rootNode != null");
 
+			if(myAccountInfo==null){
+				myAccountInfo = new MyAccountInfo(this);
+			}
+
+			myAccountInfo.setMyUser(megaApi.getMyUser());
+			if (myAccountInfo.getMyUser() != null){
+				nVEmail.setVisibility(View.VISIBLE);
+				nVEmail.setText(myAccountInfo.getMyUser().getEmail());
+//				megaApi.getUserData(this);
+				log("getUserAttribute FirstName");
+				myAccountInfo.setFirstName(false);
+				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+				log("getUserAttribute LastName");
+				myAccountInfo.setLastName(false);
+				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+
+				this.setDefaultAvatar();
+
+				this.setProfileAvatar();
+			}
+
+
+			if(myAccountInfo==null){
+				myAccountInfo=new MyAccountInfo(this);
+			}
+			megaApi.getPaymentMethods(myAccountInfo);
+			megaApi.getAccountDetails(myAccountInfo);
+			megaApi.getPricing(myAccountInfo);
+			megaApi.creditCardQuerySubscriptions(myAccountInfo);
+			dbH.resetExtendedAccountDetailsTimestamp();
+
+			initGooglePlayPayments();
+
+			megaApi.addGlobalListener(this);
+			megaApi.addTransferListener(this);
+
+			if(savedInstanceState==null) {
+				log("Run async task to check offline files");
+				//Check the consistency of the offline nodes in the DB
+				CheckOfflineNodesTask checkOfflineNodesTask = new CheckOfflineNodesTask(this);
+				checkOfflineNodesTask.execute();
+			}
+
 	        if (getIntent() != null){
 				if (getIntent().getAction() != null){
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
@@ -1454,6 +1499,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						mkLayoutVisible = true;
 						selectDrawerItemLollipop(drawerItem);
 						mkLayoutVisible = false;
+						return;
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
 						String link = getIntent().getDataString();
@@ -1545,49 +1591,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 	        }
-
-			initGooglePlayPayments();
-
-			megaApi.addGlobalListener(this);
-			megaApi.addTransferListener(this);
-
-			if(myAccountInfo==null){
-				myAccountInfo = new MyAccountInfo(this);
-			}
-
-			myAccountInfo.setMyUser(megaApi.getMyUser());
-			if (myAccountInfo.getMyUser() != null){
-				nVEmail.setVisibility(View.VISIBLE);
-				nVEmail.setText(myAccountInfo.getMyUser().getEmail());
-//				megaApi.getUserData(this);
-				log("getUserAttribute FirstName");
-				myAccountInfo.setFirstName(false);
-				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
-				log("getUserAttribute LastName");
-				myAccountInfo.setLastName(false);
-				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
-
-				this.setDefaultAvatar();
-
-				this.setProfileAvatar();
-			}
-
-
-			if(myAccountInfo==null){
-				myAccountInfo=new MyAccountInfo(this);
-			}
-			megaApi.getPaymentMethods(myAccountInfo);
-	        megaApi.getAccountDetails(myAccountInfo);
-			megaApi.getPricing(myAccountInfo);
-	        megaApi.creditCardQuerySubscriptions(myAccountInfo);
-			dbH.resetExtendedAccountDetailsTimestamp();
-
-			if(savedInstanceState==null) {
-				log("Run async task to check offline files");
-				//Check the consistency of the offline nodes in the DB
-				CheckOfflineNodesTask checkOfflineNodesTask = new CheckOfflineNodesTask(this);
-				checkOfflineNodesTask.execute();
-			}
 
 	        if (drawerItem == null) {
 	        	log("DRAWERITEM NULL");

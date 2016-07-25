@@ -1,9 +1,5 @@
 package mega.privacy.android.app;
 
-import mega.privacy.android.app.components.LoopViewPager;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.TourActivityLollipop;
-import mega.privacy.android.app.utils.Util;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,7 +18,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 
 
 public class TourActivity extends Activity implements OnClickListener {
@@ -46,12 +46,13 @@ public class TourActivity extends Activity implements OnClickListener {
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
 			log("Lollipop Version");
-			Intent intent = new Intent(this, TourActivityLollipop.class);
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
 			startActivity(intent);
 			finish();	
 		}
 		
-		setContentView(R.layout.activity_tour);
+		setContentView(R.layout.fragment_tour);
 		viewPager = (LoopViewPager) findViewById(R.id.pager);
 		bar = (ImageView) findViewById(R.id.barTour);
 		bRegister = (Button) findViewById(R.id.button_register_tour);
