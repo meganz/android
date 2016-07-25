@@ -39,7 +39,6 @@ import java.util.Locale;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.TourActivityLollipop;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -201,7 +200,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             scaleText = scaleW;
         }
 
-        View v = inflater.inflate(R.layout.fragment_activity_login, container, false);
+        View v = inflater.inflate(R.layout.fragment_login, container, false);
 
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_login);
 
@@ -1794,8 +1793,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 return 1;
             }
 
-            Intent intent = new Intent(context, TourActivityLollipop.class);
-            startActivity(intent);
+            ((LoginActivityLollipop) context).showFragment(Constants.TOUR_FRAGMENT);
             return 1;
         }
     }

@@ -57,7 +57,7 @@ public class Constants {
 
 	final public static int TOUR_FRAGMENT = 6000;
 	final public static int LOGIN_FRAGMENT = 6001;
-	final public static int CONFIRMATION_FRAGMENT = 6002;
+	final public static int CONFIRM_EMAIL_FRAGMENT = 6002;
 	final public static int CHOOSE_ACCOUNT_FRAGMENT = 6003;
 	final public static int CREATE_ACCOUNT_FRAGMENT = 604;
 

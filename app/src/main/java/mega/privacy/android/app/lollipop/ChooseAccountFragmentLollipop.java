@@ -36,7 +36,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class ChooseAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
 
-    private TextView windowTitle;
     Context context;
 
     float scaleH, scaleW;

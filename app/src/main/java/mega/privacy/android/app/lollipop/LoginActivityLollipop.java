@@ -2,7 +2,9 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,9 +15,10 @@ import android.widget.RelativeLayout;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.CreateAccountFragmentLollipop;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.InitialTourFragmentLollipop;
+import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.LoginFragmentLollipop;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
@@ -30,10 +33,11 @@ public class LoginActivityLollipop extends Activity{
 	RelativeLayout relativeContainer;
 
 	//Fragments
-	InitialTourFragmentLollipop tourFragment;
+	TourFragmentLollipop tourFragment;
 	LoginFragmentLollipop loginFragment;
 	ChooseAccountFragmentLollipop chooseAccountFragment;
 	CreateAccountFragmentLollipop createAccountFragment;
+	ConfirmEmailFragmentLollipop confirmEmailFragment;
 
 	int visibleFragment;
 
@@ -120,6 +124,28 @@ public class LoginActivityLollipop extends Activity{
 				ft.commit();
 				break;
 			}
+			case Constants.TOUR_FRAGMENT:{
+
+				if(tourFragment==null){
+					tourFragment = new TourFragmentLollipop();
+				}
+
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container_login, tourFragment);
+				ft.commit();
+				break;
+			}
+			case Constants.CONFIRM_EMAIL_FRAGMENT:{
+
+				if(confirmEmailFragment==null){
+					confirmEmailFragment = new ConfirmEmailFragmentLollipop();
+				}
+
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container_login, confirmEmailFragment);
+				ft.commit();
+				break;
+			}
 		}
 	}
 
@@ -171,6 +197,22 @@ public class LoginActivityLollipop extends Activity{
 				}
 				break;
 			}
+			case Constants.CREATE_ACCOUNT_FRAGMENT:{
+				showFragment(Constants.TOUR_FRAGMENT);
+				break;
+			}
+			case Constants.TOUR_FRAGMENT:{
+				valueReturn=0;
+				break;
+			}
+			case Constants.CONFIRM_EMAIL_FRAGMENT:{
+				valueReturn=0;
+				break;
+			}
+			case Constants.CHOOSE_ACCOUNT_FRAGMENT:{
+				//nothing to do
+				break;
+			}
 		}
 
 		if (valueReturn == 0) {
@@ -181,6 +223,58 @@ public class LoginActivityLollipop extends Activity{
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		Intent intent = getIntent();
+
+		if (intent != null){
+			if (intent.getAction() != null){
+				if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+					log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+					Intent tempIntent = null;
+					String title = null;
+					String text = null;
+					if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
+						tempIntent = new Intent(this, UploadService.class);
+						tempIntent.setAction(UploadService.ACTION_CANCEL);
+						title = getString(R.string.upload_uploading);
+						text = getString(R.string.upload_cancel_uploading);
+					}
+					else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
+						tempIntent = new Intent(this, DownloadService.class);
+						tempIntent.setAction(DownloadService.ACTION_CANCEL);
+						title = getString(R.string.download_downloading);
+						text = getString(R.string.download_cancel_downloading);
+					}
+					else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+						tempIntent = new Intent(this, CameraSyncService.class);
+						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+						title = getString(R.string.cam_sync_syncing);
+						text = getString(R.string.cam_sync_cancel_sync);
+					}
+
+					final Intent cancelIntent = tempIntent;
+					AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+							title, text, null);
+					builder.setPositiveButton(getString(R.string.general_yes),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									startService(cancelIntent);
+								}
+							});
+					builder.setNegativeButton(getString(R.string.general_no), null);
+					final AlertDialog dialog = builder.create();
+					try {
+						dialog.show();
+					}
+					catch(Exception ex)	{
+						startService(cancelIntent);
+					}
+				}
+				intent.setAction(null);
+			}
+		}
+
+		setIntent(null);
 	}
 
 //	public void onNewIntent(Intent intent){

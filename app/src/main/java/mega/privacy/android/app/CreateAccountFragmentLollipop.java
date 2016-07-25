@@ -25,7 +25,6 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import mega.privacy.android.app.lollipop.ConfirmEmailActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -401,9 +400,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @SuppressLint("NewApi")
     private void onRegister() {
-        Intent intent = new Intent(context, ConfirmEmailActivityLollipop.class);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
+        ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
     }
 
     @Override
