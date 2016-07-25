@@ -364,12 +364,19 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 
 	}
 
+
 	public void setPricing(){
 		log("setPricing");
 
 		DecimalFormat df = new DecimalFormat("#.##");
 
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
+
+		if (accounts == null){
+			log("accounts == null");
+			megaApi.getPricing(myAccountInfo);
+			return;
+		}
 
 		switch(parameterType){
 			case 1:{
