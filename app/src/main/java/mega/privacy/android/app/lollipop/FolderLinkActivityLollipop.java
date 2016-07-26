@@ -1133,8 +1133,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				try{
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-					if(e.getErrorCode() == MegaError.API_ETOOMANY){
+					if(e.getErrorCode() == MegaError.API_EBLOCKED){
 						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));
+						builder.setTitle(getString(R.string.general_error_folder_not_found));
+					}
+					else if(e.getErrorCode() == MegaError.API_ETOOMANY){
+						builder.setMessage(getString(R.string.file_link_unavaible_delete_account));
 						builder.setTitle(getString(R.string.general_error_folder_not_found));
 					}
 					else{

@@ -807,7 +807,7 @@
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">La carpeta ha sido eliminada por una violación de los TdS/PUA.</string>
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Enlace de fichero no disponible</string>
-    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">La fichero ha sido eliminado por una violación de los TdS/PUA.</string>
+    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">El fichero ha sido eliminado por una violación de los TdS/PUA.</string>
 
     <string name="action_unselect_one" context="Menu item to unselect all the elements of a list">Deseleccionar</string>
 
@@ -818,4 +818,7 @@
         <item quantity="one" context="Singular of items which contains a folder. 1 item">elemento</item>
         <item quantity="other" context="Plural of items which contains a folder. 2 items">elementos</item>
     </plurals>
+
+    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">La cuenta de usuario asociada ha sido eliminada debido a múltiples violaciones de nuestros TdS/PUA.</string>
+
 </resources>
