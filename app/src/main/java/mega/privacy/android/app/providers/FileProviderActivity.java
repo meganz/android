@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -414,7 +415,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{				
-				this.onBackPressed();			}
+				this.onBackPressed();
+			}
 		}
 	    return super.onOptionsItemSelected(item);
 	}
@@ -422,6 +424,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	protected void onCreateOlder(Bundle savedInstanceState) {
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+		aB = getSupportActionBar();
+		if(aB!=null){
+			aB.hide();
+		}
 		
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
