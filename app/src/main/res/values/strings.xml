@@ -817,4 +817,8 @@
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Awaiting email confirmation</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
+    <plurals name="general_num_items">
+        <item quantity="one" context="Singular of folder/directory. 1 item">item</item>
+        <item quantity="other" context="Plural of folder/directory. 2 items">items</item>
+    </plurals>
 </resources>

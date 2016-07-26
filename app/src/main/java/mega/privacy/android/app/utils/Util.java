@@ -267,6 +267,18 @@ public class Util {
 
         return null;
 	}
+
+	public static String getNumberItemChildren(File file){
+		File[] list = file.listFiles();
+		int count = 0;
+		if(list!=null){
+			count =  list.length;
+		}
+
+		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
+
+		return numChilden;
+	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
 

@@ -103,9 +103,15 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		FileDocument document = currentFiles.get(position);
 
 		holder.textViewFileName.setText(document.getName());
-	
-		long documentSize = document.getSize();
-		holder.textViewFileSize.setText(Util.getSizeString(documentSize));
+
+		if(document.isFolder()){
+			String items = Util.getNumberItemChildren(document.getFile());
+			holder.textViewFileSize.setText(items);
+		}
+		else{
+			long documentSize = document.getSize();
+			holder.textViewFileSize.setText(Util.getSizeString(documentSize));
+		}
 		
 		if(mode == Mode.PICK_FILE)
 		{
