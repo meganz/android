@@ -207,6 +207,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		if(myAccountInfo!=null){
 			ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
 
+			if (productAccounts == null){
+				log("productAccounts == null");
+				megaApi.getPricing(myAccountInfo);
+				return;
+			}
+
 			for (int i = 0; i < productAccounts.size(); i++) {
 				Product account = productAccounts.get(i);
 				if (account.getLevel() == 1 && account.getMonths() == 1) {

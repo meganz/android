@@ -15,6 +15,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiJava;
@@ -55,6 +56,15 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     MegaUser myUser = null;
 
     public ArrayList<Product> productAccounts;
+
+    Purchase proLiteMonthly = null;
+    Purchase proLiteYearly = null;
+    Purchase proIMonthly = null;
+    Purchase proIYearly = null;
+    Purchase proIIMonthly = null;
+    Purchase proIIYearly = null;
+    Purchase proIIIMonthly = null;
+    Purchase proIIIYearly = null;
 
     public MyAccountInfo(Context context){
         log("MyAccountInfo created");
@@ -233,6 +243,26 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     public void setInventoryFinished(boolean inventoryFinished) {
         this.inventoryFinished = inventoryFinished;
+
+        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+        if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT) {
+            if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.UPGRADE_ACCOUNT_FRAGMENT) {
+                UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
+                if (upAFL != null) {
+                    upAFL.setPricing();
+                }
+            } else if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.MONTHLY_YEARLY_FRAGMENT) {
+                MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
+                if (myFL != null) {
+                    myFL.setPricing();
+                }
+            } else if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.PAYMENT_FRAGMENT) {
+                PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
+                if (pFL != null) {
+                    pFL.setPricing();
+                }
+            }
+        }
     }
 
     public String getLastSessionFormattedDate() {
@@ -610,5 +640,69 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     public void setFirstLetter(String firstLetter) {
         this.firstLetter = firstLetter;
+    }
+
+    public void setProLiteMonthly(Purchase proLiteMonthly) {
+        this.proLiteMonthly = proLiteMonthly;
+    }
+
+    public void setProLiteYearly(Purchase proLiteYearly) {
+        this.proLiteYearly = proLiteYearly;
+    }
+
+    public void setProIMonthly(Purchase proIMonthly) {
+        this.proIMonthly = proIMonthly;
+    }
+
+    public void setProIYearly(Purchase proIYearly) {
+        this.proIYearly = proIYearly;
+    }
+
+    public void setProIIMonthly(Purchase proIIMonthly) {
+        this.proIIMonthly = proIIMonthly;
+    }
+
+    public void setProIIYearly(Purchase proIIYearly) {
+        this.proIIYearly = proIIYearly;
+    }
+
+    public void setProIIIMonthly(Purchase proIIIMonthly) {
+        this.proIIIMonthly = proIIIMonthly;
+    }
+
+    public void setProIIIYearly(Purchase proIIIYearly) {
+        this.proIIIYearly = proIIIYearly;
+    }
+
+    public Purchase getProLiteMonthly() {
+        return proLiteMonthly;
+    }
+
+    public Purchase getProLiteYearly() {
+        return proLiteYearly;
+    }
+
+    public Purchase getProIMonthly() {
+        return proIMonthly;
+    }
+
+    public Purchase getProIYearly() {
+        return proIYearly;
+    }
+
+    public Purchase getProIIMonthly() {
+        return proIIMonthly;
+    }
+
+    public Purchase getProIIYearly() {
+        return proIIYearly;
+    }
+
+    public Purchase getProIIIMonthly() {
+        return proIIIMonthly;
+    }
+
+    public Purchase getProIIIYearly() {
+        return proIIIYearly;
     }
 }

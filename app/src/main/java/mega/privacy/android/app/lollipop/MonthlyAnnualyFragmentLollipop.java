@@ -177,6 +177,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
+		if (accounts == null){
+			log("accounts == null");
+			megaApi.getPricing(myAccountInfo);
+			return;
+		}
+
 		switch(parameterType){
 			case 1:{
 
@@ -257,6 +263,21 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						if (myAccountInfo.getProIMonthly() != null) {
+							log("ProIMonthly already subscribed: " + myAccountInfo.getProIMonthly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceMonthlyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeMonthlyLayout.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProIYearly() != null) {
+							log("ProIAnnualy already subscribed: " + myAccountInfo.getProIYearly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceAnnualyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeAnnualyLayout.setVisibility(View.GONE);
+						}
 						break;
 					}
 				}
@@ -342,6 +363,21 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						if (myAccountInfo.getProIIMonthly() != null) {
+							log("ProIIMonthly already subscribed: " + myAccountInfo.getProIIMonthly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceMonthlyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeMonthlyLayout.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProIIYearly() != null) {
+							log("ProIIAnnualy already subscribed: " + myAccountInfo.getProIIYearly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceAnnualyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeAnnualyLayout.setVisibility(View.GONE);
+						}
 						break;
 					}
 				}
@@ -427,6 +463,21 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						if (myAccountInfo.getProIIIMonthly() != null) {
+							log("ProIIIMonthly already subscribed: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceMonthlyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeMonthlyLayout.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProIIIYearly() != null) {
+							log("ProIIIAnnualy already subscribed: " + myAccountInfo.getProIIIYearly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceAnnualyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeAnnualyLayout.setVisibility(View.GONE);
+						}
 						break;
 					}
 				}
@@ -519,6 +570,22 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						if (myAccountInfo.getProLiteMonthly() != null) {
+							log("ProLiteMonthly already subscribed: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceMonthlyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeMonthlyLayout.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProLiteYearly() != null) {
+							log("ProLiteAnnualy already subscribed: " + myAccountInfo.getProLiteYearly().getOriginalJson());
+							priceSeparator.setVisibility(View.GONE);
+							priceAnnualyLayout.setVisibility(View.GONE);
+							subscribeSeparator.setVisibility(View.GONE);
+							subscribeAnnualyLayout.setVisibility(View.GONE);
+						}
+
 						break;
 					}
 				}
@@ -573,7 +640,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	}
 	
 	public static void log(String message) {
-		Util.log("PaymentFragmentLollipop", message);
+		Util.log("MonthlyAnnualyFragmentLollipop", message);
 	}
 
 	@Override

@@ -300,6 +300,16 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							break;
 						}
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							if (((ManagerActivity)context).getProIMonthly() != null) {
+								log("ProIMonthly already subscribed: " + ((ManagerActivity)context).getProIMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProIYearly() != null) {
+								log("ProIAnnualy already subscribed: " + ((ManagerActivity)context).getProIYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
+
 							break;
 						}
 					}
@@ -352,6 +362,16 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							break;
 						}
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							if (((ManagerActivity)context).getProIIMonthly() != null) {
+								log("ProIIMonthly already subscribed: " + ((ManagerActivity)context).getProIIMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProIIYearly() != null) {
+								log("ProIIAnnualy already subscribed: " + ((ManagerActivity)context).getProIIYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
+
 							break;
 						}
 					}
@@ -405,6 +425,15 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							break;
 						}
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							if (((ManagerActivity)context).getProIIIMonthly() != null) {
+								log("ProIIIMonthly already subscribed: " + ((ManagerActivity)context).getProIIIMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProIIIYearly() != null) {
+								log("ProIIIAnnualy already subscribed: " + ((ManagerActivity)context).getProIIIYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
 							break;
 						}
 					}
@@ -462,6 +491,17 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 							paymentPerMonth.setVisibility(View.VISIBLE);
 							paymentPerYear.setVisibility(View.VISIBLE);
+
+							if (((ManagerActivity)context).getProLiteMonthly() != null) {
+								log("ProLiteMonthly already subscribed: " + ((ManagerActivity)context).getProLiteMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProLiteYearly() != null) {
+								log("ProLiteAnnualy already subscribed: " + ((ManagerActivity)context).getProLiteYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
+
 							break;
 						}
 					}
@@ -581,6 +621,15 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							break;
 						}
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							if (((ManagerActivity)context).getProIMonthly() != null) {
+								log("ProIMonthly already subscribed: " + ((ManagerActivity)context).getProIMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProIYearly() != null) {
+								log("ProIAnnualy already subscribed: " + ((ManagerActivity)context).getProIYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
 							break;
 						}
 					}
@@ -633,6 +682,15 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							break;
 						}
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							if (((ManagerActivity)context).getProIIMonthly() != null) {
+								log("ProIIMonthly already subscribed: " + ((ManagerActivity)context).getProIIMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProIIYearly() != null) {
+								log("ProIIAnnualy already subscribed: " + ((ManagerActivity)context).getProIIYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
 							break;
 						}
 					}
@@ -686,6 +744,15 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 							break;
 						}
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+							if (((ManagerActivity)context).getProIIIMonthly() != null) {
+								log("ProIIIMonthly already subscribed: " + ((ManagerActivity)context).getProIIIMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProIIIYearly() != null) {
+								log("ProIIIAnnualy already subscribed: " + ((ManagerActivity)context).getProIIIYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
 							break;
 						}
 					}
@@ -743,6 +810,16 @@ public class MonthlyAnnualyFragment extends Fragment implements MegaRequestListe
 						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 							paymentPerMonth.setVisibility(View.VISIBLE);
 							paymentPerYear.setVisibility(View.VISIBLE);
+
+							if (((ManagerActivity)context).getProLiteMonthly() != null) {
+								log("ProLiteMonthly already subscribed: " + ((ManagerActivity)context).getProLiteMonthly().getOriginalJson());
+								paymentPerMonth.setVisibility(View.GONE);
+							}
+
+							if (((ManagerActivity)context).getProLiteYearly() != null) {
+								log("ProLiteAnnualy already subscribed: " + ((ManagerActivity)context).getProLiteYearly().getOriginalJson());
+								paymentPerYear.setVisibility(View.GONE);
+							}
 							break;
 						}
 					}
