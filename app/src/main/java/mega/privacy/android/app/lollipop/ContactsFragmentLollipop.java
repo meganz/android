@@ -250,7 +250,13 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 	}
 		
 	//End Multiselect/////
-	
+
+	public static ContactsFragmentLollipop newInstance() {
+		log("newInstance");
+		ContactsFragmentLollipop fragment = new ContactsFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);

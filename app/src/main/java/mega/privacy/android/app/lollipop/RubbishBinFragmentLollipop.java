@@ -247,6 +247,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			updateActionModeTitle();
 		}
 	}
+
+	public static RubbishBinFragmentLollipop newInstance() {
+		log("newInstance");
+		RubbishBinFragmentLollipop fragment = new RubbishBinFragmentLollipop();
+		return fragment;
+	}
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
