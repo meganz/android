@@ -815,7 +815,7 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Por favor, comprueba tu correo electrónico y haz click en el enlace enviado para confirmar tu cuenta.</string>
 
     <plurals name="general_num_items">
-        <item quantity="one" context="Singular of folder/directory. 1 item">elemento</item>
-        <item quantity="other" context="Plural of folder/directory. 2 items">elementos</item>
+        <item quantity="one" context="Singular of items which contains a folder. 1 item">elemento</item>
+        <item quantity="other" context="Plural of items which contains a folder. 2 items">elementos</item>
     </plurals>
 </resources>
