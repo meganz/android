@@ -276,6 +276,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 	}
+
+	public static IncomingSharesFragmentLollipop newInstance() {
+		log("newInstance");
+		IncomingSharesFragmentLollipop fragment = new IncomingSharesFragmentLollipop();
+		return fragment;
+	}
 			
 	@Override
 	public void onCreate (Bundle savedInstanceState){

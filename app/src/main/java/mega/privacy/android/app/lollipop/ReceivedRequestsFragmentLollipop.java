@@ -251,6 +251,12 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	}
 	/////END Multiselect/////
 
+	public static ReceivedRequestsFragmentLollipop newInstance() {
+		log("newInstance");
+		ReceivedRequestsFragmentLollipop fragment = new ReceivedRequestsFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

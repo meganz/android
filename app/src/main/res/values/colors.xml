@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="pressed_mega">#CCcc0000</color>
-    <color name="text_tab_alpha">#b3ffffff</color>
+    <color name="text_tab_alpha">#99ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
     <color name="separator_grey">#10000000</color>
     <color name="background_secondary">#eeeeee</color>
