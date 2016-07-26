@@ -451,7 +451,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else if(e.getErrorCode() == MegaError.API_ETOOMANY){
 					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_delete_account));
-					dialogBuilder.setTitle(getString(R.string.general_error_folder_not_found));
+					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
 				}
 				else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
 					decryptionIntroduced=false;

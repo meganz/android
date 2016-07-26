@@ -1083,23 +1083,53 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			if (e.getErrorCode() == MegaError.API_OK) {
 				MegaNode rootNode = megaApiFolder.getRootNode();
 				if (rootNode != null){
-					parentHandle = rootNode.getHandle();
-					nodes = megaApiFolder.getChildren(rootNode);
-					aB.setTitle(megaApiFolder.getRootNode().getName());
-					supportInvalidateOptionsMenu();
-					
-					if (adapterList == null){
-						adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+
+					if(request.getFlag()){
+						log("Login into a folder with invalid decryption key");
+						try{
+							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							builder.setMessage(getString(R.string.general_error_invalid_decryption_key));
+							builder.setTitle(getString(R.string.general_error_word));
+
+							builder.setPositiveButton(
+									getString(android.R.string.ok),
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.dismiss();
+											Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+											startActivity(backIntent);
+											finish();
+										}
+									});
+
+							AlertDialog dialog = builder.create();
+							dialog.show();
+						}
+						catch(Exception ex){
+							Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+							finish();
+						}
 					}
 					else{
-						adapterList.setParentHandle(parentHandle);
-						adapterList.setNodes(nodes);
+						parentHandle = rootNode.getHandle();
+						nodes = megaApiFolder.getChildren(rootNode);
+						aB.setTitle(megaApiFolder.getRootNode().getName());
+						supportInvalidateOptionsMenu();
+
+						if (adapterList == null){
+							adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+						}
+						else{
+							adapterList.setParentHandle(parentHandle);
+							adapterList.setNodes(nodes);
+						}
+
+						adapterList.setPositionClicked(-1);
+						adapterList.setMultipleSelect(false);
+
+						listView.setAdapter(adapterList);
 					}
-					
-					adapterList.setPositionClicked(-1);
-					adapterList.setMultipleSelect(false);
-					
-					listView.setAdapter(adapterList);
 				}
 				else{
 					try{ 
