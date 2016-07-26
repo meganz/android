@@ -821,4 +821,7 @@
         <item quantity="one" context="Singular of items which contains a folder. 1 item">item</item>
         <item quantity="other" context="Plural of items which contains a folder. 2 items">items</item>
     </plurals>
+
+    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
+
 </resources>
