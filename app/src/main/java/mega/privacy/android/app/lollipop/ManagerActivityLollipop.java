@@ -607,6 +607,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(0);
+				myAccountInfo.setProLiteMonthly(proLiteMonthly);
 				maxP = proLiteMonthly;
 //	        		}
 //            	}
@@ -617,6 +618,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(0);
+				myAccountInfo.setProLiteYearly(proLiteYearly);
 				maxP = proLiteYearly;
 //	        		}
 //            	}
@@ -627,6 +629,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(1);
+				myAccountInfo.setProIMonthly(proIMonthly);
 				maxP = proIMonthly;
 //	        		}
 //            	}
@@ -637,6 +640,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(1);
+				myAccountInfo.setProIYearly(proIYearly);
 				maxP = proIYearly;
 //	        		}
 //            	}
@@ -647,6 +651,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(2);
+				myAccountInfo.setProIIMonthly(proIIMonthly);
 				maxP = proIIMonthly;
 //	        		}
 //            	}
@@ -657,6 +662,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(2);
+				myAccountInfo.setProIIYearly(proIIYearly);
 				maxP = proIIYearly;
 //	        		}
 //            	}
@@ -668,6 +674,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(3);
 				maxP = proIIIMonthly;
+				myAccountInfo.setProIIIMonthly(proIIIMonthly);
 //	        		}
 //            	}
 				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
@@ -677,6 +684,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
 				myAccountInfo.setLevelInventory(3);
+				myAccountInfo.setProIIIYearly(proIIIYearly);
 				maxP = proIIIYearly;
 //	        		}
 //            	}

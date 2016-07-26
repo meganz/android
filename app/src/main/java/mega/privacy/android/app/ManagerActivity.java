@@ -8665,6 +8665,42 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		return usedGbStorage;
 	}
 
+	public Purchase getProLiteMonthly() {
+		return proLiteMonthly;
+	}
+
+	public Purchase getProLiteYearly() {
+		return proLiteYearly;
+	}
+
+	public Purchase getProIMonthly() {
+		return proIMonthly;
+	}
+
+	public Purchase getProIYearly() {
+		return proIYearly;
+	}
+
+	public Purchase getProIIMonthly() {
+		return proIIMonthly;
+	}
+
+	public Purchase getProIIYearly() {
+		return proIIYearly;
+	}
+
+	public Purchase getProIIIMonthly() {
+		return proIIIMonthly;
+	}
+
+	public Purchase getProIIIYearly() {
+		return proIIIYearly;
+	}
+
+	public boolean isInventoryFinished() {
+		return inventoryFinished;
+	}
+
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		// TODO Auto-generated method stub

@@ -142,6 +142,12 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 
 		refreshAccountInfo();
 
+		if (!myAccountInfo.isInventoryFinished()){
+			log("if (!myAccountInfo.isInventoryFinished())");
+			googlePlayLayout.setVisibility(View.GONE);
+			googlePlaySeparator.setVisibility(View.GONE);
+		}
+
 		return v;
 	}
 
@@ -335,10 +341,63 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 	public void setPaymentMethods(){
 		log("setPaymentMethods");
 
-		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-			googlePlayLayout.setVisibility(View.VISIBLE);
-			googlePlaySeparator.setVisibility(View.VISIBLE);
+		if (!myAccountInfo.isInventoryFinished()){
+			log("if (!myAccountInfo.isInventoryFinished())");
+			googlePlayLayout.setVisibility(View.GONE);
+			googlePlaySeparator.setVisibility(View.GONE);
 		}
+		else{
+			if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
+				switch (parameterType){
+					case 1:{
+						if ((myAccountInfo.getProIMonthly() != null) && (myAccountInfo.getProIYearly() != null)) {
+							googlePlayLayout.setVisibility(View.GONE);
+							googlePlaySeparator.setVisibility(View.GONE);
+						}
+						else{
+							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
+						}
+						break;
+					}
+					case 2:{
+						if ((myAccountInfo.getProIIMonthly() != null) && (myAccountInfo.getProIIYearly() != null)) {
+							googlePlayLayout.setVisibility(View.GONE);
+							googlePlaySeparator.setVisibility(View.GONE);
+						}
+						else{
+							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
+						}
+						break;
+					}
+					case 3:{
+						if ((myAccountInfo.getProIIIMonthly() != null) && (myAccountInfo.getProIIIYearly() != null)) {
+							googlePlayLayout.setVisibility(View.GONE);
+							googlePlaySeparator.setVisibility(View.GONE);
+						}
+						else{
+							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
+						}
+						break;
+					}
+					case 4:{
+						if ((myAccountInfo.getProLiteMonthly() != null) && (myAccountInfo.getProLiteYearly() != null)) {
+							googlePlayLayout.setVisibility(View.GONE);
+							googlePlaySeparator.setVisibility(View.GONE);
+						}
+						else{
+							googlePlayLayout.setVisibility(View.VISIBLE);
+							googlePlaySeparator.setVisibility(View.VISIBLE);
+						}
+						break;
+					}
+				}
+
+			}
+		}
+
 		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 			creditCardLayout.setVisibility(View.VISIBLE);
 			creditCardSeparator.setVisibility(View.VISIBLE);
@@ -422,10 +481,26 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 				}
 
 				if (myAccountInfo.getPaymentBitSet() != null){
-					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-						googlePlayLayout.setVisibility(View.VISIBLE);
-						googlePlaySeparator.setVisibility(View.VISIBLE);
+					if (!myAccountInfo.isInventoryFinished()){
+						log("if (!myAccountInfo.isInventoryFinished())");
+						googlePlayLayout.setVisibility(View.GONE);
+						googlePlaySeparator.setVisibility(View.GONE);
 					}
+					else{
+						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
+							if ((myAccountInfo.getProIMonthly() != null) && (myAccountInfo.getProIYearly() != null)) {
+								log("PROI monthly: " + myAccountInfo.getProIMonthly().getOriginalJson());
+								log("PROI annualy: " + myAccountInfo.getProIYearly().getOriginalJson());
+								googlePlayLayout.setVisibility(View.GONE);
+								googlePlaySeparator.setVisibility(View.GONE);
+							}
+							else{
+								googlePlayLayout.setVisibility(View.VISIBLE);
+								googlePlaySeparator.setVisibility(View.VISIBLE);
+							}
+						}
+					}
+
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
 						creditCardSeparator.setVisibility(View.VISIBLE);
@@ -488,10 +563,26 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 				}
 
 				if (myAccountInfo.getPaymentBitSet() != null){
-					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-						googlePlayLayout.setVisibility(View.VISIBLE);
-						googlePlaySeparator.setVisibility(View.VISIBLE);
+					if (!myAccountInfo.isInventoryFinished()){
+						log("if (!myAccountInfo.isInventoryFinished())");
+						googlePlayLayout.setVisibility(View.GONE);
+						googlePlaySeparator.setVisibility(View.GONE);
 					}
+					else{
+						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
+							if ((myAccountInfo.getProIIMonthly() != null) && (myAccountInfo.getProIIYearly() != null)) {
+								log("PROII monthly: " + myAccountInfo.getProIIMonthly().getOriginalJson());
+								log("PROII annualy: " + myAccountInfo.getProIIYearly().getOriginalJson());
+								googlePlayLayout.setVisibility(View.GONE);
+								googlePlaySeparator.setVisibility(View.GONE);
+							}
+							else{
+								googlePlayLayout.setVisibility(View.VISIBLE);
+								googlePlaySeparator.setVisibility(View.VISIBLE);
+							}
+						}
+					}
+
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
 						creditCardSeparator.setVisibility(View.VISIBLE);
@@ -554,10 +645,26 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 				}
 
 				if (myAccountInfo.getPaymentBitSet() != null){
-					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-						googlePlayLayout.setVisibility(View.VISIBLE);
-						googlePlaySeparator.setVisibility(View.VISIBLE);
+					if (!myAccountInfo.isInventoryFinished()){
+						log("if (!myAccountInfo.isInventoryFinished())");
+						googlePlayLayout.setVisibility(View.GONE);
+						googlePlaySeparator.setVisibility(View.GONE);
 					}
+					else{
+						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
+							if ((myAccountInfo.getProIIIMonthly() != null) && (myAccountInfo.getProIIIYearly() != null)) {
+								log("PROIII monthly: " + myAccountInfo.getProIIIMonthly().getOriginalJson());
+								log("PROIII annualy: " + myAccountInfo.getProIIIYearly().getOriginalJson());
+								googlePlayLayout.setVisibility(View.GONE);
+								googlePlaySeparator.setVisibility(View.GONE);
+							}
+							else{
+								googlePlayLayout.setVisibility(View.VISIBLE);
+								googlePlaySeparator.setVisibility(View.VISIBLE);
+							}
+						}
+					}
+
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
 						creditCardSeparator.setVisibility(View.VISIBLE);
@@ -619,10 +726,26 @@ public class PaymentFragmentLollipop extends Fragment implements OnClickListener
 				}
 
 				if (myAccountInfo.getPaymentBitSet() != null){
-					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-						googlePlayLayout.setVisibility(View.VISIBLE);
-						googlePlaySeparator.setVisibility(View.VISIBLE);
+					if (!myAccountInfo.isInventoryFinished()){
+						log("if (!myAccountInfo.isInventoryFinished())");
+						googlePlayLayout.setVisibility(View.GONE);
+						googlePlaySeparator.setVisibility(View.GONE);
 					}
+					else {
+						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
+							if ((myAccountInfo.getProLiteMonthly() != null) && (myAccountInfo.getProLiteYearly() != null)) {
+								log("PRO Lite monthly: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
+								log("PRO Lite annualy: " + myAccountInfo.getProLiteYearly().getOriginalJson());
+								googlePlayLayout.setVisibility(View.GONE);
+								googlePlaySeparator.setVisibility(View.GONE);
+							}
+							else{
+								googlePlayLayout.setVisibility(View.VISIBLE);
+								googlePlaySeparator.setVisibility(View.VISIBLE);
+							}
+						}
+					}
+
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
 						creditCardSeparator.setVisibility(View.VISIBLE);
