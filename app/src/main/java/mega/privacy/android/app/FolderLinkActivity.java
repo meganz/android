@@ -1,29 +1,8 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import mega.privacy.android.app.FileStorageActivity.Mode;
-import mega.privacy.android.app.ManagerActivity.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,6 +24,23 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import mega.privacy.android.app.FileStorageActivity.Mode;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 public class FolderLinkActivity extends PinActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener{
@@ -542,49 +538,116 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES)
-		{		
-			MegaNode rootNode = megaApiFolder.getRootNode();
-			if (rootNode != null){
-				parentHandle = rootNode.getHandle();
-				nodes = megaApiFolder.getChildren(rootNode);
-				aB.setTitle(megaApiFolder.getRootNode().getName());
-				supportInvalidateOptionsMenu();
-				
-				if (adapterList == null){
-					adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
+		{
+			if (e.getErrorCode() == MegaError.API_OK) {
+				MegaNode rootNode = megaApiFolder.getRootNode();
+				if (rootNode != null){
+
+					if(request.getFlag()){
+						log("Login into a folder with invalid decryption key");
+
+						try{
+							AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_invalid_decryption_key), null);
+							dialogBuilder.setPositiveButton(
+									getString(android.R.string.ok),
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.dismiss();
+											Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
+											startActivity(backIntent);
+											finish();
+										}
+									});
+
+							AlertDialog dialog = dialogBuilder.create();
+							dialog.show();
+							Util.brandAlertDialog(dialog);
+						}
+						catch(Exception ex){
+							Util.showToast(this, getString(R.string.general_error_folder_not_found));
+							finish();
+						}
+					}
+					else {
+						parentHandle = rootNode.getHandle();
+						nodes = megaApiFolder.getChildren(rootNode);
+						aB.setTitle(megaApiFolder.getRootNode().getName());
+						supportInvalidateOptionsMenu();
+
+						if (adapterList == null){
+							adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
+						}
+						else{
+							adapterList.setParentHandle(parentHandle);
+							adapterList.setNodes(nodes);
+						}
+
+						adapterList.setPositionClicked(-1);
+						adapterList.setMultipleSelect(false);
+
+						listView.setAdapter(adapterList);
+					}
 				}
 				else{
-					adapterList.setParentHandle(parentHandle);
-					adapterList.setNodes(nodes);
+					try{
+						AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);;
+
+						dialogBuilder.setPositiveButton(
+							getString(android.R.string.ok),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
+									startActivity(backIntent);
+									finish();
+								}
+							});
+
+						AlertDialog dialog = dialogBuilder.create();
+						dialog.show();
+						Util.brandAlertDialog(dialog);
+					}
+					catch(Exception ex){
+						Util.showToast(this, getString(R.string.general_error_folder_not_found));
+						finish();
+					}
 				}
-				
-				adapterList.setPositionClicked(-1);
-				adapterList.setMultipleSelect(false);
-				
-				listView.setAdapter(adapterList);
 			}
 			else{
-				try{ 
-					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);
+				try{
+					AlertDialog.Builder dialogBuilder = null;
+
+					if(e.getErrorCode() == MegaError.API_EBLOCKED){
+						dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_folder_not_found), getString(R.string.folder_link_unavaible_ToS_violation), null);
+					}
+					else if(e.getErrorCode() == MegaError.API_ETOOMANY){
+						dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_folder_not_found), getString(R.string.file_link_unavaible_delete_account), null);
+					}
+					else{
+						dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);
+					}
+
 					dialogBuilder.setPositiveButton(
-						getString(android.R.string.ok),
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-								Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
-				    			startActivity(backIntent);
-				    			finish();
-							}
-						});
-									
+							getString(android.R.string.ok),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
+									startActivity(backIntent);
+									finish();
+								}
+							});
+
 					AlertDialog dialog = dialogBuilder.create();
-					dialog.show(); 
+					dialog.show();
 					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
 					Util.showToast(this, getString(R.string.general_error_folder_not_found));
-	    			finish();
+					finish();
 				}
 			}
 		}

@@ -1,18 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import mega.privacy.android.app.FileStorageActivity.Mode;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -35,6 +22,20 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import mega.privacy.android.app.FileStorageActivity.Mode;
+import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 public class FileLinkActivity extends PinActivity implements MegaRequestListenerInterface, OnClickListener {
@@ -248,9 +249,20 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 			}
 			else{
-				
+				log("ERROR: " + e.getErrorCode());
 				try{ 
-					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_file_not_found), null);
+					AlertDialog.Builder dialogBuilder = null;
+
+					if(e.getErrorCode() == MegaError.API_EBLOCKED){
+						dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_file_not_found), getString(R.string.file_link_unavaible_ToS_violation), null);
+					}
+					else if(e.getErrorCode() == MegaError.API_ETOOMANY){
+						dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_file_not_found), getString(R.string.file_link_unavaible_delete_account), null);
+					}
+					else{
+						dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_file_not_found), null);
+					}
+
 					dialogBuilder.setPositiveButton(
 						getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
