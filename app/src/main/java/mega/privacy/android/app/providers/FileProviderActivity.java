@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -72,6 +73,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.MySwitch;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
+import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -183,11 +185,22 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
 	ProgressDialog statusDialog;
-	
-	private TabHost mTabHostProvider;
-	TabsAdapter mTabsAdapterProvider;
-    ViewPager viewPagerProvider; 
-	
+
+	//Buttons Layout for Lollipop
+	LinearLayout optionsBar;
+	TextView cancelText;
+
+	//Tabs for Lollipop
+	TabLayout tabLayoutProvider;
+	LinearLayout providerSectionLayout;
+	ProviderPageAdapter mTabsAdapterProvider;
+	ViewPager viewPagerProvider;
+
+	//Tabs for Pre-Lollipop
+	private TabHost mTabHostProviderOld;
+	TabsAdapter mTabsAdapterProviderOld;
+	ViewPager viewPagerProviderOld;
+
 	ArrayList<MegaNode> nodes;
 	
 	long gParentHandle;
@@ -296,8 +309,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				lastEmail = credentials.getEmail();
 				String gSession = credentials.getSession();
 				
-				
-				
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
 				loginCreateAccount.setVisibility(View.GONE);
@@ -327,80 +338,76 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 //				aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 				aB.setDisplayHomeAsUpEnabled(true);
 				aB.setDisplayShowHomeEnabled(true);
-				
-				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
-				mTabHostProvider.setup();
-				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
+
+				Display display = getWindowManager().getDefaultDisplay();
+
+				DisplayMetrics metrics = new DisplayMetrics();
+				display.getMetrics(metrics);
+
+				optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
+
+				cancelText = (TextView) findViewById(R.id.cancel_text);
+				cancelText.setOnClickListener(this);
+				cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+				//Left and Right margin
+				LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+				cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+				cancelText.setLayoutParams(cancelTextParams);
+
+				//TABS section
+				providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
+				tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
+				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);
 
 				//Create tabs
-				mTabHostProvider.setVisibility(View.VISIBLE);
-				mTabHostProvider.getTabWidget().setDividerDrawable(null);
+				providerSectionLayout.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterProvider == null){
-					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
-
-					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-					//tabSpec.setContent(contentID);
-					//mTabHostContacts.addTab(tabSpec);
-					TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-
-					mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
-					mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
+					mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
+					viewPagerProvider.setAdapter(mTabsAdapterProvider);
+					tabLayoutProvider.setupWithViewPager(viewPagerProvider);
 				}				
-			
-				mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
-					@Override
-					public void onTabChanged(String tabId) {
-						log("TabId :"+ tabId);
-						if(tabId.equals("cloudProviderFragment")){                     	
-	
+
+				viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+					public void onPageScrollStateChanged(int state) {}
+					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+					public void onPageSelected(int position) {
+						log("onTabChanged TabId :"+ position);
+						if(position == 0){
 							tabShown=CLOUD_TAB;
 							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 							gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 							cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-	
+
 							if(cDriveProviderLol!=null){
 								if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
-									aB.setTitle(getString(R.string.section_cloud_drive));											
+									aB.setTitle(getString(R.string.section_cloud_drive));
 								}
 								else{
-									aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());											
-								}    					
-							}	
+									aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
+								}
+							}
 						}
-						else if(tabId.equals("incomingProviderFragment")){                     	
-	
+						else if(position == 1){
 							tabShown=INCOMING_TAB;
-	
+
 							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 							gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 							iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-	
+
 							if(iSharesProviderLol!=null){
 								if(iSharesProviderLol.getDeepBrowserTree()==0){
 									aB.setTitle(getString(R.string.title_incoming_shares_explorer));
 								}
 								else{
 									aB.setTitle(iSharesProviderLol.name);
-								}    					
-							}        			                      	
+								}
+							}
 						}
 					}
 				});
-	
-				for (int i=0;i<mTabsAdapterProvider.getCount();i++){
-					final int index = i;
-					mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-	
-						@Override
-						public void onClick(View v) {
-							viewPagerProvider.setCurrentItem(index);							
-						}
-					});
-				}			
-	
+
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}
@@ -667,32 +674,32 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					}
 				}*/
 			
-				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
-				mTabHostProvider.setup();
-		        viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
+				mTabHostProviderOld = (TabHost)findViewById(R.id.tabhost_provider);
+				mTabHostProviderOld.setup();
+		        viewPagerProviderOld = (ViewPager) findViewById(R.id.provider_tabs_pager);
 		        
 		        //Create tabs
-		        mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
+		        mTabHostProviderOld.getTabWidget().setBackgroundColor(Color.BLACK);
 				
-		        mTabHostProvider.setVisibility(View.VISIBLE);    			
+		        mTabHostProviderOld.setVisibility(View.VISIBLE);
 				
 				
-				if (mTabsAdapterProvider == null){
-					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+				if (mTabsAdapterProviderOld == null){
+					mTabsAdapterProviderOld= new TabsAdapter(this, mTabHostProviderOld, viewPagerProviderOld);
 					
-					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
+					TabHost.TabSpec tabSpec3 = mTabHostProviderOld.newTabSpec("cloudProviderFragment");
+					tabSpec3.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 			        //tabSpec.setContent(contentID);
 			        //mTabHostContacts.addTab(tabSpec);
-			        TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-			        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
+			        TabHost.TabSpec tabSpec4 = mTabHostProviderOld.newTabSpec("incomingProviderFragment");
+			        tabSpec4.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 			                	          				
-					mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-					mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
+					mTabsAdapterProviderOld.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
+					mTabsAdapterProviderOld.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
 					
 				}
 			
-				mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+				mTabHostProviderOld.setOnTabChangedListener(new OnTabChangeListener(){
 		            @Override
 		            public void onTabChanged(String tabId) {
 		            	log("TabId :"+ tabId);
@@ -736,13 +743,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		             }
 				});
 				
-				for (int i=0;i<mTabsAdapterProvider.getCount();i++){
+				for (int i=0;i<mTabsAdapterProviderOld.getCount();i++){
 					final int index = i;
-					mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+					mTabHostProviderOld.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
 						
 						@Override
 						public void onClick(View v) {
-							viewPagerProvider.setCurrentItem(index);							
+							viewPagerProviderOld.setCurrentItem(index);
 						}
 					});
 				}
@@ -1147,6 +1154,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					break;
 				}
 			}
+			case R.id.cancel_text:{
+				finish();
+			}
 		}
 	}
 	
@@ -1430,15 +1440,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
-				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
-				mTabHostProvider.setup();
-				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
-
-				//Create tabs
-				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
-
-				mTabHostProvider.setVisibility(View.VISIBLE);    			
-
 				if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
 
 					//Set toolbar
@@ -1451,29 +1452,43 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					aB = getSupportActionBar();
 					aB.setDisplayHomeAsUpEnabled(true);
 					aB.setDisplayShowHomeEnabled(true);
-					
+
 					//Lollipop Version
+					Display display = getWindowManager().getDefaultDisplay();
+
+					DisplayMetrics metrics = new DisplayMetrics();
+					display.getMetrics(metrics);
+
+					optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
+
+					cancelText = (TextView) findViewById(R.id.cancel_text);
+					cancelText.setOnClickListener(this);
+					cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+					//Left and Right margin
+					LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+					cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+					cancelText.setLayoutParams(cancelTextParams);
+					//TABS section
+					providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
+					tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
+					viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);
+
+					//Create tabs
+					providerSectionLayout.setVisibility(View.VISIBLE);
+
 					if (mTabsAdapterProvider == null){
-						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
-
-						TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-						//tabSpec.setContent(contentID);
-						//mTabHostContacts.addTab(tabSpec);
-						TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-
-						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
-						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
-
+						mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
+						viewPagerProvider.setAdapter(mTabsAdapterProvider);
+						tabLayoutProvider.setupWithViewPager(viewPagerProvider);
 					}
 
-					mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
-						@Override
-						public void onTabChanged(String tabId) {
-							log("TabId :"+ tabId);
-							if(tabId.equals("cloudProviderFragment")){                     	
+					viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+						public void onPageScrollStateChanged(int state) {}
+						public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
+						public void onPageSelected(int position) {
+							log("onTabChanged TabId :"+ position);
+							if(position == 0){
 								tabShown=CLOUD_TAB;
 								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
@@ -1485,11 +1500,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 									}
 									else{
 										aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
-									}    					
-								}	
+									}
+								}
 							}
-							else if(tabId.equals("incomingProviderFragment")){                     	
-
+							else if(position == 1){
 								tabShown=INCOMING_TAB;
 
 								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
@@ -1502,33 +1516,42 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 									}
 									else{
 										aB.setTitle(iSharesProviderLol.name);
-									}    					
-								}        			                      	
+									}
+								}
 							}
 						}
 					});
-					
+
 					getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 					getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 				}
 				else{
 					//NOT Lollipop
-					if (mTabsAdapterProvider == null){
-						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+					mTabHostProviderOld = (TabHost)findViewById(R.id.tabhost_provider);
+					mTabHostProviderOld.setup();
+					viewPagerProviderOld = (ViewPager) findViewById(R.id.provider_tabs_pager);
 
-						TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
+					//Create tabs
+					mTabHostProviderOld.getTabWidget().setBackgroundColor(Color.BLACK);
+
+					mTabHostProviderOld.setVisibility(View.VISIBLE);
+
+					if (mTabsAdapterProviderOld == null){
+						mTabsAdapterProviderOld = new TabsAdapter(this, mTabHostProviderOld, viewPagerProviderOld);
+
+						TabHost.TabSpec tabSpec3 = mTabHostProviderOld.newTabSpec("cloudProviderFragment");
+						tabSpec3.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 						//tabSpec.setContent(contentID);
 						//mTabHostContacts.addTab(tabSpec);
-						TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
+						TabHost.TabSpec tabSpec4 = mTabHostProviderOld.newTabSpec("incomingProviderFragment");
+						tabSpec4.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
 
-						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
+						mTabsAdapterProviderOld.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
+						mTabsAdapterProviderOld.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
 
 					}
 
-					mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+					mTabHostProviderOld.setOnTabChangedListener(new OnTabChangeListener(){
 						@Override
 						public void onTabChanged(String tabId) {
 							log("TabId :"+ tabId);
@@ -1576,13 +1599,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 
 
-				for (int i=0;i<mTabsAdapterProvider.getCount();i++){
+				for (int i=0;i<mTabsAdapterProviderOld.getCount();i++){
 					final int index = i;
-					mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+					mTabHostProviderOld.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
 
 						@Override
 						public void onClick(View v) {
-							viewPagerProvider.setCurrentItem(index);							
+							viewPagerProviderOld.setCurrentItem(index);
 						}
 					});
 				}
