@@ -1415,12 +1415,20 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCameraFolderExternalSDCard(true);
 			
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
-			dbH.setCamSyncLocalPath(pickedDir.getName());
-			localCameraUploadFolder.setSummary(pickedDir.getName());
-			localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-			
-			DocumentFile[] files = pickedDir.listFiles();
-			
+			String pickedDirName = pickedDir.getName();
+			if(pickedDirName!=null){
+				dbH.setCamSyncLocalPath(pickedDir.getName());
+				localCameraUploadFolder.setSummary(pickedDir.getName());
+				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
+
+				dbH.setCamSyncLocalPath(pickedDir.getName());
+				localCameraUploadFolder.setSummary(pickedDir.getName());
+				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
+			}
+			else{
+				log("pickedDirNAme NULL");
+			}
+
 			dbH.setCamSyncTimeStamp(0);
 			
 			Intent photosVideosIntent = null;

@@ -1,9 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.PinActivity;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +9,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
+import mega.privacy.android.app.utils.Util;
 
 
 public class OfflineActivityLollipop extends PinActivityLollipop{
@@ -20,10 +25,19 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 	OfflineFragmentLollipop oFLol;
     Toolbar tB;
     ActionBar aB;
+
+	//OPTIONS PANEL
+	private SlidingUpPanelLayout slidingOptionsPanel;
+	public FrameLayout optionsOutLayout;
+	public LinearLayout optionsLayout;
+	public LinearLayout optionRemove;
+	private NodeOptionsPanelListener nodeOptionsPanelListener;
+	////
 	
 	boolean isListOffline = true;
 	private MenuItem thumbViewMenuItem;
 	String pathNavigation = "/";
+	MegaOffline selectedNode;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +77,36 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 			oFLol.setIsList(isListOffline);
 		}
 
+		slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_offline_list);
+		optionsLayout = (LinearLayout) findViewById(R.id.offline_list_options);
+		optionsOutLayout = (FrameLayout) findViewById(R.id.offline_list_out_options);
+		optionRemove = (LinearLayout) findViewById(R.id.offline_list_option_remove_layout);
+
+		nodeOptionsPanelListener = new NodeOptionsPanelListener(this);
+
+		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
+		optionRemove.setOnClickListener(nodeOptionsPanelListener);
 //		isListOffline = oFLol.getIsList();
 //		log("IsListOffline: "+isListOffline);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commit();
+	}
+
+	public void showOptionsPanel(MegaOffline sNode){
+		log("showOptionsPanel");
+
+		this.selectedNode = sNode;
+
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+	}
+
+	public void hideOptionsPanel() {
+		log("hideOptionsPanel");
+		if(oFLol!=null){
+			oFLol.resetAdapter();
+		}
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingOptionsPanel.setVisibility(View.GONE);
 	}
 	
 	@Override
@@ -143,7 +184,14 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		
+
+		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
+			log("slidingOptionsPanel()!=PanelState.HIDDEN");
+			hideOptionsPanel();
+			return;
+		}
+
+		log("Sliding Node OPTIONs not shown");
 		if (oFLol != null){
 			if (oFLol.isVisible()){
 				if (oFLol.onBackPressed() == 0){
@@ -163,9 +211,33 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 			}
 		}
 	}
+
+	public void updateOfflineView(MegaOffline mOff){
+		log("updateOfflineView");
+		if(oFLol!=null){
+			if(mOff==null){
+				oFLol.refresh();
+			}
+			else{
+				oFLol.refreshPaths(mOff);
+			}
+		}
+	}
 	
 	public void setPathNavigationOffline(String pathNavigation){
 		this.pathNavigation = pathNavigation;
+	}
+
+	public String getPathNavigation() {
+		return pathNavigation;
+	}
+
+	public MegaOffline getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(MegaOffline selectedNode) {
+		this.selectedNode = selectedNode;
 	}
 	
 	public static void log(String message) {

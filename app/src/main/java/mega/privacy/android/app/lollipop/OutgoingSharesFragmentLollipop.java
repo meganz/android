@@ -240,21 +240,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
-					
+			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
 			if (selected.size() != 0) {
 				showTrash = true;
 				showMove = true;
 				showShare = true;
-				
-				if (selected.size() == 1) {
-					showLink=true;
-					showRename=true;
-				}
-				else{
-					showLink=false;
-					showRename=false;
-				}
-				
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -262,15 +254,28 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 				}
-				
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+					showLink=false;
+					showRename=false;
+				}
+				else if(selected.size()==1){
+					showLink=true;
+					showRename=true;
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}	
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+					showLink=false;
+					showRename=false;
+				}
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -288,6 +293,12 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			return false;
 		}
 		
+	}
+
+	public static OutgoingSharesFragmentLollipop newInstance() {
+		log("newInstance");
+		OutgoingSharesFragmentLollipop fragment = new OutgoingSharesFragmentLollipop();
+		return fragment;
 	}
 			
 	@Override

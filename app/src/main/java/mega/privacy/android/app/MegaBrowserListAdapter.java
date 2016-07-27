@@ -744,31 +744,29 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				}
 			}
 		}
-		
-		ArrayList<MegaShare> sl = megaApi.getOutShares(node);		
 
-		if (sl != null && sl.size() != 0){
-			
-			for(int i=0; i<sl.size();i++){
-
-				//Check if one of the ShareNodes is the public link
-
-				if(sl.get(i).getUser()==null){
-
-					if(multipleSelect){
-						holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
-						holder.publicLinkImage.setVisibility(View.GONE);
-					}
-					else
-					{
-						holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-						holder.publicLinkImage.setVisibility(View.VISIBLE);
-					}
-					//
-					break;
-
+		if(node.isExported()){
+			//Node has public link
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+				holder.publicLinkImage.setVisibility(View.GONE);
+			}
+			else{
+				if(multipleSelect){
+					holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+					holder.publicLinkImage.setVisibility(View.GONE);
+				}
+				else
+				{
+					holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+					holder.publicLinkImage.setVisibility(View.VISIBLE);
 				}
 			}
+		}
+		else{
+			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+			holder.publicLinkImage.setVisibility(View.GONE);
 		}
 
 		holder.imageButtonThreeDots.setTag(holder);

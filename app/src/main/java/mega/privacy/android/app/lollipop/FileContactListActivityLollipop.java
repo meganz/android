@@ -327,14 +327,22 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if (selected.size() != 0) {
 				permissions = true;
 				deleteShare = true;
-				
+
+				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
 				}	
 			}
 			else{

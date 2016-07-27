@@ -1,23 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.Product;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -34,12 +16,31 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.Product;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
+
 public class CentiliFragmentLollipop extends Fragment implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
 WebView myWebView;
 	
 	MegaApiAndroid megaApi;
 	Context context;
+	MyAccountInfo myAccountInfo;
 	private ActionBar aB;
 	
 	
@@ -68,6 +69,7 @@ WebView myWebView;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		log("onCreateView");
 
 		DecimalFormat df = new DecimalFormat("#.##");  
 
@@ -94,11 +96,29 @@ WebView myWebView;
         myWebView = (WebView) v.findViewById(R.id.webview);
 //        WebSettings webSettings = myWebView.getSettings();
 //        webSettings.setJavaScriptEnabled(true);
-	        
-        megaApi.getPricing(this);
-        
+
+		if(DBUtil.callToPricing(context)){
+			log("megaApi.getPricing SEND");
+			megaApi.getPricing(myAccountInfo);
+		}else{
+			getPaymentId();
+		}
+
 		return v;
-	}	
+	}
+
+	public void getPaymentId(){
+		log("getPaymentId");
+		ArrayList<Product> p = myAccountInfo.getProductAccounts();
+		for (int i=0;i<p.size();i++){
+			Product account = p.get(i);
+			if ((account.getLevel()==4) && (account.getMonths()==1)){
+				long planHandle = account.getHandle();
+				megaApi.getPaymentId(planHandle, this);
+				log("megaApi.getPaymentId(" + planHandle + ")");
+			}
+		}
+	}
 	
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
@@ -116,18 +136,7 @@ WebView myWebView;
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
 		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-			MegaPricing p = request.getPricing();
-			for (int i=0;i<p.getNumProducts();i++){
-				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-				if ((account.getLevel()==4) && (account.getMonths()==1)){
-					long planHandle = account.getHandle();
-					megaApi.getPaymentId(planHandle, this);
-					log("megaApi.getPaymentId(" + planHandle + ")");
-				}
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT ID: " + request.getLink());
 //			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
 
@@ -200,5 +209,9 @@ WebView myWebView;
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
+		this.myAccountInfo = myAccountInfo;
 	}
 }

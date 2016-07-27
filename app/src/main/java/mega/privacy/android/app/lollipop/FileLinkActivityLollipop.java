@@ -92,6 +92,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	RelativeLayout infoLayout;
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
+
+	boolean decryptionIntroduced=false;
 	
 	@Override
 	public void onDestroy(){
@@ -242,19 +244,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			}
 			catch(Exception e){	}
 
-			int counter = url.split("!").length - 1;
-			log("Counter !: "+counter);
-			if(counter<2){
-				//Ask for decryption key
-				log("Ask for decryption key");
-				askForDecryptionKeyDialog();
+			if(url!=null){
+				importLink(url);
 			}
 			else{
-				//Decryption key included!
-				if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
-					log("link ok, call to import link");
-					importLink(url);
-				}
+				log("url NULL");
 			}
 		}
 	}
@@ -283,7 +277,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					if (value.length() == 0) {
 						return true;
 					}
-					url=url+value;
+					if(value.startsWith("!")){
+						log("Decryption key with exclamation!");
+						url=url+value;
+					}
+					else{
+						url=url+"!"+value;
+					}
+					log("File link to import: "+url);
+					decryptionIntroduced=true;
 					importLink(url);
 					decryptionKeyDialog.dismiss();
 					return true;
@@ -311,7 +313,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						if (value.length() == 0) {
 							return;
 						}
-						url=url+value;
+						if(value.startsWith("!")){
+							log("Decryption key with exclamation!");
+							url=url+value;
+						}
+						else{
+							url=url+"!"+value;
+						}
+						log("File link to import: "+url);
+						decryptionIntroduced=true;
 						importLink(url);
 					}
 				});
@@ -356,13 +366,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}	
 	
 	private void importLink(String url) {
-		String[] parts = parseDownloadUrl(url);
-		
-		if (parts == null) {
-			Snackbar.make(fragmentContainer, getString(R.string.manager_download_from_link_incorrect), Snackbar.LENGTH_LONG).show();
-			return;
-		}
-		
+
 		if(!Util.isOnline(this))
 		{
 			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
@@ -384,22 +388,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		megaApi.getPublicNode(url, this);
 	}
-	
-	/*
-	 * Check MEGA url and parse if valid
-	 */
-	private String[] parseDownloadUrl(String url) {
-		if (url == null) {
-			return null;
-		}
-		if (!url.matches("^https://mega.co.nz/#!.*!.*$") && !url.matches("^https://mega.nz/#!.*!.*$")) {
-			return null;
-		}
-		String[] parts = url.split("!");
-		if(parts.length != 3) return null;
-		return new String[] { parts[1], parts[2] };
-	}
-	
+
 	public static void log(String message) {
 		Util.log("FileLinkActivityLollipop", message);
 	}
@@ -441,32 +430,61 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 			}
 			else{
-				
-				try{ 
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				log("ERROR: " + e.getErrorCode());
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				if(e.getErrorCode() == MegaError.API_EBLOCKED){
+					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_ToS_violation));
+					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
+				}
+				else if(e.getErrorCode() == MegaError.API_EARGS){
+					if(decryptionIntroduced){
+						log("incorrect key, ask again!");
+						decryptionIntroduced=false;
+						askForDecryptionKeyDialog();
+						return;
+					}
+					else{
+						//Link no valido
+						dialogBuilder.setTitle(getString(R.string.general_error_word));
+						dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
+					}
+				}
+				else if(e.getErrorCode() == MegaError.API_ETOOMANY){
+					dialogBuilder.setMessage(getString(R.string.file_link_unavaible_delete_account));
+					dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
+				}
+				else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
+					decryptionIntroduced=false;
+					askForDecryptionKeyDialog();
+					return;
+				}
+				else{
 					dialogBuilder.setTitle(getString(R.string.general_error_word));
 					dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
+				}
+
+				try{
 					dialogBuilder.setPositiveButton(getString(android.R.string.ok),
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-								Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-				    			startActivity(backIntent);
-				    			finish();
-							}
-						});
-									
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+									startActivity(backIntent);
+									finish();
+								}
+							});
+
 					AlertDialog dialog = dialogBuilder.create();
-					dialog.show(); 
+					dialog.show();
 				}
 				catch(Exception ex){
 					Snackbar.make(fragmentContainer, getString(R.string.general_error_file_not_found), Snackbar.LENGTH_LONG).show();
 				}
-				
-    			return;
+
+				return;
 			}
-		 }
+		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			
 			try{

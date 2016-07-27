@@ -1,18 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +24,19 @@ import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaTransfer;
 
 
 public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListener {
@@ -225,7 +225,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			
 			holder.imageButtonThreeDots1 = (ImageButton) v.findViewById(R.id.file_grid_three_dots1);
 			holder.imageButtonThreeDots2 = (ImageButton) v.findViewById(R.id.file_grid_three_dots2);
-
 			
 			holder.optionsLayout1 = (RelativeLayout) v.findViewById(R.id.file_grid_options1);
 //			holder.optionOpen1 = (ImageButton) v.findViewById(R.id.file_grid_option_open1);
@@ -280,11 +279,9 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 //			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection2);
 //			holder.arrowSelection2.setVisibility(View.GONE);
-
 			
 			holder.transferProgressBar1 = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar1);
 			holder.transferProgressBar2 = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar2);
-			
 			
 			holder.transferProgressBar1.setVisibility(View.GONE);
 			holder.transferProgressBar2.setVisibility(View.GONE);
@@ -522,6 +519,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					listFragment.smoothScrollToPosition(_position);
 					if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+						log("type == ManagerActivity.RUBBISH_BIN_ADAPTER");
 						holder.optionDownload1.setVisibility(View.VISIBLE);
 						holder.optionProperties1.setVisibility(View.VISIBLE);
 						holder.optionCopy1.setVisibility(View.VISIBLE);
@@ -544,6 +542,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					}
 					else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+						log("type == ManagerActivity.SHARED_WITH_ME_ADAPTER");
 						holder.optionDownload1.setVisibility(View.VISIBLE);
 						holder.optionProperties1.setVisibility(View.VISIBLE);
 						holder.optionCopy1.setVisibility(View.VISIBLE);
@@ -565,6 +564,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						holder.optionDelete1.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					}
+					log("type of adapter == "+type);
 //					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;

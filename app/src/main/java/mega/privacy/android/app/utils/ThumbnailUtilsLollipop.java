@@ -1,38 +1,55 @@
 package mega.privacy.android.app.utils;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
+import android.provider.MediaStore.Video.Thumbnails;
+import android.util.TypedValue;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.RelativeLayout;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import mega.privacy.android.app.MegaBrowserGridAdapter;
-import mega.privacy.android.app.MegaBrowserListAdapter;
-import mega.privacy.android.app.MegaBrowserNewGridAdapter;
-import mega.privacy.android.app.MegaExplorerAdapter;
-import mega.privacy.android.app.MegaFullScreenImageAdapter;
-import mega.privacy.android.app.MegaPhotoSyncGridAdapter;
-import mega.privacy.android.app.MegaPhotoSyncListAdapter;
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.ThumbnailCache;
 import mega.privacy.android.app.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
+import mega.privacy.android.app.MegaBrowserNewGridAdapter;
 import mega.privacy.android.app.MegaBrowserNewGridAdapter.ViewHolderBrowserNewGrid;
-import mega.privacy.android.app.MegaExplorerAdapter.ViewHolderExplorer;
+import mega.privacy.android.app.MegaFullScreenImageAdapter;
 import mega.privacy.android.app.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import mega.privacy.android.app.NavigationDrawerAdapter.ViewHolderNavigationDrawer;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.ThumbnailCache;
 import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter;
-import mega.privacy.android.app.lollipop.MegaExplorerLollipopAdapter;
-import mega.privacy.android.app.lollipop.MegaPhotoSyncGridAdapterLollipop;
-import mega.privacy.android.app.lollipop.MegaPhotoSyncListAdapterLollipop;
-import mega.privacy.android.app.lollipop.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
+import mega.privacy.android.app.lollipop.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
+import mega.privacy.android.app.lollipop.MegaPhotoSyncGridAdapterLollipop;
 import mega.privacy.android.app.lollipop.MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid;
+import mega.privacy.android.app.lollipop.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList;
+import mega.privacy.android.app.lollipop.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.MegaTransfersLollipopAdapter.ViewHolderTransfer;
 import mega.privacy.android.app.lollipop.providers.MegaProviderLollipopAdapter;
 import mega.privacy.android.app.lollipop.providers.MegaProviderLollipopAdapter.ViewHolderLollipopProvider;
-import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -40,23 +57,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.provider.BaseColumns;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
-import android.provider.MediaStore.Video.Thumbnails;
-import android.media.ThumbnailUtils;
-import android.util.TypedValue;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.RelativeLayout;
 
 
 /*
@@ -78,6 +78,84 @@ public class ThumbnailUtilsLollipop {
 	static HashMap<Long, ThumbnailDownloadListenerTransfer> listenersTransfer = new HashMap<Long, ThumbnailDownloadListenerTransfer>();
 	static HashMap<Long, ThumbnailDownloadListenerPhotoSyncList> listenersPhotoSyncList = new HashMap<Long, ThumbnailDownloadListenerPhotoSyncList>();
 	static HashMap<Long, ThumbnailDownloadListenerPhotoSyncGrid> listenersPhotoSyncGrid = new HashMap<Long, ThumbnailDownloadListenerPhotoSyncGrid>();
+
+	public static Bitmap getRoundedRectBitmap(Context context, final Bitmap bitmap,final int pixels)
+	{
+
+		final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(result);
+		final Paint paint = new Paint();
+		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		final RectF rectF = new RectF(rect);
+
+		final float densityMultiplier = context.getResources().getDisplayMetrics().density;
+		final float roundPx = pixels*densityMultiplier;
+		paint.setAntiAlias(true);
+		canvas.drawARGB(0, 0, 0, 0);
+		paint.setColor(context.getResources().getColor(R.color.new_background_fragment));
+		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+		//draw rectangles over the corners we want to be square
+//		canvas.drawRect(0, 0, bitmap.getWidth()/2, bitmap.getHeight()/2, paint);
+//		canvas.drawRect(bitmap.getWidth()/2, 0, bitmap.getWidth(), bitmap.getHeight()/2, paint);
+
+		canvas.drawRect(0, bitmap.getHeight()/2, bitmap.getWidth()/2, bitmap.getHeight(), paint);
+		canvas.drawRect(bitmap.getWidth()/2, bitmap.getHeight()/2, bitmap.getWidth(), bitmap.getHeight(), paint);
+
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+		canvas.drawBitmap(bitmap, rect, rect, paint);
+		return result;
+	}
+
+	public static Path getRoundedRect(float left, float top, float right, float bottom, float rx, float ry,
+								   boolean tl, boolean tr, boolean br, boolean bl){
+		Path path = new Path();
+		if (rx < 0) rx = 0;
+		if (ry < 0) ry = 0;
+		float width = right - left;
+		float height = bottom - top;
+		if (rx > width / 2) rx = width / 2;
+		if (ry > height / 2) ry = height / 2;
+		float widthMinusCorners = (width - (2 * rx));
+		float heightMinusCorners = (height - (2 * ry));
+
+		path.moveTo(right, top + ry);
+		if (tr)
+			path.rQuadTo(0, -ry, -rx, -ry);//top-right corner
+		else{
+			path.rLineTo(0, -ry);
+			path.rLineTo(-rx,0);
+		}
+		path.rLineTo(-widthMinusCorners, 0);
+		if (tl)
+			path.rQuadTo(-rx, 0, -rx, ry); //top-left corner
+		else{
+			path.rLineTo(-rx, 0);
+			path.rLineTo(0,ry);
+		}
+		path.rLineTo(0, heightMinusCorners);
+
+		if (bl)
+			path.rQuadTo(0, ry, rx, ry);//bottom-left corner
+		else{
+			path.rLineTo(0, ry);
+			path.rLineTo(rx,0);
+		}
+
+		path.rLineTo(widthMinusCorners, 0);
+		if (br)
+			path.rQuadTo(rx, 0, rx, -ry); //bottom-right corner
+		else{
+			path.rLineTo(rx,0);
+			path.rLineTo(0, -ry);
+		}
+
+		path.rLineTo(0, -heightMinusCorners);
+
+		path.close();//Given close, last lineto can be removed.
+
+		return path;
+	}
 
 	
 	static class ThumbnailDownloadListenerPhotoSyncList implements MegaRequestListenerInterface{

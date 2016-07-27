@@ -246,8 +246,11 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public LinearLayout cellLayout;
     	public ArrayList<RelativeLayout> relativeLayoutsComplete;
     	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
+		public ArrayList<RelativeLayout> relativeLayoutsVideoInfo;
+		public ArrayList<LinearLayout> relativeLayoutsGradientVideo;
     	public ArrayList<ImageView> imageViews;
     	public ArrayList<ImageView> videoIcons;
+		public ArrayList<TextView> videoDuration;
     	public TextView textView;
     	public RelativeLayout textRelativeLayout;
     	public ArrayList<LinearLayout> longClickLayoutsSelected;
@@ -570,6 +573,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				}
 			}
 			else{
+				log("monthPic.monthYearString != null and not empty string");
 				holder.textRelativeLayout.setVisibility(View.GONE);
 				for (int i=0;i<numberOfCells;i++){
 					if (monthPic.nodeHandles.size() > i){
@@ -629,27 +633,60 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 								}
 							}
 						}
+						else{
+							log(n.getName()+" NO ThUMB!!");
+						}
 
-						MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
-						if(Util.isVideoFile(nodeToCheck.getName())){
+						if(Util.isVideoFile(n.getName())){
+							log("IS VIDEO!");
+							holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
+							holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.VISIBLE);
 							holder.videoIcons.get(i).setVisibility(View.VISIBLE);
-							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
-								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);	
-								RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-								lp.setMargins(3, 0, 0, 3);								
-								holder.videoIcons.get(i).setLayoutParams(lp);
+
+							if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);
+								log(n.getName()+" DURATION: "+n.getDuration());
+								int duration = n.getDuration();
+								if(duration>0){
+									int hours = duration / 3600;
+									int minutes = (duration % 3600) / 60;
+									int seconds = duration % 60;
+
+									String timeString;
+									if(hours>0){
+										timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+									}
+									else{
+										timeString = String.format("%d:%02d", minutes, seconds);
+									}
+
+									log("The duration is: "+hours+" "+minutes+" "+seconds);
+
+									holder.videoDuration.get(i).setText(timeString);
+									RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+									relativeParams.bottomMargin=Util.scaleWidthPx(3, outMetrics);
+									relativeParams.leftMargin=Util.scaleWidthPx(3, outMetrics);
+									holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+									holder.videoDuration.get(i).setVisibility(View.VISIBLE);
+								}
+								else{
+									holder.videoDuration.get(i).setVisibility(View.GONE);
+								}
 							}
 							else{
-								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
-								RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-								lp.setMargins(1, 0, 0, 1);								
-								holder.videoIcons.get(i).setLayoutParams(lp);
-							}							
+								holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);
+								holder.videoIcons.get(i).setVisibility(View.VISIBLE);
+								RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+								relativeParams.bottomMargin=Util.scaleWidthPx(1, outMetrics);
+								relativeParams.leftMargin=Util.scaleWidthPx(1, outMetrics);
+								holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+								holder.videoDuration.get(i).setVisibility(View.GONE);
+							}
 						}
 						else{
+							holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.GONE);
 							holder.videoIcons.get(i).setVisibility(View.GONE);
+							holder.videoDuration.get(i).setVisibility(View.GONE);
 						}
 					}
 					else{
@@ -734,27 +771,58 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							}
 						}
 					}
+					else{
+						log(n.getName()+" NO ThUMB!!");
+					}
 
-					MegaNode nodeToCheck = megaApi.getNodeByHandle(holder.documents.get(i));
-					if(Util.isVideoFile(nodeToCheck.getName())){
+					if(Util.isVideoFile(n.getName())){
+						holder.relativeLayoutsVideoInfo.get(i).setVisibility(View.VISIBLE);
+						holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.VISIBLE);
+						holder.videoIcons.get(i).setVisibility(View.VISIBLE);
+
 						if(((CameraUploadFragmentLollipop) fragment).getIsLargeGrid()){						
-							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);	
-							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-							lp.setMargins(3, 0, 0, 3);								
-							holder.videoIcons.get(i).setLayoutParams(lp);
+							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_24dp);
+							log(n.getName()+" DURATION: "+n.getDuration());
+							int duration = n.getDuration();
+							if(duration>0){
+								int hours = duration / 3600;
+								int minutes = (duration % 3600) / 60;
+								int seconds = duration % 60;
+
+								String timeString;
+								if(hours>0){
+									timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+								}
+								else{
+									timeString = String.format("%d:%02d", minutes, seconds);
+								}
+
+								log("The duration is: "+hours+" "+minutes+" "+seconds);
+
+								holder.videoDuration.get(i).setText(timeString);
+								RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+								relativeParams.bottomMargin=Util.scaleWidthPx(3, outMetrics);
+								relativeParams.leftMargin=Util.scaleWidthPx(3, outMetrics);
+								holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+								holder.videoDuration.get(i).setVisibility(View.VISIBLE);
+							}
+							else{
+								holder.videoDuration.get(i).setVisibility(View.GONE);
+							}
 						}
 						else{
 							holder.videoIcons.get(i).setImageResource(R.drawable.ic_play_arrow_white_18dp);	
-							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-							lp.setMargins(1, 0, 0, 1);
-							lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-							holder.videoIcons.get(i).setLayoutParams(lp);
+							RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams)holder.relativeLayoutsVideoInfo.get(i).getLayoutParams();
+							relativeParams.bottomMargin=Util.scaleWidthPx(1, outMetrics);
+							relativeParams.leftMargin=Util.scaleWidthPx(1, outMetrics);
+							holder.relativeLayoutsVideoInfo.get(i).setLayoutParams(relativeParams);
+							holder.videoDuration.get(i).setVisibility(View.GONE);
 						}
-						holder.videoIcons.get(i).setVisibility(View.VISIBLE);
 					}
 					else{
+						holder.relativeLayoutsGradientVideo.get(i).setVisibility(View.GONE);
 						holder.videoIcons.get(i).setVisibility(View.GONE);
+						holder.videoDuration.get(i).setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -847,8 +915,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		holder.imageViews = new ArrayList<ImageView>();
 		holder.longClickLayoutsSelected = new ArrayList<LinearLayout>();
 		holder.longClickLayoutsUnselected = new ArrayList<LinearLayout>();
+		holder.relativeLayoutsVideoInfo = new ArrayList<RelativeLayout>();
+		holder.relativeLayoutsGradientVideo = new ArrayList<LinearLayout>();
 		holder.videoIcons = new ArrayList<ImageView>();
-		
+		holder.videoDuration = new ArrayList<TextView>();
 		holder.documents = new ArrayList<Long>();
 		
 		holder.cellLayout = (LinearLayout) v.findViewById(R.id.cell_photosync_layout);
@@ -876,16 +946,29 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			LinearLayout lcLU = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_unselected);
 			lcLU.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
 			holder.longClickLayoutsUnselected.add(lcLU);
+
+			RelativeLayout rLVdI = (RelativeLayout) rLView.findViewById(R.id.cell_photosync_grid_video_info_layout);
+			holder.relativeLayoutsVideoInfo.add(rLVdI);
+
+			LinearLayout rLVgra = (LinearLayout) rLView.findViewById(R.id.cell_photosync_gradient_effect);
+			holder.relativeLayoutsGradientVideo.add(rLVgra);
 			
 			ImageView vI = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_video_icon);
-			holder.videoIcons.add(vI);					
-			
+			holder.videoIcons.add(vI);
+
+			TextView vD = (TextView) rLView.findViewById(R.id.cell_photosync_grid_video_duration);
+			holder.videoDuration.add(vD);
+
 			holder.documents.add(-1l);
 		}
 		
 		holder.textRelativeLayout = (RelativeLayout) v.findViewById(R.id.cell_photosync_grid_month_layout);
 		
 		holder.textView = (TextView) v.findViewById(R.id.cell_photosync_grid_month_name);
+//		//Margins
+//		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)holder.textView.getLayoutParams();
+//		contentTextParams.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics));
+//		holder.textView.setLayoutParams(contentTextParams);
 		
 		v.setTag(holder);
 		

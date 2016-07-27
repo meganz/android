@@ -13,16 +13,48 @@
      android:layout_margin="3dp"
      android:background="@color/white"
      android:layout_centerHorizontal="true"/>
-    
-    <ImageView
-        android:id="@+id/cell_photosync_grid_video_icon"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:id="@+id/cell_photosync_gradient_effect"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@drawable/gradient_cam_uploads"
+        android:layout_margin="1dp"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+    </LinearLayout>
+
+    <RelativeLayout android:id="@+id/cell_photosync_grid_video_info_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="3dp"
-        android:layout_marginLeft="3dp" 
-        android:src="@drawable/ic_play_arrow_white_24dp"
-		android:background="@null" />
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/cell_photosync_grid_video_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="9dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:textSize="14sp"/>
+
+        <ImageView
+            android:id="@+id/cell_photosync_grid_video_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_play_arrow_white_24dp"
+            android:visibility="gone"
+            android:background="@null" />
+
+     </RelativeLayout>
+
+
      
     <LinearLayout
         android:id="@+id/cell_photosync_menu_long_click_unselected"

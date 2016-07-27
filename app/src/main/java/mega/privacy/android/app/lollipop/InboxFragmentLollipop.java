@@ -206,13 +206,31 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-			
-			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
-				showRename = true;
-			}
-			
-			if (selected.size() > 0) {
+
+			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
+			if (selected.size() != 0) {
+
+				if(selected.size()==adapter.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
+
+					if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) {
+						showRename = true;
+					}
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
@@ -225,7 +243,11 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 				}
 			}
-			
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
@@ -344,9 +366,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
-			emptyImageView.setImageResource(R.drawable.inbox_empty);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
-			
+
 			progressBar = (ProgressBar) v.findViewById(R.id.inbox_list_download_progress_bar);
 			transferArrow = (ImageView) v.findViewById(R.id.inbox_list_transfer_arrow);
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
@@ -383,6 +403,26 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}			
 			
 			setNodes(nodes);
+
+			if (adapter.getItemCount() == 0){
+
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+					emptyImageView.setImageResource(R.drawable.inbox_empty);
+					emptyTextView.setText(R.string.empty_inbox);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+			}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
 
 			return v;
 		}
@@ -459,6 +499,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			setNodes(nodes);
 
+			if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+				emptyImageView.setImageResource(R.drawable.inbox_empty);
+				emptyTextView.setText(R.string.empty_inbox);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+
 			return v;	
 		}
 	}
@@ -476,6 +524,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}
 		}
 		setNodes(nodes);
+		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 		if(adapter != null){				
 			adapter.notifyDataSetChanged();
 		}		
@@ -574,7 +623,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 
-					if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
+					if (megaApi.getInboxNode().getHandle()==n.getHandle()||parentHandle==-1) {
 						emptyImageView.setImageResource(R.drawable.inbox_empty);
 						emptyTextView.setText(R.string.empty_inbox);
 					} else {
@@ -795,7 +844,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getInboxNode().getHandle()==parentHandle) {
+				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 					emptyTextView.setText(R.string.empty_inbox);
 				} else {

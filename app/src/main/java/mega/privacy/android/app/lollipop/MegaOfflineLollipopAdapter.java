@@ -1,9 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -22,10 +20,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -759,8 +755,23 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						positionClicked = currentPosition;
 						notifyDataSetChanged();
 					}
-				}				
-				((ManagerActivityLollipop) context).showNodeOptionsPanel(mOff);
+				}
+
+				if (Util.isOnline(context)){
+					//With connection
+					log("Connection! - ManagerActivity instance!");
+					if(context instanceof ManagerActivityLollipop){
+						((ManagerActivityLollipop) context).showOptionsPanel(mOff);
+					}
+				}
+				else{
+					//No connection
+					log("No connection!");
+					if(context instanceof OfflineActivityLollipop){
+						((OfflineActivityLollipop) context).showOptionsPanel(mOff);
+					}
+				}
+
 				break;
 			}
 		}		
@@ -778,146 +789,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 		return null;
 	}
-	
-	private void showOverflowFolder(MegaOffline mOff){
-		final MegaOffline mOffFinal = mOff;
-		AlertDialog moreOptionsDialog;
-		
-		final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle(R.string.more_options_overflow);
-		builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case 0:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();	
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.shareFolder(path);
-						}
-						
-						break;
-					}
-					case 1:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.rename(path);
-						}
-						break;
-					}
-					case 2:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.move(path);
-						}
-						break;
-					}
-					case 3:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.copy(path);
-						}
-						break;
-					}
-				}
 
-				dialog.dismiss();
-			}
-		});
-		
-		builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-
-		moreOptionsDialog = builder.create();
-		moreOptionsDialog.show();
-		Util.brandAlertDialog(moreOptionsDialog);
-	}
-	
-	private void showOverflowFile(MegaOffline mOff){
-		final MegaOffline mOffFinal = mOff;
-		AlertDialog moreOptionsDialog;
-		
-		final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle(R.string.more_options_overflow);
-		builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case 0:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.rename(path);
-						}
-						break;
-					}
-					case 1:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.move(path);
-						}
-						break;
-					}
-					case 2:{
-						setPositionClicked(-1);
-						notifyDataSetChanged();
-						if (Util.isOnline(context)){
-							String path = mOffFinal.getPath() + mOffFinal.getName();
-							fragment.copy(path);
-						}
-						break;
-					}
-				}
-
-				dialog.dismiss();
-			}
-		});
-		
-		builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-
-		moreOptionsDialog = builder.create();
-		moreOptionsDialog.show();
-		Util.brandAlertDialog(moreOptionsDialog);
-	}
-	
-	/*
-	 * Get path at specified position
-	 */
-	public String getPathAt(int position) {
-		log("getPathAt");
-//		try {
-//			if(paths != null){
-//				return paths.get(position);
-//			}
-//		} catch (IndexOutOfBoundsException e) {}
-		return null;
-	}
-	
 	public boolean isMultipleSelect() {
 		log("isMultipleSelect");
 		return multipleSelect;
@@ -934,95 +806,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			selectedItems = new SparseBooleanArray();
 		}
 	}
-	
-	private int deleteOffline(Context context,MegaOffline node){
-		
-		log("deleteOffline");
 
-//		dbH = new DatabaseHandler(context);
-		dbH = DatabaseHandler.getDbHandler(context);
-
-		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
-		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
-		MegaOffline parentNode = null;	
-		
-		//Delete children
-		mOffListChildren=dbH.findByParentId(node.getId());
-		if(mOffListChildren.size()>0){
-			//The node have childrens, delete
-			deleteChildrenDB(mOffListChildren);			
-		}
-		
-		int parentId = node.getParentId();
-		log("Finding parents...");
-		//Delete parents
-		if(parentId!=-1){
-			mOffListParent=dbH.findByParentId(parentId);
-			
-			log("Same Parent?:" +mOffListParent.size());
-			
-			if(mOffListParent.size()<1){
-				//No more node with the same parent, keep deleting				
-
-				parentNode = dbH.findById(parentId);
-				log("Recursive parent: "+parentNode.getName());
-				if(parentNode != null){
-					deleteOffline(context, parentNode);	
-						
-				}	
-			}			
-		}	
-		
-		log("Remove the node physically");
-		//Remove the node physically
-		File destination = null;								
-
-		if (Environment.getExternalStorageDirectory() != null){
-			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
-		}
-		else{
-			destination = context.getFilesDir();
-		}	
-
-		try{
-			File offlineFile = new File(destination, node.getName());	
-			log("Delete in phone: "+node.getName());
-			Util.deleteFolderAndSubfolders(context, offlineFile);
-		}
-		catch(Exception e){
-			log("EXCEPTION: deleteOffline - adapter");
-		};		
-		
-		log("Delete in DB: "+node.getId());
-		dbH.removeById(node.getId());		
-		
-		return 1;		
-	}	
-
-	private void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
-		
-		log("deleteChildenDB: "+mOffListChildren.size());
-		MegaOffline mOffDelete=null;
-	
-		for(int i=0; i<mOffListChildren.size(); i++){	
-			
-			mOffDelete=mOffListChildren.get(i);
-			
-			log("Children "+i+ ": "+ mOffDelete.getName());
-			ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
-			if(mOffListChildren2.size()>0){
-				//The node have children, delete				
-				deleteChildrenDB(mOffListChildren2);				
-			}	
-			
-			int lines = dbH.removeById(mOffDelete.getId());		
-			log("Borradas; "+lines);
-		}		
-	}	
-	
-	
 	private static void log(String log) {
 		Util.log("MegaOfflineLollipopAdapter", log);
 	}
-
 }

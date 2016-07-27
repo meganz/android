@@ -174,8 +174,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			showRename = false;
 			showLink = false;
 
-			
-			if (selected.size() > 0) {
+			if (selected.size() != 0) {
 				showTrash = true;
 				showMove = true;
 
@@ -186,8 +185,29 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 						break;
 					}
 				}
+
+				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+				if(selected.size()==adapter.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
 			}
-			
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
@@ -226,6 +246,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			updateActionModeTitle();
 		}
+	}
+
+	public static RubbishBinFragmentLollipop newInstance() {
+		log("newInstance");
+		RubbishBinFragmentLollipop fragment = new RubbishBinFragmentLollipop();
+		return fragment;
 	}
 	
 	@Override
@@ -322,9 +348,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
-			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
-			
+
 			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_list_download_progress_bar);
 			transferArrow = (ImageView) v.findViewById(R.id.rubbishbin_list_transfer_arrow);
 			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
@@ -359,6 +383,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					emptyTextView.setText(R.string.empty_rubbish_bin);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -472,6 +504,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					emptyTextView.setText(R.string.empty_rubbish_bin);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -570,9 +610,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
+					if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+						emptyTextView.setText(R.string.empty_rubbish_bin);
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextView.setText(R.string.file_browser_empty_folder);
@@ -793,12 +833,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRubbishNode().getHandle()==parentHandle) {
+				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
 					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					emptyTextView.setText(R.string.empty_rubbish_bin);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.empty_rubbish_bin);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{

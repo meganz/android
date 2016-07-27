@@ -149,6 +149,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private RadioButton camSyncData;
 	private RadioButton camSyncWifi;
 	private RelativeLayout layoutRadioGroup;
+	private RelativeLayout fragmentContainer;
 	
 	float scaleH, scaleW;
 	float density;
@@ -761,6 +762,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);		
 			contentTextLayout.setVisibility(View.GONE);
+
+			fragmentContainer = (RelativeLayout) v.findViewById(R.id.fragment_container_file_browser_grid);
+			fragmentContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);

@@ -16,29 +16,47 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".FileProviderActivityLollipop" />
 
-    <TabHost
-        android:id="@+id/tabhost_provider"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_provider" >
+    <LinearLayout
+        android:id="@+id/options_provider_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:gravity="right|center_vertical"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:orientation="horizontal" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/cancel_text"
+            android:fontFamily="sans-serif-medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accentColor"
+            android:gravity="center_vertical|center_horizontal"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:background="@color/separator_grey"
+        android:layout_width = "fill_parent"
+        android:layout_height="1dip"
+        android:layout_above="@id/options_provider_layout"/>
+
+    <LinearLayout
+            android:id="@+id/tabhost_provider"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@id/separator"
+            android:layout_below="@id/toolbar_provider"
             android:gravity="center"
             android:orientation="vertical" >
 
-            <TabWidget
-                android:id="@android:id/tabs"
+            <android.support.design.widget.TabLayout
+                android:id="@+id/sliding_tabs_provider"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            </TabWidget>
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="0" />
+                android:layout_height="wrap_content"
+                android:background="@color/mega"
+                style="@style/MyCustomTabLayout"/>
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/provider_tabs_pager"
@@ -46,6 +64,5 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
         </LinearLayout>
-    </TabHost>
 
 </RelativeLayout>

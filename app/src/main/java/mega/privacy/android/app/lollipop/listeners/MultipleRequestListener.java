@@ -7,6 +7,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -152,6 +153,34 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_copied, max_items);
                         }
+                    }
+                    break;
+                }
+                case MegaRequest.TYPE_INVITE_CONTACT:{
+
+                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
+                        log("remind contact request finished");
+                        message = context.getString(R.string.number_correctly_reinvite_contact_request, max_items);
+                    }
+                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE){
+                        log("delete contact request finished");
+                        if(error>0){
+                            message = context.getString(R.string.number_no_delete_contact_request, max_items-error, error);
+                        }
+                        else{
+                            message = context.getString(R.string.number_correctly_delete_contact_request, max_items);
+                        }
+                    }
+                    break;
+                }
+                case MegaRequest.TYPE_REPLY_CONTACT_REQUEST:{
+                    log("multiple reply request sent");
+
+                    if(error>0){
+                        message = context.getString(R.string.number_incorrectly_invitation_reply_sent, max_items-error, error);
+                    }
+                    else{
+                        message = context.getString(R.string.number_correctly_invitation_reply_sent, max_items);
                     }
                     break;
                 }

@@ -305,7 +305,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 			    	holder.initialLetter.setVisibility(View.VISIBLE);
 			    	holder.initialLetter.setText(firstLetter);
-			    	holder.initialLetter.setTextSize(32);
+			    	holder.initialLetter.setTextSize(24);
 			    	holder.initialLetter.setTextColor(Color.WHITE);
 			    }
 		    }
@@ -317,7 +317,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 			    	holder.initialLetter.setVisibility(View.VISIBLE);
 			    	holder.initialLetter.setText(firstLetter);
-			    	holder.initialLetter.setTextSize(32);
+			    	holder.initialLetter.setTextSize(24);
 			    	holder.initialLetter.setTextColor(Color.WHITE);
 	    		}
 	    	}

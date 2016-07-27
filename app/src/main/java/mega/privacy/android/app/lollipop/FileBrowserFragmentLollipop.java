@@ -280,13 +280,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 				}
 
+				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
 				}
 			}
 			else{
@@ -324,6 +332,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
+	}
+
+	public static FileBrowserFragmentLollipop newInstance() {
+		log("newInstance");
+		FileBrowserFragmentLollipop fragment = new FileBrowserFragmentLollipop();
+		return fragment;
 	}
 
 	@Override
@@ -951,6 +965,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if(!(cameraSyncHandle.equals("")))
 			{
 				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+					((ManagerActivityLollipop)context).cameraUploadsClicked();
+					return;
+				}
+			}
+			else{
+				if(n.getName().equals("Camera Uploads")){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					dbH.setCamSyncHandle(n.getHandle());
+					log("FOUND Camera Uploads!!----> "+n.getHandle());
 					((ManagerActivityLollipop)context).cameraUploadsClicked();
 					return;
 				}

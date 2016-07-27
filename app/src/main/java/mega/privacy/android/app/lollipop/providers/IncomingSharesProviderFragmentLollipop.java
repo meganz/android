@@ -1,17 +1,5 @@
 package mega.privacy.android.app.lollipop.providers;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.providers.FileProviderActivity;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -24,15 +12,24 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 
-public class IncomingSharesProviderFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener{
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaUser;
+
+
+public class IncomingSharesProviderFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -44,10 +41,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	MegaProviderLollipopAdapter adapter;
 	GestureDetectorCompat detector;
 	public String name;
-	
-	LinearLayout optionsBar;
-	TextView cancelText;
-	
+
 //	boolean first = false;
 //	private boolean folderSelected = false;
 	RecyclerView listView;
@@ -56,6 +50,12 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	TextView emptyTextView;
 	TextView contentText;
 	int deepBrowserTree = 0;
+
+	public static IncomingSharesProviderFragmentLollipop newInstance() {
+		log("newInstance");
+		IncomingSharesProviderFragmentLollipop fragment = new IncomingSharesProviderFragmentLollipop();
+		return fragment;
+	}
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -85,17 +85,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		
-		optionsBar = (LinearLayout) v.findViewById(R.id.options_provider_layout);
-		
-		cancelText = (TextView) v.findViewById(R.id.cancel_text);
-		cancelText.setOnClickListener(this);		
-		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
-		cancelText.setLayoutParams(cancelTextParams);		
-		
+
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new MegaLinearLayoutManager(context);
@@ -180,15 +170,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
         super.onAttach(activity);
         context = activity;
     }
-	
-	@Override
-	public void onClick(View v) {
-		switch(v.getId()){
-			case R.id.cancel_text:{			
-				((FileProviderActivity) context).finish();
-			}
-		}
-	}
 
     public void itemClick(int position) {
 		log("------------------onItemClick: "+deepBrowserTree);
