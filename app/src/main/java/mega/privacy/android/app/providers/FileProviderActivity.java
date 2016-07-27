@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.StatFs;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -121,6 +122,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private String gPrivateKey;
 	
 	private MenuItem searchMenuItem;
+
+	CountDownTimer timer;
 	
 	Toolbar tB;
     ActionBar aB;
@@ -138,6 +141,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	TextView loggingInText;
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
+	TextView serversBusyText;
 	TextView loginTitle;
 	TextView generatingKeysText;
 	float scaleH, scaleW;
@@ -198,8 +202,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	ViewPager viewPagerProviderOld;
 
 	ArrayList<MegaNode> nodes;
-	
-	long gParentHandle;
+	int incomingDeepBrowserTree = -1;
+	long gParentHandle=-1;
+	long incParentHandle=-1;
 	String gcFTag = "";
 	
 	
@@ -226,8 +231,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 	}
 	
-	protected void onCreateLollipop(Bundle savedInstanceState) {		
-		
+	protected void onCreateLollipop(Bundle savedInstanceState) {
 		log("onCreateLollipop");
 	
 		requestWindowFeature(Window.FEATURE_NO_TITLE);	
@@ -253,6 +257,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
+			incParentHandle = savedInstanceState.getLong("incParentHandle", -1);
+			gParentHandle = savedInstanceState.getLong("parentHandle", -1);
+			incomingDeepBrowserTree = savedInstanceState.getInt("deepBrowserTree", -1);
+			tabShown = savedInstanceState.getInt("tabShown", CLOUD_TAB);
 		}		
 		
 		try{
@@ -272,19 +280,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		UserCredentials credentials = dbH.getCredentials();
 		if (credentials == null){
 			
-//			loginLogin.setVisibility(View.VISIBLE);
-//			loginCreateAccount.setVisibility(View.VISIBLE);
-//			loginDelimiter.setVisibility(View.VISIBLE);
-//			loginLoggingIn.setVisibility(View.GONE);
-//			generatingKeysText.setVisibility(View.GONE);
-//			loggingInText.setVisibility(View.GONE);
-//			fetchingNodesText.setVisibility(View.GONE);
-//			prepareNodesText.setVisibility(View.GONE);
-//			loginProgressBar.setVisibility(View.GONE);
-//			queryingSignupLinkText.setVisibility(View.GONE);
-//			confirmingAccountText.setVisibility(View.GONE);			
-			
 			loginLogin.setVisibility(View.VISIBLE);
+			if(scrollView!=null){
+				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
@@ -292,6 +291,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
+			if(serversBusyText!=null){
+				serversBusyText.setVisibility(View.GONE);
+			}
 			loginProgressBar.setVisibility(View.GONE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);				
@@ -311,18 +313,22 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
-//				generatingKeysText.setVisibility(View.VISIBLE);
+				if(scrollView!=null){
+					scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+				}
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
+				if(serversBusyText!=null){
+					serversBusyText.setVisibility(View.GONE);
+				}
 				megaApi.fastLogin(gSession, this);
 
 			}
 			else{
 				setContentView(R.layout.activity_file_provider);
-				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
 				//Set toolbar
@@ -357,10 +363,29 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				providerSectionLayout.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterProvider == null){
+					log("mTabsAdapterProvider == null");
+					log("tabShown: "+tabShown);
+					log("parentHandle INCOMING: "+incParentHandle);
+					log("parentHandle CLOUD: " +gParentHandle);
+					viewPagerProvider.setCurrentItem(tabShown);
+					if(tabShown==-1){
+						tabShown=CLOUD_TAB;
+					}
 					mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
 					viewPagerProvider.setAdapter(mTabsAdapterProvider);
 					tabLayoutProvider.setupWithViewPager(viewPagerProvider);
-				}				
+					viewPagerProvider.setCurrentItem(tabShown);
+				}
+				else{
+					log("mTabsAdapterProvider NOOOT null");
+					log("tabShown: "+tabShown);
+					log("parentHandle INCOMING: "+incParentHandle);
+					log("parentHandle CLOUD: " +gParentHandle);
+					viewPagerProvider.setCurrentItem(tabShown);
+					if(tabShown==-1){
+						tabShown=CLOUD_TAB;
+					}
+				}
 
 				viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 					public void onPageScrollStateChanged(int state) {}
@@ -395,7 +420,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 									aB.setTitle(getString(R.string.title_incoming_shares_explorer));
 								}
 								else{
-									aB.setTitle(iSharesProviderLol.name);
+									aB.setTitle(megaApi.getNodeByHandle(iSharesProviderLol.getParentHandle()).getName());
+
 								}
 							}
 						}
@@ -482,7 +508,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			
 			loginTitle.setText(R.string.login_text);
 			loginTitle.setTextSize(28*scaleH);
-			
 			loginLogin.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
@@ -570,7 +595,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 				fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 				prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
-				
+
 				loginTitle.setText(R.string.login_text);
 				loginTitle.setTextSize(28*scaleH);
 				
@@ -593,7 +618,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
-//				generatingKeysText.setVisibility(View.VISIBLE);
+				if(scrollView!=null){
+					scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+				}
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
@@ -814,8 +841,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
 		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
-		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);	
-		
+		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
+		serversBusyText = (TextView) findViewById(R.id.login_servers_busy_text);
+
 	}
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -985,6 +1013,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
 		bundle.putBoolean("folderSelected", folderSelected);
+		bundle.putInt("tabShown", tabShown);
+		bundle.putInt("deepBrowserTree", incomingDeepBrowserTree);
+		bundle.putLong("parentHandle", gParentHandle);
+		bundle.putLong("incParentHandle", incParentHandle);
 		super.onSaveInstanceState(bundle);
 	}
 	
@@ -1147,6 +1179,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		{
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
+			if(scrollView!=null){
+				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+			}
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
@@ -1155,6 +1190,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
+			if(serversBusyText!=null){
+				serversBusyText.setVisibility(View.GONE);
+			}
 			
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
 			return;
@@ -1164,6 +1202,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
+		if(scrollView!=null){
+			scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+		}
 		generatingKeysText.setVisibility(View.VISIBLE);
 		loginProgressBar.setVisibility(View.VISIBLE);
 		loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1212,6 +1253,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if(!Util.isOnline(this)){
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
+			if(scrollView!=null){
+				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+			}
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
@@ -1220,7 +1264,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
+			if(serversBusyText!=null){
+				serversBusyText.setVisibility(View.GONE);
+			}
+
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
 		}
@@ -1228,13 +1275,27 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		loggingInText.setVisibility(View.VISIBLE);
 		fetchingNodesText.setVisibility(View.GONE);
 		prepareNodesText.setVisibility(View.GONE);
-		
+		if(serversBusyText!=null){
+			serversBusyText.setVisibility(View.GONE);
+		}
 		log("fastLogin con publicKey y privateKey");
 		megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
 	}
 	
 	public void setParentHandle (long parentHandle){
 		this.gParentHandle = parentHandle;
+	}
+
+	public long getParentHandle() {
+		return gParentHandle;
+	}
+
+	public long getIncParentHandle() {
+		return incParentHandle;
+	}
+
+	public void setIncParentHandle(long incParentHandle) {
+		this.incParentHandle = incParentHandle;
 	}
 
 	public int getStatusBarHeight() { 
@@ -1262,7 +1323,23 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestFinish: "+request.getFile());
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+			log("Timer cancel for Lollipop");
+			try{
+				if(timer!=null){
+					timer.cancel();
+					if(serversBusyText!=null){
+						serversBusyText.setVisibility(View.GONE);
+					}
+				}
+			}
+			catch(Exception ex){
+				log("TIMER EXCEPTION");
+				log(ex.getMessage());
+			}
+		}
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
+			log("REQUEST LOGIN");
 			try { 
 				statusDialog.dismiss();	
 			} 
@@ -1284,6 +1361,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
+				if(scrollView!=null){
+					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+				}
 				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				queryingSignupLinkText.setVisibility(View.GONE);
@@ -1292,6 +1372,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
+				if(serversBusyText!=null){
+					serversBusyText.setVisibility(View.GONE);
+				}
 				
 				Util.showErrorAlertDialog(errorMessage, false, this);
 				
@@ -1312,6 +1395,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
+				if(serversBusyText!=null){
+					serversBusyText.setVisibility(View.GONE);
+				}
 				
 				gSession = megaApi.dumpSession();
 				if (lastEmail != null){
@@ -1333,12 +1419,18 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				errorMessage = e.getErrorString();
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
+				if(scrollView!=null){
+					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+				}
 				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
+				if(serversBusyText!=null){
+					serversBusyText.setVisibility(View.GONE);
+				}
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 
@@ -1544,14 +1636,48 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestTemporaryError: " + request.getRequestString());
+
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+			log("Start timer for Lollipop");
+			try {
+				timer = new CountDownTimer(10000, 2000) {
+
+					public void onTick(long millisUntilFinished) {
+						log("TemporaryError one more");
+					}
+
+					public void onFinish() {
+						log("the timer finished, message shown");
+						if (serversBusyText != null) {
+							serversBusyText.setVisibility(View.VISIBLE);
+						}
+					}
+				}.start();
+			} catch (Exception exception) {
+				log(exception.getMessage());
+				log("EXCEPTION when starting count");
+			}
+		}
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestUpdate");
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+			log("Cancel timer for Lollipop");
+			try {
+				if (timer != null) {
+					timer.cancel();
+					if (serversBusyText != null) {
+						serversBusyText.setVisibility(View.GONE);
+					}
+				}
+			} catch (Exception e) {
+				log("TIMER EXCEPTION");
+				log(e.getMessage());
+			}
+		}
 	}
 
 	@Override
@@ -1667,5 +1793,17 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public int getIncomingDeepBrowserTree() {
+		return incomingDeepBrowserTree;
+	}
+
+	public void setIncomingDeepBrowserTree(int incomingDeepBrowserTree) {
+		this.incomingDeepBrowserTree = incomingDeepBrowserTree;
+	}
+
+	public int getTabShown() {
+		return tabShown;
 	}
 }
