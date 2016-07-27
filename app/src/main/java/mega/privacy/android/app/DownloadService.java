@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -72,7 +73,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_CONTENT_URI = "CONTENT_URI";
 	
 	public static String DB_FILE = "0";
-	public static String DB_FOLDER = "1";	
+	public static String DB_FOLDER = "1";
 	
 	private int successCount = 0;
 	private int errorCount = 0;
@@ -875,7 +876,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if (videoNode != null){
 						if(!videoNode.hasThumbnail()){
 							log("The video has not thumb");
-							ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());	
+							ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+						}
+						if(videoNode.getDuration()<1){
+							log("The video has not duration!!!");
+							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+							retriever.setDataSource(transfer.getPath());
+							String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+							if(time!=null){
+								double seconds = Double.parseDouble(time)/1000;
+								log("The original duration is: "+seconds);
+								int secondsAprox = (int) Math.round(seconds);
+								log("The duration aprox is: "+secondsAprox);
+
+								megaApi.setNodeDuration(videoNode, secondsAprox, null);
+							}
 						}
 					}
 					else{

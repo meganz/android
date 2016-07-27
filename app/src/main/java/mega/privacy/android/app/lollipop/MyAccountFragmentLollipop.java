@@ -13,7 +13,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -28,21 +27,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -62,6 +55,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	Context context;
 	ActionBar aB;
+	MyAccountInfo myAccountInfo;
 
 	RelativeLayout avatarLayout;
 	TextView initialLetter;
@@ -109,25 +103,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	DisplayMetrics outMetrics;
 	float density;
 
-//	String userEmail;	
-	
 	MegaApiAndroid megaApi;
-	
-	long numberOfSubscriptions = -1;
-	
-	private boolean name = false;
-	private boolean firstName = false;
-	String firstNameText;
-	String lastNameText;
-	String fullName;
-
-	long paymentBitSetLong;
-	BitSet paymentBitSet = null;
-	int accountType;
-	MegaAccountDetails accountInfo = null;
-	
-	boolean getPaymentMethodsBoolean = false;
-	boolean accountDetailsBoolean = false;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -135,6 +111,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -285,19 +262,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logoutButton.setVisibility(View.VISIBLE);
 
 		LinearLayout.LayoutParams logoutButtonParams = (LinearLayout.LayoutParams)logoutButton.getLayoutParams();
-		logoutButtonParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(0, outMetrics));
+		logoutButtonParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(0, outMetrics));
 		logoutButton.setLayoutParams(logoutButtonParams);
 
 		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
 		deleteAccountButton.setOnClickListener(this);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(55, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
-		typeLayout.setVisibility(View.GONE);
 		expirationLayout.setVisibility(View.GONE);
-		lastSessionLayout.setVisibility(View.GONE);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
@@ -344,11 +319,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		saveMK.setLayoutParams(saveMKParams);
 		saveMK.setOnClickListener(this);
 
-		name=false;
-		firstName=false;
-		megaApi.getUserAttribute(myUser, 1, this);
-		megaApi.getUserAttribute(myUser, 2, this);
-		megaApi.getExtendedAccountDetails(true, false, false, this);
+		if(myAccountInfo==null){
+			log("MyAccountInfo is NULL");
+			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+		}
+
+		myAccountInfo.setFirstName(false);
+		myAccountInfo.setLastName(false);
+
+		megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+		megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
 
 		this.updateAvatar(myUser.getEmail(), true);
 
@@ -366,10 +346,126 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}		
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
-		
-		megaApi.getAccountDetails(this);
-		megaApi.getPaymentMethods(this);
+
+		setAccountDetails();
+
+		refreshAccountInfo();
+
 		return v;
+	}
+
+	public void refreshAccountInfo(){
+		log("refreshAccountInfo");
+
+		//Check if the call is recently
+		log("Check the last call to getAccountDetails");
+		if(DBUtil.callToAccountDetails(context)){
+			log("megaApi.getAccountDetails SEND");
+			megaApi.getAccountDetails(myAccountInfo);
+		}
+		log("Check the last call to getExtendedAccountDetails");
+		if(DBUtil.callToExtendedAccountDetails(context)){
+			log("megaApi.getExtendedAccountDetails SEND");
+			megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+		}
+		log("Check the last call to callToPaymentMethods");
+		if(DBUtil.callToPaymentMethods(context)){
+			log("megaApi.getPaymentMethods SEND");
+			megaApi.getPaymentMethods(myAccountInfo);
+		}
+	}
+
+	public void setAccountDetails(){
+		log("setAccountDetails");
+
+		if(context==null){
+			log("Context is NULL");
+			return;
+		}
+		//Set account details
+		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
+			typeAccount.setText(getString(R.string.recovering_info));
+		}
+		else{
+			switch(myAccountInfo.getAccountType()){
+
+				case 0:{
+					typeAccount.setText(R.string.my_account_free);
+					expirationLayout.setVisibility(View.GONE);
+					break;
+				}
+
+				case 1:{
+					typeAccount.setText(getString(R.string.my_account_pro1));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+				case 2:{
+					typeAccount.setText(getString(R.string.my_account_pro2));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+				case 3:{
+					typeAccount.setText(getString(R.string.my_account_pro3));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+				case 4:{
+					typeAccount.setText(getString(R.string.my_account_prolite));
+					expirationLayout.setVisibility(View.VISIBLE);
+					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					break;
+				}
+
+			}
+		}
+
+
+//		if (getPaymentMethodsBoolean == true){
+//			if (upgradeButton != null){
+//				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+//					Time now = new Time();
+//					now.setToNow();
+//					if (myAccountInfo.getAccountType() != 0){
+//						if (now.toMillis(false) >= (myAccountInfo.getAccountInfo().getProExpiration()*1000)){
+//							if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//								upgradeButton.setVisibility(View.VISIBLE);
+//							}
+//						}
+//					}
+//					else{
+//						if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//							upgradeButton.setVisibility(View.VISIBLE);
+//						}
+//					}
+//				}
+//			}
+//		}
+		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
+			usedSpace.setText(getString(R.string.recovering_info));
+		}
+		else{
+			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
+			usedSpace.setText(usedSpaceString);
+		}
+
+		if(myAccountInfo.getLastSessionFormattedDate()!=null) {
+			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
+				lastSession.setText(getString(R.string.recovering_info));
+			} else {
+				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
+			}
+		}
+		else{
+			lastSession.setText(getString(R.string.recovering_info));
+		}
+		///////////
 	}
 
 	private int getAvatarTextSize (float density){
@@ -474,7 +570,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_account_type_button:{
 				log("Upgrade Account button");
-				((ManagerActivityLollipop)context).showUpAF(null);
+				((ManagerActivityLollipop)context).showUpAF();
 
 				break;
 			}
@@ -539,33 +635,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return info;
 	}
 
-	public void updateUserName(String firstName, String lastName){
-		firstNameText = firstName;
-		lastNameText=lastName;
-		updateNameView();
-	}
-
-	public void updateNameView(){
+	public void updateNameView(String fullName){
 		log("updateNameView");
 
-		if (firstNameText.trim().length() <= 0){
-			fullName = lastNameText;
-		}
-		else{
-			fullName = firstNameText + " " + lastNameText;
-		}
-
-		if (fullName.trim().length() <= 0){
-			log("Put email as fullname");
-			String email = myEmail;
-			String[] splitEmail = email.split("[@._]");
-			fullName = splitEmail[0];
-		}
-
-		if (fullName.trim().length() > 0){
-			if (nameView != null) {
-				nameView.setText(fullName);
-			}
+		if (nameView != null) {
+			nameView.setText(fullName);
 		}
 
 		updateAvatar(myEmail, false);
@@ -585,36 +659,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		else{
 			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
 		}
-		boolean setInitialByMail = false;
+
 		if (!avatar.exists()){
-			if (fullName != null){
-				if (fullName.length() > 0){
-					String firstLetter = fullName.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(30);
-					initialLetter.setTextColor(Color.WHITE);
-				}else{
-					setInitialByMail=true;
-				}
-			}
-			else{
-				setInitialByMail=true;
-			}
-			if(setInitialByMail){
-				if (myEmail != null){
-					if (myEmail.length() > 0){
-						log("email TEXT: " + myEmail);
-						log("email TEXT AT 0: " + myEmail.charAt(0));
-						String firstLetter = myEmail.charAt(0) + "";
-						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						initialLetter.setText(firstLetter);
-						initialLetter.setTextSize(30);
-						initialLetter.setTextColor(Color.WHITE);
-						initialLetter.setVisibility(View.VISIBLE);
-					}
-				}
-			}
+			initialLetter.setText(myAccountInfo.getFirstLetter());
+			initialLetter.setTextSize(30);
+			initialLetter.setTextColor(Color.WHITE);
+			initialLetter.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -626,67 +676,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-			log("MegaRequest.TYPE_GET_ATTR_USER");
-			if (e.getErrorCode() == MegaError.API_OK){
-				if(request.getParamType()==0){
-					log("(0)request");
-					this.updateAvatar(myUser.getEmail(), false);
-					return;
-				}
-				else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-					log("(1)request.getText(): "+request.getText());
-					firstNameText=request.getText();
-					name=true;
-				}
-				else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-					log("(2)request.getText(): "+request.getText());
-					lastNameText = request.getText();
-					firstName = true;
-				}
-				if(name&&firstName){
-					updateNameView();
-					name= false;
-					firstName = false;
-				}
-				
-			}
-			else{
-				log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
-
-				if(request.getParamType()==0){
-					log("(0)request");
-					this.updateAvatar(myUser.getEmail(), false);
-					return;
-				}
-				else if(request.getParamType()==1){
-					log("ERROR - (1)request.getText(): "+request.getText());
-					firstNameText = "";
-					name=true;
-				}
-				else if(request.getParamType()==2){
-					log("ERROR - (2)request.getText(): "+request.getText());
-					lastNameText = "";
-					firstName = true;
-				}
-				if(name && firstName){
-					log("Name and First Name received!");
-					updateNameView();
-					name= false;
-					firstName = false;
-				}
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
+		if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			log("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				log("(1)request.getText(): "+request.getText());
                 countUserAttributes--;
-				firstNameText=request.getText();
+				myAccountInfo.setFirstNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The first name has changed");
-					updateNameView();
-					((ManagerActivityLollipop) context).updateUserNameNavigationView(firstNameText, lastNameText);
+					updateNameView(myAccountInfo.getFullName());
+					((ManagerActivityLollipop) context).updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
 				}
 				else{
 					log("Error with first name");
@@ -696,11 +695,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 				log("(2)request.getText(): "+request.getText());
                 countUserAttributes--;
-				lastNameText = request.getText();
+				myAccountInfo.setLastNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The last name has changed");
-					updateNameView();
-					((ManagerActivityLollipop) context).updateUserNameNavigationView(firstNameText, lastNameText);
+					updateNameView(myAccountInfo.getFullName());
+					((ManagerActivityLollipop) context).updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
 				}
 				else{
 					log("Error with last name");
@@ -710,6 +709,21 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
+					if (context.getExternalCacheDir() != null){
+						String destinationPath = null;
+						destinationPath = context.getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+						if(destinationPath!=null){
+							log("The destination of the avatar is: "+destinationPath);
+							megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+						}
+						else{
+							log("ERROR! Destination PATH is NULL");
+						}
+					}
+					else{
+						log("getExternalCacheDir() is NULL");
+						megaApi.getUserAvatar(myAccountInfo.getMyUser(), context.getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+					}
 				}
 				else{
 					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
@@ -789,174 +803,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("TYPE_CONFIRM_CHANGE_EMAIL_LINK request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The mail has been changed");
+				myAccountInfo.setMyUser(megaApi.getMyUser());
 				updateMailView(request.getEmail());
 				((ManagerActivityLollipop) context).updateMailNavigationView(request.getEmail());
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.success_changing_user_mail), getString(R.string.change_mail_title_last_step));
 			}
 			else{
-				log("ERROR when changing email: "+e.getErrorString());
+				log("ERROR when changing email: "+e.getErrorString()+ " "+e.getErrorCode());
 				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				paymentBitSetLong = request.getNumber();
-				paymentBitSet = Util.convertToBitSet(request.getNumber());
-				getPaymentMethodsBoolean = true;
-				if (accountDetailsBoolean == true){
-					if (upgradeButton != null){
-						if (accountInfo != null){
-							if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-								Time now = new Time();
-								now.setToNow();
-								if (accountType != 0){
-									if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-										if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-											upgradeButton.setVisibility(View.VISIBLE);
-										}
-									}
-								}
-								else{
-									if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-										upgradeButton.setVisibility(View.VISIBLE);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
-			log ("account_details request");
-			if (e.getErrorCode() == MegaError.API_OK && typeAccount != null)
-			{
-				accountInfo = request.getMegaAccountDetails();
-
-				accountType = accountInfo.getProLevel();
-				accountDetailsBoolean = true;
-				typeLayout.setVisibility(View.VISIBLE);
-				switch(accountType){
-
-					case 0:{
-
-						typeAccount.setText(R.string.my_account_free);
-						expirationLayout.setVisibility(View.GONE);
-						break;
-					}
-
-					case 1:{
-						typeAccount.setText(getString(R.string.my_account_pro1));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-					case 2:{
-						typeAccount.setText(getString(R.string.my_account_pro2));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-					case 3:{
-						typeAccount.setText(getString(R.string.my_account_pro3));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-					case 4:{
-						typeAccount.setText(getString(R.string.my_account_prolite));
-						expirationLayout.setVisibility(View.VISIBLE);
-						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
-						break;
-					}
-
-				}
-
-				if (getPaymentMethodsBoolean == true){
-					if (upgradeButton != null){
-						if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-							Time now = new Time();
-							now.setToNow();
-							if (accountType != 0){
-								if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-									if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-										upgradeButton.setVisibility(View.VISIBLE);
-									}
-								}
-							}
-							else{
-								if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-									upgradeButton.setVisibility(View.VISIBLE);
-								}
-							}
-						}
-					}
-				}
-
-				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();
-
-		        int usedPerc = 0;
-		        if (totalStorage != 0){
-		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
-		        }
-
-				boolean totalGb = false;
-
-				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
-				String total = "";
-				if (totalStorage >= 1024){
-					totalStorage = totalStorage / 1024;
-					total = total + totalStorage + " TB";
-				}
-				else{
-					 total = total + totalStorage + " GB";
-					 totalGb = true;
-				}
-
-				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
-				String used = "";
-				if(totalGb){
-
-					used = used + usedStorage + " GB";
-
-				}
-				else{
-					if (usedStorage >= 1024){
-						usedStorage = usedStorage / 1024;
-						used = used + usedStorage + " TB";
-					}
-					else{
-						used = used + usedStorage + " GB";
-					}
-				}
-
-				String usedSpaceString = used + " " + getString(R.string.general_x_of_x) + " " + total;
-		        usedSpace.setText(usedSpaceString);
-				typeLayout.setVisibility(View.VISIBLE);
-			}
-			if(request.getMegaAccountDetails()!=null){
-				log("getMegaAccountDetails not Null");
-
-				MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
-
-				if(megaAccountSession!=null){
-					log("getMegaAccountSESSION not Null");
-					long mostRecentSession = megaAccountSession.getMostRecentUsage();
-					log("The last session: "+mostRecentSession);
-					java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.MEDIUM,Locale.getDefault());
-					Date date = new Date(mostRecentSession * 1000);
-					Calendar cal = Calendar.getInstance();
-					TimeZone tz = cal.getTimeZone();
-					df.setTimeZone(tz);
-					String formattedDate = df.format(date);
-					log("Formatted date: "+formattedDate);
-					lastSession.setText(formattedDate);
-					lastSessionLayout.setVisibility(View.VISIBLE);
-				}
 			}
 		}
 	}
@@ -1010,6 +864,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void updateAvatar(String contactEmail, boolean retry){
 		log("updateAvatar: "+contactEmail);
 		File avatar = null;
+
 		if(context!=null){
 			log("context is not null");
 
@@ -1073,51 +928,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		int avatarTextSize = getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
-		boolean setInitialByMail = false;
 
-		if (firstNameText.trim().length() <= 0){
-			fullName = lastNameText;
-		}
-		else{
-			fullName = firstNameText + " " + lastNameText;
-		}
-
-		if (fullName.trim().length() <= 0){
-			log("Put email as fullname");
-			String email = myEmail;
-			String[] splitEmail = email.split("[@._]");
-			fullName = splitEmail[0];
-		}
-
-		if (fullName != null){
-			if (fullName.trim().length() > 0){
-				String firstLetter = fullName.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				initialLetter.setText(firstLetter);
-				initialLetter.setTextSize(30);
-				initialLetter.setTextColor(Color.WHITE);
-				initialLetter.setVisibility(View.VISIBLE);
-			}else{
-				setInitialByMail=true;
-			}
-		}
-		else{
-			setInitialByMail=true;
-		}
-		if(setInitialByMail){
-			if (myEmail != null){
-				if (myEmail.length() > 0){
-					log("email TEXT: " + myEmail);
-					log("email TEXT AT 0: " + myEmail.charAt(0));
-					String firstLetter = myEmail.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(30);
-					initialLetter.setTextColor(Color.WHITE);
-					initialLetter.setVisibility(View.VISIBLE);
-				}
-			}
-		}
+		initialLetter.setText(myAccountInfo.getFirstLetter());
+		initialLetter.setTextSize(30);
+		initialLetter.setTextColor(Color.WHITE);
+		initialLetter.setVisibility(View.VISIBLE);
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
@@ -1138,10 +953,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					if(retry){
 						log("Retry!");
 						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+							megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, myAccountInfo);
 						}
 						else{
-							megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
+							megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, myAccountInfo);
 						}
 					}
 					else{
@@ -1161,10 +976,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			if(retry){
 				log("Retry!");
 				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+					megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, myAccountInfo);
 				}
 				else{
-					megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
+					megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, myAccountInfo);
 				}
 			}
 			else{
@@ -1181,6 +996,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void setCountUserAttributes(int countUserAttributes) {
 		log("setCountUserAttributes: "+countUserAttributes);
 		this.countUserAttributes = countUserAttributes;
+	}
+
+
+	public MyAccountInfo getMyAccountInfo() {
+		return myAccountInfo;
+	}
+
+	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
+		log("setMyAccountInfo");
+		this.myAccountInfo = myAccountInfo;
 	}
 
 }

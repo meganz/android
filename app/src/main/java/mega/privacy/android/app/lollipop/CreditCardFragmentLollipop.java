@@ -1,21 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.Product;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -39,6 +23,20 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.Product;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class CreditCardFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener, OnItemSelectedListener{
 	
@@ -125,7 +123,6 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	//	private TextView perMonth;
 //	private TextView perYear;
 	private TextView pricingFrom;
-	private ArrayList<Long> handleUrl;
 	private TextView storageTitle;
 	private TextView bandwithTitle;
 //	private TextView selectMemberShip;
@@ -143,11 +140,10 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
-	ArrayList<Product> accounts;
+	MyAccountInfo myAccountInfo;
 	CreditCardFragmentLollipop paymentFragment = this;
 	int paymentMonth = -1;
-	BitSet paymentBitSet = null;
-	
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -163,8 +159,6 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		handleUrl=new ArrayList<Long>();
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
@@ -386,10 +380,12 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 //		paymentCreditCard.setOnClickListener(this);
 //		paymentFortumo.setOnClickListener(this);
 //		paymentGoogleWallet.setOnClickListener(this);
-//		
+
+		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 		switch (parameterType) {
+
 			case 1:{
-				
+
 				for (int i=0;i<accounts.size();i++){
 	
 					Product account = accounts.get(i);
@@ -532,7 +528,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 			}
 		}
 //
-//		//		megaApi.getPricing(this);	
+//		//		megaApi.getPricing(myAccountInfo);
 
 		return v;
 	}	
@@ -710,25 +706,15 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 ////		}
 	}
 	
-	public void setInfo (int _type, ArrayList<Product> _accounts, int _paymentMonth, BitSet _paymentBitSet){
-		this.accounts = _accounts;
+	public void setInfo (int _type, MyAccountInfo _myAccountInfo, int _paymentMonth){
 		this.parameterType = _type;
+		this.myAccountInfo = _myAccountInfo;
 		this.paymentMonth = _paymentMonth;
-		this.paymentBitSet = _paymentBitSet;
 	}
-	
-	public ArrayList<Product> getAccounts(){
-		return accounts;
-	}
-	
+
 	public int getParameterType(){
 		return parameterType;
 	}
-	
-	public BitSet getPaymentBitSet(){
-		return paymentBitSet;
-	}
-	
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
@@ -746,12 +732,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
 		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			if (e.getErrorCode() == MegaError.API_OK){
-				
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_STORE){
+		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_STORE){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("API_OK!!");
 				log("VOY A PAGAR CON ESTE PRODUCTHANDLE: " + productHandleLong);
@@ -765,7 +746,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				log("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
 				Toast.makeText(context, getString(R.string.credit_card_information_error) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
-				((ManagerActivityLollipop)context).getNumberOfSubscriptions();
+				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 		}
@@ -775,14 +756,14 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				log("OK payment!!!");
 				Toast.makeText(context, getString(R.string.account_successfully_upgraded), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
-				((ManagerActivityLollipop)context).getNumberOfSubscriptions();
+				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 			else{
 				log("NOOOOOOOOO___" + e.getErrorCode() + "___" + e.getErrorString());
 				Toast.makeText(context, getString(R.string.account_error_upgraded) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivityLollipop)context).dismissStatusDialog();
-				((ManagerActivityLollipop)context).getNumberOfSubscriptions();
+				((ManagerActivityLollipop)context).updateInfoNumberOfSubscriptions();
 				((ManagerActivityLollipop)context).showMyAccount();
 			}
 		}
@@ -831,7 +812,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	
 	public int onBackPressed(){
 //		((ManagerActivity)context).showpF(parameterType, accounts);
-		((ManagerActivityLollipop)context).showpF(parameterType, accounts, true, paymentBitSet);
+		((ManagerActivityLollipop)context).showpF(parameterType, true);
 		return 3;
 	}
 	
@@ -862,6 +843,9 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 //				countryString = "ES";
 //				Toast.makeText(context, address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString, Toast.LENGTH_LONG).show();
 				log(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
+
+				ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
+
 				for (int i=0;i<accounts.size();i++){
 					Product account = accounts.get(i);
 					

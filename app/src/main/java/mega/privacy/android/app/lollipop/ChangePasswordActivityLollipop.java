@@ -473,12 +473,20 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				//Intent to MyAccount
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-				resetPassIntent.putExtra("RESULT", -1);
+				if(e.getErrorCode()==MegaError.API_EARGS){
+					log("Error, the old pass is not correct");
+					resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
+				}
+				else{
+					log("General Error");
+					resetPassIntent.putExtra("RESULT", -1);
+				}
+
 				startActivity(resetPassIntent);
 				finish();
 			}
 			else{
-				log("pass changed");
+				log("pass changed OK");
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};
@@ -509,6 +517,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 					if(e.getErrorCode()==MegaError.API_EARGS){
 						resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
+					}
+					else if(e.getErrorCode()==MegaError.API_EKEY){
+						resetPassIntent.putExtra("RESULT", MegaError.API_EKEY);
 					}
 					else{
 						resetPassIntent.putExtra("RESULT", -1);

@@ -200,6 +200,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
+			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -216,12 +218,14 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				showLink = true;
 			}
-			
-			if (selected.size() > 0) {
+
+
+			if (selected.size() != 0) {
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -229,6 +233,30 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 						break;
 					}
 				}
+
+				if(selected.size()==adapter.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
+
+					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
+						showLink = true;
+					}
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);

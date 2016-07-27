@@ -41,7 +41,7 @@ public class MegaApiUtils {
         int numFolders = nodes.size();
 
         String info = "";
-        if (numFolders > 0) {
+        if (numFolders >= 0) {
             info = numFolders
                     + " "
                     + context.getResources().getQuantityString(

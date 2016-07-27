@@ -65,10 +65,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/upload_select_file_type"
-                android:textColor="@color/textGrey"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/transparent_black"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -94,10 +94,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/upload_to_image"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -123,10 +123,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/upload_to_audio"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -152,10 +152,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/upload_to_video"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -181,10 +181,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/upload_to_filesystem"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
         </LinearLayout>
 
     </LinearLayout>

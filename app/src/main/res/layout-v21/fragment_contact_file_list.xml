@@ -164,10 +164,10 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/general_download"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -192,9 +192,9 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -218,10 +218,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/section_rubbish_bin"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -238,17 +239,18 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/leave_share_ic" />
+                    android:src="@drawable/ic_ignore" />
 
                 <TextView
                     android:id="@+id/contact_file_list_option_leave_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/context_leave_menu"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -272,10 +274,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/context_rename"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -299,10 +302,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/general_move_to"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -327,10 +331,11 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/context_copy"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -354,10 +359,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="10dp"
                     android:text="@string/context_delete"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>
     </mega.privacy.android.app.components.SlidingUpPanelLayout>

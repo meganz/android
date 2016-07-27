@@ -29,13 +29,31 @@
 	    android:textColor="@color/white"
 	    android:background="@color/content_text_folder"
 	    android:textSize="14sp"/>
+
+	<ImageView
+		android:id="@+id/file_storage_empty_image"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+		android:layout_centerVertical="true"
+		android:gravity="center_horizontal" />
+
+	<TextView
+		android:id="@+id/file_storage_empty_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/file_storage_empty_image"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="@dimen/standard_margin"
+		android:textColor="@color/text_secondary"
+		android:textSize="16sp" />
     
     <LinearLayout
         android:id="@+id/options_file_storage_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:gravity="right"
+		android:gravity="right|center_vertical"
         android:background="@color/white"
         android:orientation="horizontal" >
 
@@ -57,38 +75,20 @@
             android:textColor="@color/accentColor"
             android:textSize="14sp" />
     </LinearLayout>
-    
-   <ImageView
-        android:id="@+id/file_storage_empty_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:gravity="center_horizontal" />
 
-    <TextView
-        android:id="@+id/file_storage_empty_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/file_storage_empty_image"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:textColor="@color/text_secondary"
-        android:textSize="16sp" />
+	<View
+		android:id="@+id/separator_3"
+		android:layout_width="match_parent"
+		android:layout_height="1dip"
+		android:layout_above="@id/options_file_storage_layout"
+		android:background="@color/separator_grey" />
     
    <android.support.v7.widget.RecyclerView
         android:id="@+id/file_storage_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/file_storage_content_text"
-        android:layout_above="@id/options_file_storage_layout"
+        android:layout_above="@id/separator_3"
         android:choiceMode="multipleChoice" />
-
-    <View
-        android:id="@+id/separator_3"
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:layout_above="@id/options_file_storage_layout"
-        android:background="@color/separator_grey" />
 
 </RelativeLayout>

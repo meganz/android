@@ -53,6 +53,8 @@ import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -62,6 +64,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -263,6 +266,18 @@ public class Util {
         }
 
         return null;
+	}
+
+	public static String getNumberItemChildren(File file){
+		File[] list = file.listFiles();
+		int count = 0;
+		if(list!=null){
+			count =  list.length;
+		}
+
+		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
+
+		return numChilden;
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
@@ -1558,6 +1573,20 @@ public class Util {
 		bld.create().show();
 	}
 
+	public static long calculateTimestampMinDifference(String timeStamp) {
+		log("calculateTimestampDifference");
+
+		Long actualTimestamp = System.currentTimeMillis()/1000;
+
+		Long oldTimestamp = Long.parseLong(timeStamp);
+
+		Long difference = actualTimestamp - oldTimestamp;
+
+		difference = difference/60;
+
+		return difference;
+	}
+
 	public static int getVersion(Context context) {
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
@@ -1565,6 +1594,33 @@ public class Util {
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
 		}
+	}
+
+	public static long calculateTimestamp(String time)
+	{
+		log("calculateTimestamp: "+time);
+		long unixtime;
+		DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
+		dfm.setTimeZone( TimeZone.getDefault());//Specify your timezone
+		try
+		{
+			unixtime = dfm.parse(time).getTime();
+			unixtime=unixtime/1000;
+			return unixtime;
+		}
+		catch (ParseException e)
+		{
+			log("ParseException!!!");
+		}
+		return 0;
+	}
+
+	public static Calendar calculateDateFromTimestamp (long timestamp){
+		log("calculateTimestamp: "+timestamp);
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timestamp*1000);
+		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
+		return cal;
 	}
 
 	private static void log(String message) {

@@ -13,7 +13,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -160,20 +159,26 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaUser> selected = adapter.getSelectedUsers();
-
+			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
 				
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
+				else if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}			
-								
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+				}
 			}	
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -245,7 +250,13 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 	}
 		
 	//End Multiselect/////
-	
+
+	public static ContactsFragmentLollipop newInstance() {
+		log("newInstance");
+		ContactsFragmentLollipop fragment = new ContactsFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -435,6 +446,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
     }
 
     public void itemClick(int position) {
+		log("itemClick");
 					
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
@@ -515,12 +527,11 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 			emptyTextView.setText(R.string.contacts_list_empty_text);
 		}
 		else{
-			log("CONTACTS SIZE != 0");
+			log("CONTACTS SIZE != 0 ---> "+visibleContacts.size());
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-		}	
-		
+		}
 	}
 	
 	public void updateShares(){

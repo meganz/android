@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.0.11.2</string>
-    <string name="sdk_version" context="Not translate">27e7492</string>
+    <string name="app_version" context="Not translate">3.0.11.3</string>
+    <string name="sdk_version" context="Not translate">970e65b</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -39,9 +39,7 @@
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandwidth</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>  
-    <string name="general_error_word" context="It will be followed by the error message">Error</string> 
-    <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">File link not found</string>
-    <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">Folder link not found</string>
+    <string name="general_error_word" context="It will be followed by the error message">Error</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
     <string name="error_no_selection" context="when any file or folder is selected">No file or folder selected</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Already downloaded</string>
@@ -62,7 +60,7 @@
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove this %d contacts?</string>
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these %d contacts?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
@@ -156,7 +154,6 @@
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
-    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Incorrect email or password. Have you validated your email account?</string>    
     <string name="download_updating_filelist" context="Status text when updating the file manager">Updating file list</string>
     <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Confirm account</string>
     <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Checking validation link</string>
@@ -202,7 +199,7 @@
 	<string name="section_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
 	<string name="section_contacts" context="Title of the contact list">Contacts</string>
-	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">SENT REQUESTS</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
 	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
 	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
@@ -223,7 +220,7 @@
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
-    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Empty Folder</string>
+    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Inbox Empty</string>
     
     <string name="choose_account_activity" context="Title of the activity Choose Account">Choose Account</string>
 	
@@ -284,7 +281,7 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Leave share</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove shares</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore.</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open link</string>
@@ -312,7 +309,7 @@
     <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside Rubbish Bin will be deleted.</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_send" context="get the link and send it">Send</string>
-    <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Send to contact</string>
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Remove from Offline</string>
@@ -328,7 +325,6 @@
     <string name="context_delete" context="menu item">Delete</string>
     <string name="context_more" context="menu item">More</string>
     <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
-    <string name="context_contact_invitation_sent" context="success message when sending a contact request">Request sent</string>
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
     <string name="context_contact_request_sent" context="success message when sending a contact request">Request correctly sent to %s. The status can be consulted in the Sent Requests tab.</string>
@@ -356,7 +352,7 @@
     <string name="number_incorrectly_moved" context="success message when moving a node">%d items are not moved successfully</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the Rubbish Bin successfully</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the Rubbish Bin successfully</string>
-    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">%d items are not sent successfully</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items are not sent successfully</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Shared successfully</string>
     <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process of the sharing is not completed</string>
@@ -408,7 +404,7 @@
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
-    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please include the decryption key for the link</string>
+    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please enter the decryption key for the link</string>
         
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
@@ -766,14 +762,67 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Choose picture</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Delete picture</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The recovery key is not correct. Please, try again.</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The key you supplied does not match this account. Please make sure you use the correct recovery key and try again.</string>
+    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Invalid recovery key</string>
 
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No pictures uploaded</string>
 
     <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
 
+    <string name="recovering_info" context="Message shown meanwhile the app is waiting for a request">Recovering info&#8230;</string>
+
     <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">Your new email address needs to be validated. Please check your email to proceed.</string>
 
     <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">Your picture profile will be deleted. Do you want to proceed?</string>
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
+
+    <string name="title_set_expiry_date" context="Alert Dialog to get link">Set expiry date</string>
+    <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(PRO ONLY)</string>
+
+    <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Edit link</string>
+
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">The current password you have provided is incorrect.</string>
+
+    <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d reinvite requests sent successfully. </string>
+
+    <string name="number_correctly_delete_contact_request" context="success message when reinviting multiple contacts">%d requests deleted successfully. </string>
+    <string name="number_no_delete_contact_request" context="error message when reinviting multiple contacts">%1$d requests successfully deleted but %2$d requests were not deleted.</string>
+
+    <string name="confirmation_delete_contact_request" context="confirmation message before removing a contact request.">Do you want to remove the invitation request to %s?</string>
+    <string name="confirmation_remove_multiple_contact_request" context="confirmation message before removing mutiple contact request">Do you want to remove these %d invitation requests?</string>
+
+    <string name="number_correctly_invitation_reply_sent" context="success message when replying to multiple received request">%d request replies sent.</string>
+    <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
+
+    <plurals name="general_num_request">
+        <item quantity="one" context="referring to a invitation request in the Contacts section">request</item>
+        <item quantity="other" context="referring to a invitation request in the Contacts section">requests</item>
+    </plurals>
+
+    <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">Remove shares?</string>
+
+    <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Invalid e-mail and/or password. Please try again.</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many attempts to login, please wait for an hour.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please, check your e-mail.</string>
+
+    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">Folder link unavailable</string>
+    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">The folder link has been removed because of a ToS/AUP violation.</string>
+
+    <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">File link unavailable</string>
+    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">The file link has been removed because of a ToS/AUP violation.</string>
+
+    <string name="action_unselect_one" context="Menu item to unselect all the elements of a list">Unselect</string>
+
+    <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Awaiting email confirmation</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
+
+    <plurals name="general_num_items">
+        <item quantity="one" context="Singular of items which contains a folder. 1 item">item</item>
+        <item quantity="other" context="Plural of items which contains a folder. 2 items">items</item>
+    </plurals>
+
+    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
+
+    <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">The provided decryption key for the folder link is invalid.</string>
 </resources>

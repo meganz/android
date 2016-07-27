@@ -120,6 +120,115 @@ public class ContactController {
         }
     }
 
+    public void reinviteMultipleContacts(final List<MegaContactRequest> requests){
+        log("reinviteMultipleContacts");
+
+        MultipleRequestListener reinviteMultipleListener = null;
+        if(requests.size()>1){
+            log("reinvite multiple request");
+            reinviteMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+
+                megaApi.inviteContact(request.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, reinviteMultipleListener);
+            }
+        }
+        else{
+            log("reinvite one request");
+
+            final MegaContactRequest request= requests.get(0);
+
+            reinviteContact(request);
+        }
+    }
+
+    public void deleteMultipleSentRequestContacts(final List<MegaContactRequest> requests){
+        log("deleteMultipleSentRequestContacts");
+
+        MultipleRequestListener deleteMultipleListener = null;
+        if(requests.size()>1){
+            log("delete multiple request");
+            deleteMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+
+                megaApi.inviteContact(request.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, deleteMultipleListener);
+            }
+        }
+        else{
+            log("delete one request");
+
+            final MegaContactRequest request= requests.get(0);
+
+            removeInvitationContact(request);
+        }
+    }
+
+    public void acceptMultipleReceivedRequest(final List<MegaContactRequest> requests){
+        log("acceptMultipleReceivedRequest");
+
+        MultipleRequestListener acceptMultipleListener = null;
+        if(requests.size()>1){
+            log("accept multiple request");
+            acceptMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_ACCEPT, acceptMultipleListener);
+            }
+        }
+        else{
+            log("accept one request");
+
+            final MegaContactRequest request= requests.get(0);
+            acceptInvitationContact(request);
+        }
+    }
+
+    public void declineMultipleReceivedRequest(final List<MegaContactRequest> requests){
+        log("declineMultipleReceivedRequest");
+
+        MultipleRequestListener declineMultipleListener = null;
+        if(requests.size()>1){
+            log("decline multiple request");
+            declineMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_DENY, declineMultipleListener);
+            }
+        }
+        else{
+            log("decline one request");
+
+            final MegaContactRequest request= requests.get(0);
+            declineInvitationContact(request);
+        }
+    }
+
+    public void ignoreMultipleReceivedRequest(final List<MegaContactRequest> requests){
+        log("ignoreMultipleReceivedRequest");
+
+        MultipleRequestListener ignoreMultipleListener = null;
+        if(requests.size()>1){
+            log("ignore multiple request");
+            ignoreMultipleListener = new MultipleRequestListener(-1, context);
+            for(int j=0; j<requests.size();j++){
+
+                final MegaContactRequest request= requests.get(j);
+                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_IGNORE, ignoreMultipleListener);
+            }
+        }
+        else{
+            log("ignore one request");
+
+            final MegaContactRequest request= requests.get(0);
+            ignoreInvitationContact(request);
+        }
+    }
+
     public void inviteContact(String contactEmail){
         log("inviteContact");
 

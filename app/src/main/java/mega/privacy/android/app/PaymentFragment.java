@@ -293,8 +293,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIMonthly() != null) && (((ManagerActivity)context).getProIYearly() != null)){
+									log("PRO I monthly: " + ((ManagerActivity)context).getProIMonthly().getOriginalJson());
+									log("PRO I annualy: " + ((ManagerActivity)context).getProIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								log("if (!((ManagerActivity)context).isInventoryFinished())");
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -344,8 +358,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIIMonthly() != null) && (((ManagerActivity)context).getProIIYearly() != null)){
+									log("PRO II monthly: " + ((ManagerActivity)context).getProIIMonthly().getOriginalJson());
+									log("PRO II annualy: " + ((ManagerActivity)context).getProIIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								log("if (!((ManagerActivity)context).isInventoryFinished())");
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -395,8 +423,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIIIMonthly() != null) && (((ManagerActivity)context).getProIIIYearly() != null)){
+									log("PRO III monthly: " + ((ManagerActivity)context).getProIIIMonthly().getOriginalJson());
+									log("PRO III annualy: " + ((ManagerActivity)context).getProIIIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								log("if (!((ManagerActivity)context).isInventoryFinished())");
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -444,8 +486,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProLiteMonthly() != null) && (((ManagerActivity)context).getProLiteYearly() != null)){
+									log("PRO Lite monthly: " + ((ManagerActivity)context).getProLiteMonthly().getOriginalJson());
+									log("PRO Lite annualy: " + ((ManagerActivity)context).getProLiteYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								log("if (!((ManagerActivity)context).isInventoryFinished())");
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -667,7 +723,76 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			
 			if(paymentBitSet!=null){
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-					paymentGoogleWallet.setVisibility(View.VISIBLE);
+					switch(parameterType){
+						case 1:{
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIMonthly() != null) && (((ManagerActivity)context).getProIYearly() != null)){
+									log("PRO I monthly: " + ((ManagerActivity)context).getProIMonthly().getOriginalJson());
+									log("PRO I annualy: " + ((ManagerActivity)context).getProIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
+
+							break;
+						}
+						case 2:{
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIIMonthly() != null) && (((ManagerActivity)context).getProIIYearly() != null)){
+									log("PRO II monthly: " + ((ManagerActivity)context).getProIIMonthly().getOriginalJson());
+									log("PRO II annualy: " + ((ManagerActivity)context).getProIIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
+
+							break;
+						}
+						case 3:{
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIIIMonthly() != null) && (((ManagerActivity)context).getProIIIYearly() != null)){
+									log("PRO III monthly: " + ((ManagerActivity)context).getProIIIMonthly().getOriginalJson());
+									log("PRO III annualy: " + ((ManagerActivity)context).getProIIIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
+
+							break;
+						}
+						case 4:{
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProLiteMonthly() != null) && (((ManagerActivity)context).getProLiteYearly() != null)){
+									log("PRO Lite monthly: " + ((ManagerActivity)context).getProLiteMonthly().getOriginalJson());
+									log("PRO Lite annualy: " + ((ManagerActivity)context).getProLiteYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
+
+							break;
+						}
+					}
 				}
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 					paymentCreditCard.setVisibility(View.VISIBLE);
@@ -748,8 +873,21 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIMonthly() != null) && (((ManagerActivity)context).getProIYearly() != null)){
+									log("PRO I monthly: " + ((ManagerActivity)context).getProIMonthly().getOriginalJson());
+									log("PRO I annualy: " + ((ManagerActivity)context).getProIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -807,8 +945,21 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIIMonthly() != null) && (((ManagerActivity)context).getProIIYearly() != null)){
+									log("PRO II monthly: " + ((ManagerActivity)context).getProIIMonthly().getOriginalJson());
+									log("PRO II annualy: " + ((ManagerActivity)context).getProIIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -866,8 +1017,21 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProIIIMonthly() != null) && (((ManagerActivity)context).getProIIIYearly() != null)){
+									log("PRO III monthly: " + ((ManagerActivity)context).getProIIIMonthly().getOriginalJson());
+									log("PRO III annualy: " + ((ManagerActivity)context).getProIIIYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
@@ -924,8 +1088,21 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					
 					if (paymentBitSet != null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							paymentGoogleWallet.setVisibility(View.VISIBLE);
+							if (((ManagerActivity)context).isInventoryFinished()){
+								if ((((ManagerActivity)context).getProLiteMonthly() != null) && (((ManagerActivity)context).getProLiteYearly() != null)){
+									log("PRO Lite monthly: " + ((ManagerActivity)context).getProLiteMonthly().getOriginalJson());
+									log("PRO Lite annualy: " + ((ManagerActivity)context).getProLiteYearly().getOriginalJson());
+									paymentGoogleWallet.setVisibility(View.GONE);
+								}
+								else{
+									paymentGoogleWallet.setVisibility(View.VISIBLE);
+								}
+							}
+							else{
+								paymentGoogleWallet.setVisibility(View.GONE);
+							}
 						}
+
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}

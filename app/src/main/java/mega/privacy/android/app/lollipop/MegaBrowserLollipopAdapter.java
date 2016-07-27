@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -251,29 +250,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public void setAdapterType(int adapterType){
 		this.adapterType = adapterType;
 	}
-	
-	public class MyGlobalLayoutListener implements OnGlobalLayoutListener{
-		
-		ViewHolderBrowserList holder;
 
-		public MyGlobalLayoutListener(ViewHolderBrowserList holder) {
-			super();
-			this.holder = holder;
-		}
-
-		@Override
-		public void onGlobalLayout() {
-			log("onGlobalLayout");
-			if (holder.textViewFileName.getLineCount() > 1) {
-	            log("----------------FILA MAYOR");
-	        }
-			else{
-				log("----------------FILA 1----------------");
-			}
-		}
-		
-	}
-	
 	@Override
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
@@ -453,6 +430,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if(node.isExported()){
 			//Node has public link			
 			holder.publicLinkImage.setVisibility(View.VISIBLE);
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				holder.publicLinkImage.setVisibility(View.GONE);
+			}
 		}
 		else{
 			holder.publicLinkImage.setVisibility(View.GONE);
@@ -755,19 +736,24 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		if(node.isExported()){
 			//Node has public link
-			if(multipleSelect){
-				holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+			if(node.isExpired()){
+				log("Node exported but expired!!");
+				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 				holder.publicLinkImage.setVisibility(View.GONE);
 			}
-			else
-			{
-				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-				holder.publicLinkImage.setVisibility(View.VISIBLE);
+			else{
+				if(multipleSelect){
+					holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+					holder.publicLinkImage.setVisibility(View.GONE);
+				}
+				else
+				{
+					holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+					holder.publicLinkImage.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 		else{
-			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-			holder.publicLinkImage.setVisibility(View.GONE);
 			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 			holder.publicLinkImage.setVisibility(View.GONE);
 		}

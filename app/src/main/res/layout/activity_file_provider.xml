@@ -6,13 +6,13 @@
     tools:context=".FileProviderActivityLollipop" >
 
     <RelativeLayout
-        android:id="@+id/file_explorer_toolbar"
+        android:id="@+id/file_provider_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/standard_margin" >
 
         <LinearLayout
-            android:id="@+id/file_explorer_button_bar"
+            android:id="@+id/file_provider_button_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -27,7 +27,7 @@
                 android:src="@drawable/ic_menu_navigation_refresh_dark" />
 -->
             <ImageButton
-                android:id="@+id/file_explorer_new_folder"
+                android:id="@+id/file_provider_new_folder"
                 style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
         </LinearLayout>
 
         <ImageView 
-            android:id="@+id/file_explorer_back"
+            android:id="@+id/file_provider_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -44,11 +44,11 @@
             android:src="@drawable/ic_action_navigation_previous_item"/>
         
         <TextView
-            android:id="@+id/file_explorer_window_title"
+            android:id="@+id/file_provider_window_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/file_explorer_back"
+            android:layout_toRightOf="@id/file_provider_back"
             android:ellipsize="end"
             android:singleLine="true"
             android:textAppearance="@android:style/TextAppearance.Large" />        
@@ -56,15 +56,15 @@
     </RelativeLayout>
 
     <View
-        android:id="@+id/file_explorer_divider_top"
+        android:id="@+id/file_provider_divider_top"
         android:layout_width="match_parent"
         android:layout_height="2dip"
-        android:layout_below="@id/file_explorer_toolbar"
+        android:layout_below="@id/file_provider_toolbar"
         android:background="@color/mega" />
 
     <!--  
     <Button
-        android:id="@+id/file_explorer_button"
+        android:id="@+id/file_provider_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -72,7 +72,7 @@
     
     
   <Button
-       	android:id="@+id/file_explorer_button"
+       	android:id="@+id/file_provider_button"
        	android:layout_gravity="center"
        	android:layout_height="55dp"
        	android:layout_width="fill_parent"
@@ -85,7 +85,7 @@
         android:id="@+id/tabhost_provider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/file_explorer_divider_top">
+        android:layout_below="@id/file_provider_divider_top">
 
         <LinearLayout
             android:orientation="vertical"

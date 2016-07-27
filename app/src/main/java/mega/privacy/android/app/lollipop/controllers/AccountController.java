@@ -94,7 +94,7 @@ public class AccountController {
     }
 
     public boolean existsAvatar(){
-        MegaUser myContact = ((ManagerActivityLollipop)context).getContact();
+        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
         String myEmail = myContact.getEmail();
         if(myEmail!=null){
             File avatar = null;
@@ -116,7 +116,7 @@ public class AccountController {
     public void removeAvatar(){
         log("removeAvatar");
 
-        MegaUser myContact = ((ManagerActivityLollipop)context).getContact();
+        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
         String myEmail = myContact.getEmail();
         if(myEmail!=null){
             File avatar = null;
@@ -133,7 +133,13 @@ public class AccountController {
             }
         }
 
-        megaApi.setAvatar(null);
+        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+        if(mAF!=null){
+            megaApi.setAvatar(null, mAF);
+        }
+        else{
+            megaApi.setAvatar(null);
+        }
     }
 
     public void exportMK(){
@@ -350,8 +356,8 @@ public class AccountController {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                context.startActivity(intent);
                 if (context instanceof Activity) {
+                    ((Activity) context).startActivity(intent);
                     ((Activity) context).finish();
                 }
                 context = null;

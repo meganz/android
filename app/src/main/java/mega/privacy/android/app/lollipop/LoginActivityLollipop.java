@@ -435,8 +435,12 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						Util.showAlert(this, getString(R.string.pass_changed_alert), null);
 					}
 					else if(result==MegaError.API_EARGS){
+						log("Incorrect arguments!");
+						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+					}
+					else if(result==MegaError.API_EKEY){
 						log("Incorrect MK when changing pass");
-						Util.showAlert(this, getString(R.string.incorrect_MK), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.incorrect_MK), getString(R.string.incorrect_MK_title));
 					}
 					else{
 						log("Error when changing pass - show error message");
@@ -1366,15 +1370,22 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				if (error.getErrorCode() == MegaError.API_ENOENT) {
 					errorMessage = getString(R.string.error_incorrect_email_or_password);
 				}
-				else if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_server_connection_problem);
-				}
 				else if (error.getErrorCode() == MegaError.API_ESID){
 					errorMessage = getString(R.string.error_server_expired_session);
+				}
+				else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+					errorMessage = getString(R.string.too_many_attempts_login);
+				}
+				else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+					errorMessage = getString(R.string.account_not_validated_login);
+				}
+				else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+					errorMessage = getString(R.string.error_account_suspended);
 				}
 				else{
 					errorMessage = error.getErrorString();
 				}
+				log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
@@ -1388,7 +1399,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				prepareNodesText.setVisibility(View.GONE);
 				serversBusyText.setVisibility(View.GONE);
 
-				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
+				Snackbar snackbar = Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG);
+				TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+				snackbarTextView.setMaxLines(5);
+				snackbar.show();
 
 //				DatabaseHandler dbH = new DatabaseHandler(this);
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -1474,7 +1488,21 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				log("confirmLink==null");
 				if (error.getErrorCode() != MegaError.API_OK) {
 					String errorMessage;
-					errorMessage = error.getErrorString();
+					if (error.getErrorCode() == MegaError.API_ESID){
+						errorMessage = getString(R.string.error_server_expired_session);
+					}
+					else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+						errorMessage = getString(R.string.too_many_attempts_login);
+					}
+					else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+						errorMessage = getString(R.string.account_not_validated_login);
+					}
+					else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+						errorMessage = getString(R.string.error_account_suspended);
+					}
+					else{
+						errorMessage = error.getErrorString();
+					}
 					loginLoggingIn.setVisibility(View.GONE);
 					loginLogin.setVisibility(View.VISIBLE);
 					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
@@ -1488,7 +1516,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 
-					Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
+					Snackbar snackbar = Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG);
+					TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+					snackbarTextView.setMaxLines(5);
+					snackbar.show();
 				}
 				else{
 					if(action!=null) {
