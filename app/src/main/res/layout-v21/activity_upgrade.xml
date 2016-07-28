@@ -21,19 +21,20 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:elevation="2dp">
-            
+
+			<!-- Left side (title and price) -->
             <RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_title"
-                android:layout_width="match_parent"
-                android:layout_height="142dp"
-                android:background="@drawable/card_corner_grey"
+                android:layout_width="125dp"
+                android:layout_height="118dp"
+                android:background="@color/white"
                 android:gravity="center_vertical">
                 
                 <TextView 
                     android:id="@+id/upgrade_prolite_title_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
+                    android:textColor="@color/upgrade_orange"
                     android:text="@string/prolite_account"
                     android:textAllCaps="true"
                     android:layout_centerHorizontal="true"
@@ -51,14 +52,14 @@
 	                    android:id="@+id/upgrade_prolite_integer_text"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:textColor="@color/white"
+	                    android:textColor="@color/name_my_account"
 	                    android:textSize="38sp"/>
 	                
 	                <TextView 
 	                    android:id="@+id/upgrade_prolite_decimal_text"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:textColor="@color/white"                    
+	                    android:textColor="@color/name_my_account"
 	                    android:layout_toRightOf="@id/upgrade_prolite_integer_text"
 	                    android:layout_alignBottom="@id/upgrade_prolite_integer_text"
 	                    android:layout_marginBottom="5dp"
@@ -76,14 +77,23 @@
 	                    android:layout_marginLeft="5dp" />
                 </RelativeLayout>
             </RelativeLayout>
-            
+
+			<View
+				android:id="@+id/vertical_divider"
+				android:layout_width="1dp"
+				android:layout_height="100dp"
+				android:layout_toRightOf="@id/upgrade_prolite_layout_title"
+				android:layout_centerVertical="true"
+				android:background="@color/divider_upgrade_account" />
+
+			<!-- Right side (storage and bandwidth)-->
             <RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_values_subscribe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/card_corner"
+                android:background="@color/white"
                 android:gravity="center_vertical"
-                android:layout_below="@id/upgrade_prolite_layout_title">
+				android:layout_toRightOf="@id/vertical_divider">
                 
                 <RelativeLayout 
 	                android:id="@+id/upgrade_prolite_layout_values"
@@ -120,7 +130,7 @@
                             android:id="@+id/upgrade_prolite_storage_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/upgrade_grey"
+                            android:textColor="@color/file_properties_text_available"
                             android:text="@string/general_storage"
                             android:textAllCaps="true"
                             android:layout_marginLeft="5dp"
@@ -161,7 +171,7 @@
                             android:id="@+id/upgrade_prolite_bandwith_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/upgrade_grey"
+                            android:textColor="@color/file_properties_text_available"
                             android:text="@string/general_bandwidth"
                             android:textAllCaps="true"
                             android:layout_marginLeft="5dp"
@@ -174,33 +184,6 @@
                 
                 </RelativeLayout>
                 
-                <LinearLayout 
-                    android:id="@+id/upgrade_prolite_separator"
-	                android:layout_width="match_parent"
-	                android:layout_height="1dp"
-	                android:background="@color/separator_grey"
-	                android:layout_below="@id/upgrade_prolite_layout_values"
-	                android:orientation="vertical"/>
-                
-                <RelativeLayout 
-	                android:id="@+id/upgrade_prolite_layout_subscribe"
-	                android:layout_width="match_parent"
-	                android:layout_height="52dp"
-	                android:background="@drawable/card_corner"
-	                android:layout_below="@id/upgrade_prolite_separator"
-	                android:gravity="center">
-	                
-                    <TextView 
-                        android:id="@+id/upgrade_prolite_subscribe_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/general_subscribe"
-                        android:textAllCaps="true"
-                    	android:textColor="@color/accentColor"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"/>
-	                
-                </RelativeLayout>
 			</RelativeLayout>
 			<RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_transparent"
