@@ -174,7 +174,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		pro3StorageGb = (TextView) v.findViewById(R.id.upgrade_pro_iii_storage_value_gb);
 		pro3BandwidthInteger = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwidth_value_integer);
 		pro3BandwidthTb = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwith_value_tb);
-		
 
 		setPricing();
 		showAvailableAccount();
