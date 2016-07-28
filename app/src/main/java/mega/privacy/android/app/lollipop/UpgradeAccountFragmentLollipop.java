@@ -429,22 +429,22 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()){
-			case R.id.upgrade_prolite_layout:{
-				onUpgradeLiteClick();
-				break;
-			}
-			case R.id.upgrade_pro_i_layout:{
-				onUpgrade1Click();
-				break;
-			}
-			case R.id.upgrade_pro_ii_layout:{
-				onUpgrade2Click();
-				break;
-			}
-			case R.id.upgrade_pro_iii_layout:{
-				onUpgrade3Click();
-				break;
-			}
+//			case R.id.upgrade_prolite_layout:{
+//				onUpgradeLiteClick();
+//				break;
+//			}
+//			case R.id.upgrade_pro_i_layout:{
+//				onUpgrade1Click();
+//				break;
+//			}
+//			case R.id.upgrade_pro_ii_layout:{
+//				onUpgrade2Click();
+//				break;
+//			}
+//			case R.id.upgrade_pro_iii_layout:{
+//				onUpgrade3Click();
+//				break;
+//			}
 		}
 	}
 }
