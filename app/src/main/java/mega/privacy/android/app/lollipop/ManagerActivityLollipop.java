@@ -2004,6 +2004,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else{
 							MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
+							if (parentNode == null){
+								parentNode = megaApi.getRubbishNode();
+							}
 							aB.setTitle(parentNode.getName());
 							log("indicator_arrow_back_137");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
