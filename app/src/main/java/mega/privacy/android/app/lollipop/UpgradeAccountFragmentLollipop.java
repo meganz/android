@@ -22,6 +22,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -131,7 +132,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		v = inflater.inflate(R.layout.activity_upgrade, container, false);
-		
+
 		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);
 		proLiteLayout.setOnClickListener(this);
 		pro1Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_i_layout);
@@ -196,6 +197,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		showAvailableAccount();
 
 		refreshAccountInfo();
+
 		return v;
 	}
 
@@ -231,7 +233,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			for (int i = 0; i < productAccounts.size(); i++) {
 				Product account = productAccounts.get(i);
-				if (account.getLevel() == 1 && account.getMonths() == 1) {
+				if (account.getLevel() == Constants.PRO_I && account.getMonths() == 1) {
 					log("PRO1: " + account.getStorage());
 					double price = account.getAmount() / 100.00;
 					String priceString = df.format(price);
@@ -255,7 +257,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 					pro1BandwidthInteger.setText("" + account.getTransfer() / 1024);
 					pro1BandwidthTb.setText(" TB");
-				} else if (account.getLevel() == 2 && account.getMonths() == 1) {
+				} else if (account.getLevel() == Constants.PRO_II && account.getMonths() == 1) {
 					log("PRO2: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
@@ -280,7 +282,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 					pro2BandwidthInteger.setText("" + account.getTransfer() / 1024);
 					pro2BandwidthTb.setText(" TB");
-				} else if (account.getLevel() == 3 && account.getMonths() == 1) {
+				} else if (account.getLevel() == Constants.PRO_III && account.getMonths() == 1) {
 					log("PRO3: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
@@ -305,7 +307,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 					pro3BandwidthInteger.setText("" + account.getTransfer() / 1024);
 					pro3BandwidthTb.setText(" TB");
-				} else if (account.getLevel() == 4 && account.getMonths() == 1) {
+				} else if (account.getLevel() == Constants.PRO_LITE && account.getMonths() == 1) {
 					log("Lite: " + account.getStorage());
 
 					double price = account.getAmount() / 100.00;
@@ -340,22 +342,22 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		switch(myAccountInfo.getAccountType()){
 
-			case 1:{
+			case Constants.PRO_I:{
 				hideProLite();
 				break;
 			}
-			case 2:{
+			case Constants.PRO_II:{
 				hideProLite();
 				hideProI();
 				break;
 			}
-			case 3:{
+			case Constants.PRO_III:{
 				hideProLite();
 				hideProI();
 				hideProII();
 				break;
 			}
-			case 4:{
+			case Constants.PRO_LITE:{
 				break;
 			}
 		}
@@ -387,7 +389,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			fortumoLayout.setVisibility(View.GONE);
 			centiliLayout.setVisibility(View.GONE);
 
-			showPaymentMethods(1);
+			showPaymentMethods(Constants.PRO_I);
 
 			refreshAccountInfo();
 
@@ -424,7 +426,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			fortumoLayout.setVisibility(View.GONE);
 			centiliLayout.setVisibility(View.GONE);
 
-			showPaymentMethods(2);
+			showPaymentMethods(Constants.PRO_II);
 
 			refreshAccountInfo();
 
@@ -461,7 +463,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			fortumoLayout.setVisibility(View.GONE);
 			centiliLayout.setVisibility(View.GONE);
 
-			showPaymentMethods(3);
+			showPaymentMethods(Constants.PRO_III);
 
 			refreshAccountInfo();
 
@@ -499,7 +501,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			fortumoLayout.setVisibility(View.GONE);
 			centiliLayout.setVisibility(View.GONE);
 
-			showPaymentMethods(4);
+			showPaymentMethods(Constants.PRO_LITE);
 
 			refreshAccountInfo();
 
@@ -573,16 +575,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		int parameterType;
 		if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
-			parameterType=4;
+			parameterType=Constants.PRO_LITE;
 		}
 		else if(selectPaymentMethodLayoutPro1.getVisibility()==View.VISIBLE){
-			parameterType=1;
+			parameterType=Constants.PRO_I;
 		}
 		else if(selectPaymentMethodLayoutPro2.getVisibility()==View.VISIBLE){
-			parameterType=2;
+			parameterType=Constants.PRO_II;
 		}
 		else if(selectPaymentMethodLayoutPro3.getVisibility()==View.VISIBLE){
-			parameterType=3;
+			parameterType=Constants.PRO_III;
 		}
 		else{
 			parameterType=0;
@@ -681,7 +683,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		switch(parameterType){
-			case 1:{
+			case Constants.PRO_I:{
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
 						log("if (!myAccountInfo.isInventoryFinished())");
@@ -723,7 +725,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case 2:{
+			case Constants.PRO_II:{
 
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
@@ -762,7 +764,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case 3:{
+			case Constants.PRO_III:{
 
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
@@ -798,7 +800,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case 4:{
+			case Constants.PRO_LITE:{
 
 				if (myAccountInfo.getPaymentBitSet() != null){
 					if (!myAccountInfo.isInventoryFinished()){
@@ -842,77 +844,77 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	}
 
-	public void setPaymentMethods(int parameterType){
-		log("setPaymentMethods");
-
-		if (!myAccountInfo.isInventoryFinished()){
-			log("if (!myAccountInfo.isInventoryFinished())");
-			googlePlayLayout.setVisibility(View.GONE);
-		}
-		else{
-			if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-				switch (parameterType){
-					case 1:{
-						if ((myAccountInfo.getProIMonthly() != null) && (myAccountInfo.getProIYearly() != null)) {
-							googlePlayLayout.setVisibility(View.GONE);
-						}
-						else{
-							googlePlayLayout.setVisibility(View.VISIBLE);
-						}
-						break;
-					}
-					case 2:{
-						if ((myAccountInfo.getProIIMonthly() != null) && (myAccountInfo.getProIIYearly() != null)) {
-							googlePlayLayout.setVisibility(View.GONE);
-						}
-						else{
-							googlePlayLayout.setVisibility(View.VISIBLE);
-						}
-						break;
-					}
-					case 3:{
-						if ((myAccountInfo.getProIIIMonthly() != null) && (myAccountInfo.getProIIIYearly() != null)) {
-							googlePlayLayout.setVisibility(View.GONE);
-						}
-						else{
-							googlePlayLayout.setVisibility(View.VISIBLE);
-						}
-						break;
-					}
-					case 4:{
-						if ((myAccountInfo.getProLiteMonthly() != null) && (myAccountInfo.getProLiteYearly() != null)) {
-							googlePlayLayout.setVisibility(View.GONE);
-						}
-						else{
-							googlePlayLayout.setVisibility(View.VISIBLE);
-						}
-						break;
-					}
-				}
-
-			}
-		}
-
-		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-			creditCardLayout.setVisibility(View.VISIBLE);
-		}
-		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-			if (parameterType == 4){
-				fortumoLayout.setVisibility(View.VISIBLE);
-			}
-		}
-		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
-			if (parameterType == 4){
-				centiliLayout.setVisibility(View.VISIBLE);
-			}
-		}
-		if(!Util.isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
-			selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
-		}
-		else{
-			selectPaymentMethod.setText(getString(R.string.select_payment_method));
-		}
-
-	}
+//	public void setPaymentMethods(int parameterType){
+//		log("setPaymentMethods");
+//
+//		if (!myAccountInfo.isInventoryFinished()){
+//			log("if (!myAccountInfo.isInventoryFinished())");
+//			googlePlayLayout.setVisibility(View.GONE);
+//		}
+//		else{
+//			if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
+//				switch (parameterType){
+//					case 1:{
+//						if ((myAccountInfo.getProIMonthly() != null) && (myAccountInfo.getProIYearly() != null)) {
+//							googlePlayLayout.setVisibility(View.GONE);
+//						}
+//						else{
+//							googlePlayLayout.setVisibility(View.VISIBLE);
+//						}
+//						break;
+//					}
+//					case 2:{
+//						if ((myAccountInfo.getProIIMonthly() != null) && (myAccountInfo.getProIIYearly() != null)) {
+//							googlePlayLayout.setVisibility(View.GONE);
+//						}
+//						else{
+//							googlePlayLayout.setVisibility(View.VISIBLE);
+//						}
+//						break;
+//					}
+//					case 3:{
+//						if ((myAccountInfo.getProIIIMonthly() != null) && (myAccountInfo.getProIIIYearly() != null)) {
+//							googlePlayLayout.setVisibility(View.GONE);
+//						}
+//						else{
+//							googlePlayLayout.setVisibility(View.VISIBLE);
+//						}
+//						break;
+//					}
+//					case 4:{
+//						if ((myAccountInfo.getProLiteMonthly() != null) && (myAccountInfo.getProLiteYearly() != null)) {
+//							googlePlayLayout.setVisibility(View.GONE);
+//						}
+//						else{
+//							googlePlayLayout.setVisibility(View.VISIBLE);
+//						}
+//						break;
+//					}
+//				}
+//
+//			}
+//		}
+//
+//		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
+//			creditCardLayout.setVisibility(View.VISIBLE);
+//		}
+//		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+//			if (parameterType == 4){
+//				fortumoLayout.setVisibility(View.VISIBLE);
+//			}
+//		}
+//		if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+//			if (parameterType == 4){
+//				centiliLayout.setVisibility(View.VISIBLE);
+//			}
+//		}
+//		if(!Util.isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
+//			selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
+//		}
+//		else{
+//			selectPaymentMethod.setText(getString(R.string.select_payment_method));
+//		}
+//
+//	}
 
 }
