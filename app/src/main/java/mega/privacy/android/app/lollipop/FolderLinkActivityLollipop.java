@@ -150,16 +150,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	        int position = listView.getChildPosition(view);
 
 	        // handle long press
-			if (adapterList.getPositionClicked() == -1){
-				adapterList.setMultipleSelect(true);
-			
-				actionMode = startSupportActionMode(new ActionBarCallBack());			
+			if (adapterList != null) {
+				if (adapterList.getPositionClicked() == -1) {
+					adapterList.setMultipleSelect(true);
 
-				optionsBar.setVisibility(View.GONE);
-				separator.setVisibility(View.GONE);
-				
-		        itemClick(position);
-			}  
+					actionMode = startSupportActionMode(new ActionBarCallBack());
+
+					optionsBar.setVisibility(View.GONE);
+					separator.setVisibility(View.GONE);
+
+					itemClick(position);
+				}
+			}
 	        super.onLongPress(e);
 	    }
 	}
