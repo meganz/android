@@ -194,6 +194,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 				aC.logout(this, megaApi, false);
 				
 				Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+				loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 				loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
 				startActivity(loginIntent);
 				return;

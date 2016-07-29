@@ -333,6 +333,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		this.updateAvatar(myUser.getEmail(), true);
 
 		if(mKLayoutVisible){
+			log("on Create MK visible");
 			showMKLayout();
 		}
 		
@@ -832,7 +833,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public void setMKLayoutVisible(boolean show){
+		log("setMKLayoutVisible");
 		mKLayoutVisible = show;
+//		showMKLayout();
 	}
 
 	public void showMKLayout(){
