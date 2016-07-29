@@ -812,7 +812,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	
 	public int onBackPressed(){
 //		((ManagerActivity)context).showpF(parameterType, accounts);
-		((ManagerActivityLollipop)context).showpF(parameterType, true);
+		((ManagerActivityLollipop)context).showUpAF(parameterType);
 		return 3;
 	}
 	

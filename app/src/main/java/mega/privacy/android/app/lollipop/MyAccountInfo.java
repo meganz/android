@@ -256,11 +256,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                 if (myFL != null) {
                     myFL.setPricing();
                 }
-            } else if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.PAYMENT_FRAGMENT) {
-                PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
-                if (pFL != null) {
-                    pFL.setPricing();
-                }
             }
         }
     }
@@ -489,17 +484,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
             if (e.getErrorCode() == MegaError.API_OK){
                 dbH.setPaymentMethodsTimeStamp();
                 setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
-
-                //Check if myAccount section is visible
-                ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                    if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
-                        PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
-                        if(pFL!=null){
-                            pFL.setPaymentMethods();
-                        }
-                    }
-                }
             }
         }
         else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
@@ -543,12 +527,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                         MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
                         if(myFL!=null){
                             myFL.setPricing();
-                        }
-                    }
-                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.PAYMENT_FRAGMENT) {
-                        PaymentFragmentLollipop pFL = ((ManagerActivityLollipop) context).getPaymentFragment();
-                        if(pFL!=null){
-                            pFL.setPricing();
                         }
                     }
                     else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.CENTILI_FRAGMENT) {

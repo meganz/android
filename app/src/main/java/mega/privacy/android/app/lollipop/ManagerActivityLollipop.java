@@ -379,7 +379,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private SettingsFragmentLollipop sttFLol;
 	private CameraUploadFragmentLollipop muFLol;
 	private UpgradeAccountFragmentLollipop upAFL;
-	private PaymentFragmentLollipop pFL;
 	private MonthlyAnnualyFragmentLollipop myFL;
 	private FortumoFragmentLollipop fFL;
 	private CentiliFragmentLollipop ctFL;
@@ -1608,25 +1607,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							case 1:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(1);
+								showUpAF(1);
 								return;
 							}
 							case 2:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(2);
+								showUpAF(2);
 								return;
 							}
 							case 3:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(3);
+								showUpAF(3);
 								return;
 							}
 							case 4:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(4);
+								showUpAF(4);
 								return;
 							}
 						}
@@ -1655,7 +1654,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						int accountType = getIntent().getIntExtra("accountType", 0);
 						log("accountType: "+accountType);
 						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
-						BitSet paymentBitSet = Util.convertToBitSet(paymentBitSetLong);;
 						switch (accountType){
 							case 0:{
 								log("intent firstTime==true");
@@ -1667,25 +1665,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							case 1:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(1);
+								showUpAF(1);
 								return;
 							}
 							case 2:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(2);
+								showUpAF(2);
 								return;
 							}
 							case 3:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(3);
+								showUpAF(3);
 								return;
 							}
 							case 4:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showpF(4);
+								showUpAF(4);
 								return;
 							}
 						}
@@ -3503,61 +3501,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showpF(int type){
-		log("showpF without refresh");
-
-		showpF(type, false);
-	}
-
-	public void showpF(int type, boolean refresh){
-		log("showpF");
-
-		accountFragment=Constants.PAYMENT_FRAGMENT;
-
-		cloudSectionLayout.setVisibility(View.GONE);
-		viewPagerCDrive.setVisibility(View.GONE);
-		contactsSectionLayout.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		sharesSectionLayout.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (!refresh){
-			if(pFL==null){
-				pFL = new PaymentFragmentLollipop();
-				pFL.setInfo(type, myAccountInfo);
-				ft.replace(R.id.fragment_container, pFL, "pF");
-				ft.commit();
-			}
-			else{
-				pFL.setInfo(type, myAccountInfo);
-				ft.replace(R.id.fragment_container, pFL, "pF");
-				ft.commit();
-			}
-		}
-		else{
-			Fragment tempF = getSupportFragmentManager().findFragmentByTag("pF");
-			if (tempF != null){
-				ft.detach(tempF);
-				ft.attach(tempF);
-				ft.commit();
-			}
-			else{
-				if(pFL==null){
-					pFL = new PaymentFragmentLollipop();
-					pFL.setInfo(type, myAccountInfo);
-					ft.replace(R.id.fragment_container, pFL, "pF");
-					ft.commit();
-				}
-				else{
-					pFL.setInfo(type, myAccountInfo);
-					ft.replace(R.id.fragment_container, pFL, "pF");
-					ft.commit();
-				}
-			}
-		}
-	}
-
-	public void showUpAF(){
+	public void showUpAF(int type){
+		log("showUpAF type: "+type);
 
 //		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
 //        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -3588,6 +3533,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commit();
+		}
+
+		if(type!=-1){
+			switch(type){
+				case Constants.PRO_LITE:{
+					upAFL.onUpgradeLiteClick();
+					break;
+				}
+				case Constants.PRO_I:{
+					upAFL.onUpgrade1Click();
+					break;
+				}
+				case Constants.PRO_II:{
+					upAFL.onUpgrade2Click();
+					break;
+				}
+				case Constants.PRO_III:{
+					upAFL.onUpgrade3Click();
+					break;
+				}
+			}
 		}
 	}
 
@@ -5841,7 +5807,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
-	        	showUpAF();
+	        	showUpAF(-1);
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
@@ -6274,29 +6240,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 	    			return;
 	    		}
-	    		case Constants.PAYMENT_FRAGMENT:{
-	    			if (pFL != null){
-	    				if (pFL.onBackPressed() == 0){
-	    					drawerItem = DrawerItem.CLOUD_DRIVE;
-		    				if (nV != null){
-								Menu nVMenu = nV.getMenu();
-								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-								resetNavigationViewMenu(nVMenu);
-								cloudDrive.setChecked(true);
-								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-							}
-							selectDrawerItemLollipop(drawerItem);
-	    				}
-	    			}
-	    			return;
-	    		}
 	    		case Constants.CC_FRAGMENT:{
 	    			if (ccFL != null){
 	    				int parameterType = ccFL.getParameterType();
-	    				showpF(parameterType);
+						showUpAF(parameterType);
 	    			}
 	    			else{
-	    				showUpAF();
+	    				showUpAF(-1);
 	    			}
 	    			return;
 	    		}
@@ -9076,7 +9026,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				outSpaceLayout.setVisibility(View.GONE);
 				getProLayout.setVisibility(View.GONE);
-				showUpAF();
+				showUpAF(-1);
 				break;
 			}
 
@@ -11883,10 +11833,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public UpgradeAccountFragmentLollipop getUpgradeAccountFragment() {
 		return upAFL;
-	}
-
-	public PaymentFragmentLollipop getPaymentFragment() {
-		return pFL;
 	}
 
 	public MonthlyAnnualyFragmentLollipop getMonthlyAnnualyFragment() {

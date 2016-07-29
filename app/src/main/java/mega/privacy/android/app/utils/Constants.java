@@ -43,7 +43,6 @@ public class Constants {
 
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
-	final public static int PAYMENT_FRAGMENT = 5002;
 	final public static int OVERQUOTA_ALERT = 5003;
 	final public static int CC_FRAGMENT = 5004;
 	final public static int FORTUMO_FRAGMENT = 5005;
@@ -54,6 +53,10 @@ public class Constants {
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;
 
+	public static final int PRO_LITE = 4;
+	public static final int PRO_I = 1;
+	public static final int PRO_II = 2;
+	public static final int PRO_III = 3;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
