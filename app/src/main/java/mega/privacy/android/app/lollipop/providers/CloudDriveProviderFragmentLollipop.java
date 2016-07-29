@@ -118,6 +118,11 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.provider_list_empty_text);
+
+		if (context instanceof FileProviderActivity){
+			parentHandle = ((FileProviderActivity)context).getParentHandle();
+			log("The parent handle is: "+parentHandle);
+		}
 	
 		if (parentHandle == -1)
 		{			
@@ -138,58 +143,34 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		{
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
-//			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-			changeBackVisibility(false);
+			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 		}
 		else
 		{
 			nodes = megaApi.getChildren(chosenNode);
 			if(chosenNode.getType() != MegaNode.TYPE_ROOT)
 			{
-				changeActionBarTitle(chosenNode.getName());	
-				changeBackVisibility(true);
+				changeActionBarTitle(chosenNode.getName());
 			}
 			else
 			{
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-				changeBackVisibility(false);
 			}
 		}
 		
 		if (context instanceof FileProviderActivity){
 			((FileProviderActivity)context).setParentHandle(parentHandle);
 		}
-		
-//		if (modeCloud == FileExplorerActivity.MOVE) {
-//			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
-//		}
-//		else if (modeCloud == FileExplorerActivity.COPY){
-//			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
-//		}
-//		else if (modeCloud == FileExplorerActivity.UPLOAD){
-//			uploadButton.setText(getString(R.string.action_upload));
-//		}
-//		else if (modeCloud == FileExplorerActivity.IMPORT){
-//			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
-//		}
-//		else if (modeCloud == FileExplorerActivity.SELECT){
-//			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
-//		}
-//		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
-//			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
-//		}	
-//				
+
 		if (adapter == null){
 			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView);
 		}
-		else{
-			adapter.setParentHandle(parentHandle);
-			adapter.setNodes(nodes);
-		}
+
+		listView.setAdapter(adapter);
+		adapter.setParentHandle(parentHandle);
+		setNodes(nodes);
 		
-		adapter.setPositionClicked(-1);		
-		
-		listView.setAdapter(adapter);		
+		adapter.setPositionClicked(-1);
 		
 		return v;
 	}
@@ -203,13 +184,15 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 	
 	public void changeActionBarTitle(String folder){
 		log("changeActionBarTitle");
-		((FileProviderActivity) context).changeTitle(folder);
+		if (context instanceof FileProviderActivity){
+			int tabShown = ((FileProviderActivity)context).getTabShown();
+
+			if(tabShown==FileProviderActivity.CLOUD_TAB){
+				((FileProviderActivity) context).changeTitle(folder);
+			}
+		}
 	}
-	
-	public void changeBackVisibility(boolean backVisibility){
-//		((FileProviderActivity) context).changeBackVisibility(backVisibility);
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -229,35 +212,16 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 			name = temp[temp.length-1];
 
 			changeActionBarTitle(name);
-			changeBackVisibility(true);
-		
+
 			parentHandle = nodes.get(position).getHandle();
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setParentHandle(parentHandle);
 			}
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
-			adapter.setNodes(nodes);
+			setNodes(nodes);
 			listView.scrollToPosition(0);
-			
-			//If folder has no files
-			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
+
 		}
 		else{
 			//File selected to download
@@ -279,7 +243,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-				changeBackVisibility(false);
 			}
 			else{
 				String path=parentNode.getName();	
@@ -287,8 +250,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 				temp = path.split("/");
 				name = temp[temp.length-1];
 				changeActionBarTitle(name);
-				changeBackVisibility(true);
-				
 				parentHandle = parentNode.getHandle();
 			}
 			
@@ -297,7 +258,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 			emptyTextView.setVisibility(View.GONE);			
 			
 			nodes = megaApi.getChildren(parentNode);
-			adapter.setNodes(nodes);
+			setNodes(nodes);
 			listView.scrollToPosition(0);
 			adapter.setParentHandle(parentHandle);
 			if (context instanceof FileProviderActivity){
