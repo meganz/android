@@ -1713,12 +1713,6 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	{
 		log("onRequestTemporaryError: " + request.getRequestString());
 
-//		if (request.getType() == MegaRequest.TYPE_LOGIN){
-//
-//		}
-//		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-//
-//		}
 		try{
 			timer = new CountDownTimer(10000, 2000) {
 

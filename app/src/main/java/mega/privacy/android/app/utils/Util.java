@@ -1495,14 +1495,12 @@ public class Util {
 	}
 	
 	public static int scaleHeightPx(int px, DisplayMetrics metrics){
-		log("scaleHeightPx");
 		int myHeightPx = metrics.heightPixels;
 		
 		return px*myHeightPx/548; //Based on Eduardo's measurements				
 	}
 	
 	public static int scaleWidthPx(int px, DisplayMetrics metrics){
-
 		int myWidthPx = metrics.widthPixels;
 		
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
