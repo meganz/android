@@ -9,8 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/card_corner"
-        android:gravity="center"
-        android:layout_below="@id/payment_layout_values_select">
+        android:gravity="center">
 
         <TextView
             android:id="@+id/payment_text_payment_method"

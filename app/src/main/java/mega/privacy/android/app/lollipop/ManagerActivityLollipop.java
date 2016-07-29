@@ -1604,28 +1604,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								setIntent(null);
 								return;
 							}
-							case 1:{
+							case Constants.PRO_I:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(1);
+								showUpAF(Constants.PRO_I);
 								return;
 							}
-							case 2:{
+							case Constants.PRO_II:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(2);
+								showUpAF(Constants.PRO_II);
 								return;
 							}
-							case 3:{
+							case Constants.PRO_III:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(3);
+								showUpAF(Constants.PRO_III);
 								return;
 							}
-							case 4:{
+							case Constants.PRO_LITE:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(4);
+								showUpAF(Constants.PRO_LITE);
 								return;
 							}
 						}
@@ -1662,28 +1662,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								setIntent(null);
 								return;
 							}
-							case 1:{
+							case Constants.PRO_I:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(1);
+								showUpAF(Constants.PRO_I);
 								return;
 							}
-							case 2:{
+							case Constants.PRO_II:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(2);
+								showUpAF(Constants.PRO_II);
 								return;
 							}
-							case 3:{
+							case Constants.PRO_III:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(3);
+								showUpAF(Constants.PRO_III);
 								return;
 							}
-							case 4:{
+							case Constants.PRO_LITE:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(4);
+								showUpAF(Constants.PRO_LITE);
 								return;
 							}
 						}
@@ -1709,9 +1709,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setIntent(null);
 						}
 					}
-
-
-
 
 	        		if (intentRec.getAction() != null){
 	        			if (intentRec.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
