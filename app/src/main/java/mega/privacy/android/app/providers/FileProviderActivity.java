@@ -730,7 +730,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	
 	@SuppressLint("NewApi")
 	public void checkLogin(){
-		setContentView(R.layout.activity_login);
+		setContentView(R.layout.fragment_login);
 		
 		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
 		

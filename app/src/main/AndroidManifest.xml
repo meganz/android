@@ -48,15 +48,7 @@
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait" >
         </activity>
-        
-       <activity
-            android:name="mega.privacy.android.app.lollipop.TourActivityLollipop"
-            android:label="@string/app_name"
-            android:launchMode="singleTop" 
-            android:theme="@style/login_activity"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        
+
         <activity
             android:name="LoginActivity"
             android:theme="@style/login_activity"
@@ -92,15 +84,8 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait" >            
-        </activity>    
-
-         <activity
-            android:name="mega.privacy.android.app.lollipop.ChooseAccountActivityLollipop"
-            android:label="@string/choose_account_activity" 
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden">
         </activity>
-         
+
         <activity
             android:name="CreateAccountActivity"
             android:label="@string/create_account_text"
@@ -108,22 +93,6 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait" >
-        </activity>  
-        
-        <activity
-            android:name="mega.privacy.android.app.lollipop.CreateAccountActivityLollipop"
-            android:label="@string/create_account_text"
-            android:theme="@style/login_activity"
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.ConfirmEmailActivityLollipop"
-            android:label="@string/confirm_email_text"
-            android:theme="@style/login_activity"
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden">
         </activity>
 
         <activity
