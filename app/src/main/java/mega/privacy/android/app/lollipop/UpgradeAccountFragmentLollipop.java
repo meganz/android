@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -33,6 +35,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	public MyAccountInfo myAccountInfo;
+
+	private ScrollView scrollView;
 	
 	private RelativeLayout proLiteLayout;
 	private RelativeLayout pro1Layout;
@@ -132,6 +136,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		v = inflater.inflate(R.layout.activity_upgrade, container, false);
+
+		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
 
 		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);
 		proLiteLayout.setOnClickListener(this);
@@ -398,6 +404,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				googlePlayLayout.setVisibility(View.GONE);
 			}
 			selectPaymentMethodLayoutPro1.setVisibility(View.VISIBLE);
+			new Handler().post(new Runnable() {
+				@Override
+				public void run() {
+					scrollView.smoothScrollTo(0, pro2Layout.getBottom());
+				}
+			});
 		}
 	}
 
@@ -435,6 +447,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				googlePlayLayout.setVisibility(View.GONE);
 			}
 			selectPaymentMethodLayoutPro2.setVisibility(View.VISIBLE);
+			new Handler().post(new Runnable() {
+				@Override
+				public void run() {
+					scrollView.smoothScrollTo(0, pro3Layout.getBottom());
+				}
+			});
 		}
 	}
 
@@ -472,6 +490,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				googlePlayLayout.setVisibility(View.GONE);
 			}
 			selectPaymentMethodLayoutPro3.setVisibility(View.VISIBLE);
+
+			new Handler().post(new Runnable() {
+				@Override
+				public void run() {
+					scrollView.smoothScrollTo(0, pro3Layout.getBottom());
+				}
+			});
 		}
 	}
 	
