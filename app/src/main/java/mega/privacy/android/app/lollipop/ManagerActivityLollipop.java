@@ -6703,9 +6703,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int month = c.get(Calendar.MONTH);
 		int day = c.get(Calendar.DAY_OF_MONTH);
 
-		final DatePickerDialog datePickerDialog = new DatePickerDialog(managerActivity, managerActivity, year, month, day);
+		final DatePickerDialog datePickerDialog = new DatePickerDialog(getApplicationContext(), this, year, month, day);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		            builder.setMessage(link);
+
 		builder.setTitle(getString(R.string.context_get_link_menu));
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -6894,6 +6894,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			expiryDateButton.setVisibility(View.INVISIBLE);
 		}
 
+		log("show getLinkDialog");
 		getLinkDialog.show();
 	}
 
@@ -10617,6 +10618,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("link: "+request.getLink());
 			}
 			else{
+				log("Error: "+e.getErrorString());
 				showSnackbar(getString(R.string.context_no_link));
 			}
 			isGetLink=false;
@@ -11081,6 +11083,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 				}
+			}
+		}
+		else if (drawerItem == DrawerItem.SEARCH){
+			log("SEARCH shown");
+			if (sFLol != null){
+				sFLol.refresh();
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX){
