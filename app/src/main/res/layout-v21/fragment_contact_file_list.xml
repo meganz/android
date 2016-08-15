@@ -12,12 +12,11 @@
         android:layout_height="wrap_content"
         android:background="@color/file_list_selected_row" >
 
-
         <RelativeLayout
             android:id="@+id/contact_file_list_relative_layout_avatar"
             android:layout_width="54dp"
             android:layout_height="54dp"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="12dp"
             android:paddingTop="3dp">
 
             <mega.privacy.android.app.components.RoundedImageView
@@ -27,7 +26,7 @@
                 android:scaleType="fitCenter"
                 rounded:border_color="@color/border_file_properties"
                 rounded:border_width="0dp"
-                rounded:corner_radius="27dp" />
+                rounded:corner_radius="27dp"/>
 
             <TextView
                 android:id="@+id/contact_file_list_initial_letter"
@@ -42,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_toRightOf="@id/contact_file_list_relative_layout_avatar"
-            android:paddingLeft="5dp"
+            android:layout_marginLeft="9dp"
             android:paddingTop="7dp" />
  
         <TextView
@@ -52,7 +51,7 @@
             android:layout_below="@id/contact_file_list_name"
             android:layout_toRightOf="@id/contact_file_list_relative_layout_avatar"
             android:paddingBottom="7dp"
-            android:paddingLeft="5dp"
+            android:layout_marginLeft="9dp"
             android:textColor="@color/file_list_second_row" />
     </RelativeLayout>
 
