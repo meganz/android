@@ -21,8 +21,6 @@ import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -149,8 +147,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	ImageView permissionsIcon;
 	
 	boolean owner= true;
-	Toolbar tB;
-	ActionBar aB;
 	int typeExport = -1;
 	
 	ArrayList<MegaShare> sl;

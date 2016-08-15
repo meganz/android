@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -24,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -107,9 +110,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	private List<ShareInfo> filePreparedInfos;
 
+	Toolbar tB;
+	ActionBar aB;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		log("onCreate first");
 		super.onCreate(savedInstanceState);
 
 		if (megaApi == null){
@@ -134,6 +141,25 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			userEmail = extras.getString("name");
 
 			setContentView(R.layout.activity_main_contact_properties);
+
+			//Set toolbar
+			tB = (Toolbar) findViewById(R.id.toolbar_main_contact_properties);
+			if(tB==null){
+				log("Toolbar is NULL");
+			}
+			tB.setTitle(getString(R.string.tab_outgoing_shares));
+			setSupportActionBar(tB);
+			aB = getSupportActionBar();
+			if(aB!=null){
+				//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				aB.setDisplayHomeAsUpEnabled(true);
+				aB.setDisplayShowHomeEnabled(true);
+//			aB.setTitle(getString(R.string.tab_outgoing_shares));
+				aB.hide();
+			}
+			else{
+				log("aB is NULL!!!!");
+			}
 
 			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_myaccount);
 			
@@ -295,31 +321,22 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenu----------------------------------");
 
-		//		 if(contactPropertiesVisible){				
-		//				log("Es visible ContactProperties--------------");
-		//				
-		//		}
-		//		else{
-		//			log("Es visible ContacFileListProperties-----------------");
-		//			
-		//		}
-
 		if(cflF!=null){
 			if(cflF.isVisible()){
-				log("Es visible ContacFileListProperties");
-				shareMenuItem.setVisible(true);		
-				viewSharedItem.setVisible(false);
-				//					shareMenuItem.setVisible(true);		
-				//					viewSharedItem.setVisible(false);
+				log("visible ContacFileListProperties");
+				if(shareMenuItem!=null){
+					shareMenuItem.setVisible(true);
+					viewSharedItem.setVisible(false);
+				}
 			}
 		}		
 		if(cpF!=null){
 			if(cpF.isVisible()){
-				log("Es visible ContactProperties");
-				shareMenuItem.setVisible(true);		
-				viewSharedItem.setVisible(true);
-				//					shareMenuItem.setVisible(true);		
-				//					viewSharedItem.setVisible(true);
+				log("visible ContactProperties");
+				if(shareMenuItem!=null){
+					shareMenuItem.setVisible(true);
+					viewSharedItem.setVisible(true);
+				}
 			}
 		}	
 
@@ -665,7 +682,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	public void showRenameDialog(final MegaNode document, String text) {
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
