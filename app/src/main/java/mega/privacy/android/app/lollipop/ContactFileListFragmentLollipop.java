@@ -93,8 +93,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	
-	ImageView toolbarBack;
 
 	MegaUser contact;
 	ArrayList<MegaNode> contactNodes;
@@ -166,10 +164,10 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	        int position = listView.getChildPosition(view);
 
 	        // handle long press
-			if (adapter.getPositionClicked() == -1){
+			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
+
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		        itemClick(position);
 			}  
@@ -369,13 +367,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			textViewContent = (TextView) v.findViewById(R.id.contact_file_list_content);
 			contactLayout = (RelativeLayout) v.findViewById(R.id.contact_file_list_contact_layout);
 			contactLayout.setOnClickListener(this);
-			
-			toolbarBack = (ImageView) v.findViewById(R.id.contact_file_list_toolbar_back);
-			RelativeLayout.LayoutParams paramsBack = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
-			paramsBack.setMargins(leftMarginBack, 0, 0, 0);
-			toolbarBack.setLayoutParams(paramsBack);
-			toolbarBack.setOnClickListener(this);
 
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
@@ -1160,17 +1151,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	public void onClick(View v) {
 		log("onClick");
 		switch (v.getId()) {
-		//		case R.id.contact_file_list_contact_layout: {
-		//			Intent i = new Intent(this, ContactPropertiesActivityLollipop.class);
-		//			i.putExtra("name", contact.getEmail());
-		//			startActivity(i);
-		//			finish();
-		//			break;
-		//		}
-			case R.id.contact_file_list_toolbar_back:{
-				((ContactPropertiesActivityLollipop)context).onBackPressed();
-				break;
-			}
+
 			case R.id.contact_file_list_option_download_layout: {
 				log("Download option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				

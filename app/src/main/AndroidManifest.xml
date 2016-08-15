@@ -251,8 +251,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop"
             android:label="@string/contact_properties_activity"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.Properties">            
+            android:launchMode="singleTop">
         </activity>
 
         <activity
