@@ -140,7 +140,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	        int position = listView.getChildPosition(view);
 
 	        // handle long press
-			if (adapter.getPositionClicked() == -1){
+			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
 			
 				actionMode = startSupportActionMode(new ActionBarCallBack());			
@@ -289,12 +289,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					adapter.selectAll();
+					selectAll();
 					actionMode.invalidate();
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
-					adapter.clearSelections();
+					clearSelections();
 					actionMode.invalidate();
 					break;
 				}
@@ -619,8 +619,20 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	        }
 	    }
 	}
+
+	/*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		if(adapter.isMultipleSelect()){
+			adapter.clearSelections();
+		}
+//
+		updateActionModeTitle();
+	}
 	
 	public void selectAll(){
+		log("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -802,11 +814,15 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 	
 	private void updateActionModeTitle() {
+		log("updateActionModeTitle");
 		if (actionMode == null) {
 			return;
 		}
 		List<MegaShare> contacts = adapter.getSelectedShares();
-		
+		if(contacts!=null){
+			log("Contacts selected: "+contacts.size());
+		}
+
 		Resources res = getResources();
 		String format = "%d %s";
 	
