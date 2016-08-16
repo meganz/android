@@ -55,10 +55,7 @@
             android:id="@+id/payment_method_credit_card_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/cc_ic"
-            android:layout_marginLeft="16dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"/>
+            android:src="@drawable/cc_ic"/>
 
         <TextView
             android:id="@+id/payment_method_credit_card_text"
@@ -67,8 +64,7 @@
             android:textSize="17sp"
             android:text="@string/payment_method_credit_card"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/payment_method_credit_card_icon"
-            android:layout_marginLeft="16dp"/>
+            android:layout_toRightOf="@id/payment_method_credit_card_icon"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -103,10 +99,7 @@
             android:id="@+id/payment_method_centili_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/centili_ic"
-            android:layout_marginLeft="16dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"/>
+            android:src="@drawable/centili_ic"/>
 
         <TextView
             android:id="@+id/payment_method_centili_text"
@@ -115,8 +108,7 @@
             android:textSize="17sp"
             android:text="@string/payment_method_centili"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/payment_method_centili_icon"
-            android:layout_marginLeft="16dp"/>
+            android:layout_toRightOf="@id/payment_method_centili_icon"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -128,8 +120,6 @@
             android:id="@+id/close_layout_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_alignParentRight="true"
             android:src="@drawable/ic_collapse"/>
     </RelativeLayout>
