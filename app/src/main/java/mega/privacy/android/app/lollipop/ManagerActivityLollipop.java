@@ -3535,19 +3535,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(type!=-1){
 			switch(type){
 				case Constants.PRO_LITE:{
-					upAFL.onUpgradeLiteClick();
+					upAFL.onUpgradeClick(Constants.PRO_LITE);
 					break;
 				}
 				case Constants.PRO_I:{
-					upAFL.onUpgrade1Click();
+					upAFL.onUpgradeClick(Constants.PRO_I);
 					break;
 				}
 				case Constants.PRO_II:{
-					upAFL.onUpgrade2Click();
+					upAFL.onUpgradeClick(Constants.PRO_II);
 					break;
 				}
 				case Constants.PRO_III:{
-					upAFL.onUpgrade3Click();
+					upAFL.onUpgradeClick(Constants.PRO_III);
 					break;
 				}
 			}
