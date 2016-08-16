@@ -16,9 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/card_corner"
-            android:layout_marginRight="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
             android:elevation="3dp">
 
 			<RelativeLayout
@@ -42,7 +39,6 @@
 						android:text="@string/prolite_account"
 						android:textAllCaps="true"
 						android:layout_centerHorizontal="true"
-						android:layout_marginBottom="11dp"
 						android:textSize="24sp"/>
 
 					<RelativeLayout
@@ -66,7 +62,6 @@
 							android:textColor="@color/name_my_account"
 							android:layout_toRightOf="@id/upgrade_prolite_integer_text"
 							android:layout_alignBottom="@id/upgrade_prolite_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp" />
 
 						<TextView
@@ -76,7 +71,6 @@
 							android:textColor="@color/upgrade_orange"
 							android:layout_toRightOf="@id/upgrade_prolite_decimal_text"
 							android:layout_alignBottom="@id/upgrade_prolite_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp"/>
 					</RelativeLayout>
 				</RelativeLayout>
@@ -102,7 +96,7 @@
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true">
 						<TableRow
-							android:layout_marginBottom="25dp">
+							android:id="@+id/table_row_pro_lite">
 							<TextView
 								android:id="@+id/upgrade_prolite_storage_value_integer"
 								android:layout_width="40dp"
@@ -120,6 +114,7 @@
 								android:gravity="right"/>
 
 							<TextView
+								android:id="@+id/upgrade_prolite_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -154,6 +149,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
+								android:id="@+id/upgrade_prolite_empty_text_bandwidth"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -199,9 +195,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@drawable/card_corner"
-			android:layout_marginRight="8dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginTop="8dp"
 			android:elevation="3dp">
 
 			<RelativeLayout
@@ -225,7 +218,6 @@
 						android:text="@string/pro1_account"
 						android:textAllCaps="true"
 						android:layout_centerHorizontal="true"
-						android:layout_marginBottom="11dp"
 						android:textSize="24sp"/>
 
 					<RelativeLayout
@@ -249,7 +241,6 @@
 							android:textColor="@color/name_my_account"
 							android:layout_toRightOf="@id/upgrade_pro_i_integer_text"
 							android:layout_alignBottom="@id/upgrade_pro_i_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp" />
 
 						<TextView
@@ -259,7 +250,6 @@
 							android:textColor="@color/lollipop_primary_color"
 							android:layout_toRightOf="@id/upgrade_pro_i_decimal_text"
 							android:layout_alignBottom="@id/upgrade_pro_i_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp"/>
 					</RelativeLayout>
 				</RelativeLayout>
@@ -285,7 +275,7 @@
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true">
 						<TableRow
-							android:layout_marginBottom="25dp">
+							android:id="@+id/table_row_pro_i">
 							<TextView
 								android:id="@+id/upgrade_pro_i_storage_value_integer"
 								android:layout_width="40dp"
@@ -303,6 +293,7 @@
 								android:gravity="right"/>
 
 							<TextView
+								android:id="@+id/upgrade_pro_i_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -337,6 +328,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
+								android:id="@+id/upgrade_pro_i_empty_text_bandwidth"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -381,9 +373,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@drawable/card_corner"
-			android:layout_marginRight="8dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginTop="8dp"
 			android:elevation="3dp">
 
 			<RelativeLayout
@@ -407,7 +396,6 @@
 						android:text="@string/pro2_account"
 						android:textAllCaps="true"
 						android:layout_centerHorizontal="true"
-						android:layout_marginBottom="11dp"
 						android:textSize="24sp"/>
 
 					<RelativeLayout
@@ -431,7 +419,6 @@
 							android:textColor="@color/name_my_account"
 							android:layout_toRightOf="@id/upgrade_pro_ii_integer_text"
 							android:layout_alignBottom="@id/upgrade_pro_ii_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp" />
 
 						<TextView
@@ -441,7 +428,6 @@
 							android:textColor="@color/lollipop_primary_color"
 							android:layout_toRightOf="@id/upgrade_pro_ii_decimal_text"
 							android:layout_alignBottom="@id/upgrade_pro_ii_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp"/>
 					</RelativeLayout>
 				</RelativeLayout>
@@ -467,7 +453,7 @@
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true">
 						<TableRow
-							android:layout_marginBottom="25dp">
+							android:id="@+id/table_row_pro_ii">
 							<TextView
 								android:id="@+id/upgrade_pro_ii_storage_value_integer"
 								android:layout_width="40dp"
@@ -485,6 +471,7 @@
 								android:gravity="right"/>
 
 							<TextView
+								android:id="@+id/upgrade_pro_ii_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -519,6 +506,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
+								android:id="@+id/upgrade_pro_ii_empty_text_bandwidth"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -564,10 +552,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@drawable/card_corner"
-			android:layout_marginRight="8dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginTop="8dp"
-			android:layout_marginBottom="5dp"
 			android:elevation="3dp">
 
 			<RelativeLayout
@@ -591,7 +575,6 @@
 						android:text="@string/pro3_account"
 						android:textAllCaps="true"
 						android:layout_centerHorizontal="true"
-						android:layout_marginBottom="11dp"
 						android:textSize="24sp"/>
 
 					<RelativeLayout
@@ -615,7 +598,6 @@
 							android:textColor="@color/name_my_account"
 							android:layout_toRightOf="@id/upgrade_pro_iii_integer_text"
 							android:layout_alignBottom="@id/upgrade_pro_iii_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp" />
 
 						<TextView
@@ -625,7 +607,6 @@
 							android:textColor="@color/lollipop_primary_color"
 							android:layout_toRightOf="@id/upgrade_pro_iii_decimal_text"
 							android:layout_alignBottom="@id/upgrade_pro_iii_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp"/>
 					</RelativeLayout>
 				</RelativeLayout>
@@ -651,7 +632,7 @@
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true">
 						<TableRow
-							android:layout_marginBottom="25dp">
+							android:id="@+id/table_row_pro_iii">
 							<TextView
 								android:id="@+id/upgrade_pro_iii_storage_value_integer"
 								android:layout_width="40dp"
@@ -669,6 +650,7 @@
 								android:gravity="right"/>
 
 							<TextView
+								android:id="@+id/upgrade_pro_iii_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -703,6 +685,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
+								android:id="@+id/upgrade_pro_iii_empty_text_bandwidth"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
