@@ -182,7 +182,7 @@
 
 			<include
 				android:id="@+id/available_payment_methods_prolite"
-				android:layout_width="fill_parent"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:visibility="gone"
 				android:layout_below="@+id/upgrade_prolite_layout_content"

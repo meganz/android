@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -35,10 +36,15 @@ import nz.mega.sdk.MegaApiAndroid;
 public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickListener{
 
 	static int HEIGHT_ACCOUNT_LAYOUT=109;
+
+	static int HEIGHT_PAYMENT_METHODS_LAYOUT=50;
+
 	View v = null;
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	public MyAccountInfo myAccountInfo;
+
+	DisplayMetrics outMetrics;
 
 	private ScrollView scrollView;
 	
@@ -138,6 +144,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	RelativeLayout fortumoLayout;
 	RelativeLayout centiliLayout;
 
+	ImageView closeIcon;
+	ImageView fortumoIcon;
+	TextView fortumoText;
+	ImageView centiliIcon;
+	TextView centiliText;
+	ImageView creditCardIcon;
+	TextView creditCardText;
+	ImageView googleWalletIcon;
+	TextView googleWalletText;
+
 	Context context;
 
 	@Override
@@ -169,7 +185,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		
 		aB.setTitle(R.string.action_upgrade_account);
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
+		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
@@ -801,21 +817,80 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		if (myAccountInfo.getPaymentBitSet() != null){
 
 			selectPaymentMethod = (TextView) selectPaymentMethodLayoutLite.findViewById(R.id.payment_text_payment_method);
+			RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) selectPaymentMethod.getLayoutParams();
+			titleParams.setMargins(0,Util.scaleHeightPx(18, outMetrics),0,Util.scaleHeightPx(14, outMetrics));
+			selectPaymentMethod.setLayoutParams(titleParams);
 
 			googlePlayLayout = (RelativeLayout) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_google_wallet);
 			googlePlayLayout.setOnClickListener(this);
 
+			LinearLayout.LayoutParams googlePlayParams = (LinearLayout.LayoutParams) googlePlayLayout.getLayoutParams();
+			googlePlayParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
+			googlePlayLayout.setLayoutParams(googlePlayParams);
+
+			googleWalletIcon = (ImageView) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_google_wallet_icon);
+
+			RelativeLayout.LayoutParams googleIconParams = (RelativeLayout.LayoutParams) googleWalletIcon.getLayoutParams();
+			googleIconParams.height = Util.scaleHeightPx(40, outMetrics);
+			googleIconParams.width = Util.scaleWidthPx(40, outMetrics);
+			googleIconParams.setMargins(Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(8, outMetrics));
+
+			googleWalletIcon.setLayoutParams(googleIconParams);
+
+			googleWalletText = (TextView) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_google_wallet_text);
+			RelativeLayout.LayoutParams googleTextParams = (RelativeLayout.LayoutParams) googleWalletText.getLayoutParams();
+			googleTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
+			googleWalletText.setLayoutParams(googleTextParams);
+
 			creditCardLayout = (RelativeLayout) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_credit_card);
 			creditCardLayout.setOnClickListener(this);
+
+			LinearLayout.LayoutParams creditCardParams = (LinearLayout.LayoutParams) creditCardLayout.getLayoutParams();
+			creditCardParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
+			creditCardLayout.setLayoutParams(creditCardParams);
 
 			fortumoLayout = (RelativeLayout) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_fortumo);
 			fortumoLayout.setOnClickListener(this);
 
+			LinearLayout.LayoutParams fortumoParams = (LinearLayout.LayoutParams) fortumoLayout.getLayoutParams();
+			fortumoParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
+			fortumoLayout.setLayoutParams(fortumoParams);
+
+			fortumoIcon = (ImageView) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_fortumo_icon);
+
+			RelativeLayout.LayoutParams fortumoIconParams = (RelativeLayout.LayoutParams) fortumoIcon.getLayoutParams();
+			fortumoIconParams.height = Util.scaleHeightPx(40, outMetrics);
+			fortumoIconParams.width = Util.scaleWidthPx(40, outMetrics);
+			fortumoIconParams.setMargins(Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(8, outMetrics));
+
+			fortumoIcon.setLayoutParams(fortumoIconParams);
+
+			fortumoText = (TextView) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_fortumo_text);
+			RelativeLayout.LayoutParams fortumoTextParams = (RelativeLayout.LayoutParams) fortumoText.getLayoutParams();
+			fortumoTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
+			fortumoText.setLayoutParams(fortumoTextParams);
+
 			centiliLayout = (RelativeLayout) selectPaymentMethodLayoutLite.findViewById(R.id.payment_method_centili);
 			centiliLayout.setOnClickListener(this);
 
+			LinearLayout.LayoutParams centiliParams = (LinearLayout.LayoutParams) centiliLayout.getLayoutParams();
+			centiliParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
+			centiliLayout.setLayoutParams(centiliParams);
+
 			closeLayout = (RelativeLayout) selectPaymentMethodLayoutLite.findViewById(R.id.close_layout);
 			closeLayout.setOnClickListener(this);
+
+			LinearLayout.LayoutParams closeLayoutParams = (LinearLayout.LayoutParams) closeLayout.getLayoutParams();
+			closeLayoutParams.setMargins(0,Util.scaleHeightPx(5, outMetrics),0,0);
+			closeLayout.setLayoutParams(closeLayoutParams);
+
+//			closeIcon;
+//			fortumoIcon;
+//			fortumoText;
+//			centiliIcon;
+//			centiliText;
+//			creditCardIcon;
+//			creditCardText;
 
 			closeLayout.setVisibility(View.VISIBLE);
 			googlePlayLayout.setVisibility(View.GONE);
@@ -826,11 +901,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			showPaymentMethods(Constants.PRO_LITE);
 
 			refreshAccountInfo();
-
+			log("END refreshAccountInfo");
 			if (!myAccountInfo.isInventoryFinished()){
 				log("if (!myAccountInfo.isInventoryFinished())");
 				googlePlayLayout.setVisibility(View.GONE);
 			}
+			log("Just before show the layout");
+
 			selectPaymentMethodLayoutLite.setVisibility(View.VISIBLE);
 		}
 	}
