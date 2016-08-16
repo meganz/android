@@ -512,15 +512,18 @@ public class Util {
         
         File[] files = dir.listFiles();
 
-        for (File file : files) {
-            if (file.isFile()) {
-                size += file.length();
-            }
-            else{
-                size += getDirSize(file);
-            }
-        }
-
+		if(files !=null){
+			for (File file : files) {
+				if (file.isFile()) {
+					size += file.length();
+				}
+				else{
+					size += getDirSize(file);
+				}
+			}
+			return size;
+		}
+		log("Files is NULL");
         return size;
     }
 	
@@ -540,18 +543,23 @@ public class Util {
     }
     
     private static void cleanDir(File dir) {
-        File[] files = dir.listFiles();       
-        
-        for (File file : files) {
-            
-            if (file.isFile()) {
-            	file.delete();
-            }
-            else{
-            	cleanDir(file);
-            	file.delete();
-            }            
-        }
+        File[] files = dir.listFiles();
+
+		if(files !=null){
+			for (File file : files) {
+
+				if (file.isFile()) {
+					file.delete();
+				}
+				else{
+					cleanDir(file);
+					file.delete();
+				}
+			}
+		}
+		else{
+			log("Files is NULL");
+		}
     }
     
     public static String getCacheSize(Context context){
