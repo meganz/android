@@ -228,6 +228,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 							return START_NOT_STICKY;
 
 						}
+						else{
+							log("Localpath: " + localPath);
+						}
 					}
 
 					boolean isWifi = Util.isOnWifi(this);
@@ -802,15 +805,16 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 					while(cursorCamera.moveToNext()){
 
-						log("while(cursorCamera.moveToNext())");
 						Media media = new Media();
 						media.filePath = cursorCamera.getString(dataColumn);
 						//			        log("Tipo de fichero:--------------------------: "+media.filePath);
 						media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
 
+						log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + localPath);
+
 						//Check files of the Camera Uploads
 						if (checkFile(media,localPath)){
-							log("if (checkFile(media,localPath))");
+							log("if (checkFile(media," + localPath + "))");
 							cameraFiles.add(media);
 							log("Camera Files added: "+media.filePath);
 						}
