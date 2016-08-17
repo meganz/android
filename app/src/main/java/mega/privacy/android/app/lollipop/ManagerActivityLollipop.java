@@ -255,6 +255,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     Toolbar tB;
     ActionBar aB;
 
+	int selectedPaymentMethod;
+	int selectedAccountType;
+
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
     public enum DrawerItem {
@@ -962,6 +965,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		outState.putString("pathNavigationOffline", pathNavigationOffline);
 //		outState.putParcelable("obj", myClass);
+		if(drawerItem==DrawerItem.ACCOUNT){
+			outState.putInt("accountFragment", accountFragment);
+			if(accountFragment==Constants.MONTHLY_YEARLY_FRAGMENT){
+				outState.putInt("selectedAccountType", selectedAccountType);
+				outState.putInt("selectedPaymentMethod", selectedPaymentMethod);
+			}
+		}
 	}
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -994,6 +1004,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			indexContacts = savedInstanceState.getInt("indexContacts", indexContacts);
 			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
 			log("savedInstanceState -> pathNavigationOffline: "+pathNavigationOffline);
+			accountFragment = savedInstanceState.getInt("accountFragment", -1);
+			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
+			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 		}
 		else{
 			log("Bundle is NULL");
@@ -3249,50 +3262,66 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("case ACCOUNT");
 //    			tB.setVisibility(View.GONE);
 
-    			accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
-
-    			if (maFLol == null){
-					log("New MyAccountFragment");
-    				maFLol = new MyAccountFragmentLollipop();
-    				maFLol.setMyEmail(megaApi.getMyUser().getEmail());
-					if(myAccountInfo==null){
-						log("Not possibleeeeeee!!");
+				switch(accountFragment){
+					case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
+						log("Show upgrade FRAGMENT");
+						showUpAF(-1);
+						showFabButton();
+						break;
 					}
-					else{
-						maFLol.setMyAccountInfo(myAccountInfo);
+					case Constants.MONTHLY_YEARLY_FRAGMENT:{
+						log("Show monthly yearly FRAGMENT");
+						showmyF(selectedPaymentMethod, selectedAccountType);
+						showFabButton();
+						break;
 					}
-					maFLol.setMKLayoutVisible(mkLayoutVisible);
-    			}
-				else{
-					log("MyAccountFragment is not null");
-					maFLol.setMyEmail(megaApi.getMyUser().getEmail());
-					if(myAccountInfo==null){
-						log("Not possibleeeeeee!!");
-					}
-					else{
-						maFLol.setMyAccountInfo(myAccountInfo);
-					}
+					default:{
+						log("Show myAccount Fragment");
+						if (maFLol == null){
+							log("New MyAccountFragment");
+							maFLol = new MyAccountFragmentLollipop();
+							maFLol.setMyEmail(megaApi.getMyUser().getEmail());
+							if(myAccountInfo==null){
+								log("Not possibleeeeeee!!");
+							}
+							else{
+								maFLol.setMyAccountInfo(myAccountInfo);
+							}
+							maFLol.setMKLayoutVisible(mkLayoutVisible);
+						}
+						else{
+							log("MyAccountFragment is not null");
+							maFLol.setMyEmail(megaApi.getMyUser().getEmail());
+							if(myAccountInfo==null){
+								log("Not possibleeeeeee!!");
+							}
+							else{
+								maFLol.setMyAccountInfo(myAccountInfo);
+							}
 
-					maFLol.setMKLayoutVisible(mkLayoutVisible);
-				}
+							maFLol.setMKLayoutVisible(mkLayoutVisible);
+						}
 
-				contactsSectionLayout.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			sharesSectionLayout.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-    			cloudSectionLayout.setVisibility(View.GONE);
-    			viewPagerCDrive.setVisibility(View.GONE);
+						contactsSectionLayout.setVisibility(View.GONE);
+						viewPagerContacts.setVisibility(View.GONE);
+						sharesSectionLayout.setVisibility(View.GONE);
+						viewPagerShares.setVisibility(View.GONE);
+						cloudSectionLayout.setVisibility(View.GONE);
+						viewPagerCDrive.setVisibility(View.GONE);
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, maFLol, "maF");
-    			ft.commit();
+						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+						ft.replace(R.id.fragment_container, maFLol, "maF");
+						ft.commit();
 //				getSupportFragmentManager().executePendingTransactions();
 
-    			drawerLayout.closeDrawer(Gravity.LEFT);
+						drawerLayout.closeDrawer(Gravity.LEFT);
 
-				supportInvalidateOptionsMenu();
-				showFabButton();
-    			break;
+						supportInvalidateOptionsMenu();
+						showFabButton();
+						break;
+					}
+				}
+				break;
     		}
     		case TRANSFERS:{
 
@@ -6205,7 +6234,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.ACCOUNT){
-
+			log("MyAccountSection");
+			log("The accountFragment is: "+accountFragment);
     		switch(accountFragment){
 
 	    		case Constants.MY_ACCOUNT_FRAGMENT:{
@@ -6225,8 +6255,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			return;
 	    		}
 	    		case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
+					log("Back to MyAccountFragment");
 	    			if (upAFL != null){
 	    				drawerItem = DrawerItem.ACCOUNT;
+						accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 	    				selectDrawerItemLollipop(drawerItem);
 	    				if (nV != null){
 	    					Menu nVMenu = nV.getMenu();
@@ -9030,6 +9062,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.navigation_drawer_account_view:{
 //				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
 				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
@@ -11905,5 +11938,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setSelectedOfflineNode(MegaOffline selectedOfflineNode) {
 		this.selectedOfflineNode = selectedOfflineNode;
+	}
+
+
+	public int getSelectedPaymentMethod() {
+		return selectedPaymentMethod;
+	}
+
+	public void setSelectedPaymentMethod(int selectedPaymentMethod) {
+		this.selectedPaymentMethod = selectedPaymentMethod;
+	}
+
+	public int getSelectedAccountType() {
+		return selectedAccountType;
+	}
+
+	public void setSelectedAccountType(int selectedAccountType) {
+		this.selectedAccountType = selectedAccountType;
 	}
 }

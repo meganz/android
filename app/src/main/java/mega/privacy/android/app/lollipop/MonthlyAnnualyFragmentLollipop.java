@@ -239,7 +239,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		subscribeLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_subscribe_layout);
 		subscribeLayout.setOnClickListener(this);
 		LinearLayout.LayoutParams subscribeParams = (LinearLayout.LayoutParams) subscribeLayout.getLayoutParams();
-		subscribeParams.height = Util.scaleWidthPx(52, outMetrics);
+		subscribeParams.height = Util.scaleHeightPx(52, outMetrics);
 		subscribeParams.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), 0);
 		subscribeLayout.setLayoutParams(subscribeParams);
 
