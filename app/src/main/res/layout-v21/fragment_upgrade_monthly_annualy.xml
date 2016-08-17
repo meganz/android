@@ -10,13 +10,11 @@
 		android:orientation="vertical">
     
 		<LinearLayout
+			android:id="@+id/linear_layout_monthly_annualy"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
 			android:gravity="center_horizontal"
-			android:layout_marginRight="8dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginTop="8dp"
 			android:elevation="3dp"
 			android:background="@color/white">
 
@@ -40,7 +38,6 @@
 						android:layout_height="wrap_content"
 						android:textAllCaps="true"
 						android:layout_centerHorizontal="true"
-						android:layout_marginBottom="11dp"
 						android:textSize="24sp"/>
 
 					<RelativeLayout
@@ -64,7 +61,6 @@
 							android:textColor="@color/name_my_account"
 							android:layout_toRightOf="@id/monthly_annualy_integer_text"
 							android:layout_alignBottom="@id/monthly_annualy_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp" />
 
 						<TextView
@@ -73,7 +69,6 @@
 							android:layout_height="wrap_content"
 							android:layout_toRightOf="@id/monthly_annualy_decimal_text"
 							android:layout_alignBottom="@id/monthly_annualy_integer_text"
-							android:layout_marginBottom="3dp"
 							android:textSize="14sp"/>
 					</RelativeLayout>
 				</RelativeLayout>
@@ -99,7 +94,7 @@
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true">
 						<TableRow
-							android:layout_marginBottom="25dp">
+							android:id="@+id/upgrade_monthly_annualy_table_row">
 							<TextView
 								android:id="@+id/monthly_annualy_storage_value_integer"
 								android:layout_width="40dp"
@@ -115,6 +110,7 @@
 								android:gravity="right"/>
 
 							<TextView
+								android:id="@+id/monthly_annualy_storage_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -147,6 +143,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
+								android:id="@+id/monthly_annualy_bandwith_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
@@ -173,8 +170,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@drawable/card_corner"
-				android:layout_marginTop="26dp"
-				android:layout_marginBottom="27dp"
 				android:layout_below="@id/upgrade_monthly_annualy_layout_content">
 
 					<TextView
@@ -185,8 +180,7 @@
 					   android:textAllCaps="true"
 					   android:textSize="18sp"
 					   android:textColor="@color/lollipop_primary_color"
-					   android:layout_centerHorizontal="true"
-					   android:layout_marginBottom="9dp" />
+					   android:layout_centerHorizontal="true"/>
 
 					<TextView
 					   android:id="@+id/monthly_annualy_select_comment"
@@ -213,7 +207,6 @@
 					android:id="@+id/monthly_annualy_monthly_layout"
 					android:layout_width="144dp"
 					android:layout_height="match_parent"
-					android:layout_marginRight="8dp"
 					android:gravity="center_vertical">
 
 					<TextView
@@ -246,7 +239,6 @@
 							android:layout_height="wrap_content"
 							android:layout_toRightOf="@id/monthly_annualy_price_monthly_integer_text"
 							android:layout_alignBottom="@id/monthly_annualy_price_monthly_integer_text"
-							android:layout_marginBottom="5dp"
 							android:textSize="16sp"
 							android:textColor="@color/black" />
 					</RelativeLayout>
@@ -289,7 +281,6 @@
 							android:layout_height="wrap_content"
 							android:layout_toRightOf="@id/monthly_annualy_price_annualy_integer_text"
 							android:layout_alignBottom="@id/monthly_annualy_price_annualy_integer_text"
-							android:layout_marginBottom="5dp"
 							android:textColor="@color/black"
 							android:textSize="16sp"/>
 					</RelativeLayout>
@@ -300,7 +291,6 @@
 			<RelativeLayout
 				android:id="@+id/monthly_annualy_subscribe_layout"
 				android:layout_height="52dp"
-				android:layout_marginRight="15dp"
 				android:layout_width="match_parent"
 				android:layout_below="@id/monthly_annualy_buttons_layout"
 				android:gravity="center_vertical">
@@ -326,10 +316,6 @@
 			android:layout_height="wrap_content"
 			android:textSize="14sp"
 			android:text="@string/upgrade_comment"
-			android:layout_marginRight="21dp"
-			android:layout_marginLeft="21dp"
-			android:layout_marginBottom="8dp"
-			android:layout_marginTop="37dp"
 			android:textColor="@color/small_letter_upgrade_account"/>
 
 	</LinearLayout>

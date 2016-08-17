@@ -13,7 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -29,6 +32,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickListener{
+
+	static int HEIGHT_ACCOUNT_LAYOUT=109;
+
 	private TextView title;
 	private TextView perMonth;
 	private TextView priceInteger;
@@ -47,8 +53,23 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	private RelativeLayout subscribeLayout;
 	TextView monthlyLabel;
 	TextView annualyLabel;
+
+	LinearLayout mainLinearLayout;
+	private RelativeLayout leftLayout;
+	private RelativeLayout rightLayout;
+	View verticalDivider;
+	TableRow tableRow;
+	TextView emptyTextStorage;
+	TextView emptyTextBandwidth;
+	LinearLayout buttonsLayout;
+	RelativeLayout monthLayout;
+	RelativeLayout yearLayout;
+
+	RelativeLayout selectPaymentTitle;
 	
 	private TextView selectMonthYear;
+
+	TextView commentText;
 	
 	private ActionBar aB;
 	int selectedSubscription = Constants.PAYMENT_CC_YEAR;
@@ -96,17 +117,62 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		float scaleH = Util.getScaleH(outMetrics, density);
 
 		View v = null;
-		v = inflater.inflate(R.layout.activity_upgrade_monthly_annualy, container, false);
+		v = inflater.inflate(R.layout.fragment_upgrade_monthly_annualy, container, false);
+
+		mainLinearLayout = (LinearLayout) v.findViewById(R.id.linear_layout_monthly_annualy);
+		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mainLinearLayout.getLayoutParams();
+		layoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), 0);
+		mainLinearLayout.setLayoutParams(layoutParams);
+
+		leftLayout = (RelativeLayout) v.findViewById(R.id.upgrade_monthly_annualy_left_side);
+		RelativeLayout.LayoutParams leftLayoutParams = (RelativeLayout.LayoutParams) leftLayout.getLayoutParams();
+		leftLayoutParams.width = Util.scaleWidthPx(125, outMetrics);
+		leftLayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
+		leftLayout.setLayoutParams(leftLayoutParams);
 		
 		title = (TextView) v.findViewById(R.id.monthly_annualy_title_text);
+		RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) title.getLayoutParams();
+		titleParams.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
+		title.setLayoutParams(titleParams);
+
 		perMonth = (TextView) v.findViewById(R.id.monthly_annualy_per_month_text);
 		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		RelativeLayout.LayoutParams perMonthParams = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
+		perMonthParams.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+		perMonth.setLayoutParams(perMonthParams);
+
 		priceInteger = (TextView) v.findViewById(R.id.monthly_annualy_integer_text);
 		priceDecimal = (TextView) v.findViewById(R.id.monthly_annualy_decimal_text);
+		RelativeLayout.LayoutParams priceDecimalParams = (RelativeLayout.LayoutParams) priceDecimal.getLayoutParams();
+		priceDecimalParams.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+		priceDecimal.setLayoutParams(priceDecimalParams);
+
 		priceMonthlyInteger = (TextView) v.findViewById(R.id.monthly_annualy_price_monthly_integer_text);
 		priceMonthlyDecimal = (TextView) v.findViewById(R.id.monthly_annualy_price_monthly_decimal_text);
+		RelativeLayout.LayoutParams priceMonthlyParams = (RelativeLayout.LayoutParams) priceMonthlyDecimal.getLayoutParams();
+		priceMonthlyParams.setMargins(0,0,0,Util.scaleHeightPx(5, outMetrics));
+		priceMonthlyDecimal.setLayoutParams(priceMonthlyParams);
+
 		priceAnnualyInteger = (TextView) v.findViewById(R.id.monthly_annualy_price_annualy_integer_text);
 		priceAnnualyDecimal = (TextView) v.findViewById(R.id.monthly_annualy_price_annualy_decimal_text);
+		RelativeLayout.LayoutParams priceAnnualParams = (RelativeLayout.LayoutParams) priceAnnualyDecimal.getLayoutParams();
+		priceAnnualParams.setMargins(0,0,0,Util.scaleHeightPx(5, outMetrics));
+		priceAnnualyDecimal.setLayoutParams(priceAnnualParams);
+
+		verticalDivider = (View) v.findViewById(R.id.upgrade_monthly_annualy_vertical_divider);
+		verticalDivider.getLayoutParams().width = Util.scaleWidthPx(2, outMetrics);
+		verticalDivider.getLayoutParams().height = Util.scaleHeightPx(86, outMetrics);
+
+		rightLayout = (RelativeLayout) v.findViewById(R.id.upgrade_monthly_annualy_layout_right_side);
+		RelativeLayout.LayoutParams rightLayoutParams = (RelativeLayout.LayoutParams) rightLayout.getLayoutParams();
+		rightLayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
+		rightLayout.setLayoutParams(rightLayoutParams);
+
+		tableRow = (TableRow) v.findViewById(R.id.upgrade_monthly_annualy_table_row);
+		TableLayout.LayoutParams tableRowParams = (TableLayout.LayoutParams) tableRow.getLayoutParams();
+		tableRowParams.setMargins(0,0,0,Util.scaleHeightPx(25, outMetrics));
+		tableRow.setLayoutParams(tableRowParams);
+
 		selectComment = (TextView) v.findViewById(R.id.monthly_annualy_select_comment);
 		priceMonthlyLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_monthly_layout);
 		priceAnnualyLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_annualy_layout);
@@ -120,14 +186,67 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		priceAnnualyLayout.setOnClickListener(this);
 		
 		storageInteger = (TextView) v.findViewById(R.id.monthly_annualy_storage_value_integer);
+		TableRow.LayoutParams storageValueParams = (TableRow.LayoutParams) storageInteger.getLayoutParams();
+		storageValueParams.width = Util.scaleWidthPx(40, outMetrics);
+		storageInteger.setLayoutParams(storageValueParams);
+
+		emptyTextStorage = (TextView) v.findViewById(R.id.monthly_annualy_storage_empty_text);
+		TableRow.LayoutParams emptyTextParams = (TableRow.LayoutParams) emptyTextStorage.getLayoutParams();
+		emptyTextParams.width = Util.scaleWidthPx(12, outMetrics);
+		emptyTextStorage.setLayoutParams(emptyTextParams);
+
 		storageGb = (TextView) v.findViewById(R.id.monthly_annualy_storage_value_gb);
+
 		bandwidthInteger = (TextView) v.findViewById(R.id.monthly_annualy_bandwidth_value_integer);
+		TableRow.LayoutParams bandwidthValueParams = (TableRow.LayoutParams) bandwidthInteger.getLayoutParams();
+		bandwidthValueParams.width = Util.scaleWidthPx(40, outMetrics);
+		bandwidthInteger.setLayoutParams(bandwidthValueParams);
+
+		emptyTextBandwidth = (TextView) v.findViewById(R.id.monthly_annualy_bandwith_empty_text);
+		TableRow.LayoutParams emptyTextBandwidthParams = (TableRow.LayoutParams) emptyTextBandwidth.getLayoutParams();
+		emptyTextBandwidthParams.width = Util.scaleWidthPx(12, outMetrics);
+		emptyTextBandwidth.setLayoutParams(emptyTextBandwidthParams);
+
 		bandwidthTb = (TextView) v.findViewById(R.id.monthly_annualy_bandwith_value_tb);
+
+		selectPaymentTitle = (RelativeLayout) v.findViewById(R.id.monthly_annualy_layout_select_inside);
+		LinearLayout.LayoutParams paymentTitleParams = (LinearLayout.LayoutParams) selectPaymentTitle.getLayoutParams();
+		paymentTitleParams.setMargins(0, Util.scaleHeightPx(26, outMetrics), 0, Util.scaleHeightPx(27, outMetrics));
+		selectPaymentTitle.setLayoutParams(paymentTitleParams);
 		
 		selectMonthYear = (TextView) v.findViewById(R.id.monthly_annualy_select);
+		RelativeLayout.LayoutParams textPaymentParams = (RelativeLayout.LayoutParams) selectMonthYear.getLayoutParams();
+		textPaymentParams.setMargins(0, 0, 0, Util.scaleHeightPx(9, outMetrics));
+		selectMonthYear.setLayoutParams(textPaymentParams);
+
+		buttonsLayout = (LinearLayout) v.findViewById(R.id.monthly_annualy_buttons_layout);
+		LinearLayout.LayoutParams buttonsLayoutParams = (LinearLayout.LayoutParams) buttonsLayout.getLayoutParams();
+		buttonsLayoutParams.height = Util.scaleHeightPx(128, outMetrics);
+		buttonsLayout.setLayoutParams(buttonsLayoutParams);
+
+		monthLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_monthly_layout);
+		LinearLayout.LayoutParams monthLayoutParams = (LinearLayout.LayoutParams) monthLayout.getLayoutParams();
+		monthLayoutParams.width = Util.scaleWidthPx(144, outMetrics);
+		monthLayoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), 0, 0, 0);
+		monthLayout.setLayoutParams(monthLayoutParams);
+
+		yearLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_monthly_layout);
+		LinearLayout.LayoutParams yearLayoutParams = (LinearLayout.LayoutParams) yearLayout.getLayoutParams();
+		yearLayoutParams.width = Util.scaleWidthPx(144, outMetrics);
+		yearLayoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), 0, 0, 0);
+		yearLayout.setLayoutParams(yearLayoutParams);
 
 		subscribeLayout = (RelativeLayout) v.findViewById(R.id.monthly_annualy_subscribe_layout);
 		subscribeLayout.setOnClickListener(this);
+		LinearLayout.LayoutParams subscribeParams = (LinearLayout.LayoutParams) subscribeLayout.getLayoutParams();
+		subscribeParams.height = Util.scaleWidthPx(52, outMetrics);
+		subscribeParams.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), 0);
+		subscribeLayout.setLayoutParams(subscribeParams);
+
+		commentText = (TextView) v.findViewById(R.id.monthly_annualy_layout_subscribe_comment_text);
+		LinearLayout.LayoutParams commentParams = (LinearLayout.LayoutParams) commentText.getLayoutParams();
+		commentParams.setMargins(Util.scaleWidthPx(21, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(21, outMetrics), Util.scaleHeightPx(8, outMetrics));
+		commentText.setLayoutParams(commentParams);
 
 		setPricing();
 
