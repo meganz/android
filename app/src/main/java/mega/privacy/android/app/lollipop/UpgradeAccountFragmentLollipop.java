@@ -819,7 +819,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			fortumoLayout.setVisibility(View.GONE);
 			centiliLayout.setVisibility(View.GONE);
 
-			showPaymentMethods(Constants.PRO_LITE);
+			showPaymentMethods(account);
 
 			refreshAccountInfo();
 			log("END refreshAccountInfo");
