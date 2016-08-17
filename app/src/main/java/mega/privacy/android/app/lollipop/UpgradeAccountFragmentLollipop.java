@@ -513,6 +513,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		//END -- PRO III ACCOUNT
 
 		setPricing();
+		log("setPricing ENDS");
 		showAvailableAccount();
 
 		refreshAccountInfo();
@@ -654,9 +655,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 			}
 		}
+		else{
+			log("MyAccountInfo is Null");
+		}
 	}
 	
 	public void showAvailableAccount(){
+		log("showAvailableAccount");
+
+		if(myAccountInfo==null){
+			log("MyAccountInfo is NULL");
+			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+		}
+
 		log("checkAvailableAccount: "+myAccountInfo.getAccountType());
 
 		switch(myAccountInfo.getAccountType()){
@@ -943,6 +954,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		else{
 			parameterType=0;
 		}
+		((ManagerActivityLollipop)context).setSelectedAccountType(parameterType);
+		((ManagerActivityLollipop)context).setSelectedPaymentMethod(paymentMethod);
 		((ManagerActivityLollipop)context).showmyF(paymentMethod, parameterType);
 	}
 
