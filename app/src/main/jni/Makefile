@@ -53,7 +53,7 @@ OPENSSL_CONFIGURED=openssl/openssl/lib/libcrypto.a
 OPENSSL_PREFIX=$(JNI_PATH)/$(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)
 
 SODIUM=sodium
-SODIUM_VERSION=1.0.9
+SODIUM_VERSION=1.0.10
 SODIUM_SOURCE_FILE=libsodium-$(SODIUM_VERSION).tar.gz
 SODIUM_SOURCE_FOLDER=libsodium-$(SODIUM_VERSION)
 SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/$(SODIUM_SOURCE_FILE)
@@ -77,7 +77,7 @@ all: $(CRYPTOPP) $(CURL) $(SQLITE) $(LIBUV) $(MEGA)
 
 $(OPENSSL): $(OPENSSL_CONFIGURED)
 
-$(OPENSSL_CONFIGURED): $(OPENSSL_VERIFIED_SOURCES)
+$(OPENSSL_CONFIGURED): $(OPENSSL_VERIFIED_SOURCES) $(SODIUM)
 	cd $(OPENSSL)/; tar --overwrite -xf $(OPENSSL_SOURCE_FILE)
 	ln -sf $(OPENSSL_SOURCE_FOLDER) $(OPENSSL)/$(OPENSSL)
 	ln -sf $(LIBDIR) $(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)/lib
@@ -151,8 +151,9 @@ $(SODIUM_BUILT): $(SODIUM_VERIFIED_SOURCES)
 	cd $(SODIUM)/$(SODIUM) && ./autogen.sh
 	cd $(SODIUM)/$(SODIUM) && export ANDROID_NDK_HOME=$(NDK_ROOT) && dist-build/android-x86.sh
 	cd $(SODIUM)/$(SODIUM) && export ANDROID_NDK_HOME=$(NDK_ROOT) && dist-build/android-arm.sh
-	ln -sf libsodium-android-arm $(SODIUM)/$(SODIUM)/libsodium-android-armeabi
-	ln -sf libsodium-android-arm $(SODIUM)/$(SODIUM)/libsodium-android-armeabi-v7
+	ln -sf libsodium-android-armv6 $(SODIUM)/$(SODIUM)/libsodium-android-armeabi
+	ln -sf libsodium-android-armv6 $(SODIUM)/$(SODIUM)/libsodium-android-armeabi-v7
+	ln -sf libsodium-android-i686 $(SODIUM)/$(SODIUM)/libsodium-android-x86
 	touch $(SODIUM_BUILT)
 
 $(SODIUM_VERIFIED_SOURCES):
