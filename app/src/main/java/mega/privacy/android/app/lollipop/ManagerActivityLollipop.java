@@ -3576,6 +3576,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.commit();
 		}
 
+		invalidateOptionsMenu();
+		showFabButton();
+
 		if(type!=-1){
 			switch(type){
 				case Constants.PRO_LITE:{
@@ -4287,8 +4290,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    else if (drawerItem == DrawerItem.ACCOUNT){
 			log("createOptions ACCOUNT");
-			if (maFLol != null){
-				if (createFolderMenuItem != null) {
+
+			if (createFolderMenuItem != null) {
+
+				//Hide
+				helpMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_24");
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				selectMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				settingsMenuItem.setVisible(false);
+				cancelAllTransfersMenuItem.setVisible(false);
+				gridSmallLargeMenuItem.setVisible(false);
+
+				if(accountFragment==Constants.MY_ACCOUNT_FRAGMENT){
 					//Show
 					refreshMenuItem.setVisible(true);
 					killAllSessions.setVisible(true);
@@ -4308,31 +4333,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						removeMK.setVisible(false);
 						exportMK.setVisible(true);
 					}
-
-					//Hide
-					helpMenuItem.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_24");
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
-					selectMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);
-					settingsMenuItem.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
-
 					if (myAccountInfo.getNumberOfSubscriptions() > 0) {
 						cancelSubscription.setVisible(true);
 					}
+					else{
+						cancelSubscription.setVisible(false);
+					}
 
-					gridSmallLargeMenuItem.setVisible(false);
+				}
+				else{
+
+					refreshMenuItem.setVisible(true);
+					killAllSessions.setVisible(false);
+					upgradeAccountMenuItem.setVisible(false);
+					changePass.setVisible(false);
+					logoutMenuItem.setVisible(true);
+					forgotPassMenuItem.setVisible(false);
+
+					cancelSubscription.setVisible(false);
+					removeMK.setVisible(false);
+					exportMK.setVisible(false);
 				}
 			}
 		}
@@ -8756,7 +8776,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-//				usedPerc=96;
 		if(myAccountInfo.getUsedPerc()>=95){
 			showOverquotaPanel();
 		}
@@ -8770,6 +8789,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+//		showOverquotaPanel();
 
 		if (getUsedPerc() < 90){
 			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
