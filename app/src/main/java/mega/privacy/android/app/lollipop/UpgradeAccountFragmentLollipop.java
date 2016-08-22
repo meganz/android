@@ -518,6 +518,28 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		refreshAccountInfo();
 
+		int displayedAccountType = ((ManagerActivityLollipop)context).getDisplayedAccountType();
+		log("displayedAccountType: "+displayedAccountType);
+		if(displayedAccountType!=-1){
+			switch(displayedAccountType){
+				case Constants.PRO_LITE:{
+					onUpgradeClick(Constants.PRO_LITE);
+					break;
+				}
+				case Constants.PRO_I:{
+					onUpgradeClick(Constants.PRO_I);
+					break;
+				}
+				case Constants.PRO_II:{
+					onUpgradeClick(Constants.PRO_II);
+					break;
+				}
+				case Constants.PRO_III:{
+					onUpgradeClick(Constants.PRO_III);
+					break;
+				}
+			}
+		}
 		return v;
 	}
 
@@ -652,6 +674,29 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 					proLiteBandwidthInteger.setText("" + account.getTransfer() / 1024);
 					proLiteBandwidthTb.setText(" TB");
+				}
+			}
+
+			int displayedAccountType = ((ManagerActivityLollipop)context).getDisplayedAccountType();
+			log("displayedAccountType: "+displayedAccountType);
+			if(displayedAccountType!=-1){
+				switch(displayedAccountType){
+					case Constants.PRO_LITE:{
+						onUpgradeClick(Constants.PRO_LITE);
+						break;
+					}
+					case Constants.PRO_I:{
+						onUpgradeClick(Constants.PRO_I);
+						break;
+					}
+					case Constants.PRO_II:{
+						onUpgradeClick(Constants.PRO_II);
+						break;
+					}
+					case Constants.PRO_III:{
+						onUpgradeClick(Constants.PRO_III);
+						break;
+					}
 				}
 			}
 		}
@@ -875,6 +920,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					break;
 				}
 			}
+		}
+		else{
+			log("PaymentBitSet Null");
 		}
 	}
 

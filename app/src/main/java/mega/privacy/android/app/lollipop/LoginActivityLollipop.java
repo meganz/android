@@ -79,6 +79,7 @@ public class LoginActivityLollipop extends Activity{
 			visibleFragment = 1;
 		}
 
+//		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
 		showFragment(visibleFragment);
 	}
 

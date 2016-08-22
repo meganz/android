@@ -651,4 +651,6 @@
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor termine a sessão antes de criar a conta</string>
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Os registos estão agora activos</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Os registos estão agora inactivos</string>
+
+    <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limitado</string>
 </resources>

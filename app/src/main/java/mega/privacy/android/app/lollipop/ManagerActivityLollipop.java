@@ -257,6 +257,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
+	int displayedAccountType;
 
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
@@ -1635,37 +1636,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								firstTimeCam = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								setIntent(null);
+								displayedAccountType = -1;
 								return;
 							}
 							case Constants.PRO_I:{
 								drawerItem = DrawerItem.ACCOUNT;
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
+								displayedAccountType = Constants.PRO_I;
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_I);
 								return;
 							}
 							case Constants.PRO_II:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_II);
+								displayedAccountType = Constants.PRO_II;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case Constants.PRO_III:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								selectAccountDisplayed(Constants.PRO_III);
+								displayedAccountType = Constants.PRO_III;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case Constants.PRO_LITE:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_LITE);
+								displayedAccountType = Constants.PRO_LITE;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 						}
@@ -1699,39 +1702,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								log("intent firstTime==true");
 								firstTimeCam = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
+								displayedAccountType = -1;
 								setIntent(null);
 								return;
 							}
 							case Constants.PRO_I:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_I);
+								displayedAccountType = Constants.PRO_I;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case Constants.PRO_II:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_II);
+								displayedAccountType = Constants.PRO_II;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case Constants.PRO_III:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_III);
+								displayedAccountType = Constants.PRO_III;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 							case Constants.PRO_LITE:{
 								drawerItem = DrawerItem.ACCOUNT;
-								selectDrawerItemLollipop(drawerItem);
+								accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
-								showUpAF();
-								selectAccountDisplayed(Constants.PRO_LITE);
+								displayedAccountType = Constants.PRO_LITE;
+								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
 						}
@@ -3321,7 +3325,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 						log("Show upgrade FRAGMENT");
 						showUpAF();
-						showFabButton();
 						break;
 					}
 					case Constants.MONTHLY_YEARLY_FRAGMENT:{
@@ -3609,32 +3612,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		invalidateOptionsMenu();
 		showFabButton();
-	}
-
-	public void selectAccountDisplayed (int type){
-		log("selectAccountDisplayed");
-		if(upAFL!=null){
-			if(type!=-1){
-				switch(type){
-					case Constants.PRO_LITE:{
-						upAFL.onUpgradeClick(Constants.PRO_LITE);
-						break;
-					}
-					case Constants.PRO_I:{
-						upAFL.onUpgradeClick(Constants.PRO_I);
-						break;
-					}
-					case Constants.PRO_II:{
-						upAFL.onUpgradeClick(Constants.PRO_II);
-						break;
-					}
-					case Constants.PRO_III:{
-						upAFL.onUpgradeClick(Constants.PRO_III);
-						break;
-					}
-				}
-			}
-		}
 	}
 
 	@Override
@@ -5909,7 +5886,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
-	        	showUpAF();
+				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
+				displayedAccountType = -1;
+				selectDrawerItemLollipop(drawerItem);
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
@@ -6347,13 +6327,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		}
 	    		case Constants.CC_FRAGMENT:{
 	    			if (ccFL != null){
-	    				int parameterType = ccFL.getParameterType();
-						showUpAF();
-						selectAccountDisplayed(parameterType);
+						displayedAccountType = ccFL.getParameterType();
 	    			}
-	    			else{
-	    				showUpAF();
-	    			}
+					showUpAF();
 	    			return;
 	    		}
 	    		case Constants.OVERQUOTA_ALERT:{
@@ -9133,7 +9109,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				outSpaceLayout.setVisibility(View.GONE);
 				getProLayout.setVisibility(View.GONE);
-				showUpAF();
+				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
+				displayedAccountType = -1;
+				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 
@@ -12040,5 +12019,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setSelectedAccountType(int selectedAccountType) {
 		this.selectedAccountType = selectedAccountType;
+	}
+
+
+	public int getDisplayedAccountType() {
+		return displayedAccountType;
+	}
+
+	public void setDisplayedAccountType(int displayedAccountType) {
+		this.displayedAccountType = displayedAccountType;
 	}
 }

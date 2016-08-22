@@ -147,7 +147,6 @@
 								android:layout_height="wrap_content"
 								android:gravity="right"
 								android:textAllCaps="true"
-								android:text="@string/limited_bandwith"
 								android:textColor="@color/green_free_account"
 								android:textSize="14sp"/>
 

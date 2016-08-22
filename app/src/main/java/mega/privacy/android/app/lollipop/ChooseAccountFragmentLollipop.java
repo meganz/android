@@ -262,13 +262,13 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         TextView perMonth = (TextView) v.findViewById(R.id.choose_account_free_per_month_text);
         perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
         RelativeLayout.LayoutParams perMonthParams = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
-        perMonthParams.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+        perMonthParams.setMargins(0,0,0,Util.scaleHeightPx(4, outMetrics));
         perMonth.setLayoutParams(perMonthParams);
 
         freePriceInteger = (TextView) v.findViewById(R.id.choose_account_free_integer_text);
         freePriceDecimal = (TextView) v.findViewById(R.id.choose_account_free_decimal_text);
         RelativeLayout.LayoutParams priceDecimalParams = (RelativeLayout.LayoutParams) freePriceDecimal.getLayoutParams();
-        priceDecimalParams.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+        priceDecimalParams.setMargins(0,0,0,Util.scaleHeightPx(4, outMetrics));
         freePriceDecimal.setLayoutParams(priceDecimalParams);
 
         freeStorageInteger = (TextView) v.findViewById(R.id.choose_account_free_storage_value_integer);
@@ -722,8 +722,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             freePriceInteger.setText("0");
             freePriceDecimal.setText("." + "00 €");
 
-            freeStorageInteger.setText("50");
-            freeStorageGb.setText(" GB");
+            freeStorageInteger.setVisibility(View.GONE);
+            freeStorageGb.setText("50 GB");
+
+            freeBandwidthInteger.setVisibility(View.GONE);
+            freeBandwidthTb.setText(getString(R.string.limited_bandwith));
 
             for (int i=0;i<p.getNumProducts();i++){
                 log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
