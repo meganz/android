@@ -822,4 +822,6 @@
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">La cuenta de usuario asociada ha sido eliminada debido a múltiples violaciones de nuestros TdS/PUA.</string>
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">La clave de cifrado introducida para este link es incorrecta.</string>
+
+    <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Mis credenciales</string>
 </resources>
