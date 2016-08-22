@@ -2711,6 +2711,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			tB.setVisibility(View.VISIBLE);
 
+				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
     				cuFL = new CameraUploadFragmentLollipop();
     				cuFL.setIsList(isListCameraUploads);
@@ -2729,9 +2730,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			sharesSectionLayout.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, cuFL, "cuFLol");
-    			ft.commit();
+
+				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+				if (currentFragment != null) {
+					fragTransaction.detach(currentFragment);
+					fragTransaction.commit();
+
+					fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.attach(currentFragment);
+					fragTransaction.commit();
+				}
+				else{
+					fragTransaction.replace(R.id.fragment_container, cuFL, "cuFLol");
+					fragTransaction.commit();
+				}
 
     			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
