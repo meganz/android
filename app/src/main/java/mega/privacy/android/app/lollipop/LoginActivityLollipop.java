@@ -13,10 +13,8 @@ import android.view.Display;
 import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.CreateAccountFragmentLollipop;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.LoginFragmentLollipop;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.utils.Constants;
