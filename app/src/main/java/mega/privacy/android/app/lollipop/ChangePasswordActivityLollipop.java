@@ -513,6 +513,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
 
 					if(e.getErrorCode()==MegaError.API_EARGS){
@@ -537,6 +538,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 					//Intent to Login
 					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+					resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
 					resetPassIntent.putExtra("RESULT", 0);
 					startActivity(resetPassIntent);

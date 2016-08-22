@@ -443,6 +443,14 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
+
+	@Override
+	public void onAttach(Context context) {
+		log("onAttach");
+		super.onAttach(context);
+		this.context = context;
+		aB = ((AppCompatActivity)context).getSupportActionBar();
+	}
 	
 	@Override
 	public void onClick(View v) {
@@ -769,6 +777,26 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		this.parentHandle = parentHandle;
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
+		}
+	}
+
+	public void refresh(){
+		log("refresh");
+		if(parentHandle==-1){
+			nodes = megaApi.search(searchQuery);
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode!=null){
+				log("parentNode: "+parentNode.getName());
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+			}
+		}
+		setNodes(nodes);
+
+		if(adapter != null){
+			adapter.notifyDataSetChanged();
 		}
 	}
 	

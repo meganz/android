@@ -512,15 +512,18 @@ public class Util {
         
         File[] files = dir.listFiles();
 
-        for (File file : files) {
-            if (file.isFile()) {
-                size += file.length();
-            }
-            else{
-                size += getDirSize(file);
-            }
-        }
-
+		if(files !=null){
+			for (File file : files) {
+				if (file.isFile()) {
+					size += file.length();
+				}
+				else{
+					size += getDirSize(file);
+				}
+			}
+			return size;
+		}
+		log("Files is NULL");
         return size;
     }
 	
@@ -540,18 +543,23 @@ public class Util {
     }
     
     private static void cleanDir(File dir) {
-        File[] files = dir.listFiles();       
-        
-        for (File file : files) {
-            
-            if (file.isFile()) {
-            	file.delete();
-            }
-            else{
-            	cleanDir(file);
-            	file.delete();
-            }            
-        }
+        File[] files = dir.listFiles();
+
+		if(files !=null){
+			for (File file : files) {
+
+				if (file.isFile()) {
+					file.delete();
+				}
+				else{
+					cleanDir(file);
+					file.delete();
+				}
+			}
+		}
+		else{
+			log("Files is NULL");
+		}
     }
     
     public static String getCacheSize(Context context){
@@ -621,49 +629,62 @@ public class Util {
 	public static void setFileLogger(boolean fL){
 		fileLogger = fL;
 	}
+
+	public static boolean getFileLogger(){
+		return fileLogger;
+	}
 	
 	/*
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
+
+//		try {
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//			String currentDateandTime = sdf.format(new Date());
+//
+//			message = "(" + currentDateandTime + ") - " + message;
+//		}
+//		catch (Exception e){}
+
 		File logFile=null;
 		if (DEBUG) {
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
 		}
 
-		if (fileLogger) {
-			//Send the log to a file
-
-			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
-			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
-			File dirFile = new File(dir);
-			if (!dirFile.exists()) {
-				dirFile.mkdirs();
-				logFile = new File(dirFile, "log.txt");
-				if (!logFile.exists()) {
-					try {
-						logFile.createNewFile();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			} else {
-				logFile = new File(dirFile, "log.txt");
-				if (!logFile.exists()) {
-					try {
-						logFile.createNewFile();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-
-			if (logFile != null && logFile.exists()) {
-				appendStringToFile(origin + ": " + message + "\n", logFile);
-			}
-		}
+//		if (fileLogger) {
+//			//Send the log to a file
+//
+//			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
+//			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
+//			File dirFile = new File(dir);
+//			if (!dirFile.exists()) {
+//				dirFile.mkdirs();
+//				logFile = new File(dirFile, "log.txt");
+//				if (!logFile.exists()) {
+//					try {
+//						logFile.createNewFile();
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			} else {
+//				logFile = new File(dirFile, "log.txt");
+//				if (!logFile.exists()) {
+//					try {
+//						logFile.createNewFile();
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			if (logFile != null && logFile.exists()) {
+//				appendStringToFile(origin + ": " + message + "\n", logFile);
+//			}
+//		}
 	}
 	
 	public static boolean appendStringToFile(final String appendContents, final File file) {
@@ -1495,14 +1516,12 @@ public class Util {
 	}
 	
 	public static int scaleHeightPx(int px, DisplayMetrics metrics){
-		log("scaleHeightPx");
 		int myHeightPx = metrics.heightPixels;
 		
 		return px*myHeightPx/548; //Based on Eduardo's measurements				
 	}
 	
 	public static int scaleWidthPx(int px, DisplayMetrics metrics){
-
 		int myWidthPx = metrics.widthPixels;
 		
 		return px*myWidthPx/360; //Based on Eduardo's measurements		

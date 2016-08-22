@@ -228,6 +228,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 							return START_NOT_STICKY;
 
 						}
+						else{
+							log("Localpath: " + localPath);
+						}
 					}
 
 					boolean isWifi = Util.isOnWifi(this);
@@ -802,15 +805,16 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 					while(cursorCamera.moveToNext()){
 
-						log("while(cursorCamera.moveToNext())");
 						Media media = new Media();
 						media.filePath = cursorCamera.getString(dataColumn);
 						//			        log("Tipo de fichero:--------------------------: "+media.filePath);
 						media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
 
+						log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + localPath);
+
 						//Check files of the Camera Uploads
 						if (checkFile(media,localPath)){
-							log("if (checkFile(media,localPath))");
+							log("if (checkFile(media," + localPath + "))");
 							cameraFiles.add(media);
 							log("Camera Files added: "+media.filePath);
 						}
@@ -2125,20 +2129,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		log("transfer.getNodeHandle:" + transfer.getNodeHandle());
-		if (isExternalSDCard){
-			File fileToDelete = new File(transfer.getPath());
-			if (fileToDelete != null){
-				if (fileToDelete.exists()){
-					fileToDelete.delete();
-				}
-			}
-		}
+
 		if (canceled) {
 			log("Image sync cancelled: " + transfer.getFileName());
 			if((lock != null) && (lock.isHeld()))
 				try{ lock.release(); } catch(Exception ex) {}
 			if((wl != null) && (wl.isHeld()))
 				try{ wl.release(); } catch(Exception ex) {}
+
+			if (isExternalSDCard){
+				File fileToDelete = new File(transfer.getPath());
+				if (fileToDelete != null){
+					if (fileToDelete.exists()){
+						fileToDelete.delete();
+					}
+				}
+			}
+
 			CameraSyncService.this.cancel();
 		}
 		else{
@@ -2191,6 +2198,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 				else{
 					log("NOT video!");
+				}
+
+				if (isExternalSDCard){
+					File fileToDelete = new File(transfer.getPath());
+					if (fileToDelete != null){
+						if (fileToDelete.exists()){
+							fileToDelete.delete();
+						}
+					}
 				}
 
 //				dbH.setCamSyncTimeStamp(currentTimeStamp);

@@ -15,8 +15,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -24,8 +27,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -65,7 +68,7 @@ import nz.mega.sdk.MegaUser;
 
 public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
-	FrameLayout fragmentContainer;
+	CoordinatorLayout fragmentContainer;
     
     String userEmail;
 
@@ -74,6 +77,8 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	ContactPropertiesFragmentLollipop cpF;
 	ContactFileListFragmentLollipop cflF;
+
+	CoordinatorLayout coodinatorLayout;
 
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
@@ -107,9 +112,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	private List<ShareInfo> filePreparedInfos;
 
+	Toolbar tB;
+	ActionBar aB;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		log("onCreate first");
 		super.onCreate(savedInstanceState);
 
 		if (megaApi == null){
@@ -135,12 +144,42 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 			setContentView(R.layout.activity_main_contact_properties);
 
-			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_myaccount);
+			coodinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
+			coodinatorLayout.setFitsSystemWindows(false);
+
+			//Set toolbar
+			tB = (Toolbar) findViewById(R.id.toolbar_main_contact_properties);
+			if(tB==null){
+				log("Toolbar is NULL");
+			}
+//			tB.setPadding(0,getStatusBarHeight(),0,0);
+			tB.setTitle(getString(R.string.contact_shared_files));
+			setSupportActionBar(tB);
+			aB = getSupportActionBar();
+			if(aB!=null){
+				aB.setDisplayHomeAsUpEnabled(true);
+				aB.setDisplayShowHomeEnabled(true);
+				aB.hide();
+			}
+			else{
+				log("aB is NULL!!!!");
+			}
+
+			fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_contact_properties);
 			
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
 		}
 		
+	}
+
+	public int getStatusBarHeight() {
+		int result = 0;
+		int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			result = getResources().getDimensionPixelSize(resourceId);
+		}
+		return result;
 	}
 
 	@Override
@@ -191,27 +230,46 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public void selectContactFragment(int currentFragment){
+		log("selectContactFragment: "+currentFragment);
 		switch(currentFragment){
 			case CONTACT_PROPERTIES:{
 				if (cpF == null){
 					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
+				coodinatorLayout.setFitsSystemWindows(false);
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
 	
 				break;
 			}
 			case CONTACT_FILE_LIST:{
+				log("Shared Folders are:");
+				coodinatorLayout.setFitsSystemWindows(true);
+				aB.show();
+
 				if (cflF == null){
 					cflF = new ContactFileListFragmentLollipop();
 				}
 				cflF.setUserEmail(userEmail);
 	
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
-	
+				coodinatorLayout.invalidate();
 				break;
 			}
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelectedLollipop");
+		int id = item.getItemId();
+		switch (id) {
+			case android.R.id.home: {
+				onBackPressed();
+				break;
+			}
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	public void leaveIncomingShare (MegaNode n){
@@ -295,31 +353,22 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenu----------------------------------");
 
-		//		 if(contactPropertiesVisible){				
-		//				log("Es visible ContactProperties--------------");
-		//				
-		//		}
-		//		else{
-		//			log("Es visible ContacFileListProperties-----------------");
-		//			
-		//		}
-
 		if(cflF!=null){
 			if(cflF.isVisible()){
-				log("Es visible ContacFileListProperties");
-				shareMenuItem.setVisible(true);		
-				viewSharedItem.setVisible(false);
-				//					shareMenuItem.setVisible(true);		
-				//					viewSharedItem.setVisible(false);
+				log("visible ContacFileListProperties");
+				if(shareMenuItem!=null){
+					shareMenuItem.setVisible(true);
+					viewSharedItem.setVisible(false);
+				}
 			}
 		}		
 		if(cpF!=null){
 			if(cpF.isVisible()){
-				log("Es visible ContactProperties");
-				shareMenuItem.setVisible(true);		
-				viewSharedItem.setVisible(true);
-				//					shareMenuItem.setVisible(true);		
-				//					viewSharedItem.setVisible(true);
+				log("visible ContactProperties");
+				if(shareMenuItem!=null){
+					shareMenuItem.setVisible(true);
+					viewSharedItem.setVisible(true);
+				}
 			}
 		}	
 
@@ -665,7 +714,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	public void showRenameDialog(final MegaNode document, String text) {
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -1055,6 +1103,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		if (cflF != null){
 			if (cflF.isVisible()){
 				if (cflF.onBackPressed() == 0){
+					log("onBackPressed == 0");
 					selectContactFragment(CONTACT_PROPERTIES);
 					return;
 				}

@@ -454,10 +454,27 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	@Override
 	public void onAttach(Activity activity) {
+		log("deprecated onAttach");
 		super.onAttach(activity);
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
-	}	
+		if(aB!=null){
+			log("aB hide attach activity");
+			aB.hide();
+		}
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		log("onAttach");
+		super.onAttach(context);
+		this.context = context;
+		aB = ((AppCompatActivity)context).getSupportActionBar();
+		if(aB!=null){
+			log("aB hide attach context");
+			aB.hide();
+		}
+	}
 
 	@Override
 	public void onClick(View v) {

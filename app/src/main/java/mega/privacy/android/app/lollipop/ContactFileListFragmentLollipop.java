@@ -93,8 +93,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	
-	ImageView toolbarBack;
 
 	MegaUser contact;
 	ArrayList<MegaNode> contactNodes;
@@ -166,10 +164,10 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	        int position = listView.getChildPosition(view);
 
 	        // handle long press
-			if (adapter.getPositionClicked() == -1){
+			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
+
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		        itemClick(position);
 			}  
@@ -354,28 +352,14 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_file_list, container, false);
 
-			if (aB != null){
-				aB.setTitle(R.string.contact_shared_files);
-				aB.setLogo(R.drawable.ic_action_navigation_accept_white);
-			}
-			
 			mainLayout = (RelativeLayout) v.findViewById(R.id.contact_file_list);
-			FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mainLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, 0);
-			
+
 			nameView = (TextView) v.findViewById(R.id.contact_file_list_name);
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_file_list_thumbnail);
 			contactInitialLetter = (TextView) v.findViewById(R.id.contact_file_list_initial_letter);
 			textViewContent = (TextView) v.findViewById(R.id.contact_file_list_content);
 			contactLayout = (RelativeLayout) v.findViewById(R.id.contact_file_list_contact_layout);
 			contactLayout.setOnClickListener(this);
-			
-			toolbarBack = (ImageView) v.findViewById(R.id.contact_file_list_toolbar_back);
-			RelativeLayout.LayoutParams paramsBack = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
-			paramsBack.setMargins(leftMarginBack, 0, 0, 0);
-			toolbarBack.setLayoutParams(paramsBack);
-			toolbarBack.setOnClickListener(this);
 
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
@@ -701,7 +685,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			adapter.setParentHandle(parentHandle);
 			if (aB != null){
 				aB.setTitle(R.string.contact_shared_files);
-				aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 			}
 			setNodes(megaApi.getInShares(contact));
 		}
@@ -909,7 +892,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 
 				if (aB != null){
 					aB.setTitle(n.getName());
-					aB.setLogo(R.drawable.ic_action_navigation_previous_item);
 				}
 				((ContactPropertiesActivityLollipop)context).supportInvalidateOptionsMenu();
 
@@ -986,30 +968,14 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	}
 
 	public int onBackPressed() {
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
+		log("onBackPressed");
 		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
 			log("getPanelState()!=PanelState.HIDDEN");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
 			setPositionClicked(-1);
 			notifyDataSetChanged();
+			log("return 4");
 			return 4;
 		}
 		
@@ -1021,9 +987,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		if (adapter.getPositionClicked() != -1) {
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
+			log("return 1");
 			return 1;
 		} else {
 			if (parentHandleStack.isEmpty()) {
+				log("return 0");
 				return 0;
 			} else {
 				parentHandle = parentHandleStack.pop();
@@ -1034,25 +1002,25 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					contactNodes = megaApi.getInShares(contact);
 					if (aB != null){
 						aB.setTitle(R.string.contact_shared_files);
-						aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 					}
 					((ContactPropertiesActivityLollipop)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);
 					listView.scrollToPosition(0);
 					((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
 					adapter.setParentHandle(parentHandle);
+					log("return 2");
 					return 2;
 				} else {
 					contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
 					if (aB != null){
 						aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-						aB.setLogo(R.drawable.ic_action_navigation_previous_item);
 					}
 					((ContactPropertiesActivityLollipop)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);
 					listView.scrollToPosition(0);
 					((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
 					adapter.setParentHandle(parentHandle);
+					log("return 3");
 					return 3;
 				}
 			}
@@ -1160,17 +1128,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	public void onClick(View v) {
 		log("onClick");
 		switch (v.getId()) {
-		//		case R.id.contact_file_list_contact_layout: {
-		//			Intent i = new Intent(this, ContactPropertiesActivityLollipop.class);
-		//			i.putExtra("name", contact.getEmail());
-		//			startActivity(i);
-		//			finish();
-		//			break;
-		//		}
-			case R.id.contact_file_list_toolbar_back:{
-				((ContactPropertiesActivityLollipop)context).onBackPressed();
-				break;
-			}
 			case R.id.contact_file_list_option_download_layout: {
 				log("Download option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
