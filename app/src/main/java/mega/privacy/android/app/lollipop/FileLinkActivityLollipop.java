@@ -564,6 +564,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	String urlM;
 	long sizeM;
 	long [] hashesM;
+	MegaNode documentM;
 	
 	@SuppressLint("NewApi") 
 	void downloadNode(){
@@ -611,8 +612,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				this.hashesM = new long[hashes.length];
 				for (int i=0; i< hashes.length; i++){
 					this.hashesM[i] = hashes[i];
-				} 
-				
+				}
+				this.documentM = document;
+
 				return;
 			}
 		}
@@ -982,7 +984,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 						intent.setClass(this, FileStorageActivityLollipop.class);
 						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+						if (documentM != null){
+							intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, documentM.getSize());
+						}
+						else if (document != null){
+							intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+						}
 						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 					}
 					else{
@@ -1007,7 +1014,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
 										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+										if (documentM != null){
+											intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, documentM.getSize());
+										}
+										else if (document != null){
+											intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+										}
 										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 										break;
 									}
@@ -1041,7 +1053,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 					intent.setClass(this, FileStorageActivityLollipop.class);
 					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+					if (documentM != null){
+						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, documentM.getSize());
+					}
+					else if (document != null){
+						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+					}
 					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 				}
 			}
@@ -1050,7 +1067,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, urlM);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+				if (documentM != null){
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, documentM.getSize());
+				}
+				else if (document != null){
+					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+				}
 				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}	
 			return;

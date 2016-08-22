@@ -15,7 +15,6 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -1368,8 +1367,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			case R.id.button_logout:{
 				AccountController aC = new AccountController(this);
 				aC.logout(getApplication(), megaApi, false);
-//				Intent intent = new Intent(this, TourActivityLollipop.class);
-//				startActivity(intent);
 				finish();
 				break;
 			}

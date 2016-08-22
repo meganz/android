@@ -49,7 +49,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
-	int deepBrowserTree = 0;
+	int deepBrowserTree = -1;
 
 	public static IncomingSharesProviderFragmentLollipop newInstance() {
 		log("newInstance");
@@ -71,8 +71,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 		}
 		
 		nodes = new ArrayList<MegaNode>();
-		deepBrowserTree=0;
-		parentHandle = -1;
 	}
 
 	@Override
@@ -98,40 +96,60 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.provider_list_empty_text);
+
+		if (context instanceof FileProviderActivity){
+			parentHandle = ((FileProviderActivity)context).getIncParentHandle();
+			deepBrowserTree = ((FileProviderActivity)context).getIncomingDeepBrowserTree();
+			log("The parent handle is: "+parentHandle);
+			log("The browser tree deep is: "+deepBrowserTree);
+		}
 		
 		if (adapter == null){
 			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView);
 		}
-		else{
-			adapter.setParentHandle(parentHandle);
-			adapter.setNodes(nodes);
-		}
-		
-		String actionBarTitle = getString(R.string.title_incoming_shares_explorer);	
-		
-		if (parentHandle == -1){			
-			findNodes();	
+		listView.setAdapter(adapter);
+
+		if (parentHandle == -1){
+			findNodes();
+			setNodes(nodes);
 			adapter.setParentHandle(-1);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
-		}	
-
-		if (deepBrowserTree != 0){		
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-		}						
+			if(parentNode!=null){
+				nodes = megaApi.getChildren(parentNode);
+				setNodes(nodes);
+				log("INCOMING is in: "+parentNode.getName());
+				changeActionBarTitle(parentNode.getName());
+			}
+			else{
+				log("ERROR parentNode is NULL");
+				findNodes();
+				setNodes(nodes);
+				parentHandle = -1;
+				adapter.setParentHandle(-1);
+				changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+				if (context instanceof FileProviderActivity){
+					((FileProviderActivity)context).setParentHandle(parentHandle);
+					log("PArentHandle change to: "+parentHandle);
+				}
+			}
+		}
 	
-		adapter.setPositionClicked(-1);		
-		
-		listView.setAdapter(adapter);		
-		
+		adapter.setPositionClicked(-1);
+
 		return v;
 	}
 	
 	public void findNodes(){
+		log("findNodes");
+
 		deepBrowserTree=0;
+		if (context instanceof FileProviderActivity){
+			((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
+			log("The browser tree change to: "+deepBrowserTree);
+		}
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		nodes.clear();
 		for (int i=0;i<contacts.size();i++){			
@@ -142,29 +160,21 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 				}
 			}			
 		}
-		
-//		for (int i=0;i<nodes.size();i++){	
-//			MegaNode folder = nodes.get(i);
-//			int accessLevel = megaApi.getAccess(folder);
-//			
-//			if(accessLevel==MegaShare.ACCESS_READ) {
-//				disabledNodes.add(folder.getHandle());
-//			}
-//		}
-//		
-//		this.setDisableNodes(disabledNodes);
-		
+
+		changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 	}
 	
 	
 	public void changeActionBarTitle(String folder){
-		((FileProviderActivity) context).changeTitle(folder);
+		if (context instanceof FileProviderActivity){
+			int tabShown = ((FileProviderActivity)context).getTabShown();
+
+			if(tabShown==FileProviderActivity.INCOMING_TAB){
+				((FileProviderActivity) context).changeTitle(folder);
+			}
+		}
 	}
-	
-	public void changeBackVisibility(boolean backVisibility){
-//		((FileProviderActivity) context).changeBackVisibility(backVisibility);
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -174,11 +184,14 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
     public void itemClick(int position) {
 		log("------------------onItemClick: "+deepBrowserTree);
 		
-		
 		if (nodes.get(position).isFolder()){
 					
 			deepBrowserTree = deepBrowserTree+1;
-			
+			if (context instanceof FileProviderActivity){
+				((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
+				log("The browser tree change to: "+deepBrowserTree);
+			}
+
 			MegaNode n = nodes.get(position);			
 			
 			String path=n.getName();	
@@ -187,32 +200,16 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 			name = temp[temp.length-1];
 
 			changeActionBarTitle(name);
-			changeBackVisibility(true);
 			
 			parentHandle = nodes.get(position).getHandle();
+			if (context instanceof FileProviderActivity){
+				((FileProviderActivity)context).setIncParentHandle(parentHandle);
+				log("The parent handle change to: "+parentHandle);
+			}
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
-			adapter.setNodes(nodes);
+			setNodes(nodes);
 			listView.scrollToPosition(0);
-			
-			//If folder has no files
-			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
 		}
 		else{
 			//File selected to download
@@ -227,28 +224,33 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	public int onBackPressed(){
 		log("deepBrowserTree "+deepBrowserTree);
 		deepBrowserTree = deepBrowserTree-1;
-		
+		if (context instanceof FileProviderActivity){
+			((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
+			log("The browser tree change to: "+deepBrowserTree);
+		}
+
 		if(deepBrowserTree==0){
 			parentHandle=-1;
+			if (context instanceof FileProviderActivity){
+				((FileProviderActivity)context).setIncParentHandle(parentHandle);
+				log("The parent handle change to: "+parentHandle);
+			}
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
-			changeBackVisibility(false);
 			findNodes();
 			
-			adapter.setNodes(nodes);
+			setNodes(nodes);
 			listView.scrollToPosition(0);
 			adapter.setParentHandle(parentHandle);
-
-//			adapterList.setNodes(nodes);
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
 
 			return 3;
 		}
 		else if (deepBrowserTree>0){
 			parentHandle = adapter.getParentHandle();
 			//((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);			
-			
+			if (context instanceof FileProviderActivity){
+				((FileProviderActivity)context).setIncParentHandle(parentHandle);
+				log("The parent handle change to: "+parentHandle);
+			}
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
 			if (parentNode != null){
@@ -257,12 +259,15 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 				emptyTextView.setVisibility(View.GONE);
 
 				changeActionBarTitle(parentNode.getName());
-				changeBackVisibility(true);	
 				
 				parentHandle = parentNode.getHandle();
+				if (context instanceof FileProviderActivity){
+					((FileProviderActivity)context).setIncParentHandle(parentHandle);
+					log("The parent handle change to: "+parentHandle);
+				}
 				nodes = megaApi.getChildren(parentNode);
 
-				adapter.setNodes(nodes);
+				setNodes(nodes);
 				listView.scrollToPosition(0);
 				adapter.setParentHandle(parentHandle);
 				return 2;
@@ -274,6 +279,10 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			deepBrowserTree=0;
+			if (context instanceof FileProviderActivity){
+				((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
+				log("The browser tree change to: "+deepBrowserTree);
+			}
 			return 0;
 		}
 	}
@@ -287,7 +296,12 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	}
 	
 	public void setParentHandle(long parentHandle){
+		log("setParentHandle");
 		this.parentHandle = parentHandle;
+		if (context instanceof FileProviderActivity){
+			((FileProviderActivity)context).setIncParentHandle(parentHandle);
+			log("The parent handle change to: "+parentHandle);
+		}
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
 		}
