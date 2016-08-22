@@ -6312,6 +6312,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		}
 	    		case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 					log("Back to MyAccountFragment");
+					displayedAccountType=-1;
 	    			if (upAFL != null){
 	    				drawerItem = DrawerItem.ACCOUNT;
 						accountFragment=Constants.MY_ACCOUNT_FRAGMENT;

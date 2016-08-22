@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -36,9 +36,14 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.OldPreferences;
+import mega.privacy.android.app.OldUserCredentials;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -416,10 +421,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("action is: "+action);
                 if (Constants.ACTION_CONFIRM.equals(action)) {
                     handleConfirmationIntent(intentReceived);
-                    return v;
-                } else if (Constants.ACTION_CREATE_ACCOUNT_EXISTS.equals(action)) {
-                    String message = getString(R.string.error_email_registered);
-                    Snackbar.make(scrollView, message, Snackbar.LENGTH_LONG).show();
                     return v;
                 } else if (action.equals(Constants.ACTION_RESET_PASS)) {
                     String link = intentReceived.getDataString();

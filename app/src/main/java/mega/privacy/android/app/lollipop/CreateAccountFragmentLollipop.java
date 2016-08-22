@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -25,7 +25,9 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -220,7 +222,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 break;
 
             case R.id.button_login_create:
-                onLoginClick(v);
+                ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
                 break;
 
             case R.id.tos:
@@ -234,13 +236,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 startActivity(viewIntent);
                 break;
         }
-    }
-
-    public void onLoginClick(View v){
-        Intent intent = new Intent(context, LoginActivityLollipop.class);
-        intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
     }
 
     public void onCreateAccountClick (View v){
@@ -378,22 +373,19 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
             String message = e.getErrorString();
             if (e.getErrorCode() == MegaError.API_EEXIST) {
-                Intent intent = new Intent(context, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-                intent.setAction(Constants.ACTION_CREATE_ACCOUNT_EXISTS);
-                startActivity(intent);
-                ((LoginActivityLollipop)context).finish();
+                ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
+                Snackbar.make(scrollView, getString(R.string.error_email_registered), Snackbar.LENGTH_LONG).show();
                 return;
             }
-            Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
-
-            createAccountLayout.setVisibility(View.VISIBLE);
-            createAccountLoginLayout.setVisibility(View.VISIBLE);
-            creatingAccountLayout.setVisibility(View.GONE);
-            creatingAccountTextView.setVisibility(View.GONE);
-            createAccountProgressBar.setVisibility(View.GONE);
-
-            return;
+            else{
+                Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
+                createAccountLayout.setVisibility(View.VISIBLE);
+                createAccountLoginLayout.setVisibility(View.VISIBLE);
+                creatingAccountLayout.setVisibility(View.GONE);
+                creatingAccountTextView.setVisibility(View.GONE);
+                createAccountProgressBar.setVisibility(View.GONE);
+                return;
+            }
         }
         onRegister();
     }
