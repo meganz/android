@@ -77,6 +77,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
+	TextView fingerprint;
 
 	Button upgradeButton;
 	Button logoutButton;
@@ -87,6 +88,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout expirationLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
+	LinearLayout fingerprintLayout;
 
 	RelativeLayout exportMKLayout;
 	TextView titleExportMK;
@@ -250,6 +252,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
+		fingerprintLayout = (LinearLayout) v.findViewById(R.id.my_account_fingerprint_layout);
+		LinearLayout.LayoutParams fingerprintParams = (LinearLayout.LayoutParams)fingerprintLayout.getLayoutParams();
+		fingerprintParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
+		fingerprintLayout.setLayoutParams(fingerprintParams);
+
+		fingerprint = (TextView) v.findViewById(R.id.my_account_fingerprint);
+
 		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
 		LinearLayout.LayoutParams connectionsParams = (LinearLayout.LayoutParams)connectionsLayout.getLayoutParams();
 		connectionsParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
@@ -335,6 +344,33 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if(mKLayoutVisible){
 			log("on Create MK visible");
 			showMKLayout();
+		}
+
+		fingerprintLayout.setVisibility(View.GONE);
+		if (megaApi.getMyFingerprint() != null){
+			if (megaApi.getMyFingerprint().compareTo("") != 0){
+				fingerprintLayout.setVisibility(View.VISIBLE);
+				String fingerprintString = megaApi.getMyFingerprint();
+				String fingerprintUIString = "";
+				for (int i=0;i<fingerprintString.length();i++){
+					if (i != 0){
+						if ((i % 20) == 0){
+							fingerprintUIString = fingerprintUIString + "\n" + fingerprintString.charAt(i);
+						}
+						else if ((i % 4) == 0){
+							fingerprintUIString = fingerprintUIString + " " + fingerprintString.charAt(i);
+						}
+						else{
+							fingerprintUIString = fingerprintUIString + fingerprintString.charAt(i);
+						}
+					}
+					else{
+						fingerprintUIString = fingerprintUIString + fingerprintString.charAt(i);
+					}
+				}
+
+				fingerprint.setText(fingerprintUIString);
+			}
 		}
 		
 		ArrayList<MegaUser> contacts = megaApi.getContacts();

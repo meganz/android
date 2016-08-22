@@ -257,6 +257,47 @@
 					android:visibility="invisible" />
 			</LinearLayout>
 
+			<LinearLayout
+				android:id="@+id/my_account_fingerprint_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_account_fingerprint_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_fingerprint_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/my_account_my_credentials"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_account_fingerprint"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<ImageView
+					android:id="@+id/my_account_fingerprint_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="invisible" />
+			</LinearLayout>
+
 			<Button
 				android:id="@+id/logout_button"
 				android:layout_width="wrap_content"
