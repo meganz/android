@@ -68,6 +68,7 @@ public class Constants {
 	public static final int REQUEST_READ_CONTACTS = 3;
 
 	public static final int PRO_LITE = 4;
+	public static final int FREE = 0;
 	public static final int PRO_I = 1;
 	public static final int PRO_II = 2;
 	public static final int PRO_III = 3;

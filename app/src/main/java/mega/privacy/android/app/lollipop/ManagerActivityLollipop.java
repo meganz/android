@@ -982,6 +982,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		super.onCreate(savedInstanceState);
 		log("onCreate after call super");
 
+		boolean selectDrawerItemPending = true;
+
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -1512,6 +1514,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						drawerItem=DrawerItem.ACCOUNT;
 						mkLayoutVisible = true;
 						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
 						mkLayoutVisible = false;
 						return;
 					}
@@ -1521,6 +1524,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("link to cancel: "+link);
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
+							selectDrawerItemPending=false;
 							showDialogInsertPassword(link, true);
 						}
 					}
@@ -1530,6 +1534,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("link to change mail: "+link);
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
+							selectDrawerItemPending=false;
 							showDialogInsertPassword(link, false);
 						}
 					}
@@ -1572,18 +1577,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if(result==0){
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
+							selectDrawerItemPending=false;
 							log("Show success mesage");
 							Util.showAlert(this, getString(R.string.pass_changed_alert), null);
 						}
 						else if(result==MegaError.API_EARGS){
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
+							selectDrawerItemPending=false;
 							log("Error when changing pass - the current password is not correct");
 							Util.showAlert(this,getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
 						}
 						else{
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
+							selectDrawerItemPending=false;
 							log("Error when changing pass - show error message");
 							Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 						}
@@ -1594,6 +1602,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("link to resetPass: "+link);
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
+							selectDrawerItemPending=false;
 							showConfirmationResetPassword(link);
 						}
 					}
@@ -1602,6 +1611,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						drawerItem=DrawerItem.CONTACTS;
 						indexContacts=2;
 						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
 					}
 				}
 	        }
@@ -1630,25 +1640,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							case Constants.PRO_I:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_I);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_I);
 								return;
 							}
 							case Constants.PRO_II:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_II);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_II);
 								return;
 							}
 							case Constants.PRO_III:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_III);
+								selectDrawerItemPending=false;
+								selectAccountDisplayed(Constants.PRO_III);
 								return;
 							}
 							case Constants.PRO_LITE:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_LITE);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_LITE);
 								return;
 							}
 						}
@@ -1678,7 +1695,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("accountType: "+accountType);
 						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
 						switch (accountType){
-							case 0:{
+							case Constants.FREE:{
 								log("intent firstTime==true");
 								firstTimeCam = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
@@ -1688,25 +1705,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							case Constants.PRO_I:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_I);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_I);
 								return;
 							}
 							case Constants.PRO_II:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_II);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_II);
 								return;
 							}
 							case Constants.PRO_III:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_III);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_III);
 								return;
 							}
 							case Constants.PRO_LITE:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItemLollipop(drawerItem);
-								showUpAF(Constants.PRO_LITE);
+								selectDrawerItemPending=false;
+								showUpAF();
+								selectAccountDisplayed(Constants.PRO_LITE);
 								return;
 							}
 						}
@@ -1745,7 +1770,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 	        //INITIAL FRAGMENT
-	        selectDrawerItemLollipop(drawerItem);
+			if(selectDrawerItemPending){
+				selectDrawerItemLollipop(drawerItem);
+			}
 		}
 		log("END onCreate");
 	}
@@ -3280,7 +3307,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch(accountFragment){
 					case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 						log("Show upgrade FRAGMENT");
-						showUpAF(-1);
+						showUpAF();
 						showFabButton();
 						break;
 					}
@@ -3542,17 +3569,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showUpAF(int type){
-		log("showUpAF type: "+type);
-
-//		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
-//        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//        fragTransaction.detach(currentFragment);
-//        fragTransaction.commit();
-//
-//        fragTransaction = getSupportFragmentManager().beginTransaction();
-//        fragTransaction.attach(currentFragment);
-//        fragTransaction.commit();
+	public void showUpAF(){
+		log("showUpAF");
 
 		accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 
@@ -3578,24 +3596,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		invalidateOptionsMenu();
 		showFabButton();
+	}
 
-		if(type!=-1){
-			switch(type){
-				case Constants.PRO_LITE:{
-					upAFL.onUpgradeClick(Constants.PRO_LITE);
-					break;
-				}
-				case Constants.PRO_I:{
-					upAFL.onUpgradeClick(Constants.PRO_I);
-					break;
-				}
-				case Constants.PRO_II:{
-					upAFL.onUpgradeClick(Constants.PRO_II);
-					break;
-				}
-				case Constants.PRO_III:{
-					upAFL.onUpgradeClick(Constants.PRO_III);
-					break;
+	public void selectAccountDisplayed (int type){
+		log("selectAccountDisplayed");
+		if(upAFL!=null){
+			if(type!=-1){
+				switch(type){
+					case Constants.PRO_LITE:{
+						upAFL.onUpgradeClick(Constants.PRO_LITE);
+						break;
+					}
+					case Constants.PRO_I:{
+						upAFL.onUpgradeClick(Constants.PRO_I);
+						break;
+					}
+					case Constants.PRO_II:{
+						upAFL.onUpgradeClick(Constants.PRO_II);
+						break;
+					}
+					case Constants.PRO_III:{
+						upAFL.onUpgradeClick(Constants.PRO_III);
+						break;
+					}
 				}
 			}
 		}
@@ -5873,7 +5896,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
-	        	showUpAF(-1);
+	        	showUpAF();
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
@@ -6312,10 +6335,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		case Constants.CC_FRAGMENT:{
 	    			if (ccFL != null){
 	    				int parameterType = ccFL.getParameterType();
-						showUpAF(parameterType);
+						showUpAF();
+						selectAccountDisplayed(parameterType);
 	    			}
 	    			else{
-	    				showUpAF(-1);
+	    				showUpAF();
 	    			}
 	    			return;
 	    		}
@@ -9096,7 +9120,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				outSpaceLayout.setVisibility(View.GONE);
 				getProLayout.setVisibility(View.GONE);
-				showUpAF(-1);
+				showUpAF();
 				break;
 			}
 

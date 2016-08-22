@@ -668,7 +668,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
 
-		log("checkAvailableAccount: "+myAccountInfo.getAccountType());
+		log("showAvailableAccount: "+myAccountInfo.getAccountType());
 
 		switch(myAccountInfo.getAccountType()){
 

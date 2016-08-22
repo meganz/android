@@ -713,11 +713,10 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 			}
 		}
 		return null;
-	      
 	}
 
 	public int onBackPressed(){
-		((ManagerActivityLollipop)context).showUpAF(-1);
+		((ManagerActivityLollipop)context).showUpAF();
 		return 3;
 	}
 	
