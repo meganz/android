@@ -830,4 +830,9 @@
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
 
     <string name="section_chat" context="Title of the screen that shows the chat">Chat</string>
+
+    <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">ARCHIVE</string>
+    <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
+
+    <string name="archive_chat_empty" context="the user has not sent any contact request to other users">No archived conversations</string>
 </resources>
