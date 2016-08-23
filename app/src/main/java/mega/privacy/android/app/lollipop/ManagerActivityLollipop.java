@@ -3367,9 +3367,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						cloudSectionLayout.setVisibility(View.GONE);
 						viewPagerCDrive.setVisibility(View.GONE);
 
-						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-						ft.replace(R.id.fragment_container, maFLol, "maF");
-						ft.commit();
+//						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//						ft.replace(R.id.fragment_container, maFLol, "maF");
+//						ft.commit();
+
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
+						if (currentFragment != null) {
+							fragTransaction.detach(currentFragment);
+							fragTransaction.commit();
+
+							fragTransaction = getSupportFragmentManager().beginTransaction();
+							fragTransaction.attach(currentFragment);
+							fragTransaction.commit();
+						}
+						else{
+							fragTransaction.replace(R.id.fragment_container, maFLol, "maF");
+							fragTransaction.commit();
+						}
+
 //				getSupportFragmentManager().executePendingTransactions();
 
 						drawerLayout.closeDrawer(Gravity.LEFT);
