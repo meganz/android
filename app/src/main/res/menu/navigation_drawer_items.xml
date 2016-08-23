@@ -1,7 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="mega.privacy.android.app.lollipop.ManagerActivityLollipop" >
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context="mega.privacy.android.app.lollipop.ManagerActivityLollipop">
 
     <group android:checkableBehavior="single">
 	    <item
@@ -32,6 +31,11 @@
 	        android:id="@+id/navigation_item_contacts"
 	        android:icon="@drawable/contacts_grey"
 	        android:title="@string/section_contacts"/>
+
+		<item
+			android:id="@+id/navigation_item_chat"
+			android:icon="@drawable/contacts_grey"
+			android:title="@string/section_chat"/>
 	    
 	    <item
 	        android:id="@+id/navigation_item_settings"

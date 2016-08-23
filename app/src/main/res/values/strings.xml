@@ -828,4 +828,6 @@
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">My credentials</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
+
+    <string name="section_chat" context="Title of the screen that shows the chat">Chat</string>
 </resources>
