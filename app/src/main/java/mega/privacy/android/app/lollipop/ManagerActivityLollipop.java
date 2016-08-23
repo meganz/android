@@ -444,6 +444,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem pauseTransfersMenuIcon;
 	private MenuItem logoutMenuItem;
 	private MenuItem forgotPassMenuItem;
+	private MenuItem newChatMenuItem;
 
 	boolean fromTakePicture = false;
 
@@ -3841,6 +3842,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		forgotPassMenuItem.setVisible(false);
 
+		newChatMenuItem= menu.findItem(R.id.action_menu_new_chat);
+
 	    if (drawerItem == null){
 	    	if (nV != null){
 	    		Menu nVMenu = nV.getMenu();
@@ -3988,6 +3991,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
+			newChatMenuItem.setVisible(false);
 			return super.onCreateOptionsMenu(menu);
 		}
 
@@ -4035,6 +4039,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			gridSmallLargeMenuItem.setVisible(false);
 			}
+			newChatMenuItem.setVisible(false);
 		}
 
 	    else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -4083,6 +4088,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchMenuItem.setVisible(false);
     			}
 			}
+			newChatMenuItem.setVisible(false);
 		}
 	    else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 	    	if (muFLol != null){
@@ -4130,6 +4136,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchMenuItem.setVisible(false);
     			}
 			}
+			newChatMenuItem.setVisible(false);
 		}
 
 	    else if (drawerItem == DrawerItem.INBOX){
@@ -4176,6 +4183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			gridSmallLargeMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
 			}
 		}
 
@@ -4310,6 +4318,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 				}
 			}
+			newChatMenuItem.setVisible(false);
 		}
 
 	    else if (drawerItem == DrawerItem.CONTACTS){
@@ -4324,6 +4333,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				thumbViewMenuItem.setVisible(true);
 				upgradeAccountMenuItem.setVisible(true);
 				searchMenuItem.setVisible(true);
+				newChatMenuItem.setVisible(true);
 
 				//Hide
 				pauseTransfersMenuIcon.setVisible(false);
@@ -4453,6 +4463,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
+					newChatMenuItem.setVisible(false);
 
 					//Show
 	    			selectMenuItem.setVisible(true);
@@ -4492,6 +4503,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				settingsMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
 
 				if(accountFragment==Constants.MY_ACCOUNT_FRAGMENT){
 					//Show
@@ -4562,6 +4574,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
@@ -4634,8 +4647,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				forgotPassMenuItem.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
+				newChatMenuItem.setVisible(false);
 			}
 	    }
+		else if (drawerItem == DrawerItem.CHAT){
+			log("in Chat Section");
+			int index = viewPagerChat.getCurrentItem();
+			if (index == 0) {
+				log("createOptions TAB chat");
+				if (rChatFL != null){
+					newChatMenuItem.setVisible(true);
+					addContactMenuItem.setVisible(true);
+				}
+			}
+			else{
+				newChatMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(true);
+			}
+
+			//Hide
+			searchMenuItem.setVisible(false);
+			createFolderMenuItem.setVisible(false);
+			addMenuItem.setVisible(false);
+			sortByMenuItem.setVisible(false);
+			selectMenuItem.setVisible(false);
+			unSelectMenuItem.setVisible(false);
+			thumbViewMenuItem.setVisible(false);
+			addMenuItem.setEnabled(false);
+			rubbishBinMenuItem.setVisible(false);
+			clearRubbishBinMenuitem.setVisible(false);
+			importLinkMenuItem.setVisible(false);
+			takePicture.setVisible(false);
+			settingsMenuItem.setVisible(false);
+			refreshMenuItem.setVisible(false);
+			helpMenuItem.setVisible(false);
+			upgradeAccountMenuItem.setVisible(false);
+			changePass.setVisible(false);
+			cancelSubscription.setVisible(false);
+			killAllSessions.setVisible(false);
+			logoutMenuItem.setVisible(false);
+			cancelAllTransfersMenuItem.setVisible(false);
+			forgotPassMenuItem.setVisible(false);
+			playTransfersMenuIcon.setVisible(false);
+			pauseTransfersMenuIcon.setVisible(false);
+		}
 		log("Call to super onCreateOptionsMenu");
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -4867,12 +4922,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_add_contact:{
-	        	if (drawerItem == DrawerItem.CONTACTS){
+	        	if (drawerItem == DrawerItem.CONTACTS||drawerItem == DrawerItem.CHAT){
 					chooseAddContactDialog();
 	        	}
-
 	        	return true;
 	        }
+			case R.id.action_menu_new_chat:{
+				if (drawerItem == DrawerItem.CHAT){
+					Snackbar.make(fragmentContainer, "NEW CHAT!", Snackbar.LENGTH_LONG).show();
+				}
+
+				return true;
+			}
 	        case R.id.action_menu_kill_all_sessions:{
 				aC.killAllSessions(this);
 	        	return true;
@@ -7910,7 +7971,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		addContactDialog = b.create();
 		addContactDialog.show();
 	}
-
 
 	public void addContactFromPhone(){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
