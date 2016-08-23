@@ -367,7 +367,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 	private static void log(String log) {		
 		Util.log("SentRequestsFragmentLollipop", log);
 	}
-
 	
 	public void setPositionClicked(int positionClicked){
 
