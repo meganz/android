@@ -22,10 +22,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaRecentChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -36,10 +42,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     Context context;
     ActionBar aB;
     RecyclerView listView;
-    MegaContactRequestLollipopAdapter adapterList;
+    MegaRecentChatLollipopAdapter adapterList;
     GestureDetectorCompat detector;
     TextView emptyTextView;
     RecyclerView.LayoutManager mLayoutManager;
+
+    ArrayList<ChatRoom> chats;
+    RecentChat recentChat;
 
     RelativeLayout emptyLayout;
     LinearLayout buttonsEmptyLayout;
@@ -79,6 +88,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+
+        recentChat = new RecentChat();
     }
 
     @Override
@@ -129,8 +140,28 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         getStartedButton.setLayoutParams(getStartedButtonParams);
         getStartedButton.setOnClickListener(this);
 
-        listView.setVisibility(View.GONE);
-        emptyLayout.setVisibility(View.VISIBLE);
+        chats = recentChat.getRecentChats();
+
+        if (adapterList == null){
+            adapterList = new MegaRecentChatLollipopAdapter(context, this, chats, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+        }
+        else{
+            adapterList.setContacts(chats);
+        }
+
+        adapterList.setPositionClicked(-1);
+        listView.setAdapter(adapterList);
+
+        if (adapterList.getItemCount() == 0){
+            log("adapterList.getItemCount() == 0");
+            listView.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        }
+        else{
+            log("adapterList.getItemCount() NOT = 0");
+            listView.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+        }
 
         return v;
     }
