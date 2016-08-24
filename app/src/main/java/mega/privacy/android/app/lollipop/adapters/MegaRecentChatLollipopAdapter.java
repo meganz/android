@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,18 +26,18 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 
 
-public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList> implements OnClickListener {
-	
+public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRecentChatLollipopAdapter.ViewHolderContactsRequestList> implements OnClickListener {
+
 	Context context;
 	int positionClicked;
-	ArrayList<MegaContactRequest> contacts;
+	ArrayList<ChatRoom> chats;
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
@@ -47,10 +45,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	private SparseBooleanArray selectedItems;
 	Object fragment;
 
-	public MegaContactRequestLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaContactRequest> _contacts, RecyclerView _listView, int type) {
+	public MegaRecentChatLollipopAdapter(Context _context, Object _fragment, ArrayList<ChatRoom> _chats, RecyclerView _listView, int type) {
 		log("new adapter");
 		this.context = _context;
-		this.contacts = _contacts;
+		this.chats = _chats;
 		this.positionClicked = -1;
 		this.type = type;
 		this.fragment = _fragment;
@@ -61,9 +59,9 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		listFragment = _listView;
 		
-		if(contacts!=null)
+		if(chats!=null)
     	{
-    		log("Number of requests: "+contacts.size());
+    		log("Number of requests: "+chats.size());
     	}
     	else{
     		log("Number of requests: NULL");
@@ -84,7 +82,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
-        LinearLayout optionsLayout;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -101,8 +98,8 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
 		
-		log("Get the MegaContactRequest");
-		MegaContactRequest contact = (MegaContactRequest) getItem(position);
+		log("Get the ChatRoom");
+		ChatRoom chat = (ChatRoom) getItem(position);
 		
 		if (!multipleSelect) {
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
@@ -131,62 +128,9 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			}
 		}
 						
-		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
-		{
-			holder.contactMail = contact.getTargetEmail();
-			createDefaultAvatar(holder);
-			holder.textViewContactName.setText(contact.getTargetEmail());
-			log("--------------user target: "+contact.getTargetEmail());
-		}
-		else{
-			//Incoming request
-						
-			holder.contactMail = contact.getSourceEmail();
-			createDefaultAvatar(holder);
-			holder.textViewContactName.setText(contact.getSourceEmail());
-			log("--------------user source: "+contact.getSourceEmail());	
-			
-		}		
 
-//		holder.name=false;
-//		holder.firstName=false;
-//		megaApi.getUserAttribute(contact, 1, listener);
-//		megaApi.getUserAttribute(contact, 2, listener);
 		
-		int status = contact.getStatus();
-		switch(status)
-		{
-			case MegaContactRequest.STATUS_ACCEPTED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (ACCEPTED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_DELETED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (DELETED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_DENIED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (DENIED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_IGNORED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (IGNORED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_REMINDED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (REMINDED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_UNRESOLVED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (PENDING)");
-				break;
-			}
-		}		
+
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);		
@@ -203,49 +147,23 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density); 		
 	
-		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
-		{
-			log("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_outg_request_list, parent, false);	
-			holder = new ViewHolderContactsRequestList(v);
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
-			holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);	
-			holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
-			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
-			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
-			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
+		holder = new ViewHolderContactsRequestList(v);
+		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
+		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
+		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
+		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
+		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
+		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
+		//Right margin
+		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
+		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
+		holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 
-			holder.itemLayout.setOnClickListener(this);
+		holder.itemLayout.setOnClickListener(this);
 
-			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			v.setTag(holder);	
-		}
-		else{
-			//Incoming request
-			log("ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER");
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_incom_request_list, parent, false);
-			holder = new ViewHolderContactsRequestList(v);
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
-			holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);	
-			holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
-			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
-			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
-			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+		v.setTag(holder);
 
-			holder.itemLayout.setOnClickListener(this);
-
-			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			
-			v.setTag(holder);		
-		}
 		return holder;
 	}
 	
@@ -314,7 +232,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 	@Override
     public int getItemCount() {
-        return contacts.size();
+        return chats.size();
     }
  
 	public boolean isMultipleSelect() {
@@ -381,10 +299,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	/*
 	 * Get request at specified position
 	 */
-	public MegaContactRequest getContactAt(int position) {
+	public ChatRoom getChatAt(int position) {
 		try {
-			if (contacts != null) {
-				return contacts.get(position);
+			if (chats != null) {
+				return chats.get(position);
 			}
 		} catch (IndexOutOfBoundsException e) {
 		}
@@ -392,24 +310,24 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	/*
-	 * Get list of all selected contacts
+	 * Get list of all selected chats
 	 */
-	public List<MegaContactRequest> getSelectedRequest() {
-		ArrayList<MegaContactRequest> requests = new ArrayList<MegaContactRequest>();
+	public List<ChatRoom> getSelectedChats() {
+		ArrayList<ChatRoom> chats = new ArrayList<ChatRoom>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {
 			if (selectedItems.valueAt(i) == true) {
-				MegaContactRequest r = getContactAt(selectedItems.keyAt(i));
+				ChatRoom r = getChatAt(selectedItems.keyAt(i));
 				if (r != null){
-					requests.add(r);
+					chats.add(r);
 				}
 			}
 		}
-		return requests;
+		return chats;
 	}
 	
     public Object getItem(int position) {
-        return contacts.get(position);
+        return chats.get(position);
     }
  
     @Override
@@ -431,7 +349,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	public void onClick(View v) {
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) v.getTag();
 		int currentPosition = holder.currentPosition;
-		MegaContactRequest c = (MegaContactRequest) getItem(currentPosition);
+		ChatRoom c = (ChatRoom) getItem(currentPosition);
 		
 		switch (v.getId()){	
 			case R.id.contact_request_list_three_dots:{
@@ -449,28 +367,22 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 						notifyDataSetChanged();
 					}
 				}
-				((ManagerActivityLollipop) context).showContactOptionsPanel(null, c);
+				log("click three dots!");
 				break;
 			}
 			case R.id.contact_request_list_item_layout:{
-				if(type==Constants.OUTGOING_REQUEST_ADAPTER)
-				{
-					((SentRequestsFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else{
-					((ReceivedRequestsFragmentLollipop) fragment).itemClick(currentPosition);
-				}
+				log("click layout!");
 				break;
 			}
 		}
 	}
 	
-	public void setContacts (ArrayList<MegaContactRequest> contacts){
+	public void setContacts (ArrayList<ChatRoom> chats){
 		log("SETCONTACTS!!!!");
-		this.contacts = contacts;
-		if(contacts!=null)
+		this.chats = chats;
+		if(chats!=null)
 		{
-			log("num requests: "+contacts.size());
+			log("num requests: "+chats.size());
 		}
 		positionClicked = -1;
 //		listFragment.invalidate();
@@ -511,7 +423,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaContactRequestLollipopAdapter", log);
+		Util.log("MegaRecentChatLollipopAdapter", log);
 	}
 
 }
