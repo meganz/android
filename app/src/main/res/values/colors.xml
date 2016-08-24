@@ -49,7 +49,8 @@
     <color name="green_free_account">#31B404</color>
 
     <color name="divider_upgrade_account">#1F000000</color>
-     
+
+    <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="orange">#FFFFBB33</color>
