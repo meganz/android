@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -58,6 +59,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -240,6 +243,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionAvatarDelete;
 	private AvatarOptionsPanelListener avatarOptionsPanelListener;
 	////
+
+	//COLLECTION FAB BUTTONS
+	CoordinatorLayout fabButtonsLayout;
+	FloatingActionButton mainFabButtonChat;
+	FloatingActionButton firstFabButtonChat;
+	FloatingActionButton secondFabButtonChat;
+	FloatingActionButton thirdFabButtonChat;
+	private Animation openFabAnim,closeFabAnim,rotateLeftAnim,rotateRightAnim, collectionFABLayoutOut;
+	boolean isFabOpen=false;
+	//
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -1218,6 +1231,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		//FAB button
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
+
+		//Collection of FAB for CHAT
+		fabButtonsLayout = (CoordinatorLayout) findViewById(R.id.fab_collection_layout);
+		mainFabButtonChat = (FloatingActionButton) findViewById(R.id.main_fab_chat);
+		mainFabButtonChat.setOnClickListener(new FabButtonListener(this));
+		firstFabButtonChat = (FloatingActionButton) findViewById(R.id.first_fab_chat);
+		firstFabButtonChat.setOnClickListener(new FabButtonListener(this));
+		secondFabButtonChat = (FloatingActionButton) findViewById(R.id.second_fab_chat);
+		secondFabButtonChat.setOnClickListener(new FabButtonListener(this));
+		thirdFabButtonChat = (FloatingActionButton) findViewById(R.id.third_fab_chat);
+		thirdFabButtonChat.setOnClickListener(new FabButtonListener(this));
+
+		collectionFABLayoutOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.collection_fab_layout_out);
+		collectionFABLayoutOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				log("onAnimationEnd");
+				fabButtonsLayout.setVisibility(View.GONE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+		});
+		openFabAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.open_fab);
+		closeFabAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.close_fab);
+		closeFabAnim.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				log("onAnimationEnd");
+//				mainFabButtonChat.setVisibility(View.GONE);
+//				fabButtonsLayout.startAnimation(collectionFABLayoutOut);
+				fabButtonsLayout.setVisibility(View.GONE);
+				fabButton.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+		});
+
+		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
+		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
 
 		//Sliding UPLOAD panel
 		slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
@@ -3044,6 +3112,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectDrawerItemAccount(){
 		log("selectDrawerItemAccount");
 
+		contactsSectionLayout.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		sharesSectionLayout.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		cloudSectionLayout.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		chatSectionLayout.setVisibility(View.GONE);
+		viewPagerChat.setVisibility(View.GONE);
+
 		switch(accountFragment){
 			case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 				log("Show upgrade FRAGMENT");
@@ -3082,13 +3159,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					maFLol.setMKLayoutVisible(mkLayoutVisible);
 				}
-
-				contactsSectionLayout.setVisibility(View.GONE);
-				viewPagerContacts.setVisibility(View.GONE);
-				sharesSectionLayout.setVisibility(View.GONE);
-				viewPagerShares.setVisibility(View.GONE);
-				cloudSectionLayout.setVisibility(View.GONE);
-				viewPagerCDrive.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, maFLol, "maF");
@@ -6261,6 +6331,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		drawerLayout.closeDrawer(Gravity.LEFT);
     		return;
     	}
+
+		if(isFabOpen){
+			animateFABCollection();
+			return;
+		}
 
 		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
 			log("slidingUploadPanel()!=PanelState.HIDDEN");
@@ -12057,6 +12132,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		nVEmail.setText(myAccountInfo.getMyUser().getEmail());
 	}
 
+	public void animateFABCollection(){
+		log("animateFABCollection");
+
+		if(isFabOpen){
+			mainFabButtonChat.startAnimation(rotateLeftAnim);
+			firstFabButtonChat.startAnimation(closeFabAnim);
+			secondFabButtonChat.startAnimation(closeFabAnim);
+			thirdFabButtonChat.startAnimation(closeFabAnim);
+			firstFabButtonChat.setClickable(false);
+			secondFabButtonChat.setClickable(false);
+			thirdFabButtonChat.setClickable(false);
+			isFabOpen = false;
+			log("close COLLECTION FAB");
+
+		} else {
+			mainFabButtonChat.startAnimation(rotateRightAnim);
+			firstFabButtonChat.startAnimation(openFabAnim);
+			secondFabButtonChat.startAnimation(openFabAnim);
+			thirdFabButtonChat.startAnimation(openFabAnim);
+			firstFabButtonChat.setClickable(true);
+			secondFabButtonChat.setClickable(true);
+			thirdFabButtonChat.setClickable(true);
+			isFabOpen = true;
+			fabButton.setVisibility(View.GONE);
+			fabButtonsLayout.setVisibility(View.VISIBLE);
+			log("open COLLECTION FAB");
+		}
+	}
+
 	public void showFabButton(){
 		log("showFabButton");
 		switch (drawerItem){
@@ -12169,6 +12273,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 					default:{
+						fabButtonsLayout.setVisibility(View.GONE);
 						fabButton.setVisibility(View.GONE);
 						break;
 					}
