@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -24,16 +27,19 @@ import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 
-public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRecentChatLollipopAdapter.ViewHolderContactsRequestList> implements OnClickListener {
+public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRecentChatLollipopAdapter.ViewHolderRecentChatList> implements OnClickListener {
 
 	Context context;
 	int positionClicked;
@@ -61,16 +67,16 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		
 		if(chats!=null)
     	{
-    		log("Number of requests: "+chats.size());
+    		log("Number of chats: "+chats.size());
     	}
     	else{
-    		log("Number of requests: NULL");
+    		log("Number of chats: NULL");
     	}
 	}
 	
 	/*private view holder class*/
-    class ViewHolderContactsRequestList extends ViewHolder{
-    	public ViewHolderContactsRequestList(View arg0) {
+    class ViewHolderRecentChatList extends ViewHolder{
+    	public ViewHolderRecentChatList(View arg0) {
 			super(arg0);
 			// TODO Auto-generated constructor stub
 		}
@@ -79,6 +85,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
+		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
@@ -89,10 +96,10 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
     	String nameText;
     	String firstNameText;
     }
-    ViewHolderContactsRequestList holder;
+    ViewHolderRecentChatList holder;
     
 	@Override
-	public void onBindViewHolder(ViewHolderContactsRequestList holder, int position) {		
+	public void onBindViewHolder(ViewHolderRecentChatList holder, int position) {
 
 		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
@@ -127,7 +134,40 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 		}
-						
+
+		ArrayList<MegaContact> contacts = chat.getContacts();
+		ArrayList<Message> messages = chat.getMessages();
+
+		if(contacts!=null){
+			if(contacts.size()==1){
+				holder.contactMail = contacts.get(0).getMail();
+				createDefaultAvatar(holder);
+				holder.textViewContactName.setText(contacts.get(0).getMail());
+			}
+			else{
+				log("GROUP chat, more than one contact involved");
+			}
+		}
+
+		if(messages!=null){
+			Message lastMessage = messages.get(messages.size()-1);
+			String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
+			if(lastMessage.getUser().getMail().equals(myMail)){
+				log("The last message is mine");
+
+				Spannable me = new SpannableString("Me: ");
+				me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				holder.textViewContent.setText(me);
+				Spannable myMessage = new SpannableString(lastMessage.getMessage());
+				myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				holder.textViewContent.append(myMessage);
+			}
+			else{
+				log("The last message NOT mine");
+				holder.textViewContent.setText(lastMessage.getMessage());
+			}
+			holder.textViewDate.setText(lastMessage.getDate().toString());
+		}
 
 		
 
@@ -137,7 +177,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	}
 
 	@Override
-	public ViewHolderContactsRequestList onCreateViewHolder(ViewGroup parent,int viewType) {
+	public ViewHolderRecentChatList onCreateViewHolder(ViewGroup parent, int viewType) {
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -148,12 +188,13 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	    float scaleH = Util.getScaleH(outMetrics, density); 		
 	
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
-		holder = new ViewHolderContactsRequestList(v);
+		holder = new ViewHolderRecentChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
+		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 		//Right margin
 		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
@@ -167,7 +208,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		return holder;
 	}
 	
-	public void createDefaultAvatar(ViewHolderContactsRequestList holder){
+	public void createDefaultAvatar(ViewHolderRecentChatList holder){
 		log("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -347,7 +388,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
     
 	@Override
 	public void onClick(View v) {
-		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) v.getTag();
+		ViewHolderRecentChatList holder = (ViewHolderRecentChatList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		ChatRoom c = (ChatRoom) getItem(currentPosition);
 		
