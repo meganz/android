@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -58,6 +59,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -240,6 +243,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionAvatarDelete;
 	private AvatarOptionsPanelListener avatarOptionsPanelListener;
 	////
+
+	//COLLECTION FAB BUTTONS
+	CoordinatorLayout fabButtonsLayout;
+	FloatingActionButton mainFabButtonChat;
+	FloatingActionButton firstFabButtonChat;
+	FloatingActionButton secondFabButtonChat;
+	FloatingActionButton thirdFabButtonChat;
+	private Animation openFabAnim,closeFabAnim,rotateLeftAnim,rotateRightAnim, collectionFABLayoutOut;
+	boolean isFabOpen=false;
+	//
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -444,6 +457,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem pauseTransfersMenuIcon;
 	private MenuItem logoutMenuItem;
 	private MenuItem forgotPassMenuItem;
+	private MenuItem newChatMenuItem;
 
 	boolean fromTakePicture = false;
 
@@ -1217,6 +1231,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		//FAB button
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
+
+		//Collection of FAB for CHAT
+		fabButtonsLayout = (CoordinatorLayout) findViewById(R.id.fab_collection_layout);
+		mainFabButtonChat = (FloatingActionButton) findViewById(R.id.main_fab_chat);
+		mainFabButtonChat.setOnClickListener(new FabButtonListener(this));
+		firstFabButtonChat = (FloatingActionButton) findViewById(R.id.first_fab_chat);
+		firstFabButtonChat.setOnClickListener(new FabButtonListener(this));
+		secondFabButtonChat = (FloatingActionButton) findViewById(R.id.second_fab_chat);
+		secondFabButtonChat.setOnClickListener(new FabButtonListener(this));
+		thirdFabButtonChat = (FloatingActionButton) findViewById(R.id.third_fab_chat);
+		thirdFabButtonChat.setOnClickListener(new FabButtonListener(this));
+
+		collectionFABLayoutOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.collection_fab_layout_out);
+		collectionFABLayoutOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				log("onAnimationEnd");
+				fabButtonsLayout.setVisibility(View.GONE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+		});
+		openFabAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.open_fab);
+		closeFabAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.close_fab);
+		closeFabAnim.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				log("onAnimationEnd");
+//				mainFabButtonChat.setVisibility(View.GONE);
+//				fabButtonsLayout.startAnimation(collectionFABLayoutOut);
+				fabButtonsLayout.setVisibility(View.GONE);
+				fabButton.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+		});
+
+		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
+		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
 
 		//Sliding UPLOAD panel
 		slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
@@ -3043,6 +3112,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectDrawerItemAccount(){
 		log("selectDrawerItemAccount");
 
+		contactsSectionLayout.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		sharesSectionLayout.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		cloudSectionLayout.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		chatSectionLayout.setVisibility(View.GONE);
+		viewPagerChat.setVisibility(View.GONE);
+
 		switch(accountFragment){
 			case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 				log("Show upgrade FRAGMENT");
@@ -3853,6 +3931,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		forgotPassMenuItem.setVisible(false);
 
+		newChatMenuItem= menu.findItem(R.id.action_menu_new_chat);
+
 	    if (drawerItem == null){
 	    	if (nV != null){
 	    		Menu nVMenu = nV.getMenu();
@@ -4000,6 +4080,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
+			newChatMenuItem.setVisible(false);
 			return super.onCreateOptionsMenu(menu);
 		}
 
@@ -4047,6 +4128,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			gridSmallLargeMenuItem.setVisible(false);
 			}
+			newChatMenuItem.setVisible(false);
 		}
 
 	    else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -4095,6 +4177,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchMenuItem.setVisible(false);
     			}
 			}
+			newChatMenuItem.setVisible(false);
 		}
 	    else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 	    	if (muFLol != null){
@@ -4142,6 +4225,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchMenuItem.setVisible(false);
     			}
 			}
+			newChatMenuItem.setVisible(false);
 		}
 
 	    else if (drawerItem == DrawerItem.INBOX){
@@ -4188,6 +4272,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			gridSmallLargeMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
 			}
 		}
 
@@ -4322,6 +4407,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			}
 				}
 			}
+			newChatMenuItem.setVisible(false);
 		}
 
 	    else if (drawerItem == DrawerItem.CONTACTS){
@@ -4336,6 +4422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				thumbViewMenuItem.setVisible(true);
 				upgradeAccountMenuItem.setVisible(true);
 				searchMenuItem.setVisible(true);
+				newChatMenuItem.setVisible(true);
 
 				//Hide
 				pauseTransfersMenuIcon.setVisible(false);
@@ -4465,6 +4552,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
+					newChatMenuItem.setVisible(false);
 
 					//Show
 	    			selectMenuItem.setVisible(true);
@@ -4504,6 +4592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				settingsMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
 
 				if(accountFragment==Constants.MY_ACCOUNT_FRAGMENT){
 					//Show
@@ -4574,6 +4663,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
@@ -4646,8 +4736,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				forgotPassMenuItem.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
+				newChatMenuItem.setVisible(false);
 			}
 	    }
+		else if (drawerItem == DrawerItem.CHAT){
+			log("in Chat Section");
+			int index = viewPagerChat.getCurrentItem();
+			if (index == 0) {
+				log("createOptions TAB chat");
+				if (rChatFL != null){
+					newChatMenuItem.setVisible(true);
+					addContactMenuItem.setVisible(true);
+				}
+			}
+			else{
+				newChatMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(true);
+			}
+
+			//Hide
+			searchMenuItem.setVisible(false);
+			createFolderMenuItem.setVisible(false);
+			addMenuItem.setVisible(false);
+			sortByMenuItem.setVisible(false);
+			selectMenuItem.setVisible(false);
+			unSelectMenuItem.setVisible(false);
+			thumbViewMenuItem.setVisible(false);
+			addMenuItem.setEnabled(false);
+			rubbishBinMenuItem.setVisible(false);
+			clearRubbishBinMenuitem.setVisible(false);
+			importLinkMenuItem.setVisible(false);
+			takePicture.setVisible(false);
+			settingsMenuItem.setVisible(false);
+			refreshMenuItem.setVisible(false);
+			helpMenuItem.setVisible(false);
+			upgradeAccountMenuItem.setVisible(false);
+			changePass.setVisible(false);
+			cancelSubscription.setVisible(false);
+			killAllSessions.setVisible(false);
+			logoutMenuItem.setVisible(false);
+			cancelAllTransfersMenuItem.setVisible(false);
+			forgotPassMenuItem.setVisible(false);
+			playTransfersMenuIcon.setVisible(false);
+			pauseTransfersMenuIcon.setVisible(false);
+		}
 		log("Call to super onCreateOptionsMenu");
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -4879,12 +5011,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_add_contact:{
-	        	if (drawerItem == DrawerItem.CONTACTS){
+	        	if (drawerItem == DrawerItem.CONTACTS||drawerItem == DrawerItem.CHAT){
 					chooseAddContactDialog();
 	        	}
-
 	        	return true;
 	        }
+			case R.id.action_menu_new_chat:{
+				if (drawerItem == DrawerItem.CHAT){
+					Snackbar.make(fragmentContainer, "NEW CHAT!", Snackbar.LENGTH_LONG).show();
+				}
+
+				return true;
+			}
 	        case R.id.action_menu_kill_all_sessions:{
 				aC.killAllSessions(this);
 	        	return true;
@@ -6212,6 +6350,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		drawerLayout.closeDrawer(Gravity.LEFT);
     		return;
     	}
+
+		if(isFabOpen){
+			animateFABCollection();
+			return;
+		}
 
 		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
 			log("slidingUploadPanel()!=PanelState.HIDDEN");
@@ -7922,7 +8065,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		addContactDialog = b.create();
 		addContactDialog.show();
 	}
-
 
 	public void addContactFromPhone(){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -12009,6 +12151,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		nVEmail.setText(myAccountInfo.getMyUser().getEmail());
 	}
 
+	public void animateFABCollection(){
+		log("animateFABCollection");
+
+		if(isFabOpen){
+			mainFabButtonChat.startAnimation(rotateLeftAnim);
+			firstFabButtonChat.startAnimation(closeFabAnim);
+			secondFabButtonChat.startAnimation(closeFabAnim);
+			thirdFabButtonChat.startAnimation(closeFabAnim);
+			firstFabButtonChat.setClickable(false);
+			secondFabButtonChat.setClickable(false);
+			thirdFabButtonChat.setClickable(false);
+			isFabOpen = false;
+			log("close COLLECTION FAB");
+
+		} else {
+			mainFabButtonChat.startAnimation(rotateRightAnim);
+			firstFabButtonChat.startAnimation(openFabAnim);
+			secondFabButtonChat.startAnimation(openFabAnim);
+			thirdFabButtonChat.startAnimation(openFabAnim);
+			firstFabButtonChat.setClickable(true);
+			secondFabButtonChat.setClickable(true);
+			thirdFabButtonChat.setClickable(true);
+			isFabOpen = true;
+			fabButton.setVisibility(View.GONE);
+			fabButtonsLayout.setVisibility(View.VISIBLE);
+			log("open COLLECTION FAB");
+		}
+	}
+
 	public void showFabButton(){
 		log("showFabButton");
 		switch (drawerItem){
@@ -12121,6 +12292,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 					default:{
+						fabButtonsLayout.setVisibility(View.GONE);
 						fabButton.setVisibility(View.GONE);
 						break;
 					}

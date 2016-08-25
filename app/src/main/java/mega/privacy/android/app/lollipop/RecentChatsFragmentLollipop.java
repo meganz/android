@@ -17,28 +17,43 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaRecentChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
 
     MegaApiAndroid megaApi;
 
     Context context;
     ActionBar aB;
     RecyclerView listView;
-    MegaContactRequestLollipopAdapter adapterList;
+    MegaRecentChatLollipopAdapter adapterList;
     GestureDetectorCompat detector;
-    ImageView emptyImageView;
     TextView emptyTextView;
     RecyclerView.LayoutManager mLayoutManager;
+
+    ArrayList<ChatRoom> chats;
+    RecentChat recentChat;
+
+    RelativeLayout emptyLayout;
+    LinearLayout buttonsEmptyLayout;
+    Button inviteButton;
+    Button getStartedButton;
 
     float scaleH, scaleW;
     float density;
@@ -73,6 +88,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+
+        recentChat = new RecentChat();
     }
 
     @Override
@@ -99,16 +116,52 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         listView.addOnItemTouchListener(this);
         listView.setItemAnimator(new DefaultItemAnimator());
 
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_chat_recent);
+        emptyLayout = (RelativeLayout) v.findViewById(R.id.empty_layout_chat_recent);
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
-        emptyImageView.setImageResource(R.drawable.sent_requests_empty);
-        emptyTextView.setText(R.string.sent_requests_empty);
+        RelativeLayout.LayoutParams emptyTextViewParams = (RelativeLayout.LayoutParams)emptyTextView.getLayoutParams();
+        emptyTextViewParams.setMargins(Util.scaleWidthPx(39, outMetrics), Util.scaleHeightPx(95, outMetrics), Util.scaleWidthPx(39, outMetrics), 0);
+        emptyTextView.setLayoutParams(emptyTextViewParams);
 
-        listView.setVisibility(View.GONE);
+        buttonsEmptyLayout = (LinearLayout) v.findViewById(R.id.empty_buttons_layout_recent_chat);
+        RelativeLayout.LayoutParams buttonsEmptyLayoutParams = (RelativeLayout.LayoutParams)buttonsEmptyLayout.getLayoutParams();
+        buttonsEmptyLayoutParams.setMargins(Util.scaleWidthPx(39, outMetrics), Util.scaleHeightPx(49, outMetrics), 0, 0);
+        buttonsEmptyLayout.setLayoutParams(buttonsEmptyLayoutParams);
 
-        emptyImageView.setVisibility(View.VISIBLE);
-        emptyTextView.setVisibility(View.VISIBLE);
+        inviteButton = (Button) v.findViewById(R.id.invite_button);
+        LinearLayout.LayoutParams inviteButtonParams = (LinearLayout.LayoutParams)inviteButton.getLayoutParams();
+        inviteButtonParams.setMargins(0, Util.scaleHeightPx(4, outMetrics), 0, Util.scaleHeightPx(4, outMetrics));
+        inviteButton.setLayoutParams(inviteButtonParams);
+        inviteButton.setOnClickListener(this);
+
+        getStartedButton = (Button) v.findViewById(R.id.get_started_button);
+        LinearLayout.LayoutParams getStartedButtonParams = (LinearLayout.LayoutParams)getStartedButton.getLayoutParams();
+        getStartedButtonParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, Util.scaleHeightPx(4, outMetrics));
+        getStartedButton.setLayoutParams(getStartedButtonParams);
+        getStartedButton.setOnClickListener(this);
+
+        chats = recentChat.getRecentChats();
+
+        if (adapterList == null){
+            adapterList = new MegaRecentChatLollipopAdapter(context, this, chats, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+        }
+        else{
+            adapterList.setContacts(chats);
+        }
+
+        adapterList.setPositionClicked(-1);
+        listView.setAdapter(adapterList);
+
+        if (adapterList.getItemCount() == 0){
+            log("adapterList.getItemCount() == 0");
+            listView.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        }
+        else{
+            log("adapterList.getItemCount() NOT = 0");
+            listView.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+        }
 
         return v;
     }
@@ -163,6 +216,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     @Override
     public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        log("onClick");
+        switch (v.getId()) {
+            case R.id.invite_button:{
+                break;
+            }
+            case R.id.get_started_button:{
+                break;
+            }
+        }
     }
 
     @Override

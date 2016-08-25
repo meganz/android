@@ -261,7 +261,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 		if(contacts!=null) {
 			log("Sent requests: "+contacts.size());
 			if (adapterList == null) {
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 				listView.setAdapter(adapterList);
 			} else {
 				adapterList.setContacts(contacts);
@@ -330,7 +330,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 			emptyTextView.setText(R.string.sent_requests_empty);
 
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);

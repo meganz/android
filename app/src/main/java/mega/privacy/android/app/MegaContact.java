@@ -1,7 +1,5 @@
 package mega.privacy.android.app;
 
-import nz.mega.sdk.MegaUser;
-
 public class MegaContact {
 	String handle;
 	String name;
@@ -14,6 +12,10 @@ public class MegaContact {
 		this.name = name;
 		this.lastName = lastName;
 		this.mail = mail;
+	}
+
+	public MegaContact() {
+		super();
 	}
 
 	public String getHandle() {
