@@ -14,6 +14,7 @@ public class RecentChat {
     ChatRoom chat3;
     ChatRoom chat4;
     ChatRoom chat5;
+    ChatRoom chat6;
 
     public RecentChat(){
 
@@ -121,40 +122,6 @@ public class RecentChat {
         chat3.setUnreadMessages(0);
         recentChats.add(chat3);
 
-        //Chat 4
-        chat4 = new ChatRoom();
-        MegaContact user4 = new MegaContact();
-        user4.setMail("android444@yopmail.com");
-        user4.setHandle("555456145");
-        ArrayList<MegaContact> contacts4 = new ArrayList<MegaContact>();
-        contacts4.add(user4);
-        chat4.setContacts(contacts4);
-
-        ArrayList<Message> messagesList4 = new ArrayList<Message>();
-
-        Message message7 = new Message();
-        message7.setMessage("Good night!");
-        message7.setDate(1468605677);
-        message7.setType(Message.TEXT);
-        MegaContact ownerMessage7 = new MegaContact();
-        ownerMessage7.setMail("android555@yopmail.com");
-        message7.setUser(ownerMessage7);
-        messagesList4.add(message7);
-
-        Message message8 = new Message();
-        message8.setMessage("Thank you for your help");
-        message8.setDate(1468605850);
-        message8.setType(Message.TEXT);
-        message8.setRead(true);
-        MegaContact ownerMessage8 = new MegaContact();
-        ownerMessage8.setMail("android444@yopmail.com");
-        message8.setUser(ownerMessage8);
-        messagesList4.add(message8);
-
-        chat4.setMessages(messagesList4);
-        chat4.setUnreadMessages(0);
-        recentChats.add(chat4);
-
         //Chat 5
         chat5 = new ChatRoom();
         MegaContact user5 = new MegaContact();
@@ -177,7 +144,7 @@ public class RecentChat {
 
         Message message10 = new Message();
         message10.setMessage("Imagine was you removal raising at gravity. Unsatiable understood or expression dissimilar so sufficient. Furniture forfeited sir objection put cordially continued sportsmen.");
-        message10.setDate(1455958850);
+        message10.setDate(1468605850);
         message10.setType(Message.TEXT);
         message10.setRead(false);
         MegaContact ownerMessage10 = new MegaContact();
@@ -188,6 +155,73 @@ public class RecentChat {
         chat5.setMessages(messagesList5);
         chat5.setUnreadMessages(20);
         recentChats.add(chat5);
+
+        //Chat 4
+        chat4 = new ChatRoom();
+        MegaContact user4 = new MegaContact();
+        user4.setMail("android444@yopmail.com");
+        user4.setHandle("555456145");
+        ArrayList<MegaContact> contacts4 = new ArrayList<MegaContact>();
+        contacts4.add(user4);
+        chat4.setContacts(contacts4);
+
+        ArrayList<Message> messagesList4 = new ArrayList<Message>();
+
+        Message message7 = new Message();
+        message7.setMessage("Good night!");
+        message7.setDate(1468605677);
+        message7.setType(Message.TEXT);
+        MegaContact ownerMessage7 = new MegaContact();
+        ownerMessage7.setMail("android555@yopmail.com");
+        message7.setUser(ownerMessage7);
+        messagesList4.add(message7);
+
+        Message message8 = new Message();
+        message8.setMessage("Thank you for your help");
+        message8.setDate(1455958850);
+        message8.setType(Message.TEXT);
+        message8.setRead(true);
+        MegaContact ownerMessage8 = new MegaContact();
+        ownerMessage8.setMail("android444@yopmail.com");
+        message8.setUser(ownerMessage8);
+        messagesList4.add(message8);
+
+        chat4.setMessages(messagesList4);
+        chat4.setUnreadMessages(0);
+        recentChats.add(chat4);
+
+        //Chat 6
+        chat6 = new ChatRoom();
+        MegaContact user6 = new MegaContact();
+        user6.setMail("megaiostest@yopmail.com");
+        user6.setHandle("-3079530489669586212");
+        ArrayList<MegaContact> contacts6= new ArrayList<MegaContact>();
+        contacts6.add(user6);
+        chat6.setContacts(contacts6);
+
+        ArrayList<Message> messagesList6 = new ArrayList<Message>();
+
+        Message message11 = new Message();
+        message11.setMessage("I need a chat plz");
+        message11.setDate(1470070055);
+        message11.setType(Message.TEXT);
+        MegaContact ownerMessage11 = new MegaContact();
+        ownerMessage11.setMail("android555@yopmail.com");
+        message11.setUser(ownerMessage11);
+        messagesList6.add(message11);
+
+        Message message12 = new Message();
+        message12.setDate(1470070068);
+        message12.setType(Message.VIDEO);
+        message12.setDuration(8432);
+        MegaContact ownerMessage12 = new MegaContact();
+        ownerMessage12.setMail("megaiostest@yopmail.com");
+        message12.setUser(ownerMessage12);
+        messagesList6.add(message12);
+
+        chat6.setMessages(messagesList6);
+        chat6.setUnreadMessages(0);
+        recentChats.add(chat6);
     }
 
     public ArrayList<ChatRoom> getRecentChats() {

@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -286,6 +287,11 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 				nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(16, outMetrics), 0, 0);
 				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 
+				//Set margin contentTextView - more margin bottom duration
+				RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
+				contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(0, outMetrics), Util.scaleWidthPx(65, outMetrics), 0);
+				holder.textViewContent.setLayoutParams(contentTextViewParams);
+
 				String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
 				if(lastMessage.getUser().getMail().equals(myMail)){
 					log("The last message is mine");
@@ -318,12 +324,18 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 				nameTextViewParams.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(16, outMetrics), 0, 0);
 				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 
+				//Set margin contentTextView - more margin bottom duration
+				RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
+				contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(0, outMetrics), Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(2, outMetrics));
+				holder.textViewContent.setLayoutParams(contentTextViewParams);
+
 				Spannable videoCall = new SpannableString("Video call "+" \n");
 				videoCall.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, videoCall.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				holder.textViewContent.setText(videoCall);
 				int duration = (int) lastMessage.getDuration();
 				String s = formatStringDuration(duration);
 				Spannable durationString = new SpannableString(s);
+				durationString.setSpan(new RelativeSizeSpan(0.85f), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				durationString.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				holder.textViewContent.append(durationString);
 			}
@@ -355,9 +367,11 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 
 			String timeString;
 			if (hours > 0) {
-				timeString = String.format("%d hours %d minutes %02d seconds", hours, minutes, seconds);
+				timeString = "%d " + context.getResources().getQuantityString(R.plurals.general_hours, hours) + " %d " + context.getResources().getQuantityString(R.plurals.general_minutes, minutes) + " %02d " + context.getResources().getQuantityString(R.plurals.general_seconds, seconds);
+				timeString = String.format(timeString, hours, minutes, seconds);
 			} else {
-				timeString = String.format("%d minutes %02d seconds", minutes, seconds);
+				timeString = "%d " + context.getResources().getQuantityString(R.plurals.general_minutes, minutes) + " %02d " + context.getResources().getQuantityString(R.plurals.general_seconds, seconds);
+				timeString = String.format(timeString, minutes, seconds);
 			}
 
 			log("The duration is: " + hours + " " + minutes + " " + seconds);
