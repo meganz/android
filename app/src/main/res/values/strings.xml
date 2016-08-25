@@ -834,5 +834,11 @@
     <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">ARCHIVE</string>
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
 
-    <string name="archive_chat_empty" context="the user has not sent any contact request to other users">No archived conversations</string>
+    <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
+    <string name="action_new_chat" context="Menu item">New chat</string>
+
+    <string name="get_started_button" context="Button to start using the chat">Get started</string>
+
+    <string name="recent_chat_empty" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
+
 </resources>
