@@ -391,7 +391,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 		MegaUser contact = (MegaUser) getItem(position);
 		holder.contactMail = contact.getEmail();
-		
+		log("contact: "+contact.getEmail()+" handle: "+contact.getHandle());
 	
 		if (!multipleSelect) {
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
