@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop.tempMegaChatClasses;
 
 
-import java.util.Date;
-
 import mega.privacy.android.app.MegaContact;
 
 public class Message {
@@ -12,17 +10,18 @@ public class Message {
     public static int AUDIO = 2;
 
     String message;
-    Date date;
+    long dateTimestamp;
     MegaContact user;
     int type;
     long duration;
+    boolean read;
 
-    public Date getDate() {
-        return date;
+    public long getDate() {
+        return dateTimestamp;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDate(long dateTimestamp) {
+        this.dateTimestamp = dateTimestamp;
     }
 
     public int getType() {
@@ -56,4 +55,13 @@ public class Message {
     public void setDuration(long duration) {
         this.duration = duration;
     }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
 }
