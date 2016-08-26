@@ -94,6 +94,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OldPreferences;
@@ -10285,6 +10286,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(getString(R.string.context_invitacion_reply));
+				if(request.getNumber()==MegaContactRequest.REPLY_ACTION_ACCEPT){
+					log("I've accepted the invitation");
+
+					MegaContactRequest contactRequest = megaApi.getContactRequestByHandle(request.getNodeHandle());
+					log("Handle of the rquest: "+request.getNodeHandle());
+					if(contactRequest!=null){
+						log("Source: "+contactRequest.getSourceEmail());
+						//Get the data of the user (avatar and name)
+						MegaContact contactDB = dbH.findContactByEmail(contactRequest.getSourceEmail());
+						if(contactDB==null){
+							log("The contact: "+contactRequest.getSourceEmail()+" not found! Will be added to DB!");
+							cC.addContactDB(contactRequest.getSourceEmail());
+						}
+						//Update view to get avatar
+						String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+						if (cFLol != null){
+							cFLol.updateView();
+						}
+					}
+					else{
+						log("ContactRequest is NULL");
+					}
+				}
 			}
 			else{
 				showSnackbar(getString(R.string.general_error));
