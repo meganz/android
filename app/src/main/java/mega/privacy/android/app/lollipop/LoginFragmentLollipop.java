@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -635,7 +634,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         //					log("URI: "+uriData);
                         //					extras = intentReceived.getExtras();
                         //					url = null;
-                        Snackbar.make(scrollView, getString(R.string.login_before_share), Snackbar.LENGTH_LONG).show();
+                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.login_before_share));
                     } else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)) {
                         log("ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY");
                         action = Constants.ACTION_EXPORT_MASTER_KEY;
@@ -746,7 +745,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -781,7 +780,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
         else{
             if(!Util.isOnline(context)){
-                Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
                 return;
             }
 
@@ -821,7 +820,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             prepareNodesText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -936,7 +935,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 Util.setFileLogger(true);
                                 numberOfClicks = 0;
                                 MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-                                Snackbar.make(scrollView,getString(R.string.settings_enable_logs),Snackbar.LENGTH_LONG).show();
+                                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
                                 log("App Version: " + Util.getVersion(context));
                             }
                             else{
@@ -944,21 +943,21 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 Util.setFileLogger(false);
                                 numberOfClicks = 0;
                                 MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                                Snackbar.make(scrollView,getString(R.string.settings_disable_logs),Snackbar.LENGTH_LONG).show();
+                                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
                             }
                         }
                         catch(Exception e){
                             dbH.setFileLogger(true);
                             Util.setFileLogger(true);
                             numberOfClicks = 0;
-                            Snackbar.make(scrollView,getString(R.string.settings_enable_logs),Snackbar.LENGTH_LONG).show();
+                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
                         }
                     }
                     else{
                         dbH.setFileLogger(true);
                         Util.setFileLogger(true);
                         numberOfClicks = 0;
-                        Snackbar.make(scrollView,getString(R.string.settings_enable_logs),Snackbar.LENGTH_LONG).show();
+                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
                     }
                 }
             }
@@ -1007,7 +1006,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
      */
     private void updateConfirmEmail(String link) {
         if(!Util.isOnline(context)){
-            Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -1159,10 +1158,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
-                Snackbar snackbar = Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG);
-                TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-                snackbarTextView.setMaxLines(5);
-                snackbar.show();
+                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
 
 //				DatabaseHandler dbH = new DatabaseHandler(this);
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -1269,10 +1265,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     queryingSignupLinkText.setVisibility(View.GONE);
                     confirmingAccountText.setVisibility(View.GONE);
 
-                    Snackbar snackbar = Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG);
-                    TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-                    snackbarTextView.setMaxLines(5);
-                    snackbar.show();
+                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
                 }
                 else{
                     log("OK fetch nodes");
@@ -1423,7 +1416,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 et_password.requestFocus();
             }
             else{
-                Snackbar.make(scrollView,error.getErrorString(),Snackbar.LENGTH_LONG).show();
+                ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 confirmLink = null;
             }
         }
@@ -1446,10 +1439,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 serversBusyText.setVisibility(View.GONE);
 
                 if (error.getErrorCode() == MegaError.API_ENOENT){
-                    Snackbar.make(scrollView,getString(R.string.error_incorrect_email_or_password),Snackbar.LENGTH_LONG).show();
+                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
                 }
                 else{
-                    Snackbar.make(scrollView,error.getErrorString(),Snackbar.LENGTH_LONG).show();
+                    ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 }
             }
         }
