@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,7 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
@@ -694,7 +696,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		ChatRoom c = (ChatRoom) getItem(currentPosition);
 		
 		switch (v.getId()){	
-			case R.id.contact_request_list_three_dots:{
+			case R.id.recent_chat_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
 					notifyDataSetChanged();
@@ -710,10 +712,12 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 					}
 				}
 				log("click three dots!");
+				Toast.makeText(context, "Three vertical dots!",Toast.LENGTH_SHORT).show();
 				break;
 			}
-			case R.id.contact_request_list_item_layout:{
+			case R.id.recent_chat_list_item_layout:{
 				log("click layout!");
+				((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
 				break;
 			}
 		}

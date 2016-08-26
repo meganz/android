@@ -831,7 +831,7 @@
 
     <string name="section_chat" context="Title of the screen that shows the chat">Chat</string>
 
-    <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">ARCHIVE</string>
+    <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
 
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
@@ -857,4 +857,7 @@
         <item quantity="one" context="Singular of seconds. 1 second">second</item>
         <item quantity="other" context="Plural of seconds. 2 second">seconds</item>
     </plurals>
+
+    <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d selected</string>
+    <string name="action_mute" context="Menu item">Mute</string>
 </resources>
