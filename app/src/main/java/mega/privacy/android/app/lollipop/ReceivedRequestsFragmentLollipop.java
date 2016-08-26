@@ -177,6 +177,14 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 
 	}
 
+	public boolean showSelectMenuItem(){
+		if (adapterList != null){
+			return adapterList.isMultipleSelect();
+		}
+
+		return false;
+	}
+
 	/*
 	 * Clear all selected items
 	 */

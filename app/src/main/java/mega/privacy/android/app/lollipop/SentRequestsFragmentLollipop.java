@@ -181,6 +181,14 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 
 	}
 
+	public boolean showSelectMenuItem(){
+		if (adapterList != null){
+			return adapterList.isMultipleSelect();
+		}
+
+		return false;
+	}
+
 	/*
 	 * Clear all selected items
 	 */
