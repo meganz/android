@@ -4836,19 +4836,59 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			return true;
 	        	}
 	        	if (drawerItem == DrawerItem.CONTACTS){
-		        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		        	cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		        	if (cFLol != null){
-	        			cFLol.selectAll();
-	        			if (cFLol.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
+					int index = viewPagerContacts.getCurrentItem();
+					log("----------------------------------------INDEX: "+index);
+					switch(index){
+						case 0:{
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (cFLol != null){
+								cFLol.selectAll();
+								if (cFLol.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+						case 1:{
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+							sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (sRFLol != null){
+								sRFLol.selectAll();
+								if (sRFLol.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+						case 2:{
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+							rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (rRFLol != null){
+								rRFLol.selectAll();
+								if (rRFLol.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+
+					}
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);
