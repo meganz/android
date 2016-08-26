@@ -4728,6 +4728,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (rChatFL != null){
 					newChatMenuItem.setVisible(true);
 					addContactMenuItem.setVisible(true);
+					selectMenuItem.setVisible(true);
 				}
 			}
 			else{
@@ -4740,7 +4741,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			createFolderMenuItem.setVisible(false);
 			addMenuItem.setVisible(false);
 			sortByMenuItem.setVisible(false);
-			selectMenuItem.setVisible(false);
 			unSelectMenuItem.setVisible(false);
 			thumbViewMenuItem.setVisible(false);
 			addMenuItem.setEnabled(false);
@@ -5178,6 +5178,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			}
 	        		}
     			}
+				if (drawerItem == DrawerItem.CHAT){
+					switch(indexChat){
+						case 1:{
+							break;
+						}
+						default:{
+							String chatTag = getFragmentTag(R.id.chat_tabs_pager, 0);
+							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(chatTag);
+							if (rChatFL != null){
+								rChatFL.selectAll();
+								if (rChatFL.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+					}
+				}
 	        	if (drawerItem == DrawerItem.INBOX){
 	        		if (iFLol != null){
 	        			iFLol.selectAll();
