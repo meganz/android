@@ -8,6 +8,7 @@ public class ChatRoom {
 
     ArrayList<Message> messages;
     ArrayList<MegaContact> contacts;
+    int unreadMessages;
 
     public ArrayList<MegaContact> getContacts() {
         return contacts;
@@ -23,5 +24,13 @@ public class ChatRoom {
 
     public void setMessages(ArrayList<Message> messages) {
         this.messages = messages;
+    }
+
+    public int getUnreadMessages() {
+        return unreadMessages;
+    }
+
+    public void setUnreadMessages(int unreadMessages) {
+        this.unreadMessages = unreadMessages;
     }
 }

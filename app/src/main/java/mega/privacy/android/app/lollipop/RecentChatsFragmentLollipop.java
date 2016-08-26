@@ -14,6 +14,9 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +24,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -65,17 +70,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         public void onLongPress(MotionEvent e) {
-//            View view = listView.findChildViewUnder(e.getX(), e.getY());
-//            int position = listView.getChildPosition(view);
-//
-//            // handle long press
-//            if (!adapterList.isMultipleSelect()){
-//                adapterList.setMultipleSelect(true);
-//
-//                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-//
-//                itemClick(position);
-//            }
+            View view = listView.findChildViewUnder(e.getX(), e.getY());
+            int position = listView.getChildPosition(view);
+
+            // handle long press
+            if (!adapterList.isMultipleSelect()){
+                adapterList.setMultipleSelect(true);
+
+                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+                itemClick(position);
+            }
             super.onLongPress(e);
         }
     }
@@ -223,13 +228,188 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         log("onClick");
         switch (v.getId()) {
             case R.id.invite_button:{
+                Toast.makeText(context, "INVITE!!!",Toast.LENGTH_SHORT).show();
                 break;
             }
             case R.id.get_started_button:{
+                Toast.makeText(context, "Get Started!!",Toast.LENGTH_SHORT).show();
                 break;
             }
         }
     }
+
+    /////Multiselect/////
+    private class ActionBarCallBack implements ActionMode.Callback {
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            List<ChatRoom> chats = adapterList.getSelectedChats();
+
+            switch(item.getItemId()){
+                case R.id.cab_menu_select_all:{
+                    selectAll();
+                    actionMode.invalidate();
+                    break;
+                }
+                case R.id.cab_menu_unselect_all:{
+                    clearSelections();
+                    hideMultipleSelect();
+                    actionMode.invalidate();
+                    break;
+                }
+                case R.id.cab_menu_mute:{
+                    clearSelections();
+                    hideMultipleSelect();
+                    //Mute
+                    Toast.makeText(context, "Mute: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case R.id.cab_menu_archive:{
+                    clearSelections();
+                    hideMultipleSelect();
+                    //Archive
+                    Toast.makeText(context, "Archive: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case R.id.cab_menu_delete:{
+                    clearSelections();
+                    hideMultipleSelect();
+                    //Delete
+                    Toast.makeText(context, "Delete: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.recent_chat_action, menu);
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode arg0) {
+            adapterList.setMultipleSelect(false);
+            clearSelections();
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            List<ChatRoom> selected = adapterList.getSelectedChats();
+
+            if (selected.size() != 0) {
+                menu.findItem(R.id.cab_menu_mute).setVisible(true);
+                menu.findItem(R.id.cab_menu_archive).setVisible(true);
+                menu.findItem(R.id.cab_menu_delete).setVisible(true);
+
+                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+                if(selected.size()==adapterList.getItemCount()){
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                    unselect.setTitle(getString(R.string.action_unselect_all));
+                    unselect.setVisible(true);
+                }
+                else if(selected.size()==1){
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                    unselect.setTitle(getString(R.string.action_unselect_one));
+                    unselect.setVisible(true);
+                }
+                else{
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                    unselect.setTitle(getString(R.string.action_unselect_all));
+                    unselect.setVisible(true);
+                }
+
+            }
+            else{
+                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+            }
+
+            return false;
+        }
+
+    }
+
+    public boolean showSelectMenuItem(){
+        if (adapterList != null){
+            return adapterList.isMultipleSelect();
+        }
+
+        return false;
+    }
+
+    /*
+     * Clear all selected items
+     */
+    private void clearSelections() {
+        if(adapterList.isMultipleSelect()){
+            adapterList.clearSelections();
+        }
+        updateActionModeTitle();
+    }
+
+    private void updateActionModeTitle() {
+        if (actionMode == null || getActivity() == null) {
+            return;
+        }
+        List<ChatRoom> chats = adapterList.getSelectedChats();
+
+        actionMode.setTitle(context.getString(R.string.selected_items, chats.size()));
+
+        try {
+            actionMode.invalidate();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            log("oninvalidate error");
+        }
+    }
+
+    /*
+     * Disable selection
+     */
+    void hideMultipleSelect() {
+        log("hideMultipleSelect");
+        adapterList.setMultipleSelect(false);
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+    }
+
+    public void selectAll() {
+        if (adapterList != null) {
+            if (adapterList.isMultipleSelect()) {
+                adapterList.selectAll();
+            } else {
+                adapterList.setMultipleSelect(true);
+                adapterList.selectAll();
+
+                actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+            }
+
+            updateActionModeTitle();
+        }
+    }
+
+    public void itemClick(int position) {
+        log("itemClick");
+        if (adapterList.isMultipleSelect()){
+            adapterList.toggleSelection(position);
+            List<ChatRoom> chats = adapterList.getSelectedChats();
+            if (chats.size() > 0){
+                updateActionModeTitle();
+                adapterList.notifyDataSetChanged();
+            }
+            else{
+                hideMultipleSelect();
+            }
+        }
+        else{
+            log("nothing, not multiple select");
+        }
+    }
+    /////END Multiselect/////
 
     @Override
     public void onAttach(Activity activity) {
