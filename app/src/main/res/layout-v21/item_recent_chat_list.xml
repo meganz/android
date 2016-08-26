@@ -10,7 +10,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="18dp"
-        android:layout_centerVertical="true">
+        android:layout_marginTop="22dp">
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/recent_chat_list_thumbnail"
@@ -31,17 +31,56 @@
             android:paddingBottom="3dp" />
     </RelativeLayout>
 
+    <ImageView
+        android:id="@+id/recent_chat_list_call_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
+        android:layout_marginTop="19dp"
+        android:layout_marginLeft="13dp"
+        android:background="@null"
+        android:src="@drawable/ic_camcorder_black" />
+
     <TextView
         android:id="@+id/recent_chat_list_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
+        android:layout_toRightOf="@id/recent_chat_list_call_icon"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
         android:ellipsize="end"
         android:textSize="16sp"
         android:maxLines="1"
         android:textColor="@color/file_list_first_row" />
+
+    <RelativeLayout
+        android:id="@+id/recent_chat_list_unread_layout"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="13dp">
+
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/recent_chat_list_unread_circle"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:scaleType="fitCenter"
+            rounded:border_color="@color/accentColor"
+            rounded:border_width="0dp"
+            rounded:corner_radius="12dp" />
+
+        <TextView
+            android:id="@+id/recent_chat_list_unread_number"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:gravity="center_horizontal|center_vertical"
+            android:paddingBottom="1dp" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/recent_chat_list_content"
@@ -50,7 +89,7 @@
         android:layout_below="@id/recent_chat_list_name"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="13dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="65dp"
         android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="2"
