@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -262,7 +261,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         if(!Util.isOnline(context))
         {
-            Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -301,7 +300,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             userPasswordConfirm.requestFocus();
             return false;
         } else if (!chkTOS.isChecked()) {
-            Snackbar.make(scrollView,getString(R.string.create_account_no_terms),Snackbar.LENGTH_LONG).show();
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.create_account_no_terms));
             return false;
         }
         return true;
@@ -347,7 +346,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     private void onKeysGenerated(final String privateKey, final String publicKey) {
         if(!Util.isOnline(context)){
-            Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
             return;
         }
 
@@ -371,14 +370,16 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         log("onRequestFinish");
         if (e.getErrorCode() != MegaError.API_OK) {
             log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
-            String message = e.getErrorString();
+
             if (e.getErrorCode() == MegaError.API_EEXIST) {
+                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_email_registered));
                 ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
-                Snackbar.make(scrollView, getString(R.string.error_email_registered), Snackbar.LENGTH_LONG).show();
                 return;
             }
             else{
-                Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
+                String message = e.getErrorString();
+                ((LoginActivityLollipop)context).showSnackbar(message);
+                ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
                 createAccountLayout.setVisibility(View.VISIBLE);
                 createAccountLoginLayout.setVisibility(View.VISIBLE);
                 creatingAccountLayout.setVisibility(View.GONE);
