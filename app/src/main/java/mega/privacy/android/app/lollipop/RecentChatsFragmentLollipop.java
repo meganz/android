@@ -71,7 +71,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         public void onLongPress(MotionEvent e) {
             View view = listView.findChildViewUnder(e.getX(), e.getY());
-            int position = listView.getChildPosition(view);
+            int position = listView.getChildLayoutPosition(view);
 
             // handle long press
             if (!adapterList.isMultipleSelect()){
@@ -81,6 +81,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
                 itemClick(position);
             }
+
             super.onLongPress(e);
         }
     }
@@ -399,7 +400,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             List<ChatRoom> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
-                adapterList.notifyDataSetChanged();
+//                adapterList.notifyDataSetChanged();
             }
             else{
                 hideMultipleSelect();

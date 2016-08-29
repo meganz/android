@@ -20,6 +20,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -108,6 +110,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView callIcon;
+		ImageView multiselectIcon;
         int currentPosition;
         String contactMail;
 		String lastNameText="";
@@ -147,35 +150,8 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
 		
-		log("Get the ChatRoom");
+		log("Get the ChatRoom: "+position);
 		ChatRoom chat = (ChatRoom) getItem(position);
-		
-		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			if (positionClicked != -1){
-				if (positionClicked == position){
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					listFragment.smoothScrollToPosition(positionClicked);
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			}
-		} else {
-			log("Multiselect ON");
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
-
-			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-			}
-			else{
-				log("NOT selected");
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			}
-		}
 
 		ArrayList<MegaContact> contacts = chat.getContacts();
 		ArrayList<Message> messages = chat.getMessages();
@@ -183,6 +159,39 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		if(contacts!=null){
 			if(contacts.size()==1){
 				holder.contactMail = contacts.get(0).getMail();
+
+				if (!multipleSelect) {
+					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+					if (positionClicked != -1){
+						if (positionClicked == position){
+							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+							listFragment.smoothScrollToPosition(positionClicked);
+						}
+						else{
+							holder.itemLayout.setBackgroundColor(Color.WHITE);
+						}
+					}
+					else{
+						holder.itemLayout.setBackgroundColor(Color.WHITE);
+					}
+					holder.multiselectIcon.setVisibility(View.GONE);
+					setUserAvatar(holder);
+				} else {
+					log("Multiselect ON");
+					holder.imageButtonThreeDots.setVisibility(View.GONE);
+
+					if(this.isItemChecked(position)){
+						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+						createMultiselectTick(holder);
+					}
+					else{
+						log("NOT selected");
+						holder.itemLayout.setBackgroundColor(Color.WHITE);
+						holder.multiselectIcon.setVisibility(View.GONE);
+						setUserAvatar(holder);
+					}
+				}
+
 				MegaContact contactDB = dbH.findContactByHandle(contacts.get(0).getHandle());
 //				MegaContact contactDB = dbH.findContactByHandle("6135453135");
 				if(contactDB!=null){
@@ -213,56 +222,6 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 					String fullName = splitEmail[0];
 					holder.textViewContactName.setText(fullName);
 				}
-
-				createDefaultAvatar(holder);
-
-				ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
-
-				File avatar = null;
-				if (context.getExternalCacheDir() != null){
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-				}
-				else{
-					avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-				}
-				Bitmap bitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-						if (bitmap == null) {
-							avatar.delete();
-//							if (context.getExternalCacheDir() != null){
-//								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-//							}
-//							else{
-//								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-//							}
-						}
-						else{
-							holder.contactInitialLetter.setVisibility(View.GONE);
-							holder.imageView.setImageBitmap(bitmap);
-						}
-					}
-					else{
-//						if (context.getExternalCacheDir() != null){
-//							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-//						}
-//						else{
-//							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-//						}
-					}
-				}
-				else{
-//					if (context.getExternalCacheDir() != null){
-//						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-//					}
-//					else{
-//						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-//					}
-				}
 			}
 			else{
 				log("GROUP chat, more than one contact involved");
@@ -278,7 +237,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 
 				if(chat.getUnreadMessages()!=0){
 					int unreadMessages = chat.getUnreadMessages();
-					setPendingMessages(unreadMessages);
+					setPendingMessages(unreadMessages, holder);
 				}
 				else{
 					holder.layoutPendingMessages.setVisibility(View.GONE);
@@ -317,7 +276,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 					holder.textViewContent.setText(lastMessage.getMessage());
 				}
 			}
-			else{
+			else if(lastMessage.getType()==Message.VIDEO){
 				//The last message is a call
 				log("The last message is a call!");
 				holder.callIcon.setVisibility(View.VISIBLE);
@@ -341,16 +300,68 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 				durationString.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				holder.textViewContent.append(durationString);
 			}
-
-			formatDate(lastMessage);
-
+			formatDate(lastMessage, holder);
 		}
 
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);		
 	}
 
-	public void formatDate(Message lastMessage){
+	public void setUserAvatar(ViewHolderRecentChatList holder){
+		log("setUserAvatar");
+
+		createDefaultAvatar(holder);
+
+		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
+
+		File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		}
+		Bitmap bitmap = null;
+		if (avatar.exists()){
+			if (avatar.length() > 0){
+				BitmapFactory.Options bOpts = new BitmapFactory.Options();
+				bOpts.inPurgeable = true;
+				bOpts.inInputShareable = true;
+				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				if (bitmap == null) {
+					avatar.delete();
+//							if (context.getExternalCacheDir() != null){
+//								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+//							}
+//							else{
+//								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+//							}
+				}
+				else{
+					holder.contactInitialLetter.setVisibility(View.GONE);
+					holder.imageView.setImageBitmap(bitmap);
+				}
+			}
+			else{
+//						if (context.getExternalCacheDir() != null){
+//							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+//						}
+//						else{
+//							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+//						}
+			}
+		}
+		else{
+//					if (context.getExternalCacheDir() != null){
+//						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+//					}
+//					else{
+//						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+//					}
+		}
+	}
+
+	public void formatDate(Message lastMessage, ViewHolderRecentChatList holder){
 		java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
 		Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
 		TimeZone tz = cal.getTimeZone();
@@ -400,6 +411,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		holder = new ViewHolderRecentChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
 		holder.callIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
+		holder.multiselectIcon = (ImageView) v.findViewById(R.id.recent_chat_list_multiselect_icon);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
@@ -422,7 +434,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		return holder;
 	}
 
-	public void setPendingMessages(int unreadMessages){
+	public void setPendingMessages(int unreadMessages, ViewHolderRecentChatList holder){
 		log("setPendingMessages: "+unreadMessages);
 
 		Bitmap circle = Bitmap.createBitmap(150,150, Bitmap.Config.ARGB_8888);
@@ -442,6 +454,28 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 
 		holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 		holder.numberPendingMessages.setText(unreadMessages+"");
+	}
+
+	public void createMultiselectTick (ViewHolderRecentChatList holder){
+		log("createMultiselectTick");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(context.getResources().getColor(R.color.grey_info_menu));
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		holder.imageView.setImageBitmap(defaultAvatar);
+
+		holder.contactInitialLetter.setVisibility(View.GONE);
+		holder.multiselectIcon.setVisibility(View.VISIBLE);
 	}
 	
 	public void createDefaultAvatar(ViewHolderRecentChatList holder){
@@ -477,7 +511,6 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
         
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 		holder.imageView.setImageBitmap(defaultAvatar);
-		
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -588,7 +621,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		log("setMultipleSelect");
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
+//			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
@@ -598,6 +631,13 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
+		ViewHolderRecentChatList view = (ViewHolderRecentChatList) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+view.contactMail);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			view.imageView.startAnimation(flipAnimation);
+		}
+
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
 			selectedItems.delete(pos);
@@ -608,7 +648,44 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		}
 		notifyItemChanged(pos);
 	}
-	
+
+	public void toggleSelection(ViewHolderRecentChatList holder) {
+		log("toggleSelection");
+
+		Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+
+//		flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+//
+//
+//			@Override
+//			public void onAnimationStart(Animation animation) {
+//
+//			}
+//
+//			@Override
+//			public void onAnimationEnd(Animation animation) {
+//
+//			}
+//
+//			@Override
+//			public void onAnimationRepeat(Animation animation) {
+//
+//			}
+//		});
+
+		holder.imageView.startAnimation(flipAnimation);
+
+		if (selectedItems.get(holder.currentPosition, false)) {
+			log("delete pos: "+holder.currentPosition);
+			selectedItems.delete(holder.currentPosition);
+		}
+		else {
+			log("PUT pos: "+holder.currentPosition);
+			selectedItems.put(holder.currentPosition, true);
+		}
+		notifyItemChanged(holder.currentPosition);
+	}
+
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
@@ -717,7 +794,12 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 			}
 			case R.id.recent_chat_list_item_layout:{
 				log("click layout!");
+//				if(multipleSelect){
+//					toggleSelection(holder);
+//				}
+
 				((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+
 				break;
 			}
 		}
