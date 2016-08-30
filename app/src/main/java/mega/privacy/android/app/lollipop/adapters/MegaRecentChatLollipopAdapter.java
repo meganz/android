@@ -178,14 +178,15 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 					setUserAvatar(holder);
 				} else {
 					log("Multiselect ON");
-					holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 					if(this.isItemChecked(position)){
+						holder.imageButtonThreeDots.setVisibility(View.GONE);
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 						createMultiselectTick(holder);
 					}
 					else{
 						log("NOT selected");
+						holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
 						holder.multiselectIcon.setVisibility(View.GONE);
 						setUserAvatar(holder);

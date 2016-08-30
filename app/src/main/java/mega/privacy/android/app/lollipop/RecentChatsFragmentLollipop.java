@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -70,6 +71,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         public void onLongPress(MotionEvent e) {
+            log("onLongPress");
             View view = listView.findChildViewUnder(e.getX(), e.getY());
             int position = listView.getChildLayoutPosition(view);
 
@@ -407,7 +409,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             }
         }
         else{
-            log("nothing, not multiple select");
+            log("open chat one to one");
+            Intent intent = new Intent(context, ChatActivityLollipop.class);
+            this.startActivity(intent);
         }
     }
     /////END Multiselect/////

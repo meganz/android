@@ -860,4 +860,6 @@
 
     <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d selected</string>
     <string name="action_mute" context="Menu item">Mute</string>
+
+    <string name="invite_Lara_chat" context="Menu item">Invite Lara to join you on Chat by sending the message above.\n\nPlease note that, this invitation will be sent by email and for that reason encryption will not be applied.</string>
 </resources>
