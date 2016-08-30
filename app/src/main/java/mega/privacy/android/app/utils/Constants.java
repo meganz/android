@@ -100,6 +100,8 @@ public class Constants {
 	public static String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
 	public static String ACTION_IPC = "IPC";
 
+	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
+
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;

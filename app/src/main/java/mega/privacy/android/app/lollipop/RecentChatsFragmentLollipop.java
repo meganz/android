@@ -411,6 +411,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         else{
             log("open chat one to one");
             Intent intent = new Intent(context, ChatActivityLollipop.class);
+            intent.setAction(Constants.ACTION_CHAT_INVITE);
             this.startActivity(intent);
         }
     }
