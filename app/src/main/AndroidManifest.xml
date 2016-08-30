@@ -239,7 +239,14 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Megaactionbar.Properties">            
         </activity>
-        
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.ChatActivityLollipop"
+            android:label="@string/section_chat"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+
         <activity
             android:name="ContactPropertiesMainActivity"
             android:label="@string/contact_properties_activity"
