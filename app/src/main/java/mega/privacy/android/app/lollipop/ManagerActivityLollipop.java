@@ -2694,6 +2694,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("OfflineFragment exist");
 //    				oFLol.setPathNavigation("/");
     				oFLol.setIsList(isList);
+					oFLol.findNodes();
+					oFLol.setTitle();
     			}
 
     			cloudSectionLayout.setVisibility(View.GONE);
