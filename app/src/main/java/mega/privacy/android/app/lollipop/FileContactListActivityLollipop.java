@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -68,7 +70,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	TextView nameView;
 	ImageView imageView;
 	TextView createdView;
-	
+
+	CoordinatorLayout coordinatorLayout;
 	RelativeLayout container;
 	RelativeLayout contactLayout;
 	RelativeLayout fileContactLayout;
@@ -77,6 +80,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	GestureDetectorCompat detector;
 	ImageView emptyImage;
 	TextView emptyText;
+	FloatingActionButton fab;
 	
 	ArrayList<MegaShare> listContacts;	
 	ArrayList<MegaShare> tempListContacts;	
@@ -378,7 +382,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			aB.setDisplayHomeAsUpEnabled(true);
 			aB.setDisplayShowHomeEnabled(true);
 			aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
-			
+
+			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_file_contact_list);
 			container = (RelativeLayout) findViewById(R.id.file_contact_list);
 			imageView = (ImageView) findViewById(R.id.file_properties_icon);
 			nameView = (TextView) findViewById(R.id.node_name);
@@ -386,7 +391,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			contactLayout = (RelativeLayout) findViewById(R.id.file_contact_list_layout);
 			contactLayout.setOnClickListener(this);
 			fileContactLayout = (RelativeLayout) findViewById(R.id.file_contact_list_browser_layout);
-						
+
+			fab = (FloatingActionButton) findViewById(R.id.floating_button_file_contact_list);
+			fab.setOnClickListener(this);
+
 			nameView.setText(node.getName());		
 			
 			imageView.setImageResource(R.drawable.ic_folder_shared_list);	
@@ -850,6 +858,16 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				hideOptionsPanel();
 				break;				
 			}
+			case R.id.floating_button_file_contact_list:{
+				removeShare = false;
+				changeShare = false;
+
+				Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+				intent.setClass(this, ContactsExplorerActivityLollipop.class);
+				intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+				break;
+			}
 			case R.id.file_contact_list_option_share_layout:{
 				log("En el adapter - change");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
@@ -1294,7 +1312,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public void showSnackbar(String s){
 		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(container, s, Snackbar.LENGTH_LONG);
+		Snackbar snackbar = Snackbar.make(coordinatorLayout, s, Snackbar.LENGTH_LONG);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();

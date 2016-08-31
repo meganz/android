@@ -5,6 +5,7 @@
     android:id="@+id/file_contact_list"
     android:background="@color/white"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -17,76 +18,105 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".FolderLinkActivityLollipop" />
 
-    <RelativeLayout
-        android:id="@+id/file_contact_list_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="72dp"
-        android:layout_below="@id/toolbar_file_contact_list"
-        android:background="@color/file_list_selected_row" >
-
-        <ImageView
-            android:id="@+id/file_properties_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:scaleType="fitCenter"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="14dp"/>
-
-        <TextView
-            android:id="@+id/node_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/file_properties_icon"
-            android:layout_marginTop="14dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="24dp"
-            android:textColor="@color/file_list_first_row"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:singleLine="false"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/node_last_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/node_name"
-            android:layout_toRightOf="@id/file_properties_icon"
-            android:layout_marginLeft="8dp"
-            android:textColor="@color/file_list_second_row"
-            android:textSize="14sp"
-            android:ellipsize="end"
-            android:maxLines="1"/>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/file_contact_list_browser_layout"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout_file_contact_list"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/file_contact_list_layout" >
+        android:fitsSystemWindows="false"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_file_contact_list"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/file_contact_list_view_browser"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="multipleChoice" />
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/file_contact_list_empty_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            <RelativeLayout
+                android:id="@+id/file_contact_list_layout"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="@color/file_list_selected_row" >
 
-        <TextView
-            android:id="@+id/file_contact_list_empty_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/file_contact_list_empty_image"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/standard_margin"
-            android:textColor="@color/text_secondary"
-            android:textSize="16sp" />
-    </RelativeLayout>
+                <ImageView
+                    android:id="@+id/file_properties_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:scaleType="fitCenter"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="14dp"/>
+
+                <TextView
+                    android:id="@+id/node_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/file_properties_icon"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="24dp"
+                    android:textColor="@color/file_list_first_row"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:singleLine="false"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/node_last_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/node_name"
+                    android:layout_toRightOf="@id/file_properties_icon"
+                    android:layout_marginLeft="8dp"
+                    android:textColor="@color/file_list_second_row"
+                    android:textSize="14sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/file_contact_list_browser_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/file_contact_list_layout" >
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/file_contact_list_view_browser"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice" />
+
+                <ImageView
+                    android:id="@+id/file_contact_list_empty_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+                <TextView
+                    android:id="@+id/file_contact_list_empty_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/file_contact_list_empty_image"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/standard_margin"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floating_button_file_contact_list"
+            android:layout_width="@dimen/fab_button_diameter"
+            android:layout_height="@dimen/fab_button_diameter"
+            android:background="@drawable/ripple"
+            android:elevation="@dimen/elevation_low"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white"
+            android:stateListAnimator="@anim/button_elevation"
+            android:tint="@android:color/white"
+            android:layout_gravity="bottom|right|end"/>
+    </android.support.design.widget.CoordinatorLayout>
     
      <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
