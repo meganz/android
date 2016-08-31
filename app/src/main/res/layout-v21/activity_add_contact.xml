@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="#acbdbb"
+	android:fitsSystemWindows="true">
+
+	<RelativeLayout
+		android:id="@+id/add_contact_toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#acbdbb">
+
+		<ImageView
+			android:id="@+id/add_contact_back"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_arrow_back_white"
+			style="@style/dialogActionButton"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true" />
+
+		<ImageView
+			android:id="@+id/add_contact_send"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_send_white"
+			style="@style/dialogActionButton"
+			android:layout_alignParentRight="true"/>
+
+		<!-- <com.doodle.android.chips.ChipsView
+                android:id="@+id/chipsView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/add_contact_back"
+                android:layout_toLeftOf="@id/add_contact_send"/>
+    -->
+
+
+		<mega.privacy.android.app.components.tokenautocomplete.ContactsCompletionView
+			android:id="@+id/add_contact_chips"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="Type a contact's name or email"
+			android:imeOptions="actionDone"
+			android:textColor="@color/white"
+			android:textSize="14sp"
+			android:inputType="text|textNoSuggestions|textMultiLine"
+			android:focusableInTouchMode="true"
+			android:layout_toRightOf="@id/add_contact_back"
+			android:layout_toLeftOf="@id/add_contact_send"
+			android:layout_marginTop="12dp"
+			android:background="@null"
+			android:textCursorDrawable="@drawable/add_contact_color_caret"
+			android:layout_marginBottom="20dp"
+			android:nextFocusDown="@+id/add_contact_list_layout"/>
+
+		<RelativeLayout
+			android:id="@+id/add_contact_list_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_below="@id/add_contact_chips"
+			android:background="@color/white">
+
+			<ImageView
+				android:id="@+id/add_contact_list_empty_image"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerHorizontal="true"
+				android:layout_marginTop="25dp"
+				android:gravity="center_horizontal" />
+
+			<TextView
+				android:id="@+id/add_contact_list_empty_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/add_contact_list_empty_image"
+				android:layout_centerHorizontal="true"
+				android:gravity="center_horizontal"
+				android:textColor="@color/text_secondary"
+				android:textSize="16sp" />
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/add_contact_list"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:choiceMode="multipleChoice" />
+		</RelativeLayout>
+	</RelativeLayout>
+</RelativeLayout>
