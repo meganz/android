@@ -82,5 +82,6 @@
     <color name="small_letter_upgrade_account">#8a333333</color>
 
     <color name="chat_background">#08000000</color>
+    <color name="message_background">#15000000</color>
     <color name="chat_empty_text_color">#73000000</color>
 </resources>
