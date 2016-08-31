@@ -46,6 +46,8 @@ public class Constants {
 	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
 	final public static int MULTIPLE_LEAVE_SHARE = MULTIPLE_FILE_SHARE+1;
 
+	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
+
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
 	final public static int OVERQUOTA_ALERT = 5003;
