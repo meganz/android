@@ -151,7 +151,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         chats = recentChat.getRecentChats();
 
         if (adapterList == null){
-            adapterList = new MegaRecentChatLollipopAdapter(context, this, chats, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+            adapterList = new MegaRecentChatLollipopAdapter(context, this, chats, listView);
         }
         else{
             adapterList.setContacts(chats);
@@ -411,7 +411,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         else{
             log("open chat one to one");
             Intent intent = new Intent(context, ChatActivityLollipop.class);
-            intent.setAction(Constants.ACTION_CHAT_INVITE);
+            intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
+            intent.putExtra("CHAT_ID", position);
+            intent.putExtra("MY_MAIL", myMail);
             this.startActivity(intent);
         }
     }

@@ -101,6 +101,7 @@ public class Constants {
 	public static String ACTION_IPC = "IPC";
 
 	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
+	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
