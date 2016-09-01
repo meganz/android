@@ -37,8 +37,8 @@
                 android:id="@+id/message_chat_time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="@color/message_background"
+                android:textSize="12sp"
+                android:textColor="@color/file_list_second_row"
                 android:layout_centerVertical="true"/>
 
             <TextView
@@ -61,14 +61,14 @@
             android:layout_below="@+id/title_own_message_layout"
             android:gravity="right">
 
-            <TextView
+            <mega.privacy.android.app.components.WrapTextView
                 android:id="@+id/content_own_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/name_my_account"
                 android:textSize="14sp"
+                android:inputType="textMultiLine"
                 android:background="@drawable/rounded_text_view_chat_message"
-                android:layout_marginBottom="60dp"
                 android:padding="11dp"
                 android:gravity="right"/>
 
