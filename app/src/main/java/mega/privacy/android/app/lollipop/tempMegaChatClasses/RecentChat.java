@@ -86,6 +86,30 @@ public class RecentChat {
         message4.setUser(ownerMessage4);
         messagesList2.add(message4);
 
+        Message message13 = new Message();
+        message13.setMessage("I’m good. Thanks! I have an appointment with a new editor. Fingers crossed!");
+        message13.setDate(1471724160);
+        message13.setType(Message.TEXT);
+        message13.setRead(true);
+        message13.setUser(ownerMessage4);
+        messagesList2.add(message13);
+
+        Message message14 = new Message();
+        message14.setMessage("Next week. Wednesday. I sent the manuscript a year ago...");
+        message14.setDate(1471724180);
+        message14.setType(Message.TEXT);
+        message14.setRead(true);
+        message14.setUser(ownerMessage4);
+        messagesList2.add(message14);
+
+        Message message15 = new Message();
+        message15.setMessage("Thanks!");
+        message15.setDate(1471724195);
+        message15.setType(Message.TEXT);
+        message15.setRead(true);
+        message15.setUser(ownerMessage4);
+        messagesList2.add(message15);
+
         chat2.setMessages(messagesList2);
         chat2.setUnreadMessages(0);
         recentChats.add(chat2);

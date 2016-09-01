@@ -110,7 +110,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
         //Margins
         RelativeLayout.LayoutParams meTextParams = (RelativeLayout.LayoutParams)holder.meText.getLayoutParams();
-        meTextParams.setMargins(Util.scaleWidthPx(11, outMetrics), 0, Util.scaleWidthPx(37, outMetrics), 0);
+        meTextParams.setMargins(Util.scaleWidthPx(7, outMetrics), 0, Util.scaleWidthPx(37, outMetrics), 0);
         holder.meText.setLayoutParams(meTextParams);
 
         holder.timeText = (TextView) v.findViewById(R.id.message_chat_time_text);
@@ -118,7 +118,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentOwnMessageText = (TextView) v.findViewById(R.id.content_own_message_text);
         //Margins
         RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), 0, Util.scaleWidthPx(90, outMetrics), 0);
+        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
         holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
 //
