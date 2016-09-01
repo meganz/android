@@ -22,6 +22,7 @@ public class RecentChat {
 
         //Chat one
         chat1 = new ChatRoom();
+        chat1.setId(0);
         MegaContact user1 = new MegaContact();
         user1.setMail("android111@yopmail.com");
         user1.setHandle("-8833695690414824345");
@@ -56,6 +57,7 @@ public class RecentChat {
 
         //Chat 2
         chat2 = new ChatRoom();
+        chat2.setId(1);
         MegaContact user2 = new MegaContact();
         user2.setMail("android222@yopmail.com");
         user2.setHandle("1883490498849024631");
@@ -90,6 +92,7 @@ public class RecentChat {
 
         //Chat 3
         chat3 = new ChatRoom();
+        chat3.setId(2);
         MegaContact user3 = new MegaContact();
         user3.setMail("android333@yopmail.com");
         user3.setHandle("-4662504005972119692");
@@ -124,6 +127,7 @@ public class RecentChat {
 
         //Chat 5
         chat5 = new ChatRoom();
+        chat5.setId(3);
         MegaContact user5 = new MegaContact();
         user5.setMail("android400@yopmail.com");
         user5.setHandle("5766766996096157196");
@@ -158,6 +162,7 @@ public class RecentChat {
 
         //Chat 4
         chat4 = new ChatRoom();
+        chat4.setId(4);
         MegaContact user4 = new MegaContact();
         user4.setMail("android444@yopmail.com");
         user4.setHandle("555456145");
@@ -192,6 +197,7 @@ public class RecentChat {
 
         //Chat 6
         chat6 = new ChatRoom();
+        chat1.setId(5);
         MegaContact user6 = new MegaContact();
         user6.setMail("megaiostest@yopmail.com");
         user6.setHandle("-3079530489669586212");

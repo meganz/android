@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -22,8 +23,17 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -32,6 +42,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
 
     MegaApiAndroid megaApi;
     Handler handler;
+
+    RecentChat recentChat;
+    ChatRoom chatRoom;
 
     ActionBar aB;
     Toolbar tB;
@@ -45,9 +58,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
     RelativeLayout writingContainerLayout;
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
-    RelativeLayout inviteLayout;
+    RelativeLayout chatRelativeLayout;
     TextView inviteText;
-    TextView invitationSentText;
     ImageButton keyboardButton;
     EditText textChat;
     ImageButton sendIcon;
@@ -55,7 +67,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
     ScrollView messageScrollView;
     FloatingActionButton fab;
 
+    RecyclerView listView;
+    RecyclerView.LayoutManager mLayoutManager;
+
     ChatActivityLollipop chatActivity;
+    String myMail;
 
     MenuItem callMenuItem;
     MenuItem videoMenuItem;
@@ -67,6 +83,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
     KeyboardListener keyboardListener;
 
     String intentAction;
+    MegaChatLollipopAdapter adapter;
+
+    MegaContact contactChat;
+    String fullName;
+    String shortContactName;
+
+    DatabaseHandler dbH = null;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -88,6 +111,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
             megaApi = app.getMegaApi();
         }
 
+        dbH = DatabaseHandler.getDbHandler(this);
+
+        recentChat = new RecentChat();
         chatActivity = this;
 
         setContentView(R.layout.activity_chat);
@@ -120,12 +146,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EditText) findViewById(R.id.edit_text_chat);
 
-        inviteLayout  = (RelativeLayout) findViewById(R.id.invite_relative_chat_layout);
+        chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
         inviteText = (TextView) findViewById(R.id.invite_text);
-        invitationSentText = (TextView) findViewById(R.id.invitation_sent_text);
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
+
+        listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
+        listView.setClipToPadding(false);;
+
+        mLayoutManager = new MegaLinearLayoutManager(this);
+        listView.setLayoutManager(mLayoutManager);
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
 
@@ -138,11 +169,76 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
             if (intentAction != null){
                 if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
                     fab.setVisibility(View.GONE);
-                    inviteLayout.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
+                    inviteText.setVisibility(View.VISIBLE);
                     textChat.setOnFocusChangeListener(focus);
                     keyboardListener = new KeyboardListener();
                     messageScrollView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
                     textChat.setText("Hi there!\nLet's chat!\nPlease accept my invitation.");
+                }
+                if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
+                    fab.setVisibility(View.VISIBLE);
+                    inviteText.setVisibility(View.GONE);
+
+                    int idChat = newIntent.getIntExtra("CHAT_ID", -1);
+                    myMail = newIntent.getStringExtra("MY_MAIL");
+                    if(idChat!=-1){
+                        //REcover chat
+                        log("Recover chat with id: "+idChat);
+                        ArrayList<ChatRoom> chatRoomArray = recentChat.getRecentChats();
+                        chatRoom = chatRoomArray.get(idChat);
+
+                        ArrayList<Message> messages = chatRoom.getMessages();
+                        //Create adapter
+                        adapter = new MegaChatLollipopAdapter(this, messages, listView);
+
+                        adapter.setPositionClicked(-1);
+                        listView.setAdapter(adapter);
+
+                        listView.setVisibility(View.VISIBLE);
+
+                        //Set title of screen
+                        ArrayList<MegaContact> contacts = chatRoom.getContacts();
+
+                        if(contacts.size()==1){
+                            log("Chat one to one");
+
+                            String handle = contacts.get(0).getHandle();
+                            contactChat = dbH.findContactByHandle(handle);
+
+                            //Set contact's name and title for the screen
+                            if(contactChat!=null){
+
+                                String firstNameText = contactChat.getName();
+                                String lastNameText = contactChat.getLastName();
+                                shortContactName = contactChat.getName();
+
+                                if (firstNameText.trim().length() <= 0){
+                                    fullName = lastNameText;
+                                    shortContactName = lastNameText;
+                                }
+                                else{
+                                    fullName = firstNameText + " " + lastNameText;
+                                }
+
+                                if (fullName.trim().length() <= 0){
+                                    log("Put email as fullname");
+                                    String email = contacts.get(0).getMail();
+                                    String[] splitEmail = email.split("[@._]");
+                                    fullName = splitEmail[0];
+                                    shortContactName = splitEmail[0];
+                                }
+                            }
+                            else{
+                                String email = contacts.get(0).getMail();
+                                String[] splitEmail = email.split("[@._]");
+                                fullName = splitEmail[0];
+
+                            }
+                            aB.setTitle(fullName);
+                        }
+                    }
+
                 }
             }
         }
@@ -233,8 +329,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
                 disabledWritingLayout.setVisibility(View.VISIBLE);
 
                 inviteText.setVisibility(View.GONE);
-                invitationSentText.setText(text);
-                invitationSentText.setVisibility(View.VISIBLE);
 			}
 		}
     }
@@ -267,5 +361,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
                 }
             }
         }
+    }
+
+    public String getMyMail() {
+        return myMail;
+    }
+
+    public void setMyMail(String myMail) {
+        this.myMail = myMail;
     }
 }

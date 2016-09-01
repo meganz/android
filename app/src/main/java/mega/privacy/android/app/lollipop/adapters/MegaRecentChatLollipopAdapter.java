@@ -62,19 +62,17 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
-	int type;
 	private SparseBooleanArray selectedItems;
 	Object fragment;
 
 	DisplayMetrics outMetrics;
 	DatabaseHandler dbH = null;
 
-	public MegaRecentChatLollipopAdapter(Context _context, Object _fragment, ArrayList<ChatRoom> _chats, RecyclerView _listView, int type) {
+	public MegaRecentChatLollipopAdapter(Context _context, Object _fragment, ArrayList<ChatRoom> _chats, RecyclerView _listView) {
 		log("new adapter");
 		this.context = _context;
 		this.chats = _chats;
 		this.positionClicked = -1;
-		this.type = type;
 		this.fragment = _fragment;
 		
 		if (megaApi == null){
@@ -854,5 +852,4 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	private static void log(String log) {
 		Util.log("MegaRecentChatLollipopAdapter", log);
 	}
-
 }

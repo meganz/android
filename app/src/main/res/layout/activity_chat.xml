@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -25,7 +24,7 @@
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/chat_background"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -90,11 +89,13 @@
             android:id="@+id/message_scroll_view_chat_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/chat_background"
             android:fillViewport="true">
             <RelativeLayout
-                android:id="@+id/invite_relative_chat_layout"
+                android:id="@+id/relative_chat_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/chat_background">
 
                 <TextView
                     android:id="@+id/invite_text"
@@ -107,21 +108,11 @@
                     android:layout_marginLeft="56dp"
                     android:layout_marginRight="56dp"/>
 
-                <TextView
-                    android:id="@+id/invitation_sent_text"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/messages_chat_list_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:backgroundTint="@color/message_background"
-                    android:background="@drawable/rounded_text_view_chat_message"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="60dp"
-                    android:layout_marginLeft="94dp"
-                    android:layout_marginRight="68dp"
-                    android:padding="11dp"
-                    android:gravity="right"
-                    android:visibility="gone"/>
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice" />
 
             </RelativeLayout>
 
