@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -32,6 +31,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
@@ -66,11 +66,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
     EditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
-    ScrollView messageScrollView;
+    ScrollView inviteScrollView;
     FloatingActionButton fab;
 
     RecyclerView listView;
-    RecyclerView.LayoutManager mLayoutManager;
+    MegaLinearLayoutManager mLayoutManager;
 
     ChatActivityLollipop chatActivity;
     String myMail;
@@ -143,7 +143,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
-        messageScrollView = (ScrollView) findViewById(R.id.message_scroll_view_chat_layout);
+        inviteScrollView = (ScrollView) findViewById(R.id.message_scroll_view_chat_layout);
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EditText) findViewById(R.id.edit_text_chat);
@@ -178,7 +178,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
         listView.setClipToPadding(false);;
         listView.setNestedScrollingEnabled(false);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new MegaLinearLayoutManager(this);
         listView.setLayoutManager(mLayoutManager);
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
@@ -193,15 +193,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
                 if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
                     fab.setVisibility(View.GONE);
                     listView.setVisibility(View.GONE);
+                    chatRelativeLayout.setVisibility(View.GONE);
+                    inviteScrollView.setVisibility(View.VISIBLE);
                     inviteText.setVisibility(View.VISIBLE);
                     textChat.setOnFocusChangeListener(focus);
                     keyboardListener = new KeyboardListener();
-                    messageScrollView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
+                    inviteScrollView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
                     textChat.setText("Hi there!\nLet's chat!\nPlease accept my invitation.");
                 }
                 if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
                     fab.setVisibility(View.VISIBLE);
                     inviteText.setVisibility(View.GONE);
+                    chatRelativeLayout.setVisibility(View.VISIBLE);
+                    inviteScrollView.setVisibility(View.GONE);
 
                     int idChat = newIntent.getIntExtra("CHAT_ID", -1);
                     myMail = newIntent.getStringExtra("MY_MAIL");
@@ -211,12 +215,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
                         ArrayList<ChatRoom> chatRoomArray = recentChat.getRecentChats();
                         chatRoom = chatRoomArray.get(idChat);
 
-                        ArrayList<Message> messages = chatRoom.getMessages();
+                        final ArrayList<Message> messages = chatRoom.getMessages();
                         //Create adapter
                         adapter = new MegaChatLollipopAdapter(this, messages, listView);
 
                         adapter.setPositionClicked(-1);
                         listView.setAdapter(adapter);
+
+                        mLayoutManager.setStackFromEnd(true);
                         listView.setVisibility(View.VISIBLE);
 
                         //Set title of screen
@@ -275,7 +281,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
     @Override
     public void onDestroy(){
 
-//        messageScrollView.getViewTreeObserver().removeOnGlobalLayoutListener();
+//        inviteScrollView.getViewTreeObserver().removeOnGlobalLayoutListener();
         super.onDestroy();
 
     }
@@ -334,11 +340,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.home:{
-                messageScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
+                inviteScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
             }
 			case R.id.send_message_icon_chat:{
                 log("click on Send message");
-                messageScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
+                inviteScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
 
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
@@ -360,15 +366,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
         public void onGlobalLayout() {
 
             if(!focusChanged){
-                diffMeasure = messageScrollView.getHeight();
-                log("Store Scroll height: "+messageScrollView.getHeight());
+                diffMeasure = inviteScrollView.getHeight();
+                log("Store Scroll height: "+inviteScrollView.getHeight());
                 RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
                 inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
                 inviteText.setLayoutParams(inviteTextViewParams);
             }
             else{
-                int newMeasure = messageScrollView.getHeight();
-                log("New Scroll height: "+messageScrollView.getHeight());
+                int newMeasure = inviteScrollView.getHeight();
+                log("New Scroll height: "+inviteScrollView.getHeight());
                 if(newMeasure < (diffMeasure-200)){
                     log("Keyboard shown!!!");
                     RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();

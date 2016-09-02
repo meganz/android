@@ -93,8 +93,8 @@
             android:layout_height="match_parent"
             android:background="@color/chat_background"
             android:fillViewport="true">
+
             <RelativeLayout
-                android:id="@+id/relative_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/chat_background">
@@ -109,17 +109,22 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginLeft="56dp"
                     android:layout_marginRight="56dp"/>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/messages_chat_list_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:stackFromEnd="true"
-                    android:choiceMode="multipleChoice"/>
-
             </RelativeLayout>
-
         </ScrollView>
+
+        <RelativeLayout
+            android:id="@+id/relative_chat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/chat_background">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/messages_chat_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice"/>
+
+        </RelativeLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_chat"

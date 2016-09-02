@@ -42,7 +42,7 @@ public class RecentChat {
         messagesList1.add(message1);
 
         Message message2 = new Message();
-        message2.setMessage("Thank you!I'm good! How is Jess? Ar you still in town?");
+        message2.setMessage("Let's go!!");
         message2.setDate(1472123750);
         message2.setType(Message.TEXT);
         message2.setRead(false);
@@ -50,6 +50,15 @@ public class RecentChat {
         ownerMessage2.setMail("android111@yopmail.com");
         message2.setUser(ownerMessage2);
         messagesList1.add(message2);
+
+        Message message23 = new Message();
+        message23.setMessage("Thank you!I'm good! How is Jess? Ar you still in town?");
+//        message23.setDate(1472637592);//Wednesday
+        message23.setDate(1472810392);//Today
+        message23.setType(Message.TEXT);
+        message23.setRead(false);
+        message23.setUser(ownerMessage2);
+        messagesList1.add(message23);
 
         chat1.setMessages(messagesList1);
         chat1.setUnreadMessages(3);
@@ -153,7 +162,7 @@ public class RecentChat {
 
         Message message4 = new Message();
         message4.setMessage("Have a great night!");
-        message4.setDate(1472982600);
+        message4.setDate(1472741992);//Yesterday
         message4.setType(Message.TEXT);
         message4.setRead(true);
         message4.setUser(ownerMessage3);
@@ -263,6 +272,15 @@ public class RecentChat {
         ownerMessage8.setMail("android444@yopmail.com");
         message8.setUser(ownerMessage8);
         messagesList4.add(message8);
+
+        Message message22= new Message();
+        message22.setMessage("Trying date comparator");
+        message22.setRead(true);
+        message22.setDate(1472205592);//26 agosto
+        message22.setType(Message.TEXT);
+        message22.setDuration(8432);
+        message22.setUser(ownerMessage8);
+        messagesList4.add(message22);
 
         chat4.setMessages(messagesList4);
         chat4.setUnreadMessages(0);
