@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_container_chat"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -60,6 +61,7 @@
                 android:layout_marginRight="16dp"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
+                android:hint="@string/type_message_hint"
                 android:layout_toLeftOf="@+id/send_message_icon_chat"/>
 
             <RelativeLayout
@@ -112,7 +114,8 @@
                     android:id="@+id/messages_chat_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="multipleChoice" />
+                    app:stackFromEnd="true"
+                    android:choiceMode="multipleChoice"/>
 
             </RelativeLayout>
 
