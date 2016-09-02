@@ -36,7 +36,7 @@ android {
         checkReleaseBuilds false
         // Or, if you prefer, you can continue to check for errors in release builds,
         // but continue the build even when errors are found:
-        // abortOnError false
+        abortOnError false
     }
 
     task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
