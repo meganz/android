@@ -68,47 +68,96 @@ public class RecentChat {
         ArrayList<Message> messagesList2 = new ArrayList<Message>();
 
         Message message3 = new Message();
-        message3.setMessage("Hola");
+        message3.setMessage("Hi! How are you?");
         message3.setDate(1471724060);
         message3.setType(Message.TEXT);
+        message3.setRead(true);
         MegaContact ownerMessage3 = new MegaContact();
         ownerMessage3.setMail("android222@yopmail.com");
         message3.setUser(ownerMessage3);
         messagesList2.add(message3);
 
-        Message message4 = new Message();
-        message4.setMessage("Have a great night!");
-        message4.setDate(1471724150);
-        message4.setType(Message.TEXT);
-        message4.setRead(true);
-        MegaContact ownerMessage4 = new MegaContact();
-        ownerMessage4.setMail("android555@yopmail.com");
-        message4.setUser(ownerMessage4);
-        messagesList2.add(message4);
-
         Message message13 = new Message();
-        message13.setMessage("I’m good. Thanks! I have an appointment with a new editor. Fingers crossed!");
-        message13.setDate(1471724160);
+        message13.setMessage("I’m good. Thanks! And you?");
+        message13.setDate(1471880152); //22 august
         message13.setType(Message.TEXT);
         message13.setRead(true);
+        MegaContact ownerMessage4 = new MegaContact();
+        ownerMessage4.setMail("android555@yopmail.com");
         message13.setUser(ownerMessage4);
         messagesList2.add(message13);
 
+        Message message17 = new Message();
+        message17.setMessage("Nothing new, but I heard you have good news");
+        message17.setDate(1471880200); //22 august
+        message17.setType(Message.TEXT);
+        message17.setRead(true);
+        message17.setUser(ownerMessage3);
+        messagesList2.add(message17);
+
+        Message message20 = new Message();
+        message20.setMessage("TELL me, plz");
+        message20.setDate(1471880202); //22 august
+        message20.setType(Message.TEXT);
+        message20.setRead(true);
+        message20.setUser(ownerMessage3);
+        messagesList2.add(message20);
+
+        Message message18 = new Message();
+        message18.setMessage("I have an appointment with a new editor. Fingers crossed!");
+        message18.setDate(1471880302); //22 august
+        message18.setType(Message.TEXT);
+        message18.setRead(true);
+        message18.setUser(ownerMessage4);
+        messagesList2.add(message18);
+
+        Message message19 = new Message();
+        message19.setMessage("REALLY?? WHen??");
+        message19.setDate(1471982500); //22 august
+        message19.setType(Message.TEXT);
+        message19.setRead(true);
+        message19.setUser(ownerMessage3);
+        messagesList2.add(message19);
+
         Message message14 = new Message();
         message14.setMessage("Next week. Wednesday. I sent the manuscript a year ago...");
-        message14.setDate(1471724180);
+        message14.setDate(1471982563); //23 august
         message14.setType(Message.TEXT);
         message14.setRead(true);
         message14.setUser(ownerMessage4);
         messagesList2.add(message14);
 
+        Message message21 = new Message();
+        message21.setMessage("Good luck!!! I want you to tell me everything as you leave, okay?");
+        message21.setDate(1471982600); //22 august
+        message21.setType(Message.TEXT);
+        message21.setRead(true);
+        message21.setUser(ownerMessage3);
+        messagesList2.add(message21);
+
         Message message15 = new Message();
         message15.setMessage("Thanks!");
-        message15.setDate(1471724195);
+        message15.setDate(1471982600); //23 august
         message15.setType(Message.TEXT);
         message15.setRead(true);
         message15.setUser(ownerMessage4);
         messagesList2.add(message15);
+
+        Message message16 = new Message();
+        message16.setMessage("Many Thanks!");
+        message16.setDate(1471982620); //23 august
+        message16.setType(Message.TEXT);
+        message16.setRead(true);
+        message16.setUser(ownerMessage4);
+        messagesList2.add(message16);
+
+        Message message4 = new Message();
+        message4.setMessage("Have a great night!");
+        message4.setDate(1472982600);
+        message4.setType(Message.TEXT);
+        message4.setRead(true);
+        message4.setUser(ownerMessage3);
+        messagesList2.add(message4);
 
         chat2.setMessages(messagesList2);
         chat2.setUnreadMessages(0);

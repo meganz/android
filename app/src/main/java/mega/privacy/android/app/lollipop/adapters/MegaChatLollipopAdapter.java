@@ -24,6 +24,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
+import mega.privacy.android.app.utils.TimeComparator;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -40,6 +41,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
+
+    Calendar lastDate;
 
     public MegaChatLollipopAdapter(Context _context, ArrayList<Message> _messages, RecyclerView _listView) {
         log("new adapter");
@@ -74,9 +77,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         RelativeLayout ownMessageLayout;
         RelativeLayout titleOwnMessage;
         TextView meText;
-        TextView timeText;
-        RelativeLayout contentMessageLayout;
+        TextView timeOwnText;
+        RelativeLayout contentOwnMessageLayout;
         TextView contentOwnMessageText;
+
+        RelativeLayout contactMessageLayout;
+        RelativeLayout titleContactMessage;
+        TextView contactText;
+        TextView timeContactText;
+        RelativeLayout contentContactMessageLayout;
+        TextView contentContactMessageText;
 
     }
     ViewHolderMessageChatList holder;
@@ -86,7 +96,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         log("onCReateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
+        outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = context.getResources().getDisplayMetrics().density;
 
@@ -100,10 +110,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
         //Margins
         RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams)holder.dateLayout.getLayoutParams();
-        dateLayoutParams.setMargins(0, Util.scaleHeightPx(16, outMetrics), 0, Util.scaleHeightPx(16, outMetrics));
+        dateLayoutParams.setMargins(0, Util.scaleHeightPx(12, outMetrics), 0, Util.scaleHeightPx(12, outMetrics));
         holder.dateLayout.setLayoutParams(dateLayoutParams);
 
         holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
+
         holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
         holder.ownMessageLayout.setOnClickListener(this);
         holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
@@ -113,18 +124,31 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         meTextParams.setMargins(Util.scaleWidthPx(7, outMetrics), 0, Util.scaleWidthPx(37, outMetrics), 0);
         holder.meText.setLayoutParams(meTextParams);
 
-        holder.timeText = (TextView) v.findViewById(R.id.message_chat_time_text);
-        holder.contentMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
+        holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
+        holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
         holder.contentOwnMessageText = (TextView) v.findViewById(R.id.content_own_message_text);
         //Margins
         RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
         ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
         holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-//
-//        holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
-//        holder.circlePendingMessages = (RoundedImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
-//        holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
+        holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
+        holder.contactMessageLayout.setOnClickListener(this);
+        holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
+        holder.contactText = (TextView) v.findViewById(R.id.message_chat_contact_text);
+        holder.contactText.setText(((ChatActivityLollipop) context).getShortContactName());
+        //Margins
+        RelativeLayout.LayoutParams contactTextParams = (RelativeLayout.LayoutParams)holder.contactText.getLayoutParams();
+        contactTextParams.setMargins(Util.scaleWidthPx(37, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+        holder.contactText.setLayoutParams(contactTextParams);
+
+        holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
+        holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
+        holder.contentContactMessageText = (TextView) v.findViewById(R.id.content_contact_message_text);
+        //Margins
+        RelativeLayout.LayoutParams contactMessageParams = (RelativeLayout.LayoutParams)holder.contentContactMessageText.getLayoutParams();
+        contactMessageParams.setMargins(Util.scaleWidthPx(62, outMetrics), 0, Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(16, outMetrics));
+        holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
         v.setTag(holder);
 
@@ -136,21 +160,131 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         log("onBindViewHolder");
         holder.currentPosition = position;
         Message message = messages.get(position);
+
         String myMail = ((ChatActivityLollipop) context).getMyMail();
         if(message.getUser().getMail().equals(myMail)) {
             log("MY message!!");
-            holder.dateLayout.setVisibility(View.VISIBLE);
-            getDate(message, holder);
+            holder.contactMessageLayout.setVisibility(View.GONE);
+            if(position!=0){
+                //NOT FIRST MESSAGE
+                Message lastMessage = messages.get(position-1);
+                if(lastMessage.getUser().getMail().equals(myMail)) {
+                    //The last message is mine
+                    if(compareDate(message)==0){
+                        //Same date
+                        holder.dateLayout.setVisibility(View.GONE);
+                        if(compareTime(message)==0){
+                            //Same minute
+                            holder.titleOwnMessage.setVisibility(View.GONE);
+                        }
+                        else{
+                            //Different minute
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(formatTime(message));
+                        }
+                    }
+                    else{
+                        //Different date
+                        holder.dateLayout.setVisibility(View.VISIBLE);
+                        formatDate(message, holder);
+                        holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                        holder.timeOwnText.setText(formatTime(message));
+                    }
+                }
+                else{
+                    if(compareDate(message)==0){
+                        holder.dateLayout.setVisibility(View.GONE);
+                        holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                        holder.timeOwnText.setText(formatTime(message));
+                    }
+                    else{
+                        //Different date
+                        holder.dateLayout.setVisibility(View.VISIBLE);
+                        formatDate(message, holder);
+                        holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                        holder.timeOwnText.setText(formatTime(message));
+                    }
+                }
+
+            }
+            else{
+                //First message
+                holder.dateLayout.setVisibility(View.VISIBLE);
+                formatDate(message, holder);
+                holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                holder.timeOwnText.setText(formatTime(message));
+            }
+
+            storeDate(message);
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
-            getTime(message, holder);
             holder.contentOwnMessageText.setText(message.getMessage());
         }
         else{
             log("Contact message!!");
+            holder.ownMessageLayout.setVisibility(View.GONE);
+            if(position!=0) {
+                //NOT FIRST MESSAGE
+                Message lastMessage = messages.get(position-1);
+                if(lastMessage.getUser().getMail().equals(message.getUser().getMail())) {
+                    //The last message is also a contact's message
+                    if(compareDate(message)==0){
+                        //Same date
+                        holder.dateLayout.setVisibility(View.GONE);
+                        if(compareTime(message)==0){
+                            //Same minute
+                            holder.titleContactMessage.setVisibility(View.GONE);
+
+                        }
+                        else{
+                            //Different minute
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(formatTime(message));
+                        }
+                    }
+                    else{
+                        //Different date
+                        holder.dateLayout.setVisibility(View.VISIBLE);
+                        formatDate(message, holder);
+                        holder.titleContactMessage.setVisibility(View.VISIBLE);
+                        holder.timeContactText.setText(formatTime(message));
+                    }
+                }
+                else{
+                    if(compareDate(message)==0){
+                        holder.dateLayout.setVisibility(View.GONE);
+                        holder.titleContactMessage.setVisibility(View.VISIBLE);
+                        holder.timeContactText.setText(formatTime(message));
+                    }
+                    else{
+                        //Different date
+                        holder.dateLayout.setVisibility(View.VISIBLE);
+                        formatDate(message, holder);
+                        holder.titleContactMessage.setVisibility(View.VISIBLE);
+                        holder.timeContactText.setText(formatTime(message));
+                    }
+                }
+            }
+            else{
+                //First message
+                holder.dateLayout.setVisibility(View.VISIBLE);
+                formatDate(message, holder);
+                holder.titleContactMessage.setVisibility(View.VISIBLE);
+                holder.timeContactText.setText(formatTime(message));
+            }
+            storeDate(message);
+            holder.contactMessageLayout.setVisibility(View.VISIBLE);
+            holder.contentContactMessageText.setText(message.getMessage());
         }
+
+        //Check the next message to know the margin bottom the content message
+        //        Message nextMessage = messages.get(position+1);
+        //Margins
+//        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+//        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
+//        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
     }
 
-    public void getDate(Message lastMessage, ViewHolderMessageChatList holder){
+    public void formatDate(Message lastMessage, ViewHolderMessageChatList holder){
         java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
         TimeZone tz = cal.getTimeZone();
@@ -160,19 +294,56 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.dateText.setText(formattedDate);
     }
 
-    public void getTime(Message lastMessage, ViewHolderMessageChatList holder){
+    public String formatTime(Message lastMessage){
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
         Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
         Date date = cal.getTime();
         String formattedDate = df.format(date);
-        holder.timeText.setText(formattedDate);
+        return formattedDate;
+    }
+
+    public int compareDate(Message lastMessage){
+
+        if(lastDate!=null){
+            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
+
+            TimeComparator tc = new TimeComparator(TimeComparator.DATE);
+
+            int result = tc.compare(cal, lastDate);
+            log("RESULTS: "+result);
+            return result;
+        }
+        else{
+            log("return -1");
+            return -1;
+        }
+    }
+
+    public int compareTime(Message lastMessage){
+
+        if(lastDate!=null){
+            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
+
+            TimeComparator tc = new TimeComparator(TimeComparator.TIME);
+
+            int result = tc.compare(cal, lastDate);
+            log("RESULTS: "+result);
+            return result;
+        }
+        else{
+            log("return -1");
+            return -1;
+        }
+    }
+
+    public void storeDate(Message lastMessage){
+        lastDate = Util.calculateDateFromTimestamp(lastMessage.getDate());
     }
 
     @Override
     public int getItemCount() {
-        log("getItemCount: "+messages.size());
         return messages.size();
     }
 

@@ -6,8 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -29,7 +32,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
@@ -146,16 +148,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EditText) findViewById(R.id.edit_text_chat);
 
+        textChat.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {}
+
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                if(count>0){
+                    sendIcon.setVisibility(View.VISIBLE);
+                }
+                else{
+                    sendIcon.setVisibility(View.GONE);
+                }
+            }
+        });
+
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
         inviteText = (TextView) findViewById(R.id.invite_text);
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
+        sendIcon.setVisibility(View.GONE);
 
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);;
+        listView.setNestedScrollingEnabled(false);
 
-        mLayoutManager = new MegaLinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(this);
         listView.setLayoutManager(mLayoutManager);
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
@@ -194,7 +217,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
 
                         adapter.setPositionClicked(-1);
                         listView.setAdapter(adapter);
-
                         listView.setVisibility(View.VISIBLE);
 
                         //Set title of screen
@@ -369,5 +391,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
 
     public void setMyMail(String myMail) {
         this.myMail = myMail;
+    }
+
+    public String getShortContactName() {
+        return shortContactName;
+    }
+
+    public void setShortContactName(String shortContactName) {
+        this.shortContactName = shortContactName;
     }
 }
