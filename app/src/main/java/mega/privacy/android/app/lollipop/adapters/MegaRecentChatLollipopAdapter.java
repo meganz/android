@@ -29,13 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -48,6 +44,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -299,7 +296,8 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 				durationString.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				holder.textViewContent.append(durationString);
 			}
-			formatDate(lastMessage, holder);
+
+			holder.textViewDate.setText(TimeChatUtils.formatDate(lastMessage, TimeChatUtils.DATE_LONG_FORMAT));
 		}
 
 		holder.imageButtonThreeDots.setTag(holder);
@@ -358,16 +356,6 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 //						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 //					}
 		}
-	}
-
-	public void formatDate(Message lastMessage, ViewHolderRecentChatList holder){
-		java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-		Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-		TimeZone tz = cal.getTimeZone();
-		df.setTimeZone(tz);
-		Date date = cal.getTime();
-		String formattedDate = df.format(date);
-		holder.textViewDate.setText(formattedDate);
 	}
 
 	public String formatStringDuration(int duration) {

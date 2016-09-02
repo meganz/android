@@ -12,19 +12,15 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
-import mega.privacy.android.app.utils.TimeComparator;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -180,29 +176,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         else{
                             //Different minute
                             holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                            holder.timeOwnText.setText(formatTime(message));
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                         }
                     }
                     else{
                         //Different date
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        formatDate(message, holder);
+                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(formatTime(message));
+                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                     }
                 }
                 else{
                     if(compareDate(message)==0){
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(formatTime(message));
+                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                     }
                     else{
                         //Different date
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        formatDate(message, holder);
+                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(formatTime(message));
+                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                     }
                 }
 
@@ -210,9 +206,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             else{
                 //First message
                 holder.dateLayout.setVisibility(View.VISIBLE);
-                formatDate(message, holder);
+                holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                 holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                holder.timeOwnText.setText(formatTime(message));
+                holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
             }
 
             storeDate(message);
@@ -238,38 +234,38 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         else{
                             //Different minute
                             holder.titleContactMessage.setVisibility(View.VISIBLE);
-                            holder.timeContactText.setText(formatTime(message));
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                         }
                     }
                     else{
                         //Different date
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        formatDate(message, holder);
+                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(formatTime(message));
+                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                     }
                 }
                 else{
                     if(compareDate(message)==0){
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(formatTime(message));
+                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                     }
                     else{
                         //Different date
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        formatDate(message, holder);
+                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(formatTime(message));
+                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                     }
                 }
             }
             else{
                 //First message
                 holder.dateLayout.setVisibility(View.VISIBLE);
-                formatDate(message, holder);
+                holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                 holder.titleContactMessage.setVisibility(View.VISIBLE);
-                holder.timeContactText.setText(formatTime(message));
+                holder.timeContactText.setText(TimeChatUtils.formatTime(message));
             }
             storeDate(message);
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
@@ -284,32 +280,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
     }
 
-    public void formatDate(Message lastMessage, ViewHolderMessageChatList holder){
-        java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
-        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-        TimeZone tz = cal.getTimeZone();
-        df.setTimeZone(tz);
-        Date date = cal.getTime();
-        String formattedDate = df.format(date);
-        holder.dateText.setText(formattedDate);
-    }
 
-    public String formatTime(Message lastMessage){
-        java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
-        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-        TimeZone tz = cal.getTimeZone();
-        df.setTimeZone(tz);
-        Date date = cal.getTime();
-        String formattedDate = df.format(date);
-        return formattedDate;
-    }
 
     public int compareDate(Message lastMessage){
 
         if(lastDate!=null){
             Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
 
-            TimeComparator tc = new TimeComparator(TimeComparator.DATE);
+            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
 
             int result = tc.compare(cal, lastDate);
             log("RESULTS: "+result);
@@ -326,7 +304,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         if(lastDate!=null){
             Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
 
-            TimeComparator tc = new TimeComparator(TimeComparator.TIME);
+            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
 
             int result = tc.compare(cal, lastDate);
             log("RESULTS: "+result);
