@@ -26,6 +26,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -37,6 +39,7 @@ import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -216,8 +219,96 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
                         chatRoom = chatRoomArray.get(idChat);
 
                         final ArrayList<Message> messages = chatRoom.getMessages();
+                        //Prepare data
+                        ArrayList<Integer> infoToShow = new ArrayList<Integer>();
+
+                        ListIterator<Message> itr = messages.listIterator();
+                        while (itr.hasNext()) {
+                            Message message = itr.next();
+                            log("message: "+message.getMessage());
+                            if(message.getUser().getMail().equals(myMail)) {
+                                log("MY message!!");
+                                if(itr.nextIndex()==1){
+                                    //First element
+                                    infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                                }
+                                else{
+                                    //Not first element
+                                    Message previousMessage = messages.get(itr.previousIndex()-1);
+                                    log("previous message: "+previousMessage.getMessage());
+                                    if(previousMessage.getUser().getMail().equals(myMail)) {
+                                        //The last two messages are mine
+                                        if(compareDate(message, previousMessage)==0){
+                                            //Same date
+                                            if(compareTime(message, previousMessage)==0){
+                                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                            }
+                                            else{
+                                                //Different minute
+                                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                            }
+                                        }
+                                        else{
+                                            //Different date
+                                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                                        }
+                                    }
+                                    else{
+                                        //The last message is mine, the previous not
+                                        if(compareDate(message, previousMessage)==0){
+                                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                        }
+                                        else{
+                                            //Different date
+                                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                log("Contact message!!");
+
+                                if(itr.nextIndex()==1){
+                                    //First element
+                                    infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                                }
+                                else{
+                                    //Not first element
+                                    Message previousMessage = messages.get(itr.previousIndex()-1);
+                                    log("previous message: "+previousMessage.getMessage());
+                                    if(previousMessage.getUser().getMail().equals(message.getUser().getMail())) {
+                                        //The last message is also a contact's message
+                                        if(compareDate(message, previousMessage)==0){
+                                            //Same date
+                                            if(compareTime(message, previousMessage)==0){
+                                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                            }
+                                            else{
+                                                //Different minute
+                                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                            }
+                                        }
+                                        else{
+                                            //Different date
+                                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                                        }
+                                    }
+                                    else{
+                                        //The last message is from contact, the previous not
+                                        if(compareDate(message, previousMessage)==0){
+                                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                        }
+                                        else{
+                                            //Different date
+                                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         //Create adapter
-                        adapter = new MegaChatLollipopAdapter(this, messages, listView);
+                        adapter = new MegaChatLollipopAdapter(this, messages, infoToShow, listView);
 
                         adapter.setPositionClicked(-1);
                         listView.setAdapter(adapter);
@@ -271,6 +362,43 @@ public class ChatActivityLollipop extends PinActivityLollipop implements View.On
             }
         }
 
+    }
+
+    public int compareTime(Message message, Message previous){
+
+        if(previous!=null){
+
+            Calendar cal = Util.calculateDateFromTimestamp(message.getDate());
+            Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getDate());
+
+            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+
+            int result = tc.compare(cal, previousCal);
+            log("RESULTS: "+result);
+            return result;
+        }
+        else{
+            log("return -1");
+            return -1;
+        }
+    }
+
+    public int compareDate(Message message, Message previous){
+
+        if(previous!=null){
+            Calendar cal = Util.calculateDateFromTimestamp(message.getDate());
+            Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getDate());
+
+            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+
+            int result = tc.compare(cal, previousCal);
+            log("RESULTS: "+result);
+            return result;
+        }
+        else{
+            log("return -1");
+            return -1;
+        }
     }
 
     public static float dpToPx(Context context, float valueInDp) {

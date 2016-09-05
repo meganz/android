@@ -13,13 +13,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -29,6 +29,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     Context context;
     int positionClicked;
     ArrayList<Message> messages;
+    ArrayList<Integer> infoToShow;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
     boolean multipleSelect;
@@ -38,13 +39,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
 
-    Calendar lastDate;
-
-    public MegaChatLollipopAdapter(Context _context, ArrayList<Message> _messages, RecyclerView _listView) {
+    public MegaChatLollipopAdapter(Context _context, ArrayList<Message> _messages, ArrayList<Integer> infoToShow, RecyclerView _listView) {
         log("new adapter");
         this.context = _context;
         this.messages = _messages;
         this.positionClicked = -1;
+        this.infoToShow = infoToShow;
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -160,114 +160,61 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         String myMail = ((ChatActivityLollipop) context).getMyMail();
         if(message.getUser().getMail().equals(myMail)) {
             log("MY message!!");
-            holder.contactMessageLayout.setVisibility(View.GONE);
-            if(position!=0){
-                //NOT FIRST MESSAGE
-                Message lastMessage = messages.get(position-1);
-                if(lastMessage.getUser().getMail().equals(myMail)) {
-                    //The last message is mine
-                    if(compareDate(message)==0){
-                        //Same date
-                        holder.dateLayout.setVisibility(View.GONE);
-                        if(compareTime(message)==0){
-                            //Same minute
-                            holder.titleOwnMessage.setVisibility(View.GONE);
-                        }
-                        else{
-                            //Different minute
-                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
-                        }
-                    }
-                    else{
-                        //Different date
+
+            if(infoToShow!=null){
+                switch (infoToShow.get(position)){
+                    case Constants.CHAT_ADAPTER_SHOW_ALL:{
                         holder.dateLayout.setVisibility(View.VISIBLE);
                         holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
                         holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        break;
                     }
-                }
-                else{
-                    if(compareDate(message)==0){
+                    case Constants.CHAT_ADAPTER_SHOW_TIME:{
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
                         holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        break;
                     }
-                    else{
-                        //Different date
-                        holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
-                        holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                    case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        holder.dateLayout.setVisibility(View.GONE);
+                        holder.titleOwnMessage.setVisibility(View.GONE);
+                        break;
                     }
                 }
-
-            }
-            else{
-                //First message
-                holder.dateLayout.setVisibility(View.VISIBLE);
-                holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
-                holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
             }
 
-            storeDate(message);
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
             holder.contentOwnMessageText.setText(message.getMessage());
+
+            holder.contactMessageLayout.setVisibility(View.GONE);
         }
         else{
             log("Contact message!!");
-            holder.ownMessageLayout.setVisibility(View.GONE);
-            if(position!=0) {
-                //NOT FIRST MESSAGE
-                Message lastMessage = messages.get(position-1);
-                if(lastMessage.getUser().getMail().equals(message.getUser().getMail())) {
-                    //The last message is also a contact's message
-                    if(compareDate(message)==0){
-                        //Same date
-                        holder.dateLayout.setVisibility(View.GONE);
-                        if(compareTime(message)==0){
-                            //Same minute
-                            holder.titleContactMessage.setVisibility(View.GONE);
 
-                        }
-                        else{
-                            //Different minute
-                            holder.titleContactMessage.setVisibility(View.VISIBLE);
-                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
-                        }
-                    }
-                    else{
-                        //Different date
+            if(infoToShow!=null){
+                switch (infoToShow.get(position)){
+                    case Constants.CHAT_ADAPTER_SHOW_ALL:{
                         holder.dateLayout.setVisibility(View.VISIBLE);
                         holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
                         holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                        break;
                     }
-                }
-                else{
-                    if(compareDate(message)==0){
+                    case Constants.CHAT_ADAPTER_SHOW_TIME:{
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
                         holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                        break;
                     }
-                    else{
-                        //Different date
-                        holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
-                        holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                    case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        holder.dateLayout.setVisibility(View.GONE);
+                        holder.titleContactMessage.setVisibility(View.GONE);
+                        break;
                     }
                 }
             }
-            else{
-                //First message
-                holder.dateLayout.setVisibility(View.VISIBLE);
-                holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
-                holder.titleContactMessage.setVisibility(View.VISIBLE);
-                holder.timeContactText.setText(TimeChatUtils.formatTime(message));
-            }
-            storeDate(message);
+            holder.ownMessageLayout.setVisibility(View.GONE);
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
             holder.contentContactMessageText.setText(message.getMessage());
         }
@@ -279,46 +226,46 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
     }
-
-
-
-    public int compareDate(Message lastMessage){
-
-        if(lastDate!=null){
-            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
-
-            int result = tc.compare(cal, lastDate);
-            log("RESULTS: "+result);
-            return result;
-        }
-        else{
-            log("return -1");
-            return -1;
-        }
-    }
-
-    public int compareTime(Message lastMessage){
-
-        if(lastDate!=null){
-            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
-
-            int result = tc.compare(cal, lastDate);
-            log("RESULTS: "+result);
-            return result;
-        }
-        else{
-            log("return -1");
-            return -1;
-        }
-    }
-
-    public void storeDate(Message lastMessage){
-        lastDate = Util.calculateDateFromTimestamp(lastMessage.getDate());
-    }
+//
+//
+//
+//    public int compareDate(Message lastMessage){
+//
+//        if(lastDate!=null){
+//            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
+//
+//            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+//
+//            int result = tc.compare(cal, lastDate);
+//            log("RESULTS: "+result);
+//            return result;
+//        }
+//        else{
+//            log("return -1");
+//            return -1;
+//        }
+//    }
+//
+//    public int compareTime(Message lastMessage){
+//
+//        if(lastDate!=null){
+//            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
+//
+//            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+//
+//            int result = tc.compare(cal, lastDate);
+//            log("RESULTS: "+result);
+//            return result;
+//        }
+//        else{
+//            log("return -1");
+//            return -1;
+//        }
+//    }
+//
+//    public void storeDate(Message lastMessage){
+//        lastDate = Util.calculateDateFromTimestamp(lastMessage.getDate());
+//    }
 
     @Override
     public int getItemCount() {
