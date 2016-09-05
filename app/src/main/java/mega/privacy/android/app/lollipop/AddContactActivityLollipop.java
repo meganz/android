@@ -97,6 +97,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
     public static String EXTRA_CONTACTS = "extra_contacts";
     public static String EXTRA_NODE_HANDLE = "node_handle";
+    public static String EXTRA_EMAIL = "extra_email";
+    public static String EXTRA_PHONE = "extra_phone";
 
     public class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
