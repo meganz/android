@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -33,7 +34,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.adapters.MegaRecentChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
@@ -47,7 +48,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     Context context;
     ActionBar aB;
     RecyclerView listView;
-    MegaRecentChatLollipopAdapter adapterList;
+    MegaListChatLollipopAdapter adapterList;
     GestureDetectorCompat detector;
     TextView emptyTextView;
     RecyclerView.LayoutManager mLayoutManager;
@@ -70,8 +71,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         public void onLongPress(MotionEvent e) {
+            log("onLongPress");
             View view = listView.findChildViewUnder(e.getX(), e.getY());
-            int position = listView.getChildPosition(view);
+            int position = listView.getChildLayoutPosition(view);
 
             // handle long press
             if (!adapterList.isMultipleSelect()){
@@ -81,6 +83,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
                 itemClick(position);
             }
+
             super.onLongPress(e);
         }
     }
@@ -148,10 +151,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         chats = recentChat.getRecentChats();
 
         if (adapterList == null){
-            adapterList = new MegaRecentChatLollipopAdapter(context, this, chats, listView, Constants.OUTGOING_REQUEST_ADAPTER);
+            adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
         }
         else{
-            adapterList.setContacts(chats);
+            adapterList.setChats(chats);
         }
 
         adapterList.setPositionClicked(-1);
@@ -399,14 +402,20 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             List<ChatRoom> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
-                adapterList.notifyDataSetChanged();
+//                adapterList.notifyDataSetChanged();
             }
             else{
                 hideMultipleSelect();
             }
         }
         else{
-            log("nothing, not multiple select");
+            log("open chat one to one");
+            Intent intent = new Intent(context, ChatActivityLollipop.class);
+            intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
+            intent.putExtra("CHAT_ID", position);
+            intent.putExtra("MY_MAIL", myMail);
+            this.startActivity(intent);
         }
     }
     /////END Multiselect/////

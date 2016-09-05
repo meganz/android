@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaContact;
 
-public class RecentChat {
+public class ArchivedChat {
 
-    ArrayList<ChatRoom> recentChats;
+    ArrayList<ChatRoom> archivedChats;
 
     ChatRoom chat1;
     ChatRoom chat2;
@@ -16,9 +16,9 @@ public class RecentChat {
     ChatRoom chat5;
     ChatRoom chat6;
 
-    public RecentChat(){
+    public ArchivedChat(){
 
-        recentChats = new ArrayList<ChatRoom>();
+        archivedChats = new ArrayList<ChatRoom>();
 
         //Chat one
         chat1 = new ChatRoom();
@@ -62,7 +62,7 @@ public class RecentChat {
 
         chat1.setMessages(messagesList1);
         chat1.setUnreadMessages(3);
-        recentChats.add(chat1);
+        archivedChats.add(chat1);
 
         //Chat 2
         chat2 = new ChatRoom();
@@ -170,7 +170,7 @@ public class RecentChat {
 
         chat2.setMessages(messagesList2);
         chat2.setUnreadMessages(0);
-        recentChats.add(chat2);
+        archivedChats.add(chat2);
 
         //Chat 3
         chat3 = new ChatRoom();
@@ -205,7 +205,7 @@ public class RecentChat {
 
         chat3.setMessages(messagesList3);
         chat3.setUnreadMessages(0);
-        recentChats.add(chat3);
+        archivedChats.add(chat3);
 
         //Chat 5
         chat5 = new ChatRoom();
@@ -240,7 +240,7 @@ public class RecentChat {
 
         chat5.setMessages(messagesList5);
         chat5.setUnreadMessages(20);
-        recentChats.add(chat5);
+        archivedChats.add(chat5);
 
         //Chat 4
         chat4 = new ChatRoom();
@@ -284,7 +284,7 @@ public class RecentChat {
 
         chat4.setMessages(messagesList4);
         chat4.setUnreadMessages(0);
-        recentChats.add(chat4);
+        archivedChats.add(chat4);
 
         //Chat 6
         chat6 = new ChatRoom();
@@ -318,15 +318,15 @@ public class RecentChat {
 
         chat6.setMessages(messagesList6);
         chat6.setUnreadMessages(0);
-        recentChats.add(chat6);
+        archivedChats.add(chat6);
     }
 
-    public ArrayList<ChatRoom> getRecentChats() {
-        return recentChats;
+    public ArrayList<ChatRoom> getArchivedChats() {
+        return archivedChats;
     }
 
-    public void setRecentChats(ArrayList<ChatRoom> recentChats) {
-        this.recentChats = recentChats;
+    public void setarchivedChats(ArrayList<ChatRoom> archivedChats) {
+        this.archivedChats = archivedChats;
     }
 
 

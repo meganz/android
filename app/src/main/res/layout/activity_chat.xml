@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_container_chat"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_chat"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        tools:context=".lollipop.ChatActivityLollipop" />
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/writing_container_layout_chat_layout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/chat_background"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/writing_linear_layout_chat"
+            android:layout_width="match_parent"
+            android:focusableInTouchMode="true"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/keyboard_icon_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_emoticon_grey"
+                android:layout_marginLeft="16dp"/>
+
+            <ImageButton
+                android:id="@+id/send_message_icon_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/ic_send_black" />
+
+            <EditText
+                android:id="@+id/edit_text_chat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:layout_toRightOf="@+id/keyboard_icon_chat"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_centerVertical="true"
+                android:textSize="14sp"
+                android:hint="@string/type_message_hint"
+                android:layout_toLeftOf="@+id/send_message_icon_chat"/>
+
+            <RelativeLayout
+                android:id="@+id/writing_disabled_linear_layout_chat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:background="@color/transparent_white">
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/message_container_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_chat"
+        android:background="@color/chat_background"
+        android:layout_above="@id/writing_container_layout_chat_layout"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:id="@+id/message_scroll_view_chat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/chat_background"
+            android:fillViewport="true">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/chat_background">
+
+                <TextView
+                    android:id="@+id/invite_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/invite_Lara_chat"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="16sp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="56dp"
+                    android:layout_marginRight="56dp"/>
+            </RelativeLayout>
+        </ScrollView>
+
+        <RelativeLayout
+            android:id="@+id/relative_chat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/chat_background">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/messages_chat_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice"/>
+
+        </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_chat"
+            android:layout_width="@dimen/fab_button_small_diameter"
+            android:layout_height="@dimen/fab_button_small_diameter"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            app:elevation="6dp"
+            android:scaleType="center"
+            app:backgroundTint="@color/accentColor"
+            app:pressedTranslationZ="12dp"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
