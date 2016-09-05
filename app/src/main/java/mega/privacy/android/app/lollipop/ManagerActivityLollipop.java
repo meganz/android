@@ -9791,8 +9791,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
@@ -10164,8 +10164,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			if (contactsData != null){
 				cC.inviteMultipleContacts(contactsData);

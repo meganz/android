@@ -1945,9 +1945,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				return;
 			}
 			
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
-			final boolean megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+			final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
+			final boolean megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 			
 			if (megaContacts){
 				if (node.isFolder()){
@@ -2434,9 +2434,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	    	}
 		}
 		else if (itemText.compareTo(getString(R.string.context_share_folder)) == 0){
-			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
-	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+			Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+	    	intent.setClass(this, AddContactActivityLollipop.class);
+	    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}
 		else if (itemText.compareTo(getString(R.string.context_get_link_menu)) == 0){
