@@ -81,6 +81,17 @@
 				android:textColor="@color/text_secondary"
 				android:textSize="16sp" />
 
+			<ProgressBar
+				android:id="@+id/add_contact_progress_bar"
+				style="?android:attr/progressBarStyleLargeInverse"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:layout_below="@id/add_contact_list_empty_text"
+				android:layout_centerHorizontal="true"
+				android:visibility="gone"
+				android:layout_marginTop="10dp" />
+
 			<android.support.v7.widget.RecyclerView
 				android:id="@+id/add_contact_list"
 				android:layout_width="match_parent"

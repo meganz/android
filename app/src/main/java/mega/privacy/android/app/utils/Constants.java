@@ -25,6 +25,7 @@ public class Constants {
 	public static int REQUEST_CODE_TREE = 1014;
 	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
 	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
+	public static int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
@@ -122,5 +123,8 @@ public class Constants {
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
 	final public static int PRICING_MIN_DIFFERENCE = 720;
 	final public static int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
+
+	final public static int CONTACT_TYPE_MEGA = 0;
+	final public static int CONTACT_TYPE_DEVICE = 1;
 
 }
