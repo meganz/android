@@ -8101,7 +8101,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("chooseAddContactDialog");
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
-		startActivity(in);
+//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
 
 //		Dialog addContactDialog;
 //		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
@@ -10152,6 +10154,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						inSFLol.getRecyclerView().invalidate();
 					}
 				}
+			}
+		}
+		else if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
+			log("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
+
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
+			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+
+			if (contactsData != null){
+				cC.inviteMultipleContacts(contactsData);
 			}
 		}
 		else if (requestCode == RC_REQUEST){

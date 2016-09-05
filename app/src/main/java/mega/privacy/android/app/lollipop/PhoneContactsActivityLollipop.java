@@ -55,42 +55,12 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 	PhoneContactsLollipopAdapter adapter;
 	RelativeLayout fragmentContainer;
-	ArrayList<PhoneContacts> phoneContacts;
-
-	public class PhoneContacts{
-		long id;
-		String name;
-		String email;
-		String phoneNumber;
-
-		public PhoneContacts(long id, String name, String email, String phoneNumber) {
-			this.id = id;
-			this.name = name;
-			this.email = email;
-			this.phoneNumber = phoneNumber;
-		}
-
-		public long getId(){
-			return id;
-		}
-
-		public String getName(){
-			return name;
-		}
-
-		public String getEmail(){
-			return email;
-		}
-
-		public String getPhoneNumber(){
-			return phoneNumber;
-		}
-	}
+	ArrayList<PhoneContactInfo> phoneContacts;
 
 	@SuppressLint("InlinedApi")
 	//Get the contacts explicitly added
-	private ArrayList<PhoneContacts> getPhoneContacts() {
-       ArrayList<PhoneContacts> contactList = new ArrayList<PhoneContacts>();
+	private ArrayList<PhoneContactInfo> getPhoneContacts() {
+       ArrayList<PhoneContactInfo> contactList = new ArrayList<PhoneContactInfo>();
 
        try {
             ContentResolver cr = getBaseContext().getContentResolver();
@@ -107,9 +77,9 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 				String emailAddress = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
 				log("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
 
-				if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@"))) {
+				if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
 					log("VALID Contact: "+ name + " ---> "+ emailAddress);
-					PhoneContacts contactPhone = new PhoneContacts(id, name, emailAddress, null);
+					PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
 					contactList.add(contactPhone);
 				}
             }
@@ -258,7 +228,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	public void itemClick(View view, int position) {
 		log("on item click");
 
-		final PhoneContacts contact = (PhoneContacts) adapter.getDocumentAt(position);
+		final PhoneContactInfo contact = (PhoneContactInfo) adapter.getDocumentAt(position);
 		if(contact == null)
 		{
 			return;

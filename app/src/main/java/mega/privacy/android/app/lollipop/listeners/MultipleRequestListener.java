@@ -171,6 +171,15 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             message = context.getString(R.string.number_correctly_delete_contact_request, max_items);
                         }
                     }
+                    else if (request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
+                        log("invite contact request finished");
+                        if(error>0){
+                            message = context.getString(R.string.number_no_invite_contact_request, max_items-error, error);
+                        }
+                        else{
+                            message = context.getString(R.string.number_correctly_invite_contact_request, max_items);
+                        }
+                    }
                     break;
                 }
                 case MegaRequest.TYPE_REPLY_CONTACT_REQUEST:{

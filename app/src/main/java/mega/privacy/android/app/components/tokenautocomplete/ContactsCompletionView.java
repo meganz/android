@@ -50,7 +50,7 @@ public class ContactsCompletionView extends TokenCompleteTextView<ContactInfo> {
         //Stupid simple example of guessing if we have an email or not
         int index = completionText.indexOf('@');
         if (index == -1) {
-            return new ContactInfo(completionText, completionText.replace(" ", "") + "@example.com");
+            return new ContactInfo(completionText, completionText.replace(" ", "") + "@mega.nz");
         } else {
             return new ContactInfo(completionText.substring(0, index), completionText);
         }
