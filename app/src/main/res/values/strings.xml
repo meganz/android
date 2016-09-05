@@ -872,4 +872,10 @@
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invite requests sent successfully. </string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
+
+    <string name="invite_Lara_chat" context="Menu item">Invite Lara to join you on Chat by sending the message above.\n\nPlease note that, this invitation will be sent by email and for that reason encryption will not be applied.</string>
+
+    <string name="chat_me_text" context="Word next to own user's message in chat screen">Me</string>
+    <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Type a message</string>
+
 </resources>
