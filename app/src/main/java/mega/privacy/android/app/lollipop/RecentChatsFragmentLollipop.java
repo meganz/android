@@ -34,7 +34,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.adapters.MegaRecentChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
@@ -48,7 +48,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     Context context;
     ActionBar aB;
     RecyclerView listView;
-    MegaRecentChatLollipopAdapter adapterList;
+    MegaListChatLollipopAdapter adapterList;
     GestureDetectorCompat detector;
     TextView emptyTextView;
     RecyclerView.LayoutManager mLayoutManager;
@@ -151,10 +151,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         chats = recentChat.getRecentChats();
 
         if (adapterList == null){
-            adapterList = new MegaRecentChatLollipopAdapter(context, this, chats, listView);
+            adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
         }
         else{
-            adapterList.setContacts(chats);
+            adapterList.setChats(chats);
         }
 
         adapterList.setPositionClicked(-1);

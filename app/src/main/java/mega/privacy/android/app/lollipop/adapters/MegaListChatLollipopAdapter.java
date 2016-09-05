@@ -51,7 +51,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRecentChatLollipopAdapter.ViewHolderRecentChatList> implements OnClickListener {
+public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener {
+
+	static public int ADAPTER_RECENT_CHATS = 0;
+	static public int ADAPTER_ARCHIVED_CHATS = ADAPTER_RECENT_CHATS+1;
 
 	Context context;
 	int positionClicked;
@@ -65,12 +68,15 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	DisplayMetrics outMetrics;
 	DatabaseHandler dbH = null;
 
-	public MegaRecentChatLollipopAdapter(Context _context, Object _fragment, ArrayList<ChatRoom> _chats, RecyclerView _listView) {
+	int adapterType;
+
+	public MegaListChatLollipopAdapter(Context _context, Object _fragment, ArrayList<ChatRoom> _chats, RecyclerView _listView, int type) {
 		log("new adapter");
 		this.context = _context;
 		this.chats = _chats;
 		this.positionClicked = -1;
 		this.fragment = _fragment;
+		this.adapterType = type;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -88,8 +94,8 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	}
 	
 	/*private view holder class*/
-    public class ViewHolderRecentChatList extends ViewHolder{
-    	public ViewHolderRecentChatList(View arg0) {
+    public class ViewHolderChatList extends ViewHolder{
+    	public ViewHolderChatList(View arg0) {
 			super(arg0);
 			// TODO Auto-generated constructor stub
 		}
@@ -136,10 +142,10 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 			lastNameText = lastName;
 		}
     }
-    ViewHolderRecentChatList holder;
+    ViewHolderChatList holder;
     
 	@Override
-	public void onBindViewHolder(ViewHolderRecentChatList holder, int position) {
+	public void onBindViewHolder(ViewHolderChatList holder, int position) {
 
 		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
@@ -304,7 +310,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		holder.imageButtonThreeDots.setOnClickListener(this);		
 	}
 
-	public void setUserAvatar(ViewHolderRecentChatList holder){
+	public void setUserAvatar(ViewHolderChatList holder){
 		log("setUserAvatar");
 
 		createDefaultAvatar(holder);
@@ -382,7 +388,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	}
 
 	@Override
-	public ViewHolderRecentChatList onCreateViewHolder(ViewGroup parent, int viewType) {
+	public ViewHolderChatList onCreateViewHolder(ViewGroup parent, int viewType) {
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -395,7 +401,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
-		holder = new ViewHolderRecentChatList(v);
+		holder = new ViewHolderChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
 		holder.callIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
 		holder.multiselectIcon = (ImageView) v.findViewById(R.id.recent_chat_list_multiselect_icon);
@@ -421,7 +427,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		return holder;
 	}
 
-	public void setPendingMessages(int unreadMessages, ViewHolderRecentChatList holder){
+	public void setPendingMessages(int unreadMessages, ViewHolderChatList holder){
 		log("setPendingMessages: "+unreadMessages);
 
 		Bitmap circle = Bitmap.createBitmap(150,150, Bitmap.Config.ARGB_8888);
@@ -443,7 +449,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		holder.numberPendingMessages.setText(unreadMessages+"");
 	}
 
-	public void createMultiselectTick (ViewHolderRecentChatList holder){
+	public void createMultiselectTick (ViewHolderChatList holder){
 		log("createMultiselectTick");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -465,7 +471,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		holder.multiselectIcon.setVisibility(View.VISIBLE);
 	}
 	
-	public void createDefaultAvatar(ViewHolderRecentChatList holder){
+	public void createDefaultAvatar(ViewHolderChatList holder){
 		log("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -618,7 +624,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
-		ViewHolderRecentChatList view = (ViewHolderRecentChatList) listFragment.findViewHolderForLayoutPosition(pos);
+		ViewHolderChatList view = (ViewHolderChatList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
 			log("Start animation: "+view.contactMail);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
@@ -636,7 +642,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		notifyItemChanged(pos);
 	}
 
-	public void toggleSelection(ViewHolderRecentChatList holder) {
+	public void toggleSelection(ViewHolderChatList holder) {
 		log("toggleSelection");
 
 		Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
@@ -755,7 +761,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
     
 	@Override
 	public void onClick(View v) {
-		ViewHolderRecentChatList holder = (ViewHolderRecentChatList) v.getTag();
+		ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		ChatRoom c = (ChatRoom) getItem(currentPosition);
 		
@@ -792,7 +798,7 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 		}
 	}
 	
-	public void setContacts (ArrayList<ChatRoom> chats){
+	public void setChats (ArrayList<ChatRoom> chats){
 		log("SETCONTACTS!!!!");
 		this.chats = chats;
 		if(chats!=null)
@@ -838,6 +844,6 @@ public class MegaRecentChatLollipopAdapter extends RecyclerView.Adapter<MegaRece
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaRecentChatLollipopAdapter", log);
+		Util.log("MegaListChatLollipopAdapter", log);
 	}
 }

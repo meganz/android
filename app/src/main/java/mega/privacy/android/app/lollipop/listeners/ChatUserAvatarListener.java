@@ -7,7 +7,7 @@ import android.graphics.BitmapFactory;
 
 import java.io.File;
 
-import mega.privacy.android.app.lollipop.adapters.MegaRecentChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -17,10 +17,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
     Context context;
-    MegaRecentChatLollipopAdapter.ViewHolderRecentChatList holder;
-    MegaRecentChatLollipopAdapter adapter;
+    MegaListChatLollipopAdapter.ViewHolderChatList holder;
+    MegaListChatLollipopAdapter adapter;
 
-    public ChatUserAvatarListener(Context context, MegaRecentChatLollipopAdapter.ViewHolderRecentChatList holder, MegaRecentChatLollipopAdapter adapter) {
+    public ChatUserAvatarListener(Context context, MegaListChatLollipopAdapter.ViewHolderChatList holder, MegaListChatLollipopAdapter adapter) {
         this.context = context;
         this.holder = holder;
         this.adapter = adapter;
