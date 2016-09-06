@@ -647,25 +647,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 
-//		flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-//
-//
-//			@Override
-//			public void onAnimationStart(Animation animation) {
-//
-//			}
-//
-//			@Override
-//			public void onAnimationEnd(Animation animation) {
-//
-//			}
-//
-//			@Override
-//			public void onAnimationRepeat(Animation animation) {
-//
-//			}
-//		});
-
 		holder.imageView.startAnimation(flipAnimation);
 
 		if (selectedItems.get(holder.currentPosition, false)) {
