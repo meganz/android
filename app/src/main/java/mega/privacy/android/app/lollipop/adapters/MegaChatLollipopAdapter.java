@@ -10,6 +10,9 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -82,12 +85,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         RelativeLayout contentOwnMessageLayout;
         TextView contentOwnMessageText;
 
+        RelativeLayout ownMultiselectionLayout;
+        ImageView ownMultiselectionImageView;
+        ImageView ownMultiselectionTickIcon;
+
         RelativeLayout contactMessageLayout;
         RelativeLayout titleContactMessage;
         TextView contactText;
         TextView timeContactText;
         RelativeLayout contentContactMessageLayout;
         TextView contentContactMessageText;
+
+        RelativeLayout contactMultiselectionLayout;
+        ImageView contactMultiselectionImageView;
+        ImageView contactMultiselectionTickIcon;
 
     }
     ViewHolderMessageChatList holder;
@@ -135,8 +146,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentOwnMessageText = (TextView) v.findViewById(R.id.content_own_message_text);
         //Margins
         RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
+        ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
         holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
+        holder.ownMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.own_multiselection_layout);
+        //Margins
+        RelativeLayout.LayoutParams ownMultiselectionParams = (RelativeLayout.LayoutParams)holder.ownMultiselectionLayout.getLayoutParams();
+        ownMultiselectionParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, 0);
+        holder.ownMultiselectionLayout.setLayoutParams(ownMultiselectionParams);
+
+        holder.ownMultiselectionImageView = (ImageView) v.findViewById(R.id.own_multiselection_image_view);
+        holder.ownMultiselectionTickIcon = (ImageView) v.findViewById(R.id.own_multiselection_tick_icon);
 
         holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
         holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
@@ -160,6 +180,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         contactMessageParams.setMargins(Util.scaleWidthPx(62, outMetrics), 0, Util.scaleWidthPx(11, outMetrics), 0);
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
+        holder.contactMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.contact_multiselection_layout);
+        //Margins
+        RelativeLayout.LayoutParams contactMultiselectionParams = (RelativeLayout.LayoutParams)holder.contactMultiselectionLayout.getLayoutParams();
+        contactMultiselectionParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, 0);
+        holder.contactMultiselectionLayout.setLayoutParams(contactMultiselectionParams);
+
+        holder.contactMultiselectionImageView = (ImageView) v.findViewById(R.id.contact_multiselection_image_view);
+        holder.contactMultiselectionTickIcon = (ImageView) v.findViewById(R.id.contact_multiselection_tick_icon);
+
         v.setTag(holder);
 
         return holder;
@@ -175,6 +204,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         if(message.getUser().getMail().equals(myMail)) {
             log("MY message!!");
             if (!multipleSelect) {
+                holder.ownMultiselectionLayout.setVisibility(View.GONE);
 //            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
                 if (positionClicked != -1){
                     if (positionClicked == position){
@@ -191,13 +221,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             } else {
                 log("Multiselect ON");
 //            holder.imageButtonThreeDots.setVisibility(View.GONE);
-
+                holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
                 if(this.isItemChecked(position)){
                     log("Selected: "+message.getMessage());
+                    holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                    holder.ownMultiselectionTickIcon.setVisibility(View.VISIBLE);
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
                 }
                 else{
                     log("NOT selected");
+                    holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                    holder.ownMultiselectionTickIcon.setVisibility(View.GONE);
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                 }
             }
@@ -235,6 +269,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
             if (!multipleSelect) {
 //            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+                holder.contactMultiselectionLayout.setVisibility(View.GONE);
                 if (positionClicked != -1){
                     if (positionClicked == position){
                         holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
@@ -250,13 +285,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             } else {
                 log("Multiselect ON");
 //            holder.imageButtonThreeDots.setVisibility(View.GONE);
-
+                holder.contactMultiselectionLayout.setVisibility(View.VISIBLE);
                 if(this.isItemChecked(position)){
                     log("Selected: "+message.getMessage());
+                    holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                    holder.contactMultiselectionTickIcon.setVisibility(View.VISIBLE);
                     holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
                 }
                 else{
                     log("NOT selected");
+                    holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                    holder.contactMultiselectionTickIcon.setVisibility(View.GONE);
                     holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                 }
             }
@@ -295,46 +334,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
     }
-//
-//
-//
-//    public int compareDate(Message lastMessage){
-//
-//        if(lastDate!=null){
-//            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-//
-//            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
-//
-//            int result = tc.compare(cal, lastDate);
-//            log("RESULTS: "+result);
-//            return result;
-//        }
-//        else{
-//            log("return -1");
-//            return -1;
-//        }
-//    }
-//
-//    public int compareTime(Message lastMessage){
-//
-//        if(lastDate!=null){
-//            Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
-//
-//            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
-//
-//            int result = tc.compare(cal, lastDate);
-//            log("RESULTS: "+result);
-//            return result;
-//        }
-//        else{
-//            log("return -1");
-//            return -1;
-//        }
-//    }
-//
-//    public void storeDate(Message lastMessage){
-//        lastDate = Util.calculateDateFromTimestamp(lastMessage.getDate());
-//    }
 
     @Override
     public int getItemCount() {
@@ -351,7 +350,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         log("setMultipleSelect");
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
-//			notifyDataSetChanged();
+            notifyDataSetChanged();
         }
         if(this.multipleSelect)
         {
@@ -361,41 +360,46 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     public void toggleSelection(int pos) {
         log("toggleSelection");
-//        ViewHolderMessageChatList view = (ViewHolderMessageChatList) listFragment.findViewHolderForLayoutPosition(pos);
-//        if(view!=null){
-//            log("Start animation: "+view.contactMail);
-//            Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-//            view.imageView.startAnimation(flipAnimation);
-//        }
+        ViewHolderMessageChatList view = (ViewHolderMessageChatList) listFragment.findViewHolderForLayoutPosition(pos);
 
         if (selectedItems.get(pos, false)) {
             log("delete pos: "+pos);
             selectedItems.delete(pos);
+            if(view!=null){
+                log("Start animation: "+view.meText.getText());
+                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+                Message message = messages.get(pos);
+                String myMail = ((ChatActivityLollipop) context).getMyMail();
+                if(message.getUser().getMail().equals(myMail)) {
+                    view.ownMultiselectionTickIcon.setVisibility(View.GONE);
+                    view.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                    view.ownMultiselectionLayout.startAnimation(flipAnimation);
+                }
+                else{
+                    view.contactMultiselectionTickIcon.setVisibility(View.GONE);
+                    view.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                    view.contactMultiselectionLayout.startAnimation(flipAnimation);
+                }
+            }
         }
         else {
             log("PUT pos: "+pos);
             selectedItems.put(pos, true);
+            if(view!=null){
+                log("Start animation: "+view.meText.getText());
+                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+                Message message = messages.get(pos);
+                String myMail = ((ChatActivityLollipop) context).getMyMail();
+                if(message.getUser().getMail().equals(myMail)) {
+                    view.ownMultiselectionLayout.startAnimation(flipAnimation);
+                }
+                else{
+                    view.contactMultiselectionLayout.startAnimation(flipAnimation);
+                }
+            }
         }
         notifyItemChanged(pos);
     }
-
-//    public void toggleSelection(ViewHolderMessageChatList holder) {
-//        log("toggleSelection");
-//
-////        Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-////
-////        holder.imageView.startAnimation(flipAnimation);
-//
-//        if (selectedItems.get(holder.currentPosition, false)) {
-//            log("delete pos: "+holder.currentPosition);
-//            selectedItems.delete(holder.currentPosition);
-//        }
-//        else {
-//            log("PUT pos: "+holder.currentPosition);
-//            selectedItems.put(holder.currentPosition, true);
-//        }
-//        notifyItemChanged(holder.currentPosition);
-//    }
 
     public void selectAll(){
         for (int i= 0; i<this.getItemCount();i++){
@@ -406,10 +410,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     }
 
     public void clearSelections() {
+        log("clearSelection");
         if(selectedItems!=null){
             selectedItems.clear();
         }
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     private boolean isItemChecked(int position) {

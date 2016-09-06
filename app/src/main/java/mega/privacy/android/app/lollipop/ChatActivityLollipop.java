@@ -554,18 +554,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
                     actionMode.invalidate();
                     break;
                 }
-                case R.id.cab_menu_mute:{
-                    clearSelections();
-                    hideMultipleSelect();
-                    //Mute
-                    Toast.makeText(chatActivity, "Mute: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case R.id.cab_menu_archive:{
+                case R.id.cab_menu_copy:{
                     clearSelections();
                     hideMultipleSelect();
                     //Archive
-                    Toast.makeText(chatActivity, "Archive: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(chatActivity, "Copy: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case R.id.cab_menu_delete:{
@@ -582,12 +575,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.recent_chat_action, menu);
+            inflater.inflate(R.menu.messages_chat_action, menu);
             return true;
         }
 
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
+            log("onDEstroyActionMode");
             adapter.setMultipleSelect(false);
             clearSelections();
         }

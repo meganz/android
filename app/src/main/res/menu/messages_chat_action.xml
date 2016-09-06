@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/cab_menu_copy"
+        android:orderInCategory="105"
+        android:title="@string/context_copy"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_content_copy_white"/>
+
+    <item
+        android:id="@+id/cab_menu_delete"
+        android:orderInCategory="110"
+        android:title="@string/context_delete"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_close_white"/>
+
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="120"
+        android:title="@string/action_select_all"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="120"
+        android:title="@string/action_unselect_all"
+        MEGA:showAsAction="never" />
+
+</menu>
