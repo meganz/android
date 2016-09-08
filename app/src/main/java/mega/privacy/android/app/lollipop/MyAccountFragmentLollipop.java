@@ -333,17 +333,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
 
-//		if(myAccountInfo.getFullName()==null){
-//			myAccountInfo.setFirstName(false);
-//			myAccountInfo.setLastName(false);
-//
-//			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
-//			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
-//		}
-//		else{
-//			log("My name: "+myAccountInfo.getFullName());
-//			nameView.setText(myAccountInfo.getFullName());
-//		}
+		if(myAccountInfo!=null){
+			if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
+				log("MyName is:"+ myAccountInfo.getFullName());
+				nameView.setText(myAccountInfo.getFullName());
+			}
+			else{
+				myAccountInfo.setFirstName(false);
+				myAccountInfo.setLastName(false);
+
+				megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+				megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+			}
+		}
+		else{
+			myAccountInfo.setFirstName(false);
+			myAccountInfo.setLastName(false);
+
+			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+		}
 
 		this.updateAvatar(myUser.getEmail(), true);
 
@@ -383,7 +392,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
 
 		for (int i=0;i<contacts.size();i++){
-//			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
 			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
 				visibleContacts.add(contacts.get(i));
 			}
@@ -750,6 +759,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
+				if(context==null){
+					log("Context is NULL");
+					return;
+				}
+
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
 					if(request.getFile()!=null){
