@@ -974,6 +974,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				outState.putInt("selectedPaymentMethod", selectedPaymentMethod);
 			}
 		}
+		if(myAccountInfo==null){
+			log("My AccountInfo is Null");
+		}
 	}
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1020,6 +1023,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
+
 			this.setPathNavigationOffline("/");
 		}
 
@@ -1791,6 +1795,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	protected void onResume(){
 		log("onResume");
+		if(myAccountInfo==null){
+			log("My AccountInfo is Null");
+		}
 		super.onResume();
 	}
 
@@ -3321,7 +3328,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case ACCOUNT:{
-				log("case ACCOUNT");
+				log("case ACCOUNT: "+accountFragment);
 //    			tB.setVisibility(View.GONE);
 
 				switch(accountFragment){
@@ -9725,6 +9732,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
 				intentPicture.putExtra("PICTURE_PROFILE", 1);
+				intentPicture.putExtra("MY_MAIL", myAccountInfo.getMyUser().getEmail());
 				startActivity(intentPicture);
 			}
 			else{
@@ -10156,15 +10164,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(avatarPath!=null){
 						log("Chosen picture to change the avatar: "+avatarPath);
 						File imgFile = new File(avatarPath);
-						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
-						log("----NEW Name: "+newPath);
-						File newFile = new File(newPath);
-						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-
-						if(maFLol!=null){
-							megaApi.setAvatar(newFile.getAbsolutePath(), maFLol);
+//						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+						String newPath = null;
+						if (getExternalCacheDir() != null){
+							newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
 						}
+						else{
+							log("getExternalCacheDir() is NULL");
+							newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
+						}
+
+						if(newPath!=null){
+							File newFile = new File(newPath);
+							log("NEW - the destination of the avatar is: "+newPath);
+							if(newFile!=null){
+								MegaUtilsAndroid.createAvatar(imgFile, newFile);
+
+								if(maFLol!=null){
+									megaApi.setAvatar(newFile.getAbsolutePath(), maFLol);
+								}
+
+							}
+							else{
+								log("Error new path avatar!!");
+							}
+						}
+						else{
+							log("ERROR! Destination PATH is NULL");
+						}
+
+
+//						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
+//						log("----NEW Name: "+newPath);
+//						File newFile = new File(newPath);
+//						MegaUtilsAndroid.createAvatar(imgFile, newFile);
+
 					}
 					else{
 						log("The chosen avatar path is NULL");
