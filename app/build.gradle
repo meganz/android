@@ -36,7 +36,7 @@ android {
         checkReleaseBuilds false
         // Or, if you prefer, you can continue to check for errors in release builds,
         // but continue the build even when errors are found:
-        // abortOnError false
+        abortOnError false
     }
 
     task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
@@ -60,7 +60,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
-    compile 'com.google.android.gms:play-services-wallet:9.0.0'
     compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
