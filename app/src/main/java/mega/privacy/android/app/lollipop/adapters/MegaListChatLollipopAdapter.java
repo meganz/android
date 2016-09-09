@@ -26,7 +26,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -745,7 +744,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 				}
 				log("click three dots!");
-				Toast.makeText(context, "Three vertical dots!",Toast.LENGTH_SHORT).show();
+				((ManagerActivityLollipop) context).showChatPanel(c);
 				break;
 			}
 			case R.id.recent_chat_list_item_layout:{

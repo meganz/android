@@ -114,6 +114,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
+import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ContactOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
@@ -121,6 +122,7 @@ import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -190,6 +192,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout uploadVideo;
 	public LinearLayout uploadFromSystem;
 	private UploadPanelListener uploadPanelListener;
+	////
+
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingChatPanel;
+	public FrameLayout chatOutLayout;
+	public LinearLayout chatLayout;
+	public LinearLayout optionInfoChat;
+	public LinearLayout optionLeaveChat;
+	public LinearLayout optionMuteChat;
+	private ChatPanelListener chatPanelListener;
 	////
 
 	//Sliding NODES OPTIONS panel
@@ -1299,6 +1311,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		slidingUploadPanel.setVisibility(View.INVISIBLE);
 		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		//////
+
+		//Sliding CHAT panel
+		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
+		chatLayout = (LinearLayout) findViewById(R.id.file_list_chat);
+		chatOutLayout = (FrameLayout) findViewById(R.id.file_list_out_chat);
+		optionInfoChat = (LinearLayout) findViewById(R.id.file_list_info_chat_layout);
+		optionLeaveChat= (LinearLayout) findViewById(R.id.file_list_leave_chat_layout);
+		optionMuteChat = (LinearLayout) findViewById(R.id.file_list_mute_chat_layout);
+
+		chatPanelListener = new ChatPanelListener(this);
+
+		optionInfoChat.setOnClickListener(uploadPanelListener);
+		optionMuteChat.setOnClickListener(uploadPanelListener);
+		uploadVideo.setOnClickListener(uploadPanelListener);
+		uploadOutLayout.setOnClickListener(uploadPanelListener);
+
+		slidingChatPanel.setVisibility(View.INVISIBLE);
+		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		//////
 
 		//Sliding OPTIONS panel
@@ -6275,6 +6306,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		log("Sliding AVATAR options not shown");
+
+		if(slidingChatPanel.getVisibility()==View.VISIBLE||slidingChatPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
+			hideChatPanel();
+			return;
+		}
+
+		log("Sliding CHaT options not shown");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -12016,6 +12054,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setVisibility(View.VISIBLE);
 		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		slidingUploadPanel.setVisibility(View.GONE);
+	}
+
+	public void showChatPanel(ChatRoom chat){
+		log("showChatPanel");
+
+		fabButton.setVisibility(View.GONE);
+		slidingChatPanel.setVisibility(View.VISIBLE);
+		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
+
+	public void hideChatPanel(){
+		log("hideChatPanel");
+		fabButton.setVisibility(View.VISIBLE);
+		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingChatPanel.setVisibility(View.GONE);
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){
