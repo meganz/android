@@ -878,4 +878,6 @@
     <string name="chat_me_text" context="Word next to own user's message in chat screen">Me</string>
     <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Type a message</string>
 
+    <string name="general_mute" context="button">Mute</string>
+
 </resources>

@@ -108,7 +108,6 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.lollipop.adapters.ChatPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -116,6 +115,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
+import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ContactOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
@@ -123,6 +123,7 @@ import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -182,6 +183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaOffline selectedOfflineNode;
 	MegaUser selectedUser;
 	MegaContactRequest selectedRequest;
+	ChatRoom selectedChat;
 
 	//UPLOAD PANEL
 	private SlidingUpPanelLayout slidingUploadPanel;
@@ -192,6 +194,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout uploadVideo;
 	public LinearLayout uploadFromSystem;
 	private UploadPanelListener uploadPanelListener;
+	////
+
+	//CHAT PANEL
+	private SlidingUpPanelLayout slidingChatPanel;
+	public TextView titleNameContactChatPanel;
+	public FrameLayout chatOutLayout;
+	public RoundedImageView chatImageView;
+	public TextView chatInitialLetter;
+	public LinearLayout chatLayout;
+	public LinearLayout optionInfoChat;
+	public LinearLayout optionLeaveChat;
+	public LinearLayout optionMuteChat;
+	private ChatPanelListener chatPanelListener;
 	////
 
 	//Sliding NODES OPTIONS panel
@@ -330,12 +345,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	ContactsPageAdapter mTabsAdapterContacts;
 	ViewPager viewPagerContacts;
 
-	//Tabs in Chat
-	TabLayout tabLayoutChat;
-	LinearLayout chatSectionLayout;
-	ChatPageAdapter mTabsAdapterChat;
-	ViewPager viewPagerChat;
-
 	boolean firstTime = true;
 //	String pathNavigation = "/";
 	String searchQuery = null;
@@ -388,7 +397,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int indexShares = -1;
 	int indexCloud = -1;
 	int indexContacts = -1;
-	int indexChat = -1;
+//	int indexChat = -1;
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
@@ -413,7 +422,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private CameraUploadFragmentLollipop cuFL;
 
 	private RecentChatsFragmentLollipop rChatFL;
-	private ArchiveChatsFragmentLollipop aChatFL;
 
 	ProgressDialog statusDialog;
 
@@ -1310,6 +1318,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		//////
 
+		//Sliding CHAT panel
+		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
+		titleNameContactChatPanel = (TextView) findViewById(R.id.file_list_chat_title_text);
+		chatLayout = (LinearLayout) findViewById(R.id.file_list_chat);
+		chatImageView = (RoundedImageView) findViewById(R.id.sliding_chat_list_thumbnail);
+		chatInitialLetter = (TextView) findViewById(R.id.sliding_chat_list_initial_letter);
+		chatOutLayout = (FrameLayout) findViewById(R.id.file_list_out_chat);
+		optionInfoChat = (LinearLayout) findViewById(R.id.file_list_info_chat_layout);
+		optionLeaveChat= (LinearLayout) findViewById(R.id.file_list_leave_chat_layout);
+		optionMuteChat = (LinearLayout) findViewById(R.id.file_list_mute_chat_layout);
+
+		chatPanelListener = new ChatPanelListener(this);
+
+		optionInfoChat.setOnClickListener(chatPanelListener);
+		optionMuteChat.setOnClickListener(chatPanelListener);
+		optionLeaveChat.setOnClickListener(chatPanelListener);
+		chatOutLayout.setOnClickListener(chatPanelListener);
+
+		slidingChatPanel.setVisibility(View.INVISIBLE);
+		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		//////
+
 		//Sliding OPTIONS panel
 		slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 		optionsLayout = (LinearLayout) findViewById(R.id.file_list_options);
@@ -1454,11 +1484,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		contactsSectionLayout= (LinearLayout)findViewById(R.id.tabhost_contacts);
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
-
-		//TABS section Chat
-		chatSectionLayout= (LinearLayout)findViewById(R.id.tabhost_chat);
-		tabLayoutChat =  (TabLayout) findViewById(R.id.sliding_tabs_chat);
-		viewPagerChat = (ViewPager) findViewById(R.id.chat_tabs_pager);
 
 		//TABS section Shared Items
 		sharesSectionLayout= (LinearLayout)findViewById(R.id.tabhost_shares);
@@ -2510,13 +2535,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerContacts.setVisibility(View.GONE);
 		sharesSectionLayout.setVisibility(View.GONE);
 		viewPagerShares.setVisibility(View.GONE);
-		chatSectionLayout.setVisibility(View.GONE);
-		viewPagerChat.setVisibility(View.GONE);
-
-//    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//    			if (currentFragment != null){
-//    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-//    			}
 
 		if (mTabsAdapterCDrive == null){
 			log("mTabsAdapterCloudDrive == null");
@@ -2772,13 +2790,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerContacts.setVisibility(View.GONE);
 		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
-		chatSectionLayout.setVisibility(View.GONE);
-		viewPagerChat.setVisibility(View.GONE);
-
-//    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-//    			if (currentFragment != null){
-//    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-//    			}
 
 		if (mTabsAdapterShares == null){
 			log("mTabsAdapterShares is NULL");
@@ -3009,8 +3020,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerShares.setVisibility(View.GONE);
 		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
-		chatSectionLayout.setVisibility(View.GONE);
-		viewPagerChat.setVisibility(View.GONE);
 
 		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 		if (currentFragment != null){
@@ -3119,8 +3128,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerShares.setVisibility(View.GONE);
 		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
-		chatSectionLayout.setVisibility(View.GONE);
-		viewPagerChat.setVisibility(View.GONE);
 
 		switch(accountFragment){
 			case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
@@ -3195,7 +3202,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
 
-		log("selectDrawerItemContacts");
 		tB.setVisibility(View.VISIBLE);
 
 		if (aB == null){
@@ -3212,87 +3218,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		contactsSectionLayout.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 
-		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-		}
-		chatSectionLayout.setVisibility(View.VISIBLE);
-		viewPagerChat.setVisibility(View.VISIBLE);
-
-		if (mTabsAdapterChat == null){
-			log("mTabsAdapterChat == null");
-
-			mTabsAdapterChat = new ChatPageAdapter(getSupportFragmentManager(),this);
-			viewPagerChat.setAdapter(mTabsAdapterChat);
-			tabLayoutChat.setupWithViewPager(viewPagerChat);
-
-			log("The index of the TAB CHAT is: " + indexChat);
-			if(indexChat!=-1) {
-				if (viewPagerChat != null) {
-					switch (indexChat){
-						case 1:{
-							viewPagerChat.setCurrentItem(1);
-							log("Select RecentCHAT TAB");
-							break;
-						}
-						default:{
-							viewPagerContacts.setCurrentItem(0);
-							log("Select ArchiveTAB TAB");
-							break;
-						}
-					}
-				}
-			}
-			else{
-				//No bundle, no change of orientation
-				log("indexChat is NOT -1");
-			}
+		if (rChatFL == null){
+			log("New REcentChatFragment");
+			rChatFL = new RecentChatsFragmentLollipop();
+//			maFLol.setMyEmail(megaApi.getMyUser().getEmail());
+//			if(myAccountInfo==null){
+//				log("Not possibleeeeeee!!");
+//			}
+//			else{
+//				maFLol.setMyAccountInfo(myAccountInfo);
+//			}
+//			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		else{
-			log("mTabsAdapterChat NOT null");
-			String chatTag = getFragmentTag(R.id.chat_tabs_pager, 0);
-			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(chatTag);
-			chatTag = getFragmentTag(R.id.chat_tabs_pager, 1);
-			aChatFL = (ArchiveChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(chatTag);
-
-			if(indexChat!=-1) {
-				log("The index of the TAB CHAT is: " + indexChat);
-				if (viewPagerChat != null) {
-					switch (indexChat) {
-						case 1: {
-							viewPagerChat.setCurrentItem(1);
-							log("Select RecentCHAT TAB");
-							break;
-						}
-						default: {
-							viewPagerChat.setCurrentItem(0);
-							log("Select ArchiveTAB TAB");
-							break;
-						}
-					}
-				}
-			}
+			log("REcentChatFragment is not null");
+//			rChatFL.setMyEmail(megaApi.getMyUser().getEmail());
+//			if(myAccountInfo==null){
+//				log("Not possibleeeeeee!!");
+//			}
+//			else{
+//				maFLol.setMyAccountInfo(myAccountInfo);
+//			}
+//
+//			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 
-		viewPagerChat.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, rChatFL, "rChat");
+		ft.commit();
 
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-			}
-
-			@Override
-			public void onPageSelected(int position) {
-				supportInvalidateOptionsMenu();
-				showFabButton();
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-
-			}
-		});
-
+		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
@@ -3330,8 +3285,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
     			sharesSectionLayout.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, oFLol, "oFLol");
@@ -3366,8 +3319,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			sharesSectionLayout.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
 				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
@@ -3435,8 +3386,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			sharesSectionLayout.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, muFLol, "muFLol");
@@ -3498,8 +3447,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			sharesSectionLayout.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, iFLol, "iFLol");
@@ -3541,8 +3488,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerShares.setVisibility(View.GONE);
     			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
@@ -3612,8 +3557,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerContacts.setVisibility(View.GONE);
     			sharesSectionLayout.setVisibility(View.GONE);
     			viewPagerShares.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
@@ -3653,8 +3596,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerShares.setVisibility(View.GONE);
     			cloudSectionLayout.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
-				chatSectionLayout.setVisibility(View.GONE);
-				viewPagerChat.setVisibility(View.GONE);
 
     			if (tFLol == null){
     				tFLol = new TransfersFragmentLollipop();
@@ -4744,18 +4685,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    }
 		else if (drawerItem == DrawerItem.CHAT){
 			log("in Chat Section");
-			int index = viewPagerChat.getCurrentItem();
-			if (index == 0) {
-				log("createOptions TAB chat");
-				if (rChatFL != null){
-					newChatMenuItem.setVisible(true);
-					addContactMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
-				}
-			}
-			else{
-				newChatMenuItem.setVisible(false);
+			if (rChatFL != null){
+				newChatMenuItem.setVisible(true);
 				addContactMenuItem.setVisible(true);
+				selectMenuItem.setVisible(true);
 			}
 
 			//Hide
@@ -5241,25 +5174,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		}
     			}
 				if (drawerItem == DrawerItem.CHAT){
-					switch(indexChat){
-						case 1:{
-							break;
+					if (rChatFL != null){
+						rChatFL.selectAll();
+						if (rChatFL.showSelectMenuItem()){
+							selectMenuItem.setVisible(true);
+							unSelectMenuItem.setVisible(false);
 						}
-						default:{
-							String chatTag = getFragmentTag(R.id.chat_tabs_pager, 0);
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(chatTag);
-							if (rChatFL != null){
-								rChatFL.selectAll();
-								if (rChatFL.showSelectMenuItem()){
-									selectMenuItem.setVisible(true);
-									unSelectMenuItem.setVisible(false);
-								}
-								else{
-									selectMenuItem.setVisible(false);
-									unSelectMenuItem.setVisible(true);
-								}
-							}
-							break;
+						else{
+							selectMenuItem.setVisible(false);
+							unSelectMenuItem.setVisible(true);
 						}
 					}
 				}
@@ -6452,6 +6375,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		log("Sliding AVATAR options not shown");
+
+		if(slidingChatPanel.getVisibility()==View.VISIBLE||slidingChatPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
+			hideChatPanel();
+			return;
+		}
+
+		log("Sliding CHaT options not shown");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -12203,13 +12133,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return -1;
 	}
 
-	public int getTabItemChat(){
-		if(viewPagerChat!=null){
-			return viewPagerChat.getCurrentItem();
-		}
-		return -1;
-	}
-
 	public void setTabItemCloud(int index){
 		viewPagerCDrive.setCurrentItem(index);
 	}
@@ -12244,6 +12167,131 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setVisibility(View.VISIBLE);
 		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		slidingUploadPanel.setVisibility(View.GONE);
+	}
+
+	public void showChatPanel(ChatRoom chat){
+		log("showChatPanel");
+
+		if(chat!=null){
+			this.selectedChat = chat;
+		}
+
+		//Set title of screen
+		ArrayList<MegaContact> contacts = chat.getContacts();
+
+		if(contacts.size()==1) {
+			log("Chat one to one");
+
+			String handle = contacts.get(0).getHandle();
+			MegaContact contactChat = dbH.findContactByHandle(handle);
+			String fullName;
+			//Set contact's name and title for the screen
+			if (contactChat != null) {
+
+				String firstNameText = contactChat.getName();
+				String lastNameText = contactChat.getLastName();
+
+				if (firstNameText.trim().length() <= 0) {
+					fullName = lastNameText;
+				} else {
+					fullName = firstNameText + " " + lastNameText;
+				}
+
+				if (fullName.trim().length() <= 0) {
+					log("Put email as fullname");
+					String email = contacts.get(0).getMail();
+					String[] splitEmail = email.split("[@._]");
+					fullName = splitEmail[0];
+				}
+			} else {
+				String email = contacts.get(0).getMail();
+				String[] splitEmail = email.split("[@._]");
+				fullName = splitEmail[0];
+
+			}
+			titleNameContactChatPanel.setText(fullName);
+
+			////
+			Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+
+			MegaUser contact = megaApi.getContact(contacts.get(0).getMail());
+			if (contact != null) {
+				String color = megaApi.getUserAvatarColor(contact);
+				if (color != null) {
+					log("The color to set the avatar is " + color);
+					p.setColor(Color.parseColor(color));
+				} else {
+					log("Default color to the avatar");
+					p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+				}
+			} else {
+				log("Contact is NULL");
+				p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+			}
+
+			int radius;
+			if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+				radius = defaultAvatar.getWidth() / 2;
+			else
+				radius = defaultAvatar.getHeight() / 2;
+
+			c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
+			chatImageView.setImageBitmap(defaultAvatar);
+
+			Display display = getWindowManager().getDefaultDisplay();
+			outMetrics = new DisplayMetrics();
+			display.getMetrics(outMetrics);
+			float density = getResources().getDisplayMetrics().density;
+
+			boolean setInitialByMail = false;
+
+			if (fullName != null) {
+				if (fullName.trim().length() > 0) {
+					String firstLetter = fullName.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					chatInitialLetter.setText(firstLetter);
+					chatInitialLetter.setTextColor(Color.WHITE);
+					chatInitialLetter.setVisibility(View.VISIBLE);
+				} else {
+					setInitialByMail = true;
+				}
+			} else {
+				setInitialByMail = true;
+			}
+			if (setInitialByMail) {
+				if (contacts.get(0).getMail() != null) {
+					if (contacts.get(0).getMail().length() > 0) {
+						String firstLetter = contacts.get(0).getMail().charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						chatInitialLetter.setText(firstLetter);
+						chatInitialLetter.setTextColor(Color.WHITE);
+						chatInitialLetter.setVisibility(View.VISIBLE);
+					}
+				}
+			}
+			chatInitialLetter.setTextSize(14);
+
+
+			////
+		}
+
+		fabButton.setVisibility(View.GONE);
+		slidingChatPanel.setVisibility(View.VISIBLE);
+		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
+
+	public void hideChatPanel(){
+		log("hideChatPanel");
+		fabButton.setVisibility(View.VISIBLE);
+		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingChatPanel.setVisibility(View.GONE);
+
+		if (rChatFL != null){
+			rChatFL.resetAdapter();
+		}
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){
@@ -12395,18 +12443,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case CHAT:{
-				int indexChat = getTabItemChat();
-				switch(indexChat){
-					case 0:{
-						fabButton.setVisibility(View.VISIBLE);
-						break;
-					}
-					default:{
-						fabButtonsLayout.setVisibility(View.GONE);
-						fabButton.setVisibility(View.GONE);
-						break;
-					}
-				}
+				fabButton.setVisibility(View.VISIBLE);
 				break;
 			}
 			default:{
