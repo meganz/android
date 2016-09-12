@@ -194,8 +194,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EditText) findViewById(R.id.edit_text_chat);
 
-
-
         textChat.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {}

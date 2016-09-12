@@ -109,7 +109,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RoundedImageView circlePendingMessages;
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
-        ImageView callIcon;
+        ImageView muteIcon;
 		ImageView multiselectIcon;
         int currentPosition;
         String contactMail;
@@ -234,7 +234,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			if(lastMessage.getType()==Message.TEXT){
 				log("The last message is text!");
-				holder.callIcon.setVisibility(View.GONE);
+				holder.muteIcon.setVisibility(View.GONE);
 
 				if(chat.getUnreadMessages()!=0){
 					int unreadMessages = chat.getUnreadMessages();
@@ -278,12 +278,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 			else if(lastMessage.getType()==Message.VIDEO){
+
+				if(chat.getUnreadMessages()!=0){
+					int unreadMessages = chat.getUnreadMessages();
+					setPendingMessages(unreadMessages, holder);
+				}
+				else{
+					holder.layoutPendingMessages.setVisibility(View.GONE);
+				}
+
 				//The last message is a call
 				log("The last message is a call!");
-				holder.callIcon.setVisibility(View.VISIBLE);
+				holder.muteIcon.setVisibility(View.VISIBLE);
+				RelativeLayout.LayoutParams muteIconParams = (RelativeLayout.LayoutParams)holder.muteIcon.getLayoutParams();
+				muteIconParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, 0);
+				holder.muteIcon.setLayoutParams(muteIconParams);
+
 				//Set margin
 				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(16, outMetrics), 0, 0);
+				nameTextViewParams.setMargins(0, Util.scaleHeightPx(16, outMetrics), 0, 0);
 				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 
 				//Set margin contentTextView - more margin bottom duration
@@ -402,7 +415,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 		holder = new ViewHolderChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
-		holder.callIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
+		holder.muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
 		holder.multiselectIcon = (ImageView) v.findViewById(R.id.recent_chat_list_multiselect_icon);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
