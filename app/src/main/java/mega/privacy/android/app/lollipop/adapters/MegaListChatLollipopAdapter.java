@@ -26,7 +26,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -110,7 +109,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RoundedImageView circlePendingMessages;
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
-        ImageView callIcon;
+        ImageView muteIcon;
 		ImageView multiselectIcon;
         int currentPosition;
         String contactMail;
@@ -160,8 +159,39 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(contacts!=null){
 			if(contacts.size()==1){
 				holder.contactMail = contacts.get(0).getMail();
+				MegaContact contactDB = dbH.findContactByHandle(contacts.get(0).getHandle());
+//				MegaContact contactDB = dbH.findContactByHandle("6135453135");
+				if(contactDB!=null){
+					holder.firstNameText = contactDB.getName();
+					holder.lastNameText = contactDB.getLastName();
+
+					String fullName;
+
+					if (holder.firstNameText.trim().length() <= 0){
+						fullName = holder.lastNameText;
+					}
+					else{
+						fullName = holder.firstNameText + " " + holder.lastNameText;
+					}
+
+					if (fullName.trim().length() <= 0){
+						log("Put email as fullname");
+						String email = holder.contactMail;
+						String[] splitEmail = email.split("[@._]");
+						fullName = splitEmail[0];
+					}
+
+					holder.textViewContactName.setText(fullName);
+				}
+				else{
+					String email = holder.contactMail;
+					String[] splitEmail = email.split("[@._]");
+					String fullName = splitEmail[0];
+					holder.textViewContactName.setText(fullName);
+				}
 
 				if (!multipleSelect) {
+					//Multiselect OFF
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					if (positionClicked != -1){
 						if (positionClicked == position){
@@ -193,37 +223,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						setUserAvatar(holder);
 					}
 				}
-
-				MegaContact contactDB = dbH.findContactByHandle(contacts.get(0).getHandle());
-//				MegaContact contactDB = dbH.findContactByHandle("6135453135");
-				if(contactDB!=null){
-					holder.firstNameText = contactDB.getName();
-					holder.lastNameText = contactDB.getLastName();
-
-					String fullName;
-
-					if (holder.firstNameText.trim().length() <= 0){
-						fullName = holder.lastNameText;
-					}
-					else{
-						fullName = holder.firstNameText + " " + holder.lastNameText;
-					}
-
-					if (fullName.trim().length() <= 0){
-						log("Put email as fullname");
-						String email = holder.contactMail;
-						String[] splitEmail = email.split("[@._]");
-						fullName = splitEmail[0];
-					}
-
-					holder.textViewContactName.setText(fullName);
-				}
-				else{
-					String email = holder.contactMail;
-					String[] splitEmail = email.split("[@._]");
-					String fullName = splitEmail[0];
-					holder.textViewContactName.setText(fullName);
-				}
 			}
 			else{
 				log("GROUP chat, more than one contact involved");
@@ -235,7 +234,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			if(lastMessage.getType()==Message.TEXT){
 				log("The last message is text!");
-				holder.callIcon.setVisibility(View.GONE);
+				holder.muteIcon.setVisibility(View.GONE);
 
 				if(chat.getUnreadMessages()!=0){
 					int unreadMessages = chat.getUnreadMessages();
@@ -279,12 +278,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 			else if(lastMessage.getType()==Message.VIDEO){
+
+				if(chat.getUnreadMessages()!=0){
+					int unreadMessages = chat.getUnreadMessages();
+					setPendingMessages(unreadMessages, holder);
+				}
+				else{
+					holder.layoutPendingMessages.setVisibility(View.GONE);
+				}
+
 				//The last message is a call
 				log("The last message is a call!");
-				holder.callIcon.setVisibility(View.VISIBLE);
+				holder.muteIcon.setVisibility(View.VISIBLE);
+				RelativeLayout.LayoutParams muteIconParams = (RelativeLayout.LayoutParams)holder.muteIcon.getLayoutParams();
+				muteIconParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, 0);
+				holder.muteIcon.setLayoutParams(muteIconParams);
+
 				//Set margin
 				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(16, outMetrics), 0, 0);
+				nameTextViewParams.setMargins(0, Util.scaleHeightPx(16, outMetrics), 0, 0);
 				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 
 				//Set margin contentTextView - more margin bottom duration
@@ -403,7 +415,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 		holder = new ViewHolderChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
-		holder.callIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
+		holder.muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
 		holder.multiselectIcon = (ImageView) v.findViewById(R.id.recent_chat_list_multiselect_icon);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
@@ -614,7 +626,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		log("setMultipleSelect");
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-//			notifyDataSetChanged();
+			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
@@ -642,43 +654,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		notifyItemChanged(pos);
 	}
 
-	public void toggleSelection(ViewHolderChatList holder) {
-		log("toggleSelection");
-
-		Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-
-//		flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-//
-//
-//			@Override
-//			public void onAnimationStart(Animation animation) {
-//
-//			}
-//
-//			@Override
-//			public void onAnimationEnd(Animation animation) {
-//
-//			}
-//
-//			@Override
-//			public void onAnimationRepeat(Animation animation) {
-//
-//			}
-//		});
-
-		holder.imageView.startAnimation(flipAnimation);
-
-		if (selectedItems.get(holder.currentPosition, false)) {
-			log("delete pos: "+holder.currentPosition);
-			selectedItems.delete(holder.currentPosition);
-		}
-		else {
-			log("PUT pos: "+holder.currentPosition);
-			selectedItems.put(holder.currentPosition, true);
-		}
-		notifyItemChanged(holder.currentPosition);
-	}
-
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
@@ -691,7 +666,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(selectedItems!=null){
 			selectedItems.clear();
 		}
-		notifyDataSetChanged();
+//		notifyDataSetChanged();
 	}
 	
 	private boolean isItemChecked(int position) {
@@ -782,7 +757,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 				}
 				log("click three dots!");
-				Toast.makeText(context, "Three vertical dots!",Toast.LENGTH_SHORT).show();
+				((ManagerActivityLollipop) context).showChatPanel(c);
 				break;
 			}
 			case R.id.recent_chat_list_item_layout:{
