@@ -97,6 +97,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OldPreferences;
@@ -182,6 +183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaOffline selectedOfflineNode;
 	MegaUser selectedUser;
 	MegaContactRequest selectedRequest;
+	ChatRoom selectedChat;
 
 	//UPLOAD PANEL
 	private SlidingUpPanelLayout slidingUploadPanel;
@@ -194,9 +196,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private UploadPanelListener uploadPanelListener;
 	////
 
-	//UPLOAD PANEL
+	//CHAT PANEL
 	private SlidingUpPanelLayout slidingChatPanel;
+	public TextView titleNameContactChatPanel;
 	public FrameLayout chatOutLayout;
+	public RoundedImageView chatImageView;
+	public TextView chatInitialLetter;
 	public LinearLayout chatLayout;
 	public LinearLayout optionInfoChat;
 	public LinearLayout optionLeaveChat;
@@ -1315,7 +1320,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//Sliding CHAT panel
 		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
+		titleNameContactChatPanel = (TextView) findViewById(R.id.file_list_chat_title_text);
 		chatLayout = (LinearLayout) findViewById(R.id.file_list_chat);
+		chatImageView = (RoundedImageView) findViewById(R.id.sliding_chat_list_thumbnail);
+		chatInitialLetter = (TextView) findViewById(R.id.sliding_chat_list_initial_letter);
 		chatOutLayout = (FrameLayout) findViewById(R.id.file_list_out_chat);
 		optionInfoChat = (LinearLayout) findViewById(R.id.file_list_info_chat_layout);
 		optionLeaveChat= (LinearLayout) findViewById(R.id.file_list_leave_chat_layout);
@@ -1323,10 +1331,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		chatPanelListener = new ChatPanelListener(this);
 
-		optionInfoChat.setOnClickListener(uploadPanelListener);
-		optionMuteChat.setOnClickListener(uploadPanelListener);
-		uploadVideo.setOnClickListener(uploadPanelListener);
-		uploadOutLayout.setOnClickListener(uploadPanelListener);
+		optionInfoChat.setOnClickListener(chatPanelListener);
+		optionMuteChat.setOnClickListener(chatPanelListener);
+		optionLeaveChat.setOnClickListener(chatPanelListener);
+		chatOutLayout.setOnClickListener(chatPanelListener);
 
 		slidingChatPanel.setVisibility(View.INVISIBLE);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -12059,6 +12067,112 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showChatPanel(ChatRoom chat){
 		log("showChatPanel");
 
+		if(chat!=null){
+			this.selectedChat = chat;
+		}
+
+		//Set title of screen
+		ArrayList<MegaContact> contacts = chat.getContacts();
+
+		if(contacts.size()==1) {
+			log("Chat one to one");
+
+			String handle = contacts.get(0).getHandle();
+			MegaContact contactChat = dbH.findContactByHandle(handle);
+			String fullName;
+			//Set contact's name and title for the screen
+			if (contactChat != null) {
+
+				String firstNameText = contactChat.getName();
+				String lastNameText = contactChat.getLastName();
+
+				if (firstNameText.trim().length() <= 0) {
+					fullName = lastNameText;
+				} else {
+					fullName = firstNameText + " " + lastNameText;
+				}
+
+				if (fullName.trim().length() <= 0) {
+					log("Put email as fullname");
+					String email = contacts.get(0).getMail();
+					String[] splitEmail = email.split("[@._]");
+					fullName = splitEmail[0];
+				}
+			} else {
+				String email = contacts.get(0).getMail();
+				String[] splitEmail = email.split("[@._]");
+				fullName = splitEmail[0];
+
+			}
+			titleNameContactChatPanel.setText(fullName);
+
+			////
+			Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+
+			MegaUser contact = megaApi.getContact(contacts.get(0).getMail());
+			if (contact != null) {
+				String color = megaApi.getUserAvatarColor(contact);
+				if (color != null) {
+					log("The color to set the avatar is " + color);
+					p.setColor(Color.parseColor(color));
+				} else {
+					log("Default color to the avatar");
+					p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+				}
+			} else {
+				log("Contact is NULL");
+				p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+			}
+
+			int radius;
+			if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+				radius = defaultAvatar.getWidth() / 2;
+			else
+				radius = defaultAvatar.getHeight() / 2;
+
+			c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
+			chatImageView.setImageBitmap(defaultAvatar);
+
+			Display display = getWindowManager().getDefaultDisplay();
+			outMetrics = new DisplayMetrics();
+			display.getMetrics(outMetrics);
+			float density = getResources().getDisplayMetrics().density;
+
+			boolean setInitialByMail = false;
+
+			if (fullName != null) {
+				if (fullName.trim().length() > 0) {
+					String firstLetter = fullName.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					chatInitialLetter.setText(firstLetter);
+					chatInitialLetter.setTextColor(Color.WHITE);
+					chatInitialLetter.setVisibility(View.VISIBLE);
+				} else {
+					setInitialByMail = true;
+				}
+			} else {
+				setInitialByMail = true;
+			}
+			if (setInitialByMail) {
+				if (contacts.get(0).getMail() != null) {
+					if (contacts.get(0).getMail().length() > 0) {
+						String firstLetter = contacts.get(0).getMail().charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						chatInitialLetter.setText(firstLetter);
+						chatInitialLetter.setTextColor(Color.WHITE);
+						chatInitialLetter.setVisibility(View.VISIBLE);
+					}
+				}
+			}
+			chatInitialLetter.setTextSize(14);
+
+
+			////
+		}
+
 		fabButton.setVisibility(View.GONE);
 		slidingChatPanel.setVisibility(View.VISIBLE);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
@@ -12069,6 +12183,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setVisibility(View.VISIBLE);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		slidingChatPanel.setVisibility(View.GONE);
+
+		if (rChatFL != null){
+			rChatFL.resetAdapter();
+		}
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){

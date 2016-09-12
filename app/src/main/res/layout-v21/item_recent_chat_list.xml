@@ -47,8 +47,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
-        android:layout_marginTop="19dp"
-        android:layout_marginLeft="13dp"
         android:background="@null"
         android:src="@drawable/ic_volume_mute_black" />
 
