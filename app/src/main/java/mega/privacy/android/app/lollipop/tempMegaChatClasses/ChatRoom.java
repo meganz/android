@@ -11,6 +11,16 @@ public class ChatRoom {
     ArrayList<MegaContact> contacts;
     int unreadMessages;
 
+    public boolean isMute() {
+        return isMute;
+    }
+
+    public void setMute(boolean mute) {
+        isMute = mute;
+    }
+
+    boolean isMute;
+
     public ArrayList<MegaContact> getContacts() {
         return contacts;
     }
