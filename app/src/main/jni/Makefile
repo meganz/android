@@ -33,7 +33,7 @@ C_ARES_VERSION=1.11.0
 CURL_EXTRA=--disable-smb --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi
 CURL_SOURCE_FILE=curl-$(CURL_VERSION).tar.gz
 CURL_SOURCE_FOLDER=curl-$(CURL_VERSION)
-CURL_CONFIGURED=$(CURL)/$(CURL_SOURCE_FOLDER)/curl-config
+CURL_CONFIGURED=$(CURL)/$(CURL_SOURCE_FILE)_configured
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/$(CURL_SOURCE_FILE)
 CURL_VERIFIED_SOURCES=$(CURL)/$(CURL_SOURCE_FILE)_verified
 
@@ -44,12 +44,12 @@ ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/$(ARES_SOURCE_FILE)
 ARES_VERIFIED_SOURCES=$(CURL)/$(ARES_SOURCE_FILE)_verified
 
 OPENSSL=openssl
-OPENSSL_VERSION=1.0.1s
+OPENSSL_VERSION=1.0.2h
 OPENSSL_SOURCE_FILE=openssl-$(OPENSSL_VERSION).tar.gz
 OPENSSL_SOURCE_FOLDER=$(OPENSSL)-$(OPENSSL_VERSION)
 OPENSSL_DOWNLOAD_URL=http://www.openssl.org/source/$(OPENSSL_SOURCE_FILE)
 OPENSSL_VERIFIED_SOURCES=$(OPENSSL)/$(OPENSSL_SOURCE_FILE)_verified
-OPENSSL_CONFIGURED=openssl/openssl/lib/libcrypto.a
+OPENSSL_CONFIGURED=$(OPENSSL)/$(OPENSSL_SOURCE_FILE)_configured
 OPENSSL_PREFIX=$(JNI_PATH)/$(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)
 
 SODIUM=sodium
@@ -67,43 +67,45 @@ LIBUV_SOURCE_FOLDER=libuv-v$(LIBUV_VERSION)
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v$(LIBUV_VERSION)/$(LIBUV_SOURCE_FILE)
 LIBUV_VERIFIED_SOURCES=$(LIBUV)/$(LIBUV_SOURCE_FILE)_verified
 
+LIBEXPAT=libexpat
+LIBEXPAT_VERSION=2.1.1
+LIBEXPAT_SOURCE_FILE=expat-$(LIBEXPAT_VERSION).tar.bz2
+LIBEXPAT_SOURCE_FOLDER=expat-$(LIBEXPAT_VERSION)
+LIBEXPAT_DOWNLOAD_URL=http://downloads.sourceforge.net/project/expat/expat/2.1.1/expat-2.1.1.tar.bz2
+LIBEXPAT_VERIFIED_SOURCES=$(LIBEXPAT)/$(LIBEXPAT_SOURCE_FILE)_verified
+LIBEXPAT_CONFIGURED=$(LIBEXPAT)/$(LIBEXPAT)/expat_config.h
+
 MEGA=mega
 MEGA_JAVA_OUTPUT_PATH=$(JNI_PATH)/../java
 MEGA_CONFIGURED=java_wrap.cxx
 MEGA_WRAPPER=sdk/bindings/megaapi.i
 
-all: $(CRYPTOPP) $(CURL) $(SQLITE) $(LIBUV) $(MEGA)
+all: $(SODIUM) $(CRYPTOPP) $(OPENSSL) $(CURL) $(SQLITE) $(LIBUV) $(LIBEXPAT) $(MEGA)
 	$(NDK_BUILD)
 
 $(OPENSSL): $(OPENSSL_CONFIGURED)
 
-$(OPENSSL_CONFIGURED): $(OPENSSL_VERIFIED_SOURCES) $(SODIUM)
+$(OPENSSL_CONFIGURED): $(OPENSSL_VERIFIED_SOURCES)
 	cd $(OPENSSL)/; tar --overwrite -xf $(OPENSSL_SOURCE_FILE)
 	ln -sf $(OPENSSL_SOURCE_FOLDER) $(OPENSSL)/$(OPENSSL)
 	ln -sf $(LIBDIR) $(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)/lib
 	cd $(OPENSSL)/$(OPENSSL)/; ./Configure android
-	make depend -C $(OPENSSL)/$(OPENSSL)
-	-$(NDK_BUILD) -k ssl crypto
+	touch $(OPENSSL_CONFIGURED)
 	
 $(OPENSSL_VERIFIED_SOURCES):
 	wget -O $(OPENSSL)/$(OPENSSL_SOURCE_FILE) $(OPENSSL_DOWNLOAD_URL)
-	sha1sum -c $(OPENSSL)/$(OPENSSL_SOURCE_FILE).sha1
+	cd $(OPENSSL); sha1sum -c $(OPENSSL_SOURCE_FILE).sha1
 	touch $(OPENSSL_VERIFIED_SOURCES)
 
 $(CURL): $(CURL_CONFIGURED)
 	
-$(CURL_CONFIGURED): $(CURL_VERIFIED_SOURCES) $(ARES_VERIFIED_SOURCES) $(OPENSSL)
+$(CURL_CONFIGURED): $(CURL_VERIFIED_SOURCES) $(ARES_VERIFIED_SOURCES)
 	cd $(CURL)/; tar --overwrite -xf $(CURL_SOURCE_FILE)
 	cd $(CURL)/; tar --overwrite -xf $(ARES_SOURCE_FILE)
 	ln -sf ../$(ARES_SOURCE_FOLDER) $(CURL)/$(CURL_SOURCE_FOLDER)/ares
 	ln -sf $(CURL_SOURCE_FOLDER) $(CURL)/$(CURL)
 	ln -sf $(ARES_SOURCE_FOLDER) $(CURL)/ares
-	cd $(CURL)/$(CURL_SOURCE_FOLDER); ./configure CC=$(CC) --host=arm-linux \
-		CPPFLAGS="-DANDROID " CFLAGS="--sysroot=$(NDK_ROOT)/platforms/$(APP_PLATFORM)/arch-arm" \
-		LIBS="-lc -ldl -lz" \
-		--enable-ipv6 --disable-manual --with-random=/dev/urandom \
-		--with-ssl=$(OPENSSL_PREFIX) --without-ca-bundle --without-ca-path \
-		--with-zlib --enable-ares $(CURL_EXTRA)
+	touch $(CURL_CONFIGURED)
 
 $(ARES_VERIFIED_SOURCES):	
 	wget -O $(CURL)/$(ARES_SOURCE_FILE) $(ARES_DOWNLOAD_URL)
@@ -171,6 +173,15 @@ $(LIBUV_VERIFIED_SOURCES):
 	wget -O $(LIBUV)/$(LIBUV_SOURCE_FILE) $(LIBUV_DOWNLOAD_URL)
 	cd $(LIBUV); sha1sum -c $(LIBUV_SOURCE_FILE).sha1
 	touch $(LIBUV_VERIFIED_SOURCES)
+	
+$(LIBEXPAT): $(LIBEXPAT_VERIFIED_SOURCES)
+
+$(LIBEXPAT_VERIFIED_SOURCES):
+	wget -O $(LIBEXPAT)/$(LIBEXPAT_SOURCE_FILE) $(LIBEXPAT_DOWNLOAD_URL)
+	cd $(LIBEXPAT); sha1sum -c $(LIBEXPAT_SOURCE_FILE).sha1
+	cd $(LIBEXPAT)/; tar --overwrite -xf $(LIBEXPAT_SOURCE_FILE)
+	ln -sf $(LIBEXPAT_SOURCE_FOLDER) $(LIBEXPAT)/$(LIBEXPAT)	
+	touch $(LIBEXPAT_VERIFIED_SOURCES)
 
 clean_mega:
 	-make -C $(MEGA) -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=$(MEGA_JAVA_OUTPUT_PATH)
