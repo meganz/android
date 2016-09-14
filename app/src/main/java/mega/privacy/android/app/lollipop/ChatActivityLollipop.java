@@ -86,6 +86,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     ChatActivityLollipop chatActivity;
     String myMail;
 
+    RelativeLayout uploadPanel;
+    RelativeLayout uploadFromGalleryOption;
+    RelativeLayout uploadFromCloudOption;
+    RelativeLayout uploadAudioOption;
+    RelativeLayout uploadContactOption;
+    RelativeLayout uploadFromFilesystemOption;
+
     MenuItem callMenuItem;
     MenuItem videoMenuItem;
     MenuItem inviteMenuItem;
@@ -213,6 +220,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
             }
         });
 
+        textChat.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(uploadPanel.getVisibility()==View.VISIBLE){
+                    hideUploadPanel();
+                }
+                return false;
+            }
+        });
+
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
         inviteText = (TextView) findViewById(R.id.invite_text);
 
@@ -231,6 +248,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
 
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
+        fab.setOnClickListener(this);
+
+        uploadPanel = (RelativeLayout) findViewById(R.id.upload_panel_chat);
+        uploadFromGalleryOption = (RelativeLayout) findViewById(R.id.upload_from_gallery_chat);
+        uploadFromGalleryOption.setOnClickListener(this);
+
+        uploadFromCloudOption = (RelativeLayout) findViewById(R.id.upload_from_cloud_chat);
+        uploadFromCloudOption.setOnClickListener(this);
+
+        uploadFromFilesystemOption = (RelativeLayout) findViewById(R.id.upload_from_filesystem_chat);
+        uploadFromFilesystemOption.setOnClickListener(this);
+
+        uploadAudioOption = (RelativeLayout) findViewById(R.id.upload_audio_chat);
+        uploadAudioOption.setOnClickListener(this);
+
+        uploadContactOption = (RelativeLayout) findViewById(R.id.upload_contact_chat);
+        uploadContactOption.setOnClickListener(this);
 
         Intent newIntent = getIntent();
 
@@ -501,6 +535,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
+        if(uploadPanel.getVisibility()==View.VISIBLE){
+            hideUploadPanel();
+            return;
+        }
         finish();
     }
 
@@ -513,6 +551,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         switch (v.getId()) {
             case R.id.home:{
                 inviteScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
+                break;
             }
 			case R.id.send_message_icon_chat:{
                 log("click on Send message");
@@ -529,8 +568,49 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
                 disabledWritingLayout.setVisibility(View.VISIBLE);
 
                 inviteText.setVisibility(View.GONE);
+                break;
 			}
+            case R.id.fab_chat:{
+                showUploadPanel();
+                break;
+            }
+            case R.id.upload_from_gallery_chat:{
+                hideUploadPanel();
+                break;
+            }
+            case R.id.upload_from_cloud_chat:{
+                hideUploadPanel();
+                break;
+            }
+            case R.id.upload_audio_chat:{
+                hideUploadPanel();
+                break;
+            }
+            case R.id.upload_contact_chat:{
+                hideUploadPanel();
+                break;
+            }
+            case R.id.upload_from_filesystem_chat:{
+                hideUploadPanel();
+                break;
+            }
 		}
+    }
+
+    public void showUploadPanel(){
+        fab.setVisibility(View.GONE);
+        uploadPanel.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
+        params.addRule(RelativeLayout.ABOVE, R.id.upload_panel_chat);
+        messagesContainerLayout.setLayoutParams(params);
+    }
+
+    public void hideUploadPanel(){
+        fab.setVisibility(View.VISIBLE);
+        uploadPanel.setVisibility(View.GONE);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
+        params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
+        messagesContainerLayout.setLayoutParams(params);
     }
 
     /////Multiselect/////

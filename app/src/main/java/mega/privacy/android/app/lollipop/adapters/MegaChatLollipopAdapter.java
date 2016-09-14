@@ -22,6 +22,7 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.utils.Constants;
@@ -143,7 +144,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         ownLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(16, outMetrics));
         holder.contentOwnMessageLayout.setLayoutParams(ownLayoutParams);
 
-        holder.contentOwnMessageText = (TextView) v.findViewById(R.id.content_own_message_text);
+        holder.contentOwnMessageText = (WrapTextView) v.findViewById(R.id.content_own_message_text);
         //Margins
         RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
         ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
@@ -174,10 +175,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         contactLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(16, outMetrics));
         holder.contentContactMessageLayout.setLayoutParams(contactLayoutParams);
 
-        holder.contentContactMessageText = (TextView) v.findViewById(R.id.content_contact_message_text);
+        holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
         //Margins
         RelativeLayout.LayoutParams contactMessageParams = (RelativeLayout.LayoutParams)holder.contentContactMessageText.getLayoutParams();
-        contactMessageParams.setMargins(Util.scaleWidthPx(62, outMetrics), 0, Util.scaleWidthPx(11, outMetrics), 0);
+        contactMessageParams.setMargins(Util.scaleWidthPx(62, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
         holder.contactMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.contact_multiselection_layout);
