@@ -858,6 +858,12 @@
         <item quantity="other" context="Plural of seconds. 2 second">seconds</item>
     </plurals>
 
+    <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">h</string>
+    <string name="initial_minute" context="Initial of the word minute to show the duration of a video or audio call">m</string>
+    <string name="initial_second" context="Initial of the word second to show the duration of a video or audio call">s</string>
+
+    <string name="videocall_item" context="Info shown about the last action in a chat is a videocall">Video call</string>
+
     <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d selected</string>
     <string name="action_mute" context="Menu item">Mute</string>
 
