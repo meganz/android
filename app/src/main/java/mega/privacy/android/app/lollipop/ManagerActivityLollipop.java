@@ -12504,4 +12504,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setDisplayedAccountType(int displayedAccountType) {
 		this.displayedAccountType = displayedAccountType;
 	}
+
+	public ChatRoom getSelectedChat() {
+		return selectedChat;
+	}
+
+	public void setSelectedChat(ChatRoom selectedChat) {
+		this.selectedChat = selectedChat;
+	}
 }
