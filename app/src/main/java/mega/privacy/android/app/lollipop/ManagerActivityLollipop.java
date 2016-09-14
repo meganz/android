@@ -199,6 +199,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	//CHAT PANEL
 	private SlidingUpPanelLayout slidingChatPanel;
 	public TextView titleNameContactChatPanel;
+	public TextView titleMailContactChatPanel;
 	public FrameLayout chatOutLayout;
 	public RoundedImageView chatImageView;
 	public TextView chatInitialLetter;
@@ -1320,7 +1321,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//Sliding CHAT panel
 		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
-		titleNameContactChatPanel = (TextView) findViewById(R.id.file_list_chat_title_text);
+		titleNameContactChatPanel = (TextView) findViewById(R.id.file_list_chat_name_text);
+		titleMailContactChatPanel = (TextView) findViewById(R.id.file_list_chat_mail_text);
 		chatLayout = (LinearLayout) findViewById(R.id.file_list_chat);
 		chatImageView = (RoundedImageView) findViewById(R.id.sliding_chat_list_thumbnail);
 		chatInitialLetter = (TextView) findViewById(R.id.sliding_chat_list_initial_letter);
@@ -12105,6 +12107,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			}
 			titleNameContactChatPanel.setText(fullName);
+			titleMailContactChatPanel.setText(contacts.get(0).getMail());
 
 			addAvatarChatPanel(contacts.get(0).getMail(), fullName);
 		}
@@ -12213,9 +12216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-		chatInitialLetter.setTextSize(14);
-
-
+		chatInitialLetter.setTextSize(22);
 		////
 	}
 
