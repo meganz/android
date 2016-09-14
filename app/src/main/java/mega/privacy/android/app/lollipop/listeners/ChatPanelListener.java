@@ -1,10 +1,13 @@
 package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Util;
 
 public class ChatPanelListener implements View.OnClickListener {
@@ -20,12 +23,24 @@ public class ChatPanelListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         log("onClick ChatPanelListener");
+        log("onClick NodeOptionsPanelListener");
+        ChatRoom selectedChat = null;
+        if(context instanceof ManagerActivityLollipop){
+            selectedChat = ((ManagerActivityLollipop) context).getSelectedChat();
+        }
 
         switch(v.getId()){
 
             case R.id.file_list_info_chat_layout:{
                 log("click contact info");
                 ((ManagerActivityLollipop)context).hideChatPanel();
+
+                Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
+                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
+                i.putExtra("userFullName", "Prueba");
+                context.startActivity(i);
+
+
 //                Intent intent = new Intent();
 //                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
 //                intent.setAction(Intent.ACTION_GET_CONTENT);
