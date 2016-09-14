@@ -12,10 +12,12 @@ local_c_includes := \
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/Makefile.inc
 LOCAL_MODULE    := megasdk
-LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DDEBUG
+LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DDEBUG -DENABLE_CHAT
 LOCAL_SRC_FILES := $(CPP_SOURCES) $(C_SOURCES) $(C_WRAPPER_SOURCES)
 LOCAL_C_INCLUDES += $(local_c_includes)
-LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite libuv sodium
+LOCAL_EXPORT_C_INCLUDES += $(local_c_includes)
+LOCAL_EXPORT_CFLAGS += -DENABLE_CHAT
+LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite libuv sodium libevent2 libexpat webrtc strophe
 include $(BUILD_STATIC_LIBRARY)
 
 
