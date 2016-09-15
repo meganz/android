@@ -203,6 +203,15 @@ if [ "$1" != "all" ]; then
     exit 1
 fi
 
+if [ ! -d megachat/webrtc ]; then
+    echo "* Please download prebuilt webrtc libraries from this link:"
+    echo ""
+    echo "https://mega.nz/#!pskwnRqZ!3_ts9YdDquIar-QvZ9YXDSS2FWFt12eIr1rMG-rT8xs"
+    echo ""
+    echo "* and uncompress them in megachat/webrtc"
+    exit 1
+fi
+
 echo "* Setting up MEGAchat"
 if [ ! -d megachat/karere-native ]; then
 echo "* Getting MEGAchat source code"
