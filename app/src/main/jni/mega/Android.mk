@@ -20,18 +20,3 @@ LOCAL_EXPORT_CFLAGS += -DENABLE_CHAT
 LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite libuv sodium libevent2 libexpat webrtc strophe
 include $(BUILD_STATIC_LIBRARY)
 
-# This last step is intended to strip all unneeded code from the shared library
-# All other compilations have the flag -fvisibility=hidden -fdata-sections -ffunction-sections 
-# The link step uses -Wl,-dead_strip,-gc-sections to strip all unused code
-include $(CLEAR_VARS)
-include $(LOCAL_PATH)/Makefile.inc
-LOCAL_MODULE := mega
-LOCAL_CFLAGS := -fexceptions -frtti -fdata-sections -ffunction-sections -DDEBUG
-LOCAL_SRC_FILES := $(JAVA_WRAPS) ../megachat/megachat.cpp
-LOCAL_C_INCLUDES += -fexceptions -frtti $(local_c_includes)
-LOCAL_LDLIBS := -lm -lz -llog -lGLESv2 -lOpenSLES -latomic
-LOCAL_LDFLAGS :=  -L$(LOCAL_PATH)/../../obj/local/armeabi/ -Wl,-dead_strip,-gc-sections 
-LOCAL_STATIC_LIBRARIES := megasdk megachat
-include $(BUILD_SHARED_LIBRARY)
-
-
