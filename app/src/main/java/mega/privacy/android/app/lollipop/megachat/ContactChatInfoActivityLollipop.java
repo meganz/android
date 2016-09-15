@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -9,13 +9,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -25,29 +27,24 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.nirhart.parallaxscroll.views.ParallaxScrollView;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
@@ -55,18 +52,10 @@ import nz.mega.sdk.MegaUser;
 public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener{
 
 	RelativeLayout imageLayout;
-	ImageView toolbarBack;
-	ImageView toolbarOverflow;
-	ImageView toolbarDownload;
-	ImageView toolbarRubbishBin;
 
-	RelativeLayout overflowMenuLayout;
-	ListView overflowMenuList;
-
-	RelativeLayout optionsBackLayout;
-	ParallaxScrollView sV;
-	RelativeLayout container;
-	RelativeLayout colorAvatar;
+//	RelativeLayout overflowMenuLayout;
+//	RelativeLayout colorAvatar;
+	CollapsingToolbarLayout collapsingToolbar;
 	TextView initialLetter;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
@@ -77,6 +66,8 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	RelativeLayout contentLayout;
 	RelativeLayout addedLayout;
 	RelativeLayout modifiedLayout;
+	RelativeLayout mailLayout;
+	ImageView mailIcon;
 	ImageView shareIcon;
 	ImageView infoIcon;
 	ImageView contentIcon;
@@ -87,10 +78,13 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	View dividerSharedLayout;
 
 	TextView availableOfflineView;
+	TextView userEmailTextView;
 
 	ImageView publicLinkIcon;
+	Toolbar toolbar;
+	ActionBar aB;
 
-//	ImageView publicLinkImage;
+	//	ImageView publicLinkImage;
 	Switch offlineSwitch;
 
 	TextView sizeTextView;
@@ -107,39 +101,22 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	TextView permissionInfo;
 	ImageView permissionsIcon;
 
-	boolean owner= true;
-	int typeExport = -1;
-
-	ArrayList<MegaShare> sl;
-	MegaOffline mOffDelete;
-
 	RelativeLayout ownerLayout;
 	TextView ownerLabel;
 	TextView ownerInfo;
 	ImageView ownerIcon;
 
-//	ArrayList<MegaNode> dTreeList = null;
-
 	MegaUser user;
 	String userEmail;
 	String fullName;
 
-	boolean availableOfflineBoolean = false;
-
 	private MegaApiAndroid megaApi = null;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	public ContactChatInfoActivityLollipop filePropertiesActivity;
-
 	ProgressDialog statusDialog;
-	boolean publicLink=false;
 
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
-
-	private AlertDialog renameDialog;
-
-	boolean moveToRubbish = false;
 
 	Display display;
 	DisplayMetrics outMetrics;
@@ -152,15 +129,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	AlertDialog permissionsDialog;
 
-	public int getStatusBarHeight() {
-	      int result = 0;
-	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-	      if (resourceId > 0) {
-	          result = getResources().getDimensionPixelSize(resourceId);
-	      }
-	      return result;
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -171,7 +139,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			megaApi = app.getMegaApi();
 		}
 
-		filePropertiesActivity = this;
 		handler = new Handler();
 
 //		dbH = new DatabaseHandler(getApplicationContext());
@@ -203,58 +170,23 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			}
 
 			setContentView(R.layout.activity_chat_contact_properties);
-			sV = (ParallaxScrollView) findViewById(R.id.chat_contact_properties_scroll_view);
-			sV.post(new Runnable() {
-		        public void run() {
-		             sV.scrollTo(0, outMetrics.heightPixels/3);
-		        }
-			});
-
-			container = (RelativeLayout) findViewById(R.id.chat_contact_properties_main_layout);
-			container.setOnClickListener(this);
+			toolbar = (Toolbar) findViewById(R.id.toolbar);
+			setSupportActionBar(toolbar);
+			aB = getSupportActionBar();
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageLayout.getLayoutParams();
-			params.setMargins(0, -getStatusBarHeight(), 0, 0);
-			imageLayout.setLayoutParams(params);
+			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+			collapsingToolbar.setTitle(fullName);
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-			optionsBackLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_toolbar_back_options_layout);
-			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
-			optionsBackLayout.setLayoutParams(params);
+			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 
-			toolbarBack = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_back);
-			params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-//			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
-			int leftMarginBack = Util.scaleWidthPx(2, outMetrics);
-			params.setMargins(leftMarginBack, 0, 0, 0);
-			toolbarBack.setLayoutParams(params);
-			toolbarBack.setOnClickListener(this);
+			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+			aB.setHomeButtonEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
 
-			toolbarOverflow = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_overflow);
-			params = (RelativeLayout.LayoutParams) toolbarOverflow.getLayoutParams();
-			params.setMargins(0, 0, leftMarginBack, 0);
-			toolbarOverflow.setLayoutParams(params);
-			toolbarOverflow.setOnClickListener(this);
-
-			toolbarDownload = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_download);
-			toolbarDownload.setOnClickListener(this);
-
-			toolbarRubbishBin = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_rubbish_bin);
-			toolbarRubbishBin.setOnClickListener(this);
-
-			overflowMenuLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_overflow_menu_layout);
-			params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight() + Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(5, outMetrics), 0);
-			overflowMenuLayout.setLayoutParams(params);
-			overflowMenuList = (ListView) findViewById(R.id.chat_contact_properties_overflow_menu_list);
-			overflowMenuLayout.setVisibility(View.GONE);
-
-			createOverflowMenu(overflowMenuList);
-			overflowMenuList.setOnItemClickListener(this);
-
-			colorAvatar = (RelativeLayout) findViewById(R.id.color_avatar_layout);
 			contactPropertiesImage = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_image);
-			initialLetter = (TextView) findViewById(R.id.contact_properties_toolbar_initial_letter);
+			initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
 			float scaleText;
 			if (scaleH < scaleW){
@@ -267,20 +199,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			setDefaultAvatar();
 
 			setAvatar();
-
-			//NAME Title
-
-			nameView = (TextView) findViewById(R.id.chat_contact_properties_name);
-			nameView.setText(fullName);
-			nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-			nameView.setSingleLine();
-			nameView.setTypeface(null, Typeface.BOLD);
-
-			nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
-			publicLinkIcon = (ImageView) findViewById(R.id.chat_contact_properties_public_link_image);
-			RelativeLayout.LayoutParams lpPL = new RelativeLayout.LayoutParams(publicLinkIcon.getLayoutParams());
-			lpPL.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			publicLinkIcon.setLayoutParams(lpPL);
 
 			//Available Offline Layout
 
@@ -296,6 +214,19 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 			offlineSwitch = (Switch) findViewById(R.id.chat_contact_properties_switch);
 			offlineSwitch.setOnCheckedChangeListener(this);
+
+			//Mail Layout
+			userEmailTextView = (TextView) findViewById(R.id.chat_contact_properties_email);
+			userEmailTextView.setText(userEmail);
+			mailLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_email_layout);
+//			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
+//			lpML.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, 0);
+//			mailLayout.setLayoutParams(lpML);
+
+			mailIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mailIcon.getLayoutParams());
+			lp.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			mailIcon.setLayoutParams(lp);
 
 			//Share with Layout
 
@@ -449,11 +380,11 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		String color = megaApi.getUserAvatarColor(user);
 		if(color!=null){
 			log("The color to set the avatar is "+color);
-			colorAvatar.setBackgroundColor(Color.parseColor(color));
+			imageLayout.setBackgroundColor(Color.parseColor(color));
 		}
 		else{
 			log("Default color to the avatar");
-			colorAvatar.setBackgroundColor(getResources().getColor(R.color.lollipop_primary_color));
+			imageLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
 		}
 
 		contactPropertiesImage.setImageBitmap(defaultAvatar);
@@ -519,71 +450,41 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		return (int)textSize;
 	}
 
-	private void createOverflowMenu(ListView list){
-		log("createOverflowMenu");
-		ArrayList<String> menuOptions = new ArrayList<String>();
-
-//		MegaNode parent = megaApi.getNodeByHandle(handle);
-//		while (megaApi.getParentNode(parent) != null){
-//			parent = megaApi.getParentNode(parent);
-//		}
-//
-//		if (parent.getHandle() == megaApi.getRubbishNode().getHandle()){
-//			toolbarDownload.setVisibility(View.GONE);
-//			menuOptions.add(getString(R.string.context_delete));
-//			menuOptions.add(getString(R.string.context_move));
-//		}
-//		else{
-//			toolbarDownload.setVisibility(View.VISIBLE);
-//		}
-//
-//		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
-//		if (list.getAdapter() != null){
-//			ArrayAdapter<String> ad = (ArrayAdapter<String>) list.getAdapter();
-//			ad.clear();
-//			ad.addAll(menuOptions);
-//			ad.notifyDataSetChanged();
-//		}
-//		else{
-//			list.setAdapter(arrayAdapter);
-//		}
-	}
-
 	@Override
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.chat_contact_properties_main_layout:{
-				if (overflowMenuLayout != null){
-					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-						overflowMenuLayout.setVisibility(View.GONE);
-						return;
-					}
-				}
-				break;
-			}
+//			case R.id.chat_contact_properties_main_layout:{
+//				if (overflowMenuLayout != null){
+//					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+//						overflowMenuLayout.setVisibility(View.GONE);
+//						return;
+//					}
+//				}
+//				break;
+//			}
 			case R.id.chat_contact_properties_shared_layout:{
 //				Intent i = new Intent(this, FileContactListActivityLollipop.class);
 //				i.putExtra("name", node.getHandle());
 //				startActivity(i);
 				break;
 			}
-			case R.id.chat_contact_properties_toolbar_back:{
-				finish();
-				break;
-			}
-			case R.id.chat_contact_properties_toolbar_overflow:{
-				overflowMenuLayout.setVisibility(View.VISIBLE);
-				break;
-			}
-			case R.id.chat_contact_properties_toolbar_download:{
-
-				break;
-			}
-			case R.id.chat_contact_properties_toolbar_rubbish_bin:{
-
-				break;
-			}
+//			case R.id.chat_contact_properties_toolbar_back:{
+//				finish();
+//				break;
+//			}
+//			case R.id.chat_contact_properties_toolbar_overflow:{
+//				overflowMenuLayout.setVisibility(View.VISIBLE);
+//				break;
+//			}
+//			case R.id.chat_contact_properties_toolbar_download:{
+//
+//				break;
+//			}
+//			case R.id.chat_contact_properties_toolbar_rubbish_bin:{
+//
+//				break;
+//			}
 //			case R.id.file_properties_content_table:{
 //				Intent i = new Intent(this, FileContactListActivityLollipop.class);
 //				i.putExtra("name", node.getHandle());
@@ -596,12 +497,23 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelectedLollipop");
+		int id = item.getItemId();
+		switch(id) {
+			case android.R.id.home: {
+				finish();
+			}
+		}
+		return true;
+	}
+
+	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		log("onCheckedChanged");
 
 		if (!isChecked){
 			log("isChecked");
-
 
 			supportInvalidateOptionsMenu();
 		}
@@ -698,24 +610,17 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		overflowMenuLayout.setVisibility(View.GONE);
-		String itemText = (String) parent.getItemAtPosition(position);
-		if (itemText.compareTo(getString(R.string.context_download)) == 0){
 
-		}
-		else if (itemText.compareTo(getString(R.string.context_share_folder)) == 0){
-
-		}
 	}
 	
 	@Override
 	public void onBackPressed() {
-		if (overflowMenuLayout != null){
-			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-				overflowMenuLayout.setVisibility(View.GONE);
-				return;
-			}
-		}
+//		if (overflowMenuLayout != null){
+//			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+//				overflowMenuLayout.setVisibility(View.GONE);
+//				return;
+//			}
+//		}
 		super.onBackPressed();
 	}
 }

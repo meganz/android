@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Util;
 
@@ -34,6 +34,9 @@ public class ChatPanelListener implements View.OnClickListener {
             case R.id.file_list_info_chat_layout:{
                 log("click contact info");
                 ((ManagerActivityLollipop)context).hideChatPanel();
+                if(selectedChat==null){
+                    log("Selected chat NULL");
+                }
 
                 Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
                 i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
