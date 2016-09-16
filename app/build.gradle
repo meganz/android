@@ -41,19 +41,12 @@ android {
 
     task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
         workingDir 'src/main/jni'
-        commandLine 'make'
+        commandLine './build.sh', 'all'
     }
 
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn megaSDK
     }
-
-    task cleanMegaSDK(type: Exec, description: 'Clean MEGA SDK object files') {
-        workingDir 'src/main/jni'
-        commandLine 'make', 'clean_mega'
-    }
-
-    clean.dependsOn 'cleanMegaSDK'
 }
 
 dependencies {
