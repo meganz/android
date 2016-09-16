@@ -349,10 +349,10 @@
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Please choose a destination folder</string>
     <string name="context_correctly_moved" context="success message when moving a node">Moved successfully</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d items moved successfully</string>
-    <string name="number_incorrectly_moved" context="success message when moving a node">%d items are not moved successfully</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">%d items were not moved successfully</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the Rubbish Bin successfully</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the Rubbish Bin successfully</string>
-    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items are not sent successfully</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items were not sent successfully</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Shared successfully</string>
     <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process of the sharing is not completed</string>
@@ -828,4 +828,54 @@
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">My credentials</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
+
+    <string name="section_chat" context="Title of the screen that shows the chat">Chat</string>
+
+    <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
+    <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
+
+    <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
+    <string name="action_new_chat" context="Menu item">New chat</string>
+
+    <string name="get_started_button" context="Button to start using the chat">Get started</string>
+
+    <string name="recent_chat_empty" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
+
+    <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
+
+    <plurals name="general_minutes">
+        <item quantity="one" context="Singular of minutes. 1 minute">minute</item>
+        <item quantity="other" context="Plural of minutes. 2 minute">minutes</item>
+    </plurals>
+
+    <plurals name="general_hours">
+        <item quantity="one" context="Singular of hours. 1 hour">hour</item>
+        <item quantity="other" context="Plural of hours. 2 hours">hours</item>
+    </plurals>
+
+    <plurals name="general_seconds">
+        <item quantity="one" context="Singular of seconds. 1 second">second</item>
+        <item quantity="other" context="Plural of seconds. 2 second">seconds</item>
+    </plurals>
+
+    <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d selected</string>
+    <string name="action_mute" context="Menu item">Mute</string>
+
+    <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">The contact %s will be removed from the shared folder.</string>
+    <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts will be removed from the shared folder.</string>
+
+
+    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed correctly from the shared folder</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder"> and %d contacts were not successfully removed</string>
+
+    <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Loading contacts from the phone...</string>
+
+    <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invite requests sent successfully. </string>
+    <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
+
+    <string name="invite_Lara_chat" context="Menu item">Invite Lara to join you on Chat by sending the message above.\n\nPlease note that, this invitation will be sent by email and for that reason encryption will not be applied.</string>
+
+    <string name="chat_me_text" context="Word next to own user's message in chat screen">Me</string>
+    <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Type a message</string>
+
 </resources>

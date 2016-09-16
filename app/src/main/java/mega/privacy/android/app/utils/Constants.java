@@ -25,6 +25,7 @@ public class Constants {
 	public static int REQUEST_CODE_TREE = 1014;
 	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
 	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
+	public static int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
@@ -45,6 +46,8 @@ public class Constants {
 	//one contact, many files
 	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
 	final public static int MULTIPLE_LEAVE_SHARE = MULTIPLE_FILE_SHARE+1;
+
+	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
 
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -100,6 +103,13 @@ public class Constants {
 	public static String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
 	public static String ACTION_IPC = "IPC";
 
+	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
+	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
+
+	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
+	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
+	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;
+
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
@@ -120,5 +130,8 @@ public class Constants {
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
 	final public static int PRICING_MIN_DIFFERENCE = 720;
 	final public static int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
+
+	final public static int CONTACT_TYPE_MEGA = 0;
+	final public static int CONTACT_TYPE_DEVICE = 1;
 
 }

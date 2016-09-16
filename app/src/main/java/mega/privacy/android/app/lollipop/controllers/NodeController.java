@@ -29,7 +29,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactsExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -146,12 +146,12 @@ public class NodeController {
 
         ((ManagerActivityLollipop) context).setSendToInbox(true);
 
-        Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
-        intent.setClass(context, ContactsExplorerActivityLollipop.class);
+        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
+        intent.setClass(context, AddContactActivityLollipop.class);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
         intent.putExtra("SEND_FILE",1);
-        intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
@@ -247,18 +247,18 @@ public class NodeController {
 
         ((ManagerActivityLollipop) context).setSendToInbox(true);
 
-        Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
-        intent.setClass(context, ContactsExplorerActivityLollipop.class);
+        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
+        intent.setClass(context, AddContactActivityLollipop.class);
+        //Multiselect=1
+        intent.putExtra("MULTISELECT", 1);
+        intent.putExtra("SEND_FILE",1);
         long[] handles=new long[handleList.size()];
         int j=0;
         for(int i=0; i<handleList.size();i++){
-            handles[j]=handleList.get(i);
+            handles[j] = handleList.get(i);
             j++;
         }
-        intent.putExtra("MULTISELECT", 1);
-        intent.putExtra("SEND_FILE",1);
-        log("handles length: "+handles.length);
-        intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
+        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, handles);
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
@@ -788,8 +788,8 @@ public class NodeController {
             return;
         }
 
-        Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-        intent.setClass(context, ContactsExplorerActivityLollipop.class);
+        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+        intent.setClass(context, AddContactActivityLollipop.class);
 
         long[] handles=new long[handleList.size()];
         int j=0;
@@ -797,7 +797,7 @@ public class NodeController {
             handles[j]=handleList.get(i);
             j++;
         }
-        intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
+        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, handles);
         //Multiselect=1 (multiple folders)
         intent.putExtra("MULTISELECT", 1);
         intent.putExtra("SEND_FILE",0);
@@ -807,12 +807,12 @@ public class NodeController {
     public void selectContactToShareFolder(MegaNode node){
         log("shareFolder");
 
-        Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-        intent.setClass(context, ContactsExplorerActivityLollipop.class);
+        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+        intent.setClass(context, AddContactActivityLollipop.class);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
         intent.putExtra("SEND_FILE",0);
-        intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 

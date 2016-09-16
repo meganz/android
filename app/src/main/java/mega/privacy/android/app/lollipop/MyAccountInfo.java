@@ -449,7 +449,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                         dbH.setExtendedAccountDetailsTimestamp();
                         long mostRecentSession = megaAccountSession.getMostRecentUsage();
                         log("The last session: "+mostRecentSession);
-                        java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.MEDIUM, Locale.getDefault());
+                        java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
                         Date date = new Date(mostRecentSession * 1000);
                         Calendar cal = Calendar.getInstance();
                         TimeZone tz = cal.getTimeZone();

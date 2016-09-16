@@ -244,6 +244,30 @@ public class ContactController {
         megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivityLollipop) context);
     }
 
+    public void inviteMultipleContacts(ArrayList<String> contactEmails){
+        log("inviteContact");
+
+        MultipleRequestListener inviteMultipleListener = null;
+        if (!Util.isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        if(((ManagerActivityLollipop) context).isFinishing()){
+            return;
+        }
+
+        if (contactEmails.size() == 1){
+            megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivityLollipop) context);
+        }
+        else if (contactEmails.size() > 1){
+            inviteMultipleListener = new MultipleRequestListener(-1, context);
+            for(int i=0; i<contactEmails.size();i++) {
+                megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
+            }
+        }
+    }
+
 
     public void addContactDB(String email){
         log("addContactDB");
