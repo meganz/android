@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -53,67 +51,36 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	RelativeLayout imageLayout;
 
-//	RelativeLayout overflowMenuLayout;
-//	RelativeLayout colorAvatar;
 	CollapsingToolbarLayout collapsingToolbar;
 	TextView initialLetter;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
-	TextView nameView;
-	LinearLayout availableOfflineLayout;
+	LinearLayout notificationsLayout;
+	Switch notificationsSwitch;
+	TextView notificationsTitle;
 
-	RelativeLayout sizeLayout;
-	RelativeLayout contentLayout;
-	RelativeLayout addedLayout;
-	RelativeLayout modifiedLayout;
-	RelativeLayout mailLayout;
-	ImageView mailIcon;
-	ImageView shareIcon;
-	ImageView infoIcon;
-	ImageView contentIcon;
-	ImageView addedIcon;
-	ImageView modifiedIcon;
-	RelativeLayout sharedLayout;
-	TextView usersSharedWithText;
-	View dividerSharedLayout;
+	RelativeLayout messageSoundLayout;
+	TextView messageSoundText;
+	View dividerMessageSoundLayout;
 
-	TextView availableOfflineView;
-	TextView userEmailTextView;
+	RelativeLayout ringtoneLayout;
+	TextView ringtoneText;
+	View dividerRingtoneLayout;
 
-	ImageView publicLinkIcon;
+	RelativeLayout shareContactLayout;
+	TextView shareContactText;
+	View dividerShareContactLayout;
+
+	RelativeLayout clearChatLayout;
+
 	Toolbar toolbar;
 	ActionBar aB;
-
-	//	ImageView publicLinkImage;
-	Switch offlineSwitch;
-
-	TextView sizeTextView;
-	TextView sizeTitleTextView;
-
-	TextView contentTextView;
-	TextView contentTitleTextView;
-
-	TextView addedTextView;
-	TextView modifiedTextView;
-
-	RelativeLayout permissionsLayout;
-	TextView permissionLabel;
-	TextView permissionInfo;
-	ImageView permissionsIcon;
-
-	RelativeLayout ownerLayout;
-	TextView ownerLabel;
-	TextView ownerInfo;
-	ImageView ownerIcon;
 
 	MegaUser user;
 	String userEmail;
 	String fullName;
 
 	private MegaApiAndroid megaApi = null;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-
-	ProgressDialog statusDialog;
 
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
@@ -127,8 +94,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 
-	AlertDialog permissionsDialog;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -141,7 +106,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		handler = new Handler();
 
-//		dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		display = getWindowManager().getDefaultDisplay();
@@ -176,6 +140,8 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 			collapsingToolbar.setTitle(fullName);
+			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
+			collapsingToolbar.setExpandedTitleMarginStart(Util.scaleWidthPx(72, outMetrics));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
@@ -200,130 +166,79 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 			setAvatar();
 
-			//Available Offline Layout
-
-			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
-			availableOfflineLayout.setVisibility(View.VISIBLE);
-
-			availableOfflineView = (TextView) findViewById(R.id.chat_contact_properties_available_offline_text);
-			LinearLayout.LayoutParams params4 = (LinearLayout.LayoutParams) availableOfflineView.getLayoutParams();
-			params4.leftMargin = Util.scaleWidthPx(55, outMetrics);
-			params4.topMargin = Util.scaleHeightPx(15, outMetrics);
-			params4.bottomMargin = Util.scaleHeightPx(15, outMetrics);
-			availableOfflineView.setLayoutParams(params4);
-
-			offlineSwitch = (Switch) findViewById(R.id.chat_contact_properties_switch);
-			offlineSwitch.setOnCheckedChangeListener(this);
-
-			//Mail Layout
-			userEmailTextView = (TextView) findViewById(R.id.chat_contact_properties_email);
-			userEmailTextView.setText(userEmail);
-			mailLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_email_layout);
-//			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
-//			lpML.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, 0);
-//			mailLayout.setLayoutParams(lpML);
-
-			mailIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
-			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mailIcon.getLayoutParams());
-			lp.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			mailIcon.setLayoutParams(lp);
-
-			//Share with Layout
-
-			sharedLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_layout);
-			sharedLayout.setOnClickListener(this);
-
-			shareIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_image);
-			RelativeLayout.LayoutParams lp1 = new RelativeLayout.LayoutParams(shareIcon.getLayoutParams());
-			lp1.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			shareIcon.setLayoutParams(lp1);
-
-			usersSharedWithText = (TextView) findViewById(R.id.chat_contact_properties_shared_info);
-			RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) usersSharedWithText.getLayoutParams();
-			params1.rightMargin = Util.scaleWidthPx(10, outMetrics);
-			usersSharedWithText.setLayoutParams(params1);
-
-			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
-			LinearLayout.LayoutParams paramsDivider = (LinearLayout.LayoutParams) dividerSharedLayout.getLayoutParams();
-			paramsDivider.leftMargin = Util.scaleWidthPx(55, outMetrics);
-			dividerSharedLayout.setLayoutParams(paramsDivider);
-
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
 
-			//Permissions Layout
-			permissionsLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_permissions_layout);
-			permissionsLayout.setVisibility(View.GONE);
+			//Notifications Layout
 
-		    permissionsIcon = (ImageView) findViewById(R.id.chat_contact_properties_permissions_image);
-		    RelativeLayout.LayoutParams lp3 = new RelativeLayout.LayoutParams(permissionsIcon.getLayoutParams());
-			lp3.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			permissionsIcon.setLayoutParams(lp3);
+			notificationsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_notifications_layout);
+			notificationsLayout.setVisibility(View.VISIBLE);
 
-			permissionLabel = (TextView) findViewById(R.id.chat_contact_properties_permission_label);
-			permissionInfo = (TextView) findViewById(R.id.chat_contact_properties_permission_info);
+			notificationsTitle = (TextView) findViewById(R.id.chat_contact_properties_notifications_text);
 
-			//Owner Layout
-			ownerLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_owner_layout);
+			notificationsSwitch = (Switch) findViewById(R.id.chat_contact_properties_switch);
+			notificationsSwitch.setOnCheckedChangeListener(this);
+			LinearLayout.LayoutParams paramsSwitch = (LinearLayout.LayoutParams) notificationsSwitch.getLayoutParams();
+			paramsSwitch.rightMargin = Util.scaleWidthPx(16, outMetrics);
+			notificationsSwitch.setLayoutParams(paramsSwitch);
 
-		    ownerIcon = (ImageView) findViewById(R.id.chat_contact_properties_owner_image);
-		    RelativeLayout.LayoutParams lp4 = new RelativeLayout.LayoutParams(ownerIcon.getLayoutParams());
-			lp4.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			ownerIcon.setLayoutParams(lp4);
+			//Chat message sound Layout
 
-			ownerLabel =  (TextView) findViewById(R.id.chat_contact_properties_owner_label);
-			ownerInfo = (TextView) findViewById(R.id.chat_contact_properties_owner_info);
-			ownerLayout.setVisibility(View.GONE);
+			messageSoundLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_messages_sound_layout);
+			messageSoundLayout.setOnClickListener(this);
+			LinearLayout.LayoutParams paramsSound = (LinearLayout.LayoutParams) messageSoundLayout.getLayoutParams();
+			paramsSound.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			messageSoundLayout.setLayoutParams(paramsSound);
 
-			//Info Layout
+			messageSoundText = (TextView) findViewById(R.id.chat_contact_properties_messages_sound);
 
-		    infoIcon = (ImageView) findViewById(R.id.chat_contact_properties_size_image);
-		    RelativeLayout.LayoutParams lp2 = new RelativeLayout.LayoutParams(infoIcon.getLayoutParams());
-			lp2.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			infoIcon.setLayoutParams(lp2);
+			dividerMessageSoundLayout = (View) findViewById(R.id.divider_message_sound_layout);
+			LinearLayout.LayoutParams paramsDividerSound = (LinearLayout.LayoutParams) dividerMessageSoundLayout.getLayoutParams();
+			paramsDividerSound.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			dividerMessageSoundLayout.setLayoutParams(paramsDividerSound);
 
-			sizeLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_size_layout);
-			sizeTitleTextView  = (TextView) findViewById(R.id.chat_contact_properties_info_menu_size);
-			sizeTextView = (TextView) findViewById(R.id.chat_contact_properties_info_data_size);
-			RelativeLayout.LayoutParams params5 = (RelativeLayout.LayoutParams) sizeTextView.getLayoutParams();
-			params5.rightMargin = Util.scaleWidthPx(10, outMetrics);
-			sizeTextView.setLayoutParams(params5);
+			//Call ringtone Layout
 
-			//Content Layout
-			contentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_content_layout);
+			ringtoneLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_ringtone_layout);
+			ringtoneLayout.setOnClickListener(this);
+			LinearLayout.LayoutParams paramsRingtone = (LinearLayout.LayoutParams) ringtoneLayout.getLayoutParams();
+			paramsRingtone.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			ringtoneLayout.setLayoutParams(paramsRingtone);
 
-			contentIcon = (ImageView) findViewById(R.id.chat_contact_properties_content_image);
-		    RelativeLayout.LayoutParams lpContent = new RelativeLayout.LayoutParams(contentIcon.getLayoutParams());
-		    lpContent.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-			contentIcon.setLayoutParams(lpContent);
+			ringtoneText = (TextView) findViewById(R.id.chat_contact_properties_ringtone);
 
-			contentTitleTextView  = (TextView) findViewById(R.id.chat_contact_properties_info_menu_content);
-			contentTextView = (TextView) findViewById(R.id.chat_contact_properties_info_data_content);
+			dividerRingtoneLayout = (View) findViewById(R.id.divider_ringtone_layout);
+			LinearLayout.LayoutParams paramsRingtoneDivider = (LinearLayout.LayoutParams) dividerRingtoneLayout.getLayoutParams();
+			paramsRingtoneDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			dividerRingtoneLayout.setLayoutParams(paramsRingtoneDivider);
 
-			//Added Layout
+			//Share Contact Layout
 
-			addedLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_added_layout);
+			shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
+			shareContactLayout.setOnClickListener(this);
+			LinearLayout.LayoutParams paramsShareContact = (LinearLayout.LayoutParams) shareContactLayout.getLayoutParams();
+			paramsShareContact.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			shareContactLayout.setLayoutParams(paramsShareContact);
 
-			addedIcon = (ImageView) findViewById(R.id.chat_contact_properties_added_image);
-		    RelativeLayout.LayoutParams lpAdded = new RelativeLayout.LayoutParams(addedIcon.getLayoutParams());
-		    lpAdded.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-		    addedIcon.setLayoutParams(lpAdded);
-		    addedTextView = (TextView) findViewById(R.id.chat_contact_properties_info_data_added);
+			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
+			shareContactText.setText(userEmail);
 
-		    //Modified Layout
-		    modifiedLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_modified_layout);
+			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
+			LinearLayout.LayoutParams paramsShareContactDivider = (LinearLayout.LayoutParams) dividerShareContactLayout.getLayoutParams();
+			paramsShareContactDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			dividerShareContactLayout.setLayoutParams(paramsShareContactDivider);
 
-		    modifiedIcon = (ImageView) findViewById(R.id.chat_contact_properties_modified_image);
-		    RelativeLayout.LayoutParams lpModified = new RelativeLayout.LayoutParams(modifiedIcon.getLayoutParams());
-		    lpModified.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
-		    modifiedIcon.setLayoutParams(lpModified);
-			modifiedTextView = (TextView) findViewById(R.id.chat_contact_properties_info_data_modified);
+			//Clear chat Layout
+			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
+			clearChatLayout.setOnClickListener(this);
+			LinearLayout.LayoutParams paramsClearChat = (LinearLayout.LayoutParams) clearChatLayout.getLayoutParams();
+			paramsClearChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			clearChatLayout.setLayoutParams(paramsClearChat);
 
 		}
 		else{
 			log("Extras is NULL");
 		}
-
 	}
 
 	public void setAvatar(){
@@ -454,19 +369,12 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-//			case R.id.chat_contact_properties_main_layout:{
-//				if (overflowMenuLayout != null){
-//					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-//						overflowMenuLayout.setVisibility(View.GONE);
-//						return;
-//					}
-//				}
-//				break;
-//			}
-			case R.id.chat_contact_properties_shared_layout:{
-//				Intent i = new Intent(this, FileContactListActivityLollipop.class);
-//				i.putExtra("name", node.getHandle());
-//				startActivity(i);
+			case R.id.chat_contact_properties_clear_layout:{
+				log("Clear chat option");
+				break;
+			}
+			case R.id.chat_contact_properties_share_contact_layout:{
+				log("Share contact option");
 				break;
 			}
 //			case R.id.chat_contact_properties_toolbar_back:{
