@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -30,7 +31,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -47,7 +52,7 @@ import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi")
-public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener{
+public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
 
 	RelativeLayout imageLayout;
 
@@ -99,8 +104,8 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
-		if (megaApi == null){
-			MegaApplication app = (MegaApplication)getApplication();
+		if (megaApi == null) {
+			MegaApplication app = (MegaApplication) getApplication();
 			megaApi = app.getMegaApi();
 		}
 
@@ -109,17 +114,17 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
+		outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		density = getResources().getDisplayMetrics().density;
 
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
+		scaleW = Util.getScaleW(outMetrics, density);
+		scaleH = Util.getScaleH(outMetrics, density);
 
 		Bundle extras = getIntent().getExtras();
-		if (extras != null){
+		if (extras != null) {
 			userEmail = extras.getString("userEmail");
-			if(userEmail==null){
+			if (userEmail == null) {
 				log("userMail is NULL");
 				finish();
 				return;
@@ -127,7 +132,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			fullName = extras.getString("userFullName");
 
 			user = megaApi.getContact(userEmail);
-			if(user==null){
+			if (user == null) {
 				log("MegaUser is NULL");
 				finish();
 				return;
@@ -155,10 +160,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
 			float scaleText;
-			if (scaleH < scaleW){
+			if (scaleH < scaleW) {
 				scaleText = scaleH;
-			}
-			else{
+			} else {
 				scaleText = scaleW;
 			}
 
@@ -235,57 +239,130 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			paramsClearChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
 			clearChatLayout.setLayoutParams(paramsClearChat);
 
-		}
-		else{
+		} else {
 			log("Extras is NULL");
 		}
 	}
 
-	public void setAvatar(){
+	public void setAvatar() {
 		log("setAvatar");
 		File avatar = null;
-		if (getExternalCacheDir() != null){
+		if (getExternalCacheDir() != null) {
 			avatar = new File(getExternalCacheDir().getAbsolutePath(), userEmail + ".jpg");
-		}
-		else{
+		} else {
 			avatar = new File(getCacheDir().getAbsolutePath(), userEmail + ".jpg");
 		}
 
-		if(avatar!=null){
+		if (avatar != null) {
 			setProfileAvatar(avatar);
 		}
 	}
 
-	public void setProfileAvatar(File avatar){
+	public void setProfileAvatar(File avatar) {
 		log("setProfileAvatar");
 		Bitmap imBitmap = null;
-		if (avatar.exists()){
-			if (avatar.length() > 0){
+		if (avatar.exists()) {
+			if (avatar.length() > 0) {
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
 				bOpts.inPurgeable = true;
 				bOpts.inInputShareable = true;
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (imBitmap == null) {
 					avatar.delete();
-					if (getExternalCacheDir() != null){
+					if (getExternalCacheDir() != null) {
 						megaApi.getUserAvatar(user, getExternalCacheDir().getAbsolutePath() + "/" + userEmail, this);
-					}
-					else{
+					} else {
 						megaApi.getUserAvatar(user, getCacheDir().getAbsolutePath() + "/" + userEmail, this);
 					}
-				}
-				else{
+				} else {
 					contactPropertiesImage.setImageBitmap(imBitmap);
 					initialLetter.setVisibility(View.GONE);
+
+					if (imBitmap != null && !imBitmap.isRecycled()) {
+//						Palette palette = Palette.from(imBitmap).generate();
+//						int colorBackground = palette.getDarkMutedColor(ContextCompat.getColor(this, R.color.black));
+						int colorBackground = getDominantColor1(imBitmap);
+						imageLayout.setBackgroundColor(colorBackground);
+					}
 				}
 			}
 		}
 	}
 
-	public void setDefaultAvatar(){
+	public int getDominantColor1(Bitmap bitmap) {
+
+		if (bitmap == null)
+			throw new NullPointerException();
+
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		int size = width * height;
+		int pixels[] = new int[size];
+
+		Bitmap bitmap2 = bitmap.copy(Bitmap.Config.ARGB_4444, false);
+
+		bitmap2.getPixels(pixels, 0, width, 0, 0, width, height);
+
+		final List<HashMap<Integer, Integer>> colorMap = new ArrayList<HashMap<Integer, Integer>>();
+		colorMap.add(new HashMap<Integer, Integer>());
+		colorMap.add(new HashMap<Integer, Integer>());
+		colorMap.add(new HashMap<Integer, Integer>());
+
+		int color = 0;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		Integer rC, gC, bC;
+		log("getDominantColor1: "+pixels.length);
+		int j=0;
+		//for (int i = 0; i < pixels.length; i++) {
+		while (j < pixels.length){
+
+			color = pixels[j];
+
+			r = Color.red(color);
+			g = Color.green(color);
+			b = Color.blue(color);
+
+			rC = colorMap.get(0).get(r);
+			if (rC == null)
+				rC = 0;
+			colorMap.get(0).put(r, ++rC);
+
+			gC = colorMap.get(1).get(g);
+			if (gC == null)
+				gC = 0;
+			colorMap.get(1).put(g, ++gC);
+
+			bC = colorMap.get(2).get(b);
+			if (bC == null)
+				bC = 0;
+			colorMap.get(2).put(b, ++bC);
+			j = j+width+1;
+		}
+
+		int[] rgb = new int[3];
+		for (int i = 0; i < 3; i++) {
+			int max = 0;
+			int val = 0;
+			for (Map.Entry<Integer, Integer> entry : colorMap.get(i).entrySet()) {
+				if (entry.getValue() > max) {
+					max = entry.getValue();
+					val = entry.getKey();
+				}
+			}
+			rgb[i] = val;
+		}
+
+		int dominantColor = Color.rgb(rgb[0], rgb[1], rgb[2]);
+
+		return dominantColor;
+	}
+
+	public void setDefaultAvatar() {
 		log("setDefaultAvatar");
 
-		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
@@ -293,11 +370,10 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		c.drawPaint(p);
 
 		String color = megaApi.getUserAvatarColor(user);
-		if(color!=null){
-			log("The color to set the avatar is "+color);
+		if (color != null) {
+			log("The color to set the avatar is " + color);
 			imageLayout.setBackgroundColor(Color.parseColor(color));
-		}
-		else{
+		} else {
 			log("Default color to the avatar");
 			imageLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
 		}
@@ -309,24 +385,23 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		boolean setInitialByMail = false;
 
-		if (fullName != null){
-			if (fullName.trim().length() > 0){
+		if (fullName != null) {
+			if (fullName.trim().length() > 0) {
 				String firstLetter = fullName.charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				initialLetter.setText(firstLetter);
 				initialLetter.setTextSize(100);
 				initialLetter.setTextColor(Color.WHITE);
 				initialLetter.setVisibility(View.VISIBLE);
-			}else{
-				setInitialByMail=true;
+			} else {
+				setInitialByMail = true;
 			}
+		} else {
+			setInitialByMail = true;
 		}
-		else{
-			setInitialByMail=true;
-		}
-		if(setInitialByMail){
-			if (userEmail != null){
-				if (userEmail.length() > 0){
+		if (setInitialByMail) {
+			if (userEmail != null) {
+				if (userEmail.length() > 0) {
 					log("email TEXT: " + userEmail);
 					log("email TEXT AT 0: " + userEmail.charAt(0));
 					String firstLetter = userEmail.charAt(0) + "";
@@ -340,67 +415,46 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-	private int getAvatarTextSize (float density){
+	private int getAvatarTextSize(float density) {
 		float textSize = 0.0f;
 
-		if (density > 3.0){
+		if (density > 3.0) {
 			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
+		} else if (density > 2.0) {
 			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
+		} else if (density > 1.5) {
 			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
+		} else if (density > 1.0) {
 			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
+		} else if (density > 0.75) {
 			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
+		} else {
 			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
 		}
 
-		return (int)textSize;
+		return (int) textSize;
 	}
 
 	@Override
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.chat_contact_properties_clear_layout:{
+			case R.id.chat_contact_properties_clear_layout: {
 				log("Clear chat option");
 				break;
 			}
-			case R.id.chat_contact_properties_share_contact_layout:{
+			case R.id.chat_contact_properties_share_contact_layout: {
 				log("Share contact option");
 				break;
 			}
-//			case R.id.chat_contact_properties_toolbar_back:{
-//				finish();
-//				break;
-//			}
-//			case R.id.chat_contact_properties_toolbar_overflow:{
-//				overflowMenuLayout.setVisibility(View.VISIBLE);
-//				break;
-//			}
-//			case R.id.chat_contact_properties_toolbar_download:{
-//
-//				break;
-//			}
-//			case R.id.chat_contact_properties_toolbar_rubbish_bin:{
-//
-//				break;
-//			}
-//			case R.id.file_properties_content_table:{
-//				Intent i = new Intent(this, FileContactListActivityLollipop.class);
-//				i.putExtra("name", node.getHandle());
-//				startActivity(i);
-//				finish();
-//				break;
-//			}
-//
+			case R.id.chat_contact_properties_ringtone_layout: {
+				log("Ringtone option");
+				break;
+			}
+			case R.id.chat_contact_properties_messages_sound_layout: {
+				log("Message sound option");
+				break;
+			}
 		}
 	}
 
@@ -408,7 +462,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelectedLollipop");
 		int id = item.getItemId();
-		switch(id) {
+		switch (id) {
 			case android.R.id.home: {
 				finish();
 			}
@@ -420,12 +474,11 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		log("onCheckedChanged");
 
-		if (!isChecked){
+		if (!isChecked) {
 			log("isChecked");
 
 			supportInvalidateOptionsMenu();
-		}
-		else{
+		} else {
 			log("NOT Checked");
 
 
@@ -453,34 +506,41 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	@SuppressLint("NewApi")
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-		log("onRequestFinish: "+request.getType() + "__" + request.getRequestString());
+		log("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
 
-		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 
 			log("MegaRequest.TYPE_GET_ATTR_USER");
-			if (e.getErrorCode() == MegaError.API_OK){
+			if (e.getErrorCode() == MegaError.API_OK) {
 				File avatar = null;
-				if (getExternalCacheDir() != null){
+				if (getExternalCacheDir() != null) {
 					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
-				}
-				else{
+				} else {
 					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
 				}
 				Bitmap imBitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
+				if (avatar.exists()) {
+					if (avatar.length() > 0) {
 						BitmapFactory.Options bOpts = new BitmapFactory.Options();
 						bOpts.inPurgeable = true;
 						bOpts.inInputShareable = true;
 						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 						if (imBitmap == null) {
 							avatar.delete();
-						}
-						else{
+						} else {
 							contactPropertiesImage.setImageBitmap(imBitmap);
 							initialLetter.setVisibility(View.GONE);
+
+							if (imBitmap != null && !imBitmap.isRecycled()) {
+								Palette palette = Palette.from(imBitmap).generate();
+								Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+
+//								Palette.Swatch swatch = palette.getSwatches();
+//								int colorBackground = color.getDarkMutedColor(ContextCompat.getColor(this, R.color.black));
+								imageLayout.setBackgroundColor(swatch.getBodyTextColor());
+							}
 						}
 					}
 				}
@@ -490,14 +550,14 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+										MegaError e) {
 		log("onRequestTemporaryError: " + request.getName());
 	}
 
 	@Override
-	protected void onDestroy(){
-    	super.onDestroy();
-    }
+	protected void onDestroy() {
+		super.onDestroy();
+	}
 
 	public static void log(String message) {
 		Util.log("ContactChatInfoActivityLollipop", message);
@@ -509,7 +569,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	}
 
-
 	@Override
 	protected void onResume() {
 		log("onResume-ContactChatInfoActivityLollipop");
@@ -520,7 +579,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 //		if (overflowMenuLayout != null){
