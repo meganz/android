@@ -81,6 +81,29 @@
                         android:layout_weight="1" />
             </LinearLayout>
 
+            <!-- THE CHAT TABS -->
+            <LinearLayout
+                android:id="@+id/tabhost_chat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/mega"
+                    style="@style/MyCustomTabLayout"/>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/chat_tabs_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
             <!-- THE SHARES TABS -->
             <LinearLayout
                 android:id="@+id/tabhost_shares"
@@ -104,7 +127,6 @@
                         android:layout_weight="1" />
             </LinearLayout>
 
-
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
@@ -116,7 +138,6 @@
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white"
                 android:layout_gravity="bottom|right|end"/>
-
 
         </android.support.design.widget.CoordinatorLayout>
 
@@ -136,6 +157,67 @@
             layout="@layout/layout_get_pro_account"
             android:visibility="gone" />
     </RelativeLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fab_collection_layout"
+        android:background="@color/transparent_white"
+        android:gravity="bottom|end"
+        android:visibility="gone"
+        android:fitsSystemWindows="true">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/third_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_marginBottom="200dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible"
+                app:backgroundTint="@color/orange"
+                app:elevation="6dp"
+                app:pressedTranslationZ="12dp"
+                android:src="@drawable/ic_add_white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/second_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_marginBottom="140dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible"
+                app:backgroundTint="@color/orange"
+                app:elevation="6dp"
+                app:pressedTranslationZ="12dp"
+                android:src="@drawable/ic_add_white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/first_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_marginBottom="80dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible"
+                app:elevation="6dp"
+                app:backgroundTint="@color/accentColor"
+                app:pressedTranslationZ="12dp"
+                android:src="@drawable/ic_chat_white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/main_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_gravity="bottom|end"
+                app:elevation="6dp"
+                app:backgroundTint="@color/accentColor"
+                app:pressedTranslationZ="12dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add_white" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
     <include
         android:layout_width="fill_parent"

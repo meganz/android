@@ -49,7 +49,8 @@
     <color name="green_free_account">#31B404</color>
 
     <color name="divider_upgrade_account">#1F000000</color>
-     
+
+    <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="orange">#FFFFBB33</color>
@@ -79,4 +80,7 @@
 	<color name="tour_bar_red">#cc0000</color>
 
     <color name="small_letter_upgrade_account">#8a333333</color>
+
+    <color name="chat_background">#08000000</color>
+    <color name="message_background">#0f000000</color>
 </resources>

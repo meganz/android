@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -41,8 +40,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	Context context;
 	int positionClicked;
 	ArrayList<MegaContactRequest> contacts;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
@@ -50,7 +47,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	private SparseBooleanArray selectedItems;
 	Object fragment;
 
-	public MegaContactRequestLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaContactRequest> _contacts, ImageView _emptyImageView,TextView _emptyTextView, RecyclerView _listView, int type) {
+	public MegaContactRequestLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaContactRequest> _contacts, RecyclerView _listView, int type) {
 		log("new adapter");
 		this.context = _context;
 		this.contacts = _contacts;
@@ -61,9 +58,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		emptyImageViewFragment = _emptyImageView;
-		emptyTextViewFragment = _emptyTextView;
+
 		listFragment = _listView;
 		
 		if(contacts!=null)

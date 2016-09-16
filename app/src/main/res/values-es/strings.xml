@@ -196,7 +196,7 @@
 	<string name="section_contacts" context="Title of the contact list">Contactos</string>
 	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Solicitudes enviadas</string>
 	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Solicitudes recibidas</string>
-	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No ha enviado solicitudes</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No se han enviado solicitudes</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No ha recibido solicitudes</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferencias</string>
 
@@ -825,4 +825,31 @@
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Mis credenciales</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limitado</string>
+
+    <string name="section_chat" context="Title of the screen that shows the chat">Chat</string>
+    <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">ARCHIVO</string>
+    <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECIENTE</string>
+    <string name="archive_chat_empty" context="the user has not sent any contact request to other users">No hay conversaciones archivadas</string>
+    <string name="get_started_button" context="Button to start using the chat">Comenzar</string>
+
+    <string name="recent_chat_empty" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
+
+    <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Videollamada</string>
+
+    <plurals name="general_minutes">
+        <item quantity="one" context="Singular of minutes. 1 minute">minuto</item>
+        <item quantity="other" context="Plural of minutes. 2 minute">minutos</item>
+    </plurals>
+
+    <plurals name="general_hours">
+        <item quantity="one" context="Singular of hours. 1 hour">hora</item>
+        <item quantity="other" context="Plural of hours. 2 hours">horas</item>
+    </plurals>
+
+    <plurals name="general_seconds">
+        <item quantity="one" context="Singular of seconds. 1 second">segundo</item>
+        <item quantity="other" context="Plural of seconds. 2 second">segundos</item>
+    </plurals>
+
+    <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Cargando los contactos del teléfono...</string>
 </resources>

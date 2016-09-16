@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/empty_layout_chat_recent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left">
+
+        <TextView
+            android:id="@+id/empty_text_chat_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/recent_chat_empty"
+            android:textColor="@color/text_secondary"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/empty_buttons_layout_recent_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_below="@id/empty_text_chat_recent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/invite_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="-3dp"
+                android:paddingBottom="-3dp"
+                android:textColor="@color/white"
+                android:text="@string/contact_invite"
+                android:background="@drawable/ripple_upgrade"
+                android:elevation="@dimen/elevation_upgrade_low"
+                android:stateListAnimator="@anim/button_upgrade_elevation"
+                android:tint="@android:color/white" />
+
+            <Button
+                android:id="@+id/get_started_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:text="@string/get_started_button"
+                android:background="@drawable/white_rounded_corners_button"
+                android:elevation="@dimen/elevation_upgrade_low"
+                android:stateListAnimator="@anim/button_upgrade_elevation"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_recent_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="multipleChoice" />
+
+</RelativeLayout>

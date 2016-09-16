@@ -10,6 +10,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="fab_button_diameter">56dp</dimen>
+    <dimen name="fab_button_small_diameter">40dp</dimen>
     <dimen name="fab_button_margin_bottom">16dp</dimen>
     <dimen name="fab_button_margin_right">16dp</dimen>
     <dimen name="elevation_low">6dp</dimen>

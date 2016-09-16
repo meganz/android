@@ -8,9 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
@@ -79,6 +81,13 @@ public class LoginActivityLollipop extends Activity{
 
 //		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
 		showFragment(visibleFragment);
+	}
+
+	public void showSnackbar(String message){
+		Snackbar snackbar = Snackbar.make(relativeContainer,message,Snackbar.LENGTH_LONG);
+		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+		snackbarTextView.setMaxLines(5);
+		snackbar.show();
 	}
 
 	public void showFragment(int visibleFragment){

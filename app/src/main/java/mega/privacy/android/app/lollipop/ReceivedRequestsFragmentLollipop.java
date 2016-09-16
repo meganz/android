@@ -177,6 +177,14 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 
 	}
 
+	public boolean showSelectMenuItem(){
+		if (adapterList != null){
+			return adapterList.isMultipleSelect();
+		}
+
+		return false;
+	}
+
 	/*
 	 * Clear all selected items
 	 */
@@ -305,7 +313,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);			
 			
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -346,7 +354,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	public void updateView(){
 		contacts = megaApi.getIncomingContactRequests();
 		if (adapterList == null){
-			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
+			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			listView.setAdapter(adapterList);
 		}
 		else{
@@ -411,7 +419,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
     		else
     		{
     			log("adapter==NULL");
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.INCOMING_REQUEST_ADAPTER);
+    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
     		}
     		
     		if (adapterList.getItemCount() == 0){				
