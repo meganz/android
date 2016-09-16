@@ -149,7 +149,11 @@ fi
 if [ "$1" == "bindings" ]; then
     createMEGAchatBindings
     createMEGABindings
-    echo "* Bindings ready! Task finished OK"
+    echo "* Bindings ready!"
+    echo "* Running ndk-build"
+    ${NDK_BUILD}
+    echo "* ndk-build finished"
+    echo "* Task finished OK"
     exit 0
 fi
 
@@ -315,5 +319,8 @@ fi
 echo "* cURL with c-ares is ready"
 
 echo "* All dependencies are prepared!"
-echo "* Use ndk-build to build the native library or let Android Studio do it"
+echo "* Running ndk-build"
+${NDK_BUILD}
+echo "* ndk-build finished"
 echo "* Task finished OK"
+
