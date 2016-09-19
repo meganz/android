@@ -1,14 +1,5 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import mega.privacy.android.app.FileStorageAdapter.OnItemCheckClickListener;
-import mega.privacy.android.app.utils.Util;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,6 +24,15 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import mega.privacy.android.app.FileStorageAdapter.OnItemCheckClickListener;
+import mega.privacy.android.app.utils.Util;
 
 
 public class FileStorageActivity extends PinActivity implements OnClickListener, OnItemClickListener, OnItemCheckClickListener {
@@ -87,6 +88,8 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 	private long[] documentHashes;
 	
 	FileStorageAdapter adapter;
+
+	ActionBar aB;
 	
 	private AlertDialog createFolderDialog;
 	
@@ -101,6 +104,13 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 			if (savedInstanceState.containsKey("path")) {
 				path = new File(savedInstanceState.getString("path"));
 			}
+		}
+
+		if (aB == null){
+			aB = getSupportActionBar();
+		}
+		if(aB!=null){
+			aB.hide();
 		}
 		
 		windowTitle = (TextView) findViewById(R.id.file_storage_window_title);

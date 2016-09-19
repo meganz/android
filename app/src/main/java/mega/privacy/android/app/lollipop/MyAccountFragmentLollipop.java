@@ -333,11 +333,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
 
-		myAccountInfo.setFirstName(false);
-		myAccountInfo.setLastName(false);
+		if(myAccountInfo!=null){
+			if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
+				log("MyName is:"+ myAccountInfo.getFullName());
+				nameView.setText(myAccountInfo.getFullName());
+			}
+			else{
+				myAccountInfo.setFirstName(false);
+				myAccountInfo.setLastName(false);
 
-		megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
-		megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+				megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+				megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+			}
+		}
+		else{
+			myAccountInfo.setFirstName(false);
+			myAccountInfo.setLastName(false);
+
+			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+		}
 
 		this.updateAvatar(myUser.getEmail(), true);
 
@@ -744,23 +759,34 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
+				if(context==null){
+					log("Context is NULL");
+					return;
+				}
+
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
-					if (context.getExternalCacheDir() != null){
-						String destinationPath = null;
-						destinationPath = context.getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
-						if(destinationPath!=null){
-							log("The destination of the avatar is: "+destinationPath);
-							megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
-						}
-						else{
-							log("ERROR! Destination PATH is NULL");
+					if(request.getFile()!=null){
+						log("old path: "+request.getFile());
+						File oldFile = new File(request.getFile());
+						if(oldFile!=null){
+							if(oldFile.exists()){
+								String newPath = null;
+								if (context.getExternalCacheDir() != null){
+									newPath = context.getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								}
+								else{
+									log("getExternalCacheDir() is NULL");
+									newPath = context.getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								}
+								File newFile = new File(newPath);
+								oldFile.renameTo(newFile);
+							}
 						}
 					}
-					else{
-						log("getExternalCacheDir() is NULL");
-						megaApi.getUserAvatar(myAccountInfo.getMyUser(), context.getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
-					}
+					((ManagerActivityLollipop) context).setProfileAvatar();
+
+					updateAvatar(myUser.getEmail(), false);
 				}
 				else{
 					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
