@@ -40,16 +40,9 @@ public class ChatPanelListener implements View.OnClickListener {
 
                 Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
                 i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
-                i.putExtra("userFullName", "Prueba");
+                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
+                i.putExtra("handle", selectedChat.getId());
                 context.startActivity(i);
-
-
-//                Intent intent = new Intent();
-//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//                intent.setType("*/*");
-//                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
 
                 break;
             }

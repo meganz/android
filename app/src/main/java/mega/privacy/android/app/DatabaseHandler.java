@@ -12,6 +12,7 @@ import android.util.Base64;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import mega.privacy.android.app.lollipop.megachat.ChatPreferences;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -19,13 +20,15 @@ import nz.mega.sdk.MegaApiJava;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 22;
+	private static final int DATABASE_VERSION = 23;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
     private static final String TABLE_ATTRIBUTES = "attributes";
     private static final String TABLE_OFFLINE = "offline";
     private static final String TABLE_CONTACTS = "contacts";
+	private static final String TABLE_CHAT = "chat";
+
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_SESSION= "session";
@@ -78,6 +81,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
 	private static final String KEY_PRICING_TIMESTAMP = "pricingtimestamp";
 	private static final String KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp";
+
+	private static final String KEY_CHAT_HANDLE = "chathandle";
+	private static final String KEY_CHAT_NOTIFICATIONS = "chatnotifications";
+	private static final String KEY_CHAT_RINGTONE = "chatringtone";
+	private static final String KEY_CHAT_SOUND_NOTIFICATION = "chatnotificationsound";
     
     private static DatabaseHandler instance;
     
@@ -140,6 +148,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CONTACT_HANDLE + " TEXT, " + KEY_CONTACT_MAIL + " TEXT, " + 
         		KEY_CONTACT_NAME+ " TEXT, "+KEY_CONTACT_LAST_NAME+ " TEXT"+")";
         db.execSQL(CREATE_CONTACTS_TABLE);
+
+		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_NOTIFICATIONS + " BOOLEAN, " +
+				KEY_CHAT_RINGTONE+ " TEXT, "+KEY_CHAT_SOUND_NOTIFICATION+ " TEXT"+")";
+		db.execSQL(CREATE_CHAT_TABLE);
   
 	}
 
@@ -332,6 +345,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " = '" + encrypt("") + "';");
 		}
+
+		if(oldVersion <= 22) {
+			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_NOTIFICATIONS + " BOOLEAN, " +
+					KEY_CHAT_RINGTONE + " TEXT, " + KEY_CHAT_SOUND_NOTIFICATION + " TEXT" + ")";
+			db.execSQL(CREATE_CHAT_TABLE);
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -493,6 +513,67 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		return prefs;
 	}
+
+	public void setChatPreferences (ChatPreferences chatPrefs){
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHAT_HANDLE, encrypt(chatPrefs.getChatHandle()));
+		values.put(KEY_CHAT_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsEnabled()));
+		values.put(KEY_CHAT_RINGTONE, encrypt(chatPrefs.getRingtone()));
+		values.put(KEY_CHAT_SOUND_NOTIFICATION, encrypt(chatPrefs.getNotificationsSound()));
+
+		db.insert(TABLE_CHAT, null, values);
+	}
+
+	public int setRingtoneChat (String ringtone, String handle){
+		log("setRingtoneChat: "+ringtone+" "+handle);
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHAT_RINGTONE, encrypt(ringtone));
+		return db.update(TABLE_CHAT, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+	}
+
+	public int setNotificationSoundChat (String sound, String handle){
+		log("setNotificationSoundChat: "+sound+" "+handle);
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHAT_SOUND_NOTIFICATION, encrypt(sound));
+		return db.update(TABLE_CHAT, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+	}
+
+	public int setNotificationEnabledChat (String enabled, String handle){
+		log("setNotificationEnabledChat: "+enabled+" "+handle);
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHAT_NOTIFICATIONS, encrypt(enabled));
+		return db.update(TABLE_CHAT, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+	}
+
+
+	public ChatPreferences findChatPreferencesByHandle (String handle){
+		log("findChatPreferencesByHandle: "+handle);
+		ChatPreferences prefs = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+
+				int id = Integer.parseInt(cursor.getString(0));
+				String chatHandle = decrypt(cursor.getString(1));
+				String notificationsEnabled = decrypt(cursor.getString(2));
+				String ringtone = decrypt(cursor.getString(3));
+				String notificationsSound = decrypt(cursor.getString(4));
+
+				prefs = new ChatPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound);
+				cursor.close();
+				return prefs;
+			}
+		}
+		cursor.close();
+		return null;
+	}
 	
 	public boolean isPinLockEnabled(SQLiteDatabase db){
 		log("getPinLockEnabled");
@@ -635,7 +716,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_mail = decrypt(cursor.getString(2));
 				_name = decrypt(cursor.getString(3));
 				_lastName = decrypt(cursor.getString(4));
-				
+
 				contacts = new MegaContact(handle, _mail, _name, _lastName);
 				cursor.close();
 				return contacts;

@@ -879,4 +879,6 @@
     <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat</string>
     <string name="title_properties_chat_share_contact" context="Title of the section to share the contact in the Contact Properties screen">Share contact</string>
 
+    <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Call ringtone</string>
+    <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Notification sound</string>
 </resources>

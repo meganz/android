@@ -116,6 +116,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
         String contactMail;
 		String lastNameText="";
 		String firstNameText="";
+		String fullName = "";
 
 		public String getContactMail (){
 			return contactMail;
@@ -166,29 +167,27 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.firstNameText = contactDB.getName();
 					holder.lastNameText = contactDB.getLastName();
 
-					String fullName;
-
 					if (holder.firstNameText.trim().length() <= 0){
-						fullName = holder.lastNameText;
+						holder.fullName = holder.lastNameText;
 					}
 					else{
-						fullName = holder.firstNameText + " " + holder.lastNameText;
+						holder.fullName = holder.firstNameText + " " + holder.lastNameText;
 					}
 
-					if (fullName.trim().length() <= 0){
+					if (holder.fullName.trim().length() <= 0){
 						log("Put email as fullname");
 						String email = holder.contactMail;
 						String[] splitEmail = email.split("[@._]");
-						fullName = splitEmail[0];
+						holder.fullName = splitEmail[0];
 					}
 
-					holder.textViewContactName.setText(fullName);
+					holder.textViewContactName.setText(holder.fullName);
 				}
 				else{
 					String email = holder.contactMail;
 					String[] splitEmail = email.split("[@._]");
-					String fullName = splitEmail[0];
-					holder.textViewContactName.setText(fullName);
+					holder.fullName = splitEmail[0];
+					holder.textViewContactName.setText(holder.fullName);
 				}
 
 				if (!multipleSelect) {
@@ -533,44 +532,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	    display.getMetrics(outMetrics);
 	    float density  = context.getResources().getDisplayMetrics().density;
 
-		String fullName;
-
-		if(holder.firstNameText!=null){
-			if (holder.firstNameText.trim().length() <= 0){
-				fullName = holder.lastNameText;
-			}
-			else{
-				if(holder.lastNameText!=null){
-					fullName = holder.firstNameText + " " + holder.lastNameText;
-				}
-				else{
-					fullName = holder.firstNameText;
-				}
-			}
-		}
-		else{
-			if(holder.lastNameText!=null){
-				fullName = holder.lastNameText;
-			}
-			else{
-				fullName="";
-			}
-		}
-
-		if (fullName.trim().length() <= 0){
-			log("Put email as fullname");
-			String email = holder.contactMail;
-			String[] splitEmail = email.split("[@._]");
-			fullName = splitEmail[0];
-		}
-
 		int avatarTextSize = getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 		boolean setInitialByMail = false;
 
-		if (fullName != null){
-			if (fullName.trim().length() > 0){
-				String firstLetter = fullName.charAt(0) + "";
+		if (holder.fullName != null){
+			if (holder.fullName.trim().length() > 0){
+				String firstLetter = holder.fullName.charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				holder.contactInitialLetter.setText(firstLetter);
 				holder.contactInitialLetter.setTextColor(Color.WHITE);
@@ -750,7 +718,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		ChatRoom c = (ChatRoom) getItem(currentPosition);
-		
+
 		switch (v.getId()){	
 			case R.id.recent_chat_list_three_dots:{
 				if (positionClicked == -1){
@@ -768,7 +736,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 				}
 				log("click three dots!");
-				((ManagerActivityLollipop) context).showChatPanel(c);
+				((ManagerActivityLollipop) context).showChatPanel(c, holder.fullName);
 				break;
 			}
 			case R.id.recent_chat_list_item_layout:{
