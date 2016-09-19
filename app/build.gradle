@@ -64,4 +64,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.0'
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
+    compile 'com.android.support:palette-v7:23.1.1'
 }
