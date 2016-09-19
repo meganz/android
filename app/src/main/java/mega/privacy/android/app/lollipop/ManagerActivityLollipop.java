@@ -184,6 +184,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaUser selectedUser;
 	MegaContactRequest selectedRequest;
 	ChatRoom selectedChat;
+	String fullNameChat;
 
 	//UPLOAD PANEL
 	private SlidingUpPanelLayout slidingUploadPanel;
@@ -12066,11 +12067,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingUploadPanel.setVisibility(View.GONE);
 	}
 
-	public void showChatPanel(ChatRoom chat){
+	public void showChatPanel(ChatRoom chat, String fullName){
 		log("showChatPanel");
 
 		if(chat!=null){
 			this.selectedChat = chat;
+		}
+		if(fullName!=null){
+			this.fullNameChat = fullName;
 		}
 
 		//Set title of screen
@@ -12078,34 +12082,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(contacts.size()==1) {
 			log("Chat one to one");
-
-			String handle = contacts.get(0).getHandle();
-			MegaContact contactChat = dbH.findContactByHandle(handle);
-			String fullName;
-			//Set contact's name and title for the screen
-			if (contactChat != null) {
-
-				String firstNameText = contactChat.getName();
-				String lastNameText = contactChat.getLastName();
-
-				if (firstNameText.trim().length() <= 0) {
-					fullName = lastNameText;
-				} else {
-					fullName = firstNameText + " " + lastNameText;
-				}
-
-				if (fullName.trim().length() <= 0) {
-					log("Put email as fullname");
-					String email = contacts.get(0).getMail();
-					String[] splitEmail = email.split("[@._]");
-					fullName = splitEmail[0];
-				}
-			} else {
-				String email = contacts.get(0).getMail();
-				String[] splitEmail = email.split("[@._]");
-				fullName = splitEmail[0];
-
-			}
 			titleNameContactChatPanel.setText(fullName);
 			titleMailContactChatPanel.setText(contacts.get(0).getMail());
 
@@ -12511,5 +12487,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setSelectedChat(ChatRoom selectedChat) {
 		this.selectedChat = selectedChat;
+	}
+
+	public String getFullNameChat() {
+		return fullNameChat;
+	}
+
+	public void setFullNameChat(String fullNameChat) {
+		this.fullNameChat = fullNameChat;
 	}
 }
