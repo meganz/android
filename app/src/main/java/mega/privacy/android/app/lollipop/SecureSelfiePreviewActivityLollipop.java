@@ -51,6 +51,7 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
     
     String filePath;
 	File imgFile;
+	String myEmail;
 
 	int profilePicture;
 	
@@ -85,6 +86,7 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 		if(intent!=null){
 			profilePicture = intent.getIntExtra("PICTURE_PROFILE", -1);
 			log("profilePicture set to: "+profilePicture);
+			myEmail = intent.getStringExtra("MY_MAIL");
 		}
 
 		setContentView(R.layout.activity_secure_selfie_preview);
@@ -196,23 +198,46 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 			}
 			case R.id.secure_selfie_viewer_upload:{
 
-				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-				log("Taken picture Name: "+name);
-
 				if(profilePicture==1){
 					log("Change the picture profile");
-					String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
-					log("----NEW Name: "+newPath);
-					File newFile = new File(newPath);
-					MegaUtilsAndroid.createAvatar(imgFile, newFile);
+					String newPath = null;
+					if (getExternalCacheDir() != null){
+						newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+					}
+					else{
+						log("getExternalCacheDir() is NULL");
+						newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+					}
+
+					if(newPath!=null) {
+						File newFile = new File(newPath);
+						log("NEW - the destination of the avatar is: " + newPath);
+						if (newFile != null) {
+							MegaUtilsAndroid.createAvatar(imgFile, newFile);
+
+							Intent intent = new Intent(this, ManagerActivityLollipop.class);
+							intent.setAction(Constants.ACTION_CHANGE_AVATAR);
+							intent.putExtra("IMAGE_PATH", newFile.getAbsolutePath());
+							startActivity(intent);
+							finish();
+
+						} else {
+							log("Error new path avatar!!");
+						}
+
+					}
+					else{
+						log("ERROR! Destination PATH is NULL");
+					}
+
+//					File newFile = new File(newPath);
+//					MegaUtilsAndroid.createAvatar(imgFile, newFile);
 //					imgFile.renameTo(newFile);
-					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_CHANGE_AVATAR);
-					intent.putExtra("IMAGE_PATH", newFile.getAbsolutePath());
-					startActivity(intent);
-					finish();
+
 				}
 				else{
+					String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+					log("Taken picture Name: "+name);
 					String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
 					log("----NEW Name: "+newPath);
 					File newFile = new File(newPath);

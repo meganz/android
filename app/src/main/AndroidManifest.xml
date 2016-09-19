@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="66"
-    android:versionName="3.0.11.4" >
+    android:versionCode="67"
+    android:versionName="3.0.11.5" >
 
     <uses-sdk
         android:minSdkVersion="9"
