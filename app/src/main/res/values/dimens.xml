@@ -4,8 +4,8 @@
     <dimen name="standard_margin_double">20dp</dimen>
     <dimen name="standard_margin_half">5dp</dimen>
     <dimen name="thumb_size">60dp</dimen>
-    <dimen name="tab_host_default_height">48dp</dimen>    
-        
+    <dimen name="tab_host_default_height">48dp</dimen>
+
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
@@ -15,10 +15,11 @@
     <dimen name="fab_button_margin_right">16dp</dimen>
     <dimen name="elevation_low">6dp</dimen>
     <dimen name="elevation_high">12dp</dimen>
-    
+
     <dimen name="elevation_upgrade_low">2dp</dimen>
     <dimen name="elevation_upgrade_high">8dp</dimen>
-    
+
     <dimen name="status_bar_height">24dp</dimen>
     <dimen name="left_margin_back_arrow">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

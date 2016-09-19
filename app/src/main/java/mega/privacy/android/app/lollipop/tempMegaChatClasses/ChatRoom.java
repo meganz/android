@@ -6,10 +6,20 @@ import mega.privacy.android.app.MegaContact;
 
 public class ChatRoom {
 
-    int id;
+    long id;
     ArrayList<Message> messages;
     ArrayList<MegaContact> contacts;
     int unreadMessages;
+
+    public boolean isMute() {
+        return isMute;
+    }
+
+    public void setMute(boolean mute) {
+        isMute = mute;
+    }
+
+    boolean isMute;
 
     public ArrayList<MegaContact> getContacts() {
         return contacts;
@@ -35,11 +45,11 @@ public class ChatRoom {
         this.unreadMessages = unreadMessages;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 }
