@@ -139,7 +139,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 		
 		if (adapter == null){
-			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
 			
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 				
