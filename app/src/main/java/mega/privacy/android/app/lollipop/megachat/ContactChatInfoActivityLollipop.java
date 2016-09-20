@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -94,7 +96,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	private MegaApiAndroid megaApi = null;
 
-	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 
 	Display display;
@@ -262,6 +263,11 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 					notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
 				}
 				notificationsSwitch.setChecked(notificationsEnabled);
+
+				if(!notificationsEnabled){
+					ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+					messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+				}
 
 				String ringtoneString = chatPrefs.getRingtone();
 				Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(ringtoneString));
@@ -488,6 +494,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		switch (v.getId()) {
 			case R.id.chat_contact_properties_clear_layout: {
 				log("Clear chat option");
+				showConfirmationClearChat();
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -610,6 +617,15 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		notificationsSwitch.setChecked(isChecked);
 
+		if(!isChecked){
+			ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+			messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+		}
+		else{
+			ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+			messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+		}
+
 		if(chatPrefs==null){
 			Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
 			Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
@@ -715,6 +731,31 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+	}
+
+	public void showConfirmationClearChat(){
+		log("showConfirmationClearChat");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Clear chat!");
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		String message= getResources().getString(R.string.confirmation_clear_chat,fullName);
+
+		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	@Override
