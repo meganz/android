@@ -72,6 +72,7 @@
     <color name="delimiterColor">#e6e6e6</color>
     
     <color name="accentColor">#00BFA5</color>
+    <color name="accentColorTransparent">#5900BFA5</color>
     <color name="textGrey">#6d6f70</color> 
     
     <color name="filePropertiesToolBar">#2284b1</color>
