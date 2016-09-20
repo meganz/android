@@ -217,7 +217,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		
 		if (adapter == null){
-			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);			
+			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
 			
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 				
@@ -467,7 +467,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		if (adapter == null){
 			log("Adapter is NULL");
-			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
 
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 
@@ -484,7 +484,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //		}
 		adapter.setDisableNodes(disabledNodes);
 	}
-	
+
 	private static void log(String log) {
 		Util.log("CloudDriveExplorerFragmentLollipop", log);
 	}
