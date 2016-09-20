@@ -77,6 +77,16 @@
 		android:paddingLeft="10dp"
         android:layout_alignParentRight="true"
 		android:layout_centerVertical="true" />
+
+	<ImageView
+		android:id="@+id/file_list_incoming_permissions"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/ic_permissions_full_access"
+		android:background="@null"
+		android:layout_toLeftOf="@id/file_list_three_dots"
+		android:layout_centerVertical="true"
+		android:visibility="gone"/>
     
     <ImageView
         android:id="@+id/file_list_public_link"
