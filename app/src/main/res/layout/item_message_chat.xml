@@ -60,14 +60,37 @@
             android:id="@+id/content_own_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title_own_message_layout"
-            android:gravity="right">
+            android:layout_below="@+id/title_own_message_layout">
+
+            <RelativeLayout
+                android:id="@+id/own_multiselection_layout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:gravity="left"
+                android:layout_marginRight="3dp">
+
+                <ImageView
+                    android:id="@+id/own_multiselection_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/message_multiselection_empty"/>
+
+                <ImageView
+                    android:id="@+id/own_multiselection_tick_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_done_white_18dp"/>
+
+            </RelativeLayout>
 
             <mega.privacy.android.app.components.WrapTextView
                 android:id="@+id/content_own_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/name_my_account"
+                android:layout_alignParentRight="true"
                 android:textSize="14sp"
                 android:inputType="textMultiLine"
                 android:background="@drawable/rounded_text_view_chat_own_message"
@@ -115,8 +138,30 @@
             android:id="@+id/content_contact_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title_contact_message_layout"
-            android:gravity="left">
+            android:background="@color/orange"
+            android:layout_below="@+id/title_contact_message_layout">
+
+            <RelativeLayout
+                android:id="@+id/contact_multiselection_layout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="3dp">
+
+                <ImageView
+                    android:id="@+id/contact_multiselection_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/message_multiselection_empty"/>
+
+                <ImageView
+                    android:id="@+id/contact_multiselection_tick_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_done_white_18dp"/>
+
+            </RelativeLayout>
 
             <mega.privacy.android.app.components.WrapTextView
                 android:id="@+id/content_contact_message_text"

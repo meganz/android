@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="66"
-    android:versionName="3.0.11.4" >
+    android:versionCode="67"
+    android:versionName="3.0.11.5" >
 
     <uses-sdk
         android:minSdkVersion="9"
-        android:targetSdkVersion="23" />
+        android:targetSdkVersion="23"
+        tools:overrideLibrary="io.github.rockerhieu.emojicon"/>
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
@@ -242,7 +243,20 @@
         </activity>
 
         <activity
+            android:name=".lollipop.megachat.ContactChatInfoActivityLollipop"
+            android:label="@string/contact_properties_activity"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Megaactionbar.Properties" />
+
+        <activity
             android:name="mega.privacy.android.app.lollipop.ChatActivityLollipop"
+            android:label="@string/section_chat"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.KeyboardActivityLollipop"
             android:label="@string/section_chat"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize">

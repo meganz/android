@@ -315,7 +315,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
             log("paramType: "+request.getParamType());
             boolean avatarExists = false;
             if (e.getErrorCode() == MegaError.API_OK){
-                if(request.getParamType()==0){
+                if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
                     log("(0)request avatar");
                     ((ManagerActivityLollipop) context).setProfileAvatar();
 
@@ -355,9 +355,13 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                     if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
                         log("Update the account fragment");
                         if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                            log("MyAccount is selected!");
                             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
                             if(mAF!=null){
                                 mAF.updateNameView(fullName);
+                            }
+                            else{
+                                log("MyAccount is Null");
                             }
                         }
                     }
