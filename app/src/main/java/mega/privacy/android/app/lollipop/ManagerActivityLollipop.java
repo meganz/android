@@ -8266,6 +8266,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionPermissions.setVisibility(View.GONE);
+		optionDelete.setVisibility(View.GONE);
+		optionRemoveTotal.setVisibility(View.GONE);
+		optionShare.setVisibility(View.GONE);
 
 		if(inSFLol!=null){
 			int dBT=inSFLol.getDeepBrowserTree();
@@ -8281,10 +8284,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case MegaShare.ACCESS_FULL: {
 				log("access FULL");
 				optionPublicLink.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionRename.setVisibility(View.VISIBLE);
-				optionDelete.setVisibility(View.VISIBLE);
 				optionMoveTo.setVisibility(View.GONE);
 
 				break;
@@ -8293,8 +8294,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("access read");
 				optionPublicLink.setVisibility(View.GONE);
 				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
 				break;
@@ -8303,8 +8302,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("readwrite");
 				optionPublicLink.setVisibility(View.GONE);
 				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
 

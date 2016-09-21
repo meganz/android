@@ -14,8 +14,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -25,10 +27,15 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -68,7 +75,7 @@ import nz.mega.sdk.MegaUser;
 
 public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
-	CoordinatorLayout fragmentContainer;
+	FrameLayout fragmentContainer;
     
     String userEmail;
 
@@ -78,7 +85,8 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	ContactPropertiesFragmentLollipop cpF;
 	ContactFileListFragmentLollipop cflF;
 
-	CoordinatorLayout coodinatorLayout;
+	CoordinatorLayout coordinatorLayout;
+	Handler handler;
 
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
@@ -95,12 +103,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	static ContactPropertiesActivityLollipop contactPropertiesMainActivity;
 
-	private static int EDIT_TEXT_ID = 2;
-
 	long parentHandle = -1;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
+
+	MenuItem createFolderMenuItem;
+	private AlertDialog newFolderDialog;
+	DisplayMetrics outMetrics;
 
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -114,6 +124,196 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	Toolbar tB;
 	ActionBar aB;
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.file_explorer_action, menu);
+
+		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+
+		if (cflF != null && cflF.isVisible()){
+			if(cflF.getFabVisibility()==View.VISIBLE){
+				createFolderMenuItem.setVisible(true);
+			}
+			else{
+				createFolderMenuItem.setVisible(false);
+			}
+		}
+		else{
+			createFolderMenuItem.setVisible(false);
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		int id = item.getItemId();
+		switch(id){
+			case android.R.id.home:{
+				onBackPressed();
+				break;
+			}
+			case R.id.cab_menu_create_folder:{
+				showNewFolderDialog();
+				break;
+			}
+		}
+		return true;
+	}
+
+	public void showNewFolderDialog(){
+		log("showNewFolderDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.context_new_folder_name));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					createFolder(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.menu_new_folder));
+		builder.setPositiveButton(getString(R.string.general_create),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						createFolder(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+
+	private void createFolder(String title) {
+
+		log("createFolder");
+		if (!Util.isOnline(this)){
+			Snackbar.make(fragmentContainer,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+			return;
+		}
+
+		if(isFinishing()){
+			return;
+		}
+
+		long parentHandle = cflF.getParentHandle();
+
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+
+		if (parentNode != null){
+			log("parentNode != null: " + parentNode.getName());
+			boolean exists = false;
+			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+			for (int i=0;i<nL.size();i++){
+				if (title.compareTo(nL.get(i).getName()) == 0){
+					exists = true;
+				}
+			}
+
+			if (!exists){
+				statusDialog = null;
+				try {
+					statusDialog = new ProgressDialog(this);
+					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog.show();
+				}
+				catch(Exception e){
+					return;
+				}
+
+				megaApi.createFolder(title, parentNode, this);
+			}
+			else{
+				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+			}
+		}
+		else{
+			log("parentNode == null: " + parentHandle);
+			parentNode = megaApi.getRootNode();
+			if (parentNode != null){
+				log("megaApi.getRootNode() != null");
+				boolean exists = false;
+				ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+				for (int i=0;i<nL.size();i++){
+					if (title.compareTo(nL.get(i).getName()) == 0){
+						exists = true;
+					}
+				}
+
+				if (!exists){
+					statusDialog = null;
+					try {
+						statusDialog = new ProgressDialog(this);
+						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog.show();
+					}
+					catch(Exception e){
+						return;
+					}
+
+					megaApi.createFolder(title, parentNode, this);
+				}
+				else{
+					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				}
+			}
+			else{
+				return;
+			}
+		}
+	}
+
+	private void showKeyboardDelayed(final View view) {
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +330,10 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 		contactPropertiesMainActivity=this;
 
+		handler = new Handler();
+
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
 
@@ -144,8 +346,8 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 			setContentView(R.layout.activity_main_contact_properties);
 
-			coodinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
-			coodinatorLayout.setFitsSystemWindows(false);
+			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
+			coordinatorLayout.setFitsSystemWindows(false);
 
 			//Set toolbar
 			tB = (Toolbar) findViewById(R.id.toolbar_main_contact_properties);
@@ -165,7 +367,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				log("aB is NULL!!!!");
 			}
 
-			fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_contact_properties);
+			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_contact_properties);
 			
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
@@ -237,14 +439,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
-				coodinatorLayout.setFitsSystemWindows(false);
+				coordinatorLayout.setFitsSystemWindows(false);
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
 	
 				break;
 			}
 			case CONTACT_FILE_LIST:{
 				log("Shared Folders are:");
-				coodinatorLayout.setFitsSystemWindows(true);
+				coordinatorLayout.setFitsSystemWindows(true);
 				aB.show();
 
 				if (cflF == null){
@@ -253,25 +455,12 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				cflF.setUserEmail(userEmail);
 	
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
-				coodinatorLayout.invalidate();
+				coordinatorLayout.invalidate();
 				break;
 			}
 		}
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelectedLollipop");
-		int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home: {
-				onBackPressed();
-				break;
-			}
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
 	public void leaveIncomingShare (MegaNode n){
 		log("leaveIncomingShare");
 		//TODO
@@ -1273,17 +1462,65 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			MegaError e) {
 		log("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_RENAME){
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+			try {
+				statusDialog.dismiss();
+			}
+			catch (Exception ex) {}
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_folder_created), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_folder_created), fragmentContainer);
+					}
+					cflF.setNodes();
+				}
+			}
+			else{
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_folder_no_created), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_folder_no_created), fragmentContainer);
+					}
+					cflF.setNodes();
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
+
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_correctly_renamed), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_correctly_renamed), fragmentContainer);
+					}
+				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_no_renamed), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_no_renamed), fragmentContainer);
+					}
+				}
 			}
 			log("rename nodes request finished");			
 		}
@@ -1293,11 +1530,30 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			} catch (Exception ex) {
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-				Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();				
-			} else {
-				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+			if (e.getErrorCode() == MegaError.API_OK){
+
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_correctly_copied), fragmentContainer);
+					}
+				}
 			}
+			else{
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_no_copied), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_no_copied), fragmentContainer);
+					}
+				}
+			}
+
 			log("copy nodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -1307,12 +1563,29 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_correctly_moved), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_correctly_moved), fragmentContainer);
+					}
+				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_no_moved), fragmentContainer);
+					}
+				}
 			}
-			log("move to rubbish request finished");
+			log("move request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
 			try { 
@@ -1348,5 +1621,12 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		
 	}
 
+	public void showSnackbar(String s, View view){
+		log("showSnackbar");
+		Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+		snackbarTextView.setMaxLines(5);
+		snackbar.show();
+	}
 
 }
