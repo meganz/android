@@ -8253,10 +8253,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (sNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
-			optionSendToInbox.setVisibility(View.GONE);
 		}else{
 			propertiesText.setText(R.string.general_file_info);
-			optionSendToInbox.setVisibility(View.VISIBLE);
 		}
 
 		int accessLevel = megaApi.getAccess(selectedNode);
@@ -8266,9 +8264,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionPermissions.setVisibility(View.GONE);
-		optionDelete.setVisibility(View.GONE);
 		optionRemoveTotal.setVisibility(View.GONE);
 		optionShare.setVisibility(View.GONE);
+		optionSendToInbox.setVisibility(View.VISIBLE);
 
 		if(inSFLol!=null){
 			int dBT=inSFLol.getDeepBrowserTree();
@@ -8287,7 +8285,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				optionClearShares.setVisibility(View.GONE);
 				optionRename.setVisibility(View.VISIBLE);
 				optionMoveTo.setVisibility(View.GONE);
-
+				if(inSFLol!=null){
+					int dBT=inSFLol.getDeepBrowserTree();
+					if(dBT>0){
+						optionDelete.setVisibility(View.VISIBLE);
+					}
+					else{
+						optionDelete.setVisibility(View.GONE);
+					}
+				}
 				break;
 			}
 			case MegaShare.ACCESS_READ: {
@@ -8296,6 +8302,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				optionRename.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
 				break;
 			}
 			case MegaShare.ACCESS_READWRITE: {
@@ -8304,7 +8311,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				optionRename.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
-
+				optionDelete.setVisibility(View.GONE);
 				break;
 			}
 		}
