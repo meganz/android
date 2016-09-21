@@ -20,7 +20,7 @@
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 tools:context=".ContactPropertiesActivityLollipop" />
 
-            <android.support.design.widget.CoordinatorLayout
+            <FrameLayout
                 android:id="@+id/fragment_container_contact_properties"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

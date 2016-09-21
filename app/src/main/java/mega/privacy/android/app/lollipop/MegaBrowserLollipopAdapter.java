@@ -778,7 +778,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			}
 			
-			if(type==Constants.INCOMING_SHARES_ADAPTER){
+			if(type==Constants.INCOMING_SHARES_ADAPTER||type==Constants.CONTACT_FILE_ADAPTER){
 				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 				holder.publicLinkImage.setVisibility(View.GONE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
