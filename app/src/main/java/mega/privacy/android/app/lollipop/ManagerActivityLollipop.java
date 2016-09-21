@@ -19,7 +19,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -118,6 +117,7 @@ import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -9901,31 +9901,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	/*
-	 * Background task to process files for uploading
-	 */
-	private class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
-		Context context;
-
-		FilePrepareTask(Context context){
-			log("FilePrepareTask::FilePrepareTask");
-			this.context = context;
-		}
-
-		@Override
-		protected List<ShareInfo> doInBackground(Intent... params) {
-			log("FilePrepareTask::doInBackGround");
-			return ShareInfo.processIntent(params[0], context);
-		}
-
-		@Override
-		protected void onPostExecute(List<ShareInfo> info) {
-			log("FilePrepareTask::onPostExecute");
-			filePreparedInfos = info;
-			onIntentProcessed();
-		}
-	}
-
 	void resetNavigationViewMenu(Menu menu){
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
@@ -10123,9 +10098,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	/*
 	 * Handle processed upload intent
 	 */
-	public void onIntentProcessed() {
+	public void onIntentProcessed(List<ShareInfo> infos) {
 		log("onIntentProcessedLollipop");
-		List<ShareInfo> infos = filePreparedInfos;
+//		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();

@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,7 +54,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -124,6 +126,17 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	Toolbar tB;
 	ActionBar aB;
+
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingUploadPanel;
+	public FrameLayout uploadOutLayout;
+	public LinearLayout uploadLayout;
+	public LinearLayout uploadImage;
+	public LinearLayout uploadAudio;
+	public LinearLayout uploadVideo;
+	public LinearLayout uploadFromSystem;
+	private UploadPanelListener uploadPanelListener;
+	////
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -368,6 +381,28 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			}
 
 			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_contact_properties);
+
+			//Sliding UPLOAD panel
+			slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
+			uploadLayout = (LinearLayout) findViewById(R.id.file_list_upload);
+			uploadOutLayout = (FrameLayout) findViewById(R.id.file_list_out_upload);
+			uploadImage = (LinearLayout) findViewById(R.id.file_list_upload_image_layout);
+			uploadAudio= (LinearLayout) findViewById(R.id.file_list_upload_audio_layout);
+			uploadVideo = (LinearLayout) findViewById(R.id.file_list_upload_video_layout);
+			uploadFromSystem = (LinearLayout) findViewById(R.id.file_list_upload_from_system_layout);
+
+			uploadPanelListener = new UploadPanelListener(this);
+
+			uploadImage.setOnClickListener(uploadPanelListener);
+			uploadAudio.setOnClickListener(uploadPanelListener);
+			uploadVideo.setOnClickListener(uploadPanelListener);
+			uploadFromSystem.setOnClickListener(uploadPanelListener);
+
+			uploadOutLayout.setOnClickListener(uploadPanelListener);
+
+			slidingUploadPanel.setVisibility(View.INVISIBLE);
+			slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+			//////
 			
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
@@ -375,13 +410,25 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		
 	}
 
-	public int getStatusBarHeight() {
-		int result = 0;
-		int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-		if (resourceId > 0) {
-			result = getResources().getDimensionPixelSize(resourceId);
+	public void showUploadPanel(){
+		log("showUploadPanel");
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
 		}
-		return result;
+
+		slidingUploadPanel.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
+
+	public void hideUploadPanel(){
+		log("hideUploadPanel");
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingUploadPanel.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -461,27 +508,63 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		}
 	}
 
-	public void leaveIncomingShare (MegaNode n){
-		log("leaveIncomingShare");
-		//TODO
-//		ProgressDialog temp = null;
-//		try{
-//			temp = new ProgressDialog(this);
-//			temp.setMessage(getString(R.string.leave_incoming_share)); 
-//			temp.show();
-//		}
-//		catch(Exception e){
-//			return;
-//		}
-//		statusDialog = temp;
-		megaApi.remove(n);
+	public void showConfirmationLeaveIncomingShare (final MegaNode n){
+		log("showConfirmationLeaveIncomingShare");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						//TODO remove the incoming shares
+						megaApi.remove(n);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void showConfirmationLeaveIncomingShare (final ArrayList<Long> handleList){
+		log("showConfirmationLeaveIncomingShare");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						//TODO remove the incoming shares
+						contactPropertiesMainActivity.leaveMultipleShares(handleList);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	public void leaveMultipleShares (ArrayList<Long> handleList){
 		
 		for (int i=0; i<handleList.size(); i++){
 			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-			this.leaveIncomingShare(node);
+			megaApi.remove(node);
 		}
 	}
 	
@@ -658,7 +741,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+											if(coordinatorFragment!=null){
+												showSnackbar(getString(R.string.general_download), coordinatorFragment);
+											}
+											else{
+												showSnackbar(getString(R.string.general_download), fragmentContainer);
+											}
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;
@@ -785,7 +874,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+								CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+								if(coordinatorFragment!=null){
+									showSnackbar(toastMessage, coordinatorFragment);
+								}
+								else{
+									showSnackbar(toastMessage, fragmentContainer);
+								}
 							}
 //						}
 						return;
@@ -1041,7 +1136,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			log("URL: " + url + "___SIZE: " + size);
 
 			downloadTo(parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
+
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.download_began), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.download_began), fragmentContainer);
+			}
 		} 
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {
@@ -1223,39 +1325,21 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				log("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.upload_began), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.upload_began), fragmentContainer);
+				}
 				startService(uploadServiceIntent);
 				i++;
 			}
-
 		}
 	}
 
-	/*
-	 * Background task to process files for uploading
-	 */
-	private class FilePrepareTask extends
-	AsyncTask<Intent, Void, List<ShareInfo>> {
-		Context context;
-
-		FilePrepareTask(Context context) {
-			this.context = context;
-		}
-
-		@Override
-		protected List<ShareInfo> doInBackground(Intent... params) {
-			return ShareInfo.processIntent(params[0], context);
-		}
-
-		@Override
-		protected void onPostExecute(List<ShareInfo> info) {
-			filePreparedInfos = info;
-			onIntentProcessed();
-		}
-	}
-
-	public void onIntentProcessed() {
-		List<ShareInfo> infos = filePreparedInfos;
+	public void onIntentProcessed(List<ShareInfo> infos) {
+//		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -1274,8 +1358,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
 					false, this);
 		} else {
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.upload_began), Toast.LENGTH_SHORT).show();
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.upload_began), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.upload_began), fragmentContainer);
+			}
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1289,6 +1378,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onBackPressed() {
+		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
+			log("slidingUploadPanel()!=PanelState.HIDDEN");
+			hideUploadPanel();
+			return;
+		}
+
+		log("Sliding UPLOAD options not shown");
+
 		if (cflF != null){
 			if (cflF.isVisible()){
 				if (cflF.onBackPressed() == 0){
