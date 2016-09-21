@@ -15,6 +15,11 @@ import java.util.ArrayList;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
@@ -25,8 +30,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface
-{
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
 	static final String USER_AGENT = "MEGAAndroid/3.0.11.4";
 	MegaApiAndroid megaApi;
@@ -35,7 +39,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	BackgroundRequestListener requestListener;
 	final static private String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
-	
+
+
+	MegaChatApiAndroid megaChatApi;
+
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
 //	/**
@@ -199,7 +206,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			requestListener = new BackgroundRequestListener();
 			log("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
-//			megaApi.addListener(this);
+			megaApi.addListener(this);
+
+			megaChatApi = new MegaChatApiAndroid(megaApi);
 		}
 		
 		return megaApi;
@@ -266,6 +275,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				ManagerActivity.logout(getApplicationContext(), megaApi, false);
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			megaChatApi.init(this);
+		}
 	}
 
 
@@ -275,6 +287,30 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			MegaError e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish(CHAT)");
+
+		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
+			megaChatApi.connect(this);
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 	}
 
 

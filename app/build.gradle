@@ -39,14 +39,14 @@ android {
         // abortOnError false
     }
 
-    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
-        workingDir 'src/main/jni'
-        commandLine './build.sh', 'all'
-    }
-
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn megaSDK
-    }
+//    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
+//        workingDir 'src/main/jni'
+//        commandLine './build.sh', 'all'
+//    }
+//
+//    tasks.withType(JavaCompile) {
+//        compileTask -> compileTask.dependsOn megaSDK
+//    }
 }
 
 dependencies {

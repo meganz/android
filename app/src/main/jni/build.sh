@@ -4,7 +4,7 @@ set -e
 ##################################################
 ### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
 ##################################################
-NDK_ROOT=${HOME}/android-ndk
+NDK_ROOT=${HOME}/adt-bundle/ndk/android-ndk-r10e
 ##################################################
 
 NDK_BUILD=${NDK_ROOT}/ndk-build
