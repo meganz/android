@@ -435,6 +435,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
+    public void resetAdapter(){
+        log("resetAdapter");
+        if(adapterList!=null){
+            adapterList.setPositionClicked(-1);
+        }
+    }
+
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);
     }

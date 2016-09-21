@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 9
         targetSdkVersion 24
-        versionCode 66
-        versionName "3.0.11.4"
+        versionCode 67
+        versionName "3.0.11.5"
     }
 
     sourceSets.main {
@@ -57,4 +57,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.0'
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
+    compile 'com.android.support:palette-v7:24.2.0'
+    compile 'io.github.rockerhieu:emojicon:1.4.1'
 }

@@ -2,12 +2,12 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.0.11.4</string>
+    <string name="app_version" context="Not translate">3.0.11.5</string>
     <string name="sdk_version" context="Not translate">755d8d7</string>
-    
+
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
-    
+
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> of </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
@@ -26,10 +26,10 @@
     <string name="general_move" context="button">Move</string>
     <string name="general_remove" context="button">Remove</string>
     <string name="general_share" context="button">Share</string>
-   	<string name="general_confirm" context="button">Confirm</string>
-   	<string name="general_leave" context="button">Leave</string>
-   	<string name="general_decryp" context="button">Decrypt</string>
-   	<string name="general_export" context="button">Export</string>
+    <string name="general_confirm" context="button">Confirm</string>
+    <string name="general_leave" context="button">Leave</string>
+    <string name="general_decryp" context="button">Decrypt</string>
+    <string name="general_export" context="button">Export</string>
 
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     <string name="general_loading" context="state previous to import a file">Loading</string>
@@ -38,7 +38,7 @@
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandwidth</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
-    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>  
+    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
     <string name="general_error_word" context="It will be followed by the error message">Error</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
     <string name="error_no_selection" context="when any file or folder is selected">No file or folder selected</string>
@@ -49,14 +49,14 @@
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
 
     <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
- 
-    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder</string>   
+
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">No external storage detected</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload</string>
-    
+
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are removing the exported recovery key file</string>
-    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
-     
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string>
+
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>
@@ -67,7 +67,7 @@
     <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">Are you sure you want to delete these items permanently?</string>
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
-    
+
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
 
     <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
@@ -97,48 +97,48 @@
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support@mega.nz for assistance</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close other sessions</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been closed</string>
-    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
-    
-     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>
+
+    <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">file</item>
         <item context="Plural of file. 2 files" quantity="other">files</item>
     </plurals>
-    
-     <plurals name="general_num_contacts">
-        <item quantity="one" context="referring to a contact in the contact list of the user">contact</item>
-        <item quantity="other" context="Title of the contact list">contacts</item>
+
+    <plurals name="general_num_contacts">
+        <item context="referring to a contact in the contact list of the user" quantity="one">contact</item>
+        <item context="Title of the contact list" quantity="other">contacts</item>
     </plurals>
-    
+
     <plurals name="general_num_folders">
-        <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
-        <item quantity="other" context="Plural of folder/directory. 2 folders">folders</item>
+        <item context="Singular of folder/directory. 1 folder" quantity="one">folder</item>
+        <item context="Plural of folder/directory. 2 folders" quantity="other">folders</item>
     </plurals>
-    
-   <plurals name="general_num_shared_folders">
-        <item quantity="one" context="Title of the incoming shared folders of a user in singular">shared folder</item>
-        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">shared folders</item>
+
+    <plurals name="general_num_shared_folders">
+        <item context="Title of the incoming shared folders of a user in singular" quantity="one">shared folder</item>
+        <item context="Title of the incoming shared folders of a user in plural." quantity="other">shared folders</item>
     </plurals>
-    
+
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
+        <item context="Item menu option upon clicking on one or multiple files. Singular" quantity="one">download</item>
+        <item context="Item menu option upon clicking on one or multiple files. Plural" quantity="other">downloads</item>
     </plurals>
-    
+
     <plurals name="general_num_uploads">
-        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
-        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
+        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Singular" quantity="one">upload</item>
+        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Plural" quantity="other">uploads</item>
     </plurals>
-    
-     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one" context="used for example when a folder is shared with 1 user">contact</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">contacts</item>
+
+    <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item context="used for example when a folder is shared with 1 user" quantity="one">contact</item>
+        <item context="used for example when a folder is shared with 2 or more users" quantity="other">contacts</item>
     </plurals>
-    
+
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     <string name="alert_larger_file" context="Alert text before download"> %s will be downloaded. Are you sure?</string>
     <string name="alert_no_app" context="Alert text before download"> There is no app to open the file %s. Do you want to continue with the download?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show again</string>
-     
+
     <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">E-mail</string>
     <string name="password_text" context="password label">Password</string>
@@ -170,109 +170,109 @@
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA\'s end-to-end encryption</string>
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
-    
+
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
     <string name="name_text" context="Name of the user">Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s Terms of Service</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
-    
+
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service</string>
-	<string name="error_enter_username" context="Warning dialog">Please enter your name</string>
+    <string name="error_enter_username" context="Warning dialog">Please enter your name</string>
     <string name="error_short_password" context="when creating the account">Password is too short</string>
     <string name="error_passwords_dont_match" context="when creating the account">Passwords do not match</string>
     <string name="error_email_registered" contect="when creating the account">This e-mail address has already registered an account with MEGA</string>
-    
+
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
     <string name="create_account_confirm" context="">Please check your e-mail and click the link to login and confirm your account</string>
     <string name="create_account_creating_account">Connecting to the server: Creating account</string>
-    
+
     <string name="cancel_transfer_title">Cancel Transfer</string>
     <string name="cancel_transfer_confirmation">The transfer will be cancelled, are you sure you want to continue?</string>
     <string name="cancel_all_transfer_confirmation">All transfers will be cancelled, are you sure you want to continue?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
-	<string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
-	<string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
-	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
-	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
-	<string name="section_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
-	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
-	<string name="section_contacts" context="Title of the contact list">Contacts</string>
-	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
-	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
-	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
-	<string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
-	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
+    <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
+    <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
+    <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
+    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
+    <string name="section_contacts" context="Title of the contact list">Contacts</string>
+    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
+    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
+    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
+    <string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
+    <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
 
-	<string name="section_account" context="button to the settings of the user\'s account">My Account</string>
-	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
-	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
-	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
-	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
-	
-	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
-	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
-	
-	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No files in your Cloud Drive</string>
-	<string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
-	<string name="empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
-	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
-	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
+    <string name="section_account" context="button to the settings of the user\'s account">My Account</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
+    <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
+    <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
+    <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
+
+    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
+    <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
+
+    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No files in your Cloud Drive</string>
+    <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
+    <string name="empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
+    <string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
+    <string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
     <string name="empty_inbox" context="Text that indicates that Inbox is empty">Inbox Empty</string>
-    
+
     <string name="choose_account_activity" context="Title of the activity Choose Account">Choose Account</string>
-	
-	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
-	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Available offline</string>
-	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
-	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
-	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Size: </string>
-	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Content: </string>
-	<string name="file_properties_info_added" context="when was the file added in MEGA">Added: </string>
-	<string name="file_properties_info_modified" context="when was the file modified">Modified: </string>
-	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
-	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
-	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
-	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
-	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
-	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
-	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Share Permissions</string>
-	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
-	<string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Shared with</string>
-	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
-	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
+
+    <string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
+    <string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Available offline</string>
+    <string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
+    <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
+    <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size: </string>
+    <string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Content: </string>
+    <string name="file_properties_info_added" context="when was the file added in MEGA">Added: </string>
+    <string name="file_properties_info_modified" context="when was the file modified">Modified: </string>
+    <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
+    <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
+    <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
+    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
+    <string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
+    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
+    <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Share Permissions</string>
+    <string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
+    <string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Shared with</string>
+    <string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
+    <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Invite</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
-	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
-	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
-	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
-	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>	
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>	
-	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
-	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
-	
-	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
+    <string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
+    <string name="contact_decline" context="option to decline a contact invitation">Decline</string>
+    <string name="contact_accept" context="option to accept a contact invitation">Accept</string>
+    <string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+    <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
+    <string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>
+    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>
+    <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 
-	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
-	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
-	
-	<string name="download_failed" context="Error message">Download failed</string>
-	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">downloaded</string>
-	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Downloading</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
-	<string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
+    <string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
+
+    <string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
+    <string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
+
+    <string name="download_failed" context="Error message">Download failed</string>
+    <string name="download_downloaded" context="notification message. Example: 1 file downloaded">downloaded</string>
+    <string name="download_downloading" context="Title header on the download page while the file is downloading.">Downloading</string>
+    <string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
+    <string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
     <string name="download_began" context="message when the download starts">Download has started</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Touch to cancel download</string>
     <string name="download_touch_to_show" context="Hint how to cancel the download">Touch to show all the transfers</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can\'t download files greater than 4GB. Your download will probably fail</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">There isn\'t any available app to execute this file on your device</string>
-	
+
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
@@ -318,7 +318,7 @@
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
-	<string name="leave_incoming_share" context="status text">Leaving shared folder</string>
+    <string name="leave_incoming_share" context="status text">Leaving shared folder</string>
     <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Camera folder</string>
     <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Contacts</string>
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
@@ -386,7 +386,7 @@
     <string name="context_select_one_file" context="option available for just one file">Select just one file</string>
     <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish Bin emptied successfully</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The Rubbish Bin has not be emptied</string>
-    
+
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here</string>
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Dismiss</string>
@@ -394,55 +394,55 @@
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancel Subscription</string>
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
-    
+
     <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
     <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-  
+
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">New folder</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Add contact</string>
     <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">Add contact and share</string>
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
-    
+
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please enter the decryption key for the link</string>
-        
+
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
-	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
-	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
-	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
-	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
-	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
-	<string name="upload_uploading" context="status text">Uploading</string>
-	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Touch to cancel upload</string>
-	<string name="upload_failed" context="error message">Upload failed</string>
-	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">uploaded</string>
-	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
-	<string name="upload_prepare" context="Status text at the beginning of an upload">Processing file</string>
-	<string name="error_temporary_unavaible" context="error message when downloading a file">Resource temporarily not available, please try again later</string>
-	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Cannot open selected file</string>
-	<string name="upload_began" context="when an upload starts, a message is shown to the user">Upload has started</string>
-	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
-		
-	<string name="error_io_problem" context="error message while browsing the local filesystem">Filesystem problem</string>
-	<string name="general_error" context="error message while browsing the local filesystem">Error happened when executing the action</string>
-	
-	<string name="full_screen_image_viewer_label" context="title of the image gallery">Image Viewer</string>
-	
-	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Incorrect link format</string>
-	
-	<string name="my_account_activity" context="Title of the screen where the user account information is shown">Account</string>
+    <string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
+    <string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
+    <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
+    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
+    <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
+    <string name="upload_uploading" context="status text">Uploading</string>
+    <string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Touch to cancel upload</string>
+    <string name="upload_failed" context="error message">Upload failed</string>
+    <string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">uploaded</string>
+    <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
+    <string name="upload_prepare" context="Status text at the beginning of an upload">Processing file</string>
+    <string name="error_temporary_unavaible" context="error message when downloading a file">Resource temporarily not available, please try again later</string>
+    <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Cannot open selected file</string>
+    <string name="upload_began" context="when an upload starts, a message is shown to the user">Upload has started</string>
+    <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
+
+    <string name="error_io_problem" context="error message while browsing the local filesystem">Filesystem problem</string>
+    <string name="general_error" context="error message while browsing the local filesystem">Error happened when executing the action</string>
+
+    <string name="full_screen_image_viewer_label" context="title of the image gallery">Image Viewer</string>
+
+    <string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Incorrect link format</string>
+
+    <string name="my_account_activity" context="Title of the screen where the user account information is shown">Account</string>
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Storage Space</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
-     <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
-    
+    <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
+
     <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
     <string name="my_account_last_session" context="when did the last session happen">Last session</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections</string>
-    
+
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Changing password</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Current password</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">New password</string>
@@ -450,41 +450,41 @@
     <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password or the new passwords you provided do not match. Please try again</string>
     <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password. Please try again</string>
     <string name="my_account_change_password_OK" context="Success text">Password changed successfully</string>
-    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Password doesn\'t match</string> 
-    
+    <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Password doesn\'t match</string>
+
     <string name="upgrade_activity" context="title of the Upgrade screen">Pro Membership</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Select membership</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Monthly or annually recurring</string>
     <string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>
-    
+
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
     <string name="no_available_payment_method" context="choose the payment method option when no method is available">At this moment, no method of payment is available for this plan</string>
     <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">Mobile Carrier (one-off)</string>
     <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet (subscription)</string>
-    
+
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>
-    
+
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled anytime before the renewal date</string>
-    
+
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">The link has been copied to the clipboard</string>
     <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
-    
+
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Please, log out before creating the account</string>
-    
+
     <string name="import_correct" context="success message after import a file">Imported successfully</string>
-    
+
     <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">No active transfers</string>
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">All transfers are paused</string>
     <string name="menu_pause_transfers" context="menu item">Pause transfers</string>
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
     <string name="menu_cancel_all_transfers" context="menu item">Cancel all transfers</string>
     <string name="menu_take_picture" context="menu item">Take picture</string>
-    
+
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">WiFi only</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or data plan</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
@@ -495,21 +495,21 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading files of media folders</string>
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads complete</string>
-    
+
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
-    
+
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced Features</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
-    
-    <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>    
+
+    <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating</string>
-    
+
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Default download location</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask for download location</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
-    
+
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
         <item context="internal storage option">Internal storage</item>
         <item context="external storage option">External storage</item>
@@ -519,50 +519,50 @@
         <item context="write option">Write the user\'s e-mail</item>
         <item context="import from phone option">Import from device</item>
     </string-array>
-    
+
     <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
     <string name="settings_camera_upload_turn_on" context="settings option">Turn on Camera Uploads</string>
     <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
-    
+
     <string name="settings_secondary_upload_on" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Enable Secondary Media Uploads</string>
     <string name="settings_secondary_upload_off" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Disable Secondary Media Uploads</string>
-    
+
     <string name="settings_empty_folder" context="settings option">Choose folder</string>
-    
+
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
         <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or data plan</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">WiFi only</item>
     </string-array>
-    
+
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">File Upload</string>
-    
+
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
         <item context="the options of what to upload.">Photos only</item>
         <item context="the options of what to upload.">Videos only</item>
         <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
-    
+
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
-    
+
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
     <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">MEGA Camera Uploads Folder</string>
-    
+
     <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Local Secondary folder</string>
     <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">MEGA Secondary Folder</string>
-    
+
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos only</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos only</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
-    
+
     <string name="settings_pin_lock_on" context="settings of the pin lock">Enable PIN Lock</string>
     <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
-    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string> 
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Reset PIN code</string> 
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Reset PIN code</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
-    
+
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
@@ -573,7 +573,7 @@
     <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Enter your new PIN Code</string>
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-Enter your new PIN Code</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">All your local data will be deleted and you will be logged out in %d seconds</string>
-    
+
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">About</string>
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
@@ -593,11 +593,11 @@
     <string name="october">October</string>
     <string name="november">November</string>
     <string name="december">December</string>
-    
+
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP Browser</string>
-    
+
     <string name="new_account" context="in login screen to create a new account">Create account now!</string>
-    
+
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
     <string name="expires_on" context="title of the Expiration Date">Expires on </string>
     <string name="free_account">FREE</string>
@@ -605,12 +605,12 @@
     <string name="pro1_account" context="Not translate">Pro I</string>
     <string name="pro2_account" context="Not translate">Pro II</string>
     <string name="pro3_account" context="Not translate">Pro III</string>
-    
-    <string name="free_storage" context="Not translate">50 GB</string>   
+
+    <string name="free_storage" context="Not translate">50 GB</string>
     <string name="free_bandwidth" context="Free bandwich account details">Limited</string>
-    
+
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Camera Uploads folder created</string>
-    
+
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The ZIP file will be downloaded and unzipped</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The ZIP file will be unzipped </string>
 
@@ -618,20 +618,20 @@
     <string name="sortby_name" context="category in sort by action">Name</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
-    
+
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Creation Date</string>
     <string name="sortby_modification_date" context="category in sort by action">Modification Date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
-    
+
     <string name="sortby_size" context="category in sort by action">Size</string>
     <string name="sortby_size_largest_first" context="sort files by size largest first">largest</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest</string>
-    
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
-    
+
     <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your billing details:</string>
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Address 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Address 2 (optional)</string>
@@ -639,7 +639,7 @@
     <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State / Province</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">Country</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postal code</string>
-    
+
     <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your payment details:</string>
     <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">First name</string>
     <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Last name</string>
@@ -647,9 +647,9 @@
     <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Month</string>
     <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Year</string>
     <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
-    
+
     <string name="proceed_cc" context="Text of the button which proceeds the payment">Proceed</string>
-    
+
     <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account successfully upgraded!</string>
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation failed. Your credit card has not been charged</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">The credit card information is not correct. The credit card will not be charged</string>
@@ -795,8 +795,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
 
     <plurals name="general_num_request">
-        <item quantity="one" context="referring to a invitation request in the Contacts section">request</item>
-        <item quantity="other" context="referring to a invitation request in the Contacts section">requests</item>
+        <item context="referring to a invitation request in the Contacts section" quantity="one">request</item>
+        <item context="referring to a invitation request in the Contacts section" quantity="other">requests</item>
     </plurals>
 
     <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">Remove shares?</string>
@@ -818,8 +818,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
     <plurals name="general_num_items">
-        <item quantity="one" context="Singular of items which contains a folder. 1 item">item</item>
-        <item quantity="other" context="Plural of items which contains a folder. 2 items">items</item>
+        <item context="Singular of items which contains a folder. 1 item" quantity="one">item</item>
+        <item context="Plural of items which contains a folder. 2 items" quantity="other">items</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
@@ -844,19 +844,25 @@
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
 
     <plurals name="general_minutes">
-        <item quantity="one" context="Singular of minutes. 1 minute">minute</item>
-        <item quantity="other" context="Plural of minutes. 2 minute">minutes</item>
+        <item context="Singular of minutes. 1 minute" quantity="one">minute</item>
+        <item context="Plural of minutes. 2 minute" quantity="other">minutes</item>
     </plurals>
 
     <plurals name="general_hours">
-        <item quantity="one" context="Singular of hours. 1 hour">hour</item>
-        <item quantity="other" context="Plural of hours. 2 hours">hours</item>
+        <item context="Singular of hours. 1 hour" quantity="one">hour</item>
+        <item context="Plural of hours. 2 hours" quantity="other">hours</item>
     </plurals>
 
     <plurals name="general_seconds">
-        <item quantity="one" context="Singular of seconds. 1 second">second</item>
-        <item quantity="other" context="Plural of seconds. 2 second">seconds</item>
+        <item context="Singular of seconds. 1 second" quantity="one">second</item>
+        <item context="Plural of seconds. 2 second" quantity="other">seconds</item>
     </plurals>
+
+    <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">h</string>
+    <string name="initial_minute" context="Initial of the word minute to show the duration of a video or audio call">m</string>
+    <string name="initial_second" context="Initial of the word second to show the duration of a video or audio call">s</string>
+
+    <string name="videocall_item" context="Info shown about the last action in a chat is a videocall">Video call</string>
 
     <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d selected</string>
     <string name="action_mute" context="Menu item">Mute</string>
@@ -878,4 +884,14 @@
     <string name="chat_me_text" context="Word next to own user's message in chat screen">Me</string>
     <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Type a message</string>
 
+    <string name="general_mute" context="button">Mute</string>
+
+    <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
+    <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Chat message sound</string>
+    <string name="title_properties_chat_contact_call_sound" context="Title of the section to choose the ringtone of incoming calls in the Contact Properties screen">Call ringtone</string>
+    <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat</string>
+    <string name="title_properties_chat_share_contact" context="Title of the section to share the contact in the Contact Properties screen">Share contact</string>
+
+    <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Call ringtone</string>
+    <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Notification sound</string>
 </resources>
