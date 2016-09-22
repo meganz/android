@@ -533,7 +533,14 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			case MegaShare.ACCESS_FULL: {
 				optionMoveTo.setVisibility(View.VISIBLE);
 				optionRename.setVisibility(View.VISIBLE);
-				optionDelete.setVisibility(View.GONE);
+
+				if(parentHandleStack.isEmpty()||parentHandle==-1){
+					optionDelete.setVisibility(View.GONE);
+				}
+				else{
+					optionDelete.setVisibility(View.VISIBLE);
+				}
+
 				break;
 			}
 			case MegaShare.ACCESS_READ: {
@@ -1221,7 +1228,19 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				handleList.add(selectedNode.getHandle());									
 				((ContactPropertiesActivityLollipop) context).showCopyLollipop(handleList);
 				break;
-			}	
+			}
+			case R.id.contact_file_list_option_delete_layout:{
+				log("Delete/Move to rubbish option");
+				hideOptionsPanel();
+				if(selectedNode==null){
+					log("The selected node is NULL");
+					return;
+				}
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+				((ContactPropertiesActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+				break;
+			}
 		}
 	}
 
