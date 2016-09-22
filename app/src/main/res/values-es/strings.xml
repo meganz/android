@@ -850,4 +850,6 @@
         <item quantity="one" context="Singular of seconds. 1 second">segundo</item>
         <item quantity="other" context="Plural of seconds. 2 second">segundos</item>
     </plurals>
+
+    <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Cargando los contactos del teléfono...</string>
 </resources>

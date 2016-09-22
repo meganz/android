@@ -50,15 +50,13 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/posix/fs.cpp  \
     sdk/src/posix/waiter.cpp \
     sdk/src/mega_utf8proc.cpp \
-    sdk/src/posix/waiter.cpp \
-    sdk/src/posix/net.cpp \
     sdk/src/gfx.cpp \
     sdk/src/gfx/external.cpp \
     sdk/src/thread/posixthread.cpp \
     sdk/src/logging.cpp \
     sdk/src/mega_http_parser.cpp
     
-C_SOURCES = sdk/third_party/glob/glob.c
+C_SOURCES = sdk/src/mega_glob.c
 
 HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/account.h \
@@ -101,7 +99,7 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/posix/megafs.h  \
         sdk/include/mega/posix/megawaiter.h \
         sdk/include/mega/config-android.h \
-        sdk/third_party/glob/glob.h \
+        sdk/include/mega/mega_glob.h \
         sdk/include/mega/gfx/external.h \
         sdk/include/mega/thread/posixthread.h \
         sdk/include/mega/logging.h \

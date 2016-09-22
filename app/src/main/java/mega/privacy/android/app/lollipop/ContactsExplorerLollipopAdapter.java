@@ -122,7 +122,7 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 	MegaApiAndroid megaApi;
 	OnItemClickListener mItemClickListener;
 	private List<MegaUser> contactsFromMEGA;
-//	private List<PhoneContacts> contactsFromPhone;
+//	private List<PhoneContactInfo> contactsFromPhone;
 //	private boolean megaContacts = true;
 	
 	private OnItemCheckClickListener checkClickListener;

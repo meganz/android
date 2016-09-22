@@ -597,9 +597,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				removeShare = false;
 				changeShare = false;
 
-		    	Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-		    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
-		    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+		    	Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+		    	intent.setClass(this, AddContactActivityLollipop.class);
+		    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 		    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		    	
 	        	return true;
@@ -862,9 +862,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				removeShare = false;
 				changeShare = false;
 
-				Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-				intent.setClass(this, ContactsExplorerActivityLollipop.class);
-				intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+				Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+				intent.setClass(this, AddContactActivityLollipop.class);
+				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 				break;
 			}
@@ -1001,8 +1001,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				return;
 			}
 			
-			final ArrayList<String> emails = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
+			final ArrayList<String> emails = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+			final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 			
 			if(nodeHandle!=-1){
 				node=megaApi.getNodeByHandle(nodeHandle);

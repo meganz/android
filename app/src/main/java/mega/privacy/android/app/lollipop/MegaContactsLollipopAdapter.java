@@ -47,6 +47,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
+	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
 	
 	Context context;
 	int positionClicked;
@@ -194,7 +195,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
     
 	    dbH = DatabaseHandler.getDbHandler(context);
 	    
-	    if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+	    if (viewType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 	   
 		    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);
 	
@@ -218,7 +219,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	
 			return holderList;
 	    }
-	    else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+	    else if (viewType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 	    	
 	    	View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_grid, parent, false);
 	    	
@@ -237,6 +238,31 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    
 	    	return holderGrid;	    	
 	    }
+		else if (viewType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT){
+			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);
+
+			holderList = new ViewHolderContactsList(v);
+			holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);
+			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
+			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
+			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
+			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
+			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
+
+			//Right margin
+			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
+			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
+			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+
+			holderList.itemLayout.setTag(holderList);
+			holderList.itemLayout.setOnClickListener(this);
+
+			holderList.imageButtonThreeDots.setVisibility(View.GONE);
+
+			v.setTag(holderList);
+
+			return holderList;
+		}
 	    else{
 	    	return null;
 	    }
@@ -246,13 +272,17 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public void onBindViewHolder(ViewHolderContacts holder, int position) {
 		log("onBindViewHolder");
 		
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+		if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			ViewHolderContactsList holderList = (ViewHolderContactsList) holder;
 			onBindViewHolderList(holderList, position);
 		}
-		else if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+		else if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 			ViewHolderContactsGrid holderGrid = (ViewHolderContactsGrid) holder;
 			onBindViewHolderGrid(holderGrid, position);
+		}
+		else if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT){
+			ViewHolderContactsList holderList = (ViewHolderContactsList) holder;
+			onBindViewHolderListAddContact(holderList, position);
 		}
 	}
 	
@@ -381,6 +411,11 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);	
+	}
+
+	public void onBindViewHolderListAddContact(ViewHolderContactsList holder, int position){
+		onBindViewHolderList(holder, position);
+		holderList.imageButtonThreeDots.setVisibility(View.GONE);
 	}
 	
 	public void onBindViewHolderList(ViewHolderContactsList holder, int position){
@@ -639,6 +674,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		else if (adapterType == ITEM_VIEW_TYPE_GRID){
 			holder.contactInitialLetter.setTextSize(64);
 		}
+		else if (adapterType == ITEM_VIEW_TYPE_LIST_ADD_CONTACT){
+			holder.contactInitialLetter.setTextSize(24);
+		}
 	}
 		
 	private int getAvatarTextSize (float density){
@@ -791,6 +829,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
     
 	@Override
 	public void onClick(View v) {
+		log("onClick _ adapterType: " + adapterType);
 		if (adapterType == ITEM_VIEW_TYPE_LIST){
 			ViewHolderContactsList holder = (ViewHolderContactsList) v.getTag();
 			int currentPosition = holder.currentPosition;
@@ -798,6 +837,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			
 			switch (v.getId()){			
 				case R.id.contact_list_three_dots:{
+					log("contact_list_three_dots");
 					if (positionClicked == -1){
 						positionClicked = currentPosition;
 						notifyDataSetChanged();
@@ -816,7 +856,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					break;
 				}			
 				case R.id.contact_list_item_layout:{
-					((ContactsFragmentLollipop) fragment).itemClick(currentPosition);	
+					log("contact_list_item_layout");
+					if (fragment != null){
+						((ContactsFragmentLollipop) fragment).itemClick(currentPosition);
+					}
 					break;
 				}
 			}
@@ -846,7 +889,22 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					break;
 				}			
 				case R.id.contact_grid_item_layout:{
-					((ContactsFragmentLollipop) fragment).itemClick(currentPosition);	
+					if (fragment != null){
+						((ContactsFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					break;
+				}
+			}
+		}
+		else if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT){
+			ViewHolderContactsList holder = (ViewHolderContactsList) v.getTag();
+			int currentPosition = holder.currentPosition;
+			MegaUser c = (MegaUser) getItem(currentPosition);
+
+			switch (v.getId()){
+				case R.id.contact_list_item_layout: {
+					log("contact_list_item_layout");
+					((AddContactActivityLollipop) context).itemClick(c.getEmail());
 					break;
 				}
 			}

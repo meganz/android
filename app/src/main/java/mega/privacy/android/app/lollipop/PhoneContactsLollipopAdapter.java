@@ -1,12 +1,15 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -18,6 +21,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,72 +48,51 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	DatabaseHandler dbH = null;
 
-	private class UserAvatarListenerExplorer implements MegaRequestListenerInterface{
+	private class ContactPicture extends AsyncTask<Void, Void, Long> {
 
 		Context context;
 		ViewHolderPhoneContactsLollipop holder;
 		PhoneContactsLollipopAdapter adapter;
+		Bitmap photo = null;
 
-		public UserAvatarListenerExplorer(Context context, ViewHolderPhoneContactsLollipop holder, PhoneContactsLollipopAdapter adapter) {
+
+		public ContactPicture(Context context, ViewHolderPhoneContactsLollipop holder, PhoneContactsLollipopAdapter adapter) {
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
 		}
 
 		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			log("onRequestStart()");
+		protected Long doInBackground(Void... args) {
+			log("doInBackGround");
+
+			try {
+				InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
+						ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
+
+				if (inputStream != null) {
+					photo = BitmapFactory.decodeStream(inputStream);
+				}
+
+				assert inputStream != null;
+				inputStream.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return new Long(holder.contactId);
 		}
 
+
 		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request,
-				MegaError e) {
-			log("onRequestFinish()");
-			if (e.getErrorCode() == MegaError.API_OK){
-
-				pendingAvatars.remove(request.getEmail());
-
-				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = null;
-					if (context.getExternalCacheDir() != null){
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					else{
-						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					Bitmap bitmap = null;
-					if (avatar.exists()){
-						if (avatar.length() > 0){
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (bitmap == null) {
-								avatar.delete();
-							}
-							else{
-								holder.imageView.setImageBitmap(bitmap);
-								holder.initialLetter.setVisibility(View.GONE);
-							}
-						}
-					}
+		protected void onPostExecute(Long id) {
+			if (photo != null){
+				if (holder.contactId == id){
+					holder.imageView.setImageBitmap(photo);
 					adapter.notifyDataSetChanged();
 				}
 			}
 		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api,
-				MegaRequest request, MegaError e) {
-			log("onRequestTemporaryError");
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
 
 	// Listener for item check
@@ -119,13 +103,13 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	private Context mContext;
 	MegaApiAndroid megaApi;
 	OnItemClickListener mItemClickListener;
-	private List<PhoneContactsActivityLollipop.PhoneContacts> phoneContacts;
-//	private List<PhoneContacts> contactsFromPhone;
+	private List<PhoneContactInfo> phoneContacts;
+//	private List<PhoneContactInfo> contactsFromPhone;
 //	private boolean megaContacts = true;
 
 	private OnItemCheckClickListener checkClickListener;
 
-	public PhoneContactsLollipopAdapter(Context context, ArrayList<PhoneContactsActivityLollipop.PhoneContacts> phoneContacts) {
+	public PhoneContactsLollipopAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts) {
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -142,12 +126,12 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	}
 
 	// Set new contacts
-	public void setContacts(List<PhoneContactsActivityLollipop.PhoneContacts> phoneContacts){
+	public void setContacts(List<PhoneContactInfo> phoneContacts){
 		this.phoneContacts = phoneContacts;
 		notifyDataSetChanged();
 	}
 
-	public PhoneContactsActivityLollipop.PhoneContacts getDocumentAt(int position)
+	public PhoneContactInfo getDocumentAt(int position)
 	{
 		if(position < phoneContacts.size())
 		{
@@ -168,7 +152,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 	}
 
-    public PhoneContactsActivityLollipop.PhoneContacts getItem(int position) {
+    public PhoneContactInfo getItem(int position) {
 
 		if(position < phoneContacts.size())
 		{
@@ -225,7 +209,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		
 		View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
 		ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
-		
+
 		holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_explorer_name);
 		holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
 //		holder.phoneEmailTextView.setVisibility(View.GONE);
@@ -244,10 +228,15 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		boolean isCheckable = false;
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		PhoneContactsActivityLollipop.PhoneContacts contact = (PhoneContactsActivityLollipop.PhoneContacts) getItem(position);
+		PhoneContactInfo contact = (PhoneContactInfo) getItem(position);
 
 		holder.currentPosition = position;
 		holder.contactMail = contact.getEmail();
+		holder.contactName = contact.getName();
+		holder.contactId = contact.getId();
+
+		holder.contactNameTextView.setText(contact.getName());
+		holder.phoneEmailTextView.setText(contact.getEmail());
 		
 //		if (isCheckable) {
 //			View checkArea = rowView.findViewById(R.id.checkbox);
@@ -259,12 +248,23 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 //			});
 //		}
 		
-		createDefaultAvatar(holder, true);
-		
-		UserAvatarListenerExplorer listener = new UserAvatarListenerExplorer(mContext, holder, this);
+		createDefaultAvatar(holder, false);
 
-		holder.contactNameTextView.setText(contact.getName());
-		holder.phoneEmailTextView.setText(contact.getEmail());
+//		ContactPicture task = new ContactPicture(mContext, holder, this);
+
+		try {
+			InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
+					ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
+
+			if (inputStream != null) {
+				Bitmap photo = BitmapFactory.decodeStream(inputStream);
+				holder.imageView.setImageBitmap(photo);
+				inputStream.close();
+				holder.initialLetter.setVisibility(View.GONE);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void createDefaultAvatar(ViewHolderPhoneContactsLollipop holder, boolean isMegaContact){

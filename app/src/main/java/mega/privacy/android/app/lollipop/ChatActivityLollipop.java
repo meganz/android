@@ -11,6 +11,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -23,7 +24,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -35,6 +38,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 
+import io.github.rockerhieu.emojicon.EmojiconEditText;
+import io.github.rockerhieu.emojicon.EmojiconGridFragment;
+import io.github.rockerhieu.emojicon.EmojiconsFragment;
+import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
@@ -49,7 +56,7 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     MegaApiAndroid megaApi;
     Handler handler;
@@ -74,11 +81,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     RelativeLayout chatRelativeLayout;
     TextView inviteText;
     ImageButton keyboardButton;
-    EditText textChat;
+    EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
     ScrollView inviteScrollView;
     FloatingActionButton fab;
+    FrameLayout emojiKeyboardLayout;
 
     RecyclerView listView;
     MegaLinearLayoutManager mLayoutManager;
@@ -111,6 +119,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
 
     DatabaseHandler dbH = null;
 
+    int keyboardSize = -1;
+    int firstSize = -1;
+
+    boolean emojiKeyboardShown = false;
+    boolean softKeyboardShown = false;
+
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
@@ -122,6 +136,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     };
 
     private ActionMode actionMode;
+
+    @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(textChat, emojicon);
+    }
+
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(textChat);
+    }
 
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -199,7 +223,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         inviteScrollView = (ScrollView) findViewById(R.id.message_scroll_view_chat_layout);
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
-        textChat = (EditText) findViewById(R.id.edit_text_chat);
+        textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
+        keyboardButton.setOnClickListener(this);
 
         textChat.addTextChangedListener(new TextWatcher() {
 
@@ -225,6 +250,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
             public boolean onTouch(View v, MotionEvent event) {
                 if(uploadPanel.getVisibility()==View.VISIBLE){
                     hideUploadPanel();
+                }
+                if (emojiKeyboardShown){
+//                    int inputType = textChat.getInputType();
+//                    textChat.setInputType(InputType.TYPE_NULL);
+//                    textChat.onTouchEvent(event);
+//                    textChat.setInputType(inputType);
+//
+//                    float x = event.getX();
+//                    float y = event.getY();
+//
+//                    int touchPosition = textChat.getOffsetForPosition(x, y);
+//                    Toast.makeText(ChatActivityLollipop.this, "X: " + x + "__ Y " + y + "__TOUCHPOSITION: " + touchPosition, Toast.LENGTH_SHORT).show();
+//                    if (touchPosition  > 0){
+//                        textChat.setSelection(touchPosition);
+//                    }
+////                    InputMethodManager imm = (InputMethodManager) getSystemService(ChatActivityLollipop.this.INPUT_METHOD_SERVICE);
+////                    imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
+//
+//                    return true;
+
+                    removeEmojiconFragment();
                 }
                 return false;
             }
@@ -265,6 +311,51 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
 
         uploadContactOption = (RelativeLayout) findViewById(R.id.upload_contact_chat);
         uploadContactOption.setOnClickListener(this);
+
+        emojiKeyboardLayout = (FrameLayout) findViewById(R.id.chat_emoji_keyboard);
+
+        ViewTreeObserver viewTreeObserver = fragmentContainer.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+
+                @Override
+                public void onGlobalLayout() {
+                    log("onGlobalLayout");
+                    InputMethodManager imm = (InputMethodManager) ChatActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    if (firstSize == -1){
+                        if (messagesContainerLayout != null){
+                            firstSize = messagesContainerLayout.getHeight();
+                            Toast.makeText(ChatActivityLollipop.this, "FIRSTSIZE: " + firstSize, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else {
+                        if (keyboardSize == -1) {
+                            if (imm.isAcceptingText()) {
+                                if (messagesContainerLayout != null) {
+                                    keyboardSize = firstSize - messagesContainerLayout.getHeight();
+                                    Toast.makeText(ChatActivityLollipop.this, "KS: " + keyboardSize, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    }
+
+                    if ((firstSize - messagesContainerLayout.getHeight()) > 150 ) { //Every keyboard is at least 180 px height
+                        if (!emojiKeyboardShown){
+                            softKeyboardShown = true;
+                        }
+                    }
+                    else{
+                        softKeyboardShown = false;
+                    }
+
+                    if (shouldShowEmojiKeyboard){
+                        setEmojiconFragment(false);
+                        shouldShowEmojiKeyboard = false;
+                    }
+                }
+            });
+        }
 
         Intent newIntent = getIntent();
 
@@ -484,6 +575,62 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
     }
 
+    EmojiconsFragment emojiconsFragment = null;
+    boolean firstTimeEmoji = true;
+    boolean shouldShowEmojiKeyboard = false;
+
+    private void setEmojiconFragment(boolean useSystemDefault) {
+        log("setEmojiconFragment(" + useSystemDefault + ")");
+        if (firstTimeEmoji) {
+            emojiconsFragment = EmojiconsFragment.newInstance(useSystemDefault);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.chat_emoji_keyboard, emojiconsFragment)
+                    .commitNow();
+            firstTimeEmoji = false;
+        }
+
+        if (keyboardSize != -1) {
+            if (keyboardSize == 0){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
+                params.height = 660;
+                Toast.makeText(this, "KE2: " + keyboardSize, Toast.LENGTH_SHORT).show();
+                emojiKeyboardLayout.setLayoutParams(params);
+            }
+            else {
+                if (emojiKeyboardLayout != null) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
+                    params.height = keyboardSize;
+                    Toast.makeText(this, "KE3: " + keyboardSize, Toast.LENGTH_SHORT).show();
+                    emojiKeyboardLayout.setLayoutParams(params);
+                }
+            }
+        }
+        else{
+            if (emojiKeyboardLayout != null) {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
+                params.height = 660;
+                Toast.makeText(this, "KE1: " + keyboardSize, Toast.LENGTH_SHORT).show();
+                emojiKeyboardLayout.setLayoutParams(params);
+            }
+        }
+        emojiKeyboardShown = true;
+    }
+
+    private void removeEmojiconFragment(){
+        log("removeEmojiconFragment");
+        if (emojiconsFragment != null){
+//            getSupportFragmentManager().beginTransaction().remove(emojiconsFragment).commitNow();
+
+            if (emojiKeyboardLayout != null) {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
+                params.height = 0;
+                emojiKeyboardLayout.setLayoutParams(params);
+            }
+        }
+        emojiKeyboardShown = false;
+    }
+
     @Override
     public void onDestroy(){
 
@@ -535,11 +682,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
+
         if(uploadPanel.getVisibility()==View.VISIBLE){
             hideUploadPanel();
             return;
         }
-        finish();
+
+        if (emojiKeyboardShown) {
+            removeEmojiconFragment();
+        }
+        else{
+            finish();
+        }
     }
 
     public static void log(String message) {
@@ -570,6 +724,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
                 inviteText.setVisibility(View.GONE);
                 break;
 			}
+            case R.id.keyboard_icon_chat:{
+                log("open emoji keyboard:  " + emojiKeyboardShown);
+
+                if (emojiKeyboardShown){
+                    removeEmojiconFragment();
+                    textChat.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
+                }
+                else{
+                    InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+
+                    if (softKeyboardShown){
+                        log("imm.isAcceptingText()");
+                        imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
+                        shouldShowEmojiKeyboard = true;
+                    }
+                    else{
+                        setEmojiconFragment(false);
+                    }
+                }
+
+
+//                editText.requestFocus();
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+
+//                InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
+//                Intent intent = new Intent(this, KeyboardActivityLollipop.class);
+//                this.startActivity(intent);
+
+                break;
+            }
             case R.id.fab_chat:{
                 showUploadPanel();
                 break;
