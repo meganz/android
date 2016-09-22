@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -28,55 +29,93 @@ public class UploadPanelListener implements View.OnClickListener {
 
             case R.id.file_list_upload_audio_layout:{
                 log("click upload audio");
-                ((ManagerActivityLollipop)context).hideUploadPanel();
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("*/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
 
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop)context).hideUploadPanel();
+                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                }
+                else if(context instanceof ContactPropertiesActivityLollipop){
+                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
+                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                }
                 break;
             }
 
             case R.id.file_list_upload_video_layout:{
                 log("click upload video");
-                ((ManagerActivityLollipop)context).hideUploadPanel();
+
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("*/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop)context).hideUploadPanel();
+                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                }
+                else if(context instanceof ContactPropertiesActivityLollipop){
+                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
+                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                }
+
                 break;
             }
 
             case R.id.file_list_upload_image_layout:{
                 log("click upload image");
-                ((ManagerActivityLollipop)context).hideUploadPanel();
+
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("*/*");
-                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop)context).hideUploadPanel();
+                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                }
+                else if(context instanceof ContactPropertiesActivityLollipop){
+                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
+                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                }
+
                 break;
             }
 
             case R.id.file_list_upload_from_system_layout:{
                 log("click upload from_system");
-                ((ManagerActivityLollipop)context).hideUploadPanel();
+
                 Intent intent = new Intent();
                 intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
                 intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-                intent.setClass(((ManagerActivityLollipop)context), FileStorageActivityLollipop.class);
-                ((ManagerActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
+                intent.setClass(context, FileStorageActivityLollipop.class);
+
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop)context).hideUploadPanel();
+                    ((ManagerActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
+                }
+                else if(context instanceof ContactPropertiesActivityLollipop){
+                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
+                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
+                }
+
                 break;
             }
 
             case R.id.file_list_out_upload:{
                 log("click file_list_out_upload");
-                ((ManagerActivityLollipop)context).hideUploadPanel();
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop)context).hideUploadPanel();
+                }
+                else if(context instanceof ContactPropertiesActivityLollipop){
+                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
+                }
                 break;
             }
         }

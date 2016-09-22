@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,7 +102,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	private AlertDialog newFolderDialog;
 	
 	ProgressDialog statusDialog;
-	
+
+	ActionBar aB;
+
 	private List<ShareInfo> filePreparedInfos;
 	
 	private TabHost mTabHostExplorer;
@@ -158,6 +161,13 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		if (dbH.getCredentials() == null){
 			ManagerActivity.logout(this, megaApi, false);
 			return;
+		}
+
+		if (aB == null){
+			aB = getSupportActionBar();
+		}
+		if(aB!=null){
+			aB.hide();
 		}
 		
 		if (savedInstanceState != null){

@@ -11,11 +11,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -25,10 +26,15 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -39,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -48,7 +55,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -68,7 +79,7 @@ import nz.mega.sdk.MegaUser;
 
 public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
-	CoordinatorLayout fragmentContainer;
+	FrameLayout fragmentContainer;
     
     String userEmail;
 
@@ -78,10 +89,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	ContactPropertiesFragmentLollipop cpF;
 	ContactFileListFragmentLollipop cflF;
 
-	CoordinatorLayout coodinatorLayout;
+	CoordinatorLayout coordinatorLayout;
+	Handler handler;
 
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
+
+	boolean sendToInbox=false;
+	boolean moveToRubbish=false;
 
 	public static final int CONTACT_PROPERTIES = 1000;
 	public static final int CONTACT_FILE_LIST = 1001;
@@ -95,12 +110,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	static ContactPropertiesActivityLollipop contactPropertiesMainActivity;
 
-	private static int EDIT_TEXT_ID = 2;
-
 	long parentHandle = -1;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
+
+	MenuItem createFolderMenuItem;
+	private AlertDialog newFolderDialog;
+	DisplayMetrics outMetrics;
 
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -114,6 +131,213 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	Toolbar tB;
 	ActionBar aB;
+
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingUploadPanel;
+	public FrameLayout uploadOutLayout;
+	public LinearLayout uploadLayout;
+	public LinearLayout uploadImage;
+	public LinearLayout uploadAudio;
+	public LinearLayout uploadVideo;
+	public LinearLayout uploadFromSystem;
+	private UploadPanelListener uploadPanelListener;
+	////
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.file_explorer_action, menu);
+
+		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+
+		if (cflF != null && cflF.isVisible()){
+			if(cflF.getFabVisibility()==View.VISIBLE){
+				createFolderMenuItem.setVisible(true);
+			}
+			else{
+				createFolderMenuItem.setVisible(false);
+			}
+		}
+		else{
+			createFolderMenuItem.setVisible(false);
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		int id = item.getItemId();
+		switch(id){
+			case android.R.id.home:{
+				onBackPressed();
+				break;
+			}
+			case R.id.cab_menu_create_folder:{
+				showNewFolderDialog();
+				break;
+			}
+		}
+		return true;
+	}
+
+	public void showNewFolderDialog(){
+		log("showNewFolderDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.context_new_folder_name));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					createFolder(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.menu_new_folder));
+		builder.setPositiveButton(getString(R.string.general_create),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						createFolder(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+
+	private void createFolder(String title) {
+
+		log("createFolder");
+		if (!Util.isOnline(this)) {
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
+			return;
+		}
+
+		if(isFinishing()){
+			return;
+		}
+
+		long parentHandle = cflF.getParentHandle();
+
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+
+		if (parentNode != null){
+			log("parentNode != null: " + parentNode.getName());
+			boolean exists = false;
+			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+			for (int i=0;i<nL.size();i++){
+				if (title.compareTo(nL.get(i).getName()) == 0){
+					exists = true;
+				}
+			}
+
+			if (!exists){
+				statusDialog = null;
+				try {
+					statusDialog = new ProgressDialog(this);
+					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog.show();
+				}
+				catch(Exception e){
+					return;
+				}
+
+				megaApi.createFolder(title, parentNode, this);
+			}
+			else{
+				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+			}
+		}
+		else{
+			log("parentNode == null: " + parentHandle);
+			parentNode = megaApi.getRootNode();
+			if (parentNode != null){
+				log("megaApi.getRootNode() != null");
+				boolean exists = false;
+				ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+				for (int i=0;i<nL.size();i++){
+					if (title.compareTo(nL.get(i).getName()) == 0){
+						exists = true;
+					}
+				}
+
+				if (!exists){
+					statusDialog = null;
+					try {
+						statusDialog = new ProgressDialog(this);
+						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog.show();
+					}
+					catch(Exception e){
+						return;
+					}
+
+					megaApi.createFolder(title, parentNode, this);
+				}
+				else{
+					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				}
+			}
+			else{
+				return;
+			}
+		}
+	}
+
+	private void showKeyboardDelayed(final View view) {
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +354,10 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 		contactPropertiesMainActivity=this;
 
+		handler = new Handler();
+
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
 
@@ -144,8 +370,8 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 			setContentView(R.layout.activity_main_contact_properties);
 
-			coodinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
-			coodinatorLayout.setFitsSystemWindows(false);
+			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
+			coordinatorLayout.setFitsSystemWindows(false);
 
 			//Set toolbar
 			tB = (Toolbar) findViewById(R.id.toolbar_main_contact_properties);
@@ -165,7 +391,29 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				log("aB is NULL!!!!");
 			}
 
-			fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_contact_properties);
+			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_contact_properties);
+
+			//Sliding UPLOAD panel
+			slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
+			uploadLayout = (LinearLayout) findViewById(R.id.file_list_upload);
+			uploadOutLayout = (FrameLayout) findViewById(R.id.file_list_out_upload);
+			uploadImage = (LinearLayout) findViewById(R.id.file_list_upload_image_layout);
+			uploadAudio= (LinearLayout) findViewById(R.id.file_list_upload_audio_layout);
+			uploadVideo = (LinearLayout) findViewById(R.id.file_list_upload_video_layout);
+			uploadFromSystem = (LinearLayout) findViewById(R.id.file_list_upload_from_system_layout);
+
+			uploadPanelListener = new UploadPanelListener(this);
+
+			uploadImage.setOnClickListener(uploadPanelListener);
+			uploadAudio.setOnClickListener(uploadPanelListener);
+			uploadVideo.setOnClickListener(uploadPanelListener);
+			uploadFromSystem.setOnClickListener(uploadPanelListener);
+
+			uploadOutLayout.setOnClickListener(uploadPanelListener);
+
+			slidingUploadPanel.setVisibility(View.INVISIBLE);
+			slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+			//////
 			
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
@@ -173,13 +421,25 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		
 	}
 
-	public int getStatusBarHeight() {
-		int result = 0;
-		int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-		if (resourceId > 0) {
-			result = getResources().getDimensionPixelSize(resourceId);
+	public void showUploadPanel(){
+		log("showUploadPanel");
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
 		}
-		return result;
+
+		slidingUploadPanel.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+	}
+
+	public void hideUploadPanel(){
+		log("hideUploadPanel");
+		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+		slidingUploadPanel.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -237,14 +497,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
-				coodinatorLayout.setFitsSystemWindows(false);
+				coordinatorLayout.setFitsSystemWindows(false);
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
 	
 				break;
 			}
 			case CONTACT_FILE_LIST:{
 				log("Shared Folders are:");
-				coodinatorLayout.setFitsSystemWindows(true);
+				coordinatorLayout.setFitsSystemWindows(true);
 				aB.show();
 
 				if (cflF == null){
@@ -253,46 +513,69 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				cflF.setUserEmail(userEmail);
 	
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
-				coodinatorLayout.invalidate();
+				coordinatorLayout.invalidate();
 				break;
 			}
 		}
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelectedLollipop");
-		int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home: {
-				onBackPressed();
-				break;
+	public void showConfirmationLeaveIncomingShare (final MegaNode n){
+		log("showConfirmationLeaveIncomingShare");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						//TODO remove the incoming shares
+						megaApi.remove(n);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
 			}
-		}
-		return super.onOptionsItemSelected(item);
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
-	
-	public void leaveIncomingShare (MegaNode n){
-		log("leaveIncomingShare");
-		//TODO
-//		ProgressDialog temp = null;
-//		try{
-//			temp = new ProgressDialog(this);
-//			temp.setMessage(getString(R.string.leave_incoming_share)); 
-//			temp.show();
-//		}
-//		catch(Exception e){
-//			return;
-//		}
-//		statusDialog = temp;
-		megaApi.remove(n);
+
+	public void showConfirmationLeaveIncomingShare (final ArrayList<Long> handleList){
+		log("showConfirmationLeaveIncomingShare");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						//TODO remove the incoming shares
+						contactPropertiesMainActivity.leaveMultipleShares(handleList);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	public void leaveMultipleShares (ArrayList<Long> handleList){
 		
 		for (int i=0; i<handleList.size(); i++){
 			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-			this.leaveIncomingShare(node);
+			megaApi.remove(node);
 		}
 	}
 	
@@ -469,7 +752,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+											if(coordinatorFragment!=null){
+												showSnackbar(getString(R.string.general_download), coordinatorFragment);
+											}
+											else{
+												showSnackbar(getString(R.string.general_download), fragmentContainer);
+											}
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;
@@ -596,7 +885,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+								CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+								if(coordinatorFragment!=null){
+									showSnackbar(toastMessage, coordinatorFragment);
+								}
+								else{
+									showSnackbar(toastMessage, fragmentContainer);
+								}
 							}
 //						}
 						return;
@@ -674,41 +969,40 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		}
 	}
 
-	public void moveToTrash(ArrayList<Long> handleList) {
-
+	public void moveToTrash(final ArrayList<Long> handleList){
+		log("moveToTrash: ");
+		moveToRubbish=true;
 		if (!Util.isOnline(this)) {
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-			return;
-		}
-
-		if (isFinishing()) {
-			return;
-		}
-
-		MegaNode rubbishNode = megaApi.getRubbishNode();
-
-		for (int i = 0; i < handleList.size(); i++) {
-			// Check if the node is not yet in the rubbish bin (if so, remove
-			// it)
-			MegaNode parent = megaApi.getNodeByHandle(handleList.get(i));
-			while (megaApi.getParentNode(parent) != null) {
-				parent = megaApi.getParentNode(parent);
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
 			}
-
-			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
-				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, this);
-			} 
-		}
-
-		ProgressDialog temp = null;
-		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_move_to_trash));
-			temp.show();
-		} catch (Exception e) {
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
 			return;
 		}
-		statusDialog = temp;
+
+		MultipleRequestListener moveMultipleListener = null;
+		MegaNode parent;
+		//Check if the node is not yet in the rubbish bin (if so, remove it)
+		if(handleList!=null){
+			if(handleList.size()>1){
+				log("MOVE multiple: "+handleList.size());
+				moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, this);
+				for (int i=0;i<handleList.size();i++){
+					megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
+				}
+			}
+			else{
+				log("MOVE single");
+				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), this);
+			}
+		}
+		else{
+			log("handleList NULL");
+			return;
+		}
 	}
 
 	public void showRenameDialog(final MegaNode document, String text) {
@@ -786,9 +1080,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		}
 
 		if (!Util.isOnline(this)) {
-			Util.showErrorAlertDialog(
-					getString(R.string.error_server_connection_problem), false,
-					this);
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
 			return;
 		}
 
@@ -812,7 +1110,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public void showMoveLollipop(ArrayList<Long> handleList){
-
+		moveToRubbish=false;
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -852,13 +1150,24 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			log("URL: " + url + "___SIZE: " + size);
 
 			downloadTo(parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
+
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.download_began), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.download_began), fragmentContainer);
+			}
 		} 
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {
-				Util.showErrorAlertDialog(
-						getString(R.string.error_server_connection_problem),
-						false, this);
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+				}
 				return;
 			}
 
@@ -876,6 +1185,8 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
+			sendToInbox=false;
+
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for (int i = 0; i < copyHandles.length; i++) {
 				log("NODO A COPIAR: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
@@ -885,16 +1196,22 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-	
-			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+
+			if (!Util.isOnline(this)) {
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+				}
 				return;
 			}
 			
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 //			final int totalMoves = moveHandles.length;
-			
+			moveToRubbish=false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			
 			ProgressDialog temp = null;
@@ -929,8 +1246,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		} 
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
-			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			if (!Util.isOnline(this)) {
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+				}
 				return;
 			}
 
@@ -1034,39 +1357,141 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				log("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.upload_began), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.upload_began), fragmentContainer);
+				}
 				startService(uploadServiceIntent);
 				i++;
 			}
+		}
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
+			log("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
 
+
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
+			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
+
+			if(multiselectIntent==0){
+				//Send one file to one contact
+				final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+				sendToInbox(nodeHandle, contactsData);
+			}
+			else{
+				//Send multiple files to one contact
+				final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+				sendToInbox(nodeHandles, contactsData);
+			}
+		}
+
+	}
+
+	public void sendToInbox(long[] nodeHandles, ArrayList<String> selectedContacts) {
+
+		sendToInbox=true;
+
+		if (!Util.isOnline(this)) {
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
+			return;
+		}
+
+		if(nodeHandles!=null){
+			MultipleRequestListener sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILES_SEND_INBOX, this);
+			MegaUser u = megaApi.getContact(selectedContacts.get(0));
+			if(nodeHandles.length>1){
+				log("many files to one contact");
+				for(int j=0; j<nodeHandles.length;j++){
+
+					final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+
+					if(u!=null){
+						log("Send: "+ node.getName() + " to "+ u.getEmail());
+						megaApi.sendFileToUser(node, u, sendMultipleListener);
+					}
+					else{
+						log("Send File to a NON contact! ");
+						megaApi.sendFileToUser(node, selectedContacts.get(0), sendMultipleListener);
+					}
+				}
+			}
+			else{
+				log("one file to many contacts");
+
+				final MegaNode node = megaApi.getNodeByHandle(nodeHandles[0]);
+				if(u!=null){
+					log("Send: "+ node.getName() + " to "+ u.getEmail());
+					megaApi.sendFileToUser(node, u, this);
+				}
+				else{
+					log("Send File to a NON contact! ");
+					megaApi.sendFileToUser(node, selectedContacts.get(0), this);
+				}
+			}
 		}
 	}
 
-	/*
-	 * Background task to process files for uploading
-	 */
-	private class FilePrepareTask extends
-	AsyncTask<Intent, Void, List<ShareInfo>> {
-		Context context;
+	public void sendToInbox(long fileHandle, ArrayList<String> selectedContacts){
 
-		FilePrepareTask(Context context) {
-			this.context = context;
+		sendToInbox=true;
+
+		if (!Util.isOnline(this)) {
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
+			return;
 		}
 
-		@Override
-		protected List<ShareInfo> doInBackground(Intent... params) {
-			return ShareInfo.processIntent(params[0], context);
-		}
+		MultipleRequestListener sendMultipleListener = null;
+		MegaNode node = megaApi.getNodeByHandle(fileHandle);
+		if(node!=null)
+		{
+			log("File to send: "+node.getName());
+			if(selectedContacts.size()>1){
+				log("File to multiple contacts");
+				sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SEND_INBOX, this);
+				for (int i=0;i<selectedContacts.size();i++){
+					MegaUser user= megaApi.getContact(selectedContacts.get(i));
 
-		@Override
-		protected void onPostExecute(List<ShareInfo> info) {
-			filePreparedInfos = info;
-			onIntentProcessed();
+					if(user!=null){
+						log("Send File to contact: "+user.getEmail());
+						megaApi.sendFileToUser(node, user, sendMultipleListener);
+					}
+					else{
+						log("Send File to a NON contact! ");
+						megaApi.sendFileToUser(node, selectedContacts.get(i), sendMultipleListener);
+					}
+				}
+			}
+			else{
+				log("File to a single contact");
+				MegaUser user= megaApi.getContact(selectedContacts.get(0));
+				if(user!=null){
+					log("Send File to contact: "+user.getEmail());
+					megaApi.sendFileToUser(node, user, this);
+				}
+				else{
+					log("Send File to a NON contact! ");
+					megaApi.sendFileToUser(node, selectedContacts.get(0), this);
+				}
+			}
 		}
 	}
 
-	public void onIntentProcessed() {
-		List<ShareInfo> infos = filePreparedInfos;
+	public void onIntentProcessed(List<ShareInfo> infos) {
+//		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -1085,8 +1510,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
 					false, this);
 		} else {
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.upload_began), Toast.LENGTH_SHORT).show();
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.upload_began), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.upload_began), fragmentContainer);
+			}
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1100,6 +1530,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onBackPressed() {
+		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
+			log("slidingUploadPanel()!=PanelState.HIDDEN");
+			hideUploadPanel();
+			return;
+		}
+
+		log("Sliding UPLOAD options not shown");
+
 		if (cflF != null){
 			if (cflF.isVisible()){
 				if (cflF.onBackPressed() == 0){
@@ -1260,7 +1698,46 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		else if (request.getType() == MegaRequest.TYPE_COPY) {
 			log("copy request start");
 		}
+	}
 
+	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
+		log("askConfirmationMoveToRubbish");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						moveToTrash(handleList);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		if(handleList!=null){
+
+			if (handleList.size() > 0){
+				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+				if (handleList.size() > 1){
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
+				}
+				else{
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+				}
+				builder.setPositiveButton(R.string.general_move, dialogClickListener);
+				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+				builder.show();
+			}
+		}
+		else{
+			log("handleList NULL");
+			return;
+		}
 	}
 
 	@Override
@@ -1273,17 +1750,65 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			MegaError e) {
 		log("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_RENAME){
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+			try {
+				statusDialog.dismiss();
+			}
+			catch (Exception ex) {}
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_folder_created), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_folder_created), fragmentContainer);
+					}
+					cflF.setNodes();
+				}
+			}
+			else{
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_folder_no_created), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_folder_no_created), fragmentContainer);
+					}
+					cflF.setNodes();
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
+
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_correctly_renamed), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_correctly_renamed), fragmentContainer);
+					}
+				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_no_renamed), coordinatorFragment);
+					}
+					else{
+						showSnackbar(getString(R.string.context_no_renamed), fragmentContainer);
+					}
+				}
 			}
 			log("rename nodes request finished");			
 		}
@@ -1293,11 +1818,58 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			} catch (Exception ex) {
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-				Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();				
-			} else {
-				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+			if(sendToInbox) {
+				log("sendToInbox: " + e.getErrorCode() + " " + e.getErrorString());
+				if (e.getErrorCode() == MegaError.API_OK){
+
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_correctly_sent_node), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_correctly_sent_node), fragmentContainer);
+						}
+					}
+				}
+				else{
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_no_sent_node), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_no_sent_node), fragmentContainer);
+						}
+					}
+				}
 			}
+			else{
+				if (e.getErrorCode() == MegaError.API_OK){
+
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_correctly_copied), fragmentContainer);
+						}
+					}
+				}
+				else{
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_no_copied), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_no_copied), fragmentContainer);
+						}
+					}
+				}
+			}
+			sendToInbox=false;
 			log("copy nodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -1306,13 +1878,60 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			} 
 			catch (Exception ex) {}
 
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+			if(moveToRubbish){
+				log("Finish move to Rubbish!");
+				if (e.getErrorCode() == MegaError.API_OK){
+
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_correctly_moved_to_rubbish), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_correctly_moved_to_rubbish), fragmentContainer);
+						}
+					}
+				}
+				else{
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_no_moved), fragmentContainer);
+						}
+					}
+				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+				if (e.getErrorCode() == MegaError.API_OK){
+
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_correctly_moved), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_correctly_moved), fragmentContainer);
+						}
+					}
+				}
+				else{
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_no_moved), fragmentContainer);
+						}
+					}
+				}
 			}
-			log("move to rubbish request finished");
+			moveToRubbish=false;
+
+			log("move request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
 			try { 
@@ -1348,5 +1967,12 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		
 	}
 
+	public void showSnackbar(String s, View view){
+		log("showSnackbar");
+		Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+		snackbarTextView.setMaxLines(5);
+		snackbar.show();
+	}
 
 }

@@ -35,6 +35,17 @@
         android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="1"/>
-  
+
+    <ImageView
+        android:id="@+id/file_explorer_permissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_permissions_full_access"
+        android:background="@null"
+        android:paddingLeft="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>
 

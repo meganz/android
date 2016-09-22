@@ -1,14 +1,5 @@
 package mega.privacy.android.app;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -26,6 +17,14 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class IncomingSharesExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
@@ -100,7 +99,6 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		getProLayout.setVisibility(View.GONE);
 		
 		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
-		uploadButton.setOnClickListener(this);
 		uploadButton.setVisibility(View.VISIBLE);
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
@@ -122,9 +120,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		{
 			uploadButton.setVisibility(View.GONE);
 		}
-		
-		String actionBarTitle = getString(R.string.title_incoming_shares_explorer);	
-		
+
 		if (parentHandle == -1){			
 			findNodes();	
 			adapter.parentHandle=-1;
@@ -142,7 +138,22 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	
 		adapter.setPositionClicked(-1);		
 		
-		listView.setAdapter(adapter);		
+		listView.setAdapter(adapter);
+
+		if(adapter.getCount()==0){
+			listView.setVisibility(View.GONE);
+			uploadButton.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			uploadButton.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
 		
 		return v;
 	}
@@ -202,9 +213,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		}
 		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
 			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
-		}	
-		
-		
+		}
 	}
 	
 	public void changeActionBarTitle(String folder){
@@ -270,19 +279,17 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
 			listView.setSelection(0);
+
+			uploadButton.setOnClickListener(this);
 			
 			//If folder has no files
 			if (adapter.getCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
@@ -339,6 +346,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 
+			uploadButton.setOnClickListener(null);
+
 			return 3;
 		}
 		else if (deepBrowserTree>0){
@@ -352,6 +361,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
+				changeButtonTitle(parentNode.getName());
 				changeActionBarTitle(parentNode.getName());	
 				changeBackVisibility(true);
 				
@@ -404,13 +414,9 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==parentHandle) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
