@@ -96,6 +96,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	MenuItem viewSharedItem;
 
 	boolean sendToInbox=false;
+	boolean moveToRubbish=false;
 
 	public static final int CONTACT_PROPERTIES = 1000;
 	public static final int CONTACT_FILE_LIST = 1001;
@@ -246,8 +247,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	private void createFolder(String title) {
 
 		log("createFolder");
-		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+		if (!Util.isOnline(this)) {
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
 			return;
 		}
 
@@ -962,41 +969,40 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		}
 	}
 
-	public void moveToTrash(ArrayList<Long> handleList) {
-
+	public void moveToTrash(final ArrayList<Long> handleList){
+		log("moveToTrash: ");
+		moveToRubbish=true;
 		if (!Util.isOnline(this)) {
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-			return;
-		}
-
-		if (isFinishing()) {
-			return;
-		}
-
-		MegaNode rubbishNode = megaApi.getRubbishNode();
-
-		for (int i = 0; i < handleList.size(); i++) {
-			// Check if the node is not yet in the rubbish bin (if so, remove
-			// it)
-			MegaNode parent = megaApi.getNodeByHandle(handleList.get(i));
-			while (megaApi.getParentNode(parent) != null) {
-				parent = megaApi.getParentNode(parent);
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
 			}
-
-			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
-				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, this);
-			} 
-		}
-
-		ProgressDialog temp = null;
-		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_move_to_trash));
-			temp.show();
-		} catch (Exception e) {
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
 			return;
 		}
-		statusDialog = temp;
+
+		MultipleRequestListener moveMultipleListener = null;
+		MegaNode parent;
+		//Check if the node is not yet in the rubbish bin (if so, remove it)
+		if(handleList!=null){
+			if(handleList.size()>1){
+				log("MOVE multiple: "+handleList.size());
+				moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, this);
+				for (int i=0;i<handleList.size();i++){
+					megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
+				}
+			}
+			else{
+				log("MOVE single");
+				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), this);
+			}
+		}
+		else{
+			log("handleList NULL");
+			return;
+		}
 	}
 
 	public void showRenameDialog(final MegaNode document, String text) {
@@ -1074,9 +1080,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		}
 
 		if (!Util.isOnline(this)) {
-			Util.showErrorAlertDialog(
-					getString(R.string.error_server_connection_problem), false,
-					this);
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+			}
 			return;
 		}
 
@@ -1100,7 +1110,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public void showMoveLollipop(ArrayList<Long> handleList){
-
+		moveToRubbish=false;
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -1151,9 +1161,13 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		} 
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {
-				Util.showErrorAlertDialog(
-						getString(R.string.error_server_connection_problem),
-						false, this);
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+				}
 				return;
 			}
 
@@ -1182,16 +1196,22 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-	
-			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+
+			if (!Util.isOnline(this)) {
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+				}
 				return;
 			}
 			
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 //			final int totalMoves = moveHandles.length;
-			
+			moveToRubbish=false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			
 			ProgressDialog temp = null;
@@ -1226,8 +1246,14 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		} 
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
-			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			if (!Util.isOnline(this)) {
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(coordinatorFragment!=null){
+					showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
+				}
+				else{
+					showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
+				}
 				return;
 			}
 
@@ -1672,7 +1698,46 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		else if (request.getType() == MegaRequest.TYPE_COPY) {
 			log("copy request start");
 		}
+	}
 
+	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
+		log("askConfirmationMoveToRubbish");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						moveToTrash(handleList);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		if(handleList!=null){
+
+			if (handleList.size() > 0){
+				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+				if (handleList.size() > 1){
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
+				}
+				else{
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+				}
+				builder.setPositiveButton(R.string.general_move, dialogClickListener);
+				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+				builder.show();
+			}
+		}
+		else{
+			log("handleList NULL");
+			return;
+		}
 	}
 
 	@Override
@@ -1813,29 +1878,59 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			} 
 			catch (Exception ex) {}
 
-			if (e.getErrorCode() == MegaError.API_OK){
+			if(moveToRubbish){
+				log("Finish move to Rubbish!");
+				if (e.getErrorCode() == MegaError.API_OK){
 
-				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-				if(cflF!=null && cflF.isVisible()){
-					if(coordinatorFragment!=null){
-						showSnackbar(getString(R.string.context_correctly_moved), coordinatorFragment);
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_correctly_moved_to_rubbish), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_correctly_moved_to_rubbish), fragmentContainer);
+						}
 					}
-					else{
-						showSnackbar(getString(R.string.context_correctly_moved), fragmentContainer);
+				}
+				else{
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_no_moved), fragmentContainer);
+						}
 					}
 				}
 			}
 			else{
-				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-				if(cflF!=null && cflF.isVisible()){
-					if(coordinatorFragment!=null){
-						showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
+				if (e.getErrorCode() == MegaError.API_OK){
+
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_correctly_moved), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_correctly_moved), fragmentContainer);
+						}
 					}
-					else{
-						showSnackbar(getString(R.string.context_no_moved), fragmentContainer);
+				}
+				else{
+					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+					if(cflF!=null && cflF.isVisible()){
+						if(coordinatorFragment!=null){
+							showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
+						}
+						else{
+							showSnackbar(getString(R.string.context_no_moved), fragmentContainer);
+						}
 					}
 				}
 			}
+			moveToRubbish=false;
+
 			log("move request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
