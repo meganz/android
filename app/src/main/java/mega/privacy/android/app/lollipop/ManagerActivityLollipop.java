@@ -3178,10 +3178,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					maFLol.setMKLayoutVisible(mkLayoutVisible);
 				}
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, maFLol, "maF");
-				ft.commit();
-//				getSupportFragmentManager().executePendingTransactions();
+				contactsSectionLayout.setVisibility(View.GONE);
+				viewPagerContacts.setVisibility(View.GONE);
+				sharesSectionLayout.setVisibility(View.GONE);
+				viewPagerShares.setVisibility(View.GONE);
+				cloudSectionLayout.setVisibility(View.GONE);
+				viewPagerCDrive.setVisibility(View.GONE);
+
+				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
+				if (currentFragment != null) {
+					fragTransaction.detach(currentFragment);
+					fragTransaction.commit();
+
+					fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.attach(currentFragment);
+					fragTransaction.commit();
+				}
+				else{
+					fragTransaction.replace(R.id.fragment_container, maFLol, "maF");
+					fragTransaction.commit();
+				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -3268,6 +3285,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("OfflineFragment exist");
 //    				oFLol.setPathNavigation("/");
     				oFLol.setIsList(isList);
+					oFLol.findNodes();
+					oFLol.setTitle();
     			}
 
     			cloudSectionLayout.setVisibility(View.GONE);
@@ -3557,15 +3576,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showFabButton();
     			break;
     		}
-    		case ACCOUNT:{
+			case ACCOUNT:{
 				log("case ACCOUNT: "+accountFragment);
 //    			tB.setVisibility(View.GONE);
-
 				selectDrawerItemAccount();
 				supportInvalidateOptionsMenu();
-
 				break;
-    		}
+			}
     		case TRANSFERS:{
 
     			tB.setVisibility(View.VISIBLE);
@@ -8021,36 +8038,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void chooseAddContactDialog(){
 		log("chooseAddContactDialog");
 
-		Dialog addContactDialog;
-		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
-		AlertDialog.Builder b=new AlertDialog.Builder(this);
+		Intent in = new Intent(this, AddContactActivityLollipop.class);
+//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
 
-		b.setTitle(getResources().getString(R.string.menu_add_contact));
-		b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch(which){
-					case 0:{
-						showNewContactDialog();
-						break;
-					}
-					case 1:{
-						addContactFromPhone();
-						break;
-					}
-				}
-			}
-		});
-		b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
-			}
-		});
-		addContactDialog = b.create();
-		addContactDialog.show();
+//		Dialog addContactDialog;
+//		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
+//		AlertDialog.Builder b=new AlertDialog.Builder(this);
+//
+//		b.setTitle(getResources().getString(R.string.menu_add_contact));
+//		b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
+//
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				switch(which){
+//					case 0:{
+//						showNewContactDialog();
+//						break;
+//					}
+//					case 1:{
+//						addContactFromPhone();
+//						break;
+//					}
+//				}
+//			}
+//		});
+//		b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+//
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				dialog.cancel();
+//			}
+//		});
+//		addContactDialog = b.create();
+//		addContactDialog.show();
 	}
 
 	public void addContactFromPhone(){
@@ -9711,8 +9733,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
@@ -10075,6 +10097,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						inSFLol.getRecyclerView().invalidate();
 					}
 				}
+			}
+		}
+		else if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
+			log("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
+
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+
+			if (contactsData != null){
+				cC.inviteMultipleContacts(contactsData);
 			}
 		}
 		else if (requestCode == RC_REQUEST){
