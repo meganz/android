@@ -143,8 +143,8 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 //	public LinearLayout optionPublicLink;
 //	public LinearLayout optionShare;
 //	public LinearLayout optionPermissions;
+	public LinearLayout optionSendToInbox;
 	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
 //	public LinearLayout optionClearShares;
 	public LinearLayout optionLeaveShare;
 	public LinearLayout optionMoveTo;
@@ -471,8 +471,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			propertiesText = (TextView) v.findViewById(R.id.contact_file_list_option_properties_text);			
 			
 			optionDelete = (LinearLayout) v.findViewById(R.id.contact_file_list_option_delete_layout);			
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.contact_file_list_option_remove_layout);
-	
+			optionSendToInbox = (LinearLayout) v.findViewById(R.id.contact_file_list_option_send_inbox_layout);
 			optionCopyTo = (LinearLayout) v.findViewById(R.id.contact_file_list_option_copy_layout);
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.contact_file_list_option_move_layout);
 
@@ -480,11 +479,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			optionProperties.setOnClickListener(this);
 			optionRename.setOnClickListener(this);
 			optionDelete.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);			
+
 			optionCopyTo.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionLeaveShare.setOnClickListener(this);
-			
+			optionSendToInbox.setOnClickListener(this);
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
@@ -500,6 +499,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		log("showNodeOptionsPanel");
 		
 //		fabButton.setVisibility(View.GONE);
+
+		optionDownload.setVisibility(View.VISIBLE);
+		optionProperties.setVisibility(View.VISIBLE);
+		optionSendToInbox.setVisibility(View.VISIBLE);
+		optionCopyTo.setVisibility(View.VISIBLE);
 		
 		this.selectedNode = sNode;	
 		
@@ -527,36 +531,23 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		
 		switch (accessLevel) {			
 			case MegaShare.ACCESS_FULL: {
-				
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
 				optionMoveTo.setVisibility(View.VISIBLE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionRename.setVisibility(View.VISIBLE);
 				optionDelete.setVisibility(View.GONE);
-	
 				break;
 			}
 			case MegaShare.ACCESS_READ: {
 				log("read");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);	
 				optionRename.setVisibility(View.GONE);
 				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
 				break;
 			}
 			case MegaShare.ACCESS_READWRITE: {
 				log("readwrite");
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
-				//						holder.shareDisabled.setVisibility(View.VISIBLE);
 				optionMoveTo.setVisibility(View.GONE);
 				optionRename.setVisibility(View.GONE);
 				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-
 				break;
 			}
 		}
@@ -1145,8 +1136,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		switch (v.getId()) {
 			case R.id.contact_file_list_option_download_layout: {
 				log("Download option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
+				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1156,17 +1146,32 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			}
 			case R.id.contact_file_list_option_leave_share_layout: {
 				log("Leave share option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
+				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				((ContactPropertiesActivityLollipop) context).showConfirmationLeaveIncomingShare(selectedNode);
 				break;
 			}
+			case R.id.contact_file_list_option_send_inbox_layout:{
+				log("Send to inbox option");
+				hideOptionsPanel();
+				if(selectedNode==null){
+					log("The selected node is NULL");
+					return;
+				}
+
+				Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
+				intent.setClass(context, ContactsExplorerActivityLollipop.class);
+				//Multiselect=0
+				intent.putExtra("MULTISELECT", 0);
+				intent.putExtra("SEND_FILE",1);
+				intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, selectedNode.getHandle());
+				((ContactPropertiesActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+				break;
+			}
 			case R.id.contact_file_list_option_move_layout:{
 				log("Move option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
+				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1177,8 +1182,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			}
 			case R.id.contact_file_list_option_properties_layout: {
 				log("Properties option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
+				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
@@ -1202,8 +1206,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			}
 			case R.id.contact_file_list_option_rename_layout: {
 				log("Rename option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
+				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				((ContactPropertiesActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
@@ -1211,8 +1214,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			}	
 			case R.id.contact_file_list_option_copy_layout: {
 				log("Copy option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
+				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
