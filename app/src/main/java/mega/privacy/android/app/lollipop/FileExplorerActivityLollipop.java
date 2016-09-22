@@ -122,7 +122,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private long[] copyFromHandles;
 	private ArrayList<String> selectedContacts;
 	private String imagePath;
-	String actionBarTitle;
 	private boolean folderSelected = false;
 	
 	private Handler handler;
@@ -131,9 +130,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
-	
-	private static int EDIT_TEXT_ID = 2;
-	
+
 	private AlertDialog newFolderDialog;
 	
 	ProgressDialog statusDialog;

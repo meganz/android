@@ -139,7 +139,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 		
 		if (adapter == null){
-			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
 			
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 				
@@ -153,17 +153,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			adapter.setParentHandle(parentHandle);
 			adapter.setNodes(nodes);
 			adapter.setSelectFile(selectFile);
-		}
-		
-		if (nodes != null){
-			if (nodes.size() == 0){
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
-			else{
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
 		}
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
@@ -193,9 +182,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
-		
-		String actionBarTitle = getString(R.string.title_incoming_shares_explorer);	
-		
+
 		if (parentHandle == -1){			
 			findNodes();	
 			adapter.parentHandle=-1;
@@ -205,7 +192,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			adapter.parentHandle=parentHandle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
-		}	
+		}
+
+		adapter.setPositionClicked(-1);
+		listView.setAdapter(adapter);
 
 		log("deepBrowserTree value: "+deepBrowserTree);
 		if (deepBrowserTree <= 0){
@@ -217,9 +207,16 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionsBar.setVisibility(View.VISIBLE);
 		}
 
-		adapter.setPositionClicked(-1);		
-		
-		listView.setAdapter(adapter);		
+		if (adapter.getItemCount() != 0){
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			listView.setVisibility(View.VISIBLE);
+		}
+		else{
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+		}
 		
 		return v;
 	}
@@ -339,15 +336,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
@@ -398,13 +390,21 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			listView.scrollToPosition(0);
 			adapter.setParentHandle(parentHandle);
 
-//			adapterList.setNodes(nodes);
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
+			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+
+			if (adapter.getItemCount() != 0){
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				listView.setVisibility(View.VISIBLE);
+			}
+			else{
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				listView.setVisibility(View.GONE);
+			}
 
 			return 3;
 		}
@@ -414,11 +414,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
 			if (parentNode != null){
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-
-				changeActionBarTitle(parentNode.getName());	
+				changeActionBarTitle(parentNode.getName());
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
@@ -426,6 +422,19 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				adapter.setNodes(nodes);
 				listView.scrollToPosition(0);
 				adapter.setParentHandle(parentHandle);
+
+				if (adapter.getItemCount() != 0){
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
+				}
+				else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.GONE);
+				}
 				return 2;
 			}
 

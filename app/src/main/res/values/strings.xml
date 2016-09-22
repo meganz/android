@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.0.11.3</string>
-    <string name="sdk_version" context="Not translate">970e65b</string>
-
+    <string name="app_version" context="Not translate">3.0.11.5</string>
+    <string name="sdk_version" context="Not translate">755d8d7</string>
+    
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
 
@@ -246,26 +246,26 @@
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Invite</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
-    <string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
-    <string name="contact_decline" context="option to decline a contact invitation">Decline</string>
-    <string name="contact_accept" context="option to accept a contact invitation">Accept</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
-    <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
-    <string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>
-    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>
-    <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
-    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
+	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
+	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
+	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Incoming shares with:</string>
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>	
+	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
+	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
+	
+	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
 
-    <string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
-
-    <string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
-    <string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
-
-    <string name="download_failed" context="Error message">Download failed</string>
-    <string name="download_downloaded" context="notification message. Example: 1 file downloaded">downloaded</string>
-    <string name="download_downloading" context="Title header on the download page while the file is downloading.">Downloading</string>
-    <string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
-    <string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
+	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
+	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
+	
+	<string name="download_failed" context="Error message">Download failed</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">downloaded</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Downloading</string>
+	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
     <string name="download_began" context="message when the download starts">Download has started</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Touch to cancel download</string>
@@ -349,10 +349,10 @@
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Please choose a destination folder</string>
     <string name="context_correctly_moved" context="success message when moving a node">Moved successfully</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d items moved successfully</string>
-    <string name="number_incorrectly_moved" context="success message when moving a node">%d items are not moved successfully</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">%d items were not moved successfully</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the Rubbish Bin successfully</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the Rubbish Bin successfully</string>
-    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items are not sent successfully</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items were not sent successfully</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Shared successfully</string>
     <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process of the sharing is not completed</string>
@@ -885,4 +885,13 @@
     <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Clear all messages?\nAfter cleared, neither %s nor you will be able to see messages of this chat.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Clear</string>
+
+    <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">The contact %s will be removed from the shared folder.</string>
+    <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts will be removed from the shared folder.</string>
+
+
+    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed correctly from the shared folder</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder"> and %d contacts were not successfully removed</string>
+
+
 </resources>

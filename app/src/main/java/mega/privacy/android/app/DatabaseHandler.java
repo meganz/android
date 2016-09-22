@@ -725,6 +725,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 		return null;		
 	}
+
+	public MegaContact findContactByEmail(String mail){
+		log("findContactByEmail: "+mail);
+		MegaContact contacts = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+
+				int _id = -1;
+				String _handle = null;
+				String _mail = null;
+				String _name = null;
+				String _lastName = null;
+
+				_id = Integer.parseInt(cursor.getString(0));
+				_handle = decrypt(cursor.getString(1));
+				_mail = decrypt(cursor.getString(2));
+				_name = decrypt(cursor.getString(3));
+				_lastName = decrypt(cursor.getString(4));
+
+				contacts = new MegaContact(_handle, mail, _name, _lastName);
+				cursor.close();
+				return contacts;
+			}
+		}
+		cursor.close();
+		return null;
+	}
 	
 	public long setOfflineFile (MegaOffline offline){
 		log("setOfflineFile");

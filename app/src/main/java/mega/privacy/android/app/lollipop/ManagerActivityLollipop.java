@@ -19,7 +19,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -122,6 +121,7 @@ import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Constants;
@@ -1010,6 +1010,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				outState.putInt("selectedPaymentMethod", selectedPaymentMethod);
 			}
 		}
+		if(myAccountInfo==null){
+			log("My AccountInfo is Null");
+		}
 	}
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1056,6 +1059,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
+
 			this.setPathNavigationOffline("/");
 		}
 
@@ -1905,6 +1909,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	protected void onResume(){
 		log("onResume");
+		if(myAccountInfo==null){
+			log("My AccountInfo is Null");
+		}
 		super.onResume();
 	}
 
@@ -3551,10 +3558,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case ACCOUNT:{
-				log("case ACCOUNT");
+				log("case ACCOUNT: "+accountFragment);
 //    			tB.setVisibility(View.GONE);
+
 				selectDrawerItemAccount();
 				supportInvalidateOptionsMenu();
+
 				break;
     		}
     		case TRANSFERS:{
@@ -5055,19 +5064,59 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			return true;
 	        	}
 	        	if (drawerItem == DrawerItem.CONTACTS){
-		        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		        	cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		        	if (cFLol != null){
-	        			cFLol.selectAll();
-	        			if (cFLol.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
+					int index = viewPagerContacts.getCurrentItem();
+					log("----------------------------------------INDEX: "+index);
+					switch(index){
+						case 0:{
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (cFLol != null){
+								cFLol.selectAll();
+								if (cFLol.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+						case 1:{
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+							sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (sRFLol != null){
+								sRFLol.selectAll();
+								if (sRFLol.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+						case 2:{
+							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+							rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							if (rRFLol != null){
+								rRFLol.selectAll();
+								if (rRFLol.showSelectMenuItem()){
+									selectMenuItem.setVisible(true);
+									unSelectMenuItem.setVisible(false);
+								}
+								else{
+									selectMenuItem.setVisible(false);
+									unSelectMenuItem.setVisible(true);
+								}
+							}
+							break;
+						}
+
+					}
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);
@@ -8468,10 +8517,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (sNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
-			optionSendToInbox.setVisibility(View.GONE);
 		}else{
 			propertiesText.setText(R.string.general_file_info);
-			optionSendToInbox.setVisibility(View.VISIBLE);
 		}
 
 		int accessLevel = megaApi.getAccess(selectedNode);
@@ -8481,6 +8528,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionPermissions.setVisibility(View.GONE);
+		optionRemoveTotal.setVisibility(View.GONE);
+		optionShare.setVisibility(View.GONE);
+		optionSendToInbox.setVisibility(View.VISIBLE);
 
 		if(inSFLol!=null){
 			int dBT=inSFLol.getDeepBrowserTree();
@@ -8496,33 +8546,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case MegaShare.ACCESS_FULL: {
 				log("access FULL");
 				optionPublicLink.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionRename.setVisibility(View.VISIBLE);
-				optionDelete.setVisibility(View.VISIBLE);
 				optionMoveTo.setVisibility(View.GONE);
-
+				if(inSFLol!=null){
+					int dBT=inSFLol.getDeepBrowserTree();
+					if(dBT>0){
+						optionDelete.setVisibility(View.VISIBLE);
+					}
+					else{
+						optionDelete.setVisibility(View.GONE);
+					}
+				}
 				break;
 			}
 			case MegaShare.ACCESS_READ: {
 				log("access read");
 				optionPublicLink.setVisibility(View.GONE);
 				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
 				break;
 			}
 			case MegaShare.ACCESS_READWRITE: {
 				log("readwrite");
 				optionPublicLink.setVisibility(View.GONE);
 				optionRename.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
 				optionClearShares.setVisibility(View.GONE);
 				optionMoveTo.setVisibility(View.GONE);
-
+				optionDelete.setVisibility(View.GONE);
 				break;
 			}
 		}
@@ -9948,6 +10001,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
 				intentPicture.putExtra("PICTURE_PROFILE", 1);
+				intentPicture.putExtra("MY_MAIL", myAccountInfo.getMyUser().getEmail());
 				startActivity(intentPicture);
 			}
 			else{
@@ -10109,31 +10163,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-	}
-
-	/*
-	 * Background task to process files for uploading
-	 */
-	private class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
-		Context context;
-
-		FilePrepareTask(Context context){
-			log("FilePrepareTask::FilePrepareTask");
-			this.context = context;
-		}
-
-		@Override
-		protected List<ShareInfo> doInBackground(Intent... params) {
-			log("FilePrepareTask::doInBackGround");
-			return ShareInfo.processIntent(params[0], context);
-		}
-
-		@Override
-		protected void onPostExecute(List<ShareInfo> info) {
-			log("FilePrepareTask::onPostExecute");
-			filePreparedInfos = info;
-			onIntentProcessed();
-		}
 	}
 
 	void resetNavigationViewMenu(Menu menu){
@@ -10338,9 +10367,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	/*
 	 * Handle processed upload intent
 	 */
-	public void onIntentProcessed() {
+	public void onIntentProcessed(List<ShareInfo> infos) {
 		log("onIntentProcessedLollipop");
-		List<ShareInfo> infos = filePreparedInfos;
+//		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -10384,15 +10413,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(avatarPath!=null){
 						log("Chosen picture to change the avatar: "+avatarPath);
 						File imgFile = new File(avatarPath);
-						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
-						log("----NEW Name: "+newPath);
-						File newFile = new File(newPath);
-						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-
-						if(maFLol!=null){
-							megaApi.setAvatar(newFile.getAbsolutePath(), maFLol);
+//						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+						String newPath = null;
+						if (getExternalCacheDir() != null){
+							newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
 						}
+						else{
+							log("getExternalCacheDir() is NULL");
+							newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
+						}
+
+						if(newPath!=null){
+							File newFile = new File(newPath);
+							log("NEW - the destination of the avatar is: "+newPath);
+							if(newFile!=null){
+								MegaUtilsAndroid.createAvatar(imgFile, newFile);
+
+								if(maFLol!=null){
+									megaApi.setAvatar(newFile.getAbsolutePath(), maFLol);
+								}
+
+							}
+							else{
+								log("Error new path avatar!!");
+							}
+						}
+						else{
+							log("ERROR! Destination PATH is NULL");
+						}
+
+
+//						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
+//						log("----NEW Name: "+newPath);
+//						File newFile = new File(newPath);
+//						MegaUtilsAndroid.createAvatar(imgFile, newFile);
+
 					}
 					else{
 						log("The chosen avatar path is NULL");
@@ -10516,6 +10571,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(getString(R.string.context_invitacion_reply));
+				if(request.getNumber()==MegaContactRequest.REPLY_ACTION_ACCEPT){
+					log("I've accepted the invitation");
+
+					MegaContactRequest contactRequest = megaApi.getContactRequestByHandle(request.getNodeHandle());
+					log("Handle of the rquest: "+request.getNodeHandle());
+					if(contactRequest!=null){
+						log("Source: "+contactRequest.getSourceEmail());
+						//Get the data of the user (avatar and name)
+						MegaContact contactDB = dbH.findContactByEmail(contactRequest.getSourceEmail());
+						if(contactDB==null){
+							log("The contact: "+contactRequest.getSourceEmail()+" not found! Will be added to DB!");
+							cC.addContactDB(contactRequest.getSourceEmail());
+						}
+						//Update view to get avatar
+						String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+						if (cFLol != null){
+							cFLol.updateView();
+						}
+					}
+					else{
+						log("ContactRequest is NULL");
+					}
+				}
 			}
 			else{
 				showSnackbar(getString(R.string.general_error));

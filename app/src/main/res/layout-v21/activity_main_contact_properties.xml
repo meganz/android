@@ -20,11 +20,19 @@
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 tools:context=".ContactPropertiesActivityLollipop" />
 
-            <android.support.design.widget.CoordinatorLayout
+            <FrameLayout
                 android:id="@+id/fragment_container_contact_properties"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar_main_contact_properties"/>
 
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                layout="@layout/sliding_upload_panel"
+                android:visibility="gone"
+                android:layout_alignParentBottom="true"/>
+
     </RelativeLayout>
+
 </android.support.design.widget.CoordinatorLayout>
