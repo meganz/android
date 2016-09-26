@@ -18,8 +18,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginLeft="5dp" 
-        android:scaleType="fitCenter"
-        android:layout_toRightOf="@id/file_list_checkbox" />    
+        android:scaleType="fitCenter"/>
     
     
     <TextView

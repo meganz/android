@@ -42,7 +42,6 @@
 						    android:layout_height="wrap_content" 
 						    android:text="@string/cam_sync_wifi"
 						    android:checked="true"
-						    style="@style/radio_MEGA"
 						    android:textColor="@color/file_list_first_row"
 						    android:layout_marginBottom="3dp" />
 						
@@ -51,8 +50,7 @@
 						    android:layout_width="wrap_content" 
 						    android:layout_height="wrap_content" 
 						    android:text="@string/cam_sync_data"
-						    android:textColor="@color/file_list_first_row"
-						    style="@style/radio_MEGA" />
+						    android:textColor="@color/file_list_first_row" />
 					</RadioGroup>
 					
 			        <LinearLayout 

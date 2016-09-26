@@ -88,16 +88,16 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			convertView = inflater.inflate(R.layout.item_file_list, parent,false);
 			holder = new ViewHolderBrowserList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
-
-			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
-			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);			
-			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
-			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
-			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
-			
-			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
+//
+//			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
+//			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
+//			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+//			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
+//			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
+//			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
+//			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
+//
+//			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
 
