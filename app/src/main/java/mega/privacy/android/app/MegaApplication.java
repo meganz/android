@@ -223,7 +223,22 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			megaApi.addRequestListener(requestListener);
 			megaApi.addListener(this);
 
-			megaChatApi = new MegaChatApiAndroid(megaApi);
+			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			if (dbH.getCredentials() != null){
+				megaChatApi = new MegaChatApiAndroid(megaApi, true);
+			}
+			else{
+				megaChatApi = new MegaChatApiAndroid(megaApi, false);
+			}
+
+
+//			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//			if (dbH.getCredentials() != null){
+//				megaChatApi = new MegaChatApiAndroid(megaApi, true);
+//			}
+//			else {
+//				megaChatApi = new MegaChatApiAndroid(megaApi, false);
+//			}
 		}
 		
 		return megaApi;
