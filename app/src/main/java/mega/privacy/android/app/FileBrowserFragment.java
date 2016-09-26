@@ -375,16 +375,16 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			contentText = (TextView) v.findViewById(R.id.content_text);			
 			
 //			outSpaceButton.setVisibility(View.INVISIBLE);
-//			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-//			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
-//			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);
-//
-//			leftNewFolder.setOnClickListener(this);
-//			rightUploadButton.setOnClickListener(this);
-//
-//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
+			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
+			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);			
+			
+			leftNewFolder.setOnClickListener(this);
+			rightUploadButton.setOnClickListener(this);
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			outSpaceButton.setOnClickListener(this);
 			
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
@@ -654,33 +654,33 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		
 //		onClick = true;
 
-//		switch(v.getId()){
-//			case R.id.btnLeft_new:
-//				((ManagerActivity)getActivity()).showNewFolderDialog(null);
-//				break;
-//
-//			case R.id.btnRight_upload:
-//				((ManagerActivity)getActivity()).uploadFile();
-//				break;
-//			case R.id.btnLeft_grid_new:
-//				((ManagerActivity)getActivity()).showNewFolderDialog(null);
-//				break;
-//
-//			case R.id.btnRight_grid_upload:
-//				((ManagerActivity)getActivity()).uploadFile();
-//				break;
-//
-//			case R.id.btnRight_upgrade:
-//			case R.id.btnRight_upgrade_grid:
-//			case R.id.out_space_btn:
-//				((ManagerActivity)getActivity()).upgradeAccountButton();
-//				break;
-//
-//			case R.id.btnLeft_cancel_grid:
-//			case R.id.btnLeft_cancel:
-//				getProLayout.setVisibility(View.GONE);
-//				break;
-//		}
+		switch(v.getId()){
+			case R.id.btnLeft_new:
+				((ManagerActivity)getActivity()).showNewFolderDialog(null);				
+				break;
+				
+			case R.id.btnRight_upload:
+				((ManagerActivity)getActivity()).uploadFile();
+				break;
+			case R.id.btnLeft_grid_new:
+				((ManagerActivity)getActivity()).showNewFolderDialog(null);				
+				break;
+				
+			case R.id.btnRight_grid_upload:
+				((ManagerActivity)getActivity()).uploadFile();
+				break;
+				
+			case R.id.btnRight_upgrade:	
+			case R.id.btnRight_upgrade_grid:	
+			case R.id.out_space_btn:
+				((ManagerActivity)getActivity()).upgradeAccountButton();
+				break;
+				
+			case R.id.btnLeft_cancel_grid:	
+			case R.id.btnLeft_cancel:
+				getProLayout.setVisibility(View.GONE);
+				break;
+		}
 	}
 	
 	private String getInfoFolder(MegaNode n) {

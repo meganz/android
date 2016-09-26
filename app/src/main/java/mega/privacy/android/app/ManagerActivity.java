@@ -887,27 +887,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		setContentView(R.layout.activity_manager);
 
-//		imageProfile = (RoundedImageView) findViewById(R.id.profile_photo);
-//		textViewProfile = (TextView) findViewById(R.id.profile_textview);
-//		userEmail = (TextView) findViewById(R.id.profile_user_email);
-//		userEmail.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//		userEmail.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
-//		userEmail.setSingleLine();
-//		userEmail.setEllipsize(TruncateAt.END);
-//		userName = (TextView) findViewById(R.id.profile_user_name);
-//		userName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//		userName.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
-//		userName.setSingleLine();
-//		userName.setEllipsize(TruncateAt.END);
-//		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
-//        topControlBar = (TableLayout) findViewById(R.id.top_control_bar);
-//        topControlBar.setOnClickListener(this);
-//        bottomControlBar = (TableLayout) findViewById(R.id.bottom_control_bar);
-//        bottomControlBar.setOnClickListener(this);
-//        usedSpace = (TextView) findViewById(R.id.used_space);
-//        usedSpaceText = (TextView) findViewById(R.id.used_space_text);
-//        usedSpaceWarning = (ImageView) findViewById(R.id.used_space_warning);
+		imageProfile = (RoundedImageView) findViewById(R.id.profile_photo);
+		textViewProfile = (TextView) findViewById(R.id.profile_textview);
+		userEmail = (TextView) findViewById(R.id.profile_user_email);
+		userEmail.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		userEmail.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
+		userEmail.setSingleLine();
+		userEmail.setEllipsize(TruncateAt.END);
+		userName = (TextView) findViewById(R.id.profile_user_name);
+		userName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		userName.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
+		userName.setSingleLine();
+		userName.setEllipsize(TruncateAt.END);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+        topControlBar = (TableLayout) findViewById(R.id.top_control_bar);
+        topControlBar.setOnClickListener(this);
+        bottomControlBar = (TableLayout) findViewById(R.id.bottom_control_bar);
+        bottomControlBar.setOnClickListener(this);
+        usedSpace = (TextView) findViewById(R.id.used_space);
+        usedSpaceText = (TextView) findViewById(R.id.used_space_text);
+        usedSpaceWarning = (ImageView) findViewById(R.id.used_space_warning);
         usedSpaceWarning.setVisibility(View.INVISIBLE);
         usedSpaceBar = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
@@ -4626,7 +4626,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        
 	        case R.id.action_menu_change_pass:{
-
+	        	Intent intent = new Intent(this, ChangePasswordActivity.class);
+				startActivity(intent);
 				return true;
 	        }
 	        case R.id.action_menu_remove_MK:{
@@ -4957,26 +4958,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				break;
 			}
-//			case R.id.top_control_bar:{
-//				if (nDA != null){
-//					nDA.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItem(drawerItem);
-//				break;
-//			}
-//			case R.id.bottom_control_bar:{
-//				if (nDA != null){
-//					nDA.setPositionClicked(-1);
-//				}
-//				drawerItem = DrawerItem.ACCOUNT;
-//				titleAB = drawerItem.getTitle(this);
-//
-//				selectDrawerItem(drawerItem);
-//				break;
-//			}
+			case R.id.top_control_bar:{
+				if (nDA != null){
+					nDA.setPositionClicked(-1);
+				}
+				drawerItem = DrawerItem.ACCOUNT;
+				titleAB = drawerItem.getTitle(this);
+
+				selectDrawerItem(drawerItem);
+				break;
+			}
+			case R.id.bottom_control_bar:{
+				if (nDA != null){
+					nDA.setPositionClicked(-1);
+				}
+				drawerItem = DrawerItem.ACCOUNT;
+				titleAB = drawerItem.getTitle(this);
+
+				selectDrawerItem(drawerItem);				
+				break;
+			}
 		}
 	}
 	
