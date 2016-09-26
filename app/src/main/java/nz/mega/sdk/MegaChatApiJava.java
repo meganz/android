@@ -16,9 +16,15 @@ public class MegaChatApiJava {
         runnable.run();
     }
 
-    public MegaChatApiJava(MegaApiJava megaApi)
-    {
-        megaChatApi = new MegaChatApi(megaApi.getMegaApi());
+    /**
+     * Creates an instance of MegaChatApi to access to the chat-engine.
+     *
+     * @param megaApi Instance of MegaApi to be used by the chat-engine.
+     * @param resumeSession Boolean indicating if you're going to resume a session. If false, any existing
+     * session will be discarded and MegaChatApi expects to have a login+fetchnodes before MegaChatApi::init
+     */
+    public MegaChatApiJava(MegaApiJava megaApi, boolean resumeSession){
+        megaChatApi = new MegaChatApi(megaApi.getMegaApi(), resumeSession);
     }
 
     public void addChatRequestListener(MegaChatRequestListenerInterface listener)
