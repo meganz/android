@@ -256,11 +256,11 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		listView.setOnItemLongClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		
-//		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-//		buttonsLayout.setVisibility(View.GONE);
-//
-//		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-//		outSpaceLayout.setVisibility(View.GONE);
+		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+		buttonsLayout.setVisibility(View.GONE);
+		
+		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+		outSpaceLayout.setVisibility(View.GONE);
 		
 		getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 		getProLayout.setVisibility(View.GONE);

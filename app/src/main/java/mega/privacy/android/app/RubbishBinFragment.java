@@ -331,9 +331,9 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 				adapterList.setNodes(nodes);
 			}
 			
-//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish);
-//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_rubbish);
-//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_rubbish);
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_rubbish);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_rubbish);
 			outSpaceButton.setOnClickListener(this);
 			
 			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
@@ -521,12 +521,12 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 	@Override
 	public void onClick(View v) {
 
-//		switch(v.getId()){
-//		 	case R.id.out_space_btn_grid_rubbish:
-//			case R.id.out_space_btn_rubbish:
-//				((ManagerActivity)getActivity()).upgradeAccountButton();
-//				break;
-//		}
+		switch(v.getId()){
+		 	case R.id.out_space_btn_grid_rubbish:
+			case R.id.out_space_btn_rubbish:
+				((ManagerActivity)getActivity()).upgradeAccountButton();
+				break;
+		}
 	}
 	
 	@Override

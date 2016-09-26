@@ -487,51 +487,51 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
-//			convertView = inflater.inflate(R.layout.item_file_list, parent,false);
-//			holder = new ViewHolderBrowserList();
-//			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
-//			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
-//			holder.checkbox.setClickable(false);
-//			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
-//			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
-//
-//			holder.publicLinkImageMultiselect = (ImageView) convertView.findViewById(R.id.file_list_public_link_multiselect);
-//			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
-//
-//			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
-//			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
-//			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-//			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
-//
-//			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
-//			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
-//			holder.optionRename = (RelativeLayout) convertView.findViewById(R.id.file_list_option_rename_layout);
-//			holder.optionRename.setVisibility(View.GONE);
-//			holder.optionLeaveShare = (RelativeLayout) convertView.findViewById(R.id.file_list_option_leave_share_layout);
-//			holder.optionLeaveShare.setVisibility(View.GONE);
-//
-//			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.file_list_option_download_layout);
-//			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.file_list_option_properties_layout);
-//			holder.propertiesText = (TextView) convertView.findViewById(R.id.file_list_option_properties_text);
-//
-//			holder.optionPublicLink = (RelativeLayout) convertView.findViewById(R.id.file_list_option_public_link_layout);
-////			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-////			((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//
-//			holder.optionShare = (RelativeLayout) convertView.findViewById(R.id.file_list_option_share_layout);
-//			holder.optionPermissions = (RelativeLayout) convertView.findViewById(R.id.file_list_option_permissions_layout);
-//
-//			holder.optionDelete = (RelativeLayout) convertView.findViewById(R.id.file_list_option_delete_layout);
-//			holder.optionRemoveTotal = (RelativeLayout) convertView.findViewById(R.id.file_list_option_remove_layout);
-//
-////			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-////			((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-//
-//			holder.optionClearShares = (RelativeLayout) convertView.findViewById(R.id.file_list_option_clear_share_layout);
-//			holder.optionMoveTo = (RelativeLayout) convertView.findViewById(R.id.file_list_option_move_layout);
-//
-//			holder.optionMore = (RelativeLayout) convertView.findViewById(R.id.file_list_option_overflow_layout);
+			convertView = inflater.inflate(R.layout.item_file_list, parent,false);
+			holder = new ViewHolderBrowserList();
+			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
+			holder.checkbox.setClickable(false);
+			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
+			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
+			
+			holder.publicLinkImageMultiselect = (ImageView) convertView.findViewById(R.id.file_list_public_link_multiselect);
+			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
+			
+			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);			
+			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
+			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
+			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
+			
+			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
+			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
+			holder.optionRename = (RelativeLayout) convertView.findViewById(R.id.file_list_option_rename_layout);
+			holder.optionRename.setVisibility(View.GONE);
+			holder.optionLeaveShare = (RelativeLayout) convertView.findViewById(R.id.file_list_option_leave_share_layout);
+			holder.optionLeaveShare.setVisibility(View.GONE);
+			
+			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.file_list_option_download_layout);
+			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.file_list_option_properties_layout);
+			holder.propertiesText = (TextView) convertView.findViewById(R.id.file_list_option_properties_text);			
+
+			holder.optionPublicLink = (RelativeLayout) convertView.findViewById(R.id.file_list_option_public_link_layout);
+//			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
+//			((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+
+			holder.optionShare = (RelativeLayout) convertView.findViewById(R.id.file_list_option_share_layout);
+			holder.optionPermissions = (RelativeLayout) convertView.findViewById(R.id.file_list_option_permissions_layout);
+			
+			holder.optionDelete = (RelativeLayout) convertView.findViewById(R.id.file_list_option_delete_layout);			
+			holder.optionRemoveTotal = (RelativeLayout) convertView.findViewById(R.id.file_list_option_remove_layout);
+
+//			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
+//			((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
+
+			holder.optionClearShares = (RelativeLayout) convertView.findViewById(R.id.file_list_option_clear_share_layout);	
+			holder.optionMoveTo = (RelativeLayout) convertView.findViewById(R.id.file_list_option_move_layout);		
+			
+			holder.optionMore = (RelativeLayout) convertView.findViewById(R.id.file_list_option_overflow_layout);
 //			holder.optionMore.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 //			((LinearLayout.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
 						
@@ -1261,294 +1261,294 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			break;
 		}		
-//		case R.id.file_list_option_overflow_layout: {
-//
-//			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER) || (type == ManagerActivity.OUTGOING_SHARES_ADAPTER)) {
-////				((ManagerActivity) context).showOverflowMenu(n);
-//				AlertDialog moreOptionsDialog;
-//
-//				String [] optionsString = null;
-//				if (n.isFolder()){
-//					optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
-//				}
-//				else{
-//					optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_file_inbox)};
-//				}
-//
-//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
-//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//				builder.setTitle(R.string.more_options_overflow);
-//				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						if (n.isFile()){
-//							which = which + 1;
-//						}
-//						switch (which){
-//							case 0:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								((ManagerActivity) context).shareFolder(n);
-//								break;
-//							}
-//							case 1:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								((ManagerActivity) context).showRenameDialog(n, n.getName());
-//								break;
-//							}
-//							case 2:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								ArrayList<Long> handleList = new ArrayList<Long>();
-//								handleList.add(n.getHandle());
-//								((ManagerActivity) context).showMove(handleList);
-//								break;
-//							}
-//							case 3:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								ArrayList<Long> handleList = new ArrayList<Long>();
-//								handleList.add(n.getHandle());
-//								((ManagerActivity) context).showCopy(handleList);
-//								break;
-//							}
-//							case 4:{
-//								log("Selected send file");
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								((ManagerActivity) context).sentToInbox(n);
-//								break;
-//							}
-//						}
-//
-//						dialog.dismiss();
-//					}
-//				});
-//
-//				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				});
-//
-//				moreOptionsDialog = builder.create();
-//				moreOptionsDialog.show();
-//				Util.brandAlertDialog(moreOptionsDialog);
-//			}
-//
-//			else if (type == ManagerActivity.INCOMING_SHARES_ADAPTER) {
-////				((ManagerActivity) context).showOverflowMenu(n);
-//				AlertDialog moreOptionsDialog;
-//
-//				//Differenciate FullAccess and Read&Write
-//				MegaNode folder;
-//
-//				if (n.isFile())
-//					folder = megaApi.getParentNode(n);
-//				else
-//					folder = n;
-//
-//				int accessLevel = megaApi.getAccess(folder);
-//
-//				switch (accessLevel) {
-//					case MegaShare.ACCESS_FULL: {
-//						log("more access full");
-//						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-//						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//						builder.setTitle(R.string.more_options_overflow);
-//						builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//
-//							@Override
-//							public void onClick(DialogInterface dialog, int which) {
-//								switch (which){
-//									case 0:{
-//										setPositionClicked(-1);
-//										notifyDataSetChanged();
-//										ArrayList<Long> handleList = new ArrayList<Long>();
-//										handleList.add(n.getHandle());
-//										((ManagerActivity) context).showMove(handleList);
-//										break;
-//									}
-//									case 1:{
-//										setPositionClicked(-1);
-//										notifyDataSetChanged();
-//										ArrayList<Long> handleList = new ArrayList<Long>();
-//										handleList.add(n.getHandle());
-//										((ManagerActivity) context).showCopy(handleList);
-//										break;
-//									}
-//								}
-//
-//								dialog.dismiss();
-//							}
-//						});
-//
-//						builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-//
-//							@Override
-//							public void onClick(DialogInterface dialog, int which) {
-//								dialog.dismiss();
-//							}
-//						});
-//
-//						moreOptionsDialog = builder.create();
-//						moreOptionsDialog.show();
-//						Util.brandAlertDialog(moreOptionsDialog);
-//
-//						break;
-//					}
-//					case MegaShare.ACCESS_READWRITE:
-//					case MegaShare.ACCESS_READ:
-//					{
-//						log("more readwrite");
-//						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_copy)});
-//						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//						builder.setTitle(R.string.more_options_overflow);
-//						builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//
-//							@Override
-//							public void onClick(DialogInterface dialog, int which) {
-//								switch (which){
-//									case 0:{
-//										setPositionClicked(-1);
-//										notifyDataSetChanged();
-//										ArrayList<Long> handleList = new ArrayList<Long>();
-//										handleList.add(n.getHandle());
-//										((ManagerActivity) context).showCopy(handleList);
-//										break;
-//									}
-//								}
-//
-//								dialog.dismiss();
-//							}
-//						});
-//
-//						builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-//
-//							@Override
-//							public void onClick(DialogInterface dialog, int which) {
-//								dialog.dismiss();
-//							}
-//						});
-//
-//						moreOptionsDialog = builder.create();
-//						moreOptionsDialog.show();
-//						Util.brandAlertDialog(moreOptionsDialog);
-//
-//						break;
-//					}
-//				}
-//			}
-//			else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-////				((ManagerActivity) context).showOverflowMenu(n);
-//				AlertDialog moreOptionsDialog;
-//
-//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//				builder.setTitle(R.string.more_options_overflow);
-//				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						switch (which){
-//							case 0:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								ArrayList<Long> handleList = new ArrayList<Long>();
-//								handleList.add(n.getHandle());
-//								((ContactPropertiesMainActivity) context).showMove(handleList);
-//								break;
-//							}
-//							case 1:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								ArrayList<Long> handleList = new ArrayList<Long>();
-//								handleList.add(n.getHandle());
-//								((ContactPropertiesMainActivity) context).showCopy(handleList);
-//								break;
-//							}
-//						}
-//
-//						dialog.dismiss();
-//					}
-//				});
-//
-//				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				});
-//
-//				moreOptionsDialog = builder.create();
-//				moreOptionsDialog.show();
-//				Util.brandAlertDialog(moreOptionsDialog);
-//			}
-//			else if ((type == ManagerActivity.INBOX_ADAPTER)) {
-////				((ManagerActivity) context).showOverflowMenu(n);
-//				AlertDialog moreOptionsDialog;
-//
-//				String [] optionsString = null;
-//
-//				optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
-//
-//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
-//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//				builder.setTitle(R.string.more_options_overflow);
-//				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//
-//						switch (which){
-//
-//							case 0:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								((ManagerActivity) context).showRenameDialog(n, n.getName());
-//								break;
-//							}
-//							case 1:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								ArrayList<Long> handleList = new ArrayList<Long>();
-//								handleList.add(n.getHandle());
-//								((ManagerActivity) context).showMove(handleList);
-//								break;
-//							}
-//							case 2:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								ArrayList<Long> handleList = new ArrayList<Long>();
-//								handleList.add(n.getHandle());
-//								((ManagerActivity) context).showCopy(handleList);
-//								break;
-//							}
-//						}
-//
-//						dialog.dismiss();
-//					}
-//				});
-//
-//				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-//
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				});
-//
-//				moreOptionsDialog = builder.create();
-//				moreOptionsDialog.show();
-//				Util.brandAlertDialog(moreOptionsDialog);
-//			}
-//			break;
-//		}
+		case R.id.file_list_option_overflow_layout: {
+
+			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER) || (type == ManagerActivity.OUTGOING_SHARES_ADAPTER)) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				String [] optionsString = null;
+				if (n.isFolder()){
+					optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)}; 
+				}
+				else{
+					optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_file_inbox)};
+				}
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle(R.string.more_options_overflow);
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (n.isFile()){
+							which = which + 1;
+						}
+						switch (which){
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();									
+								((ManagerActivity) context).shareFolder(n);
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).showRenameDialog(n, n.getName());
+								break;
+							}
+							case 2:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showMove(handleList);
+								break;
+							}
+							case 3:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showCopy(handleList);
+								break;
+							}
+							case 4:{
+								log("Selected send file");
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).sentToInbox(n);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				Util.brandAlertDialog(moreOptionsDialog);
+			}
+			
+			else if (type == ManagerActivity.INCOMING_SHARES_ADAPTER) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				//Differenciate FullAccess and Read&Write
+				MegaNode folder;
+				
+				if (n.isFile())
+					folder = megaApi.getParentNode(n);
+				else
+					folder = n;
+
+				int accessLevel = megaApi.getAccess(folder);
+
+				switch (accessLevel) {
+					case MegaShare.ACCESS_FULL: {
+						log("more access full");
+						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setTitle(R.string.more_options_overflow);
+						builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which){
+									case 0:{
+										setPositionClicked(-1);
+										notifyDataSetChanged();
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(n.getHandle());									
+										((ManagerActivity) context).showMove(handleList);
+										break;
+									}
+									case 1:{
+										setPositionClicked(-1);
+										notifyDataSetChanged();
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(n.getHandle());									
+										((ManagerActivity) context).showCopy(handleList);
+										break;
+									}
+								}
+
+								dialog.dismiss();
+							}
+						});					
+						
+						builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+
+						moreOptionsDialog = builder.create();
+						moreOptionsDialog.show();
+						Util.brandAlertDialog(moreOptionsDialog);
+						
+						break;
+					}
+					case MegaShare.ACCESS_READWRITE: 
+					case MegaShare.ACCESS_READ: 
+					{
+						log("more readwrite");
+						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_copy)});
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setTitle(R.string.more_options_overflow);
+						builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which){
+									case 0:{
+										setPositionClicked(-1);
+										notifyDataSetChanged();
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(n.getHandle());									
+										((ManagerActivity) context).showCopy(handleList);
+										break;
+									}
+								}
+
+								dialog.dismiss();
+							}
+						});					
+						
+						builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+
+						moreOptionsDialog = builder.create();
+						moreOptionsDialog.show();
+						Util.brandAlertDialog(moreOptionsDialog);
+	
+						break;
+					}
+				}	
+			}			
+			else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle(R.string.more_options_overflow);
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which){
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ContactPropertiesMainActivity) context).showMove(handleList);
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ContactPropertiesMainActivity) context).showCopy(handleList);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				Util.brandAlertDialog(moreOptionsDialog);
+			}
+			else if ((type == ManagerActivity.INBOX_ADAPTER)) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				String [] optionsString = null;
+
+				optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};				
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle(R.string.more_options_overflow);
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						
+						switch (which){
+							
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).showRenameDialog(n, n.getName());
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showMove(handleList);
+								break;
+							}
+							case 2:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showCopy(handleList);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				Util.brandAlertDialog(moreOptionsDialog);
+			}
+			break;
+		}					
 		case R.id.file_list_option_permissions_layout: {
 			Intent i = new Intent(context, FileContactListActivity.class);
 			i.putExtra("name", n.getHandle());
