@@ -376,16 +376,16 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			turnOnOff.setOnClickListener(this);
 	
 			contentText = (TextView) v.findViewById(R.id.content_text);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+//			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			
 			contentText.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 			getProLayout.setVisibility(View.GONE);
 			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
+//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			outSpaceButton.setVisibility(View.VISIBLE);
 			outSpaceButton.setOnClickListener(this);
 			
@@ -1022,11 +1022,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				}
 				break;
 			}
-			case R.id.out_space_btn_grid:
-			case R.id.out_space_btn:{
-				((ManagerActivity)getActivity()).upgradeAccountButton();
-				break;
-			}
+//			case R.id.out_space_btn_grid:
+//			case R.id.out_space_btn:{
+//				((ManagerActivity)getActivity()).upgradeAccountButton();
+//				break;
+//			}
 			case R.id.cam_sync_button_ok:{
 				firstTimeCam = false;
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);

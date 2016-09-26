@@ -1184,11 +1184,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		handler = new Handler();
 
+		log("Set view");
 		setContentView(R.layout.activity_manager);
 //		long num = 11179220468180L;
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar);
+		if(tB==null){
+			log("Tb is Null");
+			return;
+		}
+
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
@@ -1338,9 +1344,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		slidingAvatarOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		////
-
-//		slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
+		//slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
 
 		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);

@@ -75,12 +75,12 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
 		
-		contentText = (TextView) v.findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
-		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-		buttonsLayout.setVisibility(View.GONE);
-		
-		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+//		contentText = (TextView) v.findViewById(R.id.content_text);
+//		contentText.setVisibility(View.GONE);
+//		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+//		buttonsLayout.setVisibility(View.GONE);
+//
+//		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
 		getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 		getProLayout.setVisibility(View.GONE);

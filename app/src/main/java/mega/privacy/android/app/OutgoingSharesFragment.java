@@ -293,19 +293,19 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);			
 			
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
-			buttonsLayout.setVisibility(View.GONE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
-			
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
-			getProLayout.setVisibility(View.GONE);
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
+//			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+//			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
+//			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);
+//			buttonsLayout.setVisibility(View.GONE);
+//			leftNewFolder.setVisibility(View.GONE);
+//			rightUploadButton.setVisibility(View.GONE);
+//
+//			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+//			getProLayout.setVisibility(View.GONE);
+//
+//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			
 			outSpaceButton.setOnClickListener(this);
 			
@@ -590,26 +590,26 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 
-		switch(v.getId()){
-			case R.id.btnLeft_new:
-				((ManagerActivity)getActivity()).showNewFolderDialog(null);				
-				break;
-				
-			case R.id.btnRight_upload:
-				((ManagerActivity)getActivity()).uploadFile();
-				break;
-			case R.id.btnLeft_grid_new:
-				((ManagerActivity)getActivity()).showNewFolderDialog(null);				
-				break;
-				
-			case R.id.btnRight_grid_upload:
-				((ManagerActivity)getActivity()).uploadFile();
-				break;
-				
-			case R.id.out_space_btn:
-				((ManagerActivity)getActivity()).upgradeAccountButton();
-				break;
-		}
+//		switch(v.getId()){
+//			case R.id.btnLeft_new:
+//				((ManagerActivity)getActivity()).showNewFolderDialog(null);
+//				break;
+//
+//			case R.id.btnRight_upload:
+//				((ManagerActivity)getActivity()).uploadFile();
+//				break;
+//			case R.id.btnLeft_grid_new:
+//				((ManagerActivity)getActivity()).showNewFolderDialog(null);
+//				break;
+//
+//			case R.id.btnRight_grid_upload:
+//				((ManagerActivity)getActivity()).uploadFile();
+//				break;
+//
+//			case R.id.out_space_btn:
+//				((ManagerActivity)getActivity()).upgradeAccountButton();
+//				break;
+//		}
 	}
 	
 	private String getInfoNode() {
