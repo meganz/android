@@ -15,11 +15,15 @@ import java.util.ArrayList;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatLogger;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatRoomList;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
@@ -41,7 +45,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
 
-	MegaChatApiAndroid megaChatApi;
+	MegaChatApiAndroid megaChatApi = null;
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -114,6 +118,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
+		MegaChatApiAndroid.setLoggerObject(new MegaChatLogger());
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 
@@ -175,6 +182,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 		
 		return megaApiFolder;
+	}
+
+	public MegaChatApiAndroid getMegaChatApi(){
+		if (megaChatApi == null){
+			getMegaApi();
+		}
+
+		return megaChatApi;
 	}
 	
 	public MegaApiAndroid getMegaApi()
@@ -291,7 +306,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
+//		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
+//			MegaApiAndroid.setLoggerObject(new AndroidLogger());
+//		}
 	}
 
 	@Override
@@ -306,14 +323,32 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
 			megaChatApi.connect(this);
 		}
+		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Connected to chat!");
+				MegaChatRoomList chatList = megaChatApi.getChatRooms();
+				if(chatList!=null){
+					log("Chat size: :"+chatList.size());
+				}
+				else{
+					log("Chat NULL");
+				}
+			}
+
+			MegaChatRoom chat = megaChatApi.getChatRoom(new Long(635570421));
+			if(chat!=null){
+				log("tengo el chat!");
+			}
+			else{
+				log("el chat es Null");
+			}
+		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
 	}
-
-
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {

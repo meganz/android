@@ -12,6 +12,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -40,10 +41,15 @@ import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatRoomList;
 
 public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
     Context context;
     ActionBar aB;
@@ -95,6 +101,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if (megaChatApi == null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
         recentChat = new RecentChat();
@@ -149,6 +159,27 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         getStartedButton.setOnClickListener(this);
 
         chats = recentChat.getRecentChats();
+
+        MegaChatRoomList chatList = megaChatApi.getChatRooms();
+        if(chatList!=null){
+            log("Chat size: :"+chatList.size());
+        }
+        else{
+            log("Chat NULL");
+        }
+
+        for(int i=0;i<chatList.size();i++)
+        {
+            log("Chat size: :"+chatList.size());
+            Toast.makeText(context, "Chat size: :"+chatList.size(), Toast.LENGTH_SHORT);
+
+            MegaChatRoom chatRoom = chatList.get(i);
+            chatRoom.getPeerHandle(0);
+//            MegaChatListItem chatListItem = chatList.get(i);
+//            megaChatApi.get
+//            megaChatApi.getMessages(chatRoom.getChatId(), 50);
+//            log("Chat: "+chatRoom.getMessages);
+        }
 
         if (adapterList == null){
             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
