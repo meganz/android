@@ -341,6 +341,8 @@ public class AccountController {
         }
         dbH.clearOffline();
 
+        dbH.clearContacts();
+
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
