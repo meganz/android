@@ -1180,30 +1180,30 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case R.id.file_list_option_properties_layout: {
-			Intent i = new Intent(context, FilePropertiesActivity.class);
-			i.putExtra("handle", n.getHandle());
-			
-			if (n.isFolder()) {
-				if (megaApi.isShared(n)){
-					i.putExtra("imageId", R.drawable.folder_shared_mime);	
-				}
-				else{
-					i.putExtra("imageId", R.drawable.folder_mime);
-				}
-			} 
-			else {
-				i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
-			}
-			i.putExtra("name", n.getName());
-			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
-				i.putExtra("from", FROM_INCOMING_SHARES);
-			}
-			else{
-				i.putExtra("from", FROM_FILE_BROWSER);
-			}
-			context.startActivity(i);
-			positionClicked = -1;
-			notifyDataSetChanged();
+//			Intent i = new Intent(context, FilePropertiesActivity.class);
+//			i.putExtra("handle", n.getHandle());
+//
+//			if (n.isFolder()) {
+//				if (megaApi.isShared(n)){
+//					i.putExtra("imageId", R.drawable.folder_shared_mime);
+//				}
+//				else{
+//					i.putExtra("imageId", R.drawable.folder_mime);
+//				}
+//			}
+//			else {
+//				i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
+//			}
+//			i.putExtra("name", n.getName());
+//			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
+//				i.putExtra("from", FROM_INCOMING_SHARES);
+//			}
+//			else{
+//				i.putExtra("from", FROM_FILE_BROWSER);
+//			}
+//			context.startActivity(i);
+//			positionClicked = -1;
+//			notifyDataSetChanged();
 			break;
 		}
 		case R.id.file_list_option_clear_share_layout: {

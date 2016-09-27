@@ -117,7 +117,7 @@ public class MegaProviderAdapter extends BaseAdapter implements OnClickListener{
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_explorer_filesize);
-			holder.textViewUpdated = (TextView) convertView.findViewById(R.id.file_explorer_updated);
+//			holder.textViewUpdated = (TextView) convertView.findViewById(R.id.file_explorer_updated);
 			
 			convertView.setTag(holder);
 		}

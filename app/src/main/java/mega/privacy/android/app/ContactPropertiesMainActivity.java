@@ -401,8 +401,8 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 	public void pickFolderToShare(MegaUser user){
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_SELECT_FOLDER);
 		String[] longArray = new String[1];		
 		longArray[0] = user.getEmail();		
 		intent.putExtra("SELECTED_CONTACTS", longArray);
@@ -749,8 +749,8 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 	public void showMove(ArrayList<Long> handleList){
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
@@ -761,8 +761,8 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 	public void showCopy(ArrayList<Long> handleList) {
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i = 0; i < handleList.size(); i++) {
 			longArray[i] = handleList.get(i);

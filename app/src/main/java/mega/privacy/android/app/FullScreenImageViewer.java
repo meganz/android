@@ -938,8 +938,8 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(node.getHandle());
 		
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
@@ -953,8 +953,8 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(node.getHandle());
 		
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
