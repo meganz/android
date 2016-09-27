@@ -111,7 +111,7 @@
 
     
      <ProgressBar
-	    android:id="@+id/transfers_list__browser_bar"
+	    android:id="@+id/transfers_list_browser_bar"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"  
         android:layout_marginLeft="13dp" 

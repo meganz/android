@@ -1,408 +1,872 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_secondary"
-    android:stackFromBottom="true"
-    android:id="@+id/scroll_view_upgrade">
-    
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@color/white"
+	android:id="@+id/scroll_view_choose_account">
+
     <LinearLayout
-    android:orientation="vertical"  
-    android:layout_width="fill_parent"  
-    android:layout_height="fill_parent" >
-    
-         <!-- Free Account -->
-         <RelativeLayout
-            android:id="@+id/free_account_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="#ffffff"
-            android:onClick="onFreeClick">
-        
-            <ImageView 
-                android:id="@+id/free_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/free_ic"
-                />
-            <TextView
-                android:id="@+id/free_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="35dp" 
-                android:textSize="20sp"
-                android:text="@string/free_account"
-                android:layout_below="@id/free_image"/>
-            
-            <TextView
-                android:id="@+id/free_storage_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/settings_storage"
-                android:layout_alignTop="@id/free_image"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/free_image"/>
-            
-            <TextView
-                android:id="@+id/free_bandwidth_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/free_image"
-                android:layout_below="@id/free_storage_title"/>
-            
-            <TextView
-                android:id="@+id/free_storage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/free_image"
-                android:textSize="20sp"
-                android:text="@string/free_storage"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/free_storage_title"/>
-            
-            <TextView
-                android:id="@+id/free_bandwidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/free_bandwidth"
-                android:layout_marginLeft="@dimen/standard_margin"
-                android:layout_marginRight="@dimen/standard_margin"
-                android:layout_marginTop="12dp"
-                android:layout_toRightOf="@id/free_bandwidth_title"
-                android:layout_alignBottom="@id/free_bandwidth_title"
-                android:layout_below="@id/free_storage"/>
-            
-            <TextView
-                android:id="@+id/princingfree_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:text="@string/free_account"
-                android:layout_toRightOf="@id/free_title"  
-                android:layout_alignLeft="@id/free_bandwidth_title"            
-                android:layout_below="@id/free_image"
-                android:layout_marginBottom="10dp"/>
-            
-        </RelativeLayout>   
-        
-       <include layout="@layout/delimiter" />
- 
- 		 <!-- Pro Lite -->
-         <RelativeLayout
-            android:id="@+id/prolite_account_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="#ffffff"
-            android:onClick="onUpgradeLiteClick">
-        
-            <ImageView 
-                android:id="@+id/prolite_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/ic_pro_lite"
-                />
-            <TextView
-                android:id="@+id/prolite_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="35dp" 
-                android:textSize="20sp"
-                android:text="@string/prolite_account"
-                android:layout_below="@id/prolite_image"/>
-            
-            <TextView
-                android:id="@+id/prolite_storage_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/settings_storage"
-                android:layout_alignTop="@id/prolite_image"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/prolite_image"/>
-            
-            <TextView
-                android:id="@+id/prolite_bandwidth_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/prolite_image"
-                android:layout_below="@id/prolite_storage_title"/>
-            
-            <TextView
-                android:id="@+id/prolite_storage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/prolite_image"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/prolite_storage_title"/>
-            
-            <TextView
-                android:id="@+id/prolite_bandwidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/prolite_bandwidth_title"
-                android:layout_below="@id/prolite_storage"/>
-            
-            <TextView
-                android:id="@+id/princinglite_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:layout_toRightOf="@id/prolite_title"  
-                android:layout_alignLeft="@id/prolite_bandwidth_title"            
-                android:layout_below="@id/prolite_image"
-                android:layout_marginBottom="10dp"/>
+        android:id="@+id/choose_account_main_linear_layout"
+        android:layout_width="match_parent"  
+    	android:layout_height="wrap_content" 
+    	android:orientation="vertical"
+    	android:background="@color/white">
+    	
+        <!-- Free -->
+		<RelativeLayout
+			android:id="@+id/choose_account_free_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/card_corner"
+			android:elevation="3dp">
 
-        </RelativeLayout>        
-                      
-        <include layout="@layout/delimiter" />
-         <!-- Pro 1 -->
-         <RelativeLayout
-            android:id="@+id/pro1_account_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="#ffffff"
-            android:onClick="onUpgrade1Click">
-        
-            <ImageView 
-                android:id="@+id/pro1_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/ic_pro_1"
-                />
-            <TextView
-                android:id="@+id/pro1_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="35dp" 
-                android:textSize="20sp"
-                android:text="@string/pro1_account"
-                android:layout_below="@id/pro1_image"/>
-            
-            <TextView
-                android:id="@+id/pro1_storage_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/settings_storage"
-                android:layout_alignTop="@id/pro1_image"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_image"/>
-            
-            <TextView
-                android:id="@+id/pro1_bandwidth_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_image"
-                android:layout_below="@id/pro1_storage_title"/>
-            
-            <TextView
-                android:id="@+id/pro1_storage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/pro1_image"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_storage_title"/>
-            
-            <TextView
-                android:id="@+id/pro1_bandwidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_bandwidth_title"
-                android:layout_below="@id/pro1_storage"/>
-            
-            <TextView
-                android:id="@+id/pricing1_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:layout_toRightOf="@id/pro1_title"  
-                android:layout_alignLeft="@id/pro1_bandwidth_title"            
-                android:layout_below="@id/pro1_image"
-                android:layout_marginBottom="10dp"/>
+			<RelativeLayout
+				android:id="@+id/choose_account_free_layout_content"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
 
-        </RelativeLayout>        
-                      
-        <include layout="@layout/delimiter" />
-       
-        <!-- Pro 2 -->
-        <RelativeLayout
-            android:id="@+id/pro2_account_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:onClick="onUpgrade2Click"
-            android:background="#ffffff">
-            <ImageView 
-                android:id="@+id/pro2_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/ic_pro_2"
-                />
-            <TextView
-                android:id="@+id/pro2_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="35dp" 
-                android:textSize="20sp"
-                android:text="@string/pro2_account"
-                android:layout_below="@id/pro2_image"/>
-            
-            <TextView
-                android:id="@+id/pro2_storage_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/settings_storage"
-                android:layout_alignTop="@id/pro2_image"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_image"/>
-            
-            <TextView
-                android:id="@+id/pro2_bandwidth_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_image"
-                android:layout_below="@id/pro2_storage_title"/>
-            
-            <TextView
-                android:id="@+id/pro2_storage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_alignTop="@id/pro2_image"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_storage_title"/>
-            
-            <TextView
-                android:id="@+id/pro2_bandwidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_bandwidth_title"
-                android:layout_below="@id/pro2_storage"/>
-            
-            <TextView
-                android:id="@+id/pricing2_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:layout_alignLeft="@id/pro2_bandwidth_title" 
-                android:layout_toRightOf="@id/pro2_title"
-                android:layout_below="@id/pro2_image"
-                android:layout_marginBottom="10dp"/>
-        </RelativeLayout>
-        
-        <include layout="@layout/delimiter" />
+				<!-- Left side (title and price) -->
+				<RelativeLayout
+					android:id="@+id/choose_account_free_left_side"
+					android:layout_width="125dp"
+					android:layout_height="118dp"
+					android:background="@color/white"
+					android:gravity="center_vertical">
 
-        <!-- Pro 3 -->
-        <RelativeLayout
-            android:id="@+id/pro3_account_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="#ffffff"
-            android:onClick="onUpgrade3Click">
-            <ImageView 
-                android:id="@+id/pro3_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/ic_pro_3"
-                />
-             <TextView
-                android:id="@+id/pro3_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginLeft="35dp"                
-                android:text="@string/pro3_account"
-                android:layout_below="@id/pro3_image"/>
-            
-            <TextView
-                android:id="@+id/pro3_storage_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_alignTop="@id/pro3_image"
-                android:text="@string/settings_storage"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_image"/>
-            
-            <TextView
-                android:id="@+id/pro3_bandwidth_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_image"
-                android:layout_below="@id/pro3_storage_title"/>
-            
-            <TextView
-                android:id="@+id/pro3_storage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_alignTop="@id/pro3_image"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_storage_title"/>
-            
-            <TextView
-                android:id="@+id/pro3_bandwidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_bandwidth_title"
-                android:layout_below="@id/pro3_storage"/>
-            
-            <TextView
-                android:id="@+id/pricing3_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:text="@string/general_bandwidth"
-                android:layout_alignLeft="@id/pro3_bandwidth_title" 
-                android:layout_toRightOf="@id/pro3_title"
-                android:layout_below="@id/pro3_image"
-                android:layout_marginBottom="10dp"/>
-        </RelativeLayout>
-        
-        <include layout="@layout/delimiter" />
-        
-        
+					<TextView
+						android:id="@+id/choose_account_free_title_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/green_free_account"
+						android:text="@string/free_account"
+						android:textAllCaps="true"
+						android:layout_centerHorizontal="true"
+						android:textSize="24sp"/>
+
+					<RelativeLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_below="@id/choose_account_free_title_text"
+						android:layout_centerHorizontal="true"
+						android:gravity="bottom">
+
+						<TextView
+							android:id="@+id/choose_account_free_integer_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:textSize="28sp"/>
+
+						<TextView
+							android:id="@+id/choose_account_free_decimal_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:layout_toRightOf="@id/choose_account_free_integer_text"
+							android:layout_alignBottom="@id/choose_account_free_integer_text"
+							android:textSize="14sp" />
+
+						<TextView
+							android:id="@+id/choose_account_free_per_month_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/green_free_account"
+							android:layout_toRightOf="@id/choose_account_free_decimal_text"
+							android:layout_alignBottom="@id/choose_account_free_integer_text"
+							android:textSize="14sp"/>
+					</RelativeLayout>
+				</RelativeLayout>
+
+				<View
+					android:id="@+id/choose_account_free_vertical_divider"
+					android:layout_width="2dp"
+					android:layout_height="86dp"
+					android:layout_toRightOf="@id/choose_account_free_left_side"
+					android:layout_centerVertical="true"
+					android:background="@color/divider_upgrade_account" />
+
+				<!-- Right side (storage and bandwidth)-->
+				<RelativeLayout
+					android:id="@+id/choose_account_free_layout_right_side"
+					android:layout_width="match_parent"
+					android:layout_height="118dp"
+					android:gravity="center_vertical"
+					android:layout_toRightOf="@id/choose_account_free_vertical_divider">
+
+					<TableLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true">
+						<TableRow
+							android:id="@+id/table_row_free">
+							<TextView
+								android:id="@+id/choose_account_free_storage_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/green_free_account"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_free_storage_value_gb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="@color/green_free_account"
+								android:textSize="16sp"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_free_empty_text"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_free_storage_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textSize="14sp"
+								android:ellipsize="end"
+								android:text="@string/general_storage"
+								android:textColor="@color/file_properties_text_available"
+								android:textAllCaps="true" />
+
+						</TableRow>
+						<TableRow>
+							<TextView
+								android:id="@+id/choose_account_free_bandwidth_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/green_free_account"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_free_bandwith_value_tb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textAllCaps="true"
+								android:textColor="@color/green_free_account"
+								android:textSize="14sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_free_empty_text_bandwidth"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_free_bandwith_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textColor="@color/file_properties_text_available"
+								android:ellipsize="end"
+								android:text="@string/general_bandwidth"
+								android:textAllCaps="true"
+								android:textSize="14sp" />
+
+						</TableRow>
+					</TableLayout>
+
+				</RelativeLayout>
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/choose_account_free_layout_transparent"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:visibility="invisible"
+				android:background="#80ffffff">
+
+			</RelativeLayout>
+
+		</RelativeLayout>
+
+		<!-- Pro Lite -->
+		<RelativeLayout
+			android:id="@+id/choose_account_prolite_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/card_corner"
+			android:elevation="3dp">
+
+			<RelativeLayout
+				android:id="@+id/choose_account_prolite_layout_content"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<!-- Left side (title and price) -->
+				<RelativeLayout
+					android:id="@+id/choose_account_prolite_left_side"
+					android:layout_width="125dp"
+					android:layout_height="118dp"
+					android:background="@color/white"
+					android:gravity="center_vertical">
+
+					<TextView
+						android:id="@+id/choose_account_prolite_title_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/upgrade_orange"
+						android:text="@string/prolite_account"
+						android:textAllCaps="true"
+						android:layout_centerHorizontal="true"
+						android:textSize="24sp"/>
+
+					<RelativeLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_below="@id/choose_account_prolite_title_text"
+						android:layout_centerHorizontal="true"
+						android:gravity="bottom">
+
+						<TextView
+							android:id="@+id/choose_account_prolite_integer_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:textSize="28sp"/>
+
+						<TextView
+							android:id="@+id/choose_account_prolite_decimal_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:layout_toRightOf="@id/choose_account_prolite_integer_text"
+							android:layout_alignBottom="@id/choose_account_prolite_integer_text"
+							android:textSize="14sp" />
+
+						<TextView
+							android:id="@+id/choose_account_prolite_per_month_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/upgrade_orange"
+							android:layout_toRightOf="@id/choose_account_prolite_decimal_text"
+							android:layout_alignBottom="@id/choose_account_prolite_integer_text"
+							android:textSize="14sp"/>
+					</RelativeLayout>
+				</RelativeLayout>
+
+				<View
+					android:id="@+id/choose_account_prolite_vertical_divider"
+					android:layout_width="2dp"
+					android:layout_height="86dp"
+					android:layout_toRightOf="@id/choose_account_prolite_left_side"
+					android:layout_centerVertical="true"
+					android:background="@color/divider_upgrade_account" />
+
+				<!-- Right side (storage and bandwidth)-->
+				<RelativeLayout
+					android:id="@+id/choose_account_prolite_layout_right_side"
+					android:layout_width="match_parent"
+					android:layout_height="118dp"
+					android:gravity="center_vertical"
+					android:layout_toRightOf="@id/choose_account_prolite_vertical_divider">
+
+					<TableLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true">
+						<TableRow
+							android:id="@+id/table_row_pro_lite">
+							<TextView
+								android:id="@+id/choose_account_prolite_storage_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/upgrade_orange"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_prolite_storage_value_gb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="@color/upgrade_orange"
+								android:textSize="16sp"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_prolite_empty_text"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_prolite_storage_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textSize="14sp"
+								android:ellipsize="end"
+								android:text="@string/general_storage"
+								android:textColor="@color/file_properties_text_available"
+								android:textAllCaps="true" />
+
+						</TableRow>
+						<TableRow>
+							<TextView
+								android:id="@+id/choose_account_prolite_bandwidth_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/upgrade_orange"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_prolite_bandwith_value_tb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/upgrade_orange"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_prolite_empty_text_bandwidth"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_prolite_bandwith_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textColor="@color/file_properties_text_available"
+								android:ellipsize="end"
+								android:text="@string/general_bandwidth"
+								android:textAllCaps="true"
+								android:textSize="14sp" />
+
+						</TableRow>
+					</TableLayout>
+
+				</RelativeLayout>
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/choose_account_prolite_layout_transparent"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:visibility="invisible"
+				android:background="#80ffffff">
+
+			</RelativeLayout>
+
+		</RelativeLayout>
+
+		<!-- Pro I -->
+		<RelativeLayout
+			android:id="@+id/choose_account_pro_i_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/card_corner"
+			android:elevation="3dp">
+
+			<RelativeLayout
+				android:id="@+id/choose_account_pro_i_layout_content"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<!-- Left side (title and price) -->
+				<RelativeLayout
+					android:id="@+id/choose_account_pro_i_left_side"
+					android:layout_width="125dp"
+					android:layout_height="118dp"
+					android:background="@color/white"
+					android:gravity="center_vertical">
+
+					<TextView
+						android:id="@+id/choose_account_pro_i_title_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/lollipop_primary_color"
+						android:text="@string/pro1_account"
+						android:textAllCaps="true"
+						android:layout_centerHorizontal="true"
+						android:textSize="24sp"/>
+
+					<RelativeLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_below="@id/choose_account_pro_i_title_text"
+						android:layout_centerHorizontal="true"
+						android:gravity="bottom">
+
+						<TextView
+							android:id="@+id/choose_account_pro_i_integer_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:textSize="28sp"/>
+
+						<TextView
+							android:id="@+id/choose_account_pro_i_decimal_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:layout_toRightOf="@id/choose_account_pro_i_integer_text"
+							android:layout_alignBottom="@id/choose_account_pro_i_integer_text"
+							android:textSize="14sp" />
+
+						<TextView
+							android:id="@+id/choose_account_pro_i_per_month_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/lollipop_primary_color"
+							android:layout_toRightOf="@id/choose_account_pro_i_decimal_text"
+							android:layout_alignBottom="@id/choose_account_pro_i_integer_text"
+							android:textSize="14sp"/>
+					</RelativeLayout>
+				</RelativeLayout>
+
+				<View
+					android:id="@+id/choose_account_pro_i_vertical_divider"
+					android:layout_width="2dp"
+					android:layout_height="86dp"
+					android:layout_toRightOf="@id/choose_account_pro_i_left_side"
+					android:layout_centerVertical="true"
+					android:background="@color/divider_upgrade_account" />
+
+				<!-- Right side (storage and bandwidth)-->
+				<RelativeLayout
+					android:id="@+id/choose_account_pro_i_layout_right_side"
+					android:layout_width="match_parent"
+					android:layout_height="118dp"
+					android:gravity="center_vertical"
+					android:layout_toRightOf="@id/choose_account_pro_i_vertical_divider">
+
+					<TableLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true">
+						<TableRow
+							android:id="@+id/table_row_pro_i">
+							<TextView
+								android:id="@+id/choose_account_pro_i_storage_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_i_storage_value_gb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_i_empty_text"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_i_storage_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textSize="14sp"
+								android:ellipsize="end"
+								android:text="@string/general_storage"
+								android:textColor="@color/file_properties_text_available"
+								android:textAllCaps="true" />
+
+						</TableRow>
+						<TableRow>
+							<TextView
+								android:id="@+id/choose_account_pro_i_bandwidth_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_i_bandwith_value_tb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_i_empty_text_bandwidth"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_i_bandwith_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textColor="@color/file_properties_text_available"
+								android:ellipsize="end"
+								android:text="@string/general_bandwidth"
+								android:textAllCaps="true"
+								android:textSize="14sp" />
+
+						</TableRow>
+					</TableLayout>
+
+				</RelativeLayout>
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/choose_account_pro_i_layout_transparent"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:visibility="invisible"
+				android:background="#80ffffff">
+			</RelativeLayout>
+
+		</RelativeLayout>
+
+		<!-- Pro II -->
+		<RelativeLayout
+			android:id="@+id/choose_account_pro_ii_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/card_corner"
+			android:elevation="3dp">
+
+			<RelativeLayout
+				android:id="@+id/choose_account_pro_ii_layout_content"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<!-- Left side (title and price) -->
+				<RelativeLayout
+					android:id="@+id/choose_account_pro_ii_left_side"
+					android:layout_width="125dp"
+					android:layout_height="118dp"
+					android:background="@color/white"
+					android:gravity="center_vertical">
+
+					<TextView
+						android:id="@+id/choose_account_pro_ii_title_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/lollipop_primary_color"
+						android:text="@string/pro2_account"
+						android:textAllCaps="true"
+						android:layout_centerHorizontal="true"
+						android:textSize="24sp"/>
+
+					<RelativeLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_below="@id/choose_account_pro_ii_title_text"
+						android:layout_centerHorizontal="true"
+						android:gravity="bottom">
+
+						<TextView
+							android:id="@+id/choose_account_pro_ii_integer_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:textSize="28sp"/>
+
+						<TextView
+							android:id="@+id/choose_account_pro_ii_decimal_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:layout_toRightOf="@id/choose_account_pro_ii_integer_text"
+							android:layout_alignBottom="@id/choose_account_pro_ii_integer_text"
+							android:textSize="14sp" />
+
+						<TextView
+							android:id="@+id/choose_account_pro_ii_per_month_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/lollipop_primary_color"
+							android:layout_toRightOf="@id/choose_account_pro_ii_decimal_text"
+							android:layout_alignBottom="@id/choose_account_pro_ii_integer_text"
+							android:textSize="14sp"/>
+					</RelativeLayout>
+				</RelativeLayout>
+
+				<View
+					android:id="@+id/choose_account_pro_ii_vertical_divider"
+					android:layout_width="2dp"
+					android:layout_height="86dp"
+					android:layout_toRightOf="@id/choose_account_pro_ii_left_side"
+					android:layout_centerVertical="true"
+					android:background="@color/divider_upgrade_account" />
+
+				<!-- Right side (storage and bandwidth)-->
+				<RelativeLayout
+					android:id="@+id/choose_account_pro_ii_layout_right_side"
+					android:layout_width="match_parent"
+					android:layout_height="118dp"
+					android:gravity="center_vertical"
+					android:layout_toRightOf="@id/choose_account_pro_ii_vertical_divider">
+
+					<TableLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true">
+						<TableRow
+							android:id="@+id/table_row_pro_ii">
+							<TextView
+								android:id="@+id/choose_account_pro_ii_storage_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_ii_storage_value_gb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_ii_empty_text"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_ii_storage_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textSize="14sp"
+								android:ellipsize="end"
+								android:text="@string/general_storage"
+								android:textColor="@color/file_properties_text_available"
+								android:textAllCaps="true" />
+
+						</TableRow>
+						<TableRow>
+							<TextView
+								android:id="@+id/choose_account_pro_ii_bandwidth_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_ii_bandwith_value_tb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_ii_empty_text_bandwidth"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_ii_bandwith_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textColor="@color/file_properties_text_available"
+								android:ellipsize="end"
+								android:text="@string/general_bandwidth"
+								android:textAllCaps="true"
+								android:textSize="14sp" />
+
+						</TableRow>
+					</TableLayout>
+
+				</RelativeLayout>
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/choose_account_pro_ii_layout_transparent"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:visibility="invisible"
+				android:background="#80ffffff">
+
+			</RelativeLayout>
+
+		</RelativeLayout>
+
+		<!-- Pro III -->
+		<RelativeLayout
+			android:id="@+id/choose_account_pro_iii_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/card_corner"
+			android:elevation="3dp">
+
+			<RelativeLayout
+				android:id="@+id/choose_account_pro_iii_layout_content"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<!-- Left side (title and price) -->
+				<RelativeLayout
+					android:id="@+id/choose_account_pro_iii_left_side"
+					android:layout_width="125dp"
+					android:layout_height="118dp"
+					android:background="@color/white"
+					android:gravity="center_vertical">
+
+					<TextView
+						android:id="@+id/choose_account_pro_iii_title_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/lollipop_primary_color"
+						android:text="@string/pro3_account"
+						android:textAllCaps="true"
+						android:layout_centerHorizontal="true"
+						android:textSize="24sp"/>
+
+					<RelativeLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_below="@id/choose_account_pro_iii_title_text"
+						android:layout_centerHorizontal="true"
+						android:gravity="bottom">
+
+						<TextView
+							android:id="@+id/choose_account_pro_iii_integer_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:textSize="28sp"/>
+
+						<TextView
+							android:id="@+id/choose_account_pro_iii_decimal_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:layout_toRightOf="@id/choose_account_pro_iii_integer_text"
+							android:layout_alignBottom="@id/choose_account_pro_iii_integer_text"
+							android:textSize="14sp" />
+
+						<TextView
+							android:id="@+id/choose_account_pro_iii_per_month_text"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/lollipop_primary_color"
+							android:layout_toRightOf="@id/choose_account_pro_iii_decimal_text"
+							android:layout_alignBottom="@id/choose_account_pro_iii_integer_text"
+							android:textSize="14sp"/>
+					</RelativeLayout>
+				</RelativeLayout>
+
+				<View
+					android:id="@+id/choose_account_pro_iii_vertical_divider"
+					android:layout_width="2dp"
+					android:layout_height="86dp"
+					android:layout_toRightOf="@id/choose_account_pro_iii_left_side"
+					android:layout_centerVertical="true"
+					android:background="@color/divider_upgrade_account" />
+
+				<!-- Right side (storage and bandwidth)-->
+				<RelativeLayout
+					android:id="@+id/choose_account_pro_iii_layout_right_side"
+					android:layout_width="match_parent"
+					android:layout_height="118dp"
+					android:gravity="center_vertical"
+					android:layout_toRightOf="@id/choose_account_pro_iii_vertical_divider">
+
+					<TableLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true">
+						<TableRow
+							android:id="@+id/table_row_pro_iii">
+							<TextView
+								android:id="@+id/choose_account_pro_iii_storage_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_iii_storage_value_gb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_iii_empty_text"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_iii_storage_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textSize="14sp"
+								android:ellipsize="end"
+								android:text="@string/general_storage"
+								android:textColor="@color/file_properties_text_available"
+								android:textAllCaps="true" />
+
+						</TableRow>
+						<TableRow>
+							<TextView
+								android:id="@+id/choose_account_pro_iii_bandwidth_value_integer"
+								android:layout_width="40dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_iii_bandwith_value_tb"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:gravity="right"
+								android:textColor="@color/lollipop_primary_color"
+								android:textSize="16sp"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_iii_empty_text_bandwidth"
+								android:layout_width="12dp"
+								android:layout_height="wrap_content"
+								android:gravity="right"/>
+
+							<TextView
+								android:id="@+id/choose_account_pro_iii_bandwith_label"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:gravity="left"
+								android:textColor="@color/file_properties_text_available"
+								android:ellipsize="end"
+								android:text="@string/general_bandwidth"
+								android:textAllCaps="true"
+								android:textSize="14sp" />
+
+						</TableRow>
+					</TableLayout>
+				</RelativeLayout>
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/choose_account_pro_iii_layout_transparent"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:visibility="invisible"
+				android:background="#80ffffff">
+
+			</RelativeLayout>
+		</RelativeLayout>
     </LinearLayout>
 </ScrollView>
-

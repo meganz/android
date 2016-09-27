@@ -292,12 +292,12 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
 		if (node == null){
-			Intent intent = new Intent(activity, TourActivity.class);
-	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-	        activity.startActivity(intent);
-	        activity.finish();
-	        return viewLayout;
+//			Intent intent = new Intent(activity, TourActivity.class);
+//	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+//	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//	        activity.startActivity(intent);
+//	        activity.finish();
+//	        return viewLayout;
 		}
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);

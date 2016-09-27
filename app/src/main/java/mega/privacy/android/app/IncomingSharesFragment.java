@@ -450,16 +450,16 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	        emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);	
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
-	        
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
-			outSpaceLayout.setVisibility(View.GONE);
+//
+//			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
+//			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
+//			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);
+//			leftNewFolder.setVisibility(View.GONE);
+//			rightUploadButton.setVisibility(View.GONE);
+//			buttonsLayout.setVisibility(View.GONE);
+//
+//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
+//			outSpaceLayout.setVisibility(View.GONE);
 			
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);

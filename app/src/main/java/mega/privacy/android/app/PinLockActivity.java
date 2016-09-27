@@ -62,10 +62,10 @@ public class PinLockActivity extends ActionBarActivity implements OnClickListene
 				break;
 			}
 			case R.id.pin_lock_logout:{ 
-				ManagerActivity.logout(this, megaApi, false);
-				Intent intent = new Intent(this, TourActivity.class);
-				startActivity(intent);
-				finish();
+//				ManagerActivity.logout(this, megaApi, false);
+//				Intent intent = new Intent(this, TourActivity.class);
+//				startActivity(intent);
+//				finish();
 				break;
 			}
 		}

@@ -277,18 +277,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListOffline = true;
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
-	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private SentRequestsFragment sRF;
 	private ReceivedRequestsFragment rRF;
-	private RubbishBinFragment rbF;
 	private IncomingSharesFragment inSF;
 	private OutgoingSharesFragment outSF;
     private TransfersFragment tF; 
-    private MyAccountFragment maF;
+//    private MyAccountFragment maF;
     private OfflineFragment oF;
     private SearchFragment sF;
-    private CameraUploadFragment psF;
+//    private CameraUploadFragment psF;
     private UpgradeAccountFragment upAF;
     private PaymentFragment pF;
     MonthlyAnnualyFragment myF;
@@ -852,10 +850,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
-		    			Intent cancelTourIntent = new Intent(this, TourActivity.class);
-		    			cancelTourIntent.setAction(newIntent.getAction());
-		    			startActivity(cancelTourIntent);
-		    			finish();
+//		    			Intent cancelTourIntent = new Intent(this, TourActivity.class);
+//		    			cancelTourIntent.setAction(newIntent.getAction());
+//		    			startActivity(cancelTourIntent);
+//		    			finish();
 		    			return;		    			
 		    		}
 		    	}
@@ -1389,17 +1387,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	String pathOffline = this.pathNavigation;
     	
     	int order = this.orderGetChildren;
-    	if (fbF != null){
-    		pHBrowser = fbF.getParentHandle();
-    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-    			if (isListCloudDrive){
-    				visibleFragment = 1;
-    			}
-    			else{
-    				visibleFragment = 2;
-    			}
-    		}
-    	}
+
     	
     	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
@@ -1415,15 +1403,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	}
     	if (drawerItem == DrawerItem.RUBBISH_BIN)
     	{
-    		pHRubbish = rbF.getParentHandle();
-    		if (rbF != null){
-    			if (isListRubbishBin){
-    				visibleFragment = 5;
-    			}
-    			else{
-    				visibleFragment = 6;
-    			}
-    		}
+
     	}    	
     	
     	if (inSF != null){
@@ -1445,13 +1425,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    		outState.putBoolean("downloadPlay", downloadPlay);
 	    	}
     	}
-    	
-    	if (maF != null){
-    		if (drawerItem == DrawerItem.ACCOUNT){
-    			visibleFragment = 10;
-    		}
-    	}
-    	
+//
+//    	if (maF != null){
+//    		if (drawerItem == DrawerItem.ACCOUNT){
+//    			visibleFragment = 10;
+//    		}
+//    	}
+//
     	if (sF != null){
     		if (drawerItem == DrawerItem.SEARCH){
     			pHSearch = sF.getParentHandle();
@@ -1461,29 +1441,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
     	
-    	if (psF != null){
-    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-    			if (isListCameraUpload){
-    				visibleFragment = 12;
-    			}
-    			else{
-    				visibleFragment = 13;
-    			}
-    			
-    		}
-    	}
+//    	if (psF != null){
+//    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+//    			if (isListCameraUpload){
+//    				visibleFragment = 12;
+//    			}
+//    			else{
+//    				visibleFragment = 13;
+//    			}
+//
+//    		}
+//    	}
     	
     	if (drawerItem == DrawerItem.INBOX)
     	{
     		pHInbox = iF.getParentHandle();
-    		if (rbF != null){
-    			if (isListInbox){
-    				visibleFragment = 14;
-    			}
-    			else{
-    				visibleFragment = 15;
-    			}
-    		}
+
     	}
     	
     	outState.putInt("orderGetChildren", order);
@@ -1624,27 +1597,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				intent.removeExtra("parentHandle");
     				setParentHandleBrowser(parentHandleBrowser);
     				
-    				if (fbF != null){
-						fbF.setParentHandle(parentHandleBrowser);
-    					fbF.setIsList(isListCloudDrive);
-    					fbF.setOrder(orderGetChildren);
-    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
-    					fbF.setNodes(nodes);
-    					if (!fbF.isVisible()){
-    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
-    					}
-    				}	
-    				else{
-    					fbF = new FileBrowserFragment();
-    					fbF.setParentHandle(parentHandleBrowser);
-    					fbF.setIsList(isListCloudDrive);
-    					fbF.setOrder(orderGetChildren);
-    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
-    					fbF.setNodes(nodes);
-    					if (!fbF.isVisible()){
-    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
-    					}
-    				}
+
     			}
     			else if(intent.getAction().equals(ACTION_OVERQUOTA_ALERT)){
 	    			showOverquotaAlert();
@@ -1879,17 +1832,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     }
 	
 	public void refreshCameraUpload(){
-		drawerItem = DrawerItem.CAMERA_UPLOADS;
-		nDA.setPositionClicked(POS_CAMERA_UPLOADS);
-		
-		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
-		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		fragTransaction.detach(currentFragment);
-		fragTransaction.commit();
-
-		fragTransaction = getSupportFragmentManager().beginTransaction();
-		fragTransaction.attach(currentFragment);
-		fragTransaction.commit();
+//		drawerItem = DrawerItem.CAMERA_UPLOADS;
+//		nDA.setPositionClicked(POS_CAMERA_UPLOADS);
+//
+//		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
+//		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//		fragTransaction.detach(currentFragment);
+//		fragTransaction.commit();
+//
+//		fragTransaction = getSupportFragmentManager().beginTransaction();
+//		fragTransaction.attach(currentFragment);
+//		fragTransaction.commit();
 	}
 	
     public void selectDrawerItem(DrawerItem item){
@@ -1903,53 +1856,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //    			
 //    			megaApi.getPricing(this);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			if (fbF == null){
-					fbF = new FileBrowserFragment();
-					if (parentHandleBrowser == -1){
-						fbF.setParentHandle(megaApi.getRootNode().getHandle());
-						parentHandleBrowser = megaApi.getRootNode().getHandle();
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					}
-					else{
-						fbF.setParentHandle(parentHandleBrowser);
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					}
-					fbF.setIsList(isListCloudDrive);
-					fbF.setOrder(orderGetChildren);
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-					fbF.setNodes(nodes);
-				}
-				else{
-										
-					fbF.setIsList(isListCloudDrive);
-					fbF.setParentHandle(parentHandleBrowser);
-					fbF.setOrder(orderGetChildren);
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
-					fbF.setNodes(nodes);
-					if ((parentHandleBrowser == megaApi.getRootNode().getHandle()) || (parentHandleBrowser == -1)){
-						parentHandleBrowser = megaApi.getRootNode().getHandle();
-						fbF.setParentHandle(parentHandleBrowser);
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					}
-					else{
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					}
-				}
-								
+
 				mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, fbF, "fbF");
-    			ft.commit();
-    			
-    			if (!firstTime){
-    				mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			}
-    			else{
-    				firstTime = false;
-    			}
+
     			
     			customSearch.setVisibility(View.VISIBLE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -2162,40 +2075,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (rbF == null){
-    				rbF = new RubbishBinFragment();
-    				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-    				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-    				rbF.setIsList(isListRubbishBin);
-    				rbF.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-    				rbF.setNodes(nodes);
-    				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			}
-    			else{
-    				rbF.setIsList(isListRubbishBin);
-    				rbF.setParentHandle(parentHandleRubbish);
-    				rbF.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
-    				rbF.setNodes(nodes);
-    				
-    				if ((parentHandleRubbish == megaApi.getRubbishNode().getHandle()) || (parentHandleRubbish == -1)){
-    					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-    					rbF.setParentHandle(parentHandleRubbish);
-    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    				}
-    				else{
-    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-    				}
-    			}
-    			
+
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, rbF, "rbF");
-    			ft.commit();
+
     			
     			customSearch.setVisibility(View.VISIBLE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -2223,8 +2108,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
-        			rbF.setIsList(isListRubbishBin);	        			
-        			rbF.setParentHandle(parentHandleRubbish);
+
         			rubbishBinMenuItem.setVisible(false);
         			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
 	    			clearRubbishBinMenuitem.setVisible(true);
@@ -2379,73 +2263,73 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case ACCOUNT:{
     			
-    			if (nDA != null){
-					nDA.setPositionClicked(-1);
-				}
-    			
-    			if (aB == null){
-    				aB = getSupportActionBar();
-    			}
-    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			
-    			accountFragment=MY_ACCOUNT_FRAGMENT;
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
-    			
-    			if (maF == null){
-    				maF = new MyAccountFragment();
-    			}
-    			
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, maF, "maF");
-    			ft.commit();
-    			
-    			customSearch.setVisibility(View.GONE);
-    			mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(false);
-//        				rubbishBinMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(true);
-	    			sortByMenuItem.setVisible(false);
-	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(false);
-	    			changePass.setVisible(true); 
-	    			if (numberOfSubscriptions > 0){
-	    				cancelSubscription.setVisible(true);
-	    			}
-	    			killAllSessions.setVisible(true);
-	    			
-	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-	    			log("Export in: "+path);
-	    			File file= new File(path);
-	    			if(file.exists()){
-	    				exportMK.setVisible(false); 
-		    			removeMK.setVisible(true); 
-	    			}
-	    			else{
-	    				exportMK.setVisible(true); 
-		    			removeMK.setVisible(false); 		
-	    			}
-	    			
-//    	    			logoutMenuItem.setVisible(true);
-//    	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
-//    	    			rubbishBinMenuItem.setEnabled(false);
-//    	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			addMenuItem.setEnabled(false);
-//    	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			createFolderMenuItem.setEnabled(false);
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-        			settingsMenuItem.setVisible(false);
-	    		}
+//    			if (nDA != null){
+//					nDA.setPositionClicked(-1);
+//				}
+//
+//    			if (aB == null){
+//    				aB = getSupportActionBar();
+//    			}
+//    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//
+//    			accountFragment=MY_ACCOUNT_FRAGMENT;
+//    			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
+//
+////    			if (maF == null){
+////    				maF = new MyAccountFragment();
+////    			}
+//
+//    			mTabHostContacts.setVisibility(View.GONE);
+//    			viewPagerContacts.setVisibility(View.GONE);
+//    			mTabHostShares.setVisibility(View.GONE);
+//    			mTabHostShares.setVisibility(View.GONE);
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, maF, "maF");
+//    			ft.commit();
+//
+//    			customSearch.setVisibility(View.GONE);
+//    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+//
+//    			if (createFolderMenuItem != null){
+//    				createFolderMenuItem.setVisible(false);
+////        				rubbishBinMenuItem.setVisible(false);
+//	    			addMenuItem.setVisible(false);
+//	    			refreshMenuItem.setVisible(true);
+//	    			sortByMenuItem.setVisible(false);
+//	    			helpMenuItem.setVisible(true);
+//	    			upgradeAccountMenuItem.setVisible(true);
+//	    			selectMenuItem.setVisible(false);
+//	    			unSelectMenuItem.setVisible(false);
+//	    			thumbViewMenuItem.setVisible(false);
+//	    			changePass.setVisible(true);
+//	    			if (numberOfSubscriptions > 0){
+//	    				cancelSubscription.setVisible(true);
+//	    			}
+//	    			killAllSessions.setVisible(true);
+//
+//	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+//	    			log("Export in: "+path);
+//	    			File file= new File(path);
+//	    			if(file.exists()){
+//	    				exportMK.setVisible(false);
+//		    			removeMK.setVisible(true);
+//	    			}
+//	    			else{
+//	    				exportMK.setVisible(true);
+//		    			removeMK.setVisible(false);
+//	    			}
+//
+////    	    			logoutMenuItem.setVisible(true);
+////    	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+////    	    			rubbishBinMenuItem.setEnabled(false);
+////    	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//	    			addMenuItem.setEnabled(false);
+////    	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//	    			createFolderMenuItem.setEnabled(false);
+//	    			rubbishBinMenuItem.setVisible(false);
+//	    			clearRubbishBinMenuitem.setVisible(false);
+//        			settingsMenuItem.setVisible(false);
+//	    		}
     			
     			
     			break;
@@ -2638,24 +2522,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				nDA.setPositionClicked(POS_CAMERA_UPLOADS);
     			}
     			
-    			if (psF == null){
-    				psF = new CameraUploadFragment();
-    				psF.setIsList(isListCameraUpload);
-   					psF.setFirstTimeCam(firstTimeCam);
-				}
-				else{
-					psF.setIsList(isListCameraUpload);
-					psF.setFirstTimeCam(firstTimeCam);
-				}
-				
+//    			if (psF == null){
+//    				psF = new CameraUploadFragment();
+//    				psF.setIsList(isListCameraUpload);
+//   					psF.setFirstTimeCam(firstTimeCam);
+//				}
+//				else{
+//					psF.setIsList(isListCameraUpload);
+//					psF.setFirstTimeCam(firstTimeCam);
+//				}
+//
 				
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, psF, "psF");
-    			ft.commit();
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, psF, "psF");
+//    			ft.commit();
     			
     			
     			firstTimeCam = false;
@@ -2715,12 +2599,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	catch (Exception ex) {}		
 
     	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-    		if (fbF != null){				
-    			if (fbF.onBackPressed() == 0){
-    				super.onBackPressed();
-    				return;
-    			}
-    		}
+
     	}				
     	if (drawerItem == DrawerItem.SEARCH){
     		if (sF != null){
@@ -2799,16 +2678,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}	
     	}			
     	if (drawerItem == DrawerItem.RUBBISH_BIN){
-    		if (rbF != null){
-    			if (rbF.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-    				}
-    				return;
-    			}
-    		}
+
     	}
     	if (tF != null){
     		if (drawerItem == DrawerItem.TRANSFERS){
@@ -2827,14 +2697,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		switch(accountFragment){
 
 	    		case MY_ACCOUNT_FRAGMENT:{
-	    			if (maF != null){						
-	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-	    				selectDrawerItem(drawerItem);
-	    				if(nDA!=null){
-	    					nDA.setPositionClicked(0);
-	
-	    				}					
-	    			}
+//	    			if (maF != null){
+//	    				drawerItem = DrawerItem.CLOUD_DRIVE;
+//	    				selectDrawerItem(drawerItem);
+//	    				if(nDA!=null){
+//	    					nDA.setPositionClicked(0);
+//
+//	    				}
+//	    			}
 	    			return;
 	    		}
 	    		case UPGRADE_ACCOUNT_FRAGMENT:{
@@ -2884,14 +2754,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			return;
 	    		}
 	    		default:{
-	    			if (fbF != null){						
-	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-	    				selectDrawerItem(drawerItem);
-	    				if(nDA!=null){
-	    					nDA.setPositionClicked(0);
-	
-	    				}					
-	    			}
+
 	    		}
     		}
     	}
@@ -2908,16 +2771,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					}
     				}
 
-    				if (fbF != null){
-    					drawerItem = DrawerItem.CLOUD_DRIVE;
-    					selectDrawerItem(drawerItem);
-    					if(nDA!=null){
-    						nDA.setPositionClicked(0);
-    					}
-    				}
-    				else{
-    					super.onBackPressed();
-    				}
+
     				return;
     			}
     		}
@@ -2936,18 +2790,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	//			}
     	//		}
 
-    	if (psF != null){
-    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-    			if (psF.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-    				}
-    				return;
-    			}
-    		}
-    	}
+//    	if (psF != null){
+//    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+//    			if (psF.onBackPressed() == 0){
+//    				drawerItem = DrawerItem.CLOUD_DRIVE;
+//    				selectDrawerItem(drawerItem);
+//    				if(nDA!=null){
+//    					nDA.setPositionClicked(0);
+//    				}
+//    				return;
+//    			}
+//    		}
+//    	}
 
     }
 
@@ -3024,41 +2878,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			
-			if (fbF != null){
-				//Show
-				addMenuItem.setEnabled(true);
-				addMenuItem.setVisible(true);
-				createFolderMenuItem.setVisible(true);				
-				sortByMenuItem.setVisible(true);
-				thumbViewMenuItem.setVisible(true);
-				rubbishBinMenuItem.setVisible(false);				
-    			upgradeAccountMenuItem.setVisible(true);    			
-    			importLinkMenuItem.setVisible(true);
-    			takePicture.setVisible(true);
-    			selectMenuItem.setVisible(true);
-    			
-				//Hide
-    			pauseRestartTransfersItem.setVisible(false);
-    			addContactMenuItem.setVisible(false);    			
-    			unSelectMenuItem.setVisible(false); 
-    			clearRubbishBinMenuitem.setVisible(false); 
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-				killAllSessions.setVisible(false);			
-   			
-    			if (isListCloudDrive){	
-    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}
-    			
-    			return super.onCreateOptionsMenu(menu);
-			}
+
 		}
 		
 		if (drawerItem == DrawerItem.CONTACTS){
@@ -3127,44 +2947,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}		
 		
 		if (drawerItem == DrawerItem.RUBBISH_BIN){
-			if (rbF != null){	
-				//Show				
-    			sortByMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(true);
-    			clearRubbishBinMenuitem.setVisible(true);
-    			
-				//Hide
-    			refreshMenuItem.setVisible(false);
-				pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(true);
-    			unSelectMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-    			
-    			if (isListRubbishBin){	
-    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}
 
-				rbF.setIsList(isListRubbishBin);	        			
-    			rbF.setParentHandle(parentHandleRubbish);
-    			
-    			rubbishBinMenuItem.setVisible(false);
-    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));    			
-			}
 		}	
 		
 		if (drawerItem == DrawerItem.INBOX){
@@ -3280,50 +3063,50 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		if (drawerItem == DrawerItem.ACCOUNT){
-			if (maF != null){
-					
-				//Show
-				refreshMenuItem.setVisible(true);
-				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(true);
-				changePass.setVisible(true); 
-				
-				//Hide
-				pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			sortByMenuItem.setVisible(false);
-    			selectMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
-				
-				if (numberOfSubscriptions > 0){
-					cancelSubscription.setVisible(true);
-				}
-				
-				killAllSessions.setVisible(true);
-    			
-    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-    			log("Export in: "+path);
-    			File file= new File(path);
-    			if(file.exists()){
-    				exportMK.setVisible(false); 
-	    			removeMK.setVisible(true); 
-    			}
-    			else{
-    				exportMK.setVisible(true); 
-	    			removeMK.setVisible(false); 		
-    			}
- 
-			}
+//			if (maF != null){
+//
+//				//Show
+//				refreshMenuItem.setVisible(true);
+//				helpMenuItem.setVisible(true);
+//				upgradeAccountMenuItem.setVisible(true);
+//				changePass.setVisible(true);
+//
+//				//Hide
+//				pauseRestartTransfersItem.setVisible(false);
+//				createFolderMenuItem.setVisible(false);
+//				addContactMenuItem.setVisible(false);
+//    			addMenuItem.setVisible(false);
+//    			sortByMenuItem.setVisible(false);
+//    			selectMenuItem.setVisible(false);
+//    			unSelectMenuItem.setVisible(false);
+//    			thumbViewMenuItem.setVisible(false);
+//    			addMenuItem.setEnabled(false);
+//    			createFolderMenuItem.setEnabled(false);
+//    			rubbishBinMenuItem.setVisible(false);
+//    			clearRubbishBinMenuitem.setVisible(false);
+//    			importLinkMenuItem.setVisible(false);
+//    			takePicture.setVisible(false);
+//				settingsMenuItem.setVisible(false);
+//
+//				if (numberOfSubscriptions > 0){
+//					cancelSubscription.setVisible(true);
+//				}
+//
+//				killAllSessions.setVisible(true);
+//
+//    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+//    			log("Export in: "+path);
+//    			File file= new File(path);
+//    			if(file.exists()){
+//    				exportMK.setVisible(false);
+//	    			removeMK.setVisible(true);
+//    			}
+//    			else{
+//    				exportMK.setVisible(true);
+//	    			removeMK.setVisible(false);
+//    			}
+//
+//			}
 		}
 		
 		if (tF != null){
@@ -3435,43 +3218,43 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (psF != null){
-			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-				
-				//Show
-    			upgradeAccountMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
-    			takePicture.setVisible(true);
-
-				//Hide
-				pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			refreshMenuItem.setVisible(false);
-    			sortByMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(true);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);					
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-
-    			if (isListCameraUpload){	
-    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}
-			}
-		}
+//		if (psF != null){
+//			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+//
+//				//Show
+//    			upgradeAccountMenuItem.setVisible(true);
+//    			selectMenuItem.setVisible(true);
+//    			takePicture.setVisible(true);
+//
+//				//Hide
+//				pauseRestartTransfersItem.setVisible(false);
+//				createFolderMenuItem.setVisible(false);
+//				addContactMenuItem.setVisible(false);
+//    			addMenuItem.setVisible(false);
+//    			refreshMenuItem.setVisible(false);
+//    			sortByMenuItem.setVisible(false);
+//    			unSelectMenuItem.setVisible(false);
+//    			thumbViewMenuItem.setVisible(true);
+//    			addMenuItem.setEnabled(false);
+//    			createFolderMenuItem.setEnabled(false);
+//    			changePass.setVisible(false);
+//    			exportMK.setVisible(false);
+//    			removeMK.setVisible(false);
+//    			rubbishBinMenuItem.setVisible(false);
+//    			clearRubbishBinMenuitem.setVisible(false);
+//    			importLinkMenuItem.setVisible(false);
+//    			refreshMenuItem.setVisible(false);
+//				helpMenuItem.setVisible(false);
+//				settingsMenuItem.setVisible(false);
+//
+//    			if (isListCameraUpload){
+//    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//				}
+//				else{
+//					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//    			}
+//			}
+//		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}	
@@ -3541,18 +3324,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					mDrawerToggle.onOptionsItemSelected(item);
 				}
 		    	else {
-		    		if (fbF != null){
-		    			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-		    				fbF.onBackPressed();
-		    				return true;
-		    			}
-		    		}
-		    		if (rbF != null){
-		    			if (drawerItem == DrawerItem.RUBBISH_BIN){
-		    				rbF.onBackPressed();
-		    				return true;
-		    			}
-		    		}
+
 		    		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 		    			int index = viewPagerShares.getCurrentItem();
 		    			if(index==1){				
@@ -3693,18 +3465,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	
         		if (drawerItem == DrawerItem.CLOUD_DRIVE){	
 
-    				if (fbF != null){
-        				fbF.selectAll();
-            			if (fbF.showSelectMenuItem()){
-            				selectMenuItem.setVisible(true);
-            				unSelectMenuItem.setVisible(false);
-            			}
-            			else{
-            				selectMenuItem.setVisible(false);
-            				unSelectMenuItem.setVisible(true);
-            			}
-    				}
-        			      			
+
         			return true;        		
 	        	}
 
@@ -3785,62 +3546,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
 	        		return true;
     			}
-	        	if (psF != null){
-	        		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-	        			psF.selectAll();
-	        			if (psF.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        			return true;
-	        		}
-	        	} 	        	
+//	        	if (psF != null){
+//	        		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+//	        			psF.selectAll();
+//	        			if (psF.showSelectMenuItem()){
+//	        				selectMenuItem.setVisible(true);
+//	        				unSelectMenuItem.setVisible(false);
+//	        			}
+//	        			else{
+//	        				selectMenuItem.setVisible(false);
+//	        				unSelectMenuItem.setVisible(true);
+//	        			}
+//	        			return true;
+//	        		}
+//	        	}
 	        	if (drawerItem == DrawerItem.RUBBISH_BIN){
 
-        			if (rbF != null){
-        				rbF.selectAll();
-        				if (rbF.showSelectMenuItem()){
-        					selectMenuItem.setVisible(true);
-        					unSelectMenuItem.setVisible(false);
-        				}
-        				else{
-        					selectMenuItem.setVisible(false);
-        					unSelectMenuItem.setVisible(true);
-        				}
-        			}	        		 		
+
 	        		return true;
 	        	}
 
 	        }
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
-	        	if (fbF != null){
-	        		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fbF");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
 
-	        			isListCloudDrive = !isListCloudDrive;
-	        			if (isListCloudDrive){	
-		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-		    			}
-	        			fbF.setIsList(isListCloudDrive);
-	        			fbF.setParentHandle(parentHandleBrowser);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();
-
-	        		}
-	        	}
 
 	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 	    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
@@ -3867,29 +3596,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
 	        	}
 
-	        	if (rbF != null){
-	        		if (drawerItem == DrawerItem.RUBBISH_BIN){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("rbF");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
-	        			
-	        			isListRubbishBin = !isListRubbishBin;
-	        			if (isListRubbishBin){	
-		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-		    			}
-	        			rbF.setIsList(isListRubbishBin);	        			
-	        			rbF.setParentHandle(parentHandleRubbish);
 
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();
-
-	        		}
-	        	}
 
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
 	        		
@@ -3938,28 +3645,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			}
         		}
 
-        		if (psF != null){
-        			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
-        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.detach(currentFragment);
-        				fragTransaction.commit();
-
-        				isListCameraUpload = !isListCameraUpload;
-        				if (isListCameraUpload){	
-    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-    					}
-    					else{
-    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    	    			}
-        				psF.setIsList(isListCameraUpload);
-
-        				fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.attach(currentFragment);
-        				fragTransaction.commit();
-
-        			}
-        		}
+//        		if (psF != null){
+//        			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+//        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
+//        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//        				fragTransaction.detach(currentFragment);
+//        				fragTransaction.commit();
+//
+//        				isListCameraUpload = !isListCameraUpload;
+//        				if (isListCameraUpload){
+//    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//    					}
+//    					else{
+//    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//    	    			}
+//        				psF.setIsList(isListCameraUpload);
+//
+//        				fragTransaction = getSupportFragmentManager().beginTransaction();
+//        				fragTransaction.attach(currentFragment);
+//        				fragTransaction.commit();
+//
+//        			}
+//        		}
            	
 	        	return true;
 	        }	        
@@ -4881,20 +4588,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		this.orderGetChildren = _orderGetChildren;
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 		if (parentNode != null){
-			if (fbF != null){						
-				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-				fbF.setOrder(orderGetChildren);
-				fbF.setNodes(nodes);
-				fbF.getListView().invalidateViews();						
-			}
+
 		}
 		else{
-			if (fbF != null){						
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-				fbF.setOrder(orderGetChildren);
-				fbF.setNodes(nodes);
-				fbF.getListView().invalidateViews();					
-			}
+
 		}
 	}
 
@@ -5115,12 +4812,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (!confirmAccount){		
 			if(managerActivity != null)	{
-				Intent intent = new Intent(managerActivity, TourActivity.class);
-		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				managerActivity.startActivity(intent);
-				managerActivity.finish();
-				managerActivity = null;
+
 			}
 			else{
 				Intent intent = new Intent (context, LauncherActivity.class);
@@ -5307,10 +4999,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 		        if(drawerItem==DrawerItem.CLOUD_DRIVE){
 		        	if (usedPerc > 95){
-		        		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-						ft.detach(fbF);
-						ft.attach(fbF);
-						ft.commitAllowingStateLoss();
+
 		        	}
 		        }
 			}
@@ -5330,9 +5019,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (numberOfSubscriptions > 0){
 					if (cancelSubscription != null){
 						if (drawerItem == DrawerItem.ACCOUNT){
-							if (maF != null){
-								cancelSubscription.setVisible(true);
-							}
+//							if (maF != null){
+//								cancelSubscription.setVisible(true);
+//							}
 						}
 					}
 				}
@@ -5454,12 +5143,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					if (fbF != null){
-					
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
-					}
+
 				}
 				if (drawerItem == DrawerItem.INBOX){
 					if (iF != null){
@@ -5468,14 +5152,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						iF.refresh();
 					}
 				}	
-				if (drawerItem == DrawerItem.RUBBISH_BIN){
-					if (rbF != null){
-					
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
-					}
-				}
+
 				if (drawerItem == DrawerItem.SHARED_WITH_ME){
 					if (inSF != null){
 						//TODO: ojo con los hijos
@@ -5516,32 +5193,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 				
-				if (fbF != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
-					}
-				}
-				if (rbF != null){
-					if (drawerItem == DrawerItem.RUBBISH_BIN){
-						if (isClearRubbishBin){
-							isClearRubbishBin = false;
-							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-							rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
-							aB.setTitle(getString(R.string.section_rubbish_bin));	
-							getmDrawerToggle().setDrawerIndicatorEnabled(true);
-						}
-						else{
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
-						}
-					}
-				}
+
 	
 			}
 			else{
@@ -5649,20 +5301,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
-				if (fbF != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
-					}
-				}
-				if (rbF != null){
-					if (drawerItem == DrawerItem.RUBBISH_BIN){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
-					}
-				}
+
 				if (inSF != null){
 					if (drawerItem == DrawerItem.SHARED_WITH_ME){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
@@ -5703,20 +5342,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
-					if (fbF != null){
-						if (drawerItem == DrawerItem.CLOUD_DRIVE){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-							fbF.setNodes(nodes);
-							fbF.getListView().invalidateViews();
-						}
-					}
-					if (rbF != null){
-						if (drawerItem == DrawerItem.RUBBISH_BIN){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
-						}
-					}
+
 					if (inSF != null){
 						if (drawerItem == DrawerItem.SHARED_WITH_ME){
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
@@ -5746,13 +5372,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
-				if (fbF != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
-					}
-				}
+
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -6204,16 +5824,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (fbF != null){
-					if (!(drawerItem == DrawerItem.CLOUD_DRIVE)){
-						return;
-					}
-				}
-				if (rbF != null){
-					if (drawerItem == DrawerItem.RUBBISH_BIN){
-						return;
-					}
-				}
+
 				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (cF != null){
@@ -6235,10 +5846,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void showClearRubbishBinDialog(String editText){
 		log("showClearRubbishBinDialog");
 
-		if (rbF.isVisible()){
-			rbF.setPositionClicked(-1);
-			rbF.notifyDataSetChanged();
-		}	
+
 		
 		String text;
 		if ((editText == null) || editText.equals("")){
@@ -6350,10 +5958,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	public void showNewFolderDialog(String editText){
 		log("showNewFolderDialog");
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			fbF.setPositionClicked(-1);
-			fbF.notifyDataSetChanged();
-		}
+
 		
 		String text;
 		if (editText == null || editText.equals("")){
@@ -6454,43 +6059,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		long parentHandle;
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			parentHandle = fbF.getParentHandle();						
-		}
-		else{
-			return;
-		}
-		
-		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-		
-		if (parentNode == null){
-			parentNode = megaApi.getRootNode();
-		}
-		
-		boolean exists = false;
-		ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
-		for (int i=0;i<nL.size();i++){
-			if (title.compareTo(nL.get(i).getName()) == 0){
-				exists = true;
-			}
-		}
-		
-		if (!exists){
-			statusDialog = null;
-			try {
-				statusDialog = new ProgressDialog(this);
-				statusDialog.setMessage(getString(R.string.context_creating_folder));
-				statusDialog.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			
-			megaApi.createFolder(title, parentNode, this);
-		}
-		else{
-			Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
-		}		
+
+
 	}
 	
 	public void showRenameDialog(final MegaNode document, String text){
@@ -7108,10 +6678,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			int i = 0;
 			long parentHandleUpload=-1;
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				if(fbF!=null)
-				{
-					parentHandleUpload = fbF.getParentHandle();
-				}
+
 			}
 			else if(drawerItem == DrawerItem.SHARED_WITH_ME){
 				int index = viewPagerShares.getCurrentItem();
@@ -7237,37 +6804,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 				if (parentNode != null){
-					if (fbF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();						
-					}
+
 				}
 				else{
-					if (fbF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();						
-					}
+
 				}
 			}
 			else if (drawerItem == DrawerItem.RUBBISH_BIN){
 				parentHandleRubbish = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
-				if (parentNode != null){
-					if (rbF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();						
-					}
-				}
-				else{
-					if (rbF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();						
-					}
-				}
+
 			}
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
@@ -7314,40 +6860,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 				if (parentNode != null){
-					if (fbF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						fbF.setOrder(orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();						
-					}
+
 				}
 				else{
-					if (fbF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-						fbF.setOrder(orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();					
-					}
+
 				}
 			}
 			else if (drawerItem == DrawerItem.RUBBISH_BIN){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
-				if (parentNode != null){
-					if (rbF != null){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						rbF.setOrder(orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
-					}
-				}
-				else{
-					if (rbF != null){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-						rbF.setOrder(orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();						
-					}
-				}
+
 			}
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
@@ -7452,7 +6973,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		long parentHandle = -1;
 		MegaNode parentNode = null;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			parentHandle = fbF.getParentHandle();
+
 			parentNode = megaApi.getNodeByHandle(parentHandle);
 		}
 		else if (drawerItem == DrawerItem.SHARED_WITH_ME){
@@ -7523,15 +7044,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		catch (Exception ex) {}
 		
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if (fbF != null){
-			
-				if (fbF.isVisible()){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-					fbF.setNodes(nodes);
-					fbF.setContentText();
-					fbF.getListView().invalidateViews();
-				}
-			}
+
 		}
 		if (drawerItem == DrawerItem.INBOX){
 			log("INBOX shown");
@@ -7540,33 +7053,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //				iF.getListView().invalidateViews();
 			}
 		}
-		if (rbF != null){
-			if (drawerItem == DrawerItem.RUBBISH_BIN){
-				if (isClearRubbishBin){
-					isClearRubbishBin = false;
-					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-					aB.setTitle(getString(R.string.section_rubbish_bin));	
-					getmDrawerToggle().setDrawerIndicatorEnabled(true);
 
-					if(rbF.isVisible())
-					{
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-						rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
-					}
-				}
-				else{
-					if(rbF.isVisible())
-					{
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.setContentText();
-						rbF.getListView().invalidateViews();
-					}
-				}				
-			}
-		}
 		
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 			int index = viewPagerShares.getCurrentItem();
@@ -7592,18 +7079,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}	
 		}
 		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			if (psF != null){			
-				if(psF.isAdded()){
-					long cameraUploadHandle = psF.getPhotoSyncHandle();
-					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-					log("cameraUploadHandle: " + cameraUploadHandle);
-					if (nps != null){
-						log("nps != null");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						psF.setNodes(nodes);
-					}
-				}				
-			}
+//			if (psF != null){
+//				if(psF.isAdded()){
+//					long cameraUploadHandle = psF.getPhotoSyncHandle();
+//					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+//					log("cameraUploadHandle: " + cameraUploadHandle);
+//					if (nps != null){
+//						log("nps != null");
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						psF.setNodes(nodes);
+//					}
+//				}
+//			}
 		}
 		if (cF != null){
 			if (drawerItem == DrawerItem.CONTACTS){
@@ -7633,25 +7120,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		tF.setTransfers(tL);		
 
 		//Update File Browser Fragment
-		if (fbF != null){
-			for(int i=0; i<tL.size(); i++){
-				
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-					MegaNode parentT = megaApi.getParentNode(nodeT);
-					
-					if (parentT != null){
-						if(parentT.getHandle() == this.parentHandleBrowser){	
-							mTHash.put(handleT,tempT);						
-						}
-					}
-				}
-			}
-			
-			fbF.setTransfers(mTHash);
-		}
+
 	}
 	
 	public void setParentHandleInbox(long parentHandleInbox){
@@ -7736,26 +7205,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		tL = megaApi.getTransfers();
 		tF.setTransfers(tL);		
 
-		//Update File Browser Fragment
-		if (fbF != null){
-			for(int i=0; i<tL.size(); i++){
-				
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-					MegaNode parentT = megaApi.getParentNode(nodeT);
-					
-					if (parentT != null){
-						if(parentT.getHandle() == this.parentHandleBrowser){	
-							mTHash.put(handleT,tempT);						
-						}
-					}
-				}
-			}
-			
-			fbF.setTransfers(mTHash);
-		}
+
 		
 		if (inSF != null){
 			for(int i=0; i<tL.size(); i++){
@@ -7791,24 +7241,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		tL = megaApi.getTransfers();
 		tF.setTransfers(tL);	
 		
-		//Update File Browser Fragment
-		if (fbF != null){
-			for(int i=0; i<tL.size(); i++){
-				
-				MegaTransfer tempT = tL.get(i);
-				long handleT = tempT.getNodeHandle();
-				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-				MegaNode parentT = megaApi.getParentNode(nodeT);
-				
-				if (parentT != null){
-					if(parentT.getHandle() == this.parentHandleBrowser){
-						mTHash.put(handleT,tempT);
-					}
-				}			
-			}
-			fbF.setTransfers(mTHash);	
-		}
-		
+
 		if (inSF != null){
 			for(int i=0; i<tL.size(); i++){
 				
@@ -7849,24 +7282,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 
-		if (fbF != null){
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					Time now = new Time();
-					now.setToNow();
-					long nowMillis = now.toMillis(false);
-					if (lastTimeOnTransferUpdate < 0){
-						lastTimeOnTransferUpdate = now.toMillis(false);
-						fbF.setCurrentTransfer(transfer);
-					}
-					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-						lastTimeOnTransferUpdate = nowMillis;
-						fbF.setCurrentTransfer(transfer);
-					}			
-				}		
-			}
-		}
-		
+
 		if (inSF != null){
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
@@ -8591,9 +8007,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (numberOfSubscriptions > 0){
 			if (cancelSubscription != null){
 				if (drawerItem == DrawerItem.ACCOUNT){
-					if (maF != null){
-						cancelSubscription.setVisible(true);
-					}
+//					if (maF != null){
+//						cancelSubscription.setVisible(true);
+//					}
 				}
 			}
 		}
