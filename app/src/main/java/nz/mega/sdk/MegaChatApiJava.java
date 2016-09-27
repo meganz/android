@@ -8,6 +8,18 @@ import nz.mega.sdk.MegaApiJava;
 
 public class MegaChatApiJava {
     MegaChatApi megaChatApi;
+    static DelegateMegaChatLogger logger;
+
+    // Error information but application will continue run.
+    public final static int LOG_LEVEL_ERROR = MegaChatApi.LOG_LEVEL_ERROR;
+    // Information representing errors in application but application will keep running
+    public final static int LOG_LEVEL_WARNING = MegaChatApi.LOG_LEVEL_WARNING;
+    // Mainly useful to represent current progress of application.
+    public final static int LOG_LEVEL_INFO = MegaChatApi.LOG_LEVEL_INFO;
+    public final static int LOG_LEVEL_VERBOSE = MegaChatApi.LOG_LEVEL_VERBOSE;
+    // Informational logs, that are useful for developers. Only applicable if DEBUG is defined.
+    public final static int LOG_LEVEL_DEBUG = MegaChatApi.LOG_LEVEL_DEBUG;
+    public final static int LOG_LEVEL_MAX = MegaChatApi.LOG_LEVEL_MAX;
 
     static Set<DelegateMegaChatRequestListener> activeRequestListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaChatRequestListener>());
     static Set<DelegateMegaChatListener> activeChatListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaChatListener>());
@@ -120,6 +132,49 @@ public class MegaChatApiJava {
     public void truncateChat(long chatid, long messageid, MegaChatRequestListenerInterface listener)
     {
         megaChatApi.truncateChat(chatid, messageid, createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Set the active log level.
+     * <p>
+     * This function sets the log level of the logging system. If you set a log listener using
+     * MegaApiJava.setLoggerObject(), you will receive logs with the same or a lower level than
+     * the one passed to this function.
+     *
+     * @param logLevel
+     *            Active log level. These are the valid values for this parameter: <br>
+     *                Valid values are:
+     * - MegaChatApi::LOG_LEVEL_ERROR   = 1
+     * - MegaChatApi::LOG_LEVEL_WARNING = 2
+     * - MegaChatApi::LOG_LEVEL_INFO    = 3
+     * - MegaChatApi::LOG_LEVEL_VERBOSE = 4
+     * - MegaChatApi::LOG_LEVEL_DEBUG   = 5
+     * - MegaChatApi::LOG_LEVEL_MAX     = 6
+     *            - MegaApiJava.LOG_LEVEL_FATAL = 0. <br>
+     *            - MegaApiJava.LOG_LEVEL_ERROR = 1. <br>
+     *            - MegaApiJava.LOG_LEVEL_WARNING = 2. <br>
+     *            - MegaApiJava.LOG_LEVEL_INFO = 3. <br>
+     *            - MegaApiJava.LOG_LEVEL_DEBUG = 4. <br>
+     *            - MegaApiJava.LOG_LEVEL_MAX = 5.
+     */
+    public static void setLogLevel(int logLevel) {
+        MegaChatApi.setLogLevel(logLevel);
+    }
+
+    /**
+     * Set a MegaLogger implementation to receive SDK logs.
+     * <p>
+     * Logs received by this objects depends on the active log level.
+     * By default, it is MegaApiJava.LOG_LEVEL_INFO. You can change it
+     * using MegaApiJava.setLogLevel().
+     *
+     * @param megaLogger
+     *            MegaChatLogger implementation.
+     */
+    public static void setLoggerObject(MegaChatLoggerInterface megaLogger) {
+        DelegateMegaChatLogger newLogger = new DelegateMegaChatLogger(megaLogger);
+        MegaChatApi.setLoggerObject(newLogger);
+        logger = newLogger;
     }
 
     private MegaChatRequestListener createDelegateRequestListener(MegaChatRequestListenerInterface listener) {
