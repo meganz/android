@@ -19,7 +19,6 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatLogger;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -115,14 +114,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onCreate() {
 		super.onCreate();
 		
-		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		MegaChatApiAndroid.setLoggerObject(new MegaChatLogger());
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+//		MegaApiAndroid.setLoggerObject(new AndroidLogger());
+//		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
+
+		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		Util.setContext(getApplicationContext());
 		DatabaseHandler dbH;
@@ -323,6 +322,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
 //			MegaApiAndroid.setLoggerObject(new AndroidLogger());
+////			MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
 //		}
 	}
 
@@ -349,14 +349,24 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					log("Chat NULL");
 				}
 			}
-
-			MegaChatRoom chat = megaChatApi.getChatRoom(new Long(635570421));
-			if(chat!=null){
-				log("tengo el chat!");
-			}
 			else{
-				log("el chat es Null");
+				log("EEEERRRRROR AL CONNECT " + e.getErrorString());
+				MegaChatRoomList chatList = megaChatApi.getChatRooms();
+				if(chatList!=null){
+					log("Chat size: :"+chatList.size());
+				}
+				else{
+					log("Chat NULL");
+				}
 			}
+
+//			MegaChatRoom chat = megaChatApi.getChatRoom(new Long(635570421));
+//			if(chat!=null){
+//				log("tengo el chat!");
+//			}
+//			else{
+//				log("el chat es Null");
+//			}
 		}
 	}
 

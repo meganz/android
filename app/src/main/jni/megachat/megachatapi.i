@@ -56,7 +56,6 @@
     webrtc::JVM::Initialize(MEGAjvm, context);
     //MEGAjvm->DetachCurrentThread();
 %}
-
 #endif
 
 //Generate inheritable wrappers for listener objects
@@ -64,6 +63,7 @@
 %feature("director") megachat::MegaChatCallListener;
 %feature("director") megachat::MegaChatVideoListener;
 %feature("director") megachat::MegaChatListener;
+%feature("director") megachat::MegaChatLogger;
 
 typedef long long time_t;
 typedef long long uint64_t;
