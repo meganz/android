@@ -287,16 +287,14 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //			holderList.textViewFileName.getViewTreeObserver().addOnGlobalLayoutListener(new MyGlobalLayoutListener(holderList));		
 			
 			holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
-			holderList.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar);
+			holderList.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_browser_bar);
 			
 			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_list_three_dots);
 			
 			//Right margin
 			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
 			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);			
-		
-			v.setTag(holderList);
+			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 		
 			holderList.savedOffline.setVisibility(View.INVISIBLE);
 		
@@ -311,6 +309,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			
 			holderList.imageButtonThreeDots.setTag(holderList);
 			holderList.imageButtonThreeDots.setOnClickListener(this);
+
+			v.setTag(holderList);
 			
 			return holderList;
 		}
@@ -328,10 +328,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
 			holderGrid.publicLinkImage = (ImageView) v.findViewById(R.id.file_grid_public_link);
 			holderGrid.transferProgressBar.setVisibility(View.GONE);
-			holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
-			
-			v.setTag(holderGrid);
-			
+			if(holderGrid.textViewFileSize!=null){
+				holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
+			}
+			else{
+				log("textViewFileSize is NULL");
+			}
+
 			holderGrid.savedOffline.setVisibility(View.INVISIBLE);
 			holderGrid.publicLinkImage.setVisibility(View.GONE);
 			
@@ -340,6 +343,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			
 			holderGrid.imageButtonThreeDots.setTag(holderGrid);
 			holderGrid.imageButtonThreeDots.setOnClickListener(this);
+
+			v.setTag(holderGrid);
 			
 			return holderGrid;
 		}

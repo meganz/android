@@ -1002,11 +1002,11 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 			else{
 				log("if(confirmLink != null)");
-				Intent intent = new Intent();
-				intent = new Intent(this,ChooseAccountActivity.class);
-				log("startActivity(intent);");
-				startActivity(intent);
-				finish();
+//				Intent intent = new Intent();
+//				intent = new Intent(this,ChooseAccountActivity.class);
+//				log("startActivity(intent);");
+//				startActivity(intent);
+//				finish();
 			}
 
 		}
@@ -1075,9 +1075,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			super.onBackPressed();
 		}
 		else{
-			Intent intent = new Intent(this, TourActivity.class);
-			startActivity(intent);
-			finish();
+
 		}
 	}
 

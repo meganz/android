@@ -706,13 +706,13 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				if (monthPic.nodeHandles.size() > i){
 					MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
 					if (n == null){
-						Intent intent = new Intent(context, TourActivity.class);
-				        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-				        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				        context.startActivity(intent);
-				        if (context instanceof Activity){
-				        	((Activity)context).finish();
-				        }
+//						Intent intent = new Intent(context, TourActivity.class);
+//				        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+//				        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//				        context.startActivity(intent);
+//				        if (context instanceof Activity){
+//				        	((Activity)context).finish();
+//				        }
 				        return convertView;
 					}
 					int positionInNodes = 0;
