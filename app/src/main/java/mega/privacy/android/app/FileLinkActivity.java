@@ -359,8 +359,8 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 			finish();
 		}
 		else{
-			Intent intent = new Intent(this, FileExplorerActivity.class);
-			intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER);
+			Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+			intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_IMPORT_FOLDER);
 			startActivityForResult(intent, ManagerActivity.REQUEST_CODE_SELECT_IMPORT_FOLDER);	
 		}		
 	}

@@ -1138,28 +1138,28 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 	}
 	
 	public void onPropertiesClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
-		MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
-		
-		Intent i = new Intent(context, FilePropertiesActivity.class);
-		i.putExtra("handle", n.getHandle());
-		i.putExtra("from", FROM_FILE_BROWSER);
-
-		if (n.isFolder()) {
-			if (megaApi.isShared(n)){
-				i.putExtra("imageId", R.drawable.folder_shared_thumbnail);	
-			}
-			else{
-				i.putExtra("imageId", R.drawable.folder_thumbnail);
-			}
-
-		} 
-		else {
-			i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
-		}
-		i.putExtra("name", n.getName());
-		context.startActivity(i);
-		this.positionClicked = -1;
-		notifyDataSetChanged();
+//		MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
+//
+//		Intent i = new Intent(context, FilePropertiesActivity.class);
+//		i.putExtra("handle", n.getHandle());
+//		i.putExtra("from", FROM_FILE_BROWSER);
+//
+//		if (n.isFolder()) {
+//			if (megaApi.isShared(n)){
+//				i.putExtra("imageId", R.drawable.folder_shared_thumbnail);
+//			}
+//			else{
+//				i.putExtra("imageId", R.drawable.folder_thumbnail);
+//			}
+//
+//		}
+//		else {
+//			i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
+//		}
+//		i.putExtra("name", n.getName());
+//		context.startActivity(i);
+//		this.positionClicked = -1;
+//		notifyDataSetChanged();
 	}
 	
 	public void onDownloadClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){

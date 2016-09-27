@@ -2,31 +2,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OfflineFragment"
-    android:background="@color/white" >
+    android:background="@color/new_background_fragment"
+    tools:context=".OfflineFragmentLollipop" >
 
-    <ListView 
-        android:id="@+id/offline_grid_view_browser"
+  	<RelativeLayout
+        android:id="@+id/offline_content_grid_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:background="@color/content_text_background">
+
+        <TextView
+            android:id="@+id/offline_content_text_grid"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"  
+            android:layout_centerVertical="true"          
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <mega.privacy.android.app.components.AutofitRecyclerView
+        android:id="@+id/offline_view_browser_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
-        android:dividerHeight="0dp"
-		android:divider="@null">
-    </ListView>
+        android:choiceMode="multipleChoice"
+        android:layout_below="@id/offline_content_grid_text_layout"
+        android:columnWidth="172dp"/>
     
     <ImageView
-	    android:id="@+id/offline_grid_empty_image"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_centerInParent="true" />
-    
-    <TextView
-	    android:id="@+id/offline_grid_empty_text"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:textColor="@color/text_secondary"
-	    android:textSize="16sp"
-	    android:layout_below="@id/offline_grid_empty_image"
-	    android:layout_marginTop="@dimen/standard_margin"
-	    android:layout_centerHorizontal="true"/>
+        android:id="@+id/offline_empty_image_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
+    <TextView
+        android:id="@+id/offline_empty_text_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/offline_empty_image_grid"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp" />
 </RelativeLayout>

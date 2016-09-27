@@ -151,13 +151,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	    inflater.inflate(R.menu.folder_link_action, menu);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		
-		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
-		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
-		importFolderMenuItem.setVisible(false);
-		if(megaApiFolder.getRootNode() == null)
-		{
-			downloadFolderMenuItem.setVisible(false);
-		}
+
 		
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -172,9 +166,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	    inflater.inflate(R.menu.folder_link_action, menu);
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		
-		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
-		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
-		
+
 		importFolderMenuItem.setVisible(false);
 		if(megaApiFolder.getRootNode() == null)
 		{
@@ -196,24 +188,8 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			megaApi.retryPendingConnections();
 		}
 		// Handle presses on the action bar items
-	    switch (item.getItemId()) {
-		    case R.id.action_import_folder:{
-		    	//TODO
-		    	return true;
-		    }
-	        case R.id.action_download_folder:{
-	        	//TODO        	
-	        	
-	        	MegaNode rootNode = megaApiFolder.getRootNode();	        	
-	        	onFolderClick(rootNode.getHandle(),rootNode.getSize());	        	
-	        	return true;
-	        
-	        }
-	        default:{
-	            return super.onOptionsItemSelected(item);
-            }
-	    }
-//		return false;
+
+		return false;
     }
 
 	@Override

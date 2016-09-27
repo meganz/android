@@ -21,6 +21,7 @@ import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -191,7 +192,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	float density;
 	float scaleW;
 	float scaleH;
-	
+
 	boolean shareIt = true;
 	int imageId;
 	int from;
@@ -224,7 +225,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		
 		filePropertiesActivity = this;
 		handler = new Handler();
-		
+
 //		dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
@@ -269,7 +270,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			optionsBackLayout = (RelativeLayout) findViewById(R.id.file_properties_toolbar_back_options_layout);
 			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+				params.setMargins(0,  0, 0, Util.scaleHeightPx(100, outMetrics));
+			}
+			else{
+				params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
+			}
 			optionsBackLayout.setLayoutParams(params);
 			
 			toolbarBack = (ImageView) findViewById(R.id.file_properties_toolbar_back);

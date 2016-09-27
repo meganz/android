@@ -251,8 +251,8 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 	
 	public void showFileChooser(String imagePath){
 		log("showMove");
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_UPLOAD_SELFIE);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_UPLOAD_SELFIE);
 		intent.putExtra("IMAGE_PATH", imagePath);
 		startActivity(intent);
 		finish();

@@ -284,7 +284,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private OutgoingSharesFragment outSF;
     private TransfersFragment tF; 
 //    private MyAccountFragment maF;
-    private OfflineFragment oF;
+
     private SearchFragment sF;
 //    private CameraUploadFragment psF;
     private UpgradeAccountFragment upAF;
@@ -2405,25 +2405,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (oF == null){
-    				oF = new OfflineFragment();
-    				oF.setIsList(isListOffline);
-    				oF.setPathNavigation("/");
-    				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			}
-    			else{
-    				oF.setPathNavigation("/");
-    				oF.setIsList(isListOffline);
-    				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			}
+
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, oF, "oF");
-    			ft.commit();
+
     			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			customSearch.setVisibility(View.VISIBLE);
@@ -2759,22 +2747,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
     	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-    		if (oF != null){				
-    			if (oF.onBackPressed() == 0){
-    				attr = dbH.getAttributes();
-    				if (attr != null){
-    					if (attr.getOnline() != null){
-    						if (!Boolean.parseBoolean(attr.getOnline())){
-    							super.onBackPressed();
-    							return;
-    						}
-    					}
-    				}
 
-
-    				return;
-    			}
-    		}
     	}
 
     	//		if (sF != null){
@@ -3147,43 +3120,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (oF != null){
-			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-				
-				//Show
-				refreshMenuItem.setVisible(true);
-    			sortByMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(false); //TODO
-    			selectMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			
-				//Hide
-    			pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);					
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-    			
-    			if (isListOffline){	
-    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}    			
-			}
-		}
+
+
 		
 		if (sF != null){
 			if (drawerItem == DrawerItem.SEARCH){
@@ -3347,10 +3285,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    			}	
 		    		}
 		    		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-		    			if (oF != null){
-		    				oF.onBackPressed();
-		    				return true;
-		    			}
+
 		    		}
 		    		if (sF != null){
 		    			if (drawerItem == DrawerItem.SEARCH){
@@ -3519,17 +3454,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		return true;
 	        	}
 	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-	        		if (oF != null){ 	        		
-	    				oF.selectAll();
-	    				if (oF.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
+
 	        		return true;
     			}
 	        	if (drawerItem == DrawerItem.INBOX){
@@ -3617,33 +3542,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	        		
 	        	}
-
-        		if (oF != null){
-        			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oF");
-        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.detach(currentFragment);
-        				fragTransaction.commit();
-
-        				isListOffline = !isListOffline;
-        				if (isListOffline){	
-    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-    					}
-    					else{
-    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    	    			}
-        				oF.setIsList(isListOffline);						
-        				oF.setPathNavigation(pathNavigation);
-        				//oF.setGridNavigation(false);
-        				//oF.setParentHandle(parentHandleSharedWithMe);
-
-        				fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.attach(currentFragment);
-        				fragTransaction.commit();
-
-
-        			}
-        		}
 
 //        		if (psF != null){
 //        			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -4541,15 +4439,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		this.orderOffline = _orderOffline;
 		
-		if (oF != null){	
-			oF.setOrder(orderOffline);
-			if (orderOffline == MegaApiJava.ORDER_DEFAULT_ASC){
-				oF.sortByNameAscending();
-			}
-			else{
-				oF.sortByNameDescending();
-			}
-		}
+
 	}
 	
 	public void selectSortByIncoming(int _orderIncoming){
@@ -5945,8 +5835,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void pickFolderToShare(List<MegaUser> users){
 		
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_SELECT_FOLDER);
 		String[] longArray = new String[users.size()];
 		for (int i=0; i<users.size(); i++){
 			longArray[i] = users.get(i).getEmail();
@@ -6228,8 +6118,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void showMove(ArrayList<Long> handleList){
 		log("showMove");
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
@@ -6240,8 +6130,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void showCopy(ArrayList<Long> handleList){
 		log("showCopy");
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
@@ -7626,8 +7516,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void pickContacToSendFile(List<MegaUser> users){
 		
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_SELECT_FILE);
+		Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+		intent.setAction(LauncherFileExplorerActivity.ACTION_SELECT_FILE);
 		String[] longArray = new String[users.size()];
 		for (int i=0; i<users.size(); i++){
 			longArray[i] = users.get(i).getEmail();

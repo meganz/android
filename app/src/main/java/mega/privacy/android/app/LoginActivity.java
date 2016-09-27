@@ -338,7 +338,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						if (action != null){
 							log("if (action != null)");
 							if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
-								intent = new Intent(this, FileExplorerActivity.class);
+								intent = new Intent(this, LauncherFileExplorerActivity.class);
 								if(extras != null)
 								{
 									intent.putExtras(extras);
@@ -407,7 +407,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					if (action != null){
 						log("if (action != null)");
 						if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
-							intent = new Intent(this, FileExplorerActivity.class);
+							intent = new Intent(this, LauncherFileExplorerActivity.class);
 							if(extras != null)
 							{
 								intent.putExtras(extras);
@@ -969,7 +969,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 									intent = new Intent(loginActivity,ManagerActivity.class);
 									if (action != null){
 										if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
-											intent = new Intent(this, FileExplorerActivity.class);
+											intent = new Intent(this, LauncherFileExplorerActivity.class);
 											if(extras != null)
 											{
 												intent.putExtras(extras);

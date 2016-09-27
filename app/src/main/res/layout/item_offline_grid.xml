@@ -2,235 +2,71 @@
     android:id="@+id/offline_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white">
+    android:background="@color/new_background_fragment">
     
     <RelativeLayout 
         android:layout_width="172dp"
         android:layout_height="wrap_content"
-        android:id="@+id/offline_grid_item_layout1"
+        android:id="@+id/offline_grid_item_layout"
         android:background="@drawable/background_item_grid"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:descendantFocusability="blocksDescendants" >
+        android:layout_margin="3dp"
+        android:descendantFocusability="blocksDescendants">
         
-        <ImageButton
-	        android:id="@+id/offline_grid_thumbnail1"
-	        android:layout_width="157dp"
-	        android:layout_height="157dp"
+        <ImageView
+	        android:id="@+id/offline_grid_thumbnail"
+	        android:layout_width="172dp"
+	        android:layout_height="172dp"
+	        android:layout_margin="5dp"
 	        android:layout_centerHorizontal="true"
 	        android:scaleType="fitCenter"
 	        android:background="@null" />
         
         <View
-	        android:id="@+id/offline_grid_separator1"
-	 		android:layout_width="wrap_content"
-	 		android:layout_height="2dp"
-	 		android:background="@color/grid_item_separator"
-	        android:scaleType="fitCenter"
-	        android:layout_marginLeft="6dp"
-	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/offline_grid_thumbnail1"
+	        android:id="@+id/offline_grid_separator"
+	 		android:layout_width="match_parent"
+	 		android:layout_height="1dp"
+	 		android:background="@color/new_background_fragment"
+	        android:layout_below="@id/offline_grid_thumbnail"
 	 		 />
         
+        <ImageButton 
+	        android:id="@+id/offline_grid_three_dots"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/ic_dots_vertical_grey"
+			android:background="@null" 
+			android:layout_marginLeft="2dp"
+			android:layout_marginTop="22dp"
+			android:layout_marginRight="8dp"
+	        android:layout_below="@id/offline_grid_separator"
+	        android:layout_alignParentRight="true" />  
+	        
         <TextView
-	        android:id="@+id/offline_grid_filename1"
+	        android:id="@+id/offline_grid_filename"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"	
-	        android:paddingLeft="6dp"
-	        android:paddingTop="3dp"
-			android:textColor="@color/file_list_first_row"
-	        android:layout_below="@id/offline_grid_separator1" />
+	        android:layout_alignParentLeft="true"	
+	        android:layout_marginLeft="12dp"
+	        android:layout_marginTop="15dp"
+	        android:layout_toLeftOf="@id/offline_grid_three_dots"
+	        android:layout_below="@id/offline_grid_separator"
+	        android:textColor="@color/black"
+	        android:ellipsize="end"
+        	android:maxLines="1" />
         
         <TextView
-	        android:id="@+id/offline_grid_filesize1"
+	        android:id="@+id/offline_grid_filesize"
 	        android:layout_width="wrap_content"
 	        android:layout_height="30dp"
-	        android:paddingLeft="6dp"
-	        android:paddingBottom="7dp"
+	        android:layout_alignParentLeft="true"	
+	        android:layout_marginLeft="12dp"
+	        android:layout_marginBottom="7dp"
 	        android:textColor="@color/file_list_second_row"
-	        android:layout_below="@id/offline_grid_filename1"
-	        android:textSize="12sp" />
-        
-        <ImageButton 
-	        android:id="@+id/offline_grid_three_dots1"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/action_selector_ic"
-			android:background="@null" 
-			android:paddingTop="10dp"
-	        android:paddingLeft="2dp"
-	        android:paddingRight="10dp"
-	        android:paddingBottom="8dp"
-	        android:layout_gravity="right"
-	        android:layout_alignParentRight="true" 
-	        android:layout_alignParentBottom="true"/>
-         <!--
-        <ImageView
-	        android:id="@+id/offline_grid_arrow_selection1"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/arrow_selection_white_background"
-	        android:layout_below="@id/offline_grid_three_dots1"
-			android:layout_alignParentBottom="true"
-			android:layout_alignParentRight="true"
-			android:paddingRight="14dp" />-->
-               
-    </RelativeLayout>
-    
-    <RelativeLayout
-        android:id="@+id/offline_grid_options1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/offline_grid_item_layout1"
-        android:background="#222222"
-        android:layout_alignParentLeft="true">
-        
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            
-            <TableRow>
-  	  <!--          <ImageButton
-		            android:id="@+id/offline_grid_option_open1"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_action_collections_collection"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
-	        
-		        <ImageView
-		            android:id="@+id/offline_grid_option_properties1"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_properties"
-		            android:layout_gravity="center_vertical"
-		            style="@style/dialogActionButton" />
--->		        
-		        <ImageView
-		            android:id="@+id/offline_grid_option_delete1"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_rubbish_bin" 
-		            android:layout_gravity="center_vertical"
-		            style="@style/dialogActionButton" />
-	        </TableRow>        
-        </TableLayout>
-    </RelativeLayout>
-           
-    <RelativeLayout 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/offline_grid_item_layout2"
-        android:layout_toRightOf="@id/offline_grid_item_layout2"
-        android:background="@drawable/background_item_grid"
-        android:layout_alignParentRight="true">
-        
-        <ImageButton
-	        android:id="@+id/offline_grid_thumbnail2"
-	        android:layout_width="157dp"
-	        android:layout_height="157dp"
-	        android:layout_centerHorizontal="true"
-   	        android:scaleType="fitCenter" 
-   	        android:background="@null"/>
-        
-        <View
-	        android:id="@+id/offline_grid_separator2"
-	 		android:layout_width="wrap_content"
-	 		android:layout_height="2dp"
-	 		android:background="@color/grid_item_separator"
-	        android:scaleType="fitCenter"
-	        android:layout_marginLeft="6dp"
-	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/offline_grid_thumbnail2"/>
-        
-        <TextView
-	        android:id="@+id/offline_grid_filename2"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"	
-	        android:paddingLeft="6dp"
-	        android:paddingTop="3dp"
-			android:textColor="@color/file_list_first_row"
-	        android:layout_below="@id/offline_grid_separator2" />
-        
-        <TextView
-	        android:id="@+id/offline_grid_filesize2"
-	        android:layout_width="wrap_content"
-	        android:layout_height="30dp"
-	        android:paddingLeft="6dp"
-	        android:paddingBottom="7dp"
-	        android:textColor="@color/file_list_second_row"
-	        android:layout_below="@id/offline_grid_filename2" 
-	        android:textSize="12sp" />
-        
-        <ImageButton 
-	        android:id="@+id/offline_grid_three_dots2"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/action_selector_ic"
-			android:background="@null" 
-			android:paddingTop="10dp"
-	        android:paddingLeft="2dp"
-	        android:paddingRight="10dp"
-	        android:paddingBottom="8dp"
-	        android:layout_gravity="right"
-	        android:layout_alignParentRight="true" 
-	        android:layout_alignParentBottom="true"/>
-         <!--
-        <ImageView
-	        android:id="@+id/offline_grid_arrow_selection2"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/arrow_selection_white_background"
-	        android:layout_below="@id/offline_grid_three_dots2"
-			android:layout_alignParentBottom="true"
-			android:layout_alignParentRight="true"
-			android:paddingRight="14dp" />-->
-        
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/offline_grid_options2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/offline_grid_item_layout2"
-        android:background="#222222">
-        
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            
-            <TableRow>
-  	  <!--          <ImageButton
-		            android:id="@+id/offline_grid_option_open2"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_action_collections_collection"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
-	        
- 				<ImageView
-		            android:id="@+id/offline_grid_option_download2"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_download"
-		            android:layout_gravity="center_vertical"
-		            style="@style/dialogActionButton" />
--->
-		        <ImageView
-		            android:id="@+id/offline_grid_option_delete2"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_rubbish_bin" 
-		            android:layout_gravity="center_vertical" 
-		            style="@style/dialogActionButton" />
-	        </TableRow>        
-        </TableLayout>
+	        android:layout_below="@id/offline_grid_filename"
+	        android:textSize="12sp" />       
+          
     </RelativeLayout>
     
 </RelativeLayout>

@@ -745,8 +745,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
 			log("Changing the MEGA folder for secondary mega folder");
-			Intent intent = new Intent(this, FileExplorerActivity.class);
-			intent.setAction(FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
+			Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+			intent.setAction(LauncherFileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
@@ -951,8 +951,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
 			log("Changing the MEGA folder for camera uploads");
-			Intent intent = new Intent(this, FileExplorerActivity.class);
-			intent.setAction(FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
+			Intent intent = new Intent(this, LauncherFileExplorerActivity.class);
+			intent.setAction(LauncherFileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
