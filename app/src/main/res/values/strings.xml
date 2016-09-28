@@ -898,5 +898,6 @@
     <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Clear all messages?\nAfter cleared, neither %s nor you will be able to see messages of this chat.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Clear</string>
+    <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
 
 </resources>

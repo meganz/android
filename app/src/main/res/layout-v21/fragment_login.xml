@@ -184,6 +184,13 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/login_preparing_filelist" />
 
+            <TextView
+                android:id="@+id/login_initializing_chat_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/login_initializing_chat" />
+
             <ProgressBar
                 android:id="@+id/login_fetching_nodes_bar"
                 style="@style/MEGAProgressBarLogin"

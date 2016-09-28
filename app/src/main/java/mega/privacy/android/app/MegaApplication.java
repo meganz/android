@@ -33,7 +33,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
+public class MegaApplication extends Application implements MegaListenerInterface{
 	final String TAG = "MegaApplication";
 	static final String USER_AGENT = "MEGAAndroid/3.0.11.5";
 	MegaApiAndroid megaApi;
@@ -283,15 +283,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		
 	}
 
-
-
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		// TODO Auto-generated method stub
 		
 	}
-
-
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
@@ -304,134 +300,48 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				ManagerActivity.logout(getApplicationContext(), megaApi, false);
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			megaChatApi.init(this);
-		}
 	}
-
-
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-//		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
-//			MegaApiAndroid.setLoggerObject(new AndroidLogger());
-////			MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
-//		}
-	}
-
-	@Override
-	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish(CHAT)");
-
-		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
-			megaChatApi.connect(this);
-		}
-		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Connected to chat!");
-				MegaChatRoomList chatList = megaChatApi.getChatRooms();
-				if(chatList!=null){
-					log("Chat size: :"+chatList.size());
-				}
-				else{
-					log("Chat NULL");
-				}
-			}
-			else{
-				log("EEEERRRRROR AL CONNECT " + e.getErrorString());
-				MegaChatRoomList chatList = megaChatApi.getChatRooms();
-				if(chatList!=null){
-					log("Chat size: :"+chatList.size());
-				}
-				else{
-					log("Chat NULL");
-				}
-			}
-
-//			MegaChatRoom chat = megaChatApi.getChatRoom(new Long(635570421));
-//			if(chat!=null){
-//				log("tengo el chat!");
-//			}
-//			else{
-//				log("el chat es Null");
-//			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
 	}
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
-
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
-
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
 		// TODO Auto-generated method stub
-		
 	}
-
-
 
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
@@ -440,18 +350,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return false;
 	}
 
-
-
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
-		
 	}
 }
