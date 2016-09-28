@@ -69,15 +69,6 @@
         </activity>
 
         <activity
-            android:name="CreateAccountActivity"
-            android:label="@string/create_account_text"
-            android:theme="@style/login_activity"
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" >
-        </activity>
-
-        <activity
             android:name="ConfirmEmailActivity"
             android:label="@string/confirm_email_text"
             android:theme="@style/login_activity"

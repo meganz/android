@@ -278,8 +278,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
 
-	private IncomingSharesFragment inSF;
-	private OutgoingSharesFragment outSF;
     private TransfersFragment tF; 
 //    private MyAccountFragment maF;
 
@@ -1393,17 +1391,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
     	}    	
     	
-    	if (inSF != null){
-    		pHSharedWithMe = inSF.getParentHandle();
-    		if (drawerItem == DrawerItem.SHARED_WITH_ME){
-    			if (isListSharedWithMe){
-    				visibleFragment = 8;
-    			}
-    			else{
-    				visibleFragment = 9;
-    			}
-    		}
-    	}
+
     	
     	if (tF != null){
 	    	if (drawerItem == DrawerItem.TRANSFERS){
@@ -1986,134 +1974,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SHARED_WITH_ME:{    			
     			
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			
-    			if (aB == null){
-    				aB = getSupportActionBar();
-    			}
-    			aB.setTitle(getString(R.string.section_shared_items));
-    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			
-    			if (getmDrawerToggle() != null){
-    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
-    				supportInvalidateOptionsMenu();
-    			}
-    			
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			
-    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-    			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-    			}
-    			
-    			mTabHostShares.getTabWidget().setBackgroundColor(Color.BLACK);
-    			
-    			mTabHostShares.setVisibility(View.VISIBLE);    			
-    			mTabHostShares.setVisibility(View.VISIBLE);
-    			
-    			if (mTabsAdapterShares == null){
-    				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
-    				
-        			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
-        			tabSpec3.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-        	        //tabSpec.setContent(contentID);
-        	        //mTabHostContacts.addTab(tabSpec);
-        	        TabHost.TabSpec tabSpec4 = mTabHostShares.newTabSpec("outgoingSharesFragment");
-        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_outgoing_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-        	                	          				
-    				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragment.class, null);
-    				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragment.class, null);
-    				
-    			}
-    			
-    			mTabHostShares.setOnTabChangedListener(new OnTabChangeListener(){
-                    @Override
-                    public void onTabChanged(String tabId) {
-                    	log("TabId :"+ tabId);
-                    	supportInvalidateOptionsMenu();
-                        if(tabId.equals("outgoingSharesFragment")){                         	
-                			if (outSF != null){                 				
-                				if(parentHandleOutgoing!=-1){
-	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-	            					aB.setTitle(node.getName());
-	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-            					}
-                				else{
-                					aB.setTitle(getResources().getString(R.string.section_shared_items));
-                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-                					outSF.refresh(); 
-                				}            					   				
-                			}
-                        }
-                        else if(tabId.equals("incomingSharesFragment")){                        	
-                        	if (inSF != null){                        		
-                        		if(parentHandleIncoming!=-1){
-                        			
-                        			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-                					aB.setTitle(node.getName());	
-                					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-            					}
-                				else{
-                					
-                					aB.setTitle(getResources().getString(R.string.section_shared_items));
-                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-                					inSF.refresh(); 
-                				}   				
-                			}                           	
-                        }
-                     }
-    			});
-    			
-				for (int i=0;i<mTabsAdapterShares.getCount();i++){
-					final int index = i;
-					mTabHostShares.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							viewPagerShares.setCurrentItem(index);	
-						}
-					});
-				}
-   			
-    			customSearch.setVisibility(View.VISIBLE);
-    			mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			if (createFolderMenuItem != null){
-    				selectMenuItem.setVisible(true);
-    				sortByMenuItem.setVisible(true);
-    				thumbViewMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(true);
 
-    				
-        			//Hide
-    				createFolderMenuItem.setVisible(false);
-    				addContactMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);   			
-        			selectMenuItem.setVisible(false);
-        			unSelectMenuItem.setVisible(false);  				
-        			rubbishBinMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			createFolderMenuItem.setVisible(false);
-        			rubbishBinMenuItem.setVisible(false);
-        			clearRubbishBinMenuitem.setVisible(false);
-        			changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-	    		}
-    			
-    			if (inSF != null){
-    				aB.setTitle(getString(R.string.section_shared_items));	
-    				inSF.refresh();			
-    				
-    			}    			
-    			if (outSF != null){    				
-					aB.setTitle(getString(R.string.section_shared_items));				
-					outSF.refresh();    				
-    			}
     			
     			break;
     		}
@@ -2475,39 +2336,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 
     	if (drawerItem == DrawerItem.SHARED_WITH_ME){
-    		int index = viewPagerShares.getCurrentItem();
-    		if(index==1){				
-    			//OUTGOING				
-    			String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-    			log("Tag: "+ cFTag2);
-    			outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-    			if (outSF != null){					
-    				if (outSF.onBackPressed() == 0){
-    					drawerItem = DrawerItem.CLOUD_DRIVE;
-    					selectDrawerItem(drawerItem);
-    					if(nDA!=null){
-    						nDA.setPositionClicked(0);
-    					}
-    					return;
-    				}					
-    			}
-    		}
-    		else{			
-    			//InCOMING
-    			String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-    			log("Tag: "+ cFTag1);
-    			inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-    			if (inSF != null){					
-    				if (inSF.onBackPressed() == 0){
-    					drawerItem = DrawerItem.CLOUD_DRIVE;
-    					selectDrawerItem(drawerItem);
-    					if(nDA!=null){
-    						nDA.setPositionClicked(0);
-    					}
-    					return;
-    				}					
-    			}				
-    		}	
+
     	}			
     	if (drawerItem == DrawerItem.RUBBISH_BIN){
 
@@ -2708,81 +2537,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 			int index = viewPagerShares.getCurrentItem();
 			if(index==0){	
-				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
-				if (inSF != null){
-					sortByMenuItem.setVisible(true);
-					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(true);
 
-					addMenuItem.setEnabled(true);
-					addMenuItem.setVisible(true);
-
-					log("parentHandleIncoming: "+parentHandleIncoming);
-					if(parentHandleIncoming==-1){
-						addMenuItem.setVisible(false);
-					}
-					else{
-						addMenuItem.setVisible(true);
-					}
-
-					//Hide
-					pauseRestartTransfersItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					selectMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);  				
-					rubbishBinMenuItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					changePass.setVisible(false); 
-					exportMK.setVisible(false); 
-					removeMK.setVisible(false); 
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);					
-	    			refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
-				}
 			}
-			else if(index==1){
-				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
-				if (outSF != null){
-
-					selectMenuItem.setVisible(true);
-					sortByMenuItem.setVisible(true);
-					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(true);
-
-
-					log("parentHandleOutgoing: "+parentHandleOutgoing);
-					if(parentHandleOutgoing==-1){
-						addMenuItem.setVisible(false);
-					}
-					else{
-						addMenuItem.setVisible(true);
-					}
-
-					//Hide
-					pauseRestartTransfersItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);  				
-					rubbishBinMenuItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					changePass.setVisible(false); 
-					exportMK.setVisible(false); 
-					removeMK.setVisible(false); 
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);					
-	    			refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
-				}
+			else if(index==1) {
 			}
 		}
 		
@@ -3015,25 +2772,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    	else {
 
 		    		if (drawerItem == DrawerItem.SHARED_WITH_ME){
-		    			int index = viewPagerShares.getCurrentItem();
-		    			if(index==1){				
-		    				//OUTGOING				
-		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-		    				log("Tag: "+ cFTag2);
-		    				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-		    				if (outSF != null){					
-		    					outSF.onBackPressed();				
-		    				}
-		    			}
-		    			else{			
-		    				//InCOMING
-		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-		    				log("Tag: "+ cFTag1);
-		    				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		    				if (inSF != null){					
-		    					inSF.onBackPressed();					
-		    				}				
-		    			}	
+
 		    		}
 		    		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 
@@ -3087,43 +2826,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        case R.id.action_add:{
 	        	
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
-	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-	        		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);
-	        		if (viewPagerShares.getCurrentItem()==0){		
-		        		if (inSF != null){	        		
-		        			Long checkHandle = inSF.getParentHandle();		        			
-		        			MegaNode checkNode = megaApi.getNodeByHandle(checkHandle);
-		        			
-		        			if((megaApi.checkAccess(checkNode, MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-		        				this.uploadFile();
-							}
-							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
-								this.uploadFile();
-							}	
-							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
-								log("Not permissions to upload");
-								AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.no_permissions_upload), null, null);
-								builder.setTitle(R.string.op_not_allowed);
-								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
-							           public void onClick(DialogInterface dialog, int id) {
-							                //do things
-							        	   alertNotPermissionsUpload.dismiss();
-							           }
-							       });
-								
-								alertNotPermissionsUpload = builder.create();
-								alertNotPermissionsUpload.show();
-								Util.brandAlertDialog(alertNotPermissionsUpload);
-							}
-		        		}
-	        		}
-	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-	        		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);	
-	        		if (viewPagerShares.getCurrentItem()==1){	
-		        		if (outSF != null){        			
-		        			this.uploadFile();
-		        		}
-	        		}
+
 	        	}	
 	        	else {
 	        		this.uploadFile();
@@ -3157,36 +2860,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
-	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-	        		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);
-	        		if (viewPagerShares.getCurrentItem()==0){		
-		        		if (inSF != null){	        		
-		        			inSF.selectAll();
-		        			if (inSF.showSelectMenuItem()){
-		        				selectMenuItem.setVisible(true);
-		        				unSelectMenuItem.setVisible(false);
-		        			}
-		        			else{
-		        				selectMenuItem.setVisible(false);
-		        				unSelectMenuItem.setVisible(true);
-		        			}	  
-		        		}
-	        		}
-	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-	        		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);	
-	        		if (viewPagerShares.getCurrentItem()==1){	
-		        		if (outSF != null){        			
-		        			outSF.selectAll();
-		        			if (outSF.showSelectMenuItem()){
-		        				selectMenuItem.setVisible(true);
-		        				unSelectMenuItem.setVisible(false);
-		        			}
-		        			else{
-		        				selectMenuItem.setVisible(false);
-		        				unSelectMenuItem.setVisible(true);
-		        			}
-	        			}
-	        		}
+
 	        		return true;
 	        	}
 	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -3308,33 +2982,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        	}
 		        	case SHARED_WITH_ME:{
 		        		
-		        		int index = viewPagerShares.getCurrentItem();
-		    			if(index==1){				
-		    				//OUTGOING				
-		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-		    				log("Tag: "+ cFTag2);
-		    				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-		    				if (outSF != null){					
-		    					Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-					    		break;
-		    				}
-		    			}
-		    			else{			
-		    				//InCOMING
-		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-		    				log("Tag: "+ cFTag1);
-		    				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		    				if (inSF != null){					
-		    					Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-					    		break;
-		    				}				
-		    			}	
+
 		        	}
 		        	case ACCOUNT:{
 		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
@@ -4135,15 +3783,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		this.orderIncoming = _orderIncoming;
 		
-		if (inSF != null){	
-			inSF.setOrder(orderIncoming);
-			if (orderIncoming == MegaApiJava.ORDER_DEFAULT_ASC){
-				inSF.sortByNameAscending();
-			}
-			else{
-				inSF.sortByNameDescending();
-			}
-		}
+
 	}
 	
 	public void selectSortByOutgoing(int _orderOutgoing){
@@ -4151,15 +3791,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		this.orderOutgoing = _orderOutgoing;
 		
-		if (outSF != null){	
-			outSF.setOrder(orderOutgoing);
-			if (orderOutgoing == MegaApiJava.ORDER_DEFAULT_ASC){
-				outSF.sortByNameAscending();
-			}
-			else{
-				outSF.sortByNameDescending();
-			}
-		}
+
 	}
 	
 	public void selectSortByCloudDrive(int _orderGetChildren){
@@ -4724,18 +4356,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 
 				if (drawerItem == DrawerItem.SHARED_WITH_ME){
-					if (inSF != null){
-						//TODO: ojo con los hijos
-//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-//							inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();
-					}
-					if (outSF != null){
-						//TODO: ojo con los hijos
-//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(outSF.getParentHandle()), orderGetChildren);
-//							inSF.setNodes(nodes);
-						outSF.getListView().invalidateViews();
-					}
+
 				}
 			}	
 		}
@@ -4872,14 +4493,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
 
-				if (inSF != null){
-					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();
-					}
-				}
+
 			}
 			else{
 				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
@@ -4913,14 +4527,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
 
-					if (inSF != null){
-						if (drawerItem == DrawerItem.SHARED_WITH_ME){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-							//TODO: ojo con los hijos
-//							inSF.setNodes(nodes);
-//							inSF.getListView().invalidateViews();
-						}
-					}
+
 				}
 				else{
 					if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -5396,11 +5003,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			public void run() {
 
 
-				if (inSF != null){
-					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						return;
-					}
-				}
+
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
@@ -6156,25 +5759,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 			}
 			else if(drawerItem == DrawerItem.SHARED_WITH_ME){
-				int index = viewPagerShares.getCurrentItem();
-				if(index==0){	
-					//INCOMING
-					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-//					log("Tag: "+ cFTag1);
-					inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-					if (inSF != null){		
-						parentHandleUpload=inSF.getParentHandle();
-					}					
-				}
-				else if(index==1){
-					//OUTGOING
-					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 1);	
-//					log("Tag: "+ cFTag1);
-					outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-					if (outSF != null){		
-						parentHandleUpload=outSF.getParentHandle();
-					}	
-				}
+
 			}
 			else{
 				return;
@@ -6293,22 +5878,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				if (parentNode != null){
-					if (inSF != null){					
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();						
-					}
-				}
-				else{
-					if (inSF != null){						
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();						
-					}
-				}
+
 			}
 		}
 		else if (requestCode == TAKE_PHOTO_CODE){
@@ -6347,24 +5917,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				if (parentNode != null){
-					if (inSF != null){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						inSF.setOrder(orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();
-					}
-				}
-				else{
-					if (inSF != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						inSF.setOrder(orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();
-					}
-				}
+
 			}			
 		}
 		else if (requestCode == RC_REQUEST){
@@ -6452,27 +6005,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			parentNode = megaApi.getNodeByHandle(parentHandle);
 		}
 		else if (drawerItem == DrawerItem.SHARED_WITH_ME){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){				
-				//OUTGOING				
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-				log("Tag: "+ cFTag2);
-				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSF != null){					
-					parentHandleOutgoing = outSF.getParentHandle();
-					parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
-				}
-			}
-			else{			
-				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-				log("Tag: "+ cFTag1);
-				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSF != null){					
-					parentHandleIncoming = inSF.getParentHandle();	
-					parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				}				
-			}	
+
 		}
 		
 		if(parentNode == null){
@@ -6520,26 +6053,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 			int index = viewPagerShares.getCurrentItem();
-			if(index==1){				
-				//OUTGOING				
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-				log("Tag: "+ cFTag2);
-				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSF != null){					
-					aB.setTitle(getString(R.string.section_shared_items));				
-					outSF.refresh(this.parentHandleOutgoing);				
-				}
-			}
-			else{
-				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-				log("Tag: "+ cFTag1);
-				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSF != null){
-					aB.setTitle(getString(R.string.section_shared_items));
-					inSF.refresh(this.parentHandleIncoming);
-				}				
-			}	
+
 		}
 		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 //			if (psF != null){
@@ -6665,20 +6179,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 
 		
-		if (inSF != null){
-			for(int i=0; i<tL.size(); i++){
-				
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					
-					mTHash.put(handleT,tempT);						
-				}
-			}
-			
-			inSF.setTransfers(mTHash);
-		}
-		
+
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 
 	}
@@ -6700,19 +6201,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		tF.setTransfers(tL);	
 		
 
-		if (inSF != null){
-			for(int i=0; i<tL.size(); i++){
-				
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-	
-					mTHash.put(handleT,tempT);						
-				}
-			}
-			
-			inSF.setTransfers(mTHash);
-		}
+
 
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
@@ -6741,23 +6230,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 
 
-		if (inSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					Time now = new Time();
-					now.setToNow();
-					long nowMillis = now.toMillis(false);
-					if (lastTimeOnTransferUpdate < 0){
-						lastTimeOnTransferUpdate = now.toMillis(false);
-						inSF.setCurrentTransfer(transfer);
-					}
-					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-						lastTimeOnTransferUpdate = nowMillis;
-						inSF.setCurrentTransfer(transfer);
-					}			
-				}		
-			}
-		}
+
 	}
 
 	@Override
