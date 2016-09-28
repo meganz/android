@@ -596,9 +596,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 
 	public void onRegisterClick(View v){
 		log("public void onRegisterClick(View v)");
-		Intent intent = new Intent(this, CreateAccountActivity.class);
-		startActivity(intent);
-		finish();
+
 	}
 
 	@Override
