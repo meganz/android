@@ -12,6 +12,6 @@
 	    android:gravity="center_vertical"
 	    android:drawableLeft="@drawable/ic_launcher"
 	    android:drawablePadding="3dp"
-	    android:textColor="@color/navigation_drawer_text">
+	    android:textColor="@color/navigation_drawer_background">
 	</TextView>
 </LinearLayout>

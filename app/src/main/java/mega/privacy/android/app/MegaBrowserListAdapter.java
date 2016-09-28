@@ -410,7 +410,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.CONTACT_FILE_ADAPTER: {
-			((ContactPropertiesMainActivity) context).setParentHandle(parentHandle);
+
 			break;
 		}
 		case ManagerActivity.RUBBISH_BIN_ADAPTER: {
@@ -1148,7 +1148,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(n.getHandle());
 			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactPropertiesMainActivity) context).onFileClick(handleList);
+
 			} else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
 				((FolderLinkActivity) context).onFileClick(handleList);
 			} else {
@@ -1160,7 +1160,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			positionClicked = -1;	
 			notifyDataSetChanged();
 			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactPropertiesMainActivity) context).leaveIncomingShare(n);
+
 			}
 			else
 			{
@@ -1234,7 +1234,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				//break;
 			}
 			else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactPropertiesMainActivity) context).moveToTrash(handleList);				
+
 				//break;
 			} 
 			else {
@@ -1254,7 +1254,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		case R.id.file_list_option_rename_layout: {
 			if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
-				((ContactPropertiesMainActivity) context).showRenameDialog(n, n.getName());
+
 			}
 			else if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
 				((ManagerActivity) context).showRenameDialog(n, n.getName());
@@ -1635,7 +1635,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.CONTACT_FILE_ADAPTER: {
-			((ContactPropertiesMainActivity) context).setParentHandle(parentHandle);
+
 			break;
 		}
 		case ManagerActivity.RUBBISH_BIN_ADAPTER: {

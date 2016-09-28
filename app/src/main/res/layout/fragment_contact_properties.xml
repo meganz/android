@@ -1,138 +1,226 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
-    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contact_properties_complete_relative_layout"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:background="@color/black"
-    tools:context=".FilePropertiesFragment" >
-    
-    <!--  
-    <RelativeLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:id="@+id/contact_properties_layout_top"
-        android:background="#44000000"
-        android:layout_alignParentTop="true">
-        
-        <ImageView 
-            android:id="@+id/contact_properties_close_icon"
-            android:layout_width="wrap_content"
+    android:layout_height="match_parent" >
+
+    <com.nirhart.parallaxscroll.views.ParallaxScrollView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/contact_properties_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        app:parallax_factor="1.9"
+        tools:context=".ManagerActivity" >
+
+        <RelativeLayout
+            android:id="@+id/contact_properties_main_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_navigation_accept_white"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            style="@style/dialogActionButton"/>
-        
-        <ImageView 
-            android:id="@+id/contact_properties_overflow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_core_overflow"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            style="@style/dialogActionButton"/>
-     
-    </RelativeLayout>-->
-    
-    <RelativeLayout 
-        android:id="@+id/contact_properties_avatar_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="270dp"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp">
-    
-	    <mega.privacy.android.app.components.RoundedImageView
-	        android:id="@+id/contact_properties_image"
-	        android:layout_width="270dp"
-	        android:layout_height="270dp"
-	        android:layout_centerHorizontal="true"
-	        android:paddingBottom="10dp"
-	        android:paddingLeft="30dp"
-	        android:paddingRight="30dp"
-	        android:paddingTop="10dp"
-	        rounded:border_color="@color/border_file_properties"
-	        rounded:border_width="0dp"
-	        rounded:corner_radius="135dp" />
-    
-    	<TextView
-            android:id="@+id/contact_properties_initial_letter"
-            android:layout_width="fill_parent"
-   			android:layout_height="fill_parent"
-   			android:layout_centerInParent="true"
-			android:gravity="center_horizontal|center_vertical"
-   			android:paddingBottom="5dp" />
-	    
-    </RelativeLayout>
+            android:orientation="vertical"
+            android:background="@color/white">
 
-    <TableLayout
-        android:id="@+id/contact_properties_content_table"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/contact_properties_avatar_layout"
-        android:background="@color/black" >
+            <RelativeLayout
+                android:id="@+id/contact_properties_image_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:fitsSystemWindows="true" >
 
-        <TableRow>
+                <RelativeLayout
+                    android:id="@+id/color_avatar_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_collapseMode="parallax"
+                    android:fitsSystemWindows="true" >
 
-           <TextView
-              android:id="@+id/contact_properties_name"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:paddingTop="25dp"
-              android:textSize="20sp"
-              android:gravity="center"
-              android:textColor="@color/white" 
-             android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/contact_properties_toolbar_initial_letter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:paddingBottom="5dp" />
+
+                    <ImageView
+                        android:id="@+id/contact_properties_toolbar_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <!-- MAIL LAYOUT -->
             
-        </TableRow>
+            <RelativeLayout
+                android:id="@+id/contact_properties_name_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_below="@id/contact_properties_image_layout">
 
-        <TableRow>
+                <ImageView
+	                android:id="@+id/contact_properties_name_icon"
+	                style="@style/dialogActionButton"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:gravity="left"
+	                android:src="@drawable/ic_link_grey"
+	                android:visibility="invisible" />
+                
+                <TextView
+                    android:id="@+id/contact_properties_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="left|center_vertical"
+                    android:textStyle="bold"
+                    android:layout_toRightOf="@id/contact_properties_name_icon"/>
+            </RelativeLayout>
+            
+            <RelativeLayout
+                android:id="@+id/contact_properties_email_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/contact_properties_name_layout"
+                android:background="@color/white"
+                android:gravity="left" >
 
-            <TextView
-                android:id="@+id/contact_properties_email"
+                <ImageView
+                    android:id="@+id/contact_properties_email_icon"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_email_grey" />
+
+                <RelativeLayout
+                    android:id="@+id/contact_properties_email_text_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="left|center_vertical"                    
+                    android:layout_toRightOf="@id/contact_properties_email_icon" >
+
+                    <TextView
+                        android:id="@+id/contact_properties_email_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/email_text"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/contact_properties_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/contact_properties_email_label"
+                        android:textColor="@color/grey_info_menu" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_below="@id/contact_properties_email_layout"
+                android:id="@+id/divider_shared_layout_rl">
+
+                <View
+                    android:id="@+id/divider_shared_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grid_item_separator" />
+            </RelativeLayout>
+
+            <!-- SHARED LAYOUT -->
+
+            <RelativeLayout
+                android:id="@+id/contact_properties_shared_folders_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_below="@id/divider_shared_layout_rl" >
+
+                <ImageView
+                    android:id="@+id/contact_properties_shared_folder_icon"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:src="@drawable/ic_shared_with_grey" />
+
+                <TextView
+                    android:id="@+id/contact_properties_shared_folders_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="left|center_vertical"
+                    android:layout_toRightOf="@id/contact_properties_shared_folder_icon"
+                    android:text="@string/section_shared_items"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/contact_properties_shared_folders_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/accentColor"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </com.nirhart.parallaxscroll.views.ParallaxScrollView>
+
+    <RelativeLayout
+        android:id="@+id/contact_properties_toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/gradient_shape" >
+
+        <RelativeLayout
+            android:id="@+id/contact_properties_toolbar_back_options_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp" >
+
+            <ImageView
+                android:id="@+id/contact_properties_toolbar_back"
+                style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="35dp" 
-                android:gravity="center"               
-                android:textColor="@color/white"/>
-        </TableRow>
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_arrow_back_white" />
 
-    </TableLayout>
+            <ImageView
+                android:id="@+id/contact_properties_toolbar_overflow"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dots_vertical_white" />
+        </RelativeLayout>
+    </RelativeLayout>
 
-    <Button
-        android:id="@+id/shared_folders_button"
-        android:layout_width="fill_parent"
+    <RelativeLayout
+        android:id="@+id/contact_properties_overflow_menu_layout"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center"
-        android:background="@drawable/btn_shared_folder_holo_light"
-        android:text="@string/menu_add_contact"
-        android:textColor="@color/black" >
-    </Button>
-    
-   <!--   
-   <RelativeLayout  
-			android:layout_width="200dp"
-			android:layout_height="wrap_content"
-			android:id="@+id/contact_properties_overflow_menu"
-			android:background="#ffffffff"
-	        android:layout_alignParentRight="true"
-	        android:layout_below="@+id/contact_properties_layout_top"
-	        android:layout_marginRight="5dp">
-        
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="#ffffffff" >
+
         <ListView
             android:id="@+id/contact_properties_overflow_menu_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-			android:layout_marginLeft="0dp"
-			android:background="#00000000"
-			/>            
-	</RelativeLayout>-->
-    
+            android:layout_marginLeft="0dp"
+            android:background="#00000000"
+            android:divider="@null" />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -24,7 +24,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.ContactsExplorerAdapter.OnItemCheckClickListener;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
@@ -38,7 +37,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class PhoneContactsActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemCheckClickListener, MegaRequestListenerInterface {
+public class PhoneContactsActivityLollipop extends PinActivityLollipop implements OnClickListener, PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
 
 	ActionBar aB;
 	Toolbar tB;

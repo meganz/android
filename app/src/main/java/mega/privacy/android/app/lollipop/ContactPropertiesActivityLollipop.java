@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -1377,12 +1376,12 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 			if(multiselectIntent==0){
 				//Send one file to one contact
-				final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+				final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 				sendToInbox(nodeHandle, contactsData);
 			}
 			else{
 				//Send multiple files to one contact
-				final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+				final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
 				sendToInbox(nodeHandles, contactsData);
 			}
 		}

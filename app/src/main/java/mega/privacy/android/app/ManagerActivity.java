@@ -277,9 +277,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListOffline = true;
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
-	private ContactsFragment cF;
-	private SentRequestsFragment sRF;
-	private ReceivedRequestsFragment rRF;
+
 	private IncomingSharesFragment inSF;
 	private OutgoingSharesFragment outSF;
     private TransfersFragment tF; 
@@ -1389,18 +1387,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	int order = this.orderGetChildren;
 
     	
-    	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-    	if (cF != null){
-    		if (drawerItem == DrawerItem.CONTACTS){
-    			if (isListContacts){
-    				visibleFragment = 3;
-    			}
-    			else{
-    				visibleFragment = 4;
-    			}
-    		}
-    	}
+
     	if (drawerItem == DrawerItem.RUBBISH_BIN)
     	{
 
@@ -1945,103 +1932,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case CONTACTS:{
   			
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			
-    			if (aB == null){
-    				aB = getSupportActionBar();
-    			}
-    			aB.setTitle(getString(R.string.section_contacts));
-    			
-    			if (getmDrawerToggle() != null){
-    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
-    				supportInvalidateOptionsMenu();
-    			}
-    			
-    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-    			
-    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-    			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-    			}
-    			mTabHostContacts.setVisibility(View.VISIBLE);    			
-    			viewPagerContacts.setVisibility(View.VISIBLE);
-    			
-    			mTabHostContacts.getTabWidget().setBackgroundColor(Color.BLACK);
-    			//mTabHostContacts.getTabWidget().setTextAlignment(textAlignment)
-    			
-//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);    		    
-//    		    title1.setText(R.string.tab_contacts); 			
-    			
-    			if (mTabsAdapterContacts == null){
-    				mTabsAdapterContacts = new TabsAdapter(this, mTabHostContacts, viewPagerContacts);   	
-    				
-        			TabHost.TabSpec tabSpec1 = mTabHostContacts.newTabSpec("contactsFragment");
-        	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.section_contacts).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-        	        //tabSpec.setContent(contentID);
-        	        //mTabHostContacts.addTab(tabSpec);
-        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
-        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-        	        
-        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
-        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-   				
-    				
-    				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragment.class, null);
-    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
-    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
-    			}		
-    			
-    			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
-                    @Override
-                    public void onTabChanged(String tabId) {
-                    	managerActivity.supportInvalidateOptionsMenu();
-                    }
-    			});
-    			
-    			for (int i=0;i<mTabsAdapterContacts.getCount();i++){
-    				final int index = i;
-    				mTabHostContacts.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							viewPagerContacts.setCurrentItem(index);
-						}
-					});
-    			}
-    			
-    			customSearch.setVisibility(View.VISIBLE);     			
-			    			
-    			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
-    			if (createFolderMenuItem != null){
-    				changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
-    				createFolderMenuItem.setVisible(false);
-    				addContactMenuItem.setVisible(true);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(true);
-	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			settingsMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);	
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-	    			
-	    			if (isListContacts){	
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}	    			
-    			}
     			break;
     		}
     		case RUBBISH_BIN:{
@@ -2581,20 +2472,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 
 
-    	if (drawerItem == DrawerItem.CONTACTS){
-    		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-    		if (cF != null){			
-    			if (cF.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-    				}
-    				return;
-    			}
-    		}
-    	}
+
 
     	if (drawerItem == DrawerItem.SHARED_WITH_ME){
     		int index = viewPagerShares.getCurrentItem();
@@ -2820,70 +2698,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 		}
 		
-		if (drawerItem == DrawerItem.CONTACTS){
-			int index = viewPagerContacts.getCurrentItem();
-			if (index == 0){
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cF != null){
-					//Show
-					addContactMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
-					sortByMenuItem.setVisible(true);
-					thumbViewMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			
-	    			//Hide	
-	    			pauseRestartTransfersItem.setVisible(false);
-					createFolderMenuItem.setVisible(false);				
-	    			addMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);    			
-	    			addMenuItem.setEnabled(false);
-	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-	    			importLinkMenuItem.setVisible(false);
-	    			takePicture.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
-	    			
-	    			if (isListContacts){	
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}    	    			
-				}
-			}
-			else{
-				//Show
-    			upgradeAccountMenuItem.setVisible(true);
-    			
-    			//Hide	
-    			addContactMenuItem.setVisible(false);
-				selectMenuItem.setVisible(false);
-				sortByMenuItem.setVisible(false);
-				thumbViewMenuItem.setVisible(false);
-    			pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);				
-    			addMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);    			
-    			addMenuItem.setEnabled(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-			}
-		}		
+
 		
 		if (drawerItem == DrawerItem.RUBBISH_BIN){
 
@@ -3340,22 +3155,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			return true;        		
 	        	}
 
-	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-	        	cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	        	if (cF != null){
-	        		if (drawerItem == DrawerItem.CONTACTS){
-	        			cF.selectAll();
-	        			if (cF.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}   
-	        			return true;
-	        		}
-	        	}
+
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
 	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
 	        		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);
@@ -3418,31 +3218,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
 
-
-	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-	    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	        	if (cF != null){
-	        		if (drawerItem == DrawerItem.CONTACTS){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(cFTag);
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
-
-	        			isListContacts = !isListContacts;
-	        			if (isListContacts){	
-		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-		    			}
-	        			cF.setIsList(isListContacts);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();	
-
-	        		}
-	        	}
 
 
 
@@ -4325,17 +4100,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void selectSortByContacts(int _orderContacts){
 		this.orderContacts = _orderContacts;
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){	
-			cF.setOrder(orderContacts);
-			if (orderContacts == MegaApiJava.ORDER_DEFAULT_ASC){
-				cF.sortByNameAscending();
-			}
-			else{
-				cF.sortByNameDescending();
-			}
-		}
+
 	}
 	
 	public void takePicture(){
@@ -4867,9 +4632,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 			
-				if(drawerItem==DrawerItem.CONTACTS){
-					cF.notifyDataSetChanged();
-				}	
+
 			}
 			else{
 				log("Termino con error");
@@ -5632,13 +5395,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			@Override
 			public void run() {
 
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cF != null){
-					if (drawerItem == DrawerItem.CONTACTS){
-						return;
-					}
-				}
+
 				if (inSF != null){
 					if (drawerItem == DrawerItem.SHARED_WITH_ME){
 						return;
@@ -5684,14 +5441,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void showNewContactDialog(String editText){
 		log("showNewContactDialog");
 		
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){
-			if (drawerItem == DrawerItem.CONTACTS){
-				cF.setPositionClicked(-1);
-				cF.notifyDataSetChanged();
-			}
-		}
+
 		
 		String text;
 		if ((editText == null) || editText.equals("")){
@@ -6299,9 +6049,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;
 			}
-						
-			contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);			
-			megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
+//
+//			contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);
+//			megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
 			
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
@@ -6312,7 +6062,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					//Just one folder to share
 					if(multiselectIntent==0){
 	
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final long nodeHandle = -1;
 						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
 						
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -6373,84 +6123,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 					else if(multiselectIntent==1){
 						//Several folder to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
-						
-							
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
-								ProgressDialog temp = null;
-								try{
-									temp = new ProgressDialog(managerActivity);
-									temp.setMessage(getString(R.string.context_sharing_folder));
-									temp.show();
-								}
-								catch(Exception e){
-									return;
-								}
-								statusDialog = temp;
-								permissionsDialog.dismiss();
-								
-								switch(item) {
-				                    case 0:{
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
-				                    		for(int j=0; j<nodeHandles.length;j++){						
-				            					
-				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-				        						megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
-				                    		}
-				                    	}
-				                    	break;
-				                    }
-				                    case 1:{
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		for(int j=0; j<nodeHandles.length;j++){						
-				            					
-				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-				        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-				                    		}
-	//			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-				                    	}
-				                        break;
-				                    }
-				                    case 2:{
-				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		for(int j=0; j<nodeHandles.length;j++){						
-				            					
-				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-				        						megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-				                    		}
-	//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-				                    	}		                    	
-				                        break;
-				                    }
-				                }
-							}
-						});
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
-						Resources resources = permissionsDialog.getContext().getResources();
-						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				        alertTitle.setTextColor(resources.getColor(R.color.mega));
-						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-						if(titleDivider!=null){
-							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-						}				
+
 					}
 				}
 				else if (sentToInbox==1){
-					//Send file
-					final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
-					final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
-					MegaUser u = megaApi.getContact(contactsData.get(0));
-					megaApi.sendFileToUser(node, u, this);
+
 				}
 
 			}
@@ -6458,16 +6135,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 				for (int i=0; i < contactsData.size();i++){
 					String type = contactsData.get(i);
-					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
-						i++;
-						Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-//						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
-					}
-					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
-						i++;
-						Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-//						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
-					}
+
 				}
 
 			}			
@@ -6833,13 +6501,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){
-			if (drawerItem == DrawerItem.CONTACTS){					
-				cF.updateView();
-			}
-		}
+
 	}
 	
 	@Override
@@ -6893,12 +6555,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //				}
 //			}
 		}
-		if (cF != null){
-			if (drawerItem == DrawerItem.CONTACTS){
-				log("Share finish");
-				cF.updateView();
-			}
-		}
+
 	}	
 	
 	@Override
@@ -7377,37 +7034,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("shareFolder ArrayListLong");
 		//TODO shareMultipleFolders
 
-		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
-			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
-	    	intent.setClass(this, ContactsExplorerActivity.class);
-	    	
-	    	long[] handles=new long[handleList.size()];
-	    	int j=0;
-	    	for(int i=0; i<handleList.size();i++){
-	    		handles[j]=handleList.get(i);
-	    		j++;
-	    	}	    	
-	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, handles);
-	    	//Multiselect=1 (multiple folders)
-	    	intent.putExtra("MULTISELECT", 1);
-	    	intent.putExtra("SEND_FILE",0);
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-		}			
+
 	}
 	
 	public void shareFolder(MegaNode node){
 		log("shareFolder MegaNode");
 		
-		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
-									
-			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
-	    	intent.setClass(this, ContactsExplorerActivity.class);
-	    	//Multiselect=0
-	    	intent.putExtra("MULTISELECT", 0);
-	    	intent.putExtra("SEND_FILE",0);
-	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-		}			
+
 	}
 	
 	public void sentToInbox(MegaNode node){
@@ -7415,13 +7048,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
 			sendToInbox = true;			
-			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SEND_FILE);
-	    	intent.setClass(this, ContactsExplorerActivity.class);
-	    	//Multiselect=0
-	    	intent.putExtra("MULTISELECT", 0);
-	    	intent.putExtra("SEND_FILE",1);
-	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+
 		}			
 	}
 	
@@ -7927,33 +7554,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("---------------------onContactRequestsUpdate");
 		// TODO Auto-generated method stub
-		if (drawerItem == DrawerItem.CONTACTS){
-//			int index = viewPagerContacts.getCurrentItem();
-//			if(index==1||index==0){	
-//				log("En SentRequestFragment TAB");
-			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
-			log("Tag: "+ sRFTag1);
-			sRF = (SentRequestsFragment) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-			if (sRF != null){	
-				log("sRF != null");
-//					ArrayList<MegaContactRequest> contacts = megaApi.getOutgoingContactRequests();
-//			    	if(contacts!=null)
-//			    	{
-//			    		log("contacts SIZE: "+contacts.size());
-//			    	}
-				sRF.setContactRequests();
-			}	
-//			}
-//			else if(index==2){
-//				log("En ReceiveRequestFragment TAB");
-			String rRFTag2 = getFragmentTag(R.id.contact_tabs_pager, 2);	
-			log("Tag: "+ rRFTag2);
-			rRF = (ReceivedRequestsFragment) getSupportFragmentManager().findFragmentByTag(rRFTag2);
-			if (rRF != null){					
-				rRF.setContactRequests();
-			}	
-//			}						
-		}
+
 		
 	}
 }

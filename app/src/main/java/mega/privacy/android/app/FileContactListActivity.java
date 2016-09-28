@@ -456,11 +456,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		    }
 		    case R.id.action_folder_contacts_list_share_folder:{
 		    	//Option add new contact to share
-		    	
-		    	Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
-		    	intent.setClass(this, ContactsExplorerActivity.class);
-		    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
-		    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+
 		    	
 	        	return true;
 	        }
@@ -767,70 +763,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;
 			}
-			
-			final ArrayList<String> emails = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);
-			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
-			
-			if (node.isFolder()){
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(fileContactListActivity);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-						permissionsDialog.dismiss();
-						
-						switch(item) {
-		                    case 0:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		MegaUser u = megaApi.getContact(emails.get(i));
-		                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);
-		                    	}
-		                    	break;
-		                    }
-		                    case 1:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		MegaUser u = megaApi.getContact(emails.get(i));
-		                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);
-		                    	}
-		                        break;
-		                    }
-		                    case 2:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		MegaUser u = megaApi.getContact(emails.get(i));
-		                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);
-		                    	}		                    	
-		                        break;
-		                    }
-		                }
-					}
-				});
-				permissionsDialog = dialogBuilder.create();
-				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-			}
-			else{ 
-				for (int i=0;i<emails.size();i++){
-					MegaUser u = megaApi.getContact(emails.get(i));
-					megaApi.sendFileToUser(node, u, fileContactListActivity);
-				}
-			}
-			
+
 		}
 			
 	}

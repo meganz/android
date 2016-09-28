@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -168,7 +169,13 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			optionsBackLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_toolbar_back_options_layout);
 			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+				params.setMargins(0,  0, 0, Util.scaleHeightPx(100, outMetrics));
+			}
+			else{
+				params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
+			}
 			optionsBackLayout.setLayoutParams(params);
 			
 			toolbarBack = (ImageView) v.findViewById(R.id.contact_properties_toolbar_back);
