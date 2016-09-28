@@ -88,7 +88,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -3463,14 +3462,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private String getFragmentTag(int viewPagerId, int fragmentPosition){
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
-
-	private View getTabIndicator(Context context, String title) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
-
-        TextView tv = (TextView) view.findViewById(R.id.textView);
-        tv.setText(title);
-        return view;
-    }
 
 	private void getOverflowMenu() {
 		log("getOverflowMenu");
@@ -9463,7 +9454,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if(multiselectIntent==0){
 						//One file to share
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -9495,7 +9486,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(multiselectIntent==1){
 						//Several folders to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
 
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -9533,12 +9524,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (sentToInbox==1){
 					if(multiselectIntent==0){
 						//Send one file to one contact
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 						nC.sendToInbox(nodeHandle, contactsData);
 					}
 					else{
 						//Send multiple files to one contact
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
 						nC.sendToInbox(nodeHandles, contactsData);
 					}
 				}
@@ -9547,12 +9538,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				for (int i=0; i < contactsData.size();i++){
 					String type = contactsData.get(i);
-					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
+					if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
 						i++;
 						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 //						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 					}
-					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
+					else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
 						i++;
 						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 //						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();

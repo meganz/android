@@ -1131,7 +1131,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			((ManagerActivity) context).moveToTrash(handleList);
 		} 
 		else {
-			((ContactPropertiesMainActivity) context).moveToTrash(handleList);
+
 		}
 		this.positionClicked = -1;
 		notifyDataSetChanged();
@@ -1168,7 +1168,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());
 		if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-			((ContactPropertiesMainActivity) context).onFileClick(handleList);
+
 		} else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
 			((FolderLinkActivity) context).onFileClick(handleList);
 		} else {
