@@ -171,10 +171,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         for(int i=0;i<chatList.size();i++)
         {
             log("Chat size: :"+chatList.size());
-            Toast.makeText(context, "Chat size: :"+chatList.size(), Toast.LENGTH_SHORT);
 
             MegaChatRoom chatRoom = chatList.get(i);
-            chatRoom.getPeerHandle(0);
+            log("ChatRoom title: "+chatRoom.getTitle());
+            log("ChatRoom handle: "+chatRoom.getChatId());
 //            MegaChatListItem chatListItem = chatList.get(i);
 //            megaChatApi.get
 //            megaChatApi.getMessages(chatRoom.getChatId(), 50);
