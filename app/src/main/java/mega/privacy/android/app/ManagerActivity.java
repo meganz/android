@@ -290,7 +290,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private UpgradeAccountFragment upAF;
     private PaymentFragment pF;
     MonthlyAnnualyFragment myF;
-    private InboxFragment iF;
+
     private CreditCardFragment ccF;
     private FortumoFragment fF;
     private CentiliFragment ctF;
@@ -1453,11 +1453,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //    		}
 //    	}
     	
-    	if (drawerItem == DrawerItem.INBOX)
-    	{
-    		pHInbox = iF.getParentHandle();
 
-    	}
     	
     	outState.putInt("orderGetChildren", order);
     	outState.putInt("visibleFragment", visibleFragment);
@@ -1905,33 +1901,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (iF == null){
-    				iF = new InboxFragment();
-    				iF.setParentHandle(megaApi.getInboxNode().getHandle());
-    				parentHandleInbox = megaApi.getInboxNode().getHandle();
-    				iF.setIsList(isListInbox);
-    				iF.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-    				iF.setNodes(nodes);
-    			}
-    			else{
-    				iF.setIsList(isListInbox);
-    				iF.setParentHandle(parentHandleInbox);
-    				iF.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
-    				iF.setNodes(nodes);
-    			}
-    			
+
     			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     			    			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, iF, "iF");
-    			ft.commit();
-    			
+
     			customSearch.setVisibility(View.VISIBLE);
     			viewPagerContacts.setVisibility(View.GONE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -2602,18 +2579,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
 
-    	if (drawerItem == DrawerItem.INBOX){
-    		if (iF != null){			
-    			if (iF.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-    				}
-    				return;
-    			}
-    		}
-    	}
+
 
     	if (drawerItem == DrawerItem.CONTACTS){
     		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
@@ -2923,36 +2889,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 		}	
 		
-		if (drawerItem == DrawerItem.INBOX){
-			if (iF != null){	
-				//Show				
-    			sortByMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);    			
-    			    			
-				//Hide
-    			refreshMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-				pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(true);
-    			unSelectMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-//    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
-    			clearRubbishBinMenuitem.setVisible(false);
-    			rubbishBinMenuItem.setVisible(false);
-			}
-		}
 
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 			int index = viewPagerShares.getCurrentItem();
@@ -3457,20 +3393,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	        		return true;
     			}
-	        	if (drawerItem == DrawerItem.INBOX){
-	        		if (iF != null){	        		
-	    				iF.selectAll();
-	    				if (iF.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
-	        		return true;
-    			}
+
 //	        	if (psF != null){
 //	        		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 //	        			psF.selectAll();
@@ -5035,13 +4958,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
 				}
-				if (drawerItem == DrawerItem.INBOX){
-					if (iF != null){
-//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iF.getParentHandle()), orderGetChildren);
-//							rbF.setNodes(nodes);
-						iF.refresh();
-					}
-				}	
+
 
 				if (drawerItem == DrawerItem.SHARED_WITH_ME){
 					if (inSF != null){
@@ -6936,13 +6853,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
 		}
-		if (drawerItem == DrawerItem.INBOX){
-			log("INBOX shown");
-			if (iF != null){
-				iF.refresh();
-//				iF.getListView().invalidateViews();
-			}
-		}
+
 
 		
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
