@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1397,7 +1398,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			}
 			else{
 				if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", totalPosition);
 					if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
 						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);

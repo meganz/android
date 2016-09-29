@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -375,7 +376,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("searchQuery", searchQuery);
 					intent.putExtra("adapterType", ManagerActivity.SEARCH_ADAPTER);

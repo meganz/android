@@ -12,6 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 
@@ -367,7 +368,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		log("The absolutePath of the file to open is: "+absolutePath);
 		 
 		if (MimeTypeList.typeForName(absolutePath).isImage()){
-			Intent intent = new Intent(this, FullScreenImageViewer.class);
+			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra("position", position);
 			intent.putExtra("adapterType", ManagerActivity.ZIP_ADAPTER);
 			intent.putExtra("parentNodeHandle", -1L);			
