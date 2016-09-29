@@ -8,6 +8,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -86,7 +87,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	EditTextPIN passFourthLetter;
 	EditTextPIN passFifthLetter;
 	EditTextPIN passSixthLetter;
-	Switch passwordSwitch;
+	SwitchCompat passwordSwitch;
 	final StringBuilder sbFirst=new StringBuilder();
 	final StringBuilder sbSecond=new StringBuilder();
 	boolean secondRound = false;
@@ -234,7 +235,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		alphanumericLayout.setVisibility(View.VISIBLE);
 		switchLayout.setVisibility(View.VISIBLE);
 
-		passwordSwitch = (Switch) findViewById(R.id.switch_pin);
+		passwordSwitch = (SwitchCompat) findViewById(R.id.switch_pin);
 		passwordSwitch.setChecked(false);
 
 		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(240, outMetrics);

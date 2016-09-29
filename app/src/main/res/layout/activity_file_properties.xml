@@ -94,7 +94,7 @@
                             android:text="@string/file_properties_available_offline"
                             android:textStyle="bold" />
 
-                        <Switch
+                        <android.support.v7.widget.SwitchCompat
                             android:id="@+id/file_properties_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

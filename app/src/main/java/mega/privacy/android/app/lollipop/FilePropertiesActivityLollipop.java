@@ -22,6 +22,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -131,7 +132,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	ImageView publicLinkIcon;
 	
 //	ImageView publicLinkImage;
-	Switch offlineSwitch;
+	SwitchCompat offlineSwitch;
 	
 	TextView sizeTextView;
 	TextView sizeTitleTextView;
@@ -346,7 +347,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			params4.bottomMargin = Util.scaleHeightPx(15, outMetrics);
 			availableOfflineView.setLayoutParams(params4);			
 			
-			offlineSwitch = (Switch) findViewById(R.id.file_properties_switch);
+			offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
 			offlineSwitch.setOnCheckedChangeListener(this);
 			
 			//Share with Layout

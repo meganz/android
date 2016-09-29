@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -71,7 +72,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     TextView bLogin;
     TextView bForgotPass;
     ImageView loginThreeDots;
-    Switch loginSwitch;
+    SwitchCompat loginSwitch;
     TextView loginABC;
     LinearLayout loginLogin;
     LinearLayout loginLoggingIn;
@@ -253,7 +254,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginABC = (TextView) v.findViewById(R.id.ABC);
 
-        loginSwitch = (Switch) v.findViewById(R.id.switch_login);
+        loginSwitch = (SwitchCompat) v.findViewById(R.id.switch_login);
         LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
         switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
         loginSwitch.setLayoutParams(switchParams);

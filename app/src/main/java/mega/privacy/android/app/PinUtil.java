@@ -56,14 +56,8 @@ public class PinUtil {
 	// Display lock screen
 	public static void showLock(Context context) {
 		log("showLock");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			Intent intent = new Intent(context, PinLockActivityLollipop.class);
-			context.startActivity(intent);
-		}
-		else{
-			Intent intent = new Intent(context, PinLockActivity.class);
-			context.startActivity(intent);
-		}
+		Intent intent = new Intent(context, PinLockActivityLollipop.class);
+		context.startActivity(intent);
 	}
 	
 	// Update time since last check
