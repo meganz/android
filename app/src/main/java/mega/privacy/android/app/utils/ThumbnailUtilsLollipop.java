@@ -33,8 +33,6 @@ import mega.privacy.android.app.MegaBrowserGridAdapter;
 import mega.privacy.android.app.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import mega.privacy.android.app.MegaBrowserNewGridAdapter;
 import mega.privacy.android.app.MegaBrowserNewGridAdapter.ViewHolderBrowserNewGrid;
-import mega.privacy.android.app.MegaFullScreenImageAdapter;
-import mega.privacy.android.app.MegaFullScreenImageAdapter.ViewHolderFullImage;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
@@ -42,6 +40,7 @@ import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
 import mega.privacy.android.app.lollipop.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
+import mega.privacy.android.app.lollipop.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.MegaPhotoSyncGridAdapterLollipop;
 import mega.privacy.android.app.lollipop.MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid;
 import mega.privacy.android.app.lollipop.MegaPhotoSyncListAdapterLollipop;
@@ -691,10 +690,10 @@ public class ThumbnailUtilsLollipop {
 	
 	static class ThumbnailDownloadListenerFull implements MegaRequestListenerInterface{
 		Context context;
-		ViewHolderFullImage holder;
-		MegaFullScreenImageAdapter adapter;
+		MegaFullScreenImageAdapterLollipop.ViewHolderFullImage holder;
+		MegaFullScreenImageAdapterLollipop adapter;
 		
-		ThumbnailDownloadListenerFull(Context context, ViewHolderFullImage holder, MegaFullScreenImageAdapter adapter){
+		ThumbnailDownloadListenerFull(Context context, MegaFullScreenImageAdapterLollipop.ViewHolderFullImage holder, MegaFullScreenImageAdapterLollipop adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -1050,7 +1049,7 @@ public class ThumbnailUtilsLollipop {
 		return thumbnailCache.get(document.getHandle());
 	}
 	
-	public static Bitmap getThumbnailFromMegaFull(MegaNode document, Context context, ViewHolderFullImage viewHolder, MegaApiAndroid megaApi, MegaFullScreenImageAdapter adapter){
+	public static Bitmap getThumbnailFromMegaFull(MegaNode document, Context context, MegaFullScreenImageAdapterLollipop.ViewHolderFullImage viewHolder, MegaApiAndroid megaApi, MegaFullScreenImageAdapterLollipop adapter){
 		
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");

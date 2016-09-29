@@ -166,15 +166,7 @@
                 <data android:scheme="mega" > </data>
             </intent-filter>
         </activity>
-        
-        <activity
-            android:name="FullScreenImageViewer"
-            android:label="@string/full_screen_image_viewer_label"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-            android:uiOptions="splitActionBarWhenNarrow" >
-        </activity>
-        
+
         <activity
             android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
             android:label="@string/full_screen_image_viewer_label"

@@ -1,14 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".InitialCamSyncActivity"
-    android:background="@color/white" >
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@color/background_secondary">
     <ScrollView
         android:id="@+id/cam_sync_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
+        android:background="#ffffff">
         
         <LinearLayout 
             android:id="@+id/cam_sync_linear_total"
@@ -24,17 +22,17 @@
 
 		    <RelativeLayout
 		        android:id="@+id/cam_sync_relative_radio"
-		        android:layout_width="fill_parent"
+		        android:layout_width="match_parent"
 		    	android:layout_height="wrap_content">
 		        
 			        <RadioGroup 
-				    android:id="@+id/cam_sync_radio_group" 
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content" 
-				    android:layout_gravity="left"
-				    android:layout_marginLeft="40dp"
-				    android:layout_marginTop="5dp"
-				    android:layout_marginBottom="5dp">
+					    android:id="@+id/cam_sync_radio_group" 
+					    android:layout_width="wrap_content"
+					    android:layout_height="wrap_content" 
+					    android:layout_gravity="left"
+					    android:layout_marginLeft="40dp"
+					    android:layout_marginTop="10dp"
+					    android:layout_marginBottom="5dp">
 			             
 						<RadioButton 
 						    android:id="@+id/cam_sync_wifi" 
@@ -42,15 +40,13 @@
 						    android:layout_height="wrap_content" 
 						    android:text="@string/cam_sync_wifi"
 						    android:checked="true"
-						    android:textColor="@color/file_list_first_row"
-						    android:layout_marginBottom="3dp" />
+						    android:layout_marginBottom="5dp" />
 						
 						<RadioButton 
 						    android:id="@+id/cam_sync_data" 
 						    android:layout_width="wrap_content" 
 						    android:layout_height="wrap_content" 
-						    android:text="@string/cam_sync_data"
-						    android:textColor="@color/file_list_first_row" />
+						    android:text="@string/cam_sync_data" />
 					</RadioGroup>
 					
 			        <LinearLayout 
@@ -66,6 +62,32 @@
     </ScrollView>
 		
     <LinearLayout
+	    android:id="@+id/cam_buttons_layout"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="left"
+	    android:orientation="horizontal"
+	    android:layout_alignParentBottom="true"
+	    android:background="#ffffff">
+	
+	    <TextView
+	        android:id="@+id/cam_sync_button_skip"
+	        android:fontFamily="sans-serif-medium"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:gravity="center"
+	        android:textSize="14sp" />
+	
+	    <TextView
+	        android:id="@+id/cam_sync_button_ok"
+	        android:fontFamily="sans-serif-medium"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textColor="@color/accentColor"
+	        android:textSize="14sp" />
+	</LinearLayout>
+		
+<!--     <LinearLayout
          android:id="@+id/cam_buttons_layout"
     	 android:layout_width="match_parent"
     	 android:layout_height="wrap_content"
@@ -91,6 +113,7 @@
             android:textColor="@color/white"
             android:text="@string/cam_sync_ok" />
      </LinearLayout>
+     -->
 </RelativeLayout>
 
 

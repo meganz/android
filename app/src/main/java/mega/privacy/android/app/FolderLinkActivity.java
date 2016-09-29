@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.FileStorageActivity.Mode;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -782,7 +783,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(this, FullScreenImageViewer.class);
+					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", ManagerActivity.FOLDER_LINK_ADAPTER);
 					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
