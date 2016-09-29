@@ -97,7 +97,6 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SettingsActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
@@ -418,7 +417,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem upgradeAccountMenuItem;
-	private MenuItem settingsMenuItem;
 	private MenuItem rubbishBinMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
@@ -3667,7 +3665,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
-		settingsMenuItem = menu.findItem(R.id.action_menu_settings);
 		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
@@ -3765,7 +3762,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 
@@ -3822,7 +3818,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			changePass.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
@@ -3878,7 +3873,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -3917,7 +3911,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			importLinkMenuItem.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -3964,7 +3957,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			importLinkMenuItem.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -4025,7 +4017,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			gridSmallLargeMenuItem.setVisible(false);
@@ -4099,7 +4090,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					upgradeAccountMenuItem.setVisible(true);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
@@ -4152,7 +4142,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
@@ -4195,10 +4184,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				changePass.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -4236,10 +4223,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				changePass.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
@@ -4270,7 +4255,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
@@ -4304,7 +4288,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
@@ -4344,7 +4327,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				clearRubbishBinMenuitem.setVisible(false);
 				importLinkMenuItem.setVisible(false);
 				takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
 
@@ -4408,7 +4390,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
     			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				upgradeAccountMenuItem.setVisible(true);
@@ -4477,7 +4458,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
     			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				upgradeAccountMenuItem.setVisible(true);
@@ -5953,15 +5933,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				displayedAccountType = -1;
 				selectDrawerItemLollipop(drawerItem);
 				return true;
-	        }
-	        case R.id.action_menu_settings:{
-//				if (Build.VERSION.SDK_INT<Build.VERSION_CODES.HONEYCOMB) {
-				    startActivity(new Intent(this, SettingsActivity.class));
-//				}
-//				else {
-//					startActivity(new Intent(this, SettingsActivityHC.class));
-//				}
-	        	return true;
 	        }
 
 	        case R.id.action_menu_change_pass:{

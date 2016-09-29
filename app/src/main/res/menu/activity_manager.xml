@@ -184,13 +184,7 @@
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	
-	<item
-	    android:id="@+id/action_menu_settings"
-	    android:orderInCategory="145"
-	    android:title="@string/action_settings"
-	    android:icon="@drawable/ic_action_bar_null"
-	    MEGA:showAsAction="never" />
-		
+
 	<item
 	    android:id="@+id/action_menu_clear_rubbish_bin"
 	    android:orderInCategory="150"

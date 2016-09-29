@@ -371,13 +371,7 @@
             android:label="@string/upgrade_activity" 
             android:screenOrientation="portrait">
         </activity>
-        
-        <activity
-            android:name="SettingsActivity"
-            android:label="@string/action_settings"
-			android:screenOrientation="portrait" >
-        </activity>
-        
+
         <activity
             android:name="SettingsActivityHC"
             android:label="@string/action_settings"
@@ -389,13 +383,7 @@
             android:label="@string/settings_pin_lock"
             android:windowSoftInputMode="stateVisible">
         </activity>
-        
-        <activity
-            android:name="PinLockActivity"
-            android:label="@string/settings_pin_lock"
-            android:screenOrientation="portrait" >
-        </activity>
-        
+
         <activity
             android:name="ZipBrowserActivity"
             android:label="@string/zip_browser_activity"
