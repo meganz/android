@@ -282,13 +282,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
     private SearchFragment sF;
 //    private CameraUploadFragment psF;
-    private UpgradeAccountFragment upAF;
-    private PaymentFragment pF;
-    MonthlyAnnualyFragment myF;
 
-    private CreditCardFragment ccF;
-    private FortumoFragment fF;
-    private CentiliFragment ctF;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -2347,69 +2341,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	}		
     	if (drawerItem == DrawerItem.ACCOUNT){
 
-    		switch(accountFragment){
 
-	    		case MY_ACCOUNT_FRAGMENT:{
-//	    			if (maF != null){
-//	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-//	    				selectDrawerItem(drawerItem);
-//	    				if(nDA!=null){
-//	    					nDA.setPositionClicked(0);
-//
-//	    				}
-//	    			}
-	    			return;
-	    		}
-	    		case UPGRADE_ACCOUNT_FRAGMENT:{
-	    			if (upAF != null){						
-	    				drawerItem = DrawerItem.ACCOUNT;
-	    				selectDrawerItem(drawerItem);
-	    				if(nDA!=null){
-	    					nDA.setPositionClicked(-1);
-	
-	    				}					
-	    			}
-	    			return;
-	    		}
-	    		case PAYMENT_FRAGMENT:{
-	    			if (pF != null){
-	    				pF.onBackPressed();
-	    			}
-	    			return;					
-	    		}
-	    		case CC_FRAGMENT:{
-	    			if (ccF != null){
-	    				int parameterType = ccF.getParameterType();
-	    				ArrayList<Product> accounts = ccF.getAccounts();
-	    				BitSet paymentBitSet = ccF.getPaymentBitSet();
-	    				showpF(parameterType, accounts, paymentBitSet);
-	    			}
-	    			else{
-	    				showUpAF(null);
-	    			}
-	    			return;
-	    		}
-	    		case OVERQUOTA_ALERT:{
-	    			if (upAF != null){						
-	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-	    				selectDrawerItem(drawerItem);
-	    				if(nDA!=null){
-	    					nDA.setPositionClicked(0);
-	
-	    				}					
-	    			}
-	    			return;
-	    		}
-	    		case MONTHLY_YEARLY_FRAGMENT:{
-	    			if (myF != null){
-	    				myF.onBackPressed();
-	    			}
-	    			return;
-	    		}
-	    		default:{
-
-	    		}
-    		}
     	}
     	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 
@@ -3024,20 +2956,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
 		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
 		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-		        		
-		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
-		        		separator4.setVisibility(View.GONE);
-		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
-		        		separator5.setVisibility(View.GONE);
-		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
-		        		separator6.setVisibility(View.GONE);
-		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
-		        		separator7.setVisibility(View.GONE);
-		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
-		        		separator8.setVisibility(View.GONE);
-		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
-		        		separator9.setVisibility(View.GONE);
-		        		
+
 		        		byDateTextView.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
@@ -3128,18 +3047,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
 		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
 		        		
-		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
-		        		separator4.setVisibility(View.GONE);
-		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
-		        		separator5.setVisibility(View.GONE);
-		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
-		        		separator6.setVisibility(View.GONE);
-		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
-		        		separator7.setVisibility(View.GONE);
-		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
-		        		separator8.setVisibility(View.GONE);
-		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
-		        		separator9.setVisibility(View.GONE);
+
 		        		
 		        		byDateTextView.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
@@ -3232,19 +3140,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
 		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
 		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-		        		
-		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
-		        		separator4.setVisibility(View.GONE);
-		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
-		        		separator5.setVisibility(View.GONE);
-		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
-		        		separator6.setVisibility(View.GONE);
-		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
-		        		separator7.setVisibility(View.GONE);
-		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
-		        		separator8.setVisibility(View.GONE);
-		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
-		        		separator9.setVisibility(View.GONE);
+
 		        		
 		        		byDateTextView.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
@@ -4675,27 +4571,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			TextView textOverquota = (TextView) dialoglayout.findViewById(R.id.dialog_overquota);
 			builder.setView(dialoglayout);
 			
-			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					//Show UpgradeAccountActivity
-					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-					if(upAF==null){
-						upAF = new UpgradeAccountFragment();
-						ft.replace(R.id.fragment_container, upAF, "upAF");
-						drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=OVERQUOTA_ALERT;
-						ft.commit();
-					}
-					else{			
-						ft.replace(R.id.fragment_container, upAF, "upAF");
-						drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=OVERQUOTA_ALERT;
-						ft.commit();
-					}
-				}
-			});
+
 			builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {			
 
 				@Override
@@ -6596,19 +6472,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
-		
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if(upAF==null){
-			upAF = new UpgradeAccountFragment();
-			upAF.setInfo(paymentBitSet);
-			ft.replace(R.id.fragment_container, upAF, "upAF");
-			ft.commit();
-		}
-		else{
-			upAF.setInfo(paymentBitSet);
-			ft.replace(R.id.fragment_container, upAF, "upAF");
-			ft.commit();
-		}
+
 	}
 	
 	public void showpF(int type, ArrayList<Product> accounts, BitSet paymentBitSet){
@@ -6630,41 +6494,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (!refresh){
-			if(pF==null){			
-				pF = new PaymentFragment();
-				pF.setInfo(type, accounts, paymentBitSet);
-				ft.replace(R.id.fragment_container, pF, "pF");
-				ft.commit();
-			}
-			else{			
-				pF.setInfo(type, accounts, paymentBitSet);			
-				ft.replace(R.id.fragment_container, pF, "pF");
-				ft.commit();
-			}
-		}
-		else{
-			Fragment tempF = getSupportFragmentManager().findFragmentByTag("pF");
-			if (tempF != null){
-				ft.detach(tempF);
-				ft.attach(tempF);
-				ft.commit();
-			}
-			else{
-				if(pF==null){			
-					pF = new PaymentFragment();
-					pF.setInfo(type, accounts, paymentBitSet);
-					ft.replace(R.id.fragment_container, pF, "pF");
-					ft.commit();
-				}
-				else{			
-					pF.setInfo(type, accounts, paymentBitSet);			
-					ft.replace(R.id.fragment_container, pF, "pF");
-					ft.commit();
-				}
-			}
-		}
+
 	}
 	
 	public void showmyF(int paymentMethod, int type, ArrayList<Product> accounts, BitSet paymentBitSet){
@@ -6683,52 +6513,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		mTabHostShares.setVisibility(View.GONE);    			
 		viewPagerShares.setVisibility(View.GONE);
 		
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (myF == null){
-			myF = new MonthlyAnnualyFragment();
-			myF.setInfo(paymentMethod, type, accounts, paymentBitSet);
-			ft.replace(R.id.fragment_container, myF, "myF");
-			ft.commit();
-		}
-		else{
-			myF.setInfo(paymentMethod, type, accounts, paymentBitSet);
-			ft.replace(R.id.fragment_container, myF, "myF");
-			ft.commit();
-		}
+
 	}
 	
 	public void onUpgrade1Click(View view) {
-		if (upAF != null){
-			showpF(1, upAF.getAccounts(), upAF.getPaymentBitSet());
-		}
+
 	}
 
 	public void onUpgrade2Click(View view) {
-		if (upAF != null){
-			showpF(2, upAF.getAccounts(), upAF.getPaymentBitSet());
-		}
+
 	}
 
 	public void onUpgrade3Click(View view) {
-		if (upAF != null){
-			showpF(3, upAF.getAccounts(), upAF.getPaymentBitSet());
-		}
+
 	}
 	
 	public void onUpgradeLiteClick(View view){
-		if (upAF != null){
-			showpF(4, upAF.getAccounts(), upAF.getPaymentBitSet());
-		}
+
 	}
 	
 	public void onYearlyClick(View view) {
-		log("yearly");
-		pF.payYear();		
+
 	}
 	
 	public void onMonthlyClick(View view) {
-		log("monthly");
-		pF.payMonth();	
+
 	}
 	
 	public void showMyAccount(){
@@ -6754,40 +6563,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (!refresh){
-			if (ccF == null){
-				ccF = new CreditCardFragment();
-				ccF.setInfo(type, accounts, payMonth, paymentBitSet);
-				ft.replace(R.id.fragment_container, ccF, "ccF");
-				ft.commit();
-			}
-			else{			
-				ccF.setInfo(type, accounts, payMonth, paymentBitSet);			
-				ft.replace(R.id.fragment_container, ccF, "ccF");
-				ft.commit();
-			}
-		}
-		else{
-			Fragment tempF = getSupportFragmentManager().findFragmentByTag("ccF");
-			if (tempF != null){
-				ft.detach(tempF);
-				ft.attach(tempF);
-				ft.commit();
-			}
-			else{
-				if (ccF == null){
-					ccF = new CreditCardFragment();
-					ccF.setInfo(type, accounts, payMonth, paymentBitSet);
-					ft.replace(R.id.fragment_container, ccF, "ccF");
-					ft.commit();
-				}
-				else{			
-					ccF.setInfo(type, accounts, payMonth, paymentBitSet);			
-					ft.replace(R.id.fragment_container, ccF, "ccF");
-					ft.commit();
-				}
-			}
-		}
+
 	}
 	
 	public void showFortumo(){
@@ -6797,15 +6573,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (fF == null){
-			fF = new FortumoFragment();
-			ft.replace(R.id.fragment_container,  fF, "fF");
-			ft.commit();
-		}
-		else{
-			ft.replace(R.id.fragment_container, fF, "fF");
-			ft.commit();
-		}
+
 	}
 	
 	public void showCentili(){
@@ -6814,16 +6582,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (ctF == null){
-			ctF = new CentiliFragment();
-			ft.replace(R.id.fragment_container,  ctF, "ctF");
-			ft.commit();
-		}
-		else{
-			ft.replace(R.id.fragment_container, ctF, "ctF");
-			ft.commit();
-		}
+
 	}
 	
 	public int getUsedPerc()
