@@ -65,7 +65,7 @@
 
             </RelativeLayout>
 
-            <Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/switch_set_expiry_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

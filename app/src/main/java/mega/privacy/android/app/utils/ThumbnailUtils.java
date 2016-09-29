@@ -7,7 +7,6 @@ import mega.privacy.android.app.MegaBrowserGridAdapter;
 import mega.privacy.android.app.MegaBrowserListAdapter;
 import mega.privacy.android.app.MegaBrowserNewGridAdapter;
 import mega.privacy.android.app.MegaFullScreenImageAdapter;
-import mega.privacy.android.app.MegaPhotoSyncGridAdapter;
 import mega.privacy.android.app.MegaTransfersAdapter;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.ThumbnailCache;
@@ -15,7 +14,6 @@ import mega.privacy.android.app.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import mega.privacy.android.app.MegaBrowserListAdapter.ViewHolderBrowserList;
 import mega.privacy.android.app.MegaBrowserNewGridAdapter.ViewHolderBrowserNewGrid;
 import mega.privacy.android.app.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import mega.privacy.android.app.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import mega.privacy.android.app.MegaTransfersAdapter.ViewHolderTransfer;
 import mega.privacy.android.app.providers.MegaProviderAdapter;
 import mega.privacy.android.app.providers.MegaProviderAdapter.ViewHolderProvider;
@@ -53,9 +51,7 @@ public class ThumbnailUtils {
 	static HashMap<Long, ThumbnailDownloadListenerFull> listenersFull = new HashMap<Long, ThumbnailDownloadListenerFull>();
 	static HashMap<Long, ThumbnailDownloadListenerTransfer> listenersTransfer = new HashMap<Long, ThumbnailDownloadListenerTransfer>();
 	static HashMap<Long, ThumbnailDownloadListenerPhotoSyncList> listenersPhotoSyncList = new HashMap<Long, ThumbnailDownloadListenerPhotoSyncList>();
-	static HashMap<Long, ThumbnailDownloadListenerPhotoSyncGrid> listenersPhotoSyncGrid = new HashMap<Long, ThumbnailDownloadListenerPhotoSyncGrid>();
 
-	
 	static class ThumbnailDownloadListenerPhotoSyncList{
 		Context context;
 //		ViewHolderPhotoSyncList holder;
@@ -112,78 +108,7 @@ public class ThumbnailUtils {
 //		}
 
 	}
-	
-	static class ThumbnailDownloadListenerPhotoSyncGrid implements MegaRequestListenerInterface{
-		Context context;
-		ViewHolderPhotoSyncGrid holder;
-		MegaPhotoSyncGridAdapter adapter;
-		int numView;
-		
-		ThumbnailDownloadListenerPhotoSyncGrid(Context context, ViewHolderPhotoSyncGrid holder, MegaPhotoSyncGridAdapter adapter, int numView){
-			this.context = context;
-			this.holder = holder;
-			this.adapter = adapter;
-			this.numView = numView;
-		}
 
-		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-			
-			log("Downloading thumbnail finished");
-			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
-			
-//			pendingThumbnails.remove(handle);
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("Downloading thumbnail OK: " + handle);
-				thumbnailCache.remove(handle);
-				
-				if (holder != null){
-					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
-					if (thumb.exists()) {
-						if (thumb.length() > 0) {
-							final Bitmap bitmap = getBitmapForCache(thumb, context);
-							if (bitmap != null) {
-								thumbnailCache.put(handle, bitmap);
-								
-								if ((holder.documents.get(numView) == handle)){
-									holder.imageViews.get(numView).setImageBitmap(bitmap);
-									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-									holder.imageViews.get(numView).startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
-								}								
-							}
-						}
-					}
-				}
-			}
-			else{
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
-			}
-		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
-		}
-	}
-	
 	static class ThumbnailDownloadListenerListBrowser implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderBrowserList holder;
@@ -776,25 +701,7 @@ public class ThumbnailUtils {
 		return thumbnailCache.get(document.getHandle());
 	}
 	
-	public static Bitmap getThumbnailFromMegaPhotoSyncGrid(MegaNode document, Context context, ViewHolderPhotoSyncGrid viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapter adapter, int numView){
-//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-//			log("the thumbnail is already downloaded or added to the list");
-//			return thumbnailCache.get(document.getHandle());
-//		}
-		
-		if (!Util.isOnline(context)){
-			return thumbnailCache.get(document.getHandle());
-		}
-		
-//		pendingThumbnails.add(document.getHandle());
-		ThumbnailDownloadListenerPhotoSyncGrid listener = new ThumbnailDownloadListenerPhotoSyncGrid(context, viewHolder, adapter, numView);
-		listenersPhotoSyncGrid.put(document.getHandle(), listener);
-		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
-		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
-		
-		return thumbnailCache.get(document.getHandle());
-	}
-	
+
 	public static Bitmap getThumbnailFromMegaFull(MegaNode document, Context context, ViewHolderFullImage viewHolder, MegaApiAndroid megaApi, MegaFullScreenImageAdapter adapter){
 		
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){

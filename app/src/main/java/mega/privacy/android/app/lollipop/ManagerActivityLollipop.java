@@ -40,6 +40,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.Time;
@@ -144,7 +145,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public int accountFragment;
 
 	Button expiryDateButton;
-	Switch switchGetLink;
+	SwitchCompat switchGetLink;
 
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
@@ -6798,7 +6799,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		paramsLink.setMargins(Util.scaleWidthPx(26, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(6, outMetrics));
 		linkText.setLayoutParams(paramsLink);
 
-		switchGetLink = (Switch) dialoglayout.findViewById(R.id.switch_set_expiry_date);
+		switchGetLink = (SwitchCompat) dialoglayout.findViewById(R.id.switch_set_expiry_date);
 		RelativeLayout.LayoutParams paramsSwitch = (RelativeLayout.LayoutParams)switchGetLink.getLayoutParams();
 		paramsSwitch.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
 		switchGetLink.setLayoutParams(paramsSwitch);
