@@ -90,7 +90,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import mega.privacy.android.app.FileStorageActivity.Mode;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -277,12 +276,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
 
-    private TransfersFragment tF; 
-//    private MyAccountFragment maF;
-
     private SearchFragment sF;
 //    private CameraUploadFragment psF;
-
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -1386,14 +1381,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
 
     	
-    	if (tF != null){
-	    	if (drawerItem == DrawerItem.TRANSFERS){
-	    		visibleFragment = 7;
-	    		outState.putBoolean("pauseIconVisible", pauseIconVisible);
-	    		outState.putBoolean("downloadPlay", downloadPlay);
-	    	}
-    	}
-//
+    	//
 //    	if (maF != null){
 //    		if (drawerItem == DrawerItem.ACCOUNT){
 //    			visibleFragment = 10;
@@ -1596,12 +1584,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					builder.setPositiveButton(getString(R.string.general_yes),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
-									if (tF != null){
-										if (tF.isVisible()){
-											tF.setNoActiveTransfers();
-											downloadPlay = true;
-										}
-									}	
+
 									startService(cancelIntent);						
 								}
 							});
@@ -2062,56 +2045,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (tF == null){
-    				tF = new TransfersFragment();
-    			}
-    			tF.setTransfers(megaApi.getTransfers());
-    			tF.setPause(!downloadPlay);
-    			
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, tF, "tF");
-    			ft.commit();
-    			
-    			customSearch.setVisibility(View.GONE);
-    			mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			if (createFolderMenuItem != null){
-    				//Show
-    				pauseRestartTransfersItem.setVisible(true);
-        			upgradeAccountMenuItem.setVisible(true);
-        			
-    				//Hide
-    				createFolderMenuItem.setVisible(false);
-    				addContactMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			sortByMenuItem.setVisible(false);
-        			selectMenuItem.setVisible(false);
-        			unSelectMenuItem.setVisible(false);
-        			thumbViewMenuItem.setVisible(false);
-        			changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
-        			rubbishBinMenuItem.setVisible(false);
-        			clearRubbishBinMenuitem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-        			
-//        			if (downloadPlay){
-//        				addMenuItem.setIcon(R.drawable.ic_pause);
-//        			}
-//        			else{
-//        				addMenuItem.setIcon(R.drawable.ic_play);
-//        			}
-        			
-        			if (megaApi.getTransfers().size() == 0){
-        				downloadPlay = true;
-        			}
-    			}
-    			
+
     			break;
     		}
     		case SAVED_FOR_OFFLINE:{
@@ -2327,18 +2261,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	if (drawerItem == DrawerItem.RUBBISH_BIN){
 
     	}
-    	if (tF != null){
-    		if (drawerItem == DrawerItem.TRANSFERS){
-    			if (tF.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-    				}
-    				return;
-    			}
-    		}
-    	}		
+
     	if (drawerItem == DrawerItem.ACCOUNT){
 
 
@@ -2513,46 +2436,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //			}
 		}
 		
-		if (tF != null){
-			if (drawerItem == DrawerItem.TRANSFERS){
-				//Show
-				pauseRestartTransfersItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			
-				//Hide
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			sortByMenuItem.setVisible(false);
-    			selectMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);					
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-    			
-//    			if (downloadPlay){
-//    				addMenuItem.setIcon(R.drawable.ic_pause);
-//    			}
-//    			else{
-//    				addMenuItem.setIcon(R.drawable.ic_play);
-//    			}
-    			
-    			if (megaApi.getTransfers().size() == 0){
-    				downloadPlay = true;
-    			}
-			}
-		}
-		
 
-
-		
 		if (sF != null){
 			if (drawerItem == DrawerItem.SEARCH){
 				if (createFolderMenuItem != null){
@@ -4285,74 +4169,74 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setTitle(getString(R.string.context_get_link_menu));
 					
-					LayoutInflater inflater = getLayoutInflater();
-					View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-					ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
-					TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-					TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-					
-					String urlString = "";
-					String keyString = "";
-					String [] s = link.split("!");
-					if (s.length == 3){
-						urlString = s[0] + "!" + s[1];
-						keyString = s[2];
-					}
-					if (node.isFolder()){
-						thumb.setImageResource(R.drawable.folder_thumbnail);
-					}
-					else{
-						thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-					}
-					
-					Display display = getWindowManager().getDefaultDisplay();
-					DisplayMetrics outMetrics = new DisplayMetrics();
-					display.getMetrics(outMetrics);
-					float density = getResources().getDisplayMetrics().density;
-	
-					float scaleW = Util.getScaleW(outMetrics, density);
-					float scaleH = Util.getScaleH(outMetrics, density);
-					
-					url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-					key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-					
-					url.setText(urlString);
-					key.setText(keyString);
-					
-					
-					builder.setView(dialoglayout);
-					
-					builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Intent intent = new Intent(Intent.ACTION_SEND);
-							intent.setType("text/plain");
-							intent.putExtra(Intent.EXTRA_TEXT, link);
-							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-						}
-					});
-					
-					builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-							    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-							    clipboard.setText(link);
-							} else {
-							    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
-					            clipboard.setPrimaryClip(clip);
-							}
-							
-							Toast.makeText(managerActivity, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
-						}
-					});
-					
-					getLinkDialog = builder.create();
-					getLinkDialog.show();
-					Util.brandAlertDialog(getLinkDialog);
+//					LayoutInflater inflater = getLayoutInflater();
+//					View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+//					ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+//					TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+//					TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+//
+//					String urlString = "";
+//					String keyString = "";
+//					String [] s = link.split("!");
+//					if (s.length == 3){
+//						urlString = s[0] + "!" + s[1];
+//						keyString = s[2];
+//					}
+//					if (node.isFolder()){
+//						thumb.setImageResource(R.drawable.folder_thumbnail);
+//					}
+//					else{
+//						thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+//					}
+//
+//					Display display = getWindowManager().getDefaultDisplay();
+//					DisplayMetrics outMetrics = new DisplayMetrics();
+//					display.getMetrics(outMetrics);
+//					float density = getResources().getDisplayMetrics().density;
+//
+//					float scaleW = Util.getScaleW(outMetrics, density);
+//					float scaleH = Util.getScaleH(outMetrics, density);
+//
+//					url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+//					key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+//
+//					url.setText(urlString);
+//					key.setText(keyString);
+//
+//
+//					builder.setView(dialoglayout);
+//
+//					builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+//
+//						@Override
+//						public void onClick(DialogInterface dialog, int which) {
+//							Intent intent = new Intent(Intent.ACTION_SEND);
+//							intent.setType("text/plain");
+//							intent.putExtra(Intent.EXTRA_TEXT, link);
+//							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+//						}
+//					});
+//
+//					builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+//
+//						@Override
+//						public void onClick(DialogInterface dialog, int which) {
+//							if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+//							    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//							    clipboard.setText(link);
+//							} else {
+//							    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+//					            clipboard.setPrimaryClip(clip);
+//							}
+//
+//							Toast.makeText(managerActivity, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+//						}
+//					});
+//
+//					getLinkDialog = builder.create();
+//					getLinkDialog.show();
+//					Util.brandAlertDialog(getLinkDialog);
 				}
 			}
 			else{
@@ -4501,27 +4385,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			if (e.getErrorCode() == MegaError.API_OK) {
-				if (tF != null){
-					if (drawerItem == DrawerItem.TRANSFERS){
-						if (!downloadPlay){
-		    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_restart_transfers));
-							tF.setPause(true);
-						}
-						else{
-		    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_pause_transfers));
-							tF.setPause(false);
-						}		
-					}
-				}				
+
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (tF != null){
-					if (drawerItem == DrawerItem.TRANSFERS){
-						tF.setTransfers(megaApi.getTransfers());
-					}
-				}
+
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
@@ -4713,15 +4582,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					Toast.makeText(this, getString(R.string.context_select_one_file), Toast.LENGTH_LONG).show();
 				}		    	
 			}
-			else{
-				log("NOT advancedDevices");
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivity.class);
-				intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}				
+
 		}
 		else{
 			log("NOT askMe");
@@ -5600,32 +5461,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 			}			
 		}		
-		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
-			
-			if (intent == null) {			
-				log("Return.....");
-				return;						
-			}
-			
-			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
-			
-			int i = 0;
-			long parentHandleUpload=-1;
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-
-			}
-			else if(drawerItem == DrawerItem.SHARED_WITH_ME){
-
-			}
-			else{
-				return;
-			}
-			
-			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, parentHandleUpload);
-			uploadServiceTask.start();			
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+			else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 		
 			if (intent == null) {			
 				log("Return.....");
@@ -5691,25 +5527,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
-			if (intent == null) {			
-				log("Return.....");
-				return;						
-			}
-			
-			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			log("parentPath: "+parentPath);
-			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
-			log("url: "+url);
-			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
-			log("size: "+size);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
-			log("hashes size: "+hashes.length);
-			
-			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
-		}
+
 		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			
 			if (intent == null) {			
@@ -5939,16 +5757,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		this.parentHandleBrowser = parentHandleBrowser;
 
-		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
-
-		//Update transfer list
-		if (tF == null){
-			tF = new TransfersFragment();
-		}
-		tL = megaApi.getTransfers();
-		tF.setTransfers(tL);		
-
-		//Update File Browser Fragment
 
 	}
 	
@@ -5991,9 +5799,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void setTransfers(ArrayList<MegaTransfer> transfersList){
 		log("setTransfers");
-		if (tF != null){
-			tF.setTransfers(transfersList);
-		}
+
 	}
 	
 	private void getOverflowMenu() {
@@ -6026,17 +5832,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("onTransferStart");
 
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
-
-		//Update transfer list
-		if (tF == null){
-			tF = new TransfersFragment();
-		}
-		tL = megaApi.getTransfers();
-		tF.setTransfers(tL);		
-
-
-		
-
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 
 	}
@@ -6050,16 +5845,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
-		//Update transfer list
-		if (tF == null){
-			tF = new TransfersFragment();
-		}		
-		tL = megaApi.getTransfers();
-		tF.setTransfers(tL);	
-		
-
-
-
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 	
@@ -6067,25 +5852,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
 
-		//Update transfer list
-		if (tF == null){
-			tF = new TransfersFragment();
-		}
-		
-		if (drawerItem == DrawerItem.TRANSFERS){
-			Time now = new Time();
-			now.setToNow();
-			long nowMillis = now.toMillis(false);
-			if (lastTimeOnTransferUpdate < 0){
-				lastTimeOnTransferUpdate = now.toMillis(false);
-				tF.setCurrentTransfer(transfer);
-			}
-			else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-				lastTimeOnTransferUpdate = nowMillis;
-				tF.setCurrentTransfer(transfer);
-			}
-		}
 
+		
 
 
 	}

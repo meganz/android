@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mega.privacy.android.app.FileStorageActivity.Mode;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -310,18 +309,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				}
 			}
 		}		
-			
-		if (askMe){
-			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
-			intent.setClass(this, FileStorageActivity.class);
-			intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
-			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
-		}
-		else{
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
-		}
+
 	}
 	
 	public void onFolderClick(long handle, long size){
@@ -351,18 +339,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				}
 			}
 		}		
-			
-		if (askMe){
-			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
-			intent.setClass(this, FileStorageActivity.class);
-			intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
-			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
-		}
-		else{
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
-		}
+
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
@@ -452,17 +429,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			return;
 		}
 		
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			log("local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
-			log("URL: " + url + "___SIZE: " + size);
-	
-			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
-		}
+
 	}
 
 	@Override

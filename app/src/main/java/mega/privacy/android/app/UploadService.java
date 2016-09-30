@@ -39,7 +39,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-
 /*
  * Service to Upload files
  */
@@ -384,12 +383,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 //		if(lastError != 0) message = MegaError.getErrorString(lastError);
 
 		Intent intent;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
-		}
-		else{
-			intent = new Intent(UploadService.this, ManagerActivity.class);
-		}
+		intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+
 		
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -417,13 +412,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				+ Formatter.formatFileSize(UploadService.this, totalSizeToUpload);
 
 		Intent intent = null;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
-		}
-		else{
-			intent = new Intent(UploadService.this, ManagerActivity.class);
-		}
-		
+		intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+
 		mBuilderCompat
 		.setSmallIcon(R.drawable.ic_stat_notify_upload)
 		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
@@ -463,25 +453,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 		
 		Intent intent;
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			log("intent from Lollipop");
-			intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
-			if (dbH == null){
-				dbH = DatabaseHandler.getDbHandler(getApplicationContext());	
-			}
-			if (dbH.getCredentials() == null){
-				intent.setAction(Constants.ACTION_CANCEL_UPLOAD);
-			}
-			else{
-				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
-			}
+		intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+		if (dbH.getCredentials() == null){
+			intent.setAction(Constants.ACTION_CANCEL_UPLOAD);
 		}
 		else{
-			log("intent NOOT Lollipop");
-			intent = new Intent(UploadService.this, ManagerActivity.class);
-			intent.setAction(ManagerActivity.ACTION_CANCEL_UPLOAD);
+			intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 		}
+
 		
 		String info = Util.getProgressSize(UploadService.this, progress, totalSizeToUpload);
 
@@ -489,28 +471,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		Notification notification = null;
 		
 		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
-			
-			if (currentapiVersion >= android.os.Build.VERSION_CODES.LOLLIPOP){
-				mBuilder
-				.setSmallIcon(R.drawable.ic_stat_notify_upload)
-				.setProgress(100, progressPercent, false)
-				.setContentIntent(pendingIntent)
-				.setOngoing(true).setContentTitle(message).setContentInfo(info)
-				.setContentText(getString(R.string.download_touch_to_show))
-				.setOnlyAlertOnce(true);
+
+			mBuilder
+			.setSmallIcon(R.drawable.ic_stat_notify_upload)
+			.setProgress(100, progressPercent, false)
+			.setContentIntent(pendingIntent)
+			.setOngoing(true).setContentTitle(message).setContentInfo(info)
+			.setContentText(getString(R.string.download_touch_to_show))
+			.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
-			}
-			else{
-				mBuilder
-				.setSmallIcon(R.drawable.ic_stat_notify_upload)
-				.setProgress(100, progressPercent, false)
-				.setContentIntent(pendingIntent)
-				.setOngoing(true).setContentTitle(message).setContentInfo(info)
-				.setContentText(getString(R.string.upload_touch_to_cancel))
-				.setOnlyAlertOnce(true);
-			notification = mBuilder.getNotification();
-			}			
-//					notification = mBuilder.build();
+
 		}
 		else
 		{
@@ -638,13 +608,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					else if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
 						log("OVERQUOTA ERROR: "+error.getErrorCode());
 						Intent intent;
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-							intent = new Intent(this, ManagerActivityLollipop.class);
-							intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
-						}
-						else{
-							intent = new Intent(this, ManagerActivity.class);
-							intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);					}					
+						intent = new Intent(this, ManagerActivityLollipop.class);
+						intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						
 						startActivity(intent);
@@ -806,15 +771,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
 				
 				Intent intent;
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
-				}
-				else{
-					intent = new Intent(this, ManagerActivity.class);
-					intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
-				}					
-
+				intent = new Intent(this, ManagerActivityLollipop.class);
+				intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
 				
