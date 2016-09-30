@@ -3,46 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".TransfersFragment" >
+    tools:context=".TransfersFragmentLollipop" >
 
-    <LinearLayout
-         android:id="@+id/out_space_tranfers"
-    	 android:layout_width="fill_parent"
-    	 android:layout_height="wrap_content"
-    	 android:layout_alignParentBottom="true"
-    	 android:layout_gravity="center|fill_horizontal"
-    	 android:layout_centerHorizontal="true"
-    	 android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/transfers_list_content_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/content_text_background">
 
-		<TextView
-		    android:id="@+id/out_space_text_tranfers"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:textColor="@color/white"
-		    android:textStyle="bold"
-		    android:paddingTop="20dp"
-		    android:paddingBottom="20dp"
-		    android:paddingLeft="20dp"
-		    android:paddingRight="20dp"
-		    android:gravity="center"
-		    android:background="@color/navigation_drawer_background"
-		    android:textSize="16sp"
-		    android:text="@string/warning_out_space"/>  
-         
-         <Button
-            android:id="@+id/out_space_btn_tranfers"
-       		android:layout_height="48dp"       		
-       		android:layout_width="fill_parent"
-            android:background="@drawable/btn_default_holo_light_without_corners"
-            android:textColor="@color/white"
-            android:text="@string/my_account_upgrade_pro" />
-     </LinearLayout>          
-    
-    <ListView
+        <TextView
+            android:id="@+id/transfers_list_content_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"    
+            android:text="@string/text_downloading"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />   
+        
+       <ProgressBar
+		    android:id="@+id/transfers_list_download_progress_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" 
+			android:layout_below="@id/transfers_list_content_text" 
+			style="@style/UsedSpaceProgressBar"/>  
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@id/transfers_list_content_text_layout"
+        android:background="@color/delimiterColor" />   
+        		 
+	<android.support.v7.widget.RecyclerView
         android:id="@+id/transfers_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+        android:layout_height="match_parent" 
+        android:layout_below="@id/separator"
+        android:choiceMode="multipleChoice"/>
     
     <ImageView
 	    android:id="@+id/transfers_empty_image"

@@ -97,9 +97,7 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 				getActivity().startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
 			}
 			else{
-				intent.setAction(FileStorageActivity.Mode.PICK_FILE.getAction());
-				intent.setClass(getActivity(), FileStorageActivity.class);
-				getActivity().startActivityForResult(intent, ManagerActivity.REQUEST_CODE_GET_LOCAL);
+
 			}
 		}
 		else{

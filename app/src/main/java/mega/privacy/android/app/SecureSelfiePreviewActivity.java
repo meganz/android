@@ -350,73 +350,73 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(getString(R.string.context_get_link_menu));
 				
-				LayoutInflater inflater = getLayoutInflater();
-				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
-				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-				
-				String urlString = "";
-				String keyString = "";
-				String [] s = link.split("!");
-				if (s.length == 3){
-					urlString = s[0] + "!" + s[1];
-					keyString = s[2];
-				}
-				if (node.isFolder()){
-					thumb.setImageResource(R.drawable.folder_thumbnail);
-				}
-				else{
-					thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-				}
-				
-				Display display = getWindowManager().getDefaultDisplay();
-				DisplayMetrics outMetrics = new DisplayMetrics();
-				display.getMetrics(outMetrics);
-				float density = getResources().getDisplayMetrics().density;
-
-				float scaleW = Util.getScaleW(outMetrics, density);
-				float scaleH = Util.getScaleH(outMetrics, density);
-				
-				url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-				key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-				
-				url.setText(urlString);
-				key.setText(keyString);
-				
-				
-				builder.setView(dialoglayout);
-				
-				builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent(Intent.ACTION_SEND);
-						intent.setType("text/plain");
-						intent.putExtra(Intent.EXTRA_TEXT, link);
-						startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-					}
-				});
-				
-				builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-						    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-						    clipboard.setText(link);
-						} else {
-						    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
-				            clipboard.setPrimaryClip(clip);
-						}
-
-					}
-				});
-				
-				getLinkDialog = builder.create();
-				getLinkDialog.show();
-				Util.brandAlertDialog(getLinkDialog);
+//				LayoutInflater inflater = getLayoutInflater();
+//				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+//				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+//				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+//				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+//
+//				String urlString = "";
+//				String keyString = "";
+//				String [] s = link.split("!");
+//				if (s.length == 3){
+//					urlString = s[0] + "!" + s[1];
+//					keyString = s[2];
+//				}
+//				if (node.isFolder()){
+//					thumb.setImageResource(R.drawable.folder_thumbnail);
+//				}
+//				else{
+//					thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+//				}
+//
+//				Display display = getWindowManager().getDefaultDisplay();
+//				DisplayMetrics outMetrics = new DisplayMetrics();
+//				display.getMetrics(outMetrics);
+//				float density = getResources().getDisplayMetrics().density;
+//
+//				float scaleW = Util.getScaleW(outMetrics, density);
+//				float scaleH = Util.getScaleH(outMetrics, density);
+//
+//				url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+//				key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+//
+//				url.setText(urlString);
+//				key.setText(keyString);
+//
+//
+//				builder.setView(dialoglayout);
+//
+//				builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+//
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						Intent intent = new Intent(Intent.ACTION_SEND);
+//						intent.setType("text/plain");
+//						intent.putExtra(Intent.EXTRA_TEXT, link);
+//						startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+//					}
+//				});
+//
+//				builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+//
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+//						    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//						    clipboard.setText(link);
+//						} else {
+//						    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+//				            clipboard.setPrimaryClip(clip);
+//						}
+//
+//					}
+//				});
+//
+//				getLinkDialog = builder.create();
+//				getLinkDialog.show();
+//				Util.brandAlertDialog(getLinkDialog);
 			}
 			else{
 				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();

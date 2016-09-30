@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import mega.privacy.android.app.FileStorageActivity.Mode;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -417,18 +416,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				}
 			}
 		}
-		
-		if (askMe){
-			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.setClass(this, FileStorageActivity.class);
-			intent.putExtra(FileStorageActivity.EXTRA_URL, url);
-			intent.putExtra(FileStorageActivity.EXTRA_SIZE, document.getSize());
-			startActivityForResult(intent, ManagerActivity.REQUEST_CODE_SELECT_LOCAL_FOLDER);	
-		}
-		else{
-			downloadTo(downloadLocationDefaultPath, url, size, hashes);
-		}
+
 	}
 	
 	@Override
@@ -454,15 +442,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 		
 		if (requestCode == ManagerActivity.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
-			log("URL: " + url + "___SIZE: " + size);
 
-			
-			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == ManagerActivity.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
