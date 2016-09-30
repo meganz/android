@@ -8555,7 +8555,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				slidingOptionsPanel.setVisibility(View.VISIBLE);
 				slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 				log("Show the slidingPanel");
-
 				return;
 			}
 		}

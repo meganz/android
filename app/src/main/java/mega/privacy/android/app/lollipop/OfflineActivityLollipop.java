@@ -86,6 +86,9 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 
 		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
 		optionRemove.setOnClickListener(nodeOptionsPanelListener);
+
+		slidingOptionsPanel.setVisibility(View.INVISIBLE);
+		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 //		isListOffline = oFLol.getIsList();
 //		log("IsListOffline: "+isListOffline);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commit();
@@ -186,7 +189,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		log("onBackPressed");
 
 		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
-			log("slidingOptionsPanel()!=PanelState.HIDDEN");
+			log("slidingOptionsPanel()!=PanelState.HIDDEN: "+slidingOptionsPanel.getPanelState());
 			hideOptionsPanel();
 			return;
 		}

@@ -276,7 +276,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
 
-    private SearchFragment sF;
 //    private CameraUploadFragment psF;
     
     //Tabs in Contacts
@@ -906,9 +905,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         
         if (!Util.isOnline(this)){
         	
-        	Intent offlineIntent = new Intent(this, OfflineActivity.class);
-			startActivity(offlineIntent);
-			finish();
+//        	Intent offlineIntent = new Intent(this, OfflineActivity.class);
+//			startActivity(offlineIntent);
+//			finish();
         	return;
         }
         
@@ -1388,14 +1387,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //    		}
 //    	}
 //
-    	if (sF != null){
-    		if (drawerItem == DrawerItem.SEARCH){
-    			pHSearch = sF.getParentHandle();
-    			visibleFragment = 11;
-    			outState.putString("searchQuery", searchQuery);
-    			outState.putInt("levels", sF.getLevels());
-    		}
-    	}
+
     	
 //    	if (psF != null){
 //    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -2098,53 +2090,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SEARCH:{
     			
-    			if (aB == null){
-    				aB = getSupportActionBar();
-    			}
-    			
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			
-    			if (sF == null){
-        			sF = new SearchFragment();
-        		}
-    			
-    			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
-    			
-    			drawerItem = DrawerItem.SEARCH;
-    			
-    			sF.setSearchNodes(searchNodes);
-    			sF.setNodes(searchNodes);
-    			sF.setSearchQuery(searchQuery);
-    			sF.setParentHandle(parentHandleSearch);
-    			sF.setLevels(levelsSearch);
-    			
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, sF, "sF");
-    			ft.commit();
-    			
-    			customSearch.setVisibility(View.VISIBLE);    			
 
-    			if (createFolderMenuItem != null){
-        			createFolderMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			sortByMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-        			addMenuItem.setEnabled(true);
-        			rubbishBinMenuItem.setVisible(false); 
-        			clearRubbishBinMenuitem.setVisible(false);
-        			changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-    			}
     			break;
     		}
     		case CAMERA_UPLOADS:{
@@ -2238,21 +2184,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
     	}				
-    	if (drawerItem == DrawerItem.SEARCH){
-    		if (sF != null){
-    			if (sF.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				selectDrawerItem(drawerItem);
-    				if(nDA!=null){
-    					nDA.setPositionClicked(0);
-    				}
-    				return;
-    			}
-    		}
-    	}
-
-
-
 
 
     	if (drawerItem == DrawerItem.SHARED_WITH_ME){
@@ -2270,18 +2201,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
     	}
 
-    	//		if (sF != null){
-    	//			if (drawerItem == DrawerItem.SEARCH){
-    	//				if (sF.onBackPressed() == 0){
-    	//					drawerItem = DrawerItem.CLOUD_DRIVE;
-    	//					selectDrawerItem(drawerItem);
-    	//					if(nDA!=null){
-    	//						nDA.setPositionClicked(0);
-    	//					}
-    	//					return;
-    	//				}
-    	//			}
-    	//		}
 
 //    	if (psF != null){
 //    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -2437,38 +2356,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 
-		if (sF != null){
-			if (drawerItem == DrawerItem.SEARCH){
-				if (createFolderMenuItem != null){
-					
-					//Show
-	    			upgradeAccountMenuItem.setVisible(true);	    			
 
-					//Hide
-	    			thumbViewMenuItem.setVisible(false);
-					pauseRestartTransfersItem.setVisible(false);
-	    			createFolderMenuItem.setVisible(false);
-	    			addContactMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-	    			importLinkMenuItem.setVisible(false);
-	    			takePicture.setVisible(false);					
-	    			refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-				}
-			}
-		}
-		
 //		if (psF != null){
 //			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 //
@@ -2582,12 +2470,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 
 		    		}
-		    		if (sF != null){
-		    			if (drawerItem == DrawerItem.SEARCH){
-		    				sF.onBackPressed();
-		    				return true;
-		    			}
-		    		}
+
 				}
 		    	return true;
 		    }
@@ -3313,9 +3196,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		break;
 	        		}
 		        	default:{
-		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
+
 			    		break;
 		        	}
 	        	}
@@ -5561,8 +5442,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if(resultCode == Activity.RESULT_OK){
 				
 				log("REcibo el intent OOOOKK");
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivity.class);			
-				startActivity(intentPicture);
+
 			}
 			else{
 				log("REcibo el intent con error");
