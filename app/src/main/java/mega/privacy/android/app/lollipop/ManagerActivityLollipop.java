@@ -74,6 +74,7 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,6 +97,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -11967,6 +11969,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fabButton.setVisibility(View.GONE);
 				break;
 			}
+		}
+	}
+
+	public void openAdvancedDevices (long handleToDownload){
+		log("openAdvancedDevices");
+//		handleToDownload = handle;
+		String externalPath = Util.getExternalCardPath();
+
+		if(externalPath!=null){
+			log("ExternalPath for advancedDevices: "+externalPath);
+			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
+			if(node!=null){
+
+//				File newFile =  new File(externalPath+"/"+node.getName());
+				File newFile =  new File(node.getName());
+				log("File: "+newFile.getPath());
+				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+				// Filter to only show results that can be "opened", such as
+				// a file (as opposed to a list of contacts or timezones).
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+				// Create a file with the requested MIME type.
+				String mimeType = MimeTypeList.getMimeType(newFile);
+				log("Mimetype: "+mimeType);
+				intent.setType(mimeType);
+				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
+				intent.putExtra("handleToDownload", handleToDownload);
+				try{
+					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+				}
+				catch(Exception e){
+					log("Exception in External SDCARD");
+					Environment.getExternalStorageDirectory();
+					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+					toast.show();
+				}
+			}
+		}
+		else{
+			log("No external SD card");
+			Environment.getExternalStorageDirectory();
+			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+			toast.show();
 		}
 	}
 
