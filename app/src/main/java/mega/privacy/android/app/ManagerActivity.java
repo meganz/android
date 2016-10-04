@@ -928,12 +928,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						return;
 					}
 					else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
-						Intent intent = new Intent(managerActivity, FileLinkActivity.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
-						intent.setData(Uri.parse(getIntent().getDataString()));
-						startActivity(intent);
-						finish();	
+//						Intent intent = new Intent(managerActivity, FileLinkActivity.class);
+//						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//						intent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+//						intent.setData(Uri.parse(getIntent().getDataString()));
+//						startActivity(intent);
+//						finish();
 						return;
 					}
 					else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
@@ -1519,21 +1519,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					return;
 				}
 				else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
-					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivity.class);
-					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					fileLinkIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
-					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(fileLinkIntent);
-					finish();	
+//					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivity.class);
+//					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//					fileLinkIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+//					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
+//					startActivity(fileLinkIntent);
+//					finish();
 					return;
 				}
     			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
-    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
-    				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    				intentFolderLink.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
-    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(intentFolderLink);
-					finish();
+//    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
+//    				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//    				intentFolderLink.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+//    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
+//					startActivity(intentFolderLink);
+//					finish();
     			}
     			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
     				
@@ -1621,24 +1621,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log("open link url");
 			
 //			Intent openIntent = new Intent(this, ManagerActivity.class);
-			Intent openFileIntent = new Intent(this, FileLinkActivity.class);
-			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
-			openFileIntent.setData(Uri.parse(url));
-			startActivity(openFileIntent);
-//			finish();
+//			Intent openFileIntent = new Intent(this, FileLinkActivity.class);
+//			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+//			openFileIntent.setData(Uri.parse(url));
+//			startActivity(openFileIntent);
+////			finish();
 			return;
 		}
 		
 		// Folder Download link
 		else if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
 			log("folder link url");
-			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
-			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openFolderIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
-			openFolderIntent.setData(Uri.parse(url));
-			startActivity(openFolderIntent);
-//			finish();
+//			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
+//			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			openFolderIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+//			openFolderIntent.setData(Uri.parse(url));
+//			startActivity(openFolderIntent);
+////			finish();
 			return;
 		}
 		else{

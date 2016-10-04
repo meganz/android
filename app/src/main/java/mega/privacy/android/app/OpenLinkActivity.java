@@ -63,29 +63,13 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		// Download link
 		if (url != null && (url.matches("^https://mega.co.nz/#!.+$") || url.matches("^https://mega.nz/#!.+$"))) {
 			log("open link url");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				log("Build.VERSION_CODES.LOLLIPOP");
-//				Intent openIntent = new Intent(this, ManagerActivity.class);
-				Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
-				openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
-				openFileIntent.setData(Uri.parse(url));
-				startActivity(openFileIntent);
-				finish();
-			}
-			else{
-//				Intent openIntent = new Intent(this, ManagerActivity.class);
-				log("NOT lollipop");
-				if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
-					log("link with decrytion key");
-					Intent openFileIntent = new Intent(this, FileLinkActivity.class);
-					openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
-					openFileIntent.setData(Uri.parse(url));
-					startActivity(openFileIntent);
-					finish();
-				}
-			}
+
+			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
+			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
+			openFileIntent.setData(Uri.parse(url));
+			startActivity(openFileIntent);
+			finish();
 			return;
 		}
 		
@@ -117,23 +101,14 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		// Folder Download link
 		if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
 			log("folder link url");
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-				log("Build.VERSION_CODES.LOLLIPOP");
-				Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
-				openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
-				openFolderIntent.setData(Uri.parse(url));
-				startActivity(openFolderIntent);
-				finish();
-			}
-			else{
-				Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
-				openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openFolderIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
-				openFolderIntent.setData(Uri.parse(url));
-				startActivity(openFolderIntent);
-				finish();
-			}
+
+			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
+			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
+			openFolderIntent.setData(Uri.parse(url));
+			startActivity(openFolderIntent);
+			finish();
+
 			return;
 		}
 

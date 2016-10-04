@@ -1171,7 +1171,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
 
 		} else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
-			((FolderLinkActivity) context).onFileClick(handleList);
+//			((FolderLinkActivity) context).onFileClick(handleList);
 		} else {
 			((ManagerActivity) context).onFileClick(handleList);
 		}
