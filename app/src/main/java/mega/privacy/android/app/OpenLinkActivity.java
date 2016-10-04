@@ -15,6 +15,7 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -76,25 +77,17 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		// Confirmation link
 		if (url != null && (url.matches("^https://mega.co.nz/#confirm.+$") || url.matches("^https://mega.nz/#confirm.+$"))) {
 			log("confirmation url");
-			ManagerActivity.logout(this, megaApi, true);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-				log("Build.VERSION_CODES.LOLLIPOP");
-				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-				confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-				confirmIntent.putExtra(LoginActivity.EXTRA_CONFIRMATION, url);
-				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				confirmIntent.setAction(Constants.ACTION_CONFIRM);
-				startActivity(confirmIntent);
-				finish();
-			}
-			else{
-				Intent confirmIntent = new Intent(this, LoginActivity.class);
-				confirmIntent.putExtra(LoginActivity.EXTRA_CONFIRMATION, url);
-				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				confirmIntent.setAction(LoginActivity.ACTION_CONFIRM);
-				startActivity(confirmIntent);
-				finish();
-			}
+			AccountController aC = new AccountController(this);
+			aC.logout(this, megaApi, true);
+
+			Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+			confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			confirmIntent.putExtra(LoginActivity.EXTRA_CONFIRMATION, url);
+			confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			confirmIntent.setAction(Constants.ACTION_CONFIRM);
+			startActivity(confirmIntent);
+			finish();
+
 			return;
 		}
 
