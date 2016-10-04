@@ -899,23 +899,23 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 		else{
 			if(hashes.length == 1){
-//				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-				if((document != null) && document.getType() == MegaNode.TYPE_FILE){
+				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
-					String localPath = Util.getLocalFile(this, document.getName(), document.getSize(), parentPath);
+					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
 					if(localPath != null){	
 						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, document.getName())); 
+							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
@@ -974,8 +974,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 			}
 		}
-		
-		finish();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+			finish();
+		}
 	}
 	
 	@SuppressLint("NewApi") 
