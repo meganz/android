@@ -316,12 +316,6 @@
         </activity>
 
         <activity
-            android:name="ZipBrowserActivity"
-            android:label="@string/zip_browser_activity"
-            android:screenOrientation="portrait" >
-        </activity>
-        
-        <activity
             android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
             android:label="@string/zip_browser_activity"
             android:configChanges="orientation|screenSize" >
