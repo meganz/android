@@ -406,7 +406,7 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Spazio archiviazione</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Spazio libero</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Spazio Usato</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Aggiorna l\'account ora!</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Passa a Pro</string>
     <string name="my_account_change_password" context="menu item">Modifica password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Stai per esaurire lo spazio!Vuoi aggiornare il tuo account?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Puoi essere un utente Pro!  Vuoi aggiornare il tuo account?</string>
