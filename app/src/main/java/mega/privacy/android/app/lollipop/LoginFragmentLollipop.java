@@ -124,6 +124,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String gPublicKey;
     private String gPrivateKey;
     private String gSession;
+    private boolean resumeSesion = false;
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
@@ -872,6 +873,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         prepareNodesText.setVisibility(View.GONE);
         initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
+        resumeSesion = true;
         megaApi.fastLogin(gSession, this);
     }
 
@@ -987,6 +989,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         serversBusyText.setVisibility(View.GONE);
 
         log("fastLogin con publicKey y privateKey");
+        resumeSesion = false;
         megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
     }
 
@@ -1439,7 +1442,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     log("OK fetch nodes");
-                    megaChatApi.init(this);
+                    log("value of resumeSession: "+resumeSesion);
+                    megaChatApi.init(resumeSesion, this);
 
                     loginLogin.setVisibility(View.GONE);
                     loginDelimiter.setVisibility(View.GONE);

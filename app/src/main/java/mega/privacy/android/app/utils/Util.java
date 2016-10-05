@@ -649,6 +649,7 @@ public class Util {
 
 		File logFile=null;
 		if (DEBUG) {
+			message = origin +": " + message;
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
 		}
 
