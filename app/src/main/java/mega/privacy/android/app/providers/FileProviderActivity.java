@@ -24,6 +24,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -155,7 +156,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	TextView bLoginLol;
 	ImageView loginThreeDots;
 	TextView loginABC;
-	Switch loginSwitchLol;	
+	SwitchCompat loginSwitchLol;
 	MySwitch loginSwitch;
 	Button bRegister;
 	Button bLogin;
@@ -165,48 +166,32 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	
 	String SD_CACHE_PATH = "/Android/data/mega.privacy.android.app/cache/files";
 
-	private ImageView windowBack;
-	private boolean backVisible = false;
-	private TextView windowTitle;
-
 	private MegaApiAndroid megaApi;
 	MegaApplication app;
 //	private int mode;
-	
-	String actionBarTitle;
+
 	private boolean folderSelected = false;
 
 	private int tabShown = -1;
-	
-	private CloudDriveProviderFragment cDriveProvider;
-	private IncomingSharesProviderFragment iSharesProvider;
-	
+
 	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
 	ProgressDialog statusDialog;
 
-	//Buttons Layout for Lollipop
 	LinearLayout optionsBar;
 	TextView cancelText;
 
-	//Tabs for Lollipop
 	TabLayout tabLayoutProvider;
 	LinearLayout providerSectionLayout;
 	ProviderPageAdapter mTabsAdapterProvider;
 	ViewPager viewPagerProvider;
-
-	//Tabs for Pre-Lollipop
-	private TabHost mTabHostProviderOld;
-	TabsAdapter mTabsAdapterProviderOld;
-	ViewPager viewPagerProviderOld;
 
 	ArrayList<MegaNode> nodes;
 	int incomingDeepBrowserTree = -1;
 	long gParentHandle=-1;
 	long incParentHandle=-1;
 	String gcFTag = "";
-	
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -218,68 +203,54 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}  
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {	
-		
-		log("onCreate first");	
-		
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {		
-			onCreateLollipop(savedInstanceState);
-		}
-		else
-		{
-			onCreateOlder(savedInstanceState);
-		}
-	}
-	
-	protected void onCreateLollipop(Bundle savedInstanceState) {
-		log("onCreateLollipop");
-	
-		requestWindowFeature(Window.FEATURE_NO_TITLE);	
+	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate first");
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		super.onCreate(savedInstanceState);
-			
+
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-		
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
+		display.getMetrics(outMetrics);
+		density  = getResources().getDisplayMetrics().density;
 
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
-		
+		scaleW = Util.getScaleW(outMetrics, density);
+		scaleH = Util.getScaleH(outMetrics, density);
+
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
+
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		
+
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 			incParentHandle = savedInstanceState.getLong("incParentHandle", -1);
 			gParentHandle = savedInstanceState.getLong("parentHandle", -1);
 			incomingDeepBrowserTree = savedInstanceState.getInt("deepBrowserTree", -1);
 			tabShown = savedInstanceState.getInt("tabShown", CLOUD_TAB);
-		}		
-		
+		}
+
 		try{
 			app = (MegaApplication) getApplication();
 		}
 		catch(Exception ex){
 			finish();
 		}
-		
+
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		
+
 		megaApi.addGlobalListener(this);
 		megaApi.addTransferListener(this);
-		
+
 //		Intent intent = getIntent();
 		checkLogin();
 		UserCredentials credentials = dbH.getCredentials();
 		if (credentials == null){
-			
+
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
 				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
@@ -296,17 +267,17 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			}
 			loginProgressBar.setVisibility(View.GONE);
 			queryingSignupLinkText.setVisibility(View.GONE);
-			confirmingAccountText.setVisibility(View.GONE);				
-		
+			confirmingAccountText.setVisibility(View.GONE);
+
 		}
 		else{
 			log("dbH.getCredentials() NOT null");
 			if (megaApi.getRootNode() == null){
 				log("megaApi.getRootNode() == null");
-				
+
 				lastEmail = credentials.getEmail();
 				String gSession = credentials.getSession();
-				
+
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
 				loginCreateAccount.setVisibility(View.GONE);
@@ -431,9 +402,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}
-		}			
+		}
 	}
-	
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelectedLollipop");
@@ -447,287 +419,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	    return super.onOptionsItemSelected(item);
 	}
 
-	protected void onCreateOlder(Bundle savedInstanceState) {
-		log("onCreate first");
-		super.onCreate(savedInstanceState);
-
-		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-		aB = getSupportActionBar();
-		if(aB!=null){
-			aB.hide();
-		}
-		
-		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-		
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
-		
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		
-		if (savedInstanceState != null){
-			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
-		}
-		
-//		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
-		try{
-			app = (MegaApplication) getApplication();
-		}
-		catch(Exception ex){
-			finish();
-		}
-		
-		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		
-		megaApi.addGlobalListener(this);
-		megaApi.addTransferListener(this);
-		
-		Intent intent = getIntent();		
-		UserCredentials credentials = dbH.getCredentials();
-		if (credentials == null){
-			setContentView(R.layout.activity_login_returning);
-			log("dbH.getCredentials() == null");
-			
-			loginTitle = (TextView) findViewById(R.id.login_text_view);
-			loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
-			loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
-			loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
-			loginDelimiter = (View) findViewById(R.id.login_delimiter);
-			loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
-			loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
-			generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
-			queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
-			confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
-			loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
-			fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
-			prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
-			
-			loginTitle.setText(R.string.login_text);
-			loginTitle.setTextSize(28*scaleH);
-			loginLogin.setVisibility(View.VISIBLE);
-			loginCreateAccount.setVisibility(View.INVISIBLE);
-			loginDelimiter.setVisibility(View.VISIBLE);
-			loginLoggingIn.setVisibility(View.GONE);
-			generatingKeysText.setVisibility(View.GONE);
-			loggingInText.setVisibility(View.GONE);
-			fetchingNodesText.setVisibility(View.GONE);
-			prepareNodesText.setVisibility(View.GONE);
-			loginProgressBar.setVisibility(View.GONE);
-			queryingSignupLinkText.setVisibility(View.GONE);
-			confirmingAccountText.setVisibility(View.GONE);
-			
-			et_user = (EditText) findViewById(R.id.login_email_text);
-			et_password = (EditText) findViewById(R.id.login_password_text);
-			et_password.setOnEditorActionListener(new OnEditorActionListener() {
-				
-				@Override
-				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-					if (actionId == EditorInfo.IME_ACTION_DONE) {
-						submitForm();
-						return true;
-					}
-					return false;
-				}
-			});		
-			
-			bLogin = (Button) findViewById(R.id.button_login_login);
-			
-			bLogin.setOnClickListener(this);
-			
-			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((40*scaleH), outMetrics));
-//			
-//			bRegister = (Button) findViewById(R.id.button_create_account_login);			
-//	
-//			bRegister.setVisibility(View.GONE);
-			
-			((LinearLayout.LayoutParams)bLogin.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-			
-			loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
-			
-			loginThreeDots.setPadding(0, Util.px2dp((20*scaleH), outMetrics), Util.px2dp((4*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics));
-			
-			loginABC = (TextView) findViewById(R.id.ABC);
-			
-			((TableRow.LayoutParams)loginABC.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((5*scaleH), outMetrics));
-			
-			loginSwitch = (MySwitch) findViewById(R.id.switch_login);
-			loginSwitch.setChecked(true);
-			
-			loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					if(isChecked){
-							et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-							et_password.setSelection(et_password.getText().length());
-					}else{
-							et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-							et_password.setSelection(et_password.getText().length());
-				    }				
-				}
-			});
-			
-			((TableRow.LayoutParams)loginSwitch.getLayoutParams()).setMargins(Util.px2dp((1*scaleH), outMetrics), Util.px2dp((8*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0);
-			
-		}
-		else{
-			log("dbH.getCredentials() NOT null");
-			if (megaApi.getRootNode() == null){
-				setContentView(R.layout.activity_login_returning);
-				log("megaApi.getRootNode() == null");
-				lastEmail = credentials.getEmail();
-				String gSession = credentials.getSession();
-				
-				loginTitle = (TextView) findViewById(R.id.login_text_view);
-				loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
-				loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
-				loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
-				loginDelimiter = (View) findViewById(R.id.login_delimiter);
-				loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
-				loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
-				generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
-				queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
-				confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
-				loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
-				fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
-				prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
-
-				loginTitle.setText(R.string.login_text);
-				loginTitle.setTextSize(28*scaleH);
-				
-				loginLogin.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.INVISIBLE);
-				loginDelimiter.setVisibility(View.VISIBLE);
-				loginLoggingIn.setVisibility(View.GONE);
-				generatingKeysText.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.GONE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);
-				loginProgressBar.setVisibility(View.GONE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				
-				log("session: " + gSession);
-				loginLogin.setVisibility(View.GONE);
-				loginDelimiter.setVisibility(View.GONE);
-				loginCreateAccount.setVisibility(View.GONE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				loginLoggingIn.setVisibility(View.VISIBLE);
-				if(scrollView!=null){
-					scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-				}
-				loginProgressBar.setVisibility(View.VISIBLE);
-				loginFetchNodesProgressBar.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.VISIBLE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);
-				megaApi.fastLogin(gSession, this);
-
-			}
-			else{
-				setContentView(R.layout.activity_file_provider);
-				tabShown = CLOUD_TAB;
-				log("megaApi.getRootNode() NOT null");
-
-				mTabHostProviderOld = (TabHost)findViewById(R.id.tabhost_provider);
-				mTabHostProviderOld.setup();
-		        viewPagerProviderOld = (ViewPager) findViewById(R.id.provider_tabs_pager);
-		        
-		        //Create tabs
-		        mTabHostProviderOld.getTabWidget().setBackgroundColor(Color.BLACK);
-				
-		        mTabHostProviderOld.setVisibility(View.VISIBLE);
-				
-				
-				if (mTabsAdapterProviderOld == null){
-					mTabsAdapterProviderOld= new TabsAdapter(this, mTabHostProviderOld, viewPagerProviderOld);
-					
-					TabHost.TabSpec tabSpec3 = mTabHostProviderOld.newTabSpec("cloudProviderFragment");
-					tabSpec3.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-			        //tabSpec.setContent(contentID);
-			        //mTabHostContacts.addTab(tabSpec);
-			        TabHost.TabSpec tabSpec4 = mTabHostProviderOld.newTabSpec("incomingProviderFragment");
-			        tabSpec4.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-			                	          				
-					mTabsAdapterProviderOld.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-					mTabsAdapterProviderOld.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
-					
-				}
-			
-				mTabHostProviderOld.setOnTabChangedListener(new OnTabChangeListener(){
-		            @Override
-		            public void onTabChanged(String tabId) {
-		            	log("TabId :"+ tabId);
-		                if(tabId.equals("cloudProviderFragment")){                     	
-		
-		     				tabShown=CLOUD_TAB;
-		    				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-		    				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-		    				cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		
-		    				if(cDriveProvider!=null){
-		    					if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
-		    						changeTitle(getString(R.string.section_cloud_drive));
-		    						changeBackVisibility(false);
-		    					}
-		    					else{
-		    						changeTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
-		    						changeBackVisibility(true);
-		    					}    					
-		    				}	
-		                }
-		                else if(tabId.equals("incomingProviderFragment")){                     	
-		
-		            		tabShown=INCOMING_TAB;
-		            		
-		            		String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-		            		gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-		    				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		    		
-		    				if(iSharesProvider!=null){
-		    					if(iSharesProvider.getDeepBrowserTree()==0){
-		    						changeTitle(getString(R.string.title_incoming_shares_explorer));
-		    						changeBackVisibility(false);
-		    					}
-		    					else{
-		    						changeTitle(iSharesProvider.name);
-		    						changeBackVisibility(true);
-		    					}    					
-		    				}        			                      	
-		                }
-		             }
-				});
-				
-				for (int i=0;i<mTabsAdapterProviderOld.getCount();i++){
-					final int index = i;
-					mTabHostProviderOld.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							viewPagerProviderOld.setCurrentItem(index);
-						}
-					});
-				}
-
-				windowTitle = (TextView) findViewById(R.id.file_provider_window_title);
-				actionBarTitle = getString(R.string.section_cloud_drive);
-				windowTitle.setText(actionBarTitle);
-				
-				windowBack = (ImageView) findViewById(R.id.file_provider_back);
-				windowBack.setOnClickListener(this);
-				windowTitle.setOnClickListener(this);	
-				
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-			}			
-		}	
-	}
-	
 	@SuppressLint("NewApi")
 	public void checkLogin(){
 		setContentView(R.layout.fragment_login);
@@ -773,8 +464,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		loginThreeDots.setLayoutParams(textThreeDots);
 		
 		loginABC = (TextView) findViewById(R.id.ABC);
-		
-		loginSwitchLol = (Switch) findViewById(R.id.switch_login);
+
+		loginSwitchLol = (SwitchCompat) findViewById(R.id.switch_login);
 		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitchLol.getLayoutParams();
 		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
 		loginSwitchLol.setLayoutParams(switchParams);
@@ -865,50 +556,18 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 		return super.onCreateOptionsMenu(menu);
 	}
-	
-	private View getTabIndicator(Context context, String title) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
 
-        TextView tv = (TextView) view.findViewById(R.id.textView);
-        tv.setText(title);
-        return view;
-    }
-	
 	public void changeTitle (String title){
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-			if (aB != null){
-				aB.setTitle(title);
-			}
-		}
-		else
-		{
-			if (windowTitle != null){
-				windowTitle.setText(title);
-			}
+		if (aB != null){
+			aB.setTitle(title);
 		}
 	}
-	
-	public void changeBackVisibility(boolean backVisible){
-		this.backVisible = backVisible;
-		if (windowBack != null){
-			if (!backVisible){
-				windowBack.setVisibility(View.INVISIBLE);
-			}
-			else{
-				windowBack.setVisibility(View.VISIBLE);
-			}
-		}
-	}
-	
+
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
 	{
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
-	
-	public void finishActivity(){
-		finish();
-	}
-	
+
 	public void downloadTo(long size, long [] hashes){
 		
 		log("downloadTo");
@@ -1029,50 +688,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed: "+tabShown);
-		
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
-			onBackPressedLollipop();
-		}
-		else{
-		
-			if(tabShown==CLOUD_TAB){
-				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-				cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		
-				if(cDriveProvider!=null){
-					if (cDriveProvider.onBackPressed() == 0){
-						super.onBackPressed();
-						return;
-					}
-				}
-			}
-			else if(tabShown==INCOMING_TAB){
-				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-			
-				if(iSharesProvider!=null){
-					if (iSharesProvider.onBackPressed() == 0){
-						super.onBackPressed();
-						return;
-					}
-				}
-			}
-			else{
-				super.onBackPressed();
-			}
-		}
-	}
-	
-	public void onBackPressedLollipop() {
-		log("onBackPressedLollipop: "+tabShown);
 
 		if(tabShown==CLOUD_TAB){
 			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 			gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 			cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-	
+
 			if(cDriveProviderLol!=null){
 				if (cDriveProviderLol.onBackPressed() == 0){
 					super.onBackPressed();
@@ -1084,7 +705,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 			gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 			iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		
+
 			if(iSharesProviderLol!=null){
 				if (iSharesProviderLol.onBackPressed() == 0){
 					super.onBackPressed();
@@ -1105,16 +726,16 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				onLoginClick(v);
 				break;
 			}
-			case R.id.file_provider_back:{
-				onBackPressed();
-				break;
-			}
-			case R.id.file_provider_window_title:{
-				if (backVisible){
-					onBackPressed();
-					break;
-				}
-			}
+//			case R.id.file_provider_back:{
+//				onBackPressed();
+//				break;
+//			}
+//			case R.id.file_provider_window_title:{
+//				if (backVisible){
+//					onBackPressed();
+//					break;
+//				}
+//			}
 			case R.id.cancel_text:{
 				finish();
 			}
@@ -1323,21 +944,21 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestFinish: "+request.getFile());
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-			log("Timer cancel for Lollipop");
-			try{
-				if(timer!=null){
-					timer.cancel();
-					if(serversBusyText!=null){
-						serversBusyText.setVisibility(View.GONE);
-					}
+
+		log("Timer cancel");
+		try{
+			if(timer!=null){
+				timer.cancel();
+				if(serversBusyText!=null){
+					serversBusyText.setVisibility(View.GONE);
 				}
 			}
-			catch(Exception ex){
-				log("TIMER EXCEPTION");
-				log(ex.getMessage());
-			}
 		}
+		catch(Exception ex){
+			log("TIMER EXCEPTION");
+			log(ex.getMessage());
+		}
+
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			log("REQUEST LOGIN");
 			try { 
@@ -1448,187 +1069,87 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
-				if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-					log("Lollipop VERSION!");
-					//Set toolbar
-					tB = (Toolbar) findViewById(R.id.toolbar_provider);
-					
-					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
-					params.setMargins(0, getStatusBarHeight(), 0, 0);
-					
-					setSupportActionBar(tB);
-					aB = getSupportActionBar();
-					aB.setDisplayHomeAsUpEnabled(true);
-					aB.setDisplayShowHomeEnabled(true);
+				//Set toolbar
+				tB = (Toolbar) findViewById(R.id.toolbar_provider);
 
-					//Lollipop Version
-					Display display = getWindowManager().getDefaultDisplay();
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
+				params.setMargins(0, getStatusBarHeight(), 0, 0);
 
-					DisplayMetrics metrics = new DisplayMetrics();
-					display.getMetrics(metrics);
+				setSupportActionBar(tB);
+				aB = getSupportActionBar();
+				aB.setDisplayHomeAsUpEnabled(true);
+				aB.setDisplayShowHomeEnabled(true);
 
-					optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
+				Display display = getWindowManager().getDefaultDisplay();
 
-					cancelText = (TextView) findViewById(R.id.cancel_text);
-					cancelText.setOnClickListener(this);
-					cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-					//Left and Right margin
-					LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-					cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
-					cancelText.setLayoutParams(cancelTextParams);
-					//TABS section
-					providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
-					tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
-					viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);
+				DisplayMetrics metrics = new DisplayMetrics();
+				display.getMetrics(metrics);
 
-					//Create tabs
-					providerSectionLayout.setVisibility(View.VISIBLE);
+				optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
 
-					if (mTabsAdapterProvider == null){
-						mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
-						viewPagerProvider.setAdapter(mTabsAdapterProvider);
-						tabLayoutProvider.setupWithViewPager(viewPagerProvider);
-					}
+				cancelText = (TextView) findViewById(R.id.cancel_text);
+				cancelText.setOnClickListener(this);
+				cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+				//Left and Right margin
+				LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+				cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+				cancelText.setLayoutParams(cancelTextParams);
+				//TABS section
+				providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
+				tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
+				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);
 
-					viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-						public void onPageScrollStateChanged(int state) {}
-						public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+				//Create tabs
+				providerSectionLayout.setVisibility(View.VISIBLE);
 
-						public void onPageSelected(int position) {
-							log("onTabChanged TabId :"+ position);
-							if(position == 0){
-								tabShown=CLOUD_TAB;
-								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-								cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-								if(cDriveProviderLol!=null){
-									if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
-										aB.setTitle(getString(R.string.section_cloud_drive));
-									}
-									else{
-										aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
-									}
-								}
-							}
-							else if(position == 1){
-								tabShown=INCOMING_TAB;
-
-								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-								iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-								if(iSharesProviderLol!=null){
-									if(iSharesProviderLol.getDeepBrowserTree()==0){
-										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
-									}
-									else{
-										aB.setTitle(iSharesProviderLol.name);
-									}
-								}
-							}
-						}
-					});
-
-					getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-					getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+				if (mTabsAdapterProvider == null){
+					mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
+					viewPagerProvider.setAdapter(mTabsAdapterProvider);
+					tabLayoutProvider.setupWithViewPager(viewPagerProvider);
 				}
-				else{
-					//NOT Lollipop
-					log("NOT Lollipop!");
-					mTabHostProviderOld = (TabHost)findViewById(R.id.tabhost_provider);
-					mTabHostProviderOld.setup();
-					viewPagerProviderOld = (ViewPager) findViewById(R.id.provider_tabs_pager);
 
-					//Create tabs
-					mTabHostProviderOld.getTabWidget().setBackgroundColor(Color.BLACK);
+				viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+					public void onPageScrollStateChanged(int state) {}
+					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
-					mTabHostProviderOld.setVisibility(View.VISIBLE);
+					public void onPageSelected(int position) {
+						log("onTabChanged TabId :"+ position);
+						if(position == 0){
+							tabShown=CLOUD_TAB;
+							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+							gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+							cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
-					if (mTabsAdapterProviderOld == null){
-						mTabsAdapterProviderOld = new TabsAdapter(this, mTabHostProviderOld, viewPagerProviderOld);
-
-						TabHost.TabSpec tabSpec3 = mTabHostProviderOld.newTabSpec("cloudProviderFragment");
-						tabSpec3.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.section_cloud_drive).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-						//tabSpec.setContent(contentID);
-						//mTabHostContacts.addTab(tabSpec);
-						TabHost.TabSpec tabSpec4 = mTabHostProviderOld.newTabSpec("incomingProviderFragment");
-						tabSpec4.setIndicator(getTabIndicator(mTabHostProviderOld.getContext(), getString(R.string.tab_incoming_shares).toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
-
-						mTabsAdapterProviderOld.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-						mTabsAdapterProviderOld.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
-					}
-
-					mTabHostProviderOld.setOnTabChangedListener(new OnTabChangeListener(){
-						@Override
-						public void onTabChanged(String tabId) {
-							log("TabId :"+ tabId);
-							if(tabId.equals("cloudProviderFragment")){                     	
-
-								tabShown=CLOUD_TAB;
-								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-								cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-								if(cDriveProvider!=null){
-									if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
-										changeTitle(getString(R.string.section_cloud_drive));
-										changeBackVisibility(false);
-									}
-									else{
-										changeTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
-										changeBackVisibility(true);
-									}    					
-								}	
-							}
-							else if(tabId.equals("incomingProviderFragment")){                     	
-
-								tabShown=INCOMING_TAB;
-
-								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-								iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-								if(iSharesProvider!=null){
-									if(iSharesProvider.getDeepBrowserTree()==0){
-										changeTitle(getString(R.string.title_incoming_shares_explorer));
-//										changeTitle(getString(R.string.title_incoming_shares_explorer));
-										changeBackVisibility(false);
-									}
-									else{
-										changeTitle(iSharesProvider.name);
-//										changeTitle(iSharesProvider.name);
-										changeBackVisibility(true);
-									}    					
-								}        			                      	
+							if(cDriveProviderLol!=null){
+								if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
+									aB.setTitle(getString(R.string.section_cloud_drive));
+								}
+								else{
+									aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
+								}
 							}
 						}
-					});
+						else if(position == 1){
+							tabShown=INCOMING_TAB;
 
-					for (int i=0;i<mTabsAdapterProviderOld.getCount();i++){
-						final int index = i;
-						mTabHostProviderOld.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+							gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+							iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
-							@Override
-							public void onClick(View v) {
-								viewPagerProviderOld.setCurrentItem(index);
+							if(iSharesProviderLol!=null){
+								if(iSharesProviderLol.getDeepBrowserTree()==0){
+									aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+								}
+								else{
+									aB.setTitle(iSharesProviderLol.name);
+								}
 							}
-						});
+						}
 					}
-					//		newFolderButton.setOnClickListener(this);
+				});
 
-					windowTitle = (TextView) findViewById(R.id.file_provider_window_title);
-					if (windowTitle != null){
-						windowTitle.setText(actionBarTitle);
-					}
-
-					if (actionBarTitle != null){
-						actionBarTitle = getString(R.string.section_cloud_drive);
-					}
-
-					getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-					getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-				}//NOT Lollipop end
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}
 		}
 	}
@@ -1638,45 +1159,42 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			MegaError e) {
 		log("onRequestTemporaryError: " + request.getRequestString());
 
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-			log("Start timer for Lollipop");
-			try {
-				timer = new CountDownTimer(10000, 2000) {
+		log("Start timer");
+		try {
+			timer = new CountDownTimer(10000, 2000) {
 
-					public void onTick(long millisUntilFinished) {
-						log("TemporaryError one more");
-					}
+				public void onTick(long millisUntilFinished) {
+					log("TemporaryError one more");
+				}
 
-					public void onFinish() {
-						log("the timer finished, message shown");
-						if (serversBusyText != null) {
-							serversBusyText.setVisibility(View.VISIBLE);
-						}
+				public void onFinish() {
+					log("the timer finished, message shown");
+					if (serversBusyText != null) {
+						serversBusyText.setVisibility(View.VISIBLE);
 					}
-				}.start();
-			} catch (Exception exception) {
-				log(exception.getMessage());
-				log("EXCEPTION when starting count");
-			}
+				}
+			}.start();
+		} catch (Exception exception) {
+			log(exception.getMessage());
+			log("EXCEPTION when starting count");
 		}
 	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		log("onRequestUpdate");
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-			log("Cancel timer for Lollipop");
-			try {
-				if (timer != null) {
-					timer.cancel();
-					if (serversBusyText != null) {
-						serversBusyText.setVisibility(View.GONE);
-					}
+
+		log("Cancel timer");
+		try {
+			if (timer != null) {
+				timer.cancel();
+				if (serversBusyText != null) {
+					serversBusyText.setVisibility(View.GONE);
 				}
-			} catch (Exception e) {
-				log("TIMER EXCEPTION");
-				log(e.getMessage());
 			}
+		} catch (Exception e) {
+			log("TIMER EXCEPTION");
+			log(e.getMessage());
 		}
 	}
 
@@ -1689,24 +1207,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
-			if (cDriveProviderLol != null){
-				if (megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()) != null){
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()));
-					cDriveProviderLol.setNodes(nodes);
-					cDriveProviderLol.getListView().invalidate();
-				}
+		if (cDriveProviderLol != null){
+			if (megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()) != null){
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()));
+				cDriveProviderLol.setNodes(nodes);
+				cDriveProviderLol.getListView().invalidate();
 			}
 		}
-		else{
-			if (cDriveProvider != null){
-				if (megaApi.getNodeByHandle(cDriveProvider.getParentHandle()) != null){
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()));
-					cDriveProvider.setNodes(nodes);
-					cDriveProvider.getListView().invalidateViews();
-				}
-			}
-		}		
 	}
 
 	@Override

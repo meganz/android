@@ -1489,11 +1489,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
 
-    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
-    				
-    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);    				
-    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-    			    startActivity(intentZip);   				
+//    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
+//
+//    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);
+//    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
+//    			    startActivity(intentZip);
     				
     			}
 //    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
@@ -5824,12 +5824,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							log("MimeTypeList ZIP");
 		    			    File zipFile = new File(localPath);
 		    			    
-		    			    Intent intentZip = new Intent();
-		    			    intentZip.setClass(this, ZipBrowserActivity.class);
-		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-
-		    				this.startActivity(intentZip);
+//		    			    Intent intentZip = new Intent();
+//		    			    intentZip.setClass(this, ZipBrowserActivity.class);
+//		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+//		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
+//
+//		    				this.startActivity(intentZip);
 							
 						}
 						else{		

@@ -1549,7 +1549,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
-						log("Open after LauncherFileExplorerActivity ");
+						log("Open after LauncherFileExplorerActivityLollipop ");
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 						int access = -1;
 						if (handleIntent != -1) {

@@ -84,13 +84,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 	
 	Toolbar tB;
 	ActionBar aB;
-	
-	private boolean backVisible = false;
-	private ImageView windowBack;
-	private TextView windowTitle;
-	private ImageButton newFolderButton;
-	String actionBarTitle;
-	
+
 	LinearLayout loginLoggingIn;
 	ProgressBar loginProgressBar;
 	ProgressBar loginFetchNodesProgressBar;
@@ -357,7 +351,6 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 
 			mTabsAdapterExplorer.addTab(tabSpec3, CloudDriveExplorerFragmentLollipop.class, b1);
 			mTabsAdapterExplorer.addTab(tabSpec4, IncomingSharesExplorerFragmentLollipop.class, b1);
-
 		}
 
 		mTabHostExplorer.setOnTabChangedListener(new OnTabChangeListener(){
@@ -460,270 +453,125 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 	
 	public void buttonClick(long handle){
 		log("buttonClick");
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (tabShown == INCOMING_TAB){
-				if (iSharesExplorer.deepBrowserTree==0){
-					Intent intent = new Intent();
-					setResult(RESULT_FIRST_USER, intent);
-					finish();
-					return;
-				}
-			}
-			
-			folderSelected = true;
-			this.gParentHandle = handle;
 
-			//Only UPLOAD MODE is valid, no way to enter in the other options!
-			if (mode == MOVE) {
-				log("MOVE option");
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-				
+		if (tabShown == INCOMING_TAB){
+			if (iSharesExplorer.deepBrowserTree==0){
 				Intent intent = new Intent();
-				intent.putExtra("MOVE_TO", parentNode.getHandle());
-				intent.putExtra("MOVE_HANDLES", moveFromHandles);
-				setResult(RESULT_OK, intent);
-				log("finish!");
+				setResult(RESULT_FIRST_USER, intent);
 				finish();
-			}
-			else if (mode == COPY){
-				log("COPY option");
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-				
-				Intent intent = new Intent();
-				intent.putExtra("COPY_TO", parentNode.getHandle());
-				intent.putExtra("COPY_HANDLES", copyFromHandles);
-				setResult(RESULT_OK, intent);
-				log("finish!");
-				finish();
-			}
-			else if(mode == UPLOAD_SELFIE){
-				log("UPLOAD_SELFIE option");
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-			
-				Intent intent = new Intent(this, UploadService.class);
-				File selfie = new File(imagePath);
-				intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-				intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-				startService(intent);
-				
-				Intent intentResult = new Intent();
-				setResult(RESULT_OK, intentResult);
-				finish();
-				
-			}
-			else if (mode == UPLOAD){
-				log("mode UPLOAD");
-				
-				if (filePreparedInfos == null){
-	//				Intent prueba = getIntent();
-	//				Bundle bundle = prueba.getExtras();
-	//				Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
-	//				log("URI mode UPLOAD in bundle: "+uri);
-					
-					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-					filePrepareTask.execute(getIntent());
-					ProgressDialog temp = null;
-					try{
-						temp = new ProgressDialog(this);
-						temp.setMessage(getString(R.string.upload_prepare));
-						temp.show();
-					}
-					catch(Exception e){
-						return;
-					}
-					statusDialog = temp;
-				}
-				else{
-					onIntentProcessed();
-				}
-
-				log("After UPLOAD click - back to Cloud");
-				this.backToCloud(handle);
-			}
-			else if (mode == IMPORT){
-				log("mode IMPORT");
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-				
-				Intent intent = new Intent();
-				intent.putExtra("IMPORT_TO", parentNode.getHandle());
-				setResult(RESULT_OK, intent);
-				log("finish!");
-				finish();
-			}
-			else if (mode == SELECT){
-				log("SELECT option");
-				if(selectFile)
-				{
-					Intent intent = new Intent();
-					intent.putExtra("SELECT", handle);
-					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-				else{
-					long parentHandle = handle;
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-	
-					Intent intent = new Intent();
-					intent.putExtra("SELECT", parentNode.getHandle());
-					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-				
-			}
-			else if (mode == SELECT_CAMERA_FOLDER){
-				log("SELECT_CAMERA_FOLDER option");
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-	
-				Intent intent = new Intent();
-				intent.putExtra("SELECT_MEGA_FOLDER", parentNode.getHandle());			
-				setResult(RESULT_OK, intent);
-				finish();
+				return;
 			}
 		}
-		else{
-			//BEFORE LOLLIPOP
-			folderSelected = true;
-			this.gParentHandle = handle;
-			
-			if (mode == MOVE) {
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-				
-				Intent intent = new Intent();
-				intent.putExtra("MOVE_TO", parentNode.getHandle());
-				intent.putExtra("MOVE_HANDLES", moveFromHandles);
-				setResult(RESULT_OK, intent);
-				log("finish!");
-				finish();
-			}
-			else if (mode == COPY){
-				
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-				
-				Intent intent = new Intent();
-				intent.putExtra("COPY_TO", parentNode.getHandle());
-				intent.putExtra("COPY_HANDLES", copyFromHandles);
-				setResult(RESULT_OK, intent);
-				log("finish!");
-				finish();
-			}
-			else if(mode == UPLOAD_SELFIE){
-			
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-			
-				Intent intent = new Intent(this, UploadService.class);
-				File selfie = new File(imagePath);
-				intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-				intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-				startService(intent);
-				
-				Intent intentResult = new Intent();
-				setResult(RESULT_OK, intentResult);
-				finish();
-				
-			}
-			else if (mode == UPLOAD){
-				log("mode UPLOAD");
-				
-				if (filePreparedInfos == null){
-					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-					filePrepareTask.execute(getIntent());
-					ProgressDialog temp = null;
-					try{
-						temp = new ProgressDialog(this);
-						temp.setMessage(getString(R.string.upload_prepare));
-						temp.show();
-					}
-					catch(Exception e){
-						return;
-					}
-					statusDialog = temp;
-				}
-				else{
-					onIntentProcessed();
-				}
-			}
-			else if (mode == IMPORT){
-				long parentHandle = handle;
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
-				
-				Intent intent = new Intent();
-				intent.putExtra("IMPORT_TO", parentNode.getHandle());
-				setResult(RESULT_OK, intent);
-				log("finish!");
-				finish();
-			}
-			else if (mode == SELECT){
 
-				if(selectFile)
-				{
-					Intent intent = new Intent();
-					intent.putExtra("SELECT", handle);
-					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-				else{
-					long parentHandle = handle;
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
+		folderSelected = true;
+		this.gParentHandle = handle;
 
-					Intent intent = new Intent();
-					intent.putExtra("SELECT", parentNode.getHandle());
-					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-				
+		//Only UPLOAD MODE is valid, no way to enter in the other options!
+		if (mode == MOVE) {
+			log("MOVE option");
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
 			}
-			else if (mode == SELECT_CAMERA_FOLDER){
 
+			Intent intent = new Intent();
+			intent.putExtra("MOVE_TO", parentNode.getHandle());
+			intent.putExtra("MOVE_HANDLES", moveFromHandles);
+			setResult(RESULT_OK, intent);
+			log("finish!");
+			finish();
+		}
+		else if (mode == COPY){
+			log("COPY option");
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+
+			Intent intent = new Intent();
+			intent.putExtra("COPY_TO", parentNode.getHandle());
+			intent.putExtra("COPY_HANDLES", copyFromHandles);
+			setResult(RESULT_OK, intent);
+			log("finish!");
+			finish();
+		}
+		else if(mode == UPLOAD_SELFIE){
+			log("UPLOAD_SELFIE option");
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+
+			Intent intent = new Intent(this, UploadService.class);
+			File selfie = new File(imagePath);
+			intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+			intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+			intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+			startService(intent);
+
+			Intent intentResult = new Intent();
+			setResult(RESULT_OK, intentResult);
+			finish();
+
+		}
+		else if (mode == UPLOAD){
+			log("mode UPLOAD");
+
+			if (filePreparedInfos == null){
+				//				Intent prueba = getIntent();
+				//				Bundle bundle = prueba.getExtras();
+				//				Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
+				//				log("URI mode UPLOAD in bundle: "+uri);
+
+				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+				filePrepareTask.execute(getIntent());
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.upload_prepare));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
+			}
+			else{
+				onIntentProcessed();
+			}
+
+			log("After UPLOAD click - back to Cloud");
+			this.backToCloud(handle);
+		}
+		else if (mode == IMPORT){
+			log("mode IMPORT");
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+
+			Intent intent = new Intent();
+			intent.putExtra("IMPORT_TO", parentNode.getHandle());
+			setResult(RESULT_OK, intent);
+			log("finish!");
+			finish();
+		}
+		else if (mode == SELECT){
+			log("SELECT option");
+			if(selectFile)
+			{
+				Intent intent = new Intent();
+				intent.putExtra("SELECT", handle);
+				intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+				setResult(RESULT_OK, intent);
+				finish();
+			}
+			else{
 				long parentHandle = handle;
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				if(parentNode == null){
@@ -731,10 +579,25 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 				}
 
 				Intent intent = new Intent();
-				intent.putExtra("SELECT_MEGA_FOLDER", parentNode.getHandle());			
+				intent.putExtra("SELECT", parentNode.getHandle());
+				intent.putExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
 				finish();
 			}
+
+		}
+		else if (mode == SELECT_CAMERA_FOLDER){
+			log("SELECT_CAMERA_FOLDER option");
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+
+			Intent intent = new Intent();
+			intent.putExtra("SELECT_MEGA_FOLDER", parentNode.getHandle());
+			setResult(RESULT_OK, intent);
+			finish();
 		}
 	}
 	
@@ -766,175 +629,103 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		log("onRequestFinish");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-				try { 
-					statusDialog.dismiss();	
-				} 
-				catch (Exception ex) {}
-				
-				if (error.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer,getString(R.string.context_folder_created),Snackbar.LENGTH_LONG).show();
-					long parentHandle;
-					if(tabShown==CLOUD_TAB){
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-						cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-						if (cDriveExplorer != null){
-							parentHandle = cDriveExplorer.getParentHandle();
-							if (megaApi.getNodeByHandle(parentHandle) != null){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-								cDriveExplorer.setNodes(nodes);
-								cDriveExplorer.getListView().invalidate();
-							}
-						}						
-					}
-					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-						iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-						if (iSharesExplorer != null){
-							parentHandle = iSharesExplorer.getParentHandle();
-							if (megaApi.getNodeByHandle(parentHandle) != null){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(iSharesExplorer.getParentHandle()));
-								iSharesExplorer.setNodes(nodes);
-								iSharesExplorer.getListView().invalidate();
-							}
-						}	
-					}
-				}
+
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+			try {
+				statusDialog.dismiss();
 			}
-			if (request.getType() == MegaRequest.TYPE_LOGIN){
-				if (error.getErrorCode() != MegaError.API_OK) {
-					//ERROR LOGIN
-					String errorMessage;
-					if (error.getErrorCode() == MegaError.API_ENOENT) {
-						errorMessage = getString(R.string.error_incorrect_email_or_password);
-					}
-					else if (error.getErrorCode() == MegaError.API_ENOENT) {
-						errorMessage = getString(R.string.error_server_connection_problem);
-					}
-					else if (error.getErrorCode() == MegaError.API_ESID){
-						errorMessage = getString(R.string.error_server_expired_session);
-					}
-					else{
-						errorMessage = error.getErrorString();
-					}
-					
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					dbH.clearCredentials();
-					if (dbH.getPreferences() != null){
-						dbH.clearPreferences();
-						dbH.setFirstTime(false);
+			catch (Exception ex) {}
+
+			if (error.getErrorCode() == MegaError.API_OK){
+				Snackbar.make(fragmentContainer,getString(R.string.context_folder_created),Snackbar.LENGTH_LONG).show();
+				long parentHandle;
+				if(tabShown==CLOUD_TAB){
+					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+					if (cDriveExplorer != null){
+						parentHandle = cDriveExplorer.getParentHandle();
+						if (megaApi.getNodeByHandle(parentHandle) != null){
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+							cDriveExplorer.setNodes(nodes);
+							cDriveExplorer.getListView().invalidate();
+						}
 					}
 				}
 				else{
-					//LOGIN OK
-					
-					loginProgressBar.setVisibility(View.VISIBLE);
-					loginFetchNodesProgressBar.setVisibility(View.GONE);
-					loggingInText.setVisibility(View.VISIBLE);
-					fetchingNodesText.setVisibility(View.VISIBLE);
-					prepareNodesText.setVisibility(View.GONE);
-					
-					gSession = megaApi.dumpSession();
-					credentials = new UserCredentials(lastEmail, gSession);
-	
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					dbH.clearCredentials();
-					
-					log("Logged in: " + gSession);
-				
-					megaApi.fetchNodes(this);
+					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+					if (iSharesExplorer != null){
+						parentHandle = iSharesExplorer.getParentHandle();
+						if (megaApi.getNodeByHandle(parentHandle) != null){
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(iSharesExplorer.getParentHandle()));
+							iSharesExplorer.setNodes(nodes);
+							iSharesExplorer.getListView().invalidate();
+						}
+					}
 				}
 			}
-			else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-				if (error.getErrorCode() == MegaError.API_OK){
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					
-					gSession = megaApi.dumpSession();
-					lastEmail = megaApi.getMyUser().getEmail();
-					credentials = new UserCredentials(lastEmail, gSession);
-					
-					dbH.saveCredentials(credentials);
-					
-					loginLoggingIn.setVisibility(View.GONE);
-					getSupportActionBar().show();
-					afterLoginAndFetch();				
-	 
-				}	
-			}
 		}
-		else{
-			if (request.getType() == MegaRequest.TYPE_LOGIN){
-				if (error.getErrorCode() != MegaError.API_OK) {
-					//ERROR LOGIN
-					String errorMessage;
-					if (error.getErrorCode() == MegaError.API_ENOENT) {
-						errorMessage = getString(R.string.error_incorrect_email_or_password);
-					}
-					else if (error.getErrorCode() == MegaError.API_ENOENT) {
-						errorMessage = getString(R.string.error_server_connection_problem);
-					}
-					else if (error.getErrorCode() == MegaError.API_ESID){
-						errorMessage = getString(R.string.error_server_expired_session);
-					}
-					else{
-						errorMessage = error.getErrorString();
-					}
-					
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					dbH.clearCredentials();
-					if (dbH.getPreferences() != null){
-						dbH.clearPreferences();
-						dbH.setFirstTime(false);
-					}
+		if (request.getType() == MegaRequest.TYPE_LOGIN){
+			if (error.getErrorCode() != MegaError.API_OK) {
+				//ERROR LOGIN
+				String errorMessage;
+				if (error.getErrorCode() == MegaError.API_ENOENT) {
+					errorMessage = getString(R.string.error_incorrect_email_or_password);
+				}
+				else if (error.getErrorCode() == MegaError.API_ENOENT) {
+					errorMessage = getString(R.string.error_server_connection_problem);
+				}
+				else if (error.getErrorCode() == MegaError.API_ESID){
+					errorMessage = getString(R.string.error_server_expired_session);
 				}
 				else{
-					//LOGIN OK
-					
-					loginProgressBar.setVisibility(View.VISIBLE);
-					loginFetchNodesProgressBar.setVisibility(View.GONE);
-					loggingInText.setVisibility(View.VISIBLE);
-					fetchingNodesText.setVisibility(View.VISIBLE);
-					prepareNodesText.setVisibility(View.GONE);
-					
-					gSession = megaApi.dumpSession();
-					credentials = new UserCredentials(lastEmail, gSession);
-	
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					dbH.clearCredentials();
-					
-					log("Logged in: " + gSession);
-				
-					megaApi.fetchNodes(this);
+					errorMessage = error.getErrorString();
+				}
+
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				dbH.clearCredentials();
+				if (dbH.getPreferences() != null){
+					dbH.clearPreferences();
+					dbH.setFirstTime(false);
 				}
 			}
-			else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-				if (error.getErrorCode() == MegaError.API_OK){
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					
-					gSession = megaApi.dumpSession();
-					lastEmail = megaApi.getMyUser().getEmail();
-					credentials = new UserCredentials(lastEmail, gSession);
-					
-					dbH.saveCredentials(credentials);
-					
-					loginLoggingIn.setVisibility(View.GONE);
-					getSupportActionBar().show();
-					afterLoginAndFetch();				
-	 
-				}	
-			}
-			if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-				try { 
-					statusDialog.dismiss();	
-				} 
-				catch (Exception ex) {}
-				
-				if (error.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer,getString(R.string.context_folder_created),Snackbar.LENGTH_LONG).show();
-				}
+			else{
+				//LOGIN OK
+
+				loginProgressBar.setVisibility(View.VISIBLE);
+				loginFetchNodesProgressBar.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.VISIBLE);
+				fetchingNodesText.setVisibility(View.VISIBLE);
+				prepareNodesText.setVisibility(View.GONE);
+
+				gSession = megaApi.dumpSession();
+				credentials = new UserCredentials(lastEmail, gSession);
+
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				dbH.clearCredentials();
+
+				log("Logged in: " + gSession);
+
+				megaApi.fetchNodes(this);
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			if (error.getErrorCode() == MegaError.API_OK){
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+				gSession = megaApi.dumpSession();
+				lastEmail = megaApi.getMyUser().getEmail();
+				credentials = new UserCredentials(lastEmail, gSession);
+
+				dbH.saveCredentials(credentials);
+
+				loginLoggingIn.setVisibility(View.GONE);
+				getSupportActionBar().show();
+				afterLoginAndFetch();
+
+			}
+		}
+
 	}
 
 	public void backToCloud(long handle){
@@ -987,20 +778,16 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			
-			// Inflate the menu items for use in the action bar
-		    MenuInflater inflater = getMenuInflater();
-		    inflater.inflate(R.menu.file_explorer_action, menu);
-		    
-		    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		    
-		    if (cDriveExplorer != null){	
-		    	createFolderMenuItem.setVisible(true);
-		    }
+
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.file_explorer_action, menu);
+
+		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+
+		if (cDriveExplorer != null){
+			createFolderMenuItem.setVisible(true);
 		}
-			    
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -1286,30 +1073,11 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 	public void setParentHandle (long parentHandle){
 		this.gParentHandle = parentHandle;
 	}
-	
+
 	public void changeTitle (String title){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			aB.setTitle(title);	
-		}
-		else{		
-			if (windowTitle != null){
-				windowTitle.setText(title);
-			}
-		}
+		aB.setTitle(title);
 	}
-	
-	public void changeBackVisibility(boolean backVisible){
-		this.backVisible = backVisible;
-		if (windowBack != null){
-			if (!backVisible){
-				windowBack.setVisibility(View.INVISIBLE);
-			}
-			else{
-				windowBack.setVisibility(View.VISIBLE);
-			}
-		}
-	}
-	
+
 	private View getTabIndicator(Context context, String title) {
         View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
 

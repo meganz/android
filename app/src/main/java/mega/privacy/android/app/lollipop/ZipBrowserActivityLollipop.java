@@ -223,7 +223,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				log(element.getName());
 			}
 				
-				
 		} catch (IOException e) {
 
 			e.printStackTrace();
