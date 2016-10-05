@@ -1550,9 +1550,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //			break;
 //		}
 		case R.id.file_list_option_permissions_layout: {
-			Intent i = new Intent(context, FileContactListActivity.class);
-			i.putExtra("name", n.getHandle());
-			context.startActivity(i);			
+//			Intent i = new Intent(context, FileContactListActivity.class);
+//			i.putExtra("name", n.getHandle());
+//			context.startActivity(i);
 			break;
 		}		
 		case R.id.file_list_option_share_layout: {			
