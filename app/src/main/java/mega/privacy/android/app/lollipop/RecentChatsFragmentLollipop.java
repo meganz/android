@@ -45,6 +45,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomList;
+import nz.mega.sdk.MegaUser;
 
 public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
 
@@ -175,6 +176,38 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             MegaChatRoom chatRoom = chatList.get(i);
             log("ChatRoom title: "+chatRoom.getTitle());
             log("ChatRoom handle: "+chatRoom.getChatId());
+            long numUsers = chatRoom.getPeerCount();
+            log("Num users: "+numUsers);
+            for (int j=0; j< numUsers; j++){
+                long userHandle = chatRoom.getPeerHandle(j);
+                log("userHAndle: "+userHandle);
+//                MegaUser user = megaApi.getContact(String.valueOf(userHandle));
+                MegaUser user = megaApi.getContact(new String(String.valueOf(userHandle)));
+                log("String de userHandle: "+String.valueOf(userHandle));
+                if(user!=null){
+                    log("El email del user es: ");
+                }
+                else{
+                    log("El user es NULL");
+                }
+            }
+
+            log("Prueba de handle manual:");
+            MegaUser user = megaApi.getContact("android112@yopmail.com");
+            if(user!=null){
+                log("El handle MArta es: "+user.getHandle());
+            }
+            else{
+                log("El user es NULL");
+            }
+
+            int unread = -1;
+            unread = chatRoom.getUnreadCount();
+            log("Unread: "+unread);
+
+//            log("Probando");
+//            long userHandle = chatRoom.getPeerHandle(0);
+//            log("userHandle: "+userHandle);
 //            MegaChatListItem chatListItem = chatList.get(i);
 //            megaChatApi.get
 //            megaChatApi.getMessages(chatRoom.getChatId(), 50);
