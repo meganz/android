@@ -11,7 +11,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -25,7 +24,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -55,10 +53,13 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     Handler handler;
 
     RecentChat recentChat;
@@ -79,12 +80,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
     RelativeLayout chatRelativeLayout;
-    TextView inviteText;
+//    TextView inviteText;
     ImageButton keyboardButton;
     EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
-    ScrollView inviteScrollView;
+    ScrollView emptyScrollView;
     FloatingActionButton fab;
     FrameLayout emojiKeyboardLayout;
 
@@ -188,6 +189,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
             megaApi = app.getMegaApi();
         }
 
+        if (megaChatApi == null) {
+            MegaApplication app = (MegaApplication) getApplication();
+            megaChatApi = app.getMegaChatApi();
+        }
+
         dbH = DatabaseHandler.getDbHandler(this);
 
         detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
@@ -220,7 +226,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
-        inviteScrollView = (ScrollView) findViewById(R.id.message_scroll_view_chat_layout);
+        emptyScrollView = (ScrollView) findViewById(R.id.layout_empty_scroll_view);
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
@@ -277,7 +283,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         });
 
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
-        inviteText = (TextView) findViewById(R.id.invite_text);
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
@@ -362,22 +367,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         if (newIntent != null){
             intentAction = newIntent.getAction();
             if (intentAction != null){
-                if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
+                if (intentAction.equals(Constants.ACTION_CHAT_NEW)){
+                    long chatId = newIntent.getLongExtra("CHAT_ID", -1);
+                    if(chatId!=-1){
+                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                        aB.setTitle(chatRoom.getTitle());
+                    }
+                    else{
+                        log("ChatRoom is -1");
+                    }
+
+                    log("I have chat!!!: "+chatId);
+                    fab.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
+                    chatRelativeLayout.setVisibility(View.GONE);
+                    emptyScrollView.setVisibility(View.VISIBLE);
+//                    inviteText.setVisibility(View.VISIBLE);
+                    textChat.setOnFocusChangeListener(focus);
+                }
+                else if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
                     fab.setVisibility(View.GONE);
                     listView.setVisibility(View.GONE);
                     chatRelativeLayout.setVisibility(View.GONE);
-                    inviteScrollView.setVisibility(View.VISIBLE);
-                    inviteText.setVisibility(View.VISIBLE);
+                    emptyScrollView.setVisibility(View.VISIBLE);
+//                    inviteText.setVisibility(View.VISIBLE);
                     textChat.setOnFocusChangeListener(focus);
                     keyboardListener = new KeyboardListener();
-                    inviteScrollView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
-                    textChat.setText("Hi there!\nLet's chat!\nPlease accept my invitation.");
+                    emptyScrollView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
+                    textChat.setText("Hi there!\nLet's chat!");
                 }
-                if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
+                else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
                     fab.setVisibility(View.VISIBLE);
-                    inviteText.setVisibility(View.GONE);
+//                    inviteText.setVisibility(View.GONE);
                     chatRelativeLayout.setVisibility(View.VISIBLE);
-                    inviteScrollView.setVisibility(View.GONE);
+                    emptyScrollView.setVisibility(View.GONE);
 
                     int idChat = newIntent.getIntExtra("CHAT_ID", -1);
                     myMail = newIntent.getStringExtra("MY_MAIL");
@@ -704,12 +727,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.home:{
-                inviteScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
+                emptyScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
                 break;
             }
 			case R.id.send_message_icon_chat:{
                 log("click on Send message");
-                inviteScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
+                emptyScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
 
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
@@ -721,7 +744,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
                 disabledWritingLayout.setLayoutParams(params);
                 disabledWritingLayout.setVisibility(View.VISIBLE);
 
-                inviteText.setVisibility(View.GONE);
+//                inviteText.setVisibility(View.GONE);
                 break;
 			}
             case R.id.keyboard_icon_chat:{
@@ -979,29 +1002,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
         @Override
         public void onGlobalLayout() {
 
-            if(!focusChanged){
-                diffMeasure = inviteScrollView.getHeight();
-                log("Store Scroll height: "+inviteScrollView.getHeight());
-                RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
-                inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-                inviteText.setLayoutParams(inviteTextViewParams);
-            }
-            else{
-                int newMeasure = inviteScrollView.getHeight();
-                log("New Scroll height: "+inviteScrollView.getHeight());
-                if(newMeasure < (diffMeasure-200)){
-                    log("Keyboard shown!!!");
-                    RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
-                    inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-                    inviteText.setLayoutParams(inviteTextViewParams);
-                }
-                else{
-                    log("Keyboard hidden!!!");
-                    RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
-                    inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-                    inviteText.setLayoutParams(inviteTextViewParams);
-                }
-            }
+//            if(!focusChanged){
+//                diffMeasure = emptyScrollView.getHeight();
+//                log("Store Scroll height: "+emptyScrollView.getHeight());
+//                RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
+//                inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
+//                inviteText.setLayoutParams(inviteTextViewParams);
+//            }
+//            else{
+//                int newMeasure = emptyScrollView.getHeight();
+//                log("New Scroll height: "+emptyScrollView.getHeight());
+//                if(newMeasure < (diffMeasure-200)){
+//                    log("Keyboard shown!!!");
+//                    RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
+//                    inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
+//                    inviteText.setLayoutParams(inviteTextViewParams);
+//                }
+//                else{
+//                    log("Keyboard hidden!!!");
+//                    RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
+//                    inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
+//                    inviteText.setLayoutParams(inviteTextViewParams);
+//                }
+//            }
         }
     }
 

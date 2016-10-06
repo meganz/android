@@ -137,6 +137,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoomList;
@@ -4965,7 +4966,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_add_contact:{
 	        	if (drawerItem == DrawerItem.CONTACTS||drawerItem == DrawerItem.CHAT){
-					chooseAddContactDialog();
+					chooseAddContactDialog(false);
 	        	}
 	        	return true;
 	        }
@@ -4988,7 +4989,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		showNewFolderDialog();
 	        	}
 	        	else if (drawerItem == DrawerItem.CONTACTS){
-					chooseAddContactDialog();
+					chooseAddContactDialog(false);
 	        	}
 	        	return true;
 	        }
@@ -8044,13 +8045,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 	}
 
-	public void chooseAddContactDialog(){
+	public void chooseAddContactDialog(boolean isMegaContact){
 		log("chooseAddContactDialog");
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 //		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
-		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
+		if(isMegaContact){
+			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
+		}
+		else{
+			in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+			startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
+		}
 
 //		Dialog addContactDialog;
 //		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
@@ -10108,6 +10115,44 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+		else if (requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
+			log("onActivityResult REQUEST_CREATE_CHAT OK");
+
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+
+			if (contactsData != null){
+				log("Creo Chat con: "+contactsData.size());
+				//Check if there is no already chat with the user
+
+				//If yes
+				//Open the activity
+
+				//If not
+
+				MegaChatPeerList peers = MegaChatPeerList.createInstance();
+				if(contactsData.size()==1){
+					MegaUser user = megaApi.getContact(contactsData.get(0));
+					if(user!=null){
+						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+					}
+					megaChatApi.createChat(false, peers, this);
+				}
+				else{
+					for (int i=0; i<contactsData.size(); i++){
+						MegaUser user = megaApi.getContact(contactsData.get(i));
+						if(user!=null){
+							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+						}
+					}
+					megaChatApi.createChat(true, peers, this);
+				}
+			}
+		}
 		else if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
 
@@ -10551,6 +10596,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Chat CREATEDD!!!");
+
+				log("open new chat");
+				Intent intent = new Intent(this, ChatActivityLollipop.class);
+				intent.setAction(Constants.ACTION_CHAT_NEW);
+				String myMail = getMyAccountInfo().getMyUser().getEmail();
+				intent.putExtra("CHAT_ID", request.getChatHandle());
+				intent.putExtra("MY_MAIL", myMail);
+				this.startActivity(intent);
+			}
+			else{
+				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
 			}
 		}
 	}

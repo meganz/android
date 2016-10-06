@@ -27,6 +27,8 @@ public class Constants {
 	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
 	public static int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
 
+	public static int REQUEST_CREATE_CHAT = 1018;
+
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
@@ -103,8 +105,9 @@ public class Constants {
 	public static String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
 	public static String ACTION_IPC = "IPC";
 
-	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
+	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
+	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
 
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;

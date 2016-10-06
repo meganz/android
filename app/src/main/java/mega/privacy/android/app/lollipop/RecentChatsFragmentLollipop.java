@@ -39,10 +39,13 @@ import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.billing.Base64;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomList;
 import nz.mega.sdk.MegaUser;
@@ -161,7 +164,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         chats = recentChat.getRecentChats();
 
-        MegaChatRoomList chatList = megaChatApi.getChatRooms();
+        ArrayList<MegaChatRoom> chatList = megaChatApi.getChatRooms();
         if(chatList!=null){
             log("Chat size: :"+chatList.size());
         }
@@ -182,23 +185,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 long userHandle = chatRoom.getPeerHandle(j);
                 log("userHAndle: "+userHandle);
 //                MegaUser user = megaApi.getContact(String.valueOf(userHandle));
-                MegaUser user = megaApi.getContact(new String(String.valueOf(userHandle)));
-                log("String de userHandle: "+String.valueOf(userHandle));
+                String userHandleString = userHandle + "";
+                String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                MegaUser user = megaApi.getContact(userHandleEncoded);
+//                MegaUser user = megaApi.getContact(new String(String.valueOf(userHandle)));
+                log("String de userHandle: "+String.valueOf(userHandle) + "__" + userHandleEncoded);
                 if(user!=null){
                     log("El email del user es: ");
                 }
                 else{
                     log("El user es NULL");
                 }
-            }
-
-            log("Prueba de handle manual:");
-            MegaUser user = megaApi.getContact("android112@yopmail.com");
-            if(user!=null){
-                log("El handle MArta es: "+user.getHandle());
-            }
-            else{
-                log("El user es NULL");
             }
 
             int unread = -1;
