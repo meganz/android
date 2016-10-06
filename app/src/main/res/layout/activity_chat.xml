@@ -184,9 +184,9 @@
         android:layout_above="@id/writing_container_layout_chat_layout"
         android:orientation="vertical">
 
-        <!-- Layout to invite contact -->
+        <!-- Layout to empty chat -->
         <ScrollView
-            android:id="@+id/message_scroll_view_chat_layout"
+            android:id="@+id/layout_empty_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/chat_background"
@@ -197,16 +197,119 @@
                 android:layout_height="wrap_content"
                 android:background="@color/chat_background">
 
-                <TextView
-                    android:id="@+id/invite_text"
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/invite_Lara_chat"
-                    android:textColor="@color/mail_my_account"
-                    android:textSize="16sp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="56dp"
-                    android:layout_marginRight="56dp"/>
+                    android:layout_height="wrap_content">
+
+                    <TableRow>
+
+                        <RelativeLayout
+                            android:id="@+id/mega_icon_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/mega_icon_image"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_accept"
+                                android:visibility="invisible"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/mega_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="MEGA"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/mega_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/invite_Lara_chat"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="16sp"
+                                android:layout_below="@+id/mega_title"/>
+
+                        </RelativeLayout>
+                    </TableRow>
+
+                    <TableRow>
+                        <RelativeLayout
+                            android:id="@+id/confidentiality_icon_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/confidentiality_icon_image"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_accept"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout>
+                            <TextView
+                                android:id="@+id/confidentiality_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Confidenciatilty"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/confidentiality_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/invite_Lara_chat"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="16sp"
+                                android:layout_below="@+id/confidentiality_title"/>
+
+                        </RelativeLayout>
+                    </TableRow>
+
+                    <TableRow>
+                        <RelativeLayout
+                            android:id="@+id/authenticity_icon_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:id="@+id/authenticity_icon_image"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_accept"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/authenticity_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Authenticity"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/authenticity_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/invite_Lara_chat"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="16sp"
+                                android:layout_below="@+id/authenticity_title"/>
+
+                        </RelativeLayout>
+                    </TableRow>
+
+                </TableLayout>
+
+
             </RelativeLayout>
         </ScrollView>
 
