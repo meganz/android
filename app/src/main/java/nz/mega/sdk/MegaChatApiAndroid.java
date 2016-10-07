@@ -6,8 +6,8 @@ import android.os.Looper;
 public class MegaChatApiAndroid extends MegaChatApiJava {
     static Handler handler = new Handler(Looper.getMainLooper());
 
-    public MegaChatApiAndroid(MegaApiAndroid megaApi, boolean resumeSession) {
-        super(megaApi, resumeSession);
+    public MegaChatApiAndroid(nz.mega.sdk.MegaApiAndroid megaApi) {
+        super(megaApi);
     }
 
     @Override

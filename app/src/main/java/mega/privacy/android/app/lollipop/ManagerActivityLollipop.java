@@ -140,6 +140,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomList;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -10140,7 +10141,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(user!=null){
 						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 					}
-					megaChatApi.createChat(false, peers, this);
+					MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+					if(chat==null){
+						log("No chat, create it!");
+						megaChatApi.createChat(false, peers, this);
+					}
+					else{
+						log("There is already a chat, open it!");
+						Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+						intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+						String myMail = getMyAccountInfo().getMyUser().getEmail();
+						intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+						intentOpenChat.putExtra("MY_MAIL", myMail);
+						this.startActivity(intent);
+					}
 				}
 				else{
 					for (int i=0; i<contactsData.size(); i++){

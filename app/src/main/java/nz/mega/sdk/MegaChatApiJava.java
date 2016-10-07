@@ -1,5 +1,6 @@
 package nz.mega.sdk;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -23,6 +24,7 @@ public class MegaChatApiJava {
 
     static Set<DelegateMegaChatRequestListener> activeRequestListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaChatRequestListener>());
     static Set<DelegateMegaChatListener> activeChatListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaChatListener>());
+    static Set<DelegateMegaChatRoomListener> activeChatRoomListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaChatRoomListener>());
 
     void runCallback(Runnable runnable) {
         runnable.run();
@@ -32,11 +34,10 @@ public class MegaChatApiJava {
      * Creates an instance of MegaChatApi to access to the chat-engine.
      *
      * @param megaApi Instance of MegaApi to be used by the chat-engine.
-     * @param resumeSession Boolean indicating if you're going to resume a session. If false, any existing
      * session will be discarded and MegaChatApi expects to have a login+fetchnodes before MegaChatApi::init
      */
-    public MegaChatApiJava(MegaApiJava megaApi, boolean resumeSession){
-        megaChatApi = new MegaChatApi(megaApi.getMegaApi(), resumeSession);
+    public MegaChatApiJava(MegaApiJava megaApi){
+        megaChatApi = new MegaChatApi(megaApi.getMegaApi());
     }
 
     public void addChatRequestListener(MegaChatRequestListenerInterface listener)
@@ -49,14 +50,14 @@ public class MegaChatApiJava {
         megaChatApi.addChatListener(createDelegateChatListener(listener));
     }
 
-    public void init()
+    public void init(boolean resumeSession)
     {
-        megaChatApi.init();
+        megaChatApi.init(resumeSession);
     }
 
-    public void init(MegaChatRequestListenerInterface listener)
+    public void init(boolean resumeSession, MegaChatRequestListenerInterface listener)
     {
-        megaChatApi.init(createDelegateRequestListener(listener));
+        megaChatApi.init(resumeSession, createDelegateRequestListener(listener));
     }
 
     public void connect()
@@ -79,20 +80,102 @@ public class MegaChatApiJava {
         megaChatApi.setOnlineStatus(status, createDelegateRequestListener(listener));
     }
 
-    public MegaChatRoomList getChatRooms()
-    {
-        return megaChatApi.getChatRooms();
+    /**
+     * Creates a chat for one or more participants, allowing you to specify their
+     * permissions and if the chat should be a group chat or not (when it is just for 2 participants).
+     *
+     * There are two types of chat: permanent an group. A permanent chat is between two people, and
+     * participants can not leave it.
+     *
+     * The creator of the chat will have moderator level privilege and should not be included in the
+     * list of peers.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_CREATE_CHATROOM
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getFlag - Returns if the new chat is a group chat or permanent chat
+     * - MegaChatRequest::getMegaChatPeerList - List of participants and their privilege level
+     *
+     * Valid data in the MegaChatRequest object received in onRequestFinish when the error code
+     * is MegaError::ERROR_OK:
+     * - MegaChatRequest::getChatHandle - Returns the handle of the new chatroom
+     *
+     * @note If you are trying to create a chat with more than 1 other person, then it will be forced
+     * to be a group chat.
+     *
+     * @note If peers list contains only one person, group chat is not set and a permament chat already
+     * exists with that person, then this call will return the information for the existing chat, rather
+     * than a new chat.
+     *
+     * @param group Flag to indicate if the chat is a group chat or not
+     * @param peers MegaChatPeerList including other users and their privilege level
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void createChat(boolean group, MegaChatPeerList peers, MegaChatRequestListenerInterface listener){
+        megaChatApi.createChat(group, peers, createDelegateRequestListener(listener));
     }
 
-    public void intiveToChat(long chatid, long userhandle, int privs)
+    public void inviteToChat(long chatid, long userhandle, int privs)
     {
         megaChatApi.inviteToChat(chatid, userhandle, privs);
     }
 
-    public void intiveToChat(long chatid, long userhandle, int privs, MegaChatRequestListenerInterface listener)
+    public void inviteToChat(long chatid, long userhandle, int privs, MegaChatRequestListenerInterface listener)
     {
         megaChatApi.inviteToChat(chatid, userhandle, privs, createDelegateRequestListener(listener));
     }
+
+    public ArrayList<MegaChatRoom> getChatRooms()
+    {
+        return chatRoomListToArray(megaChatApi.getChatRooms());
+    }
+
+    /**
+     * Get the MegaChatRoom for the 1on1 chat with the specified user
+     *
+     * If the 1on1 chat with the user specified doesn't exist, this function will
+     * return NULL.
+     *
+     * It is needed to have successfully completed the \c MegaChatApi::init request
+     * before calling this function.
+     *
+     * You take the ownership of the returned value
+     *
+     * @param userhandle MegaChatHandle that identifies the user
+     * @return MegaChatRoom object for the specified \c userhandle
+     */
+    public MegaChatRoom getChatRoomByUser(long userhandle){
+        return megaChatApi.getChatRoomByUser(userhandle);
+    }
+
+    /**
+     * Get the MegaChatRoom that has a specific handle
+     *
+     * You can get the handle of a MegaChatRoom using MegaChatRoom::getChatId or
+     * MegaChatListItem::getChatId.
+     *
+     * It is needed to have successfully completed the \c MegaChatApi::init request
+     * before calling this function.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return List of MegaChatRoom objects with all chatrooms of this account.
+     */
+    public MegaChatRoom getChatRoom(long chatid){
+        return megaChatApi.getChatRoom(chatid);
+    }
+
+/*
+    /**
+     * @brief Returns the handle of the user.
+     *
+     * @return For outgoing messages, it returns the handle of the target user.
+     * For incoming messages, it returns the handle of the sender.
+     *
+    public long getUserHandle()
+    {
+
+    }
+*/
 
     public void removeFromChat(long chatid, long userhandle)
     {
@@ -132,6 +215,70 @@ public class MegaChatApiJava {
     public void truncateChat(long chatid, long messageid, MegaChatRequestListenerInterface listener)
     {
         megaChatApi.truncateChat(chatid, messageid, createDelegateRequestListener(listener));
+    }
+
+    /**
+     * This method should be called when a chat is opened
+     *
+     * The second parameter is the listener that will receive notifications about
+     * events related to the specified chatroom.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRoomListener to track events on this chatroom
+     *
+     * @return True if success, false if the chatroom was not found.
+     */
+//    public boolean openChatRoom(long chatid, MegaChatRoomListenerInterface listener){
+    public boolean openChatRoom(long chatid, MegaChatRoomListenerInterface listener){
+        return megaChatApi.openChatRoom(chatid, createDelegateChatRoomListener(listener));
+    }
+
+    /**
+     * This method should be called when a chat is closed.
+     *
+     * It automatically unregisters the listener to stop receiving the related events.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRoomListener to be unregistered.
+     */
+    public void closeChatRoom(long chatid, MegaChatRoomListenerInterface listener){
+        megaChatApi.openChatRoom(chatid, createDelegateChatRoomListener(listener));
+    }
+
+    /**
+     * Initiates fetching more history of the specified chatroom.
+     *
+     * The loaded messages will be notified one by one through the MegaChatRoomListener
+     * specified at MegaChatApi::openChatRoom (and through any other listener you may have
+     * registered by calling MegaChatApi::addChatRoomListener).
+     *
+     * The corresponding callback is MegaChatRoomListener::onMessageLoaded.
+     *
+     * @note The actual number of messages loaded can be less than \c count. One reason is
+     * the history being shorter than requested, the other is due to internal protocol
+     * messages that are not intended to be displayed to the user. Additionally, if the fetch
+     * is local and there's no more history locally available, the number of messages could be
+     * lower too (and the next call to MegaChatApi::getMessages will fetch messages from server).
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param count The number of requested messages to load.
+     *
+     * @return True if the fetch is local, false if it will request the server. This value
+     * can be used to show a progress bar accordingly when network operation occurs.
+     */
+    public boolean getMessages(long chatid, int count){
+        return megaChatApi.getMessages(chatid, count);
+    }
+
+    /**
+     * Returns the last-seen-by-us message
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     *
+     * @return The last-seen-by-us MegaChatMessage, or NULL if error.
+     */
+    public MegaChatMessage getLastMessageSeen(long chatid){
+        return megaChatApi.getLastMessageSeen(chatid);
     }
 
     /**
@@ -189,6 +336,12 @@ public class MegaChatApiJava {
         return delegateListener;
     }
 
+    private MegaChatRoomListener createDelegateChatRoomListener(MegaChatRoomListenerInterface listener) {
+        DelegateMegaChatRoomListener delegateListener = new DelegateMegaChatRoomListener(this, listener);
+        activeChatRoomListeners.add(delegateListener);
+        return delegateListener;
+    }
+
     private MegaChatListener createDelegateChatListener(MegaChatListenerInterface listener) {
         DelegateMegaChatListener delegateListener = new DelegateMegaChatListener(this, listener);
         activeChatListeners.add(delegateListener);
@@ -197,5 +350,19 @@ public class MegaChatApiJava {
 
     void privateFreeRequestListener(DelegateMegaChatRequestListener listener) {
         activeRequestListeners.remove(listener);
+    }
+
+    static ArrayList<MegaChatRoom> chatRoomListToArray(MegaChatRoomList chatRoomList) {
+
+        if (chatRoomList == null) {
+            return null;
+        }
+
+        ArrayList<MegaChatRoom> result = new ArrayList<MegaChatRoom>((int)chatRoomList.size());
+        for (int i = 0; i < chatRoomList.size(); i++) {
+            result.add(chatRoomList.get(i).copy());
+        }
+
+        return result;
     }
 };
