@@ -54,9 +54,13 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatRoomListener;
+import nz.mega.sdk.MegaChatRoomListenerInterface;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -368,6 +372,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
             intentAction = newIntent.getAction();
             if (intentAction != null){
                 if (intentAction.equals(Constants.ACTION_CHAT_NEW)){
+                    log("ACTION_CHAT_NEW");
                     long chatId = newIntent.getLongExtra("CHAT_ID", -1);
                     if(chatId!=-1){
                         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
@@ -397,10 +402,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
                     textChat.setText("Hi there!\nLet's chat!");
                 }
                 else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
+                    log("ACTION_CHAT_SHOW_MESSAGES");
                     fab.setVisibility(View.VISIBLE);
 //                    inviteText.setVisibility(View.GONE);
                     chatRelativeLayout.setVisibility(View.VISIBLE);
                     emptyScrollView.setVisibility(View.GONE);
+
+
+                    long id = 4544794408876351272L;
+                    log("Call to open chat");
+                    boolean result = megaChatApi.openChatRoom(id, this);
+                    log("El resultado de abrir chat: "+result);
+                    log("Start to get Messages!!!");
+                    megaChatApi.getMessages(id, 16);
+
+
+//                    MegaChatMessage lastMessage = megaChatApi.getLastMessageSeen(chatRoom.getChatId());
+//                    if(lastMessage!=null){
+//                        log("Last MESSAGE:");
+//                        log("UserHAndle: "+lastMessage.getUserHandle() + "_" + lastMessage.getContent());
+//                    }
+//                    else{
+//                        log("El last message is NULL!!!");
+//                    }
+
+
 
                     int idChat = newIntent.getIntExtra("CHAT_ID", -1);
                     myMail = newIntent.getStringExtra("MY_MAIL");
@@ -1088,5 +1114,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements Recycle
 
     public void setShortContactName(String shortContactName) {
         this.shortContactName = shortContactName;
+    }
+
+    @Override
+    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
+
+    }
+
+    @Override
+    public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
+        log("onMessageLoaded!");
+
+    }
+
+    @Override
+    public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
+        log("onMessageReceived!");
+    }
+
+    @Override
+    public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
+        log("onMessageUpdate!");
     }
 }

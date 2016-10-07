@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.billing.Base64;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomList;
@@ -167,48 +168,32 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         ArrayList<MegaChatRoom> chatList = megaChatApi.getChatRooms();
         if(chatList!=null){
             log("Chat size: :"+chatList.size());
+            for(int i=0;i<chatList.size();i++)
+            {
+                MegaChatRoom chatRoom = chatList.get(i);
+                log("ChatRoom title: "+chatRoom.getTitle());
+                log("ChatRoom handle: "+chatRoom.getChatId());
+                long numUsers = chatRoom.getPeerCount();
+                log("Num users: "+numUsers);
+                for (int j=0; j< numUsers; j++){
+                    long userHandle = chatRoom.getPeerHandle(j);
+                    String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                    MegaUser user = megaApi.getContact(userHandleEncoded);
+                    if(user!=null){
+                        log("El email del user es: "+user.getEmail());
+                    }
+                    else{
+                        log("El user es NULL");
+                    }
+                }
+
+                int unread = -1;
+                unread = chatRoom.getUnreadCount();
+                log("Unread messages: "+unread);
+            }
         }
         else{
             log("Chat NULL");
-        }
-
-        for(int i=0;i<chatList.size();i++)
-        {
-            log("Chat size: :"+chatList.size());
-
-            MegaChatRoom chatRoom = chatList.get(i);
-            log("ChatRoom title: "+chatRoom.getTitle());
-            log("ChatRoom handle: "+chatRoom.getChatId());
-            long numUsers = chatRoom.getPeerCount();
-            log("Num users: "+numUsers);
-            for (int j=0; j< numUsers; j++){
-                long userHandle = chatRoom.getPeerHandle(j);
-                log("userHAndle: "+userHandle);
-//                MegaUser user = megaApi.getContact(String.valueOf(userHandle));
-                String userHandleString = userHandle + "";
-                String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-                MegaUser user = megaApi.getContact(userHandleEncoded);
-//                MegaUser user = megaApi.getContact(new String(String.valueOf(userHandle)));
-                log("String de userHandle: "+String.valueOf(userHandle) + "__" + userHandleEncoded);
-                if(user!=null){
-                    log("El email del user es: ");
-                }
-                else{
-                    log("El user es NULL");
-                }
-            }
-
-            int unread = -1;
-            unread = chatRoom.getUnreadCount();
-            log("Unread: "+unread);
-
-//            log("Probando");
-//            long userHandle = chatRoom.getPeerHandle(0);
-//            log("userHandle: "+userHandle);
-//            MegaChatListItem chatListItem = chatList.get(i);
-//            megaChatApi.get
-//            megaChatApi.getMessages(chatRoom.getChatId(), 50);
-//            log("Chat: "+chatRoom.getMessages);
         }
 
         if (adapterList == null){
