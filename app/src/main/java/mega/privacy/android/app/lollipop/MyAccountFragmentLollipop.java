@@ -93,6 +93,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout fingerprintLayout;
 
 	RelativeLayout exportMKLayout;
+	LinearLayout exportMKButtonsLayout;
 	TextView titleExportMK;
 	TextView subTitleExportMK;
 	TextView firstParExportMK;
@@ -305,6 +306,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
+		LinearLayout.LayoutParams exportMKButtonsParams = (LinearLayout.LayoutParams)exportMKLayout.getLayoutParams();
+		exportMKButtonsParams.setMargins(0, 0, 0, Util.scaleHeightPx(10, outMetrics));
+		exportMKLayout.setLayoutParams(exportMKButtonsParams);
+
+		exportMKButtonsLayout = (LinearLayout) v.findViewById(R.id.MK_buttons_layout);
 
 		titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
 		RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();

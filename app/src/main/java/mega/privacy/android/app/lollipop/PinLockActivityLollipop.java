@@ -32,7 +32,6 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.ManagerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
@@ -862,9 +861,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 						     }
 
 						     public void onFinish() {
-						    	 log("Logout!!!");
-									ManagerActivity.logout(getApplication(), megaApi, false);
-									finish();
+								 log("Logout!!!");
+								 AccountController accountController = new AccountController(getApplicationContext());
+								 accountController.logout(getApplication(), megaApi, false);
+								 finish();
 						     }
 						  }.start();
 					}
@@ -963,8 +963,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
-									ManagerActivity.logout(getApplication(), megaApi, false);
-									finish();
+								 AccountController accountController = new AccountController(getApplicationContext());
+								 accountController.logout(getApplication(), megaApi, false);
+								 finish();
 						     }
 						  }.start();
 					}
@@ -1058,8 +1059,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
-									ManagerActivity.logout(getApplication(), megaApi, false);
-									finish();
+								 AccountController accountController = new AccountController(getApplicationContext());
+								 accountController.logout(getApplication(), megaApi, false);
+								 finish();
 						     }
 						  }.start();
 					}
@@ -1141,8 +1143,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
-									ManagerActivity.logout(getApplication(), megaApi, false);
-									finish();
+								 AccountController accountController = new AccountController(getApplicationContext());
+								 accountController.logout(getApplication(), megaApi, false);
+								 finish();
 						     }
 						  }.start();
 					}

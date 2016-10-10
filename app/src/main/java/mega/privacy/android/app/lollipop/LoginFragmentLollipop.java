@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.InputType;
@@ -385,12 +386,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
         yesMK.setLayoutParams(yesMKParams);
         yesMK.setOnClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            yesMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
 
         noMK = (Button) v.findViewById(R.id.no_MK_button);
         LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
         noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
         noMK.setLayoutParams(noMKParams);
         noMK.setOnClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            noMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
 
         parkAccountLayout = (RelativeLayout) v.findViewById(R.id.park_account_layout);
         parkAccountTitle = (TextView) v.findViewById(R.id.title_park_account_layout);
