@@ -2,9 +2,11 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -47,6 +49,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	DisplayMetrics outMetrics;
 
 	private ScrollView scrollView;
+	private LinearLayout linearLayoutMain;
 	
 	private RelativeLayout proLiteLayout;
 	private RelativeLayout pro1Layout;
@@ -184,6 +187,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 		aB.setTitle(R.string.action_upgrade_account);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -203,6 +208,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
+		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
+		else{
+			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.content_text_background));
+			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
 
 		//PRO LITE ACCOUNT
 		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);

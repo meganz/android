@@ -1,12 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:background="@color/background_secondary">
+	android:background="@color/white">
     <ScrollView
         android:id="@+id/cam_sync_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff">
+        android:background="@color/white">
         
         <LinearLayout 
             android:id="@+id/cam_sync_linear_total"
