@@ -1855,14 +1855,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				Formatter.formatFileSize(CameraSyncService.this, totalSizeUploaded));
 		String title = getString(R.string.settings_camera_notif_complete);
 		Intent intent = null;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
-			intent.putExtra(Constants.EXTRA_OPEN_FOLDER, cameraUploadHandle);
-		}
-		else{
-			intent = new Intent(CameraSyncService.this, ManagerActivity.class);
-			intent.putExtra(Constants.EXTRA_OPEN_FOLDER, cameraUploadHandle);
-		}
+		intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
+		intent.putExtra(Constants.EXTRA_OPEN_FOLDER, cameraUploadHandle);
+
 
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_camera_sync)
@@ -2230,15 +2225,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
 
 				Intent intent = null;
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
-				}
-				else{
-					intent = new Intent(this, ManagerActivity.class);
-					intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
-				}
-
+				intent = new Intent(this, ManagerActivityLollipop.class);
+				intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
 
@@ -2306,14 +2294,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 		Intent intent = null;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
-		}
-		else{
-			intent = new Intent(CameraSyncService.this, ManagerActivity.class);
-			intent.setAction(ManagerActivity.ACTION_CANCEL_CAM_SYNC);
-		}
+		intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
 
 		String info = Util.getProgressSize(CameraSyncService.this, progress, totalSizeToUpload);
 

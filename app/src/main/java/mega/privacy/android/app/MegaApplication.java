@@ -12,6 +12,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -74,11 +75,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			if (e.getErrorCode() == MegaError.API_ESID){
 				if (request.getType() == MegaRequest.TYPE_LOGOUT){
 					log("type_logout");
-					ManagerActivity.logout(getApplicationContext(), megaApi, false, true);
-				}
-				else{
-					log("calling ManagerActivity.logout");
-//					ManagerActivity.logout(getApplicationContext(), megaApi, false);
+					AccountController.logout(getApplicationContext(), getMegaApi(), false);
 				}
 			}
 			else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -263,12 +260,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
 			if (e.getErrorCode() == MegaError.API_ESID){
 				log("calling ManagerActivity.logout");
-				ManagerActivity.logout(getApplicationContext(), megaApi, false);
+				AccountController.logout(getApplicationContext(), getMegaApi(), false);
 			}
 		}
 	}
-
-
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
@@ -276,8 +271,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		// TODO Auto-generated method stub
 		
 	}
-
-
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
