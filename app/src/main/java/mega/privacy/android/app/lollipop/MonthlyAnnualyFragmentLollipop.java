@@ -109,6 +109,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();

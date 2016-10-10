@@ -56,6 +56,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private RelativeLayout pro3Layout;
 	private RelativeLayout pro2Layout;
 
+	private RelativeLayout proLiteLayoutContent;
+
 	private RelativeLayout leftProLiteLayout;
 	private RelativeLayout leftPro1Layout;
 	private RelativeLayout leftPro3Layout;
@@ -188,6 +190,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		
 		aB.setTitle(R.string.action_upgrade_account);
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
@@ -196,28 +199,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
-		
-		float scaleText;
-		if (scaleH < scaleW){
-			scaleText = scaleH;
-		}
-		else{
-			scaleText = scaleW;
-		}
 
 		v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
 		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
-		else{
-			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.content_text_background));
-			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
 
 		//PRO LITE ACCOUNT
 		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);
@@ -225,6 +211,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) proLiteLayout.getLayoutParams();
 		layoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), 0);
 		proLiteLayout.setLayoutParams(layoutParams);
+
+		proLiteLayoutContent = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout_content);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+		}
+		else{
+			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+		}
 
 		leftProLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_left_side);
 		RelativeLayout.LayoutParams leftLayoutParams = (RelativeLayout.LayoutParams) leftProLiteLayout.getLayoutParams();
