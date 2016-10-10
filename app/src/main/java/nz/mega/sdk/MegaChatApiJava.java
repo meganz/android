@@ -266,9 +266,56 @@ public class MegaChatApiJava {
      * @return True if the fetch is local, false if it will request the server. This value
      * can be used to show a progress bar accordingly when network operation occurs.
      */
-    public boolean getMessages(long chatid, int count){
-        return megaChatApi.getMessages(chatid, count);
+    public int loadMessages(long chatid, int count){
+        return megaChatApi.loadMessages(chatid, count);
     }
+
+    /**
+     * Returns the MegaChatMessage specified from the chat room.
+     *
+     * Only the messages that are already loaded and notified
+     * by MegaChatRoomListener::onMessageLoaded can be requested. For any
+     * other message, this function will return NULL.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param msgid MegaChatHandle that identifies the message
+     * @return The MegaChatMessage object, or NULL if not found.
+     */
+    public MegaChatMessage getMessage(long chatid, long msgid){
+        return megaChatApi.getMessage(chatid, msgid);
+    }
+
+    /**
+     * Sends a new message to the specified chatroom
+     *
+     * The MegaChatMessage object returned by this function includes a message transaction id,
+     * That id is not the definitive id, which will be assigned by the server. You can obtain the
+     * temporal id with MegaChatMessage::getTempId()
+     *
+     * When the server confirms the reception of the message, the MegaChatRoomListener::onMessageUpdate
+     * is called, including the definitive id and the new status: MegaChatMessage::STATUS_SERVER_RECEIVED.
+     * At this point, the app should refresh the message identified by the temporal id and move it to
+     * the final position in the history, based on the reported index in the callback.
+     *
+     * If the message is rejected by the server, the message will keep its temporal id and will have its
+     * a message id set to INVALID_HANDLE.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param msg Content of the message
+     * @param msglen Length of the message
+     * @param type Type of the message (normal message, type of management message,
+     * application-specific type like link, share, picture etc.) @see MegaChatMessage::Type.
+     *
+     * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
+     */
+    public MegaChatMessage sendMessage(long chatid, String msg, int msglen, MegaChatMessage.Type type){
+        return megaChatApi.sendMessage(chatid, msg, msglen, type);
+    }
+
 
     /**
      * Returns the last-seen-by-us message
