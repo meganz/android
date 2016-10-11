@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener, DatePickerDialog.OnDateSetListener{
 	
@@ -381,8 +382,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				linkIcon.setVisibility(View.GONE);
 				
 				shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
-				shareIcon.setOnClickListener(this);
-				shareIcon.setVisibility(View.VISIBLE);
+				shareIcon.setVisibility(View.GONE);
 				
 				bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
 			    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
@@ -464,8 +464,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			linkIcon.setVisibility(View.GONE);
 			
 			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
-			shareIcon.setOnClickListener(this);
-			shareIcon.setVisibility(View.VISIBLE);
+			shareIcon.setVisibility(View.GONE);
 			
 			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
 		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
@@ -650,8 +649,24 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			
 			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
-			shareIcon.setVisibility(View.VISIBLE);
-			shareIcon.setOnClickListener(this);
+
+			if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+				shareIcon.setVisibility(View.GONE);
+			}
+			else{
+				if(fromShared){
+					shareIcon.setVisibility(View.GONE);
+				}
+				else{
+					if (!isFolderLink){
+						shareIcon.setVisibility(View.VISIBLE);
+						shareIcon.setOnClickListener(this);
+					}
+					else{
+						shareIcon.setVisibility(View.GONE);
+					}
+				}
+			}
 			
 			downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
 			downloadIcon.setVisibility(View.VISIBLE);
@@ -669,22 +684,60 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
 			if (!isFolderLink){
 				linkIcon.setVisibility(View.VISIBLE);
+				linkIcon.setOnClickListener(this);
+				if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+					linkIcon.setVisibility(View.GONE);
+				}
+				else{
+					if(fromShared){
+						linkIcon.setVisibility(View.GONE);
+					}
+					else{
+						shareIcon.setVisibility(View.VISIBLE);
+						shareIcon.setOnClickListener(this);
+					}
+				}
 			}
 			else{
 				linkIcon.setVisibility(View.GONE);
 			}
-			linkIcon.setOnClickListener(this);
-			
-			String menuOptions[] = new String[4];
-//			menuOptions[0] = getString(R.string.context_get_link_menu);
-			menuOptions[0] = getString(R.string.context_rename);
-			menuOptions[1] = getString(R.string.context_move);
-			menuOptions[2] = getString(R.string.context_copy);
-			menuOptions[3] = getString(R.string.context_remove);
-			
-			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
-			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
-			overflowMenuList.setAdapter(arrayAdapter);
+
+			ArrayAdapter<String> arrayAdapter;
+
+			if(fromShared){
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+				int accessLevel = megaApi.getAccess(node);
+
+				if(accessLevel== MegaShare.ACCESS_FULL){
+					String menuOptions[] = new String[4];
+					menuOptions[0] = getString(R.string.context_rename);
+					menuOptions[1] = getString(R.string.context_move);
+					menuOptions[2] = getString(R.string.context_copy);
+					menuOptions[3] = getString(R.string.context_remove);
+					overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
+					arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
+					overflowMenuList.setAdapter(arrayAdapter);
+				}
+				else{
+					String menuOptions[] = new String[1];
+					menuOptions[0] = getString(R.string.context_copy);
+					overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
+					arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
+					overflowMenuList.setAdapter(arrayAdapter);
+				}
+			}
+			else{
+				String menuOptions[] = new String[4];
+				menuOptions[0] = getString(R.string.context_rename);
+				menuOptions[1] = getString(R.string.context_move);
+				menuOptions[2] = getString(R.string.context_copy);
+				menuOptions[3] = getString(R.string.context_remove);
+				overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
+				arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
+				overflowMenuList.setAdapter(arrayAdapter);
+			}
+
 			overflowMenuList.setOnItemClickListener(this);
 			if (overflowVisible){
 				overflowMenuList.setVisibility(View.VISIBLE);	
