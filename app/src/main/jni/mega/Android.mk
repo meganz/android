@@ -6,7 +6,6 @@ local_c_includes := \
         $(LOCAL_PATH)/sdk \
         $(LOCAL_PATH)/sdk/include \
         $(LOCAL_PATH)/sdk/include/mega/posix \
-        $(LOCAL_PATH)/sdk/third_party/glob \
         $(LOCAL_PATH)/android
 
 include $(CLEAR_VARS)
