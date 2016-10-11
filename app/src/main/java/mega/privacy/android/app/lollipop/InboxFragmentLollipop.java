@@ -652,6 +652,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						intent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					startActivity(intent);
 				}

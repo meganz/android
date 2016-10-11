@@ -872,6 +872,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						else{
 							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 						}
+						MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+						if(accountInfo!=null){
+							intent.putExtra("typeAccount", accountInfo.getAccountType());
+						}
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 								

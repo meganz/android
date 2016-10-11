@@ -770,6 +770,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						intent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					intent.putExtra("fromShared", true);
 					startActivity(intent);

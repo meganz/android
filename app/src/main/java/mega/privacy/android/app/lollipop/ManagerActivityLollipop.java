@@ -6808,7 +6808,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int month = c.get(Calendar.MONTH);
 		int day = c.get(Calendar.DAY_OF_MONTH);
 
-		final DatePickerDialog datePickerDialog = new DatePickerDialog(getApplicationContext(), this, year, month, day);
+		final DatePickerDialog datePickerDialog = new DatePickerDialog(managerActivity, this, year, month, day);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 		builder.setTitle(getString(R.string.context_get_link_menu));
@@ -6962,7 +6962,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		});
 
-		if(myAccountInfo.getAccountType()>0){
+		if(myAccountInfo.getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
 			log("The user is PRO - enable expiration date");
 
 			if(expirationTimestamp<=0){
