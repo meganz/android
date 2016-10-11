@@ -6028,7 +6028,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_menu_forgot_pass:{
 				log("action menu forgot pass pressed");
 				if(maFLol!=null){
-					maFLol.resetPass();
+					showConfirmationResetPasswordFromMyAccount();
 				}
 				return true;
 			}
@@ -8121,6 +8121,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void showConfirmationResetPasswordFromMyAccount (){
+		log("showConfirmationResetPasswordFromMyAccount: ");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						if(maFLol!=null){
+							maFLol.resetPass();
+						}
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		String message= getResources().getString(R.string.email_verification_text_change_pass);
+		builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void showConfirmationResetPassword (final String link){
