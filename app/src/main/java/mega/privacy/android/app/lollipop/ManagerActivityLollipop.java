@@ -11350,9 +11350,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					log("RECEIVED REQUEST");
-					log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+					log("STATUS: "+req.getStatus()+" sourceEmail: "+req.getSourceEmail()+" contactHandle: "+req.getHandle());
 					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
-						cC.addContactDB(req.getTargetEmail());
+						cC.addContactDB(req.getSourceEmail());
 					}
 					updateContactsView(true, false, true);
 				}

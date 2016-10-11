@@ -1775,6 +1775,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			}
 			else{
 				Snackbar.make(container, getString(R.string.context_no_link), Snackbar.LENGTH_LONG).show();
+				log("Error code: "+e.getErrorCode()+" "+e.getErrorString());
 			}
 			createOverflowMenu(overflowMenuList);
 			log("export request finished");
