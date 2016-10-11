@@ -859,7 +859,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("TYPE_GET_RECOVERY_LINK");
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The recovery link has been sent");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_pass), getString(R.string.email_verification_title));
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text), getString(R.string.email_verification_title));
 			}
 			else if (e.getErrorCode() == MegaError.API_ENOENT){
 				log("No account with this mail");

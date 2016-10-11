@@ -735,7 +735,7 @@
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">This recovery link has expired, please try again.</string>
 
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Your recovery key is going to be used to reset your password. Please, enter your new password.</string>
-    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">You will receive a recovery link that will allow you to reset your password.</string>
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
