@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.RelativeLayout;
@@ -23,7 +25,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
  
-public class LoginActivityLollipop extends Activity{
+public class LoginActivityLollipop extends AppCompatActivity {
 
 	float scaleH, scaleW;
 	float density;
@@ -39,6 +41,7 @@ public class LoginActivityLollipop extends Activity{
 	CreateAccountFragmentLollipop createAccountFragment;
 	ConfirmEmailFragmentLollipop confirmEmailFragment;
 
+	ActionBar aB;
 	int visibleFragment;
 
 	static LoginActivityLollipop loginActivity;
@@ -61,6 +64,11 @@ public class LoginActivityLollipop extends Activity{
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
+
+		aB = getSupportActionBar();
+		if(aB!=null){
+			aB.hide();
+		}
 
 		scaleW = Util.getScaleW(outMetrics, density);
 		scaleH = Util.getScaleH(outMetrics, density);

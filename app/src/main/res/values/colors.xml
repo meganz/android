@@ -10,7 +10,6 @@
     <color name="mega_transparency">#CCdb0605</color>
     <color name="text_login">#333333</color>
     <color name="transparency_white">#80FFFFFF</color>
-    <color name="used_space_ok">#1fa4e7</color>
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>
     <color name="transfer_progress">#cccccc</color>
@@ -72,7 +71,7 @@
     
     <color name="accentColor">#00BFA5</color>
     <color name="textGrey">#6d6f70</color> 
-    
+
     <color name="filePropertiesToolBar">#2284b1</color>
 
 	<color name="tour_bar_grey">#dddddd</color>

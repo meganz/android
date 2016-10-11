@@ -15,7 +15,6 @@
 	    android:id="@+id/dialog_cancel_feedback"
 	    android:gravity="top|left" 
 	    android:inputType="textMultiLine"
-	    style="@style/InputField"
 	    android:layout_marginTop="0dp"
 	    android:lines="5"
 	    android:layout_below="@id/dialog_cancel_text" 

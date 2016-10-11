@@ -906,8 +906,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 onLoginClick(v);
                 break;
             }
-            case R.id.button_create_account_login:
-            case R.id.login_text_create_account: {
+            case R.id.button_create_account_login:{
                 log("click on button_create_account_login");
                 onRegisterClick(v);
                 break;
