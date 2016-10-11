@@ -1026,6 +1026,14 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
+
+						if (context instanceof ManagerActivityLollipop){
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+							if(accountInfo!=null){
+								intent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
+
 						startActivity(intent);
 					}
 					else{

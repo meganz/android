@@ -1340,6 +1340,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							else{
 								intent.putExtra("parentNodeHandle", megaApi.getParentNode(psHMegaNode).getHandle());
 							}
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+							if(accountInfo!=null){
+								intent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
 							intent.putExtra("orderGetChildren", orderGetChildren);
 							startActivity(intent);
 									

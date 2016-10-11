@@ -775,6 +775,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					intent.putExtra("isFolderLink", false);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						intent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
