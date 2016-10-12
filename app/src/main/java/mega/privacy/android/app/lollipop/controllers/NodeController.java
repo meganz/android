@@ -33,6 +33,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactsExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -865,6 +866,14 @@ public class NodeController {
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((FullScreenImageViewerLollipop) context));
         }
+        else  if(context instanceof FilePropertiesActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((FilePropertiesActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((FilePropertiesActivityLollipop) context).setIsGetLink(true);
+            megaApi.exportNode(document, ((FilePropertiesActivityLollipop) context));
+        }
     }
 
     public void exportLinkTimestamp(MegaNode document, int timestamp){
@@ -887,7 +896,15 @@ public class NodeController {
             ((FullScreenImageViewerLollipop) context).setExpiredDateLink(true);
             megaApi.exportNode(document, timestamp, ((FullScreenImageViewerLollipop) context));
         }
-
+        else if (context instanceof FilePropertiesActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((FilePropertiesActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((FilePropertiesActivityLollipop) context).setIsGetLink(true);
+            ((FilePropertiesActivityLollipop) context).setExpiredDateLink(true);
+            megaApi.exportNode(document, timestamp, ((FilePropertiesActivityLollipop) context));
+        }
     }
 
     public void removeLink(MegaNode document){

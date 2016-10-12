@@ -1195,7 +1195,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				notifyDataSetChanged();
 				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 				i.putExtra("handle", selectedNode.getHandle());
-				
+				i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
 				if (selectedNode.isFolder()) {
 					if (megaApi.isShared(selectedNode)){
 						i.putExtra("imageId", R.drawable.folder_shared_mime);	
