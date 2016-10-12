@@ -14,6 +14,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.OfflineActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
@@ -124,6 +125,10 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                     i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
                 }
                 i.putExtra("name", selectedNode.getName());
+                MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+                if(accountInfo!=null){
+                    i.putExtra("typeAccount", accountInfo.getAccountType());
+                }
                 context.startActivity(i);
                 break;
             }

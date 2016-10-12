@@ -92,12 +92,8 @@ import nz.mega.sdk.MegaShare;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener, DatePickerDialog.OnDateSetListener{
 	
-	private Display display;
 	private DisplayMetrics outMetrics;
-	private float density;
-	private float scaleW;
-	private float scaleH;
-	
+
 	private boolean aBshown = true;
 	
 	ProgressDialog statusDialog;
