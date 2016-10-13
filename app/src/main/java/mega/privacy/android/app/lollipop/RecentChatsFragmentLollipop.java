@@ -44,14 +44,16 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.Base64;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomList;
 import nz.mega.sdk.MegaUser;
 
-public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
+public class RecentChatsFragmentLollipop extends Fragment implements MegaChatListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -112,6 +114,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
+        megaChatApi.addChatListener(this);
         recentChat = new RecentChat();
     }
 
@@ -486,6 +489,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         if(adapterList!=null){
             adapterList.setPositionClicked(-1);
         }
+    }
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+        log("onChatListItemUpdate");
+    }
+
+    @Override
+    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
+        log("onChatRoomUpdate");
+
     }
 
     private static void log(String log) {

@@ -312,8 +312,8 @@ public class MegaChatApiJava {
      *
      * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
      */
-    public MegaChatMessage sendMessage(long chatid, String msg, int msglen, MegaChatMessage.Type type){
-        return megaChatApi.sendMessage(chatid, msg, msglen, type);
+    public MegaChatMessage sendMessage(long chatid, String msg, MegaChatMessage.Type type){
+        return megaChatApi.sendMessage(chatid, msg, type);
     }
 
 
