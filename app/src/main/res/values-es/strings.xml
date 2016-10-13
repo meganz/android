@@ -825,4 +825,16 @@
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Mis credenciales</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limitado</string>
+
+    <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">El contacto %s se eliminará de la carpeta compartida.</string>
+    <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contactos se eliminarán de la carpeta compartida.</string>
+
+    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d correctamente eliminados de la carpeta compartida/string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder"> y %d no se ha podido eliminar.</string>
+
+    <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">Este enlace no corresponde con la cuenta de esta sesión. Por favor, inicie sesión con la cuenta correcta.</string>
+    <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">El enlace para cancelar la cuenta ha caducado, por favor, solicita uno nuevo.</string>
+
+
+
 </resources>

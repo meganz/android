@@ -189,11 +189,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 
 					} else {
 						log("Logged IN");
-						Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
-						cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
-						cancelAccountIntent.setData(Uri.parse(url));
-						startActivity(cancelAccountIntent);
-						finish();
+						megaApi.queryCancelLink(url, this);
 					}
 				} else {
 					log("Not logged");
@@ -371,40 +367,76 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		log("onRequestFinish");
 		if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK){
 			log("TYPE_GET_RECOVERY_LINK");
+
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("The recovery link has been sent");
-				boolean mk = request.getFlag();
 				String url = request.getLink();
-				if(mk){
-					log("Link with master key");
-					if(url!=null){
+				if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
+					log("cancel account url");
+					String myEmail = request.getEmail();
+					if(myEmail!=null){
+						if(myEmail.equals(megaApi.getMyEmail())){
+							log("The email matchs!!!");
+							Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
+							cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+							cancelAccountIntent.setData(Uri.parse(url));
+							startActivity(cancelAccountIntent);
+							finish();
+						}
+						else{
+							log("Not logged with the correct account");
+							log(e.getErrorString() + "___" + e.getErrorCode());
+							Util.showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
+						}
+					}
+					else{
+						log("My email is NULL in the request");
+					}
+
+				}
+				else if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
+					log("reset pass url");
+					log("The recovery link has been sent");
+					boolean mk = request.getFlag();
+					if(mk){
+						log("Link with master key");
+						if(url!=null){
+							Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+							resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+							resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+							resetPassIntent.setData(Uri.parse(url));
+							startActivity(resetPassIntent);
+							finish();
+						}
+						else{
+							log("LINK is null");
+							log(e.getErrorString() + "___" + e.getErrorCode());
+							Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						}
+					}
+					else{
+						log("Link without master key - park account");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
 						resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+						resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
 						finish();
 					}
-					else{
-						log("LINK is null");
-						log(e.getErrorString() + "___" + e.getErrorCode());
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-					}
 				}
-				else{
-					log("Link without master key - park account");
-					Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-					resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-					resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
-					resetPassIntent.setData(Uri.parse(url));
-					startActivity(resetPassIntent);
-					finish();
-				}
+
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
 				log("Error expired link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+				String url = request.getLink();
+				if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
+					log("cancel account url");
+					Util.showAlert(this, getString(R.string.cancel_link_expired), getString(R.string.general_error_word));
+				}
+				else if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
+					log("reset pass url");
+					Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+				}
 			}
 			else{
 				log("Error when asking for recovery pass link");

@@ -1535,7 +1535,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;
-							showDialogInsertPassword(link, true);
+							megaApi.queryCancelLink(link, this);
 						}
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CHANGE_MAIL)){
@@ -10298,6 +10298,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					ManagerActivityLollipop.logout(managerActivity, app, megaApi, false);
 //				}
 //			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
+			log("TYPE_GET_RECOVERY_LINK");
+			if (e.getErrorCode() == MegaError.API_OK){
+				String url = request.getLink();
+				log("cancel account url");
+				String myEmail = request.getEmail();
+				if(myEmail!=null){
+					if(myEmail.equals(myAccountInfo.getMyUser().getEmail())){
+						log("The email matchs!!!");
+						showDialogInsertPassword(url, true);
+					}
+					else{
+						log("Not logged with the correct account");
+						log(e.getErrorString() + "___" + e.getErrorCode());
+						Util.showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
+					}
+				}
+				else{
+					log("My email is NULL in the request");
+				}
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
+				log("Error expired link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.cancel_link_expired), getString(R.string.general_error_word));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
