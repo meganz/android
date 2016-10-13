@@ -86,6 +86,7 @@
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
 
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/lollipop_primary_color</item>
@@ -187,6 +188,7 @@
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
 
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/lollipop_primary_color</item>
@@ -212,6 +214,7 @@
 
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
 
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
