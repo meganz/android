@@ -33,13 +33,12 @@ class DelegateMegaChatListener extends MegaChatListener {
     public void onChatListItemUpdate(MegaChatApi api, MegaChatListItem item)
     {
         if (listener != null) {
-            // TODO: Uncomment when MegaChatListItem::copy() is available
-            /*final MegaChatListItem megaChatListItem = item.copy();
+            final MegaChatListItem megaChatListItem = item.copy();
             megaChatApi.runCallback(new Runnable() {
                 public void run() {
-                    listener.onChatListItemUpdate(megaChatApi, megaChatRoom);
+                    listener.onChatListItemUpdate(megaChatApi, megaChatListItem);
                 }
-            });*/
+            });
         }
     }
 
@@ -47,13 +46,12 @@ class DelegateMegaChatListener extends MegaChatListener {
     public void onChatRoomUpdate(MegaChatApi api, MegaChatRoom chat)
     {
         if (listener != null) {
-            // TODO: Uncomment when MegaChatRoom::copy() is available
-            /*final MegaChatRoom megaChatRoom = chat.copy();
+            final MegaChatRoom megaChatRoom = chat.copy();
             megaChatApi.runCallback(new Runnable() {
                 public void run() {
                     listener.onChatRoomUpdate(megaChatApi, megaChatRoom);
                 }
-            });*/
+            });
         }
     }
 }

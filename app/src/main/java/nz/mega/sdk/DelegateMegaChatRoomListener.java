@@ -31,7 +31,8 @@ class DelegateMegaChatRoomListener extends MegaChatRoomListener {
         return listener;
     }
 
-    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat){
+    @Override
+    public void onChatRoomUpdate(MegaChatApi api, MegaChatRoom chat){
         if (listener != null) {
             final MegaChatRoom megaChatRoom = chat.copy();
             megaChatApi.runCallback(new Runnable() {
@@ -42,7 +43,8 @@ class DelegateMegaChatRoomListener extends MegaChatRoomListener {
         }
     }
 
-    public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg){
+    @Override
+    public void onMessageLoaded(MegaChatApi api, MegaChatMessage msg){
         if (listener != null) {
             final MegaChatMessage megaChatMessage = msg.copy();
             megaChatApi.runCallback(new Runnable() {
@@ -53,7 +55,8 @@ class DelegateMegaChatRoomListener extends MegaChatRoomListener {
         }
     }
 
-    public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg){
+    @Override
+    public void onMessageReceived(MegaChatApi api, MegaChatMessage msg){
         if (listener != null) {
             final MegaChatMessage megaChatMessage = msg.copy();
             megaChatApi.runCallback(new Runnable() {
@@ -63,8 +66,8 @@ class DelegateMegaChatRoomListener extends MegaChatRoomListener {
             });
         }
     }
-
-    public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg){
+    @Override
+    public void onMessageUpdate(MegaChatApi api, MegaChatMessage msg){
         if (listener != null) {
             final MegaChatMessage megaChatMessage = msg.copy();
             megaChatApi.runCallback(new Runnable() {

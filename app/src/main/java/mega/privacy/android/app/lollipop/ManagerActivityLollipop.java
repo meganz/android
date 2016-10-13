@@ -1641,7 +1641,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        if (getIntent() != null){
 				if (getIntent().getAction() != null){
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
-			        	log("Intent to export Master Key - im logged in!");
+			        	log("Intent to export Master KeyonFi - im logged in!");
 						drawerItem=DrawerItem.ACCOUNT;
 						mkLayoutVisible = true;
 						selectDrawerItemLollipop(drawerItem);
