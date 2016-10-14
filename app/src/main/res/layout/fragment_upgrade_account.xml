@@ -30,6 +30,7 @@
 					android:layout_width="125dp"
 					android:layout_height="118dp"
 					android:background="@color/white"
+					android:padding="2dp"
 					android:gravity="center_vertical">
 
 					<TextView
