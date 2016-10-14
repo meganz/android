@@ -213,12 +213,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		proLiteLayout.setLayoutParams(layoutParams);
 
 		proLiteLayoutContent = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout_content);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-		}
-		else{
-			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
-		}
+
 
 		leftProLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_left_side);
 		RelativeLayout.LayoutParams leftLayoutParams = (RelativeLayout.LayoutParams) leftProLiteLayout.getLayoutParams();
@@ -230,6 +225,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) titleProLite.getLayoutParams();
 		titleParams.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
 		titleProLite.setLayoutParams(titleParams);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+		}
+		else{
+			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+			leftProLiteLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.upgrade_elevation_pre_lollipop));
+		}
 
 		verticalDividerProLite = (View) v.findViewById(R.id.upgrade_prolite_vertical_divider);
 		verticalDividerProLite.getLayoutParams().width = Util.scaleWidthPx(2, outMetrics);

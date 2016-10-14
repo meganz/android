@@ -686,7 +686,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                     size=size/1024;
                 }
 
-                String value = new DecimalFormat("#").format(size) + "TB";
+                String value = new DecimalFormat("#").format(size);
                 return value;
             }
         }
