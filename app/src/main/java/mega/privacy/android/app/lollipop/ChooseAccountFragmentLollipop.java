@@ -691,7 +691,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         }
         return null;
-
     }
 
     @Override

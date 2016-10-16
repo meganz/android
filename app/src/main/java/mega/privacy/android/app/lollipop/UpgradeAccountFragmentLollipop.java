@@ -203,7 +203,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
+		//Replace elevation
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+		}
+
 		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
+		//Replace elevation
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+		}
 
 		//PRO LITE ACCOUNT
 		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);
@@ -214,25 +223,21 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		proLiteLayoutContent = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout_content);
 
-
 		leftProLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_left_side);
 		RelativeLayout.LayoutParams leftLayoutParams = (RelativeLayout.LayoutParams) leftProLiteLayout.getLayoutParams();
 		leftLayoutParams.width = Util.scaleWidthPx(125, outMetrics);
 		leftLayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
 		leftProLiteLayout.setLayoutParams(leftLayoutParams);
 
+		//Replace elevation
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			proLiteLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
+
 		titleProLite = (TextView) v.findViewById(R.id.upgrade_prolite_title_text);
 		RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) titleProLite.getLayoutParams();
 		titleParams.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
 		titleProLite.setLayoutParams(titleParams);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-		}
-		else{
-			proLiteLayoutContent.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
-			leftProLiteLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.upgrade_elevation_pre_lollipop));
-		}
 
 		verticalDividerProLite = (View) v.findViewById(R.id.upgrade_prolite_vertical_divider);
 		verticalDividerProLite.getLayoutParams().width = Util.scaleWidthPx(2, outMetrics);
@@ -304,6 +309,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		leftPro1LayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
 		leftPro1Layout.setLayoutParams(leftPro1LayoutParams);
 
+		//Replace elevation
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			pro1Layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
+
 		titlePro1 = (TextView) v.findViewById(R.id.upgrade_pro_i_title_text);
 		RelativeLayout.LayoutParams titlePro1Params = (RelativeLayout.LayoutParams) titlePro1.getLayoutParams();
 		titlePro1Params.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
@@ -343,7 +353,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		emptyTextBandwidthPro1Params.width = Util.scaleWidthPx(12, outMetrics);
 		emptyTextBandwidthPro1.setLayoutParams(emptyTextBandwidthPro1Params);
 
-
 		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_i_per_month_text);
 		perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 
@@ -381,6 +390,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		leftPro2LayoutParams.width = Util.scaleWidthPx(125, outMetrics);
 		leftPro2LayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
 		leftPro2Layout.setLayoutParams(leftPro2LayoutParams);
+
+		//Replace elevation
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			pro2Layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
 
 		titlePro2 = (TextView) v.findViewById(R.id.upgrade_pro_ii_title_text);
 		RelativeLayout.LayoutParams titlePro2Params = (RelativeLayout.LayoutParams) titlePro2.getLayoutParams();
@@ -459,6 +473,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		leftPro3LayoutParams.width = Util.scaleWidthPx(125, outMetrics);
 		leftPro3LayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
 		leftPro3Layout.setLayoutParams(leftPro3LayoutParams);
+
+		//Replace elevation
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			pro3Layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
 
 		titlePro3 = (TextView) v.findViewById(R.id.upgrade_pro_iii_title_text);
 		RelativeLayout.LayoutParams titlePro3Params = (RelativeLayout.LayoutParams) titlePro3.getLayoutParams();
