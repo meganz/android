@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -51,6 +54,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     public ArrayList<Product> accounts;
 
     private LinearLayout mainLinearLayout;
+    private ScrollView scrollView;
 
     private RelativeLayout freeLayout;
     private RelativeLayout proLiteLayout;
@@ -205,7 +209,14 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         View v = inflater.inflate(R.layout.fragment_choose_account, container, false);
 
+        scrollView = (ScrollView) v.findViewById(R.id.scroll_view_choose_account);
         mainLinearLayout = (LinearLayout) v.findViewById(R.id.choose_account_main_linear_layout);
+
+        //Replace elevation
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+            mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+        }
 
         //FREE ACCOUNT
         freeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout);
@@ -213,6 +224,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) freeLayout.getLayoutParams();
         layoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), 0);
         freeLayout.setLayoutParams(layoutParams);
+
+        //Replace elevation
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            freeLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
 
         leftFreeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_left_side);
         RelativeLayout.LayoutParams leftLayoutParams = (RelativeLayout.LayoutParams) leftFreeLayout.getLayoutParams();
@@ -287,6 +303,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         layoutParamsProLite.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), 0);
         proLiteLayout.setLayoutParams(layoutParamsProLite);
 
+        //Replace elevation
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            proLiteLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
+
         leftProLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_left_side);
         RelativeLayout.LayoutParams leftLayoutParamsProLite = (RelativeLayout.LayoutParams) leftProLiteLayout.getLayoutParams();
         leftLayoutParamsProLite.width = Util.scaleWidthPx(125, outMetrics);
@@ -359,6 +380,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         LinearLayout.LayoutParams pro1LayoutParams = (LinearLayout.LayoutParams) pro1Layout.getLayoutParams();
         pro1LayoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), 0);
         pro1Layout.setLayoutParams(pro1LayoutParams);
+
+        //Replace elevation
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            pro1Layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
 
         leftPro1Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_i_left_side);
         RelativeLayout.LayoutParams leftPro1LayoutParams = (RelativeLayout.LayoutParams) leftPro1Layout.getLayoutParams();
@@ -441,6 +467,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         leftPro2LayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
         leftPro2Layout.setLayoutParams(leftPro2LayoutParams);
 
+        //Replace elevation
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            pro2Layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
+
         titlePro2 = (TextView) v.findViewById(R.id.choose_account_pro_ii_title_text);
         RelativeLayout.LayoutParams titlePro2Params = (RelativeLayout.LayoutParams) titlePro2.getLayoutParams();
         titlePro2Params.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
@@ -511,6 +542,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro3LayoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(5, outMetrics));
         pro3Layout.setLayoutParams(pro3LayoutParams);
 
+        //Replace elevation
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            pro3Layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
+
         leftPro3Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_iii_left_side);
         RelativeLayout.LayoutParams leftPro3LayoutParams = (RelativeLayout.LayoutParams) leftPro3Layout.getLayoutParams();
         leftPro3LayoutParams.width = Util.scaleWidthPx(125, outMetrics);
@@ -520,7 +556,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         titlePro3 = (TextView) v.findViewById(R.id.choose_account_pro_iii_title_text);
         RelativeLayout.LayoutParams titlePro3Params = (RelativeLayout.LayoutParams) titlePro3.getLayoutParams();
         titlePro3Params.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
-        titlePro2.setLayoutParams(titlePro3Params);
+        titlePro3.setLayoutParams(titlePro3Params);
 
         verticalDividerPro3 = (View) v.findViewById(R.id.choose_account_pro_iii_vertical_divider);
         verticalDividerPro3.getLayoutParams().width = Util.scaleWidthPx(2, outMetrics);

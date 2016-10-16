@@ -203,14 +203,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
+		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
+
 		//Replace elevation
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-		}
-
-		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
-		//Replace elevation
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
 		}
 
