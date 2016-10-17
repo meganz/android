@@ -835,4 +835,5 @@
     <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">Este enlace no corresponde con la cuenta de esta sesión. Por favor, inicie sesión con la cuenta correcta.</string>
     <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">El enlace para cancelar la cuenta ha caducado, por favor, solicita uno nuevo.</string>
 
+    <string name="no_results_found" context="Text shown after searching and no results found">No se encontraron resultados</string>
 </resources>

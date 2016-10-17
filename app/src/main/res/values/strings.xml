@@ -832,11 +832,11 @@
     <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">The contact %s will be removed from the shared folder.</string>
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts will be removed from the shared folder.</string>
 
-
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed correctly from the shared folder</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder"> and %d contacts were not successfully removed</string>
 
     <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">This link is not related to this account. Please, log in with the correct account.</string>
     <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">This cancel link has expired, please try again.</string>
 
+    <string name="no_results_found" context="Text shown after searching and no results found">No results were found</string>
 </resources>
