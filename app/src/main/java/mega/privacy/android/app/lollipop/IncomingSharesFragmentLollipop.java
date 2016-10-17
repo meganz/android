@@ -340,7 +340,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);

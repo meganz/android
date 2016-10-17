@@ -340,7 +340,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);

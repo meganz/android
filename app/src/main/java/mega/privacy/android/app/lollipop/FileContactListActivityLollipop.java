@@ -409,7 +409,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);

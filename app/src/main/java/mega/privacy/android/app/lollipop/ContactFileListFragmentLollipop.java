@@ -422,7 +422,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.contact_file_list_view_browser);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);

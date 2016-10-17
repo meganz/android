@@ -150,7 +150,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		aB.setTitle(getResources().getString(R.string.section_contacts));
 		
 		listView = (RecyclerView) findViewById(R.id.contacts_explorer_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);		
 		
