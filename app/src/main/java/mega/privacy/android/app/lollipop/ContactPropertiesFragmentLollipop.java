@@ -222,8 +222,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			//Mail Layout
 			mailLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_email_layout);
 //			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
-//			lpML.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, 0);
-//			mailLayout.setLayoutParams(lpML);				
+//			lpML.setMargins(0, 0, 0,  Util.scaleHeightPx(10, outMetrics));
+//			mailLayout.setLayoutParams(lpML);
 			
 			mailIcon = (ImageView) v.findViewById(R.id.contact_properties_email_icon);
 			RelativeLayout.LayoutParams lp1 = new RelativeLayout.LayoutParams(mailIcon.getLayoutParams());
@@ -235,6 +235,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			separator = (View) v.findViewById(R.id.divider_shared_layout);
 			RelativeLayout.LayoutParams paramsDivider = (RelativeLayout.LayoutParams) separator.getLayoutParams();
 			paramsDivider.leftMargin = Util.scaleWidthPx(55, outMetrics);
+			paramsDivider.topMargin = Util.scaleHeightPx(10, outMetrics);
 			separator.setLayoutParams(paramsDivider);
 
 			infoEmail.setText(userEmail);		
