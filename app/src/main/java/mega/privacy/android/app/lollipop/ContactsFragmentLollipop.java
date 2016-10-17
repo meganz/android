@@ -392,6 +392,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 			}
 		
 			adapter.setPositionClicked(-1);
+			adapter.setMultipleSelect(false);
 			recyclerView.setAdapter(adapter);
 						
 			if (adapter.getItemCount() == 0){				
