@@ -4296,15 +4296,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					forgotPassMenuItem.setVisible(false);
 
 					//Show
-	    			selectMenuItem.setVisible(true);
-	    			thumbViewMenuItem.setVisible(true);
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					if(sFLol.getNodes()!=null){
+						if(sFLol.getNodes().size()!=0){
+//							log("size after search: "+sFLol.getNodes().size());
+							selectMenuItem.setVisible(true);
+							thumbViewMenuItem.setVisible(true);
+							if (isList){
+								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+							}
+							else{
+								thumbViewMenuItem.setTitle(getString(R.string.action_list));
+							}
+						}
+						else{
+							selectMenuItem.setVisible(false);
+							thumbViewMenuItem.setVisible(false);
+						}
 					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
 				}
 			}
 		}
