@@ -463,7 +463,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
             String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
             intent.putExtra("CHAT_ID", position);
-            intent.putExtra("MY_MAIL", myMail);
             this.startActivity(intent);
         }
     }

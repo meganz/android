@@ -24,17 +24,17 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatMessage;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollipopAdapter.ViewHolderMessageChatList> {
 
     Context context;
     int positionClicked;
-    ArrayList<Message> messages;
+    ArrayList<MegaChatMessage> messages;
     ArrayList<Integer> infoToShow;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
@@ -45,7 +45,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
 
-    public MegaChatLollipopAdapter(Context _context, ArrayList<Message> _messages, ArrayList<Integer> infoToShow, RecyclerView _listView) {
+    public MegaChatLollipopAdapter(Context _context, ArrayList<MegaChatMessage> _messages, ArrayList<Integer> infoToShow, RecyclerView _listView) {
         log("new adapter");
         this.context = _context;
         this.messages = _messages;
@@ -168,6 +168,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         contactTextParams.setMargins(Util.scaleWidthPx(37, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
         holder.contactText.setLayoutParams(contactTextParams);
 
+
+
         holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
         holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
         //Margins
@@ -199,10 +201,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     public void onBindViewHolder(ViewHolderMessageChatList holder, int position) {
         log("onBindViewHolder");
         holder.currentPosition = position;
-        Message message = messages.get(position);
+        MegaChatMessage message = messages.get(position);
 
-        String myMail = ((ChatActivityLollipop) context).getMyMail();
-        if(message.getUser().getMail().equals(myMail)) {
+//        String myMail = ((ChatActivityLollipop) context).getMyMail();
+        if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
             log("MY message!!");
             if (!multipleSelect) {
                 holder.ownMultiselectionLayout.setVisibility(View.GONE);
@@ -224,7 +226,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //            holder.imageButtonThreeDots.setVisibility(View.GONE);
                 holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
                 if(this.isItemChecked(position)){
-                    log("Selected: "+message.getMessage());
+                    log("Selected: "+message.getContent());
                     holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
                     holder.ownMultiselectionTickIcon.setVisibility(View.VISIBLE);
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
@@ -261,7 +263,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             }
 
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
-            holder.contentOwnMessageText.setText(message.getMessage());
+            holder.contentOwnMessageText.setText(message.getContent());
 
             holder.contactMessageLayout.setVisibility(View.GONE);
         }
@@ -288,7 +290,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //            holder.imageButtonThreeDots.setVisibility(View.GONE);
                 holder.contactMultiselectionLayout.setVisibility(View.VISIBLE);
                 if(this.isItemChecked(position)){
-                    log("Selected: "+message.getMessage());
+                    log("Selected: "+message.getContent());
                     holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
                     holder.contactMultiselectionTickIcon.setVisibility(View.VISIBLE);
                     holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
@@ -325,7 +327,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             }
             holder.ownMessageLayout.setVisibility(View.GONE);
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
-            holder.contentContactMessageText.setText(message.getMessage());
+            holder.contentContactMessageText.setText(message.getContent());
         }
 
         //Check the next message to know the margin bottom the content message
@@ -369,9 +371,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(view!=null){
                 log("Start animation: "+view.meText.getText());
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                Message message = messages.get(pos);
-                String myMail = ((ChatActivityLollipop) context).getMyMail();
-                if(message.getUser().getMail().equals(myMail)) {
+                MegaChatMessage message = messages.get(pos);
+//                String myMail = ((ChatActivityLollipop) context).getMyMail();
+                if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
                     view.ownMultiselectionTickIcon.setVisibility(View.GONE);
                     view.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
                     view.ownMultiselectionLayout.startAnimation(flipAnimation);
@@ -389,9 +391,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(view!=null){
                 log("Start animation: "+view.meText.getText());
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                Message message = messages.get(pos);
+                MegaChatMessage message = messages.get(pos);
                 String myMail = ((ChatActivityLollipop) context).getMyMail();
-                if(message.getUser().getMail().equals(myMail)) {
+                if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
                     view.ownMultiselectionLayout.startAnimation(flipAnimation);
                 }
                 else{
@@ -437,7 +439,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     /*
      * Get request at specified position
      */
-    public Message getMessageAt(int position) {
+    public MegaChatMessage getMessageAt(int position) {
         try {
             if (messages != null) {
                 return messages.get(position);
@@ -450,12 +452,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     /*
      * Get list of all selected chats
      */
-    public List<Message> getSelectedMessages() {
-        ArrayList<Message> messages = new ArrayList<Message>();
+    public List<MegaChatMessage> getSelectedMessages() {
+        ArrayList<MegaChatMessage> messages = new ArrayList<MegaChatMessage>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
             if (selectedItems.valueAt(i) == true) {
-                Message m = getMessageAt(selectedItems.keyAt(i));
+                MegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
                 if (m != null){
                     messages.add(m);
                 }
@@ -472,6 +474,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     public void setPositionClicked(int p){
         log("setPositionClicked: "+p);
         positionClicked = p;
+        notifyDataSetChanged();
+    }
+
+    public void setMessages (ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow){
+        this.messages = messages;
+        this.infoToShow = infoToShow;
         notifyDataSetChanged();
     }
 

@@ -92,7 +92,7 @@
                 android:textColor="@color/name_my_account"
                 android:layout_alignParentRight="true"
                 android:textSize="14sp"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textNoSuggestions"
                 android:background="@drawable/rounded_text_view_chat_own_message"
                 android:padding="11dp"
                 android:gravity="right"/>
@@ -169,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/name_my_account"
                 android:textSize="14sp"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textNoSuggestions"
                 android:background="@drawable/rounded_text_view_chat_contact_message"
                 android:padding="11dp"
                 android:gravity="left"/>

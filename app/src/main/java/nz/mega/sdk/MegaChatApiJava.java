@@ -306,7 +306,6 @@ public class MegaChatApiJava {
      *
      * @param chatid MegaChatHandle that identifies the chat room
      * @param msg Content of the message
-     * @param msglen Length of the message
      * @param type Type of the message (normal message, type of management message,
      * application-specific type like link, share, picture etc.) @see MegaChatMessage::Type.
      *
@@ -316,6 +315,43 @@ public class MegaChatApiJava {
         return megaChatApi.sendMessage(chatid, msg, type);
     }
 
+    /**
+     * Edits an existing message
+     *
+     * Message's edits are only allowed during a short timeframe, usually 1 hour.
+     * Message's deletions are equivalent to message's edits, but with empty content.
+     *
+     * There is only one pending edit for not-yet confirmed edits. Therefore, this function will
+     * discard previous edits that haven't been notified via MegaChatRoomListener::onMessageUpdate
+     * where the message has MegaChatMessage::hasChanged(MegaChatMessage::CHANGE_TYPE_CONTENT).
+     *
+     * If the edits is rejected... // TODO:
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param msgid MegaChatHandle that identifies the message
+     * @param msg New content of the message
+     *
+     * @return MegaChatMessage that will be modified. NULL if the message cannot be edited (too old)
+     */
+    MegaChatMessage editMessage(long chatid, long msgid, String msg){
+        return megaChatApi.editMessage(chatid, msgid, msg);
+    }
+
+    /**
+     * Deletes an existing message
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param msgid MegaChatHandle that identifies the message
+     *
+     * @return MegaChatMessage that will be deleted. NULL if the message cannot be deleted (too old)
+     */
+    MegaChatMessage deleteMessage(long chatid, long msgid){
+        return megaChatApi.deleteMessage(chatid, msgid);
+    }
 
     /**
      * Returns the last-seen-by-us message
