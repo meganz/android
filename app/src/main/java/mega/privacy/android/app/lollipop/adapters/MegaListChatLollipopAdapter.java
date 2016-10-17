@@ -321,7 +321,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 			}
 
-			holder.textViewDate.setText(TimeChatUtils.formatDate(lastMessage, TimeChatUtils.DATE_LONG_FORMAT));
+			//Descomentar!!!!
+//			holder.textViewDate.setText(TimeChatUtils.formatDate(lastMessage, TimeChatUtils.DATE_LONG_FORMAT));
 		}
 
 		holder.imageButtonThreeDots.setTag(holder);

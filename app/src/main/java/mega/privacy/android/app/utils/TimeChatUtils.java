@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
+import nz.mega.sdk.MegaChatMessage;
 
 public class TimeChatUtils implements Comparator<Calendar> {
 
@@ -47,9 +48,9 @@ public class TimeChatUtils implements Comparator<Calendar> {
         return -1;
     }
 
-    public static String formatTime(Message lastMessage){
+    public static String formatTime(MegaChatMessage lastMessage){
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
-        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
+        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getTimestamp());
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
         Date date = cal.getTime();
@@ -57,7 +58,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String formatDate(Message lastMessage, int format){
+    public static String formatDate(MegaChatMessage lastMessage, int format){
 
         java.text.DateFormat df;
         if(format == DATE_LONG_FORMAT){
@@ -67,7 +68,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
             df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
-        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getDate());
+        Calendar cal = Util.calculateDateFromTimestamp(lastMessage.getTimestamp());
 
         //Compare to yesterday
         Calendar calToday = Calendar.getInstance();
