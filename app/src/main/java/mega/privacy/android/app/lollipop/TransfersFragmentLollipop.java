@@ -122,7 +122,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		tL = megaApi.getTransfers();
 		
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);

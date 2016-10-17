@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +53,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	RecyclerView.LayoutManager mLayoutManager;
 
 	private ActionMode actionMode;
+
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	boolean isList = true;
 	GestureDetectorCompat detector;
@@ -282,7 +288,12 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 
 		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 
-    	contacts = megaApi.getIncomingContactRequests();
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		density  = getResources().getDisplayMetrics().density;
+
+		contacts = megaApi.getIncomingContactRequests();
     	if(contacts!=null)
     	{
     		log("Number of requests: "+contacts.size());
@@ -302,7 +313,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	        View v = inflater.inflate(R.layout.contacts_received_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
 
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			//Just onClick implemented

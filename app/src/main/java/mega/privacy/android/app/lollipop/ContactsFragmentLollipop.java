@@ -311,7 +311,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			recyclerView.setHasFixedSize(true);
 			MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);			

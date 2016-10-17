@@ -316,7 +316,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 		
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
