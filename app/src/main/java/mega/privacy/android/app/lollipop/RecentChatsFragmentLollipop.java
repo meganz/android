@@ -66,7 +66,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     TextView emptyTextView;
     RecyclerView.LayoutManager mLayoutManager;
 
-    ArrayList<ChatRoom> chats;
+    ArrayList<MegaChatRoom> chats;
     RecentChat recentChat;
 
     RelativeLayout emptyLayout;
@@ -166,38 +166,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         getStartedButton.setLayoutParams(getStartedButtonParams);
         getStartedButton.setOnClickListener(this);
 
-        chats = recentChat.getRecentChats();
-
-        ArrayList<MegaChatRoom> chatList = megaChatApi.getChatRooms();
-        if(chatList!=null){
-            log("Chat size: :"+chatList.size());
-            for(int i=0;i<chatList.size();i++)
-            {
-                MegaChatRoom chatRoom = chatList.get(i);
-                log("ChatRoom title: "+chatRoom.getTitle());
-                log("ChatRoom handle: "+chatRoom.getChatId());
-                long numUsers = chatRoom.getPeerCount();
-                log("Num users: "+numUsers);
-                for (int j=0; j< numUsers; j++){
-                    long userHandle = chatRoom.getPeerHandle(j);
-                    String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-                    MegaUser user = megaApi.getContact(userHandleEncoded);
-                    if(user!=null){
-                        log("El email del user es: "+user.getEmail());
-                    }
-                    else{
-                        log("El user es NULL");
-                    }
-                }
-
-                int unread = -1;
-                unread = chatRoom.getUnreadCount();
-                log("Unread messages: "+unread);
-            }
-        }
-        else{
-            log("Chat NULL");
-        }
+        chats = megaChatApi.getChatRooms();
 
         if (adapterList == null){
             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
@@ -295,7 +264,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            List<ChatRoom> chats = adapterList.getSelectedChats();
+            List<MegaChatRoom> chats = adapterList.getSelectedChats();
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
@@ -349,7 +318,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            List<ChatRoom> selected = adapterList.getSelectedChats();
+            List<MegaChatRoom> selected = adapterList.getSelectedChats();
 
             if (selected.size() != 0) {
                 menu.findItem(R.id.cab_menu_mute).setVisible(true);
@@ -406,7 +375,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         if (actionMode == null || getActivity() == null) {
             return;
         }
-        List<ChatRoom> chats = adapterList.getSelectedChats();
+        List<MegaChatRoom> chats = adapterList.getSelectedChats();
 
         actionMode.setTitle(context.getString(R.string.selected_items, chats.size()));
 
@@ -448,7 +417,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         log("itemClick");
         if (adapterList.isMultipleSelect()){
             adapterList.toggleSelection(position);
-            List<ChatRoom> chats = adapterList.getSelectedChats();
+            List<MegaChatRoom> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
 //                adapterList.notifyDataSetChanged();
@@ -458,11 +427,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             }
         }
         else{
-            log("open chat one to one");
+            log("open chat");
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-            String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
-            intent.putExtra("CHAT_ID", position);
+            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
             this.startActivity(intent);
         }
     }

@@ -242,7 +242,7 @@ public class MegaChatApiJava {
      * @param listener MegaChatRoomListener to be unregistered.
      */
     public void closeChatRoom(long chatid, MegaChatRoomListenerInterface listener){
-        megaChatApi.openChatRoom(chatid, createDelegateChatRoomListener(listener));
+        megaChatApi.closeChatRoom(chatid, createDelegateChatRoomListener(listener));
     }
 
     /**

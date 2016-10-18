@@ -191,8 +191,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaOffline selectedOfflineNode;
 	MegaUser selectedUser;
 	MegaContactRequest selectedRequest;
-	ChatRoom selectedChat;
-	String fullNameChat;
+	MegaChatRoom selectedChat;
+//	String fullNameChat;
 
 	//UPLOAD PANEL
 	private SlidingUpPanelLayout slidingUploadPanel;
@@ -10127,33 +10127,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
 			if (contactsData != null){
-				log("Creo Chat con: "+contactsData.size());
-				//Check if there is no already chat with the user
-
-				//If yes
-				//Open the activity
-
-				//If not
 
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				if(contactsData.size()==1){
 					MegaUser user = megaApi.getContact(contactsData.get(0));
 					if(user!=null){
-						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-					}
-					MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
-					if(chat==null){
-						log("No chat, create it!");
-						megaChatApi.createChat(false, peers, this);
-					}
-					else{
-						log("There is already a chat, open it!");
-						Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-						intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-						String myMail = getMyAccountInfo().getMyUser().getEmail();
-						intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-						intentOpenChat.putExtra("MY_MAIL", myMail);
-						this.startActivity(intent);
+						log("Chat with contact: "+contactsData.size());
+						MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+						if(chat==null){
+							log("No chat, create it!");
+							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+							megaChatApi.createChat(false, peers, this);
+						}
+						else{
+							log("There is already a chat, open it!");
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							this.startActivity(intentOpenChat);
+						}
 					}
 				}
 				else{
@@ -12300,28 +12292,51 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingUploadPanel.setVisibility(View.GONE);
 	}
 
-	public void showChatPanel(ChatRoom chat, String fullName){
+	public void showChatPanel(MegaChatRoom chat){
 		log("showChatPanel");
 
 		if(chat!=null){
 			this.selectedChat = chat;
 		}
-		if(fullName!=null){
-			this.fullNameChat = fullName;
-		}
+//		if(fullName!=null){
+//			this.fullNameChat = fullName;
+//		}
 
 		//Set title of screen
-		ArrayList<MegaContact> contacts = chat.getContacts();
+//		ArrayList<MegaContact> contacts = chat.getContacts();
+//
+//		if(contacts.size()==1) {
+//			log("Chat one to one");
+//			titleNameContactChatPanel.setText(fullName);
+//			titleMailContactChatPanel.setText(contacts.get(0).getMail());
+//
+//			addAvatarChatPanel(contacts.get(0).getMail(), fullName);
+//		}
 
-		if(contacts.size()==1) {
-			log("Chat one to one");
-			titleNameContactChatPanel.setText(fullName);
-			titleMailContactChatPanel.setText(contacts.get(0).getMail());
+		titleNameContactChatPanel.setText(chat.getTitle());
 
-			addAvatarChatPanel(contacts.get(0).getMail(), fullName);
+		if(chat.getPeerCount()==1){
+			long userHandle = chat.getPeerHandle(0);
+
+			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+			MegaUser user = megaApi.getContact(userHandleEncoded);
+			if(user!=null){
+				log("El email del user es: "+user.getEmail());
+				titleMailContactChatPanel.setText(user.getEmail());
+				addAvatarChatPanel(user.getEmail(), chat.getTitle());
+			}
+			else{
+				log("El user es NULL");
+			}
 		}
 
 		fabButton.setVisibility(View.GONE);
+		if(chat.isGroup()){
+			optionLeaveChat.setVisibility(View.VISIBLE);
+		}
+		else{
+			optionLeaveChat.setVisibility(View.INVISIBLE);
+		}
 		slidingChatPanel.setVisibility(View.VISIBLE);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
@@ -12337,7 +12352,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void addAvatarChatPanel(String contactMail, String fullName){
+	public void addAvatarChatPanel(String contactMail, String title){
 
 		File avatar = null;
 		if (getExternalCacheDir() != null){
@@ -12401,9 +12416,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		boolean setInitialByMail = false;
 
-		if (fullName != null) {
-			if (fullName.trim().length() > 0) {
-				String firstLetter = fullName.charAt(0) + "";
+		if (title != null) {
+			if (title.trim().length() > 0) {
+				String firstLetter = title.charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				chatInitialLetter.setText(firstLetter);
 				chatInitialLetter.setTextColor(Color.WHITE);
@@ -12714,19 +12729,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.displayedAccountType = displayedAccountType;
 	}
 
-	public ChatRoom getSelectedChat() {
+	public MegaChatRoom getSelectedChat() {
 		return selectedChat;
 	}
 
-	public void setSelectedChat(ChatRoom selectedChat) {
+	public void setSelectedChat(MegaChatRoom selectedChat) {
 		this.selectedChat = selectedChat;
 	}
 
-	public String getFullNameChat() {
-		return fullNameChat;
-	}
-
-	public void setFullNameChat(String fullNameChat) {
-		this.fullNameChat = fullNameChat;
-	}
+//	public String getFullNameChat() {
+//		return fullNameChat;
+//	}
+//
+//	public void setFullNameChat(String fullNameChat) {
+//		this.fullNameChat = fullNameChat;
+//	}
 }

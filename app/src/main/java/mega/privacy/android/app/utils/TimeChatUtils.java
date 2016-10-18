@@ -96,4 +96,43 @@ public class TimeChatUtils implements Comparator<Calendar> {
             }
         }
     }
+
+    public static String formatDate(long timestamp, int format){
+
+        java.text.DateFormat df;
+        if(format == DATE_LONG_FORMAT){
+            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+        }
+        else{
+            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+        }
+
+        Calendar cal = Util.calculateDateFromTimestamp(timestamp);
+
+        //Compare to yesterday
+        Calendar calToday = Calendar.getInstance();
+        Calendar calYesterday = Calendar.getInstance();
+        calYesterday.add(Calendar.DATE, -1);
+        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        if(tc.compare(cal, calToday)==0) {
+            return "Today";
+        }
+        else if(tc.compare(cal, calYesterday)==0){
+            return "Yesterday";
+        }
+        else{
+            if(tc.calculateDifferenceDays(cal, calToday)<7){
+                Date date = cal.getTime();
+                String dayWeek = new SimpleDateFormat("EEEE").format(date);
+                return dayWeek;
+            }
+            else{
+                TimeZone tz = cal.getTimeZone();
+                df.setTimeZone(tz);
+                Date date = cal.getTime();
+                String formattedDate = df.format(date);
+                return formattedDate;
+            }
+        }
+    }
 }

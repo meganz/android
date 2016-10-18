@@ -435,8 +435,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
 
-//                    idChat = newIntent.getLongExtra("CHAT_ID", -1);
-                    idChat=8179160514871859886L;
+                    idChat = newIntent.getLongExtra("CHAT_ID", -1);
+//                    idChat=8179160514871859886L;
                     myMail = megaApi.getMyEmail();
                     myUserHandle = megaApi.getMyUser().getHandle();
 
@@ -1216,11 +1216,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             });
 
-            log("PRINT messages");
-//        for(int i=0; i<messages.size();i++){
-//            String pruebaContent= messages.get(i).getContent();
-//
-//        }
             infoToShow.clear();
             ListIterator<MegaChatMessage> itr = messages.listIterator();
             while (itr.hasNext()) {
