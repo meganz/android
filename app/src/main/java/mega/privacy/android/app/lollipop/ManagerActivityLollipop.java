@@ -17,6 +17,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -6847,7 +6848,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(getResources().getDrawable(R.drawable.contacts_red));
+				menuItem.setIcon(getResources().getDrawable(R.drawable.ic_chat));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -10290,7 +10291,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		mi = menu.findItem(R.id.navigation_item_chat);
 		if (mi != null){
-			mi.setIcon(getResources().getDrawable(R.drawable.contacts_grey));
+			mi.setIcon(getResources().getDrawable(R.drawable.ic_chat));
 			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
