@@ -9,6 +9,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaChatRoom;
 
 public class ChatPanelListener implements View.OnClickListener {
 
@@ -24,7 +25,7 @@ public class ChatPanelListener implements View.OnClickListener {
     public void onClick(View v) {
         log("onClick ChatPanelListener");
         log("onClick NodeOptionsPanelListener");
-        ChatRoom selectedChat = null;
+        MegaChatRoom selectedChat = null;
         if(context instanceof ManagerActivityLollipop){
             selectedChat = ((ManagerActivityLollipop) context).getSelectedChat();
         }
@@ -39,9 +40,9 @@ public class ChatPanelListener implements View.OnClickListener {
                 }
 
                 Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
-                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
-                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
-                i.putExtra("handle", selectedChat.getId());
+//                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
+//                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
+                i.putExtra("handle", selectedChat.getChatId());
                 context.startActivity(i);
 
                 break;

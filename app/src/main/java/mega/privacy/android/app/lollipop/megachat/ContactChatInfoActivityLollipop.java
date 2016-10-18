@@ -50,6 +50,8 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -90,11 +92,11 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	ActionBar aB;
 
 	MegaUser user;
-	String userEmail;
-	String fullName;
 	long chatHandle;
+	MegaChatRoom chat;
 
 	private MegaApiAndroid megaApi = null;
+	MegaChatApiAndroid megaChatApi = null;
 
 	private Handler handler;
 
@@ -117,6 +119,11 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			megaApi = app.getMegaApi();
 		}
 
+		if (megaChatApi == null) {
+			MegaApplication app = (MegaApplication) getApplication();
+			megaChatApi = app.getMegaChatApi();
+		}
+
 		handler = new Handler();
 
 		display = getWindowManager().getDefaultDisplay();
@@ -136,20 +143,12 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				return;
 			}
 
-			userEmail = extras.getString("userEmail");
-			if (userEmail == null) {
-				log("userMail is NULL");
-				finish();
-				return;
-			}
-			fullName = extras.getString("userFullName");
+			chat = megaChatApi.getChatRoom(chatHandle);
 
-			user = megaApi.getContact(userEmail);
-			if (user == null) {
-				log("MegaUser is NULL");
-				finish();
-				return;
-			}
+			long userHandle = chat.getPeerHandle(0);
+
+			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+			user = megaApi.getContact(userHandleEncoded);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -160,7 +159,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			aB = getSupportActionBar();
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
-			collapsingToolbar.setTitle(fullName);
+			collapsingToolbar.setTitle(chat.getTitle());
 			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
 			collapsingToolbar.setExpandedTitleMarginStart(Util.scaleWidthPx(72, outMetrics));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -241,7 +240,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			shareContactLayout.setLayoutParams(paramsShareContact);
 
 			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
-			shareContactText.setText(userEmail);
+			shareContactText.setText(user.getEmail());
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 			LinearLayout.LayoutParams paramsShareContactDivider = (LinearLayout.LayoutParams) dividerShareContactLayout.getLayoutParams();
@@ -301,9 +300,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		log("setAvatar");
 		File avatar = null;
 		if (getExternalCacheDir() != null) {
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), userEmail + ".jpg");
+			avatar = new File(getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
 		} else {
-			avatar = new File(getCacheDir().getAbsolutePath(), userEmail + ".jpg");
+			avatar = new File(getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
 		}
 
 		if (avatar != null) {
@@ -323,9 +322,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				if (imBitmap == null) {
 					avatar.delete();
 					if (getExternalCacheDir() != null) {
-						megaApi.getUserAvatar(user, getExternalCacheDir().getAbsolutePath() + "/" + userEmail, this);
+						megaApi.getUserAvatar(user, getExternalCacheDir().getAbsolutePath() + "/" + user.getEmail(), this);
 					} else {
-						megaApi.getUserAvatar(user, getCacheDir().getAbsolutePath() + "/" + userEmail, this);
+						megaApi.getUserAvatar(user, getCacheDir().getAbsolutePath() + "/" + user.getEmail(), this);
 					}
 				} else {
 					contactPropertiesImage.setImageBitmap(imBitmap);
@@ -438,9 +437,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		boolean setInitialByMail = false;
 
-		if (fullName != null) {
-			if (fullName.trim().length() > 0) {
-				String firstLetter = fullName.charAt(0) + "";
+		if (chat.getTitle() != null) {
+			if (chat.getTitle().trim().length() > 0) {
+				String firstLetter = chat.getTitle().charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				initialLetter.setText(firstLetter);
 				initialLetter.setTextSize(100);
@@ -453,11 +452,11 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			setInitialByMail = true;
 		}
 		if (setInitialByMail) {
-			if (userEmail != null) {
-				if (userEmail.length() > 0) {
-					log("email TEXT: " + userEmail);
-					log("email TEXT AT 0: " + userEmail.charAt(0));
-					String firstLetter = userEmail.charAt(0) + "";
+			if (user.getEmail() != null) {
+				if (user.getEmail().length() > 0) {
+					log("email TEXT: " + user.getEmail());
+					log("email TEXT AT 0: " + user.getEmail().charAt(0));
+					String firstLetter = user.getEmail().charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					initialLetter.setText(firstLetter);
 					initialLetter.setTextSize(100);
@@ -742,6 +741,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
 						log("Clear chat!");
+//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -752,7 +752,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_clear_chat,fullName);
+		String message= getResources().getString(R.string.confirmation_clear_chat,chat.getTitle());
 
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
