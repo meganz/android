@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -63,16 +64,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     RecyclerView listView;
     MegaListChatLollipopAdapter adapterList;
     GestureDetectorCompat detector;
-    TextView emptyTextView;
+
     RecyclerView.LayoutManager mLayoutManager;
 
     ArrayList<MegaChatRoom> chats;
     RecentChat recentChat;
 
-    RelativeLayout emptyLayout;
-    LinearLayout buttonsEmptyLayout;
+    //Empty screen
+    TextView emptyTextView;
+    LinearLayout emptyLayout;
+    TextView emptyTextViewInvite;
+    ImageView emptyImageView;
     Button inviteButton;
-    Button getStartedButton;
 
     float scaleH, scaleW;
     float density;
@@ -142,29 +145,23 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         listView.addOnItemTouchListener(this);
         listView.setItemAnimator(new DefaultItemAnimator());
 
-        emptyLayout = (RelativeLayout) v.findViewById(R.id.empty_layout_chat_recent);
+        emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
+        emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
-        RelativeLayout.LayoutParams emptyTextViewParams = (RelativeLayout.LayoutParams)emptyTextView.getLayoutParams();
-        emptyTextViewParams.setMargins(Util.scaleWidthPx(39, outMetrics), Util.scaleHeightPx(95, outMetrics), Util.scaleWidthPx(39, outMetrics), 0);
-        emptyTextView.setLayoutParams(emptyTextViewParams);
+        LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
+        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+        emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
-        buttonsEmptyLayout = (LinearLayout) v.findViewById(R.id.empty_buttons_layout_recent_chat);
-        RelativeLayout.LayoutParams buttonsEmptyLayoutParams = (RelativeLayout.LayoutParams)buttonsEmptyLayout.getLayoutParams();
-        buttonsEmptyLayoutParams.setMargins(Util.scaleWidthPx(39, outMetrics), Util.scaleHeightPx(49, outMetrics), 0, 0);
-        buttonsEmptyLayout.setLayoutParams(buttonsEmptyLayoutParams);
+        LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
+        emptyTextViewParams2.setMargins(0, Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
+        emptyTextView.setLayoutParams(emptyTextViewParams2);
+
+        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
 
         inviteButton = (Button) v.findViewById(R.id.invite_button);
-        LinearLayout.LayoutParams inviteButtonParams = (LinearLayout.LayoutParams)inviteButton.getLayoutParams();
-        inviteButtonParams.setMargins(0, Util.scaleHeightPx(4, outMetrics), 0, Util.scaleHeightPx(4, outMetrics));
-        inviteButton.setLayoutParams(inviteButtonParams);
         inviteButton.setOnClickListener(this);
-
-        getStartedButton = (Button) v.findViewById(R.id.get_started_button);
-        LinearLayout.LayoutParams getStartedButtonParams = (LinearLayout.LayoutParams)getStartedButton.getLayoutParams();
-        getStartedButtonParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, Util.scaleHeightPx(4, outMetrics));
-        getStartedButton.setLayoutParams(getStartedButtonParams);
-        getStartedButton.setOnClickListener(this);
 
         chats = megaChatApi.getChatRooms();
 
@@ -249,11 +246,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         log("onClick");
         switch (v.getId()) {
             case R.id.invite_button:{
-                Toast.makeText(context, "INVITE!!!",Toast.LENGTH_SHORT).show();
-                break;
-            }
-            case R.id.get_started_button:{
-                Toast.makeText(context, "Get Started!!",Toast.LENGTH_SHORT).show();
+                ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
                 break;
             }
         }
@@ -461,6 +454,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
         log("onChatListItemUpdate");
+//        chats=megaChatApi.getChatRooms();
     }
 
     @Override
