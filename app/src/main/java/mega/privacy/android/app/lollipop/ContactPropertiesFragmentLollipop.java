@@ -87,8 +87,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	//	private ListView overflowMenuList;
 	private boolean overflowVisible = false; 
-	String firstNameText;
-	String lastNameText;
+	String firstNameText = "";
+	String lastNameText = "";
 	
 	MegaApiAndroid megaApi;
 	MegaUser contact;
