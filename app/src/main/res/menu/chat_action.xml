@@ -22,7 +22,25 @@
     <item
         android:id="@+id/cab_menu_invite_chat"
         android:orderInCategory="120"
-        android:title="@string/contact_invite"
+        android:title="@string/add_participants_menu_item"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_contact_info_chat"
+        android:orderInCategory="125"
+        android:title="@string/contact_properties_activity"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_clear_history_chat"
+        android:orderInCategory="125"
+        android:title="@string/general_clear"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_leave_chat"
+        android:orderInCategory="125"
+        android:title="@string/general_leave"
         MEGA:showAsAction="never" />
 
 </menu>

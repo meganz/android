@@ -60,6 +60,15 @@
         android:maxLines="1"
         android:textColor="@color/file_list_first_row" />
 
+    <ImageView
+        android:id="@+id/recent_chat_list_contact_state"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:layout_alignTop="@id/recent_chat_list_name"
+        android:layout_toRightOf="@id/recent_chat_list_name"
+        android:background="@null"
+        android:src="@drawable/circle_status_contact_not_connected" />
+
     <RelativeLayout
         android:id="@+id/recent_chat_list_unread_layout"
         android:layout_width="24dp"

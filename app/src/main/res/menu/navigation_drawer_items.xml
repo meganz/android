@@ -34,7 +34,7 @@
 
 		<item
 			android:id="@+id/navigation_item_chat"
-			android:icon="@drawable/ic_chat"
+			android:icon="@drawable/ic_menu_chat"
 			android:title="@string/section_chat"/>
 	    
 	    <item

@@ -48,6 +48,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
@@ -116,6 +117,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
 		ImageView multiselectIcon;
+		ImageView contactStateIcon;
         int currentPosition;
         String contactMail;
 		String lastNameText="";
@@ -239,9 +241,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					setUserAvatar(holder, user);
 				}
 			}
+			holder.contactStateIcon.setVisibility(View.VISIBLE);
 		}
 		else{
 			log("Group chat");
+			holder.contactStateIcon.setVisibility(View.GONE);
 		}
 
 		int unreadMessages = chat.getUnreadCount();
@@ -383,6 +387,22 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			holder.textViewContactName.setLayoutParams(nameTextViewParams);
 		}
 
+		holder.contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
+		holder.contactStateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
+
+		RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)holder.contactStateIcon.getLayoutParams();
+		stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
+		holder.contactStateIcon.setLayoutParams(stateIconParams);
+
+//			MegaChatApi.Status state = chat.getOnlineStatus();
+//			log("State of the chat: "+state.toString());
+//			if(state.equals(MegaChatApi.Status.STATUS_ONLINE)){
+//				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+//			}
+//			else{
+//				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+//			}
+
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);		
 	}
@@ -500,6 +520,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
 		holder.circlePendingMessages = (RoundedImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
+
+		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
 
 		holder.itemLayout.setOnClickListener(this);
 

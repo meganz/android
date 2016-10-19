@@ -901,4 +901,9 @@
     <string name="general_clear" context="Button to clear the chat history">Clear</string>
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
 
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">The history of the chat has been cleared</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Error. The history of the chat has not been cleared correctly</string>
+
+    <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Add participants</string>
+
 </resources>

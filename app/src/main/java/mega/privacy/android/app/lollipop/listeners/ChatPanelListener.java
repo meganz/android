@@ -6,6 +6,7 @@ import android.view.View;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Util;
@@ -15,10 +16,12 @@ public class ChatPanelListener implements View.OnClickListener {
 
     Context context;
     ManagerActivityLollipop.DrawerItem drawerItem;
+    ChatController chatC;
 
     public ChatPanelListener(Context context){
         log("UploadPanelListener created");
         this.context = context;
+        chatC = new ChatController(context);
     }
 
     @Override
@@ -57,6 +60,17 @@ public class ChatPanelListener implements View.OnClickListener {
 //                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 //                intent.setType("*/*");
 //                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                break;
+            }
+
+            case R.id.file_list_clear_history_chat_layout:{
+                log("click clear history chat");
+                ((ManagerActivityLollipop)context).hideChatPanel();
+                if(selectedChat==null){
+                    log("Selected chat NULL");
+                }
+                log("Clear chat with: "+selectedChat.getTitle());
+                chatC.clearHistory(selectedChat);
                 break;
             }
 

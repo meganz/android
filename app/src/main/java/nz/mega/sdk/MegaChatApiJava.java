@@ -52,12 +52,12 @@ public class MegaChatApiJava {
 
     public void init(boolean resumeSession)
     {
-        megaChatApi.init(resumeSession);
+        megaChatApi.init();
     }
 
     public void init(boolean resumeSession, MegaChatRequestListenerInterface listener)
     {
-        megaChatApi.init(resumeSession, createDelegateRequestListener(listener));
+        megaChatApi.init(createDelegateRequestListener(listener));
     }
 
     public void connect()
@@ -197,16 +197,6 @@ public class MegaChatApiJava {
         megaChatApi.updateChatPermissions(chatid, userhandle, privilege, createDelegateRequestListener(listener));
     }
 
-    public void setChatTitle(long chatid, String title)
-    {
-        megaChatApi.setChatTitle(chatid, title);
-    }
-
-    public void setChatTitle(long chatid, String title, MegaChatRequestListenerInterface listener)
-    {
-        megaChatApi.setChatTitle(chatid, title, createDelegateRequestListener(listener));
-    }
-
     public void truncateChat(long chatid, long messageid)
     {
         megaChatApi.truncateChat(chatid, messageid);
@@ -215,6 +205,55 @@ public class MegaChatApiJava {
     public void truncateChat(long chatid, long messageid, MegaChatRequestListenerInterface listener)
     {
         megaChatApi.truncateChat(chatid, messageid, createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Allows a logged in operator/moderator to clear the entire history of a chat
+     *
+     * The latest message gets overridden with a management message.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_TRUNCATE_HISTORY
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to truncate the chat history
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatid.
+     * - MegaChatError::ERROR_ARGS - If the chatid or user handle are invalid
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void clearChatHistory(long chatid, MegaChatRequestListenerInterface listener){
+        megaChatApi.clearChatHistory(chatid, createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Allows to set the title of a group chat
+     *
+     * Only participants with privilege level MegaChatPeerList::PRIV_MODERATOR are allowed to
+     * set the title of a chat.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_EDIT_CHATROOM_NAME
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getText - Returns the title of the chat.
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to invite peers.
+     * - MegaChatError::ERROR_ARGS - If there's a title and it's not Base64url encoded.
+     *
+     * Valid data in the MegaChatRequest object received in onRequestFinish when the error code
+     * is MegaError::ERROR_OK:
+     * - MegaChatRequest::getText - Returns the title of the chat that was actually saved.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param title Null-terminated character string with the title that wants to be set. If the
+     * title is longer than 30 characters, it will be truncated to that maximum length.
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void setChatTitle(long chatid, String title, MegaChatRequestListenerInterface listener){
+        megaChatApi.setChatTitle(chatid, title, createDelegateRequestListener(listener));
     }
 
     /**
