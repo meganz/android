@@ -149,7 +149,7 @@ WebView myWebView;
 			/*FIN FORTUMO*/
 			
 			/*INICIO CENTILI*/
-			String urlCentili = "https://www.centili.com/widget/WidgetModule?api=9e8eee856f4c048821954052a8d734ac&clientid=" + request.getLink();
+			String urlCentili = "https://widget.centili.com/widget/WidgetModule?api=9e8eee856f4c048821954052a8d734ac&clientid=" + request.getLink();
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlCentili));
 			startActivity(browserIntent);
 			((ManagerActivityLollipop)context).onBackPressed();
