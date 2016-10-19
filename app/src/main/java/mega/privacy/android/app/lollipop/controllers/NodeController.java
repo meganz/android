@@ -1321,7 +1321,7 @@ public class NodeController {
 
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
         log("deleteOffline");
-        if(selectedNode.getHandle().equals("0")){
+        if (selectedNode == null){
             log("Delete RK");
             String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
             File file= new File(path);
@@ -1382,68 +1382,122 @@ public class NodeController {
                 }
             }
         }
-        else{
-            log("deleteOffline node");
-            dbH = DatabaseHandler.getDbHandler(context);
+        else {
+            if (selectedNode.getHandle().equals("0")) {
+                log("Delete RK");
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.rKFile;
+                File file = new File(path);
+                if (file.exists()) {
+                    file.delete();
 
-            ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
-            ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();
-            MegaOffline parentNode = null;
+                    ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
 
-            //Delete children
-            mOffListChildren=dbH.findByParentId(selectedNode.getId());
-            if(mOffListChildren.size()>0){
-                //The node have childrens, delete
-                deleteChildrenDB(mOffListChildren);
-            }
+                    log("Number of elements: " + mOffList.size());
 
-            log("Remove the node physically");
-            //Remove the node physically
-            File destination = null;
-            //Check if the node is incoming
-            if(selectedNode.isIncoming()){
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + selectedNode.getHandleIncoming() + selectedNode.getPath());
+                    for (int i = 0; i < mOffList.size(); i++) {
+
+                        MegaOffline checkOffline = mOffList.get(i);
+
+                        if (!checkOffline.isIncoming()) {
+                            log("NOT isIncomingOffline");
+                            File offlineDirectory = null;
+                            if (Environment.getExternalStorageDirectory() != null) {
+                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath() + checkOffline.getName());
+                            } else {
+                                offlineDirectory = context.getFilesDir();
+                            }
+
+                            if (!offlineDirectory.exists()) {
+                                log("Path to remove A: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
+                                //dbH.removeById(mOffList.get(i).getId());
+                                mOffList.remove(i);
+                                i--;
+                            }
+                        } else {
+                            log("isIncomingOffline");
+                            File offlineDirectory = null;
+                            if (Environment.getExternalStorageDirectory() != null) {
+                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + checkOffline.getHandleIncoming() + "/" + checkOffline.getPath() + checkOffline.getName());
+                                log("offlineDirectory: " + offlineDirectory);
+                            } else {
+                                offlineDirectory = context.getFilesDir();
+                            }
+
+                            if (!offlineDirectory.exists()) {
+                                log("Path to remove B: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
+                                //dbH.removeById(mOffList.get(i).getId());
+                                mOffList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+
+                    if (context instanceof ManagerActivityLollipop) {
+                        ((ManagerActivityLollipop) context).updateOfflineView(null);
+                    } else {
+                        ((OfflineActivityLollipop) context).updateOfflineView(null);
+                    }
                 }
-                else{
-                    destination = context.getFilesDir();
+            } else {
+                log("deleteOffline node");
+                dbH = DatabaseHandler.getDbHandler(context);
+
+                ArrayList<MegaOffline> mOffListParent = new ArrayList<MegaOffline>();
+                ArrayList<MegaOffline> mOffListChildren = new ArrayList<MegaOffline>();
+                MegaOffline parentNode = null;
+
+                //Delete children
+                mOffListChildren = dbH.findByParentId(selectedNode.getId());
+                if (mOffListChildren.size() > 0) {
+                    //The node have childrens, delete
+                    deleteChildrenDB(mOffListChildren);
                 }
-            }
-            else{
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + selectedNode.getPath());
+
+                log("Remove the node physically");
+                //Remove the node physically
+                File destination = null;
+                //Check if the node is incoming
+                if (selectedNode.isIncoming()) {
+                    if (Environment.getExternalStorageDirectory() != null) {
+                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + selectedNode.getHandleIncoming() + selectedNode.getPath());
+                    } else {
+                        destination = context.getFilesDir();
+                    }
+                } else {
+                    if (Environment.getExternalStorageDirectory() != null) {
+                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + selectedNode.getPath());
+                    } else {
+                        destination = context.getFilesDir();
+                    }
                 }
-                else{
-                    destination = context.getFilesDir();
+
+                try {
+                    File offlineFile = new File(destination, selectedNode.getName());
+                    log("Delete in phone: " + selectedNode.getName());
+                    Util.deleteFolderAndSubfolders(context, offlineFile);
+                } catch (Exception e) {
+                    log("EXCEPTION: deleteOffline - adapter");
                 }
-            }
+                ;
 
-            try{
-                File offlineFile = new File(destination, selectedNode.getName());
-                log("Delete in phone: "+selectedNode.getName());
-                Util.deleteFolderAndSubfolders(context, offlineFile);
-            }
-            catch(Exception e){
-                log("EXCEPTION: deleteOffline - adapter");
-            };
+                dbH.removeById(selectedNode.getId());
 
-            dbH.removeById(selectedNode.getId());
+                //Check if the parent has to be deleted
 
-            //Check if the parent has to be deleted
+                int parentId = selectedNode.getParentId();
+                parentNode = dbH.findById(parentId);
 
-            int parentId = selectedNode.getParentId();
-            parentNode = dbH.findById(parentId);
+                if (parentNode != null) {
+                    log("Parent to check: " + parentNode.getName());
+                    checkParentDeletion(parentNode);
+                }
 
-            if(parentNode != null){
-                log("Parent to check: "+parentNode.getName());
-                checkParentDeletion(parentNode);
-            }
-
-            if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop)context).updateOfflineView(null);
-            }
-            else{
-                ((OfflineActivityLollipop)context).updateOfflineView(null);
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).updateOfflineView(null);
+                } else {
+                    ((OfflineActivityLollipop) context).updateOfflineView(null);
+                }
             }
         }
     }

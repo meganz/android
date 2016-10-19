@@ -673,7 +673,7 @@
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Tu contraseña desbloquea tu clave de recuperación</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Tus datos sólo se pueden leer a través de una cadena de operaciones de descifrado que comienza con tu clave de recuperación de cifrado, que se guardará cifrada con su contraseña. Esto significa que si pierdes tu contraseña, tu clave de recuperación ya no puede ser descifrada, y tu no puedes descifrar los datos.</string>
-    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exportar la clave de recuperación y guardarla en un lugar seguro te permite establecer otra contraseña sin perdida de datos.</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exportar la clave de recuperación y guardarla en un lugar seguro te permite establecer otra contraseña sin pérdida de datos.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacante desde el exterior no puede acceder a tu cuenta solo con tu clave. Un restablecimiento de contraseña requiere tanto la clave principal como el acceso a tu correo electrónico.</string>
     <string name="backup_action" context="Sentence to inform the user. the available actions in the screen to backup the master key">Copia la clave de recuperación o guárdala en un fichero de texto</string>
 
