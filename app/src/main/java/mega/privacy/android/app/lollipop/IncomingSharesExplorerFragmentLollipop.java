@@ -36,7 +36,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	Context context;
 	MegaApiAndroid megaApi;
-	ArrayList<MegaNode> nodes;
+	ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
 	long parentHandle = -1;
 	
 	MegaExplorerLollipopAdapter adapter;
@@ -68,8 +68,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (megaApi.getRootNode() == null){
 			return;
 		}
-		
-		nodes = new ArrayList<MegaNode>();
+
 		deepBrowserTree=0;
 		parentHandle = -1;
 		
