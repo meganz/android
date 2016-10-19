@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
@@ -28,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +50,7 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
@@ -55,14 +58,18 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListener;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -95,6 +102,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
     ScrollView emptyScrollView;
+    TableLayout emptyTableLayout;
+
+
     FloatingActionButton fab;
     FrameLayout emojiKeyboardLayout;
 
@@ -114,6 +124,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MenuItem callMenuItem;
     MenuItem videoMenuItem;
     MenuItem inviteMenuItem;
+    MenuItem clearHistoryMenuItem;
+    MenuItem contactInfoMenuItem;
+    MenuItem leaveMenuItem;
 
     int diffMeasure;
     boolean focusChanged=false;
@@ -238,7 +251,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
+        ///Empty screen
         emptyScrollView = (ScrollView) findViewById(R.id.layout_empty_scroll_view);
+        emptyTableLayout = (TableLayout) findViewById(R.id.empty_table_layout);
+
+        RelativeLayout.LayoutParams emptyTableParams = (RelativeLayout.LayoutParams)emptyTableLayout.getLayoutParams();
+        emptyTableParams.setMargins(Util.scaleWidthPx(36, outMetrics), 0, Util.scaleHeightPx(40, outMetrics), Util.scaleWidthPx(36, outMetrics));
+        emptyTableLayout.setLayoutParams(emptyTableParams);
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
@@ -410,30 +429,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
                     log("ACTION_CHAT_SHOW_MESSAGES");
                     fab.setVisibility(View.VISIBLE);
-//                    inviteText.setVisibility(View.GONE);
-                    chatRelativeLayout.setVisibility(View.VISIBLE);
-                    emptyScrollView.setVisibility(View.GONE);
-
-//                    String mensajeEnviar = "Hola prueba de envio!";
-//                    MegaChatMessage msgSent = megaChatApi.sendMessage(id, mensajeEnviar, MegaChatMessage.Type.TYPE_NORMAL);
-//                    if(msgSent!=null){
-//                        log("Mensaje enviado con id temp: "+msgSent.getTempId());
-//                    }
-//                    else{
-//                        log("Error al enviar mensaje!");
-//                    }
-
-
-//                    MegaChatMessage lastMessage = megaChatApi.getLastMessageSeen(chatRoom.getChatId());
-//                    if(lastMessage!=null){
-//                        log("Last MESSAGE:");
-//                        log("UserHAndle: "+lastMessage.getUserHandle() + "_" + lastMessage.getContent());
-//                    }
-//                    else{
-//                        log("El last message is NULL!!!");
-//                    }
-
-
 
                     idChat = newIntent.getLongExtra("CHAT_ID", -1);
 //                    idChat=8179160514871859886L;
@@ -449,21 +444,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         log("Call to open chat");
                         boolean result = megaChatApi.openChatRoom(idChat, this);
-                        log("El resultado de abrir chat: "+result);
-                        log("Start to get Messages!!!");
-                        megaChatApi.loadMessages(idChat, 16);
 
                         messages = new ArrayList<MegaChatMessage>();
                         //Prepare data
                         infoToShow = new ArrayList<Integer>();
 
+                        log("El resultado de abrir chat: "+result);
+                        log("Start to get Messages!!!");
+                        int emptyHistory = megaChatApi.loadMessages(idChat, 16);
+                        if(emptyHistory== MegaChatApi.SOURCE_NONE){
+                            log("No messages, show empty screen");
+                            chatRelativeLayout.setVisibility(View.GONE);
+                            emptyScrollView.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            chatRelativeLayout.setVisibility(View.VISIBLE);
+                            emptyScrollView.setVisibility(View.GONE);
+                        }
+
                         String[] words = chatRoom.getTitle().split(" ");
                         shortContactName=words[0];
-
-
-
-
-
 
                         mLayoutManager.setStackFromEnd(true);
                         listView.setVisibility(View.VISIBLE);
@@ -582,6 +582,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callMenuItem = menu.findItem(R.id.cab_menu_call_chat);
         videoMenuItem = menu.findItem(R.id.cab_menu_video_chat);
         inviteMenuItem = menu.findItem(R.id.cab_menu_invite_chat);
+        clearHistoryMenuItem = menu.findItem(R.id.cab_menu_clear_history_chat);
+        contactInfoMenuItem = menu.findItem(R.id.cab_menu_contact_info_chat);
+        leaveMenuItem = menu.findItem(R.id.cab_menu_leave_chat);
+
+        if(chatRoom!=null){
+            if(chatRoom.isGroup()){
+                contactInfoMenuItem.setVisible(false);
+                clearHistoryMenuItem.setVisible(false);
+                leaveMenuItem.setVisible(true);
+            }
+            else{
+                contactInfoMenuItem.setVisible(true);
+                clearHistoryMenuItem.setVisible(true);
+                leaveMenuItem.setVisible(false);
+            }
+        }
+        else{
+            log("Chatroom NULL on create menu");
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -605,6 +624,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.cab_menu_invite_chat:{
 
+                break;
+            }
+            case R.id.cab_menu_contact_info_chat:{
+                break;
+            }
+            case R.id.cab_menu_clear_history_chat:{
+                log("Clear history selected!");
+                ChatController chatC = new ChatController(this);
+                chatC.clearHistory(chatRoom);
+                break;
+            }
+            case R.id.cab_menu_leave_chat:{
+                log("Leave selected!");
                 break;
             }
         }
@@ -1305,6 +1337,47 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Error, id temp message not found!!");
         }
 
+    }
+
+    public void showSnackbar(String s){
+        log("showSnackbar: "+s);
+        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
+    }
+
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish");
+
+        if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
+            log("Truncate history request finish!!!");
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Ok. Clear history done");
+                showSnackbar(getString(R.string.clear_history_success));
+            }
+            else{
+                log("Error clearing history: "+e.getErrorString());
+                showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestTemporaryError");
     }
 
     @Override

@@ -216,6 +216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout chatLayout;
 	public LinearLayout optionInfoChat;
 	public LinearLayout optionLeaveChat;
+	public LinearLayout optionClearHistory;
 	public LinearLayout optionMuteChat;
 	private ChatPanelListener chatPanelListener;
 	////
@@ -1345,6 +1346,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		chatOutLayout = (FrameLayout) findViewById(R.id.file_list_out_chat);
 		optionInfoChat = (LinearLayout) findViewById(R.id.file_list_info_chat_layout);
 		optionLeaveChat= (LinearLayout) findViewById(R.id.file_list_leave_chat_layout);
+		optionClearHistory = (LinearLayout) findViewById(R.id.file_list_clear_history_chat_layout);
 		optionMuteChat = (LinearLayout) findViewById(R.id.file_list_mute_chat_layout);
 
 		chatPanelListener = new ChatPanelListener(this);
@@ -1352,6 +1354,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionInfoChat.setOnClickListener(chatPanelListener);
 		optionMuteChat.setOnClickListener(chatPanelListener);
 		optionLeaveChat.setOnClickListener(chatPanelListener);
+		optionClearHistory.setOnClickListener(chatPanelListener);
 		chatOutLayout.setOnClickListener(chatPanelListener);
 
 		slidingChatPanel.setVisibility(View.INVISIBLE);
@@ -6848,7 +6851,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(getResources().getDrawable(R.drawable.ic_chat));
+				menuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -10291,7 +10294,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		mi = menu.findItem(R.id.navigation_item_chat);
 		if (mi != null){
-			mi.setIcon(getResources().getDrawable(R.drawable.ic_chat));
+			mi.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat));
 			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
@@ -10603,6 +10606,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
+			log("Truncate history request finisf!!!");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				showSnackbar(getString(R.string.clear_history_success));
+			}
+			else{
+				showSnackbar(getString(R.string.clear_history_error));
+				log("Error clearing history: "+e.getErrorString());
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
@@ -12334,9 +12347,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setVisibility(View.GONE);
 		if(chat.isGroup()){
 			optionLeaveChat.setVisibility(View.VISIBLE);
+			optionClearHistory.setVisibility(View.GONE);
 		}
 		else{
-			optionLeaveChat.setVisibility(View.INVISIBLE);
+			optionLeaveChat.setVisibility(View.GONE);
+			optionClearHistory.setVisibility(View.VISIBLE);
 		}
 		slidingChatPanel.setVisibility(View.VISIBLE);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
@@ -12595,6 +12610,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case CHAT:{
+				if(megaChatApi.getChatRooms().size()==0){
+					fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
+				}
+				else{
+					fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
+				}
 				fabButton.setVisibility(View.VISIBLE);
 				break;
 			}
