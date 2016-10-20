@@ -345,13 +345,12 @@ public class MegaChatApiJava {
      *
      * @param chatid MegaChatHandle that identifies the chat room
      * @param msg Content of the message
-     * @param type Type of the message (normal message, type of management message,
      * application-specific type like link, share, picture etc.) @see MegaChatMessage::Type.
      *
      * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
      */
-    public MegaChatMessage sendMessage(long chatid, String msg, MegaChatMessage.Type type){
-        return megaChatApi.sendMessage(chatid, msg, type);
+    public MegaChatMessage sendMessage(long chatid, String msg){
+        return megaChatApi.sendMessage(chatid, msg);
     }
 
     /**

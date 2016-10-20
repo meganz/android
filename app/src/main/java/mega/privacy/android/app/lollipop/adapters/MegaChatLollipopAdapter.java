@@ -168,8 +168,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         contactTextParams.setMargins(Util.scaleWidthPx(37, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
         holder.contactText.setLayoutParams(contactTextParams);
 
-
-
         holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
         holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
         //Margins
