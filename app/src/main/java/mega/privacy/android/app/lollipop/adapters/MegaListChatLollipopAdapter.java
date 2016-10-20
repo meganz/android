@@ -394,14 +394,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
 		holder.contactStateIcon.setLayoutParams(stateIconParams);
 
-//			MegaChatApi.Status state = chat.getOnlineStatus();
-//			log("State of the chat: "+state.toString());
-//			if(state.equals(MegaChatApi.Status.STATUS_ONLINE)){
-//				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
-//			}
-//			else{
-//				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
-//			}
+		int state = chat.getOnlineStatus();
+		if(state == MegaChatApi.STATUS_ONLINE){
+			log("This user is connected: "+chat.getTitle());
+			holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+		}
+		else{
+			log("This user status is: "+state+  " " + chat.getTitle());
+			holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+		}
 
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);		

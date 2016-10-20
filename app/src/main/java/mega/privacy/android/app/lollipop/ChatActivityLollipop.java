@@ -27,6 +27,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -102,8 +103,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
     ScrollView emptyScrollView;
-    TableLayout emptyTableLayout;
-
 
     FloatingActionButton fab;
     FrameLayout emojiKeyboardLayout;
@@ -128,6 +127,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MenuItem contactInfoMenuItem;
     MenuItem leaveMenuItem;
 
+    LinearLayout megaInfoEmptyLayout;
+    LinearLayout confidentialityEmptyLayout;
+    LinearLayout authenticityEmptyLayout;
+    TextView megaInfoTextView;
+    TextView confidentialityTextView;
+    TextView authenticityTextView;
+    TextView megaInfoTitle;
+    TextView authenticityTitle;
+    TextView confidentialityTitle;
+
     int diffMeasure;
     boolean focusChanged=false;
 
@@ -139,6 +148,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MegaContact contactChat;
     String fullName;
     String shortContactName;
+
+    int stateHistory;
 
     DatabaseHandler dbH = null;
 
@@ -253,11 +264,52 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         ///Empty screen
         emptyScrollView = (ScrollView) findViewById(R.id.layout_empty_scroll_view);
-        emptyTableLayout = (TableLayout) findViewById(R.id.empty_table_layout);
+//        emptyScrollView.setVisibility(View.VISIBLE);
 
-        RelativeLayout.LayoutParams emptyTableParams = (RelativeLayout.LayoutParams)emptyTableLayout.getLayoutParams();
-        emptyTableParams.setMargins(Util.scaleWidthPx(36, outMetrics), 0, Util.scaleHeightPx(40, outMetrics), Util.scaleWidthPx(36, outMetrics));
-        emptyTableLayout.setLayoutParams(emptyTableParams);
+        megaInfoEmptyLayout = (LinearLayout) findViewById(R.id.mega_info_layout);
+        RelativeLayout.LayoutParams megaInfoParams = (RelativeLayout.LayoutParams)megaInfoEmptyLayout.getLayoutParams();
+        megaInfoParams.setMargins(Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(40, outMetrics), Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(24, outMetrics));
+        megaInfoEmptyLayout.setLayoutParams(megaInfoParams);
+
+        confidentialityEmptyLayout = (LinearLayout) findViewById(R.id.confidentiality_info);
+        RelativeLayout.LayoutParams megaConfidentialityParams = (RelativeLayout.LayoutParams)confidentialityEmptyLayout.getLayoutParams();
+        megaConfidentialityParams.setMargins(Util.scaleWidthPx(36, outMetrics), 0, Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(24, outMetrics));
+        confidentialityEmptyLayout.setLayoutParams(megaConfidentialityParams);
+
+        authenticityEmptyLayout = (LinearLayout) findViewById(R.id.authenticity_info);
+        RelativeLayout.LayoutParams megaAuthenticityParams = (RelativeLayout.LayoutParams)authenticityEmptyLayout.getLayoutParams();
+        megaAuthenticityParams.setMargins(Util.scaleWidthPx(36, outMetrics), 0, Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(24, outMetrics));
+        authenticityEmptyLayout.setLayoutParams(megaAuthenticityParams);
+
+        megaInfoTitle = (TextView) findViewById(R.id.mega_title);
+        RelativeLayout.LayoutParams megaTitleParams = (RelativeLayout.LayoutParams)megaInfoTitle.getLayoutParams();
+        megaTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
+        megaInfoTitle.setLayoutParams(megaTitleParams);
+
+        confidentialityTitle = (TextView) findViewById(R.id.confidentiality_title);
+        RelativeLayout.LayoutParams confidentialityTitleParams = (RelativeLayout.LayoutParams)confidentialityTitle.getLayoutParams();
+        confidentialityTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
+        confidentialityTitle.setLayoutParams(confidentialityTitleParams);
+
+        authenticityTitle = (TextView) findViewById(R.id.authenticity_title);
+        RelativeLayout.LayoutParams authenticityTitleParams = (RelativeLayout.LayoutParams)authenticityTitle.getLayoutParams();
+        authenticityTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
+        authenticityTitle.setLayoutParams(authenticityTitleParams);
+
+        megaInfoTextView = (TextView) findViewById(R.id.mega_info);
+        RelativeLayout.LayoutParams megaTextParams = (RelativeLayout.LayoutParams)megaInfoTextView.getLayoutParams();
+        megaTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
+        megaInfoTextView.setLayoutParams(megaTextParams);
+
+        confidentialityTextView = (TextView) findViewById(R.id.confidentiality_text);
+        RelativeLayout.LayoutParams confidentialityTextParams = (RelativeLayout.LayoutParams)confidentialityTextView.getLayoutParams();
+        confidentialityTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
+        confidentialityTextView.setLayoutParams(confidentialityTextParams);
+
+        authenticityTextView = (TextView) findViewById(R.id.authenticity_text);
+        RelativeLayout.LayoutParams authenticityTextParams = (RelativeLayout.LayoutParams)authenticityTextView.getLayoutParams();
+        authenticityTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
+        authenticityTextView.setLayoutParams(authenticityTextParams);
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
@@ -435,6 +487,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     myMail = megaApi.getMyEmail();
                     myUserHandle = megaApi.getMyUser().getHandle();
 
+                    log("Show empty screen");
+                    chatRelativeLayout.setVisibility(View.GONE);
+                    emptyScrollView.setVisibility(View.VISIBLE);
+
                     if(idChat!=-1){
                         //REcover chat
                         log("Recover chat with id: "+idChat);
@@ -451,23 +507,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         log("El resultado de abrir chat: "+result);
                         log("Start to get Messages!!!");
-                        int emptyHistory = megaChatApi.loadMessages(idChat, 16);
-                        if(emptyHistory== MegaChatApi.SOURCE_NONE){
-                            log("No messages, show empty screen");
-                            chatRelativeLayout.setVisibility(View.GONE);
-                            emptyScrollView.setVisibility(View.VISIBLE);
-                        }
-                        else{
-                            chatRelativeLayout.setVisibility(View.VISIBLE);
-                            emptyScrollView.setVisibility(View.GONE);
-                        }
+                        stateHistory = megaChatApi.loadMessages(idChat, 16);
 
                         String[] words = chatRoom.getTitle().split(" ");
                         shortContactName=words[0];
 
                         mLayoutManager.setStackFromEnd(true);
                         listView.setVisibility(View.VISIBLE);
-
                     }
 
                 }
@@ -757,7 +803,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void sendMessage(String text){
         log("sendMessage: "+text);
 
-        MegaChatMessage msgSent = megaChatApi.sendMessage(idChat, text, MegaChatMessage.Type.TYPE_NORMAL);
+        MegaChatMessage msgSent = megaChatApi.sendMessage(idChat, text);
         if(msgSent!=null){
             log("Mensaje enviado con id temp: "+msgSent.getTempId());
             messages.add(msgSent);
@@ -1099,6 +1145,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageLoaded!");
+
+        log("Show messages screen");
+        chatRelativeLayout.setVisibility(View.VISIBLE);
+        emptyScrollView.setVisibility(View.GONE);
 
         messages.add(msg);
 
