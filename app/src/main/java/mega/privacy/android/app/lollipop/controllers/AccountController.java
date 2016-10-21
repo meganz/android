@@ -33,12 +33,14 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 public class AccountController {
 
     Context context;
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
     MegaPreferences prefs = null;
 
@@ -248,13 +250,13 @@ public class AccountController {
         megaApi.killSession(-1, (ManagerActivityLollipop) context);
     }
 
-    static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
+    static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount) {
         log("logout");
-        logout(context, megaApi, confirmAccount, false);
+        logout(context, megaApi, megaChatApi, confirmAccount, false);
     }
 
 
-    static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount, boolean logoutBadSession) {
+    static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount, boolean logoutBadSession) {
         log("logout");
 
         File offlineDirectory = null;
@@ -347,8 +349,13 @@ public class AccountController {
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
+        if (megaChatApi == null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        }
+
         if (!logoutBadSession){
             megaApi.logout();
+//            megaChatApi.logout(((ManagerActivityLollipop)context));
         }
 
         if (!confirmAccount){

@@ -53,6 +53,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -116,6 +117,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //	private TextView windowTitle;
 	
 	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
 	private int mode;
 	
 	private long[] moveFromHandles;
@@ -231,7 +233,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if (credentials == null){
 			log("User credentials NULL");
 			AccountController aC = new AccountController(this);
-			aC.logout(this, megaApi, false);
+			aC.logout(this, megaApi, megaChatApi, false);
 			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);

@@ -1161,7 +1161,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    	if (!openLink){
 				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, false);
+				aC.logout(this, megaApi, megaChatApi, false);
 		    }
 
 	    	return;
@@ -1950,7 +1950,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	if(dbH.getCredentials() == null){
     		if (!openLink){
 				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, false);
+				aC.logout(this, megaApi, megaChatApi, false);
     			return;
     		}
     		else{
@@ -2547,6 +2547,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
     		megaApi.removeRequestListener(this);
+
+			megaApi.localLogout();
+			megaChatApi.localLogout(this);
     	}
 
     	super.onDestroy();
@@ -6251,7 +6254,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        case R.id.action_menu_logout:{
 				log("action menu logout pressed");
 				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, false);
+				aC.logout(this, megaApi, megaChatApi, false);
 	        	return true;
 	        }
 	        case R.id.action_menu_cancel_subscriptions:{
