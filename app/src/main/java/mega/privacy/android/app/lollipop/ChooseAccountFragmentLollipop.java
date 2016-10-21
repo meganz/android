@@ -31,6 +31,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
@@ -46,6 +47,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     DisplayMetrics outMetrics;
     Display display;
     private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
     ActionBar aB;
 
     public ArrayList<Product> accounts;
@@ -189,16 +191,20 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             scaleText = scaleW;
         }
 
+        if(megaApi==null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if(megaChatApi==null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        }
+
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(((Activity)context).getApplicationContext());
         if (dbH.getCredentials() == null){
             AccountController aC = new AccountController(context);
-            aC.logout(context, megaApi, false);
+            aC.logout(context, megaApi, megaChatApi, false);
             //Show Login Fragment
             ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
-        }
-
-        if(megaApi==null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
         accounts = new ArrayList<Product>();

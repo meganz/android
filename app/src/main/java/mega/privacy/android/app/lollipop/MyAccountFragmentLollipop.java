@@ -38,6 +38,7 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -106,6 +107,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	float density;
 
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -131,6 +133,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		if(megaChatApi==null){
+			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 
 		if (aB == null){
@@ -573,7 +579,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			case R.id.logout_button:{
 				log("Logout button");
 				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, false);
+				aC.logout(context, megaApi, megaChatApi,false);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -855,7 +861,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The account has been canceled");
 				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, false);
+				aC.logout(context, megaApi, megaChatApi, false);
 			}
 			else{
 				log("ERROR when cancelling account: "+e.getErrorString());

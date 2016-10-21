@@ -191,7 +191,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 			if (credentials == null){
 				log("User credentials NULL");
 				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, false);
+				aC.logout(this, megaApi, null, false);
 				
 				Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 				loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);

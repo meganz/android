@@ -479,6 +479,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         this.messages = messages;
         this.infoToShow = infoToShow;
         notifyDataSetChanged();
+//        notifyItemInserted(mItems.size() - 1);
+    }
+
+    public void addMessage(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow){
+        this.messages = messages;
+        this.infoToShow = infoToShow;
+        notifyItemInserted(messages.size() - 1);
     }
 
     private static void log(String log) {

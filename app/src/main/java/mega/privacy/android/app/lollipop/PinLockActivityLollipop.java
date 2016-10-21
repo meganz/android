@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
 
 
 @SuppressLint("NewApi")
@@ -66,6 +67,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	CoordinatorLayout coordinatorLayout;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	RelativeLayout fragmentContainer;
     LinearLayout sixPinLayout;
     LinearLayout fourPinLayout;
@@ -115,7 +117,14 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		}
 
 		setContentView(R.layout.activity_pin_lock);
-		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+
+		if(megaApi==null) {
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+
+		if(megaChatApi==null){
+			megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+		}
 
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -862,7 +871,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
-									ManagerActivity.logout(getApplication(), megaApi, false);
+									 AccountController aC = new AccountController(getApplicationContext());
+									 aC.logout(getApplicationContext(), megaApi, megaChatApi, false);
 									finish();
 						     }
 						  }.start();
@@ -1366,7 +1376,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		switch(v.getId()){
 			case R.id.button_logout:{
 				AccountController aC = new AccountController(this);
-				aC.logout(getApplication(), megaApi, false);
+				aC.logout(getApplication(), megaApi, megaChatApi, false);
 				finish();
 				break;
 			}
@@ -1375,7 +1385,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				break;
 			}
 		}
-
 	}
 
 	public void checkPasswordText() {

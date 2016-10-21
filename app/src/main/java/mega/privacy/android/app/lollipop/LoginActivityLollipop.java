@@ -76,7 +76,7 @@ public class LoginActivityLollipop extends Activity{
 			log("There is an intent! VisibleFragment: "+visibleFragment);
 		}
 		else{
-			visibleFragment = 1;
+			visibleFragment = Constants.LOGIN_FRAGMENT;
 		}
 
 //		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;

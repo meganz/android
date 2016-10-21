@@ -70,14 +70,66 @@ public class MegaChatApiJava {
         megaChatApi.connect(createDelegateRequestListener(listener));
     }
 
-    public void setOnlineStatus(int status)
-    {
-        megaChatApi.setOnlineStatus(status);
+    /**
+     * @brief Logout of chat servers invalidating the session
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_LOGOUT
+     *
+     * After calling \c logout, the subsequent call to MegaChatApi::init expects to
+     * have a new session created by MegaApi::login.
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void logout(MegaChatRequestListenerInterface listener){
+        megaChatApi.logout(createDelegateRequestListener(listener));
     }
 
+    /**
+     * @brief Logout of chat servers without invalidating the session
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_LOGOUT
+     *
+     * After calling \c localLogout, the subsequent call to MegaChatApi::init expects to
+     * have an already existing session created by MegaApi::fastLogin(session)
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void localLogout(MegaChatRequestListenerInterface listener){
+        megaChatApi.localLogout(createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Set your online status.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_SET_CHAT_STATUS
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the new status of the user in chat.
+     *
+     * @param status Online status in the chat.
+     *
+     * It can be one of the following values:
+     * - MegaChatApi::STATUS_OFFLINE = 1
+     * The user appears as being offline
+     *
+     * - MegaChatApi::STATUS_BUSY = 2
+     * The user is busy and don't want to be disturbed.
+     *
+     * - MegaChatApi::STATUS_AWAY = 3
+     * The user is away and might not answer.
+     *
+     * - MegaChatApi::STATUS_ONLINE = 4
+     * The user is connected and online.
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
     public void setOnlineStatus(int status, MegaChatRequestListenerInterface listener)
     {
         megaChatApi.setOnlineStatus(status, createDelegateRequestListener(listener));
+    }
+
+    public void setOnlineStatus(int status)
+    {
+        megaChatApi.setOnlineStatus(status);
     }
 
     /**
