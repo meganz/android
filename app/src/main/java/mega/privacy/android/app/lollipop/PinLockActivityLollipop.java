@@ -214,15 +214,23 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			warningLayout.setVisibility(View.INVISIBLE);
 		}
 
-		if(prefs.getPinLockType().equals(Constants.PIN_4)){
-			log("4 PIN");
-			add4DigitsPin();
-		}
-		else if(prefs.getPinLockType().equals(Constants.PIN_6)){
-			add6DigitsPin();
-		}
-		else{
-			addAlphanumericPin();
+		if (prefs != null){
+			if (prefs.getPinLockType() != null){
+				if(prefs.getPinLockType().equals(Constants.PIN_4)){
+					log("4 PIN");
+					add4DigitsPin();
+				}
+				else if(prefs.getPinLockType().equals(Constants.PIN_6)){
+					add6DigitsPin();
+				}
+				else{
+					addAlphanumericPin();
+				}
+			}
+			else{
+				log("4 PIN else");
+				add4DigitsPin();
+			}
 		}
 	}
 
