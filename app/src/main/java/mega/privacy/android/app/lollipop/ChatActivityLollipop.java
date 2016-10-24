@@ -469,6 +469,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(chatId!=-1){
                         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
                         aB.setTitle(chatRoom.getTitle());
+
+		/*
+  public final static int STATUS_OFFLINE = 0;
+  public final static int STATUS_BUSY = 1;
+  public final static int STATUS_AWAY = 2;
+  public final static int STATUS_ONLINE = 3;
+  public final static int STATUS_CHATTY = 4;*/
+
                         aB.setSubtitle("Status");
                     }
                     else{

@@ -2,6 +2,7 @@ package nz.mega.sdk;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -321,6 +322,7 @@ public class MegaChatApiJava {
      */
 //    public boolean openChatRoom(long chatid, MegaChatRoomListenerInterface listener){
     public boolean openChatRoom(long chatid, MegaChatRoomListenerInterface listener){
+
         return megaChatApi.openChatRoom(chatid, createDelegateChatRoomListener(listener));
     }
 
@@ -333,7 +335,20 @@ public class MegaChatApiJava {
      * @param listener MegaChatRoomListener to be unregistered.
      */
     public void closeChatRoom(long chatid, MegaChatRoomListenerInterface listener){
-        megaChatApi.closeChatRoom(chatid, createDelegateChatRoomListener(listener));
+
+        DelegateMegaChatRoomListener listenerToDelete=null;
+
+        Iterator<DelegateMegaChatRoomListener> itr = activeChatRoomListeners.iterator();
+        while(itr.hasNext()) {
+            DelegateMegaChatRoomListener item = itr.next();
+            if(item.getUserListener() == listener){
+                listenerToDelete = item;
+                itr.remove();
+                break;
+            }
+        }
+
+        megaChatApi.closeChatRoom(chatid, listenerToDelete);
     }
 
     /**

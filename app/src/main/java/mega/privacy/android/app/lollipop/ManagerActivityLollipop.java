@@ -2547,9 +2547,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
     		megaApi.removeRequestListener(this);
-
-			megaApi.localLogout();
-			megaChatApi.localLogout(this);
     	}
 
     	super.onDestroy();

@@ -229,7 +229,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("Multiselect ON");
 
 				if(this.isItemChecked(position)){
-					holder.imageButtonThreeDots.setVisibility(View.GONE);
+//					holder.imageButtonThreeDots.setVisibility(View.GONE);
+					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 					createMultiselectTick(holder);
 				}
@@ -363,28 +364,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				RelativeLayout.LayoutParams muteIconParams = (RelativeLayout.LayoutParams)holder.muteIcon.getLayoutParams();
 				muteIconParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(14, outMetrics), 0, 0);
 				holder.muteIcon.setLayoutParams(muteIconParams);
-
-				//Set margin
-				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(0, Util.scaleHeightPx(12, outMetrics), 0, 0);
-				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 			}
 			else{
 				log("Chat with notifications enabled!!");
 				holder.muteIcon.setVisibility(View.GONE);
-				//Set margin
-				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
-				holder.textViewContactName.setLayoutParams(nameTextViewParams);
 			}
 		}
 		else{
 			log("Chat prefs is NULL");
 			holder.muteIcon.setVisibility(View.GONE);
-			//Set margin
-			RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-			nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
-			holder.textViewContactName.setLayoutParams(nameTextViewParams);
 		}
 
 		holder.contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
@@ -510,12 +498,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
+		//Set margin
+		RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
+		nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
+		holder.textViewContactName.setLayoutParams(nameTextViewParams);
+
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 		//Right margin
 		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
+		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
 		holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
