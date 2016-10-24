@@ -8,6 +8,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -43,6 +44,9 @@ public class ChatController {
         }
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.clearChatHistory(chat.getChatId(), (ChatActivityLollipop) context);
+        }
+        else if(context instanceof ContactChatInfoActivityLollipop){
+            megaChatApi.clearChatHistory(chat.getChatId(), (ContactChatInfoActivityLollipop) context);
         }
     }
 
