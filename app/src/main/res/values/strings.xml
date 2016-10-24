@@ -915,4 +915,8 @@
     <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">This cancel link has expired, please try again.</string>
 
     <string name="no_results_found" context="Text shown after searching and no results found">No results were found</string>
+
+    <string name="offline_status" context="Info label about the status of the user">Offline</string>
+    <string name="online_status" context="Info label about the status of the user">Online</string>
+
 </resources>
