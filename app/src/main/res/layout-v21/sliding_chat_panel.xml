@@ -215,7 +215,7 @@
                 android:layout_marginLeft="5dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_volume_off_black"
+                android:src="@drawable/ic_notifications_off_black"
                 android:visibility="visible" />
 
             <TextView

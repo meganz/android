@@ -42,21 +42,15 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/recent_chat_list_call_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
-        android:background="@null"
-        android:src="@drawable/ic_volume_mute_black" />
-
     <TextView
         android:id="@+id/recent_chat_list_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/recent_chat_list_call_icon"
         android:ellipsize="end"
         android:textSize="16sp"
+        android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
+        android:layout_marginLeft="13dp"
+        android:layout_marginRight="65dp"
         android:maxLines="1"
         android:textColor="@color/file_list_first_row" />
 
@@ -132,5 +126,15 @@
         android:paddingLeft="10dp"
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
+
+    <ImageView
+        android:id="@+id/recent_chat_list_call_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_notifications_off_black"
+        android:background="@null"
+        android:tint="@color/transparency_white"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/recent_chat_list_three_dots"/>
 
 </RelativeLayout>
