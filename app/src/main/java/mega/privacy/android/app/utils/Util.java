@@ -90,7 +90,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
@@ -368,16 +368,16 @@ public class Util {
 		dialogBuilder.setInverseBackgroundForced(true);
 		return dialogBuilder;
 	}
-	
+
 	/*
 	 * Create custom alert dialog view
 	 */
 	private static ViewGroup getCustomAlertView(Activity activity, String title, String message) {
 		View customView = activity.getLayoutInflater().inflate(R.layout.alert_dialog, null);
-		
+
 		TextView titleView = (TextView)customView.findViewById(R.id.dialog_title);
 		titleView.setText(title);
-		
+
 		TextView messageView = (TextView)customView.findViewById(R.id.message);
 		if (message == null) {
 			messageView.setVisibility(View.GONE);
@@ -386,7 +386,7 @@ public class Util {
 		}
 		return (ViewGroup)customView;
 	}
-	
+
 	/*
 	 * Show Toast message with resId
 	 */
@@ -399,7 +399,7 @@ public class Util {
 	 */
 	public static void showToast(Context context, String message) {
 		try { Toast.makeText(context, message, Toast.LENGTH_LONG).show(); } catch(Exception ex) {};
-	}	
+	}
 	
 	public static float getScaleW(DisplayMetrics outMetrics, float density){
 		

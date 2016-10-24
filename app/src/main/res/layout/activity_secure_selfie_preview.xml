@@ -4,24 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/secure_selfie_viewer_parent_layout" 
+    android:fitsSystemWindows="true"
     android:background="#000000">
+    
+    <mega.privacy.android.app.components.TouchImageView
+        android:id="@+id/secure_selfie_viewer_image"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="fitXY" />
     
      <RelativeLayout 
         android:layout_width="fill_parent"
         android:layout_height="48dp"
         android:id="@+id/secure_selfie_viewer_layout_top"
-        android:background="#44000000"
+        android:background="#66000000"
         android:layout_alignParentTop="true">
-        
-        <ImageView 
-            android:id="@+id/secure_selfie_viewer_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_navigation_accept_white"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            style="@style/dialogActionButton"/>
         
         <ImageView 
             android:id="@+id/secure_selfie_viewer_discard"
@@ -41,43 +38,8 @@
 		    android:layout_centerVertical="true"
 		    android:layout_toLeftOf="@id/secure_selfie_viewer_discard"
 		    android:layout_marginRight="5dp"
-		    style="@style/dialogActionButton" />
-        
-         <ImageView 
-            android:id="@+id/secure_selfie_viewer_repeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_repeat"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/secure_selfie_viewer_upload"
-            android:layout_marginRight="5dp"
-            style="@style/dialogActionButton"/>
+		    style="@style/dialogActionButton" />        
         
     </RelativeLayout>
-    
-    <RelativeLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:id="@+id/secure_selfie_viewer_layout_bottom"
-        android:background="#44000000"
-        android:layout_alignParentBottom="true">
-        
-        <TextView 
-            android:id="@+id/secure_selfie_viewer_file_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="@color/white" 
-            android:textStyle="bold"/>
-           
-    </RelativeLayout>
-    
-   <ImageView
-        android:id="@+id/secure_selfie_viewer_image"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:scaleType="fitCenter" 
-        android:layout_below="@id/secure_selfie_viewer_layout_top"/>
     
 </RelativeLayout>

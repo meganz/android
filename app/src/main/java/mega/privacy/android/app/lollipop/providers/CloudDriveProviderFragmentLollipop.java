@@ -107,7 +107,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);

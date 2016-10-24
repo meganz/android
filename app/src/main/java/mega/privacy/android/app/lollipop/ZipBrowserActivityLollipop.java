@@ -201,17 +201,16 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		aB.setTitle(getString(R.string.zip_browser_activity));
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		
-		Window window = this.getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(this.getResources().getColor(R.color.lollipop_dark_primary_color));
+//		Window window = this.getWindow();
+//		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//		window.setStatusBarColor(this.getResources().getColor(R.color.lollipop_dark_primary_color));
 		
 		listView = (ListView) findViewById(R.id.zip_list_view_browser);
 		listView.setOnItemClickListener(this);
 		listView.setOnItemLongClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		listView.setItemsCanFocus(false);
-		
 
 		try {
 			myZipFile = new ZipFile(pathZip);			
@@ -223,7 +222,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				
 				log(element.getName());
 			}
-				
 				
 		} catch (IOException e) {
 

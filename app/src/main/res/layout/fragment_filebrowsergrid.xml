@@ -2,168 +2,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileBrowserGridFragment"
-    android:background="@color/white" >
-    
-    <TextView
-	    android:id="@+id/content_grid_text"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:paddingLeft="8dp"
-	    android:textColor="@color/black"
-	    android:background="@color/content_text_folder"
-	    android:textSize="14sp"/>
-       
+    android:id="@+id/fragment_container_file_browser_grid"
+    android:background="@color/new_background_fragment"
+    tools:context=".FileBrowserGridFragment" >
+
+    <RelativeLayout
+        android:id="@+id/content_grid_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:background="@color/new_background_fragment" >
+
+        <TextView
+            android:id="@+id/content_grid_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:layout_centerVertical="true"
+            android:textSize="14sp" />
+
+        <ProgressBar
+            android:id="@+id/file_grid_download_progress_bar"
+            style="@style/UsedSpaceProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/content_grid_text"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/file_grid_transfer_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/file_grid_download_progress_bar"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_chevron_right_grey"
+            android:visibility="gone" />
+    </RelativeLayout>
+
     <ImageView
-	    android:id="@+id/file_grid_empty_image"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_centerInParent="true" />
-    
+        android:id="@+id/file_grid_empty_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:gravity="center_horizontal" />
+
     <TextView
-	    android:id="@+id/file_grid_empty_text"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:textColor="@color/text_secondary"
-	    android:textSize="16sp"
-	    android:layout_below="@id/file_grid_empty_image"
-	    android:layout_marginTop="@dimen/standard_margin"
-	    android:layout_centerHorizontal="true"/>
-    
-         <LinearLayout
-         android:id="@+id/buttons_grid_layout"
-    	 android:layout_width="fill_parent"
-    	 android:layout_height="wrap_content"
-    	 android:layout_alignParentBottom="true"
-    	 android:layout_gravity="center|fill_horizontal"
-    	 android:orientation="horizontal">
+        android:id="@+id/file_grid_empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/file_grid_empty_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp" />    
 
-         <Button
-             android:id="@+id/btnLeft_grid_new"
-             android:layout_width="fill_parent"
-       		android:layout_height="48dp"
-       		android:layout_weight="1"
-             android:background="@drawable/grey_btn_default_holo_light"
-             android:textColor="@color/white"
-             android:text="@string/menu_new_folder" />
-         
-         <Button
-             android:id="@+id/btnRight_grid_upload"
-             android:layout_width="fill_parent"
-       		android:layout_height="48dp"
-       		android:layout_weight="1"
-             android:background="@drawable/btn_default_holo_light_without_corners"
-             android:textColor="@color/white"
-             android:text="@string/general_upload" />
-      </LinearLayout>  
-      
-      <LinearLayout
-         android:id="@+id/out_space_grid"
-    	 android:layout_width="fill_parent"
-    	 android:layout_height="wrap_content"
-    	 android:layout_alignParentBottom="true"
-    	 android:layout_gravity="center|fill_horizontal"
-    	 android:layout_centerHorizontal="true"
-    	 android:orientation="vertical">
-
-		<TextView
-		    android:id="@+id/out_space_text_grid"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:textColor="@color/white"
-		    android:textStyle="bold"
-		    android:paddingTop="20dp"
-		    android:paddingBottom="20dp"
-		    android:paddingLeft="20dp"
-		    android:paddingRight="20dp"
-		    android:gravity="center"
-		    android:background="@color/navigation_drawer_background"
-		    android:textSize="16sp"
-		    android:text="@string/warning_out_space"/>  
-         
-         <Button
-            android:id="@+id/out_space_btn_grid"
-       		android:layout_height="48dp"       		
-       		android:layout_width="fill_parent"
-            android:background="@drawable/btn_default_holo_light_without_corners"
-            android:textColor="@color/white"
-            android:text="@string/my_account_upgrade_pro" />
-     </LinearLayout>       
-     
-       <LinearLayout
-         android:id="@+id/get_pro_account_grid"
-    	 android:layout_width="fill_parent"
-    	 android:layout_height="wrap_content"
-    	 android:layout_alignParentBottom="true"
-    	 android:layout_gravity="center|fill_horizontal"
-    	 android:layout_centerHorizontal="true"
-    	 android:orientation="vertical">
-
-		<TextView
-		    android:id="@+id/get_pro_account_text_grid"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:textColor="@color/white"
-		    android:textStyle="bold"
-		    android:paddingTop="20dp"
-		    android:paddingBottom="20dp"
-		    android:paddingLeft="20dp"
-		    android:paddingRight="20dp"
-		    android:gravity="center"
-		    android:background="@color/navigation_drawer_background"
-		    android:textSize="16sp"
-		    android:text="@string/get_pro_account"/>  
-         
-	      <LinearLayout
-	         android:id="@+id/get_pro_account_buttons_layout_grid"
-	    	 android:layout_width="fill_parent"
-	    	 android:layout_height="wrap_content"
-	    	 android:layout_alignParentBottom="true"
-	    	 android:layout_gravity="center|fill_horizontal"
-	    	 android:orientation="horizontal">
-	
-	         <Button
-	             android:id="@+id/btnLeft_cancel_grid"
-	             android:layout_width="fill_parent"
-	       		android:layout_height="48dp"
-	       		android:layout_weight="1"
-	             android:background="@drawable/grey_btn_default_holo_light"
-	             android:textColor="@color/white"
-	             android:text="@string/general_cancel" />
-	         
-	         <Button
-	             android:id="@+id/btnRight_upgrade_grid"
-	             android:layout_width="fill_parent"
-	       		android:layout_height="48dp"
-	       		android:layout_weight="1"
-	             android:background="@drawable/btn_default_holo_light_without_corners"
-	             android:textColor="@color/white"
-	             android:text="@string/my_account_upgrade_pro" />
-	      	</LinearLayout> 
-     </LinearLayout>        
-      
-      
-     <ListView 
+    <mega.privacy.android.app.components.AutofitRecyclerView
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:dividerHeight="0dp"
-		android:divider="@null"
-		android:layout_below="@id/content_grid_text"
-        android:layout_above="@id/buttons_grid_layout">
-    </ListView>
-    
-     	
-      <Button
-       	android:id="@+id/file_grid_browser_camera_upload_on_off"
-       	android:layout_gravity="center"
-       	android:layout_height="48dp"
-       	android:layout_width="fill_parent"
-       	android:layout_alignParentBottom="true"
-       	android:background="@drawable/btn_default_holo_light_without_corners"
-       	android:textColor="@color/white"
-       	android:text="@string/settings_camera_upload_on"
-       	android:visibility="gone">
-    </Button>
+        android:layout_height="match_parent"
+        android:layout_below="@id/content_grid_text_layout"
+        android:choiceMode="multipleChoice"
+        android:columnWidth="172dp" />
 
+    <TextView
+        android:id="@+id/file_grid_browser_camera_upload_on_off"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/accentColor"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/file_explorer_button_grid"
+        android:layout_width="fill_parent"
+        android:layout_height="55dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center"
+        android:background="@drawable/btn_default_holo_light_without_corners"
+        android:textColor="@color/white"
+        android:visibility="gone" >
+    </Button>
 </RelativeLayout>

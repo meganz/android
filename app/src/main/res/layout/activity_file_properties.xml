@@ -1,269 +1,460 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@color/file_properties_bottom"
-	tools:context=".FilePropertiesActivityLollipop">
-    
-    <LinearLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="@color/navigation_drawer_background"
-	    android:orientation="vertical"
-	    android:weightSum="6"
-	    android:id="@+id/file_title_layout">   
-	    
-        <RelativeLayout 
-            android:layout_width="match_parent"
-	    	android:layout_height="wrap_content"
-	    	android:gravity="center_horizontal"
-            android:layout_weight="5">
-	        
-	     <ImageView 
-	         android:id="@+id/file_properties_image"
-	         android:layout_width="wrap_content"
-	         android:layout_height="200dp"/>
-	     
-	     <ImageView 
-	         android:id="@+id/file_properties_image_link"
-	         android:layout_width="wrap_content"
-	         android:src="@drawable/get_link_circle_white_ic"
-	         android:layout_height="70dp"
-	         android:layout_alignLeft="@id/file_properties_image"
-        	 android:layout_alignBottom="@id/file_properties_image" />	
-	     
-	     </RelativeLayout>
-	     
-	     <TextView
-	        android:id="@+id/file_properties_name"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal"
-	        android:layout_marginBottom="20dp"
-	        android:layout_marginTop="-10dp"
-	        android:layout_weight="1"
-	        android:textColor="@color/white"/>
-	     
-	     <TextView
-	        android:id="@+id/file_properties_owner_info"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal"
-	        android:layout_marginBottom="20dp"
-	        android:layout_marginTop="-10dp"
-	        android:layout_weight="1"
-	        android:textColor="@color/white"/>   
-	
-	  </LinearLayout>
-         
-      <LinearLayout       		
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content" 
-	    android:orientation="horizontal"
-	    android:id="@+id/available_offline_layout"
-	    android:background="@color/switch_selector_layout"
-      	android:layout_below="@+id/file_title_layout" >    		    
-             
-           <TextView
-             android:id="@+id/file_properties_available_offline_text"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/file_properties_available_offline"
-			 android:layout_gravity="left|center_vertical"
-			 android:textStyle="bold"
-			 android:textColor="@color/white"
-			 android:layout_weight="5" />
-               
-           <TextView
-             android:id="@+id/file_properties_available_offline_on"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:gravity="right"
-             android:text="@string/file_properties_available_offline_off"
-			 android:layout_gravity="left|center_vertical"
-			 android:textStyle="bold"
-			 android:textColor="@color/white" 
-			 android:layout_weight="1"/>
-               
-           	<mega.privacy.android.app.components.MySwitch
-		        android:id="@+id/file_properties_switch_online"
-		        style="@style/mySwitchStyle"
-		        android:layout_width="wrap_content"
-		        android:layout_height="20dp"
-		        android:layout_gravity="right|center_vertical"
-		    	android:layout_margin="5dp"
-		        android:gravity="right"     
-		        mySwitch:textOff=""
-		        mySwitch:textOn=""
-		        mySwitch:textOnThumb="false"
-		        mySwitch:thumb="@drawable/switch_thumb"
-		        mySwitch:trackMySwitch="@drawable/switch_track_online" 
-		        android:layout_weight="1"/>
-           	
-           	<mega.privacy.android.app.components.MySwitch
-	        android:id="@+id/file_properties_switch_offline"
-	        style="@style/mySwitchStyle"
-	        android:layout_width="wrap_content"
-	        android:layout_height="20dp"
-	        android:gravity="right"
-	        android:layout_gravity="right|center_vertical"
-	        android:layout_margin="5dp"
-	        mySwitch:textOff=""
-	        mySwitch:textOn=""
-	        mySwitch:textOnThumb="false"
-	        mySwitch:thumb="@drawable/switch_thumb"
-	        mySwitch:trackMySwitch="@drawable/switch_track_offline"
-	        android:layout_weight="1" />
-               
-         <TextView
-             android:id="@+id/file_properties_available_offline_off"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="left|center_vertical"
-             android:text="@string/file_properties_available_offline_on"
-             android:textColor="@color/white"
-			 android:textStyle="bold"
-			 android:layout_marginLeft="-5dp"
-			 android:layout_marginRight="15dp"
-			 android:layout_weight="1" /> 	
-   		    
-       </LinearLayout>         
-     
-     <TableLayout 
-         android:id="@+id/file_properties_layout"
-         android:layout_width="fill_parent"
-       	 android:layout_height="wrap_content" 
-       	 android:layout_gravity="center"
-       	 android:background="@color/file_properties_bottom"
-       	 android:layout_below="@id/available_offline_layout"
-       	 android:layout_marginTop="10dp" >
-         
-         <TableRow >
-             
-              <TextView
-	             android:id="@+id/file_properties_permission_label"
-	             android:layout_width="wrap_content"
-	             android:layout_height="wrap_content"
-	             android:text="@string/file_properties_shared_folder_permissions"
-	             android:textColor="@color/grey_info_menu"
-				 android:layout_gravity="center_vertical|left"
-				 android:textStyle="bold"
-				 android:paddingLeft="30dp"
-				 android:paddingTop="7dp" />   
-             
-        	<TextView
-	             android:id="@+id/file_properties_permission_info"
-	             android:layout_width="wrap_content"
-	             android:layout_height="wrap_content"
-	             android:textColor="@color/white"
-				 android:layout_gravity="center_vertical|left" 
-				 android:paddingLeft="18dp"
-				 android:paddingTop="7dp"/>         
-                         
-             
-         </TableRow>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/file_properties_complete_relative_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-         <TableRow>
-             <TextView
-		             android:id="@+id/file_properties_info_menu_size"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/file_properties_info_size_file"
-		             android:textColor="@color/grey_info_menu"
-					 android:layout_gravity="center_vertical|left"
-					 android:textStyle="bold"
-					 android:paddingLeft="30dp"
-					 android:paddingTop="7dp" />                        
-             
-             <TextView
-		             android:id="@+id/file_properties_info_data_size"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:textColor="@color/white"
-					 android:layout_gravity="center_vertical|left" 
-					 android:paddingLeft="18dp"
-					 android:paddingTop="7dp"/>
-         </TableRow>            
-          
-         <TableRow>
-             <TextView
-		             android:id="@+id/file_properties_info_menu_content"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/file_properties_info_content"
-		             android:textColor="@color/grey_info_menu"
-					 android:layout_gravity="center_vertical|left"
-					 android:textStyle="bold"
-					 android:paddingLeft="30dp"
-					 android:paddingTop="7dp" />                        
-             
-             <TextView
-		             android:id="@+id/file_properties_info_data_content"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:textColor="@color/white"
-					 android:layout_gravity="center_vertical|left" 
-					 android:paddingLeft="18dp"
-					 android:paddingTop="7dp"/>
-         </TableRow>      
-         
-         
-         <TableRow>
-             <TextView
-		             android:id="@+id/file_properties_info_menu_added"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/file_properties_info_added"
-		             android:textColor="@color/grey_info_menu"
-					 android:layout_gravity="center_vertical|left"
-					 android:textStyle="bold"
-					 android:paddingLeft="30dp"
-					 android:paddingTop="7dp" />
-             
-             <TextView
-		             android:id="@+id/file_properties_info_data_added"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:textColor="@color/white"
-					 android:layout_gravity="center_vertical|left"
-					 android:paddingLeft="18dp"
-					 android:paddingTop="7dp" />
-         </TableRow>
-         
-         <TableRow>
-             <TextView
-		             android:id="@+id/file_properties_info_menu_modified"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/file_properties_info_modified"
-		             android:textColor="@color/grey_info_menu"
-					 android:layout_gravity="center_vertical|left"
-					 android:textStyle="bold"
-					 android:paddingLeft="30dp"
-					 android:paddingTop="7dp"
-					 android:paddingBottom="15dp" />
-             
-             <TextView
-		             android:id="@+id/file_properties_info_data_modified"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:textColor="@color/white"
-					 android:layout_gravity="center_vertical|left"
-					 android:paddingLeft="18dp"
-					 android:paddingTop="7dp"
-					 android:paddingBottom="15dp" />
-         </TableRow>
-     </TableLayout>
-	
-    <Button
-        android:id="@+id/shared_with_button"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/btn_shared_folder_holo_light"
-        android:textColor="@color/black" >
-    </Button>
-    
+    <com.nirhart.parallaxscroll.views.ParallaxScrollView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/file_properties_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        app:parallax_factor="1.9"
+        tools:context=".MainActivity" >
+
+        <RelativeLayout
+            android:id="@+id/file_properties_main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <RelativeLayout
+                android:id="@+id/file_properties_image_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:fitsSystemWindows="true" >
+
+                <ImageView
+                    android:id="@+id/file_properties_toolbar_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/file_properties_image_layout"
+                android:background="@color/white" >
+
+                <LinearLayout
+                    android:id="@+id/file_properties_options"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:orientation="vertical" >
+                  
+                     <!-- NAME LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_name_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_public_link_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:src="@drawable/ic_link_grey" />
+
+                        <TextView
+                            android:id="@+id/file_properties_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="left|center_vertical"
+                            android:layout_toRightOf="@id/file_properties_public_link_image"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+ 
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/separator_grey" />
+
+                    <!-- AVAILABLE OFFLINE LAYOUT -->
+
+                    <LinearLayout
+                        android:id="@+id/available_offline_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:orientation="horizontal" >
+
+                        <TextView
+                            android:id="@+id/file_properties_available_offline_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left|center_vertical"
+                            android:layout_weight="5"
+                            android:text="@string/file_properties_available_offline"
+                            android:textStyle="bold" />
+
+                        <android.support.v7.widget.SwitchCompat
+                            android:id="@+id/file_properties_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_weight="1"
+                            android:gravity="right" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/separator_grey" />
+
+                    <!-- SHARED LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_shared_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_shared_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:src="@drawable/ic_shared_with_grey" />
+
+                        <TextView
+                            android:id="@+id/file_properties_shared_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="left|center_vertical"
+                            android:layout_toRightOf="@id/file_properties_shared_image"
+                            android:text="@string/file_properties_shared_folder_select_contact"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/file_properties_shared_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/accentColor" 
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+
+                    <View
+                        android:id="@+id/divider_shared_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/separator_grey" />
+
+                    <!-- PERMISSIONS LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_permissions_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_permissions_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_permissions_grey"
+                            android:visibility="invisible" />
+
+                        <RelativeLayout
+                            android:id="@+id/file_properties_child_permissions_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="left|center_vertical"
+                            android:layout_toRightOf="@id/file_properties_permissions_image" >
+
+                            <TextView
+                                android:id="@+id/file_properties_permission_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_properties_shared_folder_permissions"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/file_properties_permission_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/file_properties_permission_label"
+                                android:textColor="@color/grey_info_menu" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- OWNER LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_owner_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left">
+
+                        <ImageView
+                            android:id="@+id/file_properties_owner_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_information_grey"
+                            android:visibility="invisible" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="left|center_vertical"
+                            android:layout_toRightOf="@id/file_properties_owner_image" >
+
+                            <TextView
+                                android:id="@+id/file_properties_owner_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_properties_owner"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/file_properties_owner_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/file_properties_owner_label"
+                                android:textColor="@color/grey_info_menu" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- SIZE LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_size_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_size_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_information_grey" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="left|center_vertical"
+                            android:layout_toRightOf="@id/file_properties_size_image" >
+
+                            <TextView
+                                android:id="@+id/file_properties_info_menu_size"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_properties_info_size_file"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/file_properties_info_data_size"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/file_properties_info_menu_size"
+                                android:textColor="@color/grey_info_menu" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- CONTENT LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_content_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_content_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_information_grey"
+                            android:visibility="invisible" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/file_properties_content_image"
+                            android:gravity="left" >
+
+                            <TextView
+                                android:id="@+id/file_properties_info_menu_content"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_properties_info_content"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/file_properties_info_data_content"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/file_properties_info_menu_content"
+                                android:textColor="@color/grey_info_menu" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- ADDED LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_added_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_added_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_information_grey"
+                            android:visibility="invisible" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/file_properties_added_image"
+                            android:gravity="left" >
+
+                            <TextView
+                                android:id="@+id/file_properties_info_menu_added"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_properties_info_added"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/file_properties_info_data_added"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/file_properties_info_menu_added"
+                                android:textColor="@color/grey_info_menu" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- MODIFIED LAYOUT -->
+
+                    <RelativeLayout
+                        android:id="@+id/file_properties_modified_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/file_properties_modified_image"
+                            style="@style/dialogActionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_information_grey"
+                            android:visibility="invisible" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/file_properties_modified_image"
+                            android:gravity="left" >
+
+                            <TextView
+                                android:id="@+id/file_properties_info_menu_modified"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_properties_info_modified"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/file_properties_info_data_modified"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/file_properties_info_menu_modified"
+                                android:textColor="@color/grey_info_menu" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </com.nirhart.parallaxscroll.views.ParallaxScrollView>
+
+    <RelativeLayout
+        android:id="@+id/file_properties_toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/gradient_shape" >
+
+        <RelativeLayout
+            android:id="@+id/file_properties_toolbar_back_options_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp" >
+
+            <ImageView
+                android:id="@+id/file_properties_toolbar_back"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_arrow_back_white" />
+
+            <ImageView
+                android:id="@+id/file_properties_toolbar_overflow"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_dots_vertical_white" />
+
+            <ImageView
+                android:id="@+id/file_properties_toolbar_download"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="0dp"
+                android:layout_toLeftOf="@id/file_properties_toolbar_overflow"
+                android:src="@drawable/ic_download_white" />
+
+            <ImageView
+                android:id="@+id/file_properties_toolbar_rubbish_bin"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="0dp"
+                android:layout_toLeftOf="@id/file_properties_toolbar_download"
+                android:src="@drawable/ic_rubbish_bin_white" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/file_properties_overflow_menu_layout"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="#ffffffff" >
+
+        <ListView
+            android:id="@+id/file_properties_overflow_menu_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="0dp"
+            android:background="#00000000"
+            android:divider="@null" />
+    </RelativeLayout>
+
 </RelativeLayout>

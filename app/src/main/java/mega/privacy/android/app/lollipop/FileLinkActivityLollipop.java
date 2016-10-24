@@ -81,7 +81,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	RelativeLayout fragmentContainer;
 	ImageView iconView;
 	TextView nameView;
-	RelativeLayout nameLayout;
 	ScrollView scrollView;
 	TextView sizeTextView;
 	TextView sizeTitleView;
@@ -131,12 +130,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//		aB.setLogo(R.drawable.ic_arrow_back_black);
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setDisplayShowHomeEnabled(true);
-		aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-		aB.setDisplayShowTitleEnabled(false);
-		
+		if(aB!=null){
+			//		aB.setLogo(R.drawable.ic_arrow_back_black);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setDisplayShowHomeEnabled(true);
+			aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+			aB.setDisplayShowTitleEnabled(false);
+		}
+
 		fragmentContainer = (RelativeLayout) findViewById(R.id.file_link_fragment_container);
 		
 		infoLayout = (RelativeLayout) findViewById(R.id.file_link_layout);
@@ -181,8 +182,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 //		lp.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics));
 //		nameView.setLayoutParams(lp);
-		
-		nameLayout = (RelativeLayout) findViewById(R.id.file_link_name_layout);
 		sizeTitleView = (TextView) findViewById(R.id.file_link_info_menu_size);
 		//Left margin, Top margin
 		RelativeLayout.LayoutParams sizeTitleParams = (RelativeLayout.LayoutParams)sizeTitleView.getLayoutParams();
@@ -417,7 +416,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				document = request.getPublicMegaNode();
 				
 				if (document == null){
-					Snackbar.make(fragmentContainer, MegaError.API_ETEMPUNAVAIL, Snackbar.LENGTH_LONG).show();
+					log("documment==null --> Intent to ManagerActivityLollipop");
 					Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
 	    			startActivity(backIntent);
 	    			finish();
@@ -461,6 +460,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				else{
 					dialogBuilder.setTitle(getString(R.string.general_error_word));
 					dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
+
+					if(e.getErrorCode() == MegaError.API_ETEMPUNAVAIL){
+						log("ERROR: "+MegaError.API_ETEMPUNAVAIL);
+					}
 				}
 
 				try{
@@ -871,7 +874,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
-		
+		log("downloadTo");
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);
@@ -896,30 +899,34 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 		else{
 			if(hashes.length == 1){
-//				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-				if((document != null) && document.getType() == MegaNode.TYPE_FILE){
+				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
-					String localPath = Util.getLocalFile(this, document.getName(), document.getSize(), parentPath);
+					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
 					if(localPath != null){	
 						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, document.getName())); 
+							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
 						}
+						log("Finish");
 						finish();
 						return;
+					}
+					else{
+						log("LocalPath is NULL");
 					}
 				}
 			}
@@ -927,6 +934,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			for (long hash : hashes) {
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				if(node != null){
+					log("Node!=null: "+node.getName());
 					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 					dlFiles.put(node, parentPath);
 					
@@ -944,6 +952,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						service.putExtra(DownloadService.EXTRA_URL, url);
 						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
 						service.putExtra(DownloadService.EXTRA_PATH, path);
+						log("intent to DownloadService");
 						startService(service);
 					}
 				}
@@ -965,12 +974,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 			}
 		}
-		
-		finish();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+			finish();
+		}
 	}
 	
 	@SuppressLint("NewApi") 
 	public void downloadWithPermissions(){
+		log("downloadWithPermissions");
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}

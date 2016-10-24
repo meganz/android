@@ -2,45 +2,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileBrowserListFragment"
-    android:background="@color/white" >
+    android:background="@color/new_background_fragment"
+    tools:context=".FileBrowserListFragment" >
 
     <ImageView
-	    android:id="@+id/contact_grid_empty_image"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginTop="20dp"
-	    android:layout_centerHorizontal="true" 
-	    android:gravity="center_horizontal"/>
-    
+        android:id="@+id/contact_grid_empty_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:gravity="center_horizontal" />
+
     <TextView
-	    android:id="@+id/contact_grid_empty_text"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:textColor="@color/text_secondary"
-	    android:textSize="16sp"
-	    android:layout_below="@id/contact_grid_empty_image"
-	    android:layout_centerHorizontal="true"
-	    android:gravity="center_horizontal"/>
-    
-    <ListView 
-        android:id="@+id/contact_grid_view_browser"
+        android:id="@+id/contact_grid_empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_grid_empty_image"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp" />
+
+    <mega.privacy.android.app.components.AutofitRecyclerView
+        android:id="@+id/contacts_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
-        android:layout_alignParentTop="true"
-		android:layout_above="@+id/add_contact_button"
-		android:divider="@null">
-    </ListView>
-    
-	<Button
-       	android:id="@+id/add_contact_button"
-       	android:layout_gravity="center"
-       	android:layout_height="55dp"
-       	android:layout_width="fill_parent"
-       	android:layout_alignParentBottom="true"
-       	android:background="@drawable/btn_default_holo_light_without_corners"
-       	android:textColor="@color/white"
-       	android:text="@string/menu_add_contact" >
-    </Button>
+        android:choiceMode="multipleChoice"
+        android:columnWidth="172dp"/>
 
-</RelativeLayout>
+ </RelativeLayout>

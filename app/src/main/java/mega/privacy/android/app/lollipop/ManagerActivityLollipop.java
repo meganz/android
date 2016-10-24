@@ -42,6 +42,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.Time;
@@ -77,6 +78,7 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +94,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.ContactsExplorerActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -100,9 +101,9 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SettingsActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
@@ -160,7 +161,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public int accountFragment;
 
 	Button expiryDateButton;
-	Switch switchGetLink;
+	SwitchCompat switchGetLink;
 
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
@@ -465,7 +466,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem upgradeAccountMenuItem;
-	private MenuItem settingsMenuItem;
 	private MenuItem rubbishBinMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
@@ -1232,11 +1232,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		handler = new Handler();
 
+		log("Set view");
 		setContentView(R.layout.activity_manager);
 //		long num = 11179220468180L;
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar);
+		if(tB==null){
+			log("Tb is Null");
+			return;
+		}
+
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
@@ -1466,9 +1472,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		slidingAvatarOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		////
-
-//		slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
+		//slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
 
 		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
@@ -1660,7 +1664,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;
-							showDialogInsertPassword(link, true);
+							megaApi.queryCancelLink(link, this);
 						}
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CHANGE_MAIL)){
@@ -1674,7 +1678,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
-						log("Open after LauncherFileExplorerActivity ");
+						log("Open after LauncherFileExplorerActivityLollipop ");
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 						int access = -1;
 						if (handleIntent != -1) {
@@ -3657,14 +3661,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
-	private View getTabIndicator(Context context, String title) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
-
-        TextView tv = (TextView) view.findViewById(R.id.textView);
-        tv.setText(title);
-        return view;
-    }
-
 	private void getOverflowMenu() {
 		log("getOverflowMenu");
 	     try {
@@ -3869,7 +3865,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
-		settingsMenuItem = menu.findItem(R.id.action_menu_settings);
 		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
@@ -3969,7 +3964,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 
@@ -4026,7 +4020,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			changePass.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
@@ -4083,7 +4076,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -4123,7 +4115,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			importLinkMenuItem.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -4171,7 +4162,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			importLinkMenuItem.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -4233,7 +4223,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			gridSmallLargeMenuItem.setVisible(false);
@@ -4308,7 +4297,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					upgradeAccountMenuItem.setVisible(true);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
@@ -4361,7 +4349,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
@@ -4406,10 +4393,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				changePass.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 
@@ -4447,10 +4432,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				changePass.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
@@ -4481,7 +4464,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
@@ -4515,22 +4497,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
 
 					//Show
-	    			selectMenuItem.setVisible(true);
-	    			thumbViewMenuItem.setVisible(true);
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					if(sFLol.getNodes()!=null){
+						if(sFLol.getNodes().size()!=0){
+//							log("size after search: "+sFLol.getNodes().size());
+							selectMenuItem.setVisible(true);
+							thumbViewMenuItem.setVisible(true);
+							if (isList){
+								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+							}
+							else{
+								thumbViewMenuItem.setTitle(getString(R.string.action_list));
+							}
+						}
+						else{
+							selectMenuItem.setVisible(false);
+							thumbViewMenuItem.setVisible(false);
+						}
 					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
 				}
 			}
 		}
@@ -4556,7 +4545,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				clearRubbishBinMenuitem.setVisible(false);
 				importLinkMenuItem.setVisible(false);
 				takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
 				newChatMenuItem.setVisible(false);
@@ -4621,7 +4609,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
     			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				upgradeAccountMenuItem.setVisible(true);
@@ -4691,7 +4678,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
     			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				upgradeAccountMenuItem.setVisible(true);
@@ -4726,7 +4712,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			clearRubbishBinMenuitem.setVisible(false);
 			importLinkMenuItem.setVisible(false);
 			takePicture.setVisible(false);
-			settingsMenuItem.setVisible(false);
 			refreshMenuItem.setVisible(false);
 			helpMenuItem.setVisible(false);
 			upgradeAccountMenuItem.setVisible(false);
@@ -4845,7 +4830,63 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			}
 		        		}
 		    		}
+					else if (drawerItem == DrawerItem.ACCOUNT){
+						if(accountFragment==Constants.UPGRADE_ACCOUNT_FRAGMENT){
 
+						}
+						else if(accountFragment==Constants.MONTHLY_YEARLY_FRAGMENT){
+
+						}
+
+						switch(accountFragment){
+							case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
+								log("Back to MyAccountFragment");
+								setFirstNavigationLevel(true);
+								displayedAccountType=-1;
+								if (upAFL != null){
+									drawerItem = DrawerItem.ACCOUNT;
+									accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+									selectDrawerItemLollipop(drawerItem);
+									if (nV != null){
+										Menu nVMenu = nV.getMenu();
+										MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+										resetNavigationViewMenu(nVMenu);
+										hidden.setChecked(true);
+									}
+								}
+								return true;
+							}
+							case Constants.CC_FRAGMENT:{
+								if (ccFL != null){
+									displayedAccountType = ccFL.getParameterType();
+								}
+								showUpAF();
+								return true;
+							}
+							case Constants.MONTHLY_YEARLY_FRAGMENT:{
+								if (myFL != null){
+									myFL.onBackPressed();
+								}
+								return true;
+							}
+						}
+
+
+//						if (tFLol != null){
+//							if (tFLol.onBackPressed() == 0){
+//								drawerItem = DrawerItem.CLOUD_DRIVE;
+//								if (nV != null){
+//									Menu nVMenu = nV.getMenu();
+//									MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//									resetNavigationViewMenu(nVMenu);
+//									cloudDrive.setChecked(true);
+//									cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+//								}
+//								selectDrawerItemLollipop(drawerItem);
+//								return true;
+//							}
+//						}
+					}
 				}
 		    	return true;
 		    }
@@ -6221,15 +6262,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				selectDrawerItemLollipop(drawerItem);
 				return true;
 	        }
-	        case R.id.action_menu_settings:{
-//				if (Build.VERSION.SDK_INT<Build.VERSION_CODES.HONEYCOMB) {
-				    startActivity(new Intent(this, SettingsActivity.class));
-//				}
-//				else {
-//					startActivity(new Intent(this, SettingsActivityHC.class));
-//				}
-	        	return true;
-	        }
 
 	        case R.id.action_menu_change_pass:{
 	        	Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
@@ -6265,7 +6297,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_menu_forgot_pass:{
 				log("action menu forgot pass pressed");
 				if(maFLol!=null){
-					maFLol.resetPass();
+					showConfirmationResetPasswordFromMyAccount();
 				}
 				return true;
 			}
@@ -7080,7 +7112,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		int month = c.get(Calendar.MONTH);
 		int day = c.get(Calendar.DAY_OF_MONTH);
 
-		final DatePickerDialog datePickerDialog = new DatePickerDialog(getApplicationContext(), this, year, month, day);
+		final DatePickerDialog datePickerDialog = new DatePickerDialog(managerActivity, this, year, month, day);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 		builder.setTitle(getString(R.string.context_get_link_menu));
@@ -7129,7 +7161,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		paramsLink.setMargins(Util.scaleWidthPx(26, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(6, outMetrics));
 		linkText.setLayoutParams(paramsLink);
 
-		switchGetLink = (Switch) dialoglayout.findViewById(R.id.switch_set_expiry_date);
+		switchGetLink = (SwitchCompat) dialoglayout.findViewById(R.id.switch_set_expiry_date);
 		RelativeLayout.LayoutParams paramsSwitch = (RelativeLayout.LayoutParams)switchGetLink.getLayoutParams();
 		paramsSwitch.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
 		switchGetLink.setLayoutParams(paramsSwitch);
@@ -7234,7 +7266,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		});
 
-		if(myAccountInfo.getAccountType()>0){
+		if(myAccountInfo.getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
 			log("The user is PRO - enable expiration date");
 
 			if(expirationTimestamp<=0){
@@ -8405,6 +8437,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationResetPasswordFromMyAccount (){
+		log("showConfirmationResetPasswordFromMyAccount: ");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						if(maFLol!=null){
+							maFLol.resetPass();
+						}
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		String message= getResources().getString(R.string.email_verification_text_change_pass);
+		builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
 	public void showConfirmationResetPassword (final String link){
 		log("showConfirmationResetPassword: "+link);
 
@@ -8895,7 +8953,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				slidingOptionsPanel.setVisibility(View.VISIBLE);
 				slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 				log("Show the slidingPanel");
-
 				return;
 			}
 		}
@@ -9766,7 +9823,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if(multiselectIntent==0){
 						//One file to share
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -9798,7 +9855,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(multiselectIntent==1){
 						//Several folders to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
 
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -9836,12 +9893,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (sentToInbox==1){
 					if(multiselectIntent==0){
 						//Send one file to one contact
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 						nC.sendToInbox(nodeHandle, contactsData);
 					}
 					else{
 						//Send multiple files to one contact
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
 						nC.sendToInbox(nodeHandles, contactsData);
 					}
 				}
@@ -9850,12 +9907,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				for (int i=0; i < contactsData.size();i++){
 					String type = contactsData.get(i);
-					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
+					if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
 						i++;
 						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 //						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 					}
-					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
+					else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
 						i++;
 						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 //						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
@@ -10677,6 +10734,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					ManagerActivityLollipop.logout(managerActivity, app, megaApi, false);
 //				}
 //			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
+			log("TYPE_GET_RECOVERY_LINK");
+			if (e.getErrorCode() == MegaError.API_OK){
+				String url = request.getLink();
+				log("cancel account url");
+				String myEmail = request.getEmail();
+				if(myEmail!=null){
+					if(myEmail.equals(myAccountInfo.getMyUser().getEmail())){
+						log("The email matchs!!!");
+						showDialogInsertPassword(url, true);
+					}
+					else{
+						log("Not logged with the correct account");
+						log(e.getErrorString() + "___" + e.getErrorCode());
+						Util.showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
+					}
+				}
+				else{
+					log("My email is NULL in the request");
+				}
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
+				log("Error expired link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.cancel_link_expired), getString(R.string.general_error_word));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
@@ -11755,9 +11844,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					log("RECEIVED REQUEST");
-					log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+					log("STATUS: "+req.getStatus()+" sourceEmail: "+req.getSourceEmail()+" contactHandle: "+req.getHandle());
 					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
-						cC.addContactDB(req.getTargetEmail());
+						cC.addContactDB(req.getSourceEmail());
 					}
 					updateContactsView(true, false, true);
 				}
@@ -12624,6 +12713,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fabButton.setVisibility(View.GONE);
 				break;
 			}
+		}
+	}
+
+	public void openAdvancedDevices (long handleToDownload){
+		log("openAdvancedDevices");
+//		handleToDownload = handle;
+		String externalPath = Util.getExternalCardPath();
+
+		if(externalPath!=null){
+			log("ExternalPath for advancedDevices: "+externalPath);
+			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
+			if(node!=null){
+
+//				File newFile =  new File(externalPath+"/"+node.getName());
+				File newFile =  new File(node.getName());
+				log("File: "+newFile.getPath());
+				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+				// Filter to only show results that can be "opened", such as
+				// a file (as opposed to a list of contacts or timezones).
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+				// Create a file with the requested MIME type.
+				String mimeType = MimeTypeList.getMimeType(newFile);
+				log("Mimetype: "+mimeType);
+				intent.setType(mimeType);
+				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
+				intent.putExtra("handleToDownload", handleToDownload);
+				try{
+					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+				}
+				catch(Exception e){
+					log("Exception in External SDCARD");
+					Environment.getExternalStorageDirectory();
+					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+					toast.show();
+				}
+			}
+		}
+		else{
+			log("No external SD card");
+			Environment.getExternalStorageDirectory();
+			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+			toast.show();
 		}
 	}
 

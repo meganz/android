@@ -63,7 +63,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class FileExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
+public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -874,129 +874,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
-	@Override
-	public void onClick(View v) {
-		switch(v.getId()){/*
-			case R.id.file_explorer_button:{
-				log("button clicked!");
-				folderSelected = true;
-				
-				if (mode == Mode.MOVE) {
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-					
-					Intent intent = new Intent();
-					intent.putExtra("MOVE_TO", parentNode.getHandle());
-					intent.putExtra("MOVE_HANDLES", moveFromHandles);
-					setResult(RESULT_OK, intent);
-					log("finish!");
-					finish();
-				}
-				else if (mode == Mode.COPY){
-					
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-					
-					Intent intent = new Intent();
-					intent.putExtra("COPY_TO", parentNode.getHandle());
-					intent.putExtra("COPY_HANDLES", copyFromHandles);
-					setResult(RESULT_OK, intent);
-					log("finish!");
-					finish();
-				}
-				else if(mode == Mode.UPLOAD_SELFIE){
-				
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-				
-					Intent intent = new Intent(this, UploadService.class);
-					File selfie = new File(imagePath);
-					intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-					intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-					startService(intent);
-					
-					Intent intentResult = new Intent();
-					setResult(RESULT_OK, intentResult);
-					log("----------------------------------------finish!");
-					finish();
-					
-				}
-				else if (mode == Mode.UPLOAD){
-					if (filePreparedInfos == null){
-						FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-						filePrepareTask.execute(getIntent());
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(this);
-							temp.setMessage(getString(R.string.upload_prepare));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-					}
-					else{
-						onIntentProcessed();
-					}
-				}
-				else if (mode == Mode.IMPORT){
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-					
-					Intent intent = new Intent();
-					intent.putExtra("IMPORT_TO", parentNode.getHandle());
-					setResult(RESULT_OK, intent);
-					log("finish!");
-					finish();
-				}
-				else if (mode == Mode.SELECT){
-
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-
-					Intent intent = new Intent();
-					intent.putExtra("SELECT", parentNode.getHandle());
-					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-				break;
-			}*/
-			case R.id.file_explorer_new_folder:{
-				showNewFolderDialog(null);
-				break;
-			}
-			case R.id.file_explorer_back:{
-				onBackPressed();
-				break;
-			}
-			case R.id.file_explorer_window_title:{
-//				if (backVisible){
-//					onBackPressed();
-//					break;
-//				}
-			}
-		}
-	}
-	
 	public void showNewFolderDialog(String editText){
 		
 		String text;

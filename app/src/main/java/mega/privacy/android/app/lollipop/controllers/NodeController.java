@@ -14,6 +14,7 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -32,8 +33,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.OfflineActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
@@ -262,8 +265,18 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
-    //Old onFileClick
     public void prepareForDownload(ArrayList<Long> handleList){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            prepareForDownloadLollipop(handleList);
+        }
+        else{
+            prepareForDownloadPreLollipop(handleList);
+        }
+    }
+
+
+    //Old onFileClick
+    public void prepareForDownloadLollipop(ArrayList<Long> handleList){
         log("prepareForDownload: "+handleList.size()+" files to download");
         long size = 0;
         long[] hashes = new long[handleList.size()];
@@ -376,6 +389,93 @@ public class NodeController {
             defaultPathF.mkdirs();
             checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes);
         }
+    }
+
+    //Old onFileClick
+    public void prepareForDownloadPreLollipop(ArrayList<Long> handleList){
+        log("prepareForDownloadPreLollipop: "+handleList.size()+" files to download");
+        long size = 0;
+        long[] hashes = new long[handleList.size()];
+        for (int i=0;i<handleList.size();i++){
+            hashes[i] = handleList.get(i);
+            MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
+            if (nodeTemp != null){
+                size += nodeTemp.getSize();
+            }
+        }
+        log("Number of files: "+hashes.length);
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        }
+
+        boolean askMe = true;
+        boolean advancedDevices=false;
+        String downloadLocationDefaultPath = Util.downloadDIR;
+        prefs = dbH.getPreferences();
+
+        if (prefs != null){
+            log("prefs != null");
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    log("askMe==false");
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            askMe = false;
+                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+                else
+                {
+                    log("askMe==true");
+                    //askMe=true
+                    if (prefs.getStorageAdvancedDevices() != null){
+                        advancedDevices = Boolean.parseBoolean(prefs.getStorageAdvancedDevices());
+                    }
+
+                }
+            }
+        }
+
+        if (askMe){
+            log("askMe");
+            if(advancedDevices){
+                log("advancedDevices");
+                //Launch Intent to SAF
+                if(hashes.length==1){
+                    downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                    if(context instanceof ManagerActivityLollipop){
+                        ((ManagerActivityLollipop) context).openAdvancedDevices(hashes[0]);
+                    }
+                   else{
+                        log("ManagerActivityLollipop is not CONTEXT");
+                    }
+                }
+                else
+                {
+                    //Show error message, just one file
+                    Toast.makeText(context, context.getString(R.string.context_select_one_file), Toast.LENGTH_LONG).show();
+                }
+            }
+            else{
+                log("NOT advancedDevices");
+
+                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.context_download_to));
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+                intent.setClass(context, FileStorageActivityLollipop.class);
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            }
+        }
+        else{
+            log("NOT askMe");
+            File defaultPathF = new File(downloadLocationDefaultPath);
+            defaultPathF.mkdirs();
+            checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes);
+        }
+
     }
 
     //Old downloadTo
@@ -750,23 +850,61 @@ public class NodeController {
     //old getPublicLinkAndShareIt
     public void exportLink(MegaNode document){
         log("exportLink");
-        if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            return;
+        if(context instanceof ManagerActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((ManagerActivityLollipop) context).setIsGetLink(true);
+            megaApi.exportNode(document, ((ManagerActivityLollipop) context));
         }
-        ((ManagerActivityLollipop) context).setIsGetLink(true);
-        megaApi.exportNode(document, ((ManagerActivityLollipop) context));
+        else  if(context instanceof FullScreenImageViewerLollipop){
+            if (!Util.isOnline(context)){
+                ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
+            megaApi.exportNode(document, ((FullScreenImageViewerLollipop) context));
+        }
+        else  if(context instanceof FilePropertiesActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((FilePropertiesActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((FilePropertiesActivityLollipop) context).setIsGetLink(true);
+            megaApi.exportNode(document, ((FilePropertiesActivityLollipop) context));
+        }
     }
 
     public void exportLinkTimestamp(MegaNode document, int timestamp){
         log("exportLinkTimestamp: "+timestamp);
-        if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            return;
+        if (context instanceof ManagerActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((ManagerActivityLollipop) context).setIsGetLink(true);
+            ((ManagerActivityLollipop) context).setExpiredDateLink(true);
+            megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
         }
-        ((ManagerActivityLollipop) context).setIsGetLink(true);
-        ((ManagerActivityLollipop) context).setExpiredDateLink(true);
-        megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
+        else if (context instanceof FullScreenImageViewerLollipop){
+            if (!Util.isOnline(context)){
+                ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
+            ((FullScreenImageViewerLollipop) context).setExpiredDateLink(true);
+            megaApi.exportNode(document, timestamp, ((FullScreenImageViewerLollipop) context));
+        }
+        else if (context instanceof FilePropertiesActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((FilePropertiesActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+            ((FilePropertiesActivityLollipop) context).setIsGetLink(true);
+            ((FilePropertiesActivityLollipop) context).setExpiredDateLink(true);
+            megaApi.exportNode(document, timestamp, ((FilePropertiesActivityLollipop) context));
+        }
     }
 
     public void removeLink(MegaNode document){
@@ -1183,7 +1321,7 @@ public class NodeController {
 
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
         log("deleteOffline");
-        if(selectedNode.getHandle().equals("0")){
+        if (selectedNode == null){
             log("Delete RK");
             String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
             File file= new File(path);
@@ -1244,68 +1382,122 @@ public class NodeController {
                 }
             }
         }
-        else{
-            log("deleteOffline node");
-            dbH = DatabaseHandler.getDbHandler(context);
+        else {
+            if (selectedNode.getHandle().equals("0")) {
+                log("Delete RK");
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.rKFile;
+                File file = new File(path);
+                if (file.exists()) {
+                    file.delete();
 
-            ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
-            ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();
-            MegaOffline parentNode = null;
+                    ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
 
-            //Delete children
-            mOffListChildren=dbH.findByParentId(selectedNode.getId());
-            if(mOffListChildren.size()>0){
-                //The node have childrens, delete
-                deleteChildrenDB(mOffListChildren);
-            }
+                    log("Number of elements: " + mOffList.size());
 
-            log("Remove the node physically");
-            //Remove the node physically
-            File destination = null;
-            //Check if the node is incoming
-            if(selectedNode.isIncoming()){
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + selectedNode.getHandleIncoming() + selectedNode.getPath());
+                    for (int i = 0; i < mOffList.size(); i++) {
+
+                        MegaOffline checkOffline = mOffList.get(i);
+
+                        if (!checkOffline.isIncoming()) {
+                            log("NOT isIncomingOffline");
+                            File offlineDirectory = null;
+                            if (Environment.getExternalStorageDirectory() != null) {
+                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath() + checkOffline.getName());
+                            } else {
+                                offlineDirectory = context.getFilesDir();
+                            }
+
+                            if (!offlineDirectory.exists()) {
+                                log("Path to remove A: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
+                                //dbH.removeById(mOffList.get(i).getId());
+                                mOffList.remove(i);
+                                i--;
+                            }
+                        } else {
+                            log("isIncomingOffline");
+                            File offlineDirectory = null;
+                            if (Environment.getExternalStorageDirectory() != null) {
+                                offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + checkOffline.getHandleIncoming() + "/" + checkOffline.getPath() + checkOffline.getName());
+                                log("offlineDirectory: " + offlineDirectory);
+                            } else {
+                                offlineDirectory = context.getFilesDir();
+                            }
+
+                            if (!offlineDirectory.exists()) {
+                                log("Path to remove B: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
+                                //dbH.removeById(mOffList.get(i).getId());
+                                mOffList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+
+                    if (context instanceof ManagerActivityLollipop) {
+                        ((ManagerActivityLollipop) context).updateOfflineView(null);
+                    } else {
+                        ((OfflineActivityLollipop) context).updateOfflineView(null);
+                    }
                 }
-                else{
-                    destination = context.getFilesDir();
+            } else {
+                log("deleteOffline node");
+                dbH = DatabaseHandler.getDbHandler(context);
+
+                ArrayList<MegaOffline> mOffListParent = new ArrayList<MegaOffline>();
+                ArrayList<MegaOffline> mOffListChildren = new ArrayList<MegaOffline>();
+                MegaOffline parentNode = null;
+
+                //Delete children
+                mOffListChildren = dbH.findByParentId(selectedNode.getId());
+                if (mOffListChildren.size() > 0) {
+                    //The node have childrens, delete
+                    deleteChildrenDB(mOffListChildren);
                 }
-            }
-            else{
-                if (Environment.getExternalStorageDirectory() != null){
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + selectedNode.getPath());
+
+                log("Remove the node physically");
+                //Remove the node physically
+                File destination = null;
+                //Check if the node is incoming
+                if (selectedNode.isIncoming()) {
+                    if (Environment.getExternalStorageDirectory() != null) {
+                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + selectedNode.getHandleIncoming() + selectedNode.getPath());
+                    } else {
+                        destination = context.getFilesDir();
+                    }
+                } else {
+                    if (Environment.getExternalStorageDirectory() != null) {
+                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + selectedNode.getPath());
+                    } else {
+                        destination = context.getFilesDir();
+                    }
                 }
-                else{
-                    destination = context.getFilesDir();
+
+                try {
+                    File offlineFile = new File(destination, selectedNode.getName());
+                    log("Delete in phone: " + selectedNode.getName());
+                    Util.deleteFolderAndSubfolders(context, offlineFile);
+                } catch (Exception e) {
+                    log("EXCEPTION: deleteOffline - adapter");
                 }
-            }
+                ;
 
-            try{
-                File offlineFile = new File(destination, selectedNode.getName());
-                log("Delete in phone: "+selectedNode.getName());
-                Util.deleteFolderAndSubfolders(context, offlineFile);
-            }
-            catch(Exception e){
-                log("EXCEPTION: deleteOffline - adapter");
-            };
+                dbH.removeById(selectedNode.getId());
 
-            dbH.removeById(selectedNode.getId());
+                //Check if the parent has to be deleted
 
-            //Check if the parent has to be deleted
+                int parentId = selectedNode.getParentId();
+                parentNode = dbH.findById(parentId);
 
-            int parentId = selectedNode.getParentId();
-            parentNode = dbH.findById(parentId);
+                if (parentNode != null) {
+                    log("Parent to check: " + parentNode.getName());
+                    checkParentDeletion(parentNode);
+                }
 
-            if(parentNode != null){
-                log("Parent to check: "+parentNode.getName());
-                checkParentDeletion(parentNode);
-            }
-
-            if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop)context).updateOfflineView(null);
-            }
-            else{
-                ((OfflineActivityLollipop)context).updateOfflineView(null);
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).updateOfflineView(null);
+                } else {
+                    ((OfflineActivityLollipop) context).updateOfflineView(null);
+                }
             }
         }
     }

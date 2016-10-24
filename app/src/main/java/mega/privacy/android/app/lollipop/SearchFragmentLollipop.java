@@ -336,7 +336,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
@@ -521,6 +521,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						intent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					startActivity(intent);
 				}
@@ -819,21 +824,31 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	public void setSearchNodes (ArrayList<MegaNode> searchNodes){
 		this.searchNodes = searchNodes;
 	}
+
+	public ArrayList<MegaNode> getNodes(){
+		return nodes;
+	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
+		log("setNodes");
 		this.nodes = nodes;
-		
 		if (adapter != null){
 			adapter.setNodes(nodes);
 			if (adapter.getItemCount() == 0){
+				log("no results");
 				recyclerView.setVisibility(View.GONE);
 				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRootNode().getHandle()==parentHandle) {
+				if(parentHandle==-1){
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.no_results_found);
+				}
+				else if (megaApi.getRootNode().getHandle()==parentHandle) {
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-				} else {
+				}
+				else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}

@@ -422,7 +422,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.contact_file_list_view_browser);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
@@ -908,6 +908,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
+					intent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
 					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
 						intent.putExtra("parentNodeHandle", -1L);
 					} else {
@@ -1194,7 +1195,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				notifyDataSetChanged();
 				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 				i.putExtra("handle", selectedNode.getHandle());
-				
+				i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
 				if (selectedNode.isFolder()) {
 					if (megaApi.isShared(selectedNode)){
 						i.putExtra("imageId", R.drawable.folder_shared_mime);	

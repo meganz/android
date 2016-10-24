@@ -376,7 +376,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         recyclerView = (RecyclerView) findViewById(R.id.add_contact_list);
         recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
         recyclerView.setClipToPadding(false);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
         recyclerView.setHasFixedSize(true);
         MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);

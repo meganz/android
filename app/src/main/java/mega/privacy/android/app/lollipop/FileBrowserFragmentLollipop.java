@@ -431,7 +431,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
@@ -872,6 +872,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						else{
 							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 						}
+						MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+						if(accountInfo!=null){
+							intent.putExtra("typeAccount", accountInfo.getAccountType());
+						}
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 								
@@ -971,7 +975,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			else{
 				if(n.getName().equals("Camera Uploads")){
-					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					if (prefs != null){
+						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					}
 					dbH.setCamSyncHandle(n.getHandle());
 					log("FOUND Camera Uploads!!----> "+n.getHandle());
 					((ManagerActivityLollipop)context).cameraUploadsClicked();
@@ -981,7 +987,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			if(n.getName().equals("Camera Uploads")){
-				prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				if (prefs != null){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				}
 				dbH.setCamSyncHandle(n.getHandle());
 				log("FOUND Camera Uploads!!: "+n.getHandle());
 				((ManagerActivityLollipop)context).cameraUploadsClicked();
@@ -1014,7 +1022,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			if(n.getName().equals("Media Uploads")){
-				prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				if (prefs != null){
+					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				}
 				dbH.setSecondaryFolderHandle(n.getHandle());
 				log("FOUND Media Uploads!!: "+n.getHandle());
 				((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();

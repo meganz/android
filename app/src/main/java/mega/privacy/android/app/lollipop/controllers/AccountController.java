@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.controllers;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -49,6 +50,7 @@ public class AccountController {
     public AccountController(Context context){
         log("AccountController created");
         this.context = context;
+
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -56,6 +58,11 @@ public class AccountController {
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
         }
+    }
+
+    public AccountController(Context context, MegaApiAndroid megaApi){
+        this.context = context;
+        this.megaApi = megaApi;
     }
 
     public void deleteAccount(MyAccountFragmentLollipop mAF){
@@ -253,6 +260,11 @@ public class AccountController {
     static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount) {
         log("logout");
         logout(context, megaApi, megaChatApi, confirmAccount, false);
+    }
+
+    static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
+        log("logout");
+        logout(context, megaApi, null, confirmAccount, false);
     }
 
 

@@ -441,7 +441,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		cancelButton.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.addOnItemTouchListener(this);
 		listView.setLayoutManager(mLayoutManager);

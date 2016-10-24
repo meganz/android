@@ -36,7 +36,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	Context context;
 	MegaApiAndroid megaApi;
-	ArrayList<MegaNode> nodes;
+	ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
 	long parentHandle = -1;
 	
 	MegaExplorerLollipopAdapter adapter;
@@ -68,8 +68,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (megaApi.getRootNode() == null){
 			return;
 		}
-		
-		nodes = new ArrayList<MegaNode>();
+
 		deepBrowserTree=0;
 		parentHandle = -1;
 		
@@ -125,7 +124,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		cancelText.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		

@@ -1,26 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/statelist_item_layout"
     android:id="@+id/file_list_item_layout" >
     
-    <CheckBox
-        android:id="@+id/file_list_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:checked="false"
-        android:focusable="false"
-        android:layout_centerVertical="true"
-        android:button="@drawable/btn_check_holo_light" />
-    
-      <ImageView
+    <ImageView
         android:id="@+id/file_list_saved_offline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_cloud_saved_offline"
 		android:background="@null" 
-        android:layout_marginTop="22dp"
-        android:layout_toRightOf="@id/file_list_checkbox"/> 
+        android:layout_centerVertical="true"/> 
         
 <!--       <ImageView
         android:id="@+id/file_list_saved_offline_multiselect"
@@ -33,33 +24,35 @@
      -->
      <ImageView
         android:id="@+id/file_list_thumbnail"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:scaleType="fitCenter"
+        android:layout_centerVertical="true"
         android:layout_toRightOf="@id/file_list_saved_offline" />    
    
     
     <TextView
         android:id="@+id/file_list_filename"
         android:layout_width="225dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/file_list_thumbnail"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="13dp"
         android:textColor="@color/file_list_first_row"
-        android:paddingLeft="3dp"
-        android:paddingTop="7dp"
-        android:ellipsize="end"
-        android:maxLines="2"/>
+        android:maxLines="2"
+		android:ellipsize="end"
+		android:singleLine="false"
+        android:textSize="14sp"/>
     
     <TextView
         android:id="@+id/file_list_filesize"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/file_list_thumbnail"
         android:layout_below="@+id/file_list_filename"
-        android:paddingLeft="3dp"
-        android:paddingBottom="7dp"
-        android:textColor="@color/file_list_second_row" 
-        android:textSize="12sp"
+        android:textColor="@color/file_list_second_row"
+        android:layout_marginLeft="13dp"
+        android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="1"/>
 <!--    
@@ -79,40 +72,51 @@
         android:id="@+id/file_list_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/action_selector_ic"
+        android:src="@drawable/ic_dots_vertical_grey"
 		android:background="@null" 
-        android:layout_alignTop="@id/file_list_filename"
+		android:paddingLeft="10dp"
         android:layout_alignParentRight="true"
-		android:paddingTop="12dp"
-        android:paddingRight="15dp" />
+		android:layout_centerVertical="true" />
+
+	<ImageView
+		android:id="@+id/file_list_incoming_permissions"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/ic_permissions_full_access"
+		android:background="@null"
+		android:layout_toLeftOf="@id/file_list_three_dots"
+		android:layout_centerVertical="true"
+		android:visibility="gone"/>
     
     <ImageView
         android:id="@+id/file_list_public_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_public_link_list"
+        android:src="@drawable/link_ic"
 		android:background="@null" 
-        android:layout_marginTop="15dp"
+		android:tint="@color/transparency_white"
+        android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/file_list_three_dots"/> 
         
     <ImageView
         android:id="@+id/file_list_public_link_multiselect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_public_link_list"
-		android:background="@null" 
-        android:layout_marginTop="15dp"
-        android:paddingRight="7dp" 
-       	android:layout_alignParentRight="true"/> 
-                     
+        android:src="@drawable/link_ic"
+		android:background="@null"
+		android:tint="@color/transparency_white"
+        android:layout_marginRight="10dp"
+		android:layout_centerVertical="true"
+		android:layout_alignParentRight="true"/>
+
     
      <ProgressBar
-	    android:id="@+id/transfers_list__browser_bar"
+	    android:id="@+id/transfers_list_browser_bar"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		style="@style/MEGAProgressBarTransfers"  
-		android:layout_margin="5dip"
-		android:paddingRight="5dp" 
+		android:layout_height="wrap_content"  
+        android:layout_marginLeft="13dp" 
+        android:layout_marginTop="6dp"
+        style="@style/UsedSpaceProgressBar"
         android:layout_toRightOf="@id/file_list_thumbnail"
         android:layout_toLeftOf="@id/file_list_three_dots"
         android:layout_below="@id/file_list_filename" />    
@@ -124,394 +128,7 @@
         android:src="@drawable/arrow_selection"
 		android:layout_alignBottom="@id/file_list_thumbnail"
         android:layout_alignParentRight="true"
-        android:paddingRight="15dp" />-->
-        
-        <LinearLayout 
-            android:id="@+id/file_list_options"
-            android:layout_width="match_parent"
-        	android:layout_height="60dp"
-        	android:layout_below="@id/file_list_thumbnail"
-        	android:padding="0dp"
-        	android:background="@color/adapters_background"
-        	android:orientation="horizontal">
-        	
-            <RelativeLayout
-                android:id="@+id/file_list_option_download_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-                
-                <ImageView
-		            android:id="@+id/file_list_option_download"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_download"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-                
-                <TextView 
-                    android:id="@+id/file_list_option_download_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/general_download"
-                    android:layout_centerHorizontal="true"
-                    android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-            </RelativeLayout>
-        	
-           
-			<RelativeLayout
-                android:id="@+id/file_list_option_properties_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		        
-		        <ImageView
-		            android:id="@+id/file_list_option_properties"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/info_ic"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"
-	             />
-		        
-		        <TextView 
-                    android:id="@+id/file_list_option_properties_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-	        </RelativeLayout>    
-		    
-			<RelativeLayout
-                android:id="@+id/file_list_option_public_link_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-				
-				<ImageView
-		            android:id="@+id/file_list_option_public_link"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/link_ic"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-				
-				<TextView 
-                    android:id="@+id/file_list_option_public_link_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_get_link_menu"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-		    </RelativeLayout>
-
-			<RelativeLayout
-                android:id="@+id/file_list_option_leave_share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		         
-		        <ImageView
-		            android:id="@+id/file_list_option_leave_share"
-		            android:layout_width="match_parent"
-		            android:layout_height="match_parent"
-		            android:src="@drawable/leave_share_ic"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:layout_marginTop="-10dp"/>		
-		        
-				<TextView 
-                    android:id="@+id/file_list_option_leave_share_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_leave_menu"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>	               
-		      </RelativeLayout>  
-		         
-		   <RelativeLayout
-                android:id="@+id/file_list_option_share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		          
-		        <ImageView
-		            android:id="@+id/file_list_option_share"
-		            android:layout_width="match_parent"
-		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_share"
-		            style="@style/dialogActionButton"
-		             android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-		        
-		        <TextView 
-                    android:id="@+id/file_list_option_share_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_share_folder"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>	               
-		      </RelativeLayout>  
-
-		     
-		    <RelativeLayout
-                android:id="@+id/file_list_option_permissions_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		           
-		         <ImageView
-		            android:id="@+id/file_list_option_permissions"
-		            android:layout_width="match_parent"
-		            android:layout_height="match_parent"
-		            android:src="@drawable/permissions_ic"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:layout_marginTop="-10dp"/>
-		         
-		          <TextView 
-                    android:id="@+id/file_list_option_permissions_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/file_properties_shared_folder_select_contact"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>	
-		           
-		     </RelativeLayout>
-		    
-		    <RelativeLayout
-                android:id="@+id/file_list_option_clear_share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		           	
-		         <ImageView
-		            android:id="@+id/file_list_option_clear_share"
-		            android:layout_width="match_parent"
-		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_clear_shares"
-		            android:layout_gravity="center_vertical"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:layout_marginTop="-10dp"/>
-		         <TextView 
-                    android:id="@+id/file_list_option_clear_share_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_clean_shares_menu"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>	               
-		      </RelativeLayout>  
-
-		         
-		    <RelativeLayout
-                android:id="@+id/file_list_option_rename_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		            
-		         <ImageView
-		            android:id="@+id/file_list_option_rename"
-		            android:layout_width="match_parent"
-		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_rename"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:layout_marginTop="-10dp"/>
-		         
-		          <TextView 
-                    android:id="@+id/file_list_option_rename_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_rename"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>	    
-		           
-		         </RelativeLayout>
-		            
-		    <RelativeLayout
-                android:id="@+id/file_list_option_delete_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		            
-		         <ImageView
-		            android:id="@+id/file_list_option_delete"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_rubbish_bin"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"
-	             />
-		         
-		         <TextView 
-                    android:id="@+id/file_list_option_delete_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/section_rubbish_bin"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-		      </RelativeLayout>
-		    
-		    <RelativeLayout
-                android:id="@+id/file_list_option_move_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		            
-		         <ImageView
-		            android:id="@+id/file_list_option_move"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_move"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-		         
-		         <TextView 
-                    android:id="@+id/file_list_option_move_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/general_move_to"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-		      </RelativeLayout>
-		   
-		    
-		    
-		    <RelativeLayout
-                android:id="@+id/file_list_option_remove_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		            
-		         <ImageView
-		            android:id="@+id/file_list_option_remove"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-		         
-		         <TextView 
-                    android:id="@+id/file_list_option_remove_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_delete"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-		      </RelativeLayout>
-		         
-		         
-		     <RelativeLayout
-                android:id="@+id/file_list_option_overflow_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
-		             
-		         <ImageView
-		            android:id="@+id/file_list_option_overflow"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_action_core_overflow"
-		            android:layout_gravity="center_vertical"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-		         
-		         <TextView 
-                    android:id="@+id/file_list_option_more_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_more"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-            
-		         </RelativeLayout>
-        </LinearLayout>
+        android:paddingRight="15dp" />-->        
     
-<!-- <RelativeLayout
-        android:id="@+id/file_list_options"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/file_list_thumbnail"
-        android:padding="0dp"
-        android:background="#2a2a2a">
-        
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            
-            <TableRow>
-						         
-	        </TableRow>        
-        </TableLayout>
-    </RelativeLayout> 
-     -->   
 </RelativeLayout>
 

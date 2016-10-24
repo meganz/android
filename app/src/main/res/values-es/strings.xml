@@ -49,7 +49,7 @@
     <string name="no_external_SD_card_detected" context="when no external card exists">Ningún dispositivo de almacenamiento externo detectado</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">La carpeta es sólo de lectura. No tiene permisos para subir contenido.</string>
     
-    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave de recuperación. ¿Deseas continuar?</string>
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Desea continuar?</string> 
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones</string>
@@ -85,15 +85,15 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar todo</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista miniaturas</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Ver como lista</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar Clave Maestra</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar la Clave Maestra</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar clave de recuperación</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar la clave de recuperación</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar subscripción</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La subscripción ha sido cancelada correctamente</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">Ha habido algún problema cancelando la subscripción. Por favor, contacta con support\@mega.co.nz para cancelar la subscripción</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Cerrar el resto de sesiones</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">El resto de sesiones se han cerrado con éxito</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error al cerrar las sesiones abiertas</string> 
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">El fichero con la Clave Maestra fue eliminado</string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">El fichero con la clave de recuperación fue eliminado</string>
     
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">archivo</item>
@@ -670,15 +670,15 @@
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
 
     <string name="backup_title" context="Title of the screen to backup the master key">Haz copia de tu clave principal de cifrado</string>
-    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Tu contraseña desbloquea tu clave maestra</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Tu contraseña desbloquea tu clave de recuperación</string>
 
-    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Tus datos sólo se pueden leer a través de una cadena de operaciones de descifrado que comienza con tu clave maestra de cifrado, que se guardará cifrada con su contraseña. Esto significa que si pierdes tu contraseña, tu clave maestra ya no puede ser descifrada, y tu no puedes descifrar los datos.</string>
-    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exportar la clave maestra y guardarla en un lugar seguro te permite establecer otra contraseña sin perdida de datos.</string>
+    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Tus datos sólo se pueden leer a través de una cadena de operaciones de descifrado que comienza con tu clave de recuperación de cifrado, que se guardará cifrada con su contraseña. Esto significa que si pierdes tu contraseña, tu clave de recuperación ya no puede ser descifrada, y tu no puedes descifrar los datos.</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exportar la clave de recuperación y guardarla en un lugar seguro te permite establecer otra contraseña sin pérdida de datos.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacante desde el exterior no puede acceder a tu cuenta solo con tu clave. Un restablecimiento de contraseña requiere tanto la clave principal como el acceso a tu correo electrónico.</string>
-    <string name="backup_action" context="Sentence to inform the user. the available actions in the screen to backup the master key">Copia la clave maestra o guárdala en un fichero de texto</string>
+    <string name="backup_action" context="Sentence to inform the user. the available actions in the screen to backup the master key">Copia la clave de recuperación o guárdala en un fichero de texto</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Guardar</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clave maestra se ha copiado satisfactoriamente</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clave de recuperación se ha copiado satisfactoriamente</string>
 
     <string name="change_pass" context="Button to change the password">Cambiar</string>
 
@@ -688,14 +688,14 @@
     <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">Contraseña olvidada?</string>
     <string name="forgot_pass" context="Button in the Login screen to reset the password">¿Has olvidado tu contraseña?</string>
     <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Si tienes una copia de respaldo de tu clave principal de cifrado, puedes resetear tu contraseña eligiendo la opción SI. Ningún dato se perderá en el proceso.</string>
-    <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">Puedes todavía exportar la clave maestra si tienes una sesión de MEGA activa en un navegador en este o en otro ordenador. Si no es así, ya no puedes descifrar tu cuenta existente, pero puedes empezar una nueva cuenta con la misma dirección de correo electrónico seleccionando NO.</string>
-    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">¿Tienes copia de seguridad de tu clave maestra?</string>
-    <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">Si no es así, todavía puedes exportar la clave maestra en esta sesión de MEGA. Por favor, vuelve a la pantalla anterior y exporta tu clave maestra.</string>
+    <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">Puedes todavía exportar la clave de recuperación si tienes una sesión de MEGA activa en un navegador en este o en otro ordenador. Si no es así, ya no puedes descifrar tu cuenta existente, pero puedes empezar una nueva cuenta con la misma dirección de correo electrónico seleccionando NO.</string>
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">¿Tienes copia de seguridad de tu clave de recuperación?</string>
+    <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">Si no es así, todavía puedes exportar la clave de recuperación en esta sesión de MEGA. Por favor, vuelve a la pantalla anterior y exporta tu clave de recuperación.</string>
 
 
     <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">¡Bien!</string>
     <string name="edit_text_insert_mail" context="Hint of the text when the user can write his e-mail">escribe aquí tu email</string>
-    <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace de recuperación que te permitirá enviar tu clave maestra y restablecer su contraseña.</string>
+    <string name="text_alert_reset_with_MK" context="Text of the alert message to ask for the link to reset the pass with the MK">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace de recuperación que te permitirá enviar tu clave de recuperación y restablecer su contraseña.</string>
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">escribe aquí la clave</string>
 
@@ -715,14 +715,14 @@
     <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">No se puede realizar esta acción con una sesión abierta.</string>
 
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Reestablecer contraseña</string>
-    <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Por favor, escribe tu clave maestra.</string>
+    <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Por favor, escribe tu clave de recuperación.</string>
 
     <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Contraseña modificada!</string>
 
     <string name="park_account_dialog_title" context="Button to park an account">Aparcar cuenta</string>
     <string name="park_account_title" context="Title of the screen to park an account">Ups!</string>
     <string name="park_account_button" context="Button to park an account">Aparcar</string>
-    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Debido a nuestro paradigma de cifrado end-to-end no podrás acceder a tus datos sin tu contraseña o una copia de seguridad de la clave maestra.</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Debido a nuestro paradigma de cifrado end-to-end no podrás acceder a tus datos sin tu contraseña o una copia de seguridad de la clave de recuperación.</string>
     <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">Puedes aparcar tu cuenta existente y empezar con una nueva usando la misma dirección de correo electrónico. Tus datos se conservarán durante al menos 60 días. En caso de que recuerdes la contraseña de la cuenta aparcada, por favor, pónte en contacto con support&#64;mega.nz</string>
 
     <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Por favor introduce la dirección de correo electrónico a continuación. Recibirás un enlace que te permitirá aparcar la cuenta.</string>
@@ -731,13 +731,13 @@
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Escribe la nueva contraseña</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">El enlace ha caducado, por favor, inténtalo de nuevo.</string>
 
-    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu clave maestra se utilizará para resetear tu contraseña. Por favor, establece tu nueva contraseña.</string>
-    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás en tu correo electrónico un link que te permitirá resetear tu contraseña. Por favor, comprueba tu correo electrónico para proceder.</string>
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu clave de recuperación se utilizará para resetear tu contraseña. Por favor, establece tu nueva contraseña.</string>
+    <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás en tu correo electrónico un link que te permitirá resetear tu contraseña..</string>
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta Pro!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave Maestra ha sido exportada en: %s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Disponible Sin Conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Disponible Sin Conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string>
 
@@ -759,8 +759,8 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Elegir foto</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Borrar foto</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clave maestra introducida no es correcta. Por favor, asegúrese de introducir bien la clave y pruebe otra vez.</string>
-    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Clave maestra incorrecta</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">La clave de recuperación introducida no es correcta. Por favor, asegúrese de introducir bien la clave y pruebe otra vez.</string>
+    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Clave de recuperación incorrecta</string>
 
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Ninguna imagen subida</string>
 
@@ -771,7 +771,7 @@
     <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">La nueva dirección de correo eléctronico debe validarse. Por favor, comprueba tu correo electrónico para proceder.</string>
 
     <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">Your picture profile will be deleted. Do you want to proceed?</string>
-    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
+    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Editar</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Fecha de caducidad</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(SOLO PRO)</string>
@@ -852,4 +852,16 @@
     </plurals>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Cargando los contactos del teléfono...</string>
+
+    <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">El contacto %s se eliminará de la carpeta compartida.</string>
+    <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contactos se eliminarán de la carpeta compartida.</string>
+
+    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d correctamente eliminados de la carpeta compartida</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder"> y %d no se ha podido eliminar.</string>
+
+    <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">Este enlace no corresponde con la cuenta de esta sesión. Por favor, inicie sesión con la cuenta correcta.</string>
+    <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">El enlace para cancelar la cuenta ha caducado, por favor, solicita uno nuevo.</string>
+
+    <string name="no_results_found" context="Text shown after searching and no results found">No se encontraron resultados</string>
+
 </resources>

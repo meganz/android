@@ -64,6 +64,7 @@
 %feature("director") megachat::MegaChatVideoListener;
 %feature("director") megachat::MegaChatListener;
 %feature("director") megachat::MegaChatLogger;
+%feature("director") megachat::MegaChatRoomListener;
 
 typedef long long time_t;
 typedef long long uint64_t;

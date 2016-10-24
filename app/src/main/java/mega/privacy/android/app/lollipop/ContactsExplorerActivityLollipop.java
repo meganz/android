@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.ContactsExplorerAdapter.OnItemCheckClickListener;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -57,7 +56,7 @@ import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
 
-public class ContactsExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+public class ContactsExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, ContactsExplorerLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
 	public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
 	public static String ACTION_PICK_CONTACT_SEND_FILE = "ACTION_PICK_CONTACT_SEND_FILE";
@@ -151,7 +150,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		aB.setTitle(getResources().getString(R.string.section_contacts));
 		
 		listView = (RecyclerView) findViewById(R.id.contacts_explorer_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);		
 		

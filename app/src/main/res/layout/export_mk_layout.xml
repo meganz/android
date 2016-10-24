@@ -78,7 +78,7 @@
             android:paddingRight="12dp"
             android:textColor="@color/white"
             android:text="@string/context_copy"
-            android:background="@drawable/ripple_upgrade"
+            android:background="@color/accentColor"
             android:elevation="@dimen/elevation_upgrade_low"
             android:stateListAnimator="@anim/button_upgrade_elevation"
             android:tint="@android:color/white" />
@@ -90,7 +90,7 @@
             android:layout_centerVertical="true"
             android:textColor="@color/white"
             android:text="@string/save_action"
-            android:background="@drawable/ripple_upgrade"
+            android:background="@color/accentColor"
             android:elevation="@dimen/elevation_upgrade_low"
             android:stateListAnimator="@anim/button_upgrade_elevation"
             android:tint="@android:color/white" />
