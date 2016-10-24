@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
@@ -469,15 +470,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(chatId!=-1){
                         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
                         aB.setTitle(chatRoom.getTitle());
-
-		/*
-  public final static int STATUS_OFFLINE = 0;
-  public final static int STATUS_BUSY = 1;
-  public final static int STATUS_AWAY = 2;
-  public final static int STATUS_ONLINE = 3;
-  public final static int STATUS_CHATTY = 4;*/
-
-                        aB.setSubtitle("Status");
+                        setStatus();
                     }
                     else{
                         log("ChatRoom is -1");
@@ -521,7 +514,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         chatRoom = megaChatApi.getChatRoom(idChat);
                         aB.setTitle(chatRoom.getTitle());
-                        aB.setSubtitle("Status");
+                        setStatus();
 
                         log("Call to open chat");
                         boolean result = megaChatApi.openChatRoom(idChat, this);
@@ -543,7 +536,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
+    }
 
+    public void setStatus(){
+
+        int state = chatRoom.getOnlineStatus();
+        if(state == MegaChatApi.STATUS_ONLINE){
+            log("This user is connected: "+chatRoom.getTitle());
+            aB.setSubtitle(getString(R.string.online_status));
+        }
+        else{
+            log("This user status is: "+state+  " " + chatRoom.getTitle());
+            aB.setSubtitle(getString(R.string.offline_status));
+        }
     }
 
     public int compareTime(MegaChatMessage message, MegaChatMessage previous){
