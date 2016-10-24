@@ -359,7 +359,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
@@ -775,6 +775,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					intent.putExtra("isFolderLink", false);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						intent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
 					}

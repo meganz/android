@@ -9,22 +9,34 @@
 package mega.privacy.android.app.components;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
+    DisplayMetrics outMetrics;
  
-    public SimpleDividerItemDecoration(Context context) {
+    public SimpleDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
         mDivider = context.getResources().getDrawable(R.drawable.line_divider);
+        this.outMetrics = outMetrics;
     }
- 
+
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        int left = parent.getPaddingLeft()+212;
+        int left;
+        if(outMetrics!=null){
+            left = parent.getPaddingLeft()+ Util.scaleWidthPx(73, outMetrics);
+        }
+        else{
+            left = parent.getPaddingLeft()+ 212;
+        }
+
         int right = parent.getWidth() - parent.getPaddingRight();
  
         int childCount = parent.getChildCount();

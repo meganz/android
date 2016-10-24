@@ -7,9 +7,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -92,6 +94,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout fingerprintLayout;
 
 	RelativeLayout exportMKLayout;
+	LinearLayout exportMKButtonsLayout;
 	TextView titleExportMK;
 	TextView subTitleExportMK;
 	TextView firstParExportMK;
@@ -207,6 +210,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+		}
+		else{
+			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+		}
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
 
@@ -237,6 +246,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
 
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			upgradeButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+		}
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
 		upgradeButton.setOnClickListener(this);
 		upgradeButton.setVisibility(View.VISIBLE);
@@ -273,6 +285,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+		}
+		else{
+			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
 
@@ -281,6 +299,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logoutButton.setLayoutParams(logoutButtonParams);
 
 		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			deleteAccountButton.setBackground(ContextCompat.getDrawable(context, R.drawable.red_rounded_corners_button));
+		}
 		deleteAccountButton.setOnClickListener(this);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
@@ -291,6 +312,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
+		LinearLayout.LayoutParams exportMKButtonsParams = (LinearLayout.LayoutParams)exportMKLayout.getLayoutParams();
+		exportMKButtonsParams.setMargins(0, 0, 0, Util.scaleHeightPx(10, outMetrics));
+		exportMKLayout.setLayoutParams(exportMKButtonsParams);
+
+		exportMKButtonsLayout = (LinearLayout) v.findViewById(R.id.MK_buttons_layout);
 
 		titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
 		RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
@@ -323,12 +349,18 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		actionExportMK.setLayoutParams(actionExportMKParams);
 
 		copyMK = (Button) v.findViewById(R.id.copy_MK_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			copyMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+		}
 		LinearLayout.LayoutParams copyMKParams = (LinearLayout.LayoutParams)copyMK.getLayoutParams();
 		copyMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
 		copyMK.setLayoutParams(copyMKParams);
 		copyMK.setOnClickListener(this);
 
 		saveMK = (Button) v.findViewById(R.id.save_MK_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			saveMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+		}
 		LinearLayout.LayoutParams saveMKParams = (LinearLayout.LayoutParams)saveMK.getLayoutParams();
 		saveMKParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
 		saveMK.setLayoutParams(saveMKParams);
@@ -833,7 +865,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("TYPE_GET_RECOVERY_LINK");
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The recovery link has been sent");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_pass), getString(R.string.email_verification_title));
+				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text), getString(R.string.email_verification_title));
 			}
 			else if (e.getErrorCode() == MegaError.API_ENOENT){
 				log("No account with this mail");

@@ -10,23 +10,14 @@ import android.os.Bundle;
 
 public class LauncherActivity extends PinActivity{
 	
-	ManagerActivity mActivity;
-	ManagerActivityLollipop mActivityLol;	
+	ManagerActivityLollipop mActivityLol;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			log("Lollipop Version");
-			Intent intent = new Intent(this, ManagerActivityLollipop.class);
-			startActivity(intent);
-			finish();	
-		} else {
-			log("Older Version");
-			Intent intent = new Intent(this, ManagerActivity.class);
-			startActivity(intent);
-			finish();
-		}
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		startActivity(intent);
+		finish();
 		super.onCreate(savedInstanceState);
 	}
 	

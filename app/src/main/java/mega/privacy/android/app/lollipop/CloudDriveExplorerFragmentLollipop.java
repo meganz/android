@@ -75,7 +75,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		Bundle bundle = this.getArguments();
 		if (bundle != null) {
-		    modeCloud = bundle.getInt("MODE", LauncherFileExplorerActivity.COPY);	
+		    modeCloud = bundle.getInt("MODE", LauncherFileExplorerActivity.COPY);
 		    selectFile = bundle.getBoolean("SELECTFILE", false);
 		}
 		log("onCreate mode: "+modeCloud);
@@ -123,7 +123,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		cancelText.setLayoutParams(cancelTextParams);				
 				
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new MegaLinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		

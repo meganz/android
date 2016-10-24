@@ -1,259 +1,339 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:rounded="http://schemas.android.com/apk/res-auto"
-	android:id="@+id/my_account_total_relative_layout"
+    android:id="@+id/my_account_complete_relative_layout"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@color/black">
+	android:background="@color/white"
+	android:layout_height="match_parent" >
 
-    <ScrollView
-        android:id="@+id/cam_sync_scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-		
-		<RelativeLayout    
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:background="@color/black"
-		    android:gravity="center"
-		    android:orientation="vertical">
-	    
-		    <RelativeLayout 
-		        android:id="@+id/my_account_avatar_layout"
-		        android:layout_width="100dp"
-		        android:layout_height="100dp"
-		        android:layout_centerHorizontal="true"
-		        android:paddingBottom="10dp"
-		        android:paddingTop="10dp">
-		    
-			    <mega.privacy.android.app.components.RoundedImageView
-			        android:id="@+id/my_avatar_image"
-			        android:layout_width="100dp"
-			         android:layout_height="100dp"
-			       	android:layout_gravity="center_horizontal|center_vertical"
-			        android:paddingBottom="10dp"
-			        android:paddingTop="10dp"
-			        rounded:border_color="@color/border_file_properties"
-			        rounded:border_width="0dp"
-			        rounded:corner_radius="100dp" />
-			    
-			    <TextView
-		            android:id="@+id/my_account_initial_letter"
-		            android:layout_width="fill_parent"
-		   			android:layout_height="fill_parent"
-		   			android:layout_centerInParent="true"
-					android:gravity="center_horizontal|center_vertical"
-		   			android:paddingBottom="5dp" />
-			    
-		    </RelativeLayout>
-	
-		    <TextView
-		    	android:id="@+id/my_name"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:paddingTop="0dp"
-		        android:textSize="20sp"
-		        android:layout_centerHorizontal="true"
-		        android:textColor="@color/white" 
-		        android:textStyle="bold"
-		        android:layout_below="@id/my_account_avatar_layout" />
-	            
-	
-	        <TextView
-	           android:id="@+id/my_email"
-	           android:layout_width="wrap_content"
-	           android:layout_height="wrap_content"
-	           android:paddingTop="5dp" 
-	           android:layout_centerHorizontal="true"               
-	           android:textColor="@color/white"
-	           android:layout_below="@id/my_name"/>
-	
-	    
-	     	<TableLayout 
-	           android:id="@+id/progress_my_account"
-			   android:layout_width="fill_parent" 
-			   android:layout_height="wrap_content"	
-			   android:stretchColumns="1"
-			   android:layout_below="@id/my_email">        
-	
-				<TableRow>
-				    <TextView
-				        android:id="@+id/used_space_text_my_account"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:text="@string/my_account_used_space" 
-			            android:textColor="@color/navigation_drawer_text"
-			            android:paddingTop="5dp"
-			            android:layout_marginLeft="10dp"
-			            android:textSize="18sp"
-			            android:layout_gravity="left|bottom" />
-				    
-				    <TextView
-				        android:id="@+id/used_space_my_account"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:text="@string/used_space" 
-			            android:textColor="@color/navigation_drawer_text"
-			            android:paddingTop="5dp"
-			            android:paddingRight="20dp"
-			            android:layout_gravity="right|bottom" />
-			            
-			    </TableRow>
-	        </TableLayout>
-	        	            
-		    <ProgressBar
-			    android:id="@+id/my_account_used_space_bar"
-				android:layout_width="fill_parent"
-				android:layout_gravity="center"
-				android:layout_height="wrap_content" 
-				style="@style/MEGAProgressBar"  
-				android:paddingLeft="5dip"
-				android:paddingRight="5dip"
-				android:layout_below="@id/progress_my_account" />
-	        
-	        <RelativeLayout
-	              android:id="@+id/my_account_title_type"
-	              android:layout_width="match_parent"
-	              android:layout_height="wrap_content"
-	              android:gravity="center"
-	              android:layout_below="@id/my_account_used_space_bar" >
-	
-	             
-		        <TextView
-		             android:id="@+id/my_account_title"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/my_account_title"
-		             android:textColor="@color/grey_info_menu"
-					 android:textStyle="bold"
-					 android:paddingTop="10dp"
-					 android:paddingBottom="4dp" />   
-		             
-		        <TextView
-		             android:id="@+id/my_account_type_account"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:layout_toRightOf="@id/my_account_title"
-		             android:textColor="@color/white"			 
-					 android:paddingLeft="4dp"
-					 android:paddingTop="10dp"
-					 android:paddingBottom="10dp" /> 
-					 
-		        <TextView
-		             android:id="@+id/my_account_expires_on"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/expires_on"
-		             android:textColor="@color/grey_info_menu"
-					 android:textStyle="bold"
-					 android:paddingTop="4dp"
-					 android:paddingBottom="4dp"
-					 android:layout_below="@id/my_account_title" />  
-					 
-		        <TextView 
-		            android:id="@+id/my_account_expiration"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:layout_below="@id/my_account_title"
-		            android:layout_toRightOf="@id/my_account_expires_on"
-		            android:textColor="@color/white"			 
-					android:paddingLeft="4dp"
-					android:paddingTop="4dp"
-					android:paddingBottom="4dp" />
-	 
-	         </RelativeLayout>     
-	 
-	        
-	     	<RelativeLayout android:id="@+id/button_upgrade"
-				android:layout_width="fill_parent" 
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/white"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:id="@+id/parent_linear_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@color/white"
+			android:orientation="vertical">
+
+			<LinearLayout
+				android:id="@+id/my_account_email_layout"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@id/my_account_title_type" >        
-	        
-		        <Button
-		            android:id="@+id/btn_upgrade"            
-		            android:layout_width="200dp"
-		       		android:layout_height="48dp"
-		       		android:layout_marginTop="10dp"
-		       		android:textStyle="bold"
-		       		android:layout_centerHorizontal="true"
-		            android:layout_centerVertical="true"
-		            android:text="@string/my_account_upgrade_pro" 
-		            style="@style/button_MEGA_inverse"/>
-	            
-	        </RelativeLayout>
-	        
-	        <RelativeLayout
-	            android:id="@+id/my_account_my_last_session_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_below="@id/button_upgrade"
-                android:visibility="invisible">
-		                   
-	            <TextView
-		             android:id="@+id/my_last_session_title"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:text="@string/my_account_last_session"
-		             android:textColor="@color/grey_info_menu"
-					 android:textStyle="bold"
-					 android:paddingTop="10dp" />   
-	             
-	        	<TextView
-		             android:id="@+id/my_last_session"
-		             android:layout_width="wrap_content"
-		             android:layout_height="wrap_content"
-		             android:layout_toRightOf="@id/my_last_session_title"
-		             android:textColor="@color/white"
-					 android:paddingLeft="4dp"
-					 android:paddingTop="10dp"/>       
-	         </RelativeLayout>
-	         
-	         <RelativeLayout
-	             	android:id="@+id/my_account_my_connections_relative_layout"
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content"
-	                android:gravity="center"
-	                android:paddingBottom="5dp"
-	                android:layout_below="@id/my_account_my_last_session_relative_layout">
-	            
-	           <TextView
-		            android:id="@+id/my_connections_title"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-				 	android:paddingTop="5dp"
-		            android:text="@string/my_account_connections"
-		            android:textColor="@color/grey_info_menu"
-				 	android:textStyle="bold" />   
-	            
-		       	<TextView
-		            android:id="@+id/my_connections"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		             android:paddingLeft="4dp"
-				 	android:paddingTop="5dp"
-		            android:layout_toRightOf="@id/my_connections_title"
-		            android:textColor="@color/white"/>      
-	       </RelativeLayout>
-	       
-	         <LinearLayout 
-		            android:layout_width="match_parent"
-		            android:layout_height="48dp"
-		            android:orientation="vertical"
-		            android:layout_below="@id/my_account_my_connections_relative_layout">
-		            
-		        </LinearLayout>
-		</RelativeLayout>
-	</ScrollView>
-	
-	<Button
-        android:id="@+id/my_account_logout"
-		android:layout_height="48dp"
-		android:layout_width="fill_parent"
-		android:paddingTop="7dp"
-        android:background="@drawable/btn_default_holo_light_without_corners"
-        android:text="@string/action_logout"
-        android:textColor="@color/white"
-        android:layout_alignParentBottom="true" >
-    </Button>
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
 
-</RelativeLayout>
+				<ImageView
+					android:id="@+id/my_account_email_icon"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey" />
+
+				<LinearLayout
+					android:id="@+id/my_account_email_text_layout"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_name"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textColor="@color/name_my_account"
+						android:textSize="16sp" />
+
+					<TextView
+						android:id="@+id/my_account_email"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/my_account_extra_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+					<RelativeLayout
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true">
+
+						<RelativeLayout
+							android:id="@+id/my_account_relative_layout_avatar"
+							android:layout_width="60dp"
+							android:layout_height="60dp"
+							android:layout_gravity="right"
+							android:layout_alignParentRight="true"
+							android:orientation="horizontal">
+
+							<mega.privacy.android.app.components.RoundedImageView
+								android:id="@+id/my_account_thumbnail"
+								android:layout_width="fill_parent"
+								android:layout_height="fill_parent"
+								android:scaleType="fitCenter"
+								android:layout_centerInParent="true"
+								rounded:border_color="@color/border_file_properties"
+								rounded:border_width="0dp"
+								rounded:corner_radius="30dp" />
+
+							<TextView
+								android:id="@+id/my_account_initial_letter"
+								android:layout_width="fill_parent"
+								android:layout_height="fill_parent"
+								android:layout_centerInParent="true"
+								android:gravity="center_horizontal|center_vertical"
+								android:paddingBottom="3dp" />
+						</RelativeLayout>
+
+					</RelativeLayout>
+
+				</LinearLayout>
+
+			</LinearLayout>
+
+			<Button
+				android:id="@+id/MK_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/name_my_account"
+				android:layout_centerVertical="true"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:text="@string/action_export_master_key"
+				android:background="@color/white"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation"/>
+
+			<RelativeLayout
+				android:id="@+id/my_account_account_type_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white">
+
+				<LinearLayout
+					android:id="@+id/my_account_account_type_account_type_layout"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="left"
+					android:orientation="vertical">
+
+					<TextView
+						android:id="@+id/my_account_account_type_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_account_used_space"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account"/>
+
+				</LinearLayout>
+
+				<Button
+					android:id="@+id/my_account_account_type_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentRight="true"
+					android:paddingLeft="20dp"
+					android:paddingRight="20dp"
+					android:paddingTop="-3dp"
+					android:paddingBottom="-3dp"
+					android:textColor="@color/white"
+					android:text="@string/my_account_upgrade_pro"
+					android:background="@color/accentColor"
+					android:elevation="@dimen/elevation_upgrade_low"
+					android:stateListAnimator="@anim/button_upgrade_elevation"
+					android:tint="@android:color/white" />
+
+			</RelativeLayout>
+
+			<LinearLayout
+				android:id="@+id/my_account_expiration_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_account_expiration_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_expiration_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/expires_on"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account" />
+
+					<TextView
+						android:id="@+id/my_account_expiration"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_account_last_session_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="vertical" >
+
+				<TextView
+					android:id="@+id/my_account_last_session_label"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/my_account_last_session"
+					android:textSize="16sp"
+					android:textColor="@color/name_my_account"/>
+
+				<TextView
+					android:id="@+id/my_account_last_session"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="14sp"
+					android:textColor="@color/mail_my_account"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_account_connections_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_account_connections_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_connections_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/my_account_connections"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_account_connections"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<ImageView
+					android:id="@+id/my_account_connections_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="gone" />
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_account_fingerprint_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_account_fingerprint_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_account_fingerprint_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/my_account_my_credentials"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_account_fingerprint"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<ImageView
+					android:id="@+id/my_account_fingerprint_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="invisible" />
+			</LinearLayout>
+
+			<Button
+				android:id="@+id/logout_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/name_my_account"
+				android:layout_centerVertical="true"
+				android:text="@string/action_logout"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:background="@color/white"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation" />
+
+			<Button
+				android:id="@+id/delete_account_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:textColor="@color/white"
+				android:layout_centerVertical="true"
+				android:text="@string/delete_account"
+				android:background="@color/delete_account"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation" />
+
+
+		</LinearLayout>
+
+		<include
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			layout="@layout/export_mk_layout"
+			android:visibility="gone"/>
+
+	</LinearLayout>
+
+</ScrollView>

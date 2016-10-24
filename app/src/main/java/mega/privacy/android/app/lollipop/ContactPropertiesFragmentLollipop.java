@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -86,8 +87,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	//	private ListView overflowMenuList;
 	private boolean overflowVisible = false; 
-	String firstNameText;
-	String lastNameText;
+	String firstNameText = "";
+	String lastNameText = "";
 	
 	MegaApiAndroid megaApi;
 	MegaUser contact;
@@ -168,7 +169,13 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			optionsBackLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_toolbar_back_options_layout);
 			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+				params.setMargins(0,  0, 0, Util.scaleHeightPx(100, outMetrics));
+			}
+			else{
+				params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
+			}
 			optionsBackLayout.setLayoutParams(params);
 			
 			toolbarBack = (ImageView) v.findViewById(R.id.contact_properties_toolbar_back);
@@ -215,8 +222,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			//Mail Layout
 			mailLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_email_layout);
 //			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
-//			lpML.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, 0);
-//			mailLayout.setLayoutParams(lpML);				
+//			lpML.setMargins(0, 0, 0,  Util.scaleHeightPx(10, outMetrics));
+//			mailLayout.setLayoutParams(lpML);
 			
 			mailIcon = (ImageView) v.findViewById(R.id.contact_properties_email_icon);
 			RelativeLayout.LayoutParams lp1 = new RelativeLayout.LayoutParams(mailIcon.getLayoutParams());
@@ -228,6 +235,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			separator = (View) v.findViewById(R.id.divider_shared_layout);
 			RelativeLayout.LayoutParams paramsDivider = (RelativeLayout.LayoutParams) separator.getLayoutParams();
 			paramsDivider.leftMargin = Util.scaleWidthPx(55, outMetrics);
+			paramsDivider.topMargin = Util.scaleHeightPx(10, outMetrics);
 			separator.setLayoutParams(paramsDivider);
 
 			infoEmail.setText(userEmail);		

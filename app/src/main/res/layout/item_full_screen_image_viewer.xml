@@ -21,7 +21,7 @@
     
     <ProgressBar
         android:id="@+id/full_screen_image_viewer_download_progress_bar"
-        style="@style/ProgressBarTheme.mega"
+        style="@style/UsedSpaceProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 		android:layout_centerInParent="true"/>

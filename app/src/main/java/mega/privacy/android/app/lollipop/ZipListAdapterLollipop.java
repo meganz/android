@@ -99,7 +99,7 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
+			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_browser_bar);
 			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			holder.publicLinkImageMultiselect = (ImageView) convertView.findViewById(R.id.file_list_public_link_multiselect);
 			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);

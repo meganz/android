@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/white">
+    
      <mega.privacy.android.app.components.MEGAPreferenceCategory 
         android:key="settings_pin_lock"
         android:title="@string/settings_pin_lock">
  <!--        android:textColor="@color/pressed_mega">  -->
         
-         <Preference
-	        android:key="settings_pin_lock_enable"
-	        android:title="@string/settings_pin_lock_on" />
+		 <mega.privacy.android.app.components.TwoLineCheckPreference
+			 android:key="settings_pin_lock_enable"
+			 android:title="@string/settings_pin_lock_switch"
+			 android:defaultValue="false"/>
 		
-		<EditTextPreference
+		<Preference
 	        android:key="settings_pin_lock_code"
-	        android:title="@string/settings_pin_lock_code"
-	        android:password="true"
-	        android:inputType="numberPassword" />
+	        android:title="@string/settings_reset_lock_code"/>
     </mega.privacy.android.app.components.MEGAPreferenceCategory>
     
     <PreferenceCategory 
@@ -50,6 +51,10 @@
 	        android:title="@string/settings_local_camera_upload_folder" />
 		
 		<Preference
+		    android:key="settings_local_camera_upload_folder_sdcard"
+		    android:title="@string/settings_local_camera_upload_folder" />
+		
+		<Preference
 	        android:key="settings_mega_camera_folder"
 	        android:title="@string/settings_mega_camera_upload_folder" />
 		
@@ -79,9 +84,27 @@
             android:key="settings_storage_advanced_devices"
         	android:title="@string/settings_storage_advanced_devices" />
         
+        <Preference 
+            android:key="settings_storage_download_location_sd_card_preference"
+            android:title="@string/settings_storage_download_location"/>
+        
 		<Preference
 	        android:key="settings_storage_download_location"
 	        android:title="@string/settings_storage_download_location" />
+	</PreferenceCategory>
+	
+	<PreferenceCategory
+	    android:key="advanced_features"
+	    android:textColor="@color/pressed_mega"
+	    android:title="@string/settings_advanced_features" >
+		
+	    <Preference
+	        android:key="settings_advanced_features_cache"
+	        android:title="@string/settings_advanced_features_cache" />
+	    
+	    <Preference
+	        android:key="settings_advanced_features_offline"
+	        android:title="@string/settings_advanced_features_offline" />
 	</PreferenceCategory>
 	
     <PreferenceCategory 
@@ -102,7 +125,7 @@
 		<Preference
 			android:key="settings_about_code_link"
 			android:title="@string/settings_about_code_link_title" />
-		
+
         <Preference
             android:key="settings_about_sdk_version"
         	android:title="@string/settings_about_sdk_version"
@@ -112,5 +135,7 @@
             android:key="settings_about_app_version"
         	android:title="@string/settings_about_app_version"
         	android:summary="@string/app_version" />
+
+
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -2,60 +2,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RubbishBinListFragment"
-	android:background="@color/white">
+    android:background="@color/new_background_fragment"
+    tools:context=".RubbishBinFragmentLollipop" >
     
-    <TextView
-	    android:id="@+id/rubbishbin_content_grid_text"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:paddingLeft="8dp"
-	    android:textColor="@color/black"
-	    android:background="@color/content_text_folder"
-	    android:textSize="14sp"/>
+   <RelativeLayout
+        android:id="@+id/rubbishbin_grid_content_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:background="@color/new_background_fragment">
 
-   <LinearLayout
-         android:id="@+id/out_space_grid_rubbish"
-    	 android:layout_width="fill_parent"
-    	 android:layout_height="wrap_content"
-    	 android:layout_alignParentBottom="true"
-    	 android:layout_gravity="center|fill_horizontal"
-    	 android:layout_centerHorizontal="true"
-    	 android:orientation="vertical">
+        <TextView
+            android:id="@+id/rubbishbin_grid_content_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"            
+            android:textColor="@color/text_secondary"
+            android:layout_centerVertical="true"
+            android:textSize="14sp" />
+        
+       <ProgressBar
+		    android:id="@+id/rubbishbin_grid_download_progress_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" 
+			android:layout_below="@id/rubbishbin_grid_content_text" 
+			style="@style/UsedSpaceProgressBar"
+			android:visibility="gone"/>
+       
+       <ImageView
+	        android:id="@+id/rubbishbin_grid_transfer_arrow"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/ic_chevron_right_grey"
+	        android:layout_above="@id/rubbishbin_grid_download_progress_bar" 
+	        android:layout_alignParentRight="true" 
+	        android:visibility="gone"/>  
+    </RelativeLayout>
 
-		<TextView
-		    android:id="@+id/out_space_text_grid_rubbish"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:textColor="@color/white"
-		    android:textStyle="bold"
-		    android:paddingTop="20dp"
-		    android:paddingBottom="20dp"
-		    android:paddingLeft="20dp"
-		    android:paddingRight="20dp"
-		    android:gravity="center"
-		    android:background="@color/navigation_drawer_background"
-		    android:textSize="16sp"
-		    android:text="@string/warning_out_space"/>  
-         
-         <Button
-            android:id="@+id/out_space_btn_grid_rubbish"
-       		android:layout_height="48dp"       		
-       		android:layout_width="fill_parent"
-            android:background="@drawable/btn_default_holo_light_without_corners"
-            android:textColor="@color/white"
-            android:text="@string/my_account_upgrade_pro" />
-     </LinearLayout>  
-    
-    
-    <ListView 
+    <mega.privacy.android.app.components.AutofitRecyclerView
         android:id="@+id/rubbishbin_grid_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:dividerHeight="0dp"
-		android:divider="@null"
-		android:layout_below="@id/rubbishbin_content_grid_text">
-    </ListView>
+        android:layout_height="match_parent"
+        android:choiceMode="multipleChoice" 
+		android:layout_below="@id/rubbishbin_grid_content_text_layout"
+		android:columnWidth="172dp" />
     
     <ImageView
 	    android:id="@+id/rubbishbin_grid_empty_image"
@@ -72,5 +60,5 @@
 	    android:layout_below="@id/rubbishbin_grid_empty_image"
 	    android:layout_marginTop="@dimen/standard_margin"
 	    android:layout_centerHorizontal="true"/>
-
+    
 </RelativeLayout>

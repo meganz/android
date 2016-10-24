@@ -1,18 +1,48 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/photo_sync_large_layout" >
 	    
-	<RelativeLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="5dp"
-	    android:descendantFocusability="blocksDescendants"
-	    android:id="@+id/photo_sync_list_item_layout" >
+		<RelativeLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:descendantFocusability="blocksDescendants"
+		    android:id="@+id/photo_sync_list_item_layout"
+		    android:background="@drawable/statelist_item_layout" >
+	   
+	    <ImageView
+	        android:id="@+id/photo_sync_list_thumbnail"
+	        android:layout_width="60dp"
+	        android:layout_height="60dp"
+	        android:layout_marginLeft="5dp" 
+	        android:scaleType="fitCenter" />
 	    
+	    <TextView
+	        android:id="@+id/photo_sync_list_filename"
+	        android:layout_width="225dp"
+	        android:layout_height="30dp"
+	        android:layout_toRightOf="@id/photo_sync_list_thumbnail"
+	        android:paddingLeft="3dp"
+	        android:paddingTop="7dp"
+	        android:textColor="@color/file_list_first_row"
+        	android:ellipsize="end"
+        	android:maxLines="2" />
+	    
+	    <TextView
+	        android:id="@+id/photo_sync_list_filesize"
+	        android:layout_width="wrap_content"
+	        android:layout_height="30dp"
+	        android:layout_toRightOf="@id/photo_sync_list_thumbnail"
+	        android:layout_below="@+id/photo_sync_list_filename"
+	        android:paddingLeft="3dp"
+	        android:paddingBottom="7dp"
+	        android:textColor="@color/file_list_second_row" 
+	        android:textSize="12sp"
+	        android:ellipsize="end"
+        	android:maxLines="1"/>
+	    
+	   <!-- 
 	    <CheckBox
 	        android:id="@+id/photo_sync_list_checkbox"
 	        android:layout_width="wrap_content"
@@ -37,7 +67,6 @@
 	        android:layout_toRightOf="@id/photo_sync_list_thumbnail"
 	        android:paddingLeft="3dp"
 	        android:paddingTop="7dp"
-	        android:textColor="@color/file_list_first_row"
 	        android:singleLine="false" />
 	    
 	    <TextView
@@ -61,16 +90,7 @@
 	        android:layout_alignParentRight="true"
 			android:paddingTop="25dp"
 	        android:paddingRight="15dp" />
-	     <!--
-	    <ImageView
-	        android:id="@+id/photo_sync_list_arrow_selection"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/arrow_selection"
-			android:layout_alignBottom="@id/photo_sync_list_thumbnail"
-	        android:layout_alignParentRight="true"
-	        android:paddingRight="15dp" />-->
-	    
+    
 	    <RelativeLayout
 	        android:id="@+id/photo_sync_list_options"
 	        android:layout_width="fill_parent"
@@ -84,16 +104,6 @@
 	            android:layout_height="wrap_content">
 	            
 	            <TableRow>
-	<!-- 	            <ImageButton
-			            android:id="@+id/photo_sync_list_option_open"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_action_collections_collection"
-			            android:paddingLeft="30dp"
-			            android:paddingTop="10dp"
-			            android:background="@null" 
-			            android:layout_gravity="center_vertical"/>
-	-->	        
 					<ImageView
 			            android:id="@+id/photo_sync_list_option_download"
 			            android:layout_width="wrap_content"
@@ -152,8 +162,10 @@
 		        </TableRow>        
 	        </TableLayout>
 	    </RelativeLayout>
-    
+    -->
     </RelativeLayout>
+
+
     
     <RelativeLayout
 	    android:layout_width="fill_parent"
@@ -161,7 +173,7 @@
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/photo_sync_list_month_layout" 
 	    android:background="@color/white"
-	    android:layout_marginLeft="72dp" >
+	    android:layout_marginLeft="72dp">
 	    
     	<TextView
 	        android:id="@+id/photo_sync_list_month_name"
@@ -170,7 +182,9 @@
 	        android:singleLine="false" 
 	        android:textColor="@color/photo_sync_month_text"
 	        android:textSize="14sp"
-	        android:textStyle="bold"/>
+	        android:textStyle="bold"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp" />
     
 	</RelativeLayout>	
     

@@ -459,7 +459,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
@@ -1026,6 +1026,14 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
+
+						if (context instanceof ManagerActivityLollipop){
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+							if(accountInfo!=null){
+								intent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
+
 						startActivity(intent);
 					}
 					else{

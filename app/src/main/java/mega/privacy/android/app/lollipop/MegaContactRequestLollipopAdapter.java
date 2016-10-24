@@ -84,7 +84,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
-        LinearLayout optionsLayout;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -221,7 +220,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 			holder.itemLayout.setOnClickListener(this);
 
-			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
+//			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 			v.setTag(holder);	
 		}
 		else{
@@ -242,7 +241,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 			holder.itemLayout.setOnClickListener(this);
 
-			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
+//			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 			
 			v.setTag(holder);		
 		}

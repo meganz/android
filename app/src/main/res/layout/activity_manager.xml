@@ -1,247 +1,304 @@
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    
-<FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-<!-- THE CONTACTS TABS -->
-
-	<TabHost
-        android:id="@+id/tabhost_contacts"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-           <TabWidget
-            android:id="@android:id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-       	   </TabWidget>
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="0"/>
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/contact_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-    </TabHost>
-    
-	<TabHost
-        android:id="@+id/tabhost_shares"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-           <TabWidget
-            android:id="@android:id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-       	   </TabWidget>
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="0"/>
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/shares_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-        </LinearLayout>
-    </TabHost>
-    
-	
-
-
-
-<!-- <android.support.v4.view.ViewPager
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/contact_tabs_pager"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />-->
-
-<!-- THE DRAWER -->	
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="280dp"
     android:layout_height="match_parent"
-    android:id="@+id/left_drawer"
-    android:layout_gravity="start"
-    android:background="@color/navigation_drawer_background" >
-    
-    
-    <TableLayout 
-        android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		android:id="@+id/top_control_bar">
-		
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            
-            <RelativeLayout
-                android:id="@+id/relative_layout_profile_avatar"
-                android:layout_width="55dp"
-				android:layout_height="55dp"
-				android:paddingLeft="5dp"
-			    android:paddingTop="5dp"
-			    android:paddingBottom="5dp"
-			    android:paddingRight="5dp" >
-            
-	            <mega.privacy.android.app.components.RoundedImageView 
-				    android:id="@+id/profile_photo" 
-				    android:layout_width="50dp"
-				    android:layout_height="50dp"
-				    android:scaleType="fitCenter"         
-			        rounded:corner_radius="25dp" 
-			        rounded:border_width="0dp"
-			        rounded:border_color="@color/border_file_properties" />
-	            
-	            <TextView
-	                android:id="@+id/profile_textview"
-	                android:layout_width="fill_parent"
-				    android:layout_height="fill_parent"
-				    android:layout_centerInParent="true"
-				    android:gravity="center_horizontal|center_vertical"
-				    android:paddingBottom="5dp"  />
-	            
-	        </RelativeLayout>
-            
-            <TableLayout 
-                android:layout_width="fill_parent"
-				android:layout_height="wrap_content" 
-				android:id="@+id/table_right">
-			
-                <TableRow
-                    android:id="@+id/tableRow2"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content">
-	            
-                    <TextView
-                        android:id="@+id/profile_user_name"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:text="User Name" 
-                        android:textColor="@color/navigation_drawer_text"
-                        android:paddingTop="5dp"
-                        android:paddingLeft="10dp"
-                        android:textSize="18sp" />
-	            </TableRow>
-	            <TableRow
-                    android:id="@+id/tableRow3"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/profile_user_email"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:text="email@domain.com" 
-                        android:textColor="@color/navigation_drawer_mail"
-                        android:paddingLeft="10dp"
-                        android:paddingBottom="5dp"/>
-	            
-	            </TableRow>
-                
-            </TableLayout>
-            
-        </TableRow>
-    </TableLayout>
-    
-    <TableLayout android:id="@+id/bottom_control_bar"
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:stretchColumns="1">
-        
-        <TableRow>
+    android:fitsSystemWindows="true">
 
-		    <TextView
-		        android:id="@+id/used_space_text"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:text="@string/my_account_used_space" 
-	            android:textColor="@color/navigation_drawer_text"
-	            android:paddingTop="10dp"
-	            android:paddingLeft="12dp"
-	            android:textSize="14sp"
-	            android:layout_gravity="left|bottom" />
-
-		    <ImageView 
-		        android:id="@+id/used_space_warning"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:src="@drawable/warning_ic"
-		        android:layout_gravity="right|bottom" 
-		        android:paddingRight="5dp" />
-		    
-		    <TextView
-		        android:id="@+id/used_space"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:text="@string/used_space" 
-	            android:textColor="@color/navigation_drawer_text"
-	            android:paddingTop="10dp"
-	            android:paddingRight="10dp"
-	            android:layout_gravity="right|center_vertical" />
-        </TableRow>
-        
-        <TableRow>
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="3">
-	            
-                <ProgressBar
-				    android:id="@+id/manager_used_space_bar"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content" 
-					style="@style/MEGAProgressBar"  
-					android:layout_marginLeft="12dip"
-					android:layout_marginRight="12dip"
-					android:layout_marginBottom="12dip"
-					android:layout_marginTop="9dip" />
-            </RelativeLayout>
-        </TableRow>
-		
-	</TableLayout>
-	
-    <ListView android:id="@+id/left_drawer_list"
-        android:layout_width="280dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="singleChoice"
-        
-        android:dividerHeight="1dp"
-        android:background="@color/navigation_drawer_background"
-        android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar"/>
-</RelativeLayout>
-    
-	
+        android:orientation="vertical" >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            tools:context=".ManagerActivityLollipop" />
+
+        <android.support.design.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar" />
+
+            <!-- THE Cloud Drive TABS -->
+            <LinearLayout
+                android:id="@+id/tabhost_cloud_drive"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/sliding_tabs_cloud_drive"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/mega"
+                        style="@style/MyCustomTabLayout"/>
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/cloud_drive_tabs_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+            </LinearLayout>
+
+            <!-- THE CONTACTS TABS -->
+            <LinearLayout
+                android:id="@+id/tabhost_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/sliding_tabs_contacts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/mega"
+                        style="@style/MyCustomTabLayout"/>
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/contact_tabs_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+            </LinearLayout>
+
+            <!-- THE SHARES TABS -->
+            <LinearLayout
+                android:id="@+id/tabhost_shares"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_shares"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/mega"
+                    style="@style/MyCustomTabLayout"/>
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/shares_tabs_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floating_button"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:elevation="@dimen/elevation_low"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add_white"
+                android:stateListAnimator="@anim/button_elevation"
+                android:tint="@android:color/white"
+                android:layout_gravity="bottom|right|end"/>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:elevation="@dimen/elevation_high"
+            layout="@layout/layout_overquota_alert"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"/>
+
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            layout="@layout/layout_get_pro_account"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fab_collection_layout"
+        android:background="@color/transparent_white"
+        android:gravity="bottom|end"
+        android:visibility="gone"
+        android:fitsSystemWindows="true">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/third_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_marginBottom="200dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible"
+                app:backgroundTint="@color/orange"
+                app:elevation="6dp"
+                app:pressedTranslationZ="12dp"
+                android:src="@drawable/ic_add_white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/second_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_marginBottom="140dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible"
+                app:backgroundTint="@color/orange"
+                app:elevation="6dp"
+                app:pressedTranslationZ="12dp"
+                android:src="@drawable/ic_add_white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/first_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_marginBottom="80dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginRight="16dp"
+                android:visibility="invisible"
+                app:elevation="6dp"
+                app:backgroundTint="@color/accentColor"
+                app:pressedTranslationZ="12dp"
+                android:src="@drawable/ic_chat_white" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/main_fab_chat"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:layout_gravity="bottom|end"
+                app:elevation="6dp"
+                app:backgroundTint="@color/accentColor"
+                app:pressedTranslationZ="12dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add_white" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_upload_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_options_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_contact_options_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_avatar_options_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/sliding_chat_panel"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"/>
+
+    <!--
+    The navigation drawer 
+    <include
+        layout="@layout/navigation_drawer"/>
+    -->
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#ffffff"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp"
+        app:itemBackground="@drawable/navigation_view_item_background"
+        app:itemIconTint="@color/drawer_item_text"
+        app:itemTextColor="@color/drawer_item_text"
+        app:menu="@menu/navigation_drawer_items" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="-96dp"
+            android:background="#ffffff" >
+
+            <TextView
+                android:id="@+id/navigation_drawer_used_space_text"
+                style="@style/NavDrawerAccountUsedSpaceText"
+                android:text="@string/my_account_used_space"
+                android:textStyle="bold"
+                tools:fontFamily="sans-serif-medium" />
+
+            <ProgressBar
+                android:id="@+id/manager_used_space_bar"
+                style="@style/UsedSpaceProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/navigation_drawer_used_space_text"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:id="@+id/navigation_drawer_used_space"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/manager_used_space_bar"
+                android:paddingLeft="10dp"
+                android:text="0"
+                android:textColor="#9b9b9b"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/navigation_drawer_total_space"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/manager_used_space_bar"
+                android:paddingRight="10dp"
+                android:text="50GB"
+                android:textColor="#9b9b9b"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:fontFamily="sans-serif-medium" />
+        </RelativeLayout>
+    </android.support.design.widget.NavigationView>
+
 </android.support.v4.widget.DrawerLayout>

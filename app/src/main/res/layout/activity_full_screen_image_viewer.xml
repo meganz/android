@@ -40,40 +40,60 @@
             android:id="@+id/full_image_viewer_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_navigation_accept_white"
+            android:src="@drawable/ic_arrow_back_white"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="0dp"
             style="@style/dialogActionButton"/>
         
         <ImageView 
             android:id="@+id/full_image_viewer_overflow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_core_overflow"
+            android:src="@drawable/ic_dots_vertical_white"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="0dp"
             style="@style/dialogActionButton"/>
+        
+        <ImageView
+		    android:id="@+id/full_image_viewer_get_link"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:src="@drawable/link_ic_white"
+		    android:layout_centerVertical="true"
+		    android:layout_toLeftOf="@id/full_image_viewer_overflow"
+		    android:layout_marginRight="0dp"
+		    style="@style/dialogActionButton" />
         
         <ImageView 
             android:id="@+id/full_image_viewer_share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_social_share"
+            android:src="@drawable/ic_social_share_white"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/full_image_viewer_overflow"
-            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/full_image_viewer_get_link"
+            android:layout_marginRight="0dp"
             style="@style/dialogActionButton"/>
+        
+        <ImageView
+		    android:id="@+id/full_image_viewer_properties"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:src="@drawable/info_ic_white"
+		    android:layout_centerVertical="true"
+		    android:layout_toLeftOf="@id/full_image_viewer_share"
+		    android:layout_marginRight="0dp"
+		    style="@style/dialogActionButton" />
         
         <ImageView
 		    android:id="@+id/full_image_viewer_download"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:src="@drawable/ic_download"
+		    android:src="@drawable/ic_download_white"
 		    android:layout_centerVertical="true"
-		    android:layout_toLeftOf="@id/full_image_viewer_share"
-		    android:layout_marginRight="5dp"
+		    android:layout_toLeftOf="@id/full_image_viewer_properties"
+		    android:layout_marginRight="0dp"
 		    style="@style/dialogActionButton" />
         
     </RelativeLayout>
@@ -84,8 +104,8 @@
 			android:id="@+id/image_viewer_layout_overflow_menu"
 			android:background="#ffffffff"
 	        android:layout_alignParentRight="true"
-	        android:layout_below="@+id/image_viewer_layout_top"
-	        android:layout_marginRight="5dp">
+	        android:layout_marginRight="5dp"
+	        android:layout_marginTop="5dp">
         
         <ListView
             android:id="@+id/image_viewer_overflow_menu_list"
@@ -94,7 +114,7 @@
             android:layout_alignParentLeft="true"
 			android:layout_marginLeft="0dp"
 			android:background="#00000000"
-			/>            
+			android:divider="@null" />
 	</RelativeLayout>
     
 <!-- <TextView

@@ -11,7 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -76,7 +78,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     TextView bLogin;
     TextView bForgotPass;
     ImageView loginThreeDots;
-    Switch loginSwitch;
+    SwitchCompat loginSwitch;
     TextView loginABC;
     LinearLayout loginLogin;
     LinearLayout loginLoggingIn;
@@ -402,7 +404,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginABC = (TextView) v.findViewById(R.id.ABC);
 
-        loginSwitch = (Switch) v.findViewById(R.id.switch_login);
+        loginSwitch = (SwitchCompat) v.findViewById(R.id.switch_login);
         LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
         switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
         loginSwitch.setLayoutParams(switchParams);
@@ -535,12 +537,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         yesMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
         yesMK.setLayoutParams(yesMKParams);
         yesMK.setOnClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            yesMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
 
         noMK = (Button) v.findViewById(R.id.no_MK_button);
         LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
         noMKParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(25, outMetrics), 0, 0);
         noMK.setLayoutParams(noMKParams);
         noMK.setOnClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            noMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
 
         parkAccountLayout = (RelativeLayout) v.findViewById(R.id.park_account_layout);
         parkAccountTitle = (TextView) v.findViewById(R.id.title_park_account_layout);
@@ -1058,8 +1066,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 onLoginClick(v);
                 break;
             }
-            case R.id.button_create_account_login:
-            case R.id.login_text_create_account: {
+            case R.id.button_create_account_login:{
                 log("click on button_create_account_login");
                 onRegisterClick(v);
                 break;

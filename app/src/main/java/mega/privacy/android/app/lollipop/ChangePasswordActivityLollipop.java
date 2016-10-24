@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -60,7 +61,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private EditText oldPasswordView, newPassword1View, newPassword2View;
 	private TextView changePasswordButton;
 	ImageView loginThreeDots;
-	Switch loginSwitch;
+	SwitchCompat loginSwitch;
 	TextView loginABC;
     RelativeLayout fragmentContainer;
 	TextView title;
@@ -133,7 +134,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		
 		loginABC = (TextView) findViewById(R.id.ABC_change_pass);
 		
-		loginSwitch = (Switch) findViewById(R.id.switch_change_pass);
+		loginSwitch = (SwitchCompat) findViewById(R.id.switch_change_pass);
 		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
 		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
 		loginSwitch.setLayoutParams(switchParams);
