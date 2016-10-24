@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -47,10 +49,15 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -59,13 +66,15 @@ import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi")
-public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
+public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
 
 	RelativeLayout imageLayout;
 
+	ContactChatInfoActivityLollipop contactChatInfoActivityLollipop;
+	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
 	TextView initialLetter;
 	ImageView contactPropertiesImage;
@@ -114,6 +123,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
+		contactChatInfoActivityLollipop = this;
 		if (megaApi == null) {
 			MegaApplication app = (MegaApplication) getApplication();
 			megaApi = app.getMegaApi();
@@ -154,6 +164,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
 			setContentView(R.layout.activity_chat_contact_properties);
+			fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container);
 			toolbar = (Toolbar) findViewById(R.id.toolbar);
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
@@ -742,6 +753,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 					case DialogInterface.BUTTON_POSITIVE:
 						log("Clear chat!");
 //						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
+						log("Clear history selected!");
+						ChatController chatC = new ChatController(contactChatInfoActivityLollipop);
+						chatC.clearHistory(chat);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -767,5 +781,45 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 //			}
 //		}
 		super.onBackPressed();
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish");
+
+		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
+			log("Truncate history request finish!!!");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Ok. Clear history done");
+				showSnackbar(getString(R.string.clear_history_success));
+			}
+			else{
+				log("Error clearing history: "+e.getErrorString());
+				showSnackbar(getString(R.string.clear_history_error));
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+	}
+
+	public void showSnackbar(String s){
+		log("showSnackbar: "+s);
+		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+		snackbarTextView.setMaxLines(5);
+		snackbar.show();
 	}
 }
