@@ -3,6 +3,13 @@
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/cab_menu_edit"
+        android:orderInCategory="105"
+        android:title="@string/title_edit_profile_info"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_edit"/>
+
+    <item
         android:id="@+id/cab_menu_copy"
         android:orderInCategory="105"
         android:title="@string/context_copy"

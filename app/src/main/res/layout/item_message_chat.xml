@@ -57,6 +57,25 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/own_deleted_message_layout"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/title_own_message_layout"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/own_deleted_message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/accentColor"
+                android:text="Message deleted!"
+                android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/content_own_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -131,6 +150,25 @@
                 android:textColor="@color/file_list_second_row"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/message_chat_contact_text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/contact_deleted_message_layout"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/title_contact_message_layout"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/contact_deleted_message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/accentColor"
+                android:text="Message deleted!"
+                android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>
 
