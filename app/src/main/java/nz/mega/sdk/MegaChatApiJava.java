@@ -440,7 +440,7 @@ public class MegaChatApiJava {
      *
      * @return MegaChatMessage that will be modified. NULL if the message cannot be edited (too old)
      */
-    MegaChatMessage editMessage(long chatid, long msgid, String msg){
+    public MegaChatMessage editMessage(long chatid, long msgid, String msg){
         return megaChatApi.editMessage(chatid, msgid, msg);
     }
 
@@ -454,7 +454,7 @@ public class MegaChatApiJava {
      *
      * @return MegaChatMessage that will be deleted. NULL if the message cannot be deleted (too old)
      */
-    MegaChatMessage deleteMessage(long chatid, long msgid){
+    public MegaChatMessage deleteMessage(long chatid, long msgid){
         return megaChatApi.deleteMessage(chatid, msgid);
     }
 

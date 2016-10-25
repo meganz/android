@@ -91,6 +91,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     DisplayMetrics outMetrics;
     Display display;
 
+    boolean editingMessage = false;
+    MegaChatMessage messageToEdit = null;
+
     GestureDetectorCompat detector;
 
     RelativeLayout fragmentContainer;
@@ -523,7 +526,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         //Prepare data
                         infoToShow = new ArrayList<Integer>();
 
-                        log("El resultado de abrir chat: "+result);
+                        log("Result of open chat: "+result);
                         log("Start to get Messages!!!");
                         stateHistory = megaChatApi.loadMessages(idChat, 16);
 
@@ -753,8 +756,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
 
-                sendMessage(text);
-                log("Send message: "+text);
+                if(editingMessage){
+                    editMessage(text);
+                    log("Edited message: "+text);
+                    clearSelections();
+                    hideMultipleSelect();
+                    actionMode.invalidate();
+                }
+                else{
+                    sendMessage(text);
+                    log("Send message: "+text);
+                }
+
                 textChat.getText().clear();
 
 //                textChat.setFocusable(false);
@@ -875,14 +888,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
             }
-
-            adapter.setMessages(messages, infoToShow);
+            adapter.appendMessage(messages, infoToShow);
+//            adapter.setMessages(messages, infoToShow);
         }
         else{
             log("Error al enviar mensaje!");
         }
+    }
 
+    public void editMessage(String text){
+        log("editMessage: "+text);
 
+        MegaChatMessage msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getMsgId(), text);
+        if(msgEdited!=null){
+            log("Edited message");
+            modifyMessageReceived(msgEdited);
+        }
+        else{
+            log("Message cannot be edited!");
+        }
     }
 
     public void showUploadPanel(){
@@ -906,7 +930,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            List<MegaChatMessage> chats = adapter.getSelectedMessages();
+            List<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
@@ -920,18 +944,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     actionMode.invalidate();
                     break;
                 }
+                case R.id.cab_menu_edit:{
+                    log("Edit text");
+                    editingMessage = true;
+                    messageToEdit = messagesSelected.get(0);
+                    textChat.setText(messageToEdit.getContent());
+                    //Show keyboard
+
+                    break;
+                }
                 case R.id.cab_menu_copy:{
                     clearSelections();
                     hideMultipleSelect();
                     //Archive
-                    Toast.makeText(chatActivity, "Copy: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(chatActivity, "Copy: "+messagesSelected.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case R.id.cab_menu_delete:{
                     clearSelections();
                     hideMultipleSelect();
                     //Delete
-                    Toast.makeText(chatActivity, "Delete: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(chatActivity, "Delete: "+messagesSelected.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
             }
@@ -949,6 +982,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public void onDestroyActionMode(ActionMode arg0) {
             log("onDEstroyActionMode");
             adapter.setMultipleSelect(false);
+            textChat.getText().clear();
+            editingMessage = false;
             clearSelections();
         }
 
@@ -956,28 +991,42 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             List<MegaChatMessage> selected = adapter.getSelectedMessages();
 
-            if (selected.size() != 0) {
-                menu.findItem(R.id.cab_menu_mute).setVisible(true);
-                menu.findItem(R.id.cab_menu_archive).setVisible(true);
-                menu.findItem(R.id.cab_menu_delete).setVisible(true);
-
+            if (selected.size() !=0) {
                 MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-                if(selected.size()==adapter.getItemCount()){
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
-                }
-                else if(selected.size()==1){
+                if (selected.size() == 1) {
+                    MegaChatMessage message = selected.get(0);
+                    if(message.getUserHandle()==myUserHandle){
+                        menu.findItem(R.id.cab_menu_edit).setVisible(true);
+                        menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                    }
+                    else{
+                        menu.findItem(R.id.cab_menu_edit).setVisible(false);
+                        menu.findItem(R.id.cab_menu_delete).setVisible(false);
+                    }
+
+                    menu.findItem(R.id.cab_menu_copy).setVisible(true);
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                     unselect.setTitle(getString(R.string.action_unselect_one));
                     unselect.setVisible(true);
                 }
+                else if (selected.size()==adapter.getItemCount()){
+                    menu.findItem(R.id.cab_menu_edit).setVisible(false);
+                    menu.findItem(R.id.cab_menu_copy).setVisible(true);
+                    menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                    unselect.setTitle(getString(R.string.action_unselect_all));
+                    unselect.setVisible(true);
+                }
                 else{
+                    menu.findItem(R.id.cab_menu_edit).setVisible(false);
+                    menu.findItem(R.id.cab_menu_copy).setVisible(true);
+                    menu.findItem(R.id.cab_menu_delete).setVisible(true);
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                     unselect.setTitle(getString(R.string.action_unselect_all));
                     unselect.setVisible(true);
                 }
-
             }
             else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -1179,128 +1228,35 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         chatRelativeLayout.setVisibility(View.VISIBLE);
         emptyScrollView.setVisibility(View.GONE);
 
-        messages.add(msg);
-
-//        Collections.sort(messages,  new Comparator<MegaChatMessage>() {
-//            @Override
-//            public int compare(MegaChatMessage m1, MegaChatMessage m2) {
-//                return m1.getMsgIndex() - m2.getMsgIndex();
-//            }
-//        });
-
-        infoToShow.clear();
-        ListIterator<MegaChatMessage> itr = messages.listIterator();
-        while (itr.hasNext()) {
-            MegaChatMessage messageToShow = itr.next();
-            if(messageToShow.getUserHandle()==myUserHandle) {
-                log("MY message!!: "+messageToShow.getContent());
-                if(itr.nextIndex()==1){
-                    //First element
-                    infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
-                }
-                else{
-                    //Not first element
-                    MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
-                    log("previous message: "+previousMessage.getContent());
-                    if(previousMessage.getUserHandle()==myUserHandle) {
-                        log("Last message and previous is mine");
-                        //The last two messages are mine
-                        if(compareDate(messageToShow, previousMessage)==0){
-                            //Same date
-                            if(compareTime(messageToShow, previousMessage)==0){
-                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_NOTHING);
-                            }
-                            else{
-                                //Different minute
-                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
-                            }
-                        }
-                        else{
-                            //Different date
-                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
-                        }
-                    }
-                    else{
-                        //The last message is mine, the previous not
-                        log("Last message is mine, NOT previous");
-                        if(compareDate(messageToShow, previousMessage)==0){
-                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
-                        }
-                        else{
-                            //Different date
-                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
-                        }
-                    }
-                }
-            }
-            else {
-                log("NOT MY message!! - CONTACT");
-
-                if(itr.nextIndex()==1){
-                    //First element
-                    infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
-                }
-                else{
-                    //Not first element
-                    MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
-                    log("previous message: "+previousMessage.getContent());
-                    if(previousMessage.getUserHandle()==messageToShow.getUserHandle()) {
-                        //The last message is also a contact's message
-                        if(compareDate(messageToShow, previousMessage)==0){
-                            //Same date
-                            if(compareTime(messageToShow, previousMessage)==0){
-                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_NOTHING);
-                            }
-                            else{
-                                //Different minute
-                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
-                            }
-                        }
-                        else{
-                            //Different date
-                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
-                        }
-                    }
-                    else{
-                        //The last message is from contact, the previous not
-                        if(compareDate(messageToShow, previousMessage)==0){
-                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
-                        }
-                        else{
-                            //Different date
-                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
-                        }
-                    }
-                }
-            }
-//            log("Index: "+ messageToShow.getMsgIndex() + " Message: "+messageToShow.getContent());
-        }
-
-        //Create adapter
-        if(adapter==null){
-            adapter = new MegaChatLollipopAdapter(this, messages, infoToShow, listView);
-            listView.setLayoutManager(mLayoutManager);
-            listView.setAdapter(adapter);
-            adapter.setMessages(messages, infoToShow);
-//            adapter.setPositionClicked(-1);
-        }
-        else{
-//            adapter.setPositionClicked(-1);
-//            adapter.addMessage(messages, infoToShow);
-            adapter.setMessages(messages, infoToShow);
-//            adapter.notifyDataSetChanged();
-            log("addMesagge: "+messages.size());
-        }
+        loadPreviousMessage(msg);
     }
 
     @Override
     public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageReceived!");
+
+        appendMessage(msg);
+
+        int firstVisiblePosition = mLayoutManager.findLastVisibleItemPosition();
+        log("The last item visible: "+firstVisiblePosition+" the last message: "+messages.size());
+        mLayoutManager.scrollToPosition(messages.size()-1);
+//        mLayoutManager.setStackFromEnd(true);
+//        mLayoutManager.scrollToPosition(0);
     }
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageUpdate!");
+
+        if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
+            log("Change content of the message");
+            modifyMessageReceived(msg);
+
+        }
+        else{
+            log("Status change");
+            modifyMessageReceived(msg);
+        }
 //        if(msg!=null){
 //            log(msg.getContent()+" "+msg.getStatus());
 //        }
@@ -1413,6 +1369,205 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //            log("Error, id temp message not found!!");
 //        }
 
+    }
+
+    public void appendMessage(MegaChatMessage msg){
+        messages.add(msg);
+
+        createInfoToShow();
+
+        //Create adapter
+        if(adapter==null){
+            adapter = new MegaChatLollipopAdapter(this, messages, infoToShow, listView);
+            listView.setLayoutManager(mLayoutManager);
+            listView.setAdapter(adapter);
+            adapter.setMessages(messages, infoToShow);
+//            adapter.setPositionClicked(-1);
+        }
+        else{
+//            adapter.setPositionClicked(-1);
+            adapter.appendMessage(messages, infoToShow);
+//            adapter.setMessages(messages, infoToShow);
+//            adapter.notifyDataSetChanged();
+            log("addMesagge: "+messages.size());
+        }
+
+    }
+
+    public void modifyMessageReceived(MegaChatMessage msg){
+        int indexToChange = -1;
+        ListIterator<MegaChatMessage> itr = messages.listIterator();
+        while (itr.hasNext()) {
+            MegaChatMessage messageToCheck = itr.next();
+            if (messageToCheck.getMsgId() == msg.getMsgId()) {
+                log("Found message!!: " + messageToCheck.getContent());
+                indexToChange = itr.nextIndex()-1;
+                break;
+            }
+        }
+
+        if(indexToChange!=-1){
+            messages.set(indexToChange, msg);
+
+            //Update infoToShow also
+            if (indexToChange == 0) {
+                infoToShow.set(0, Constants.CHAT_ADAPTER_SHOW_ALL);
+            }
+            else{
+                //Not first element
+                MegaChatMessage previousMessage = messages.get(indexToChange - 1);
+                log("previous message: " + previousMessage.getContent());
+                if (previousMessage.getUserHandle() == myUserHandle) {
+                    //The last two messages are mine
+                    if (compareDate(msg, previousMessage) == 0) {
+                        //Same date
+                        if (compareTime(msg, previousMessage) == 0) {
+                            infoToShow.set(indexToChange,Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        } else {
+                            //Different minute
+                            infoToShow.set(indexToChange, Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                    } else {
+                        //Different date
+                        infoToShow.set(indexToChange, Constants.CHAT_ADAPTER_SHOW_ALL);
+                    }
+                } else {
+                    //The last message is mine, the previous not
+                    if (compareDate(msg, previousMessage) == 0) {
+                        infoToShow.set(indexToChange, Constants.CHAT_ADAPTER_SHOW_TIME);
+                    } else {
+                        //Different date
+                        infoToShow.set(indexToChange, Constants.CHAT_ADAPTER_SHOW_ALL);
+                    }
+                }
+            }
+
+            //Create adapter
+            if (adapter == null) {
+                adapter = new MegaChatLollipopAdapter(this, messages, infoToShow, listView);
+                listView.setAdapter(adapter);
+                adapter.setPositionClicked(-1);
+            } else {
+                adapter.setPositionClicked(-1);
+                adapter.modifyMessage(messages, infoToShow, indexToChange);
+            }
+        }
+        else{
+            log("Error, id temp message not found!!");
+        }
+    }
+
+    public void loadPreviousMessage(MegaChatMessage msg){
+        messages.add(0, msg);
+
+        createInfoToShow();
+
+        //Create adapter
+        if(adapter==null){
+            adapter = new MegaChatLollipopAdapter(this, messages, infoToShow, listView);
+            listView.setLayoutManager(mLayoutManager);
+            listView.setAdapter(adapter);
+            adapter.setMessages(messages, infoToShow);
+//            adapter.setPositionClicked(-1);
+        }
+        else{
+//            adapter.setPositionClicked(-1);
+            adapter.loadPreviousMessage(messages, infoToShow);
+//            adapter.setMessages(messages, infoToShow);
+//            adapter.notifyDataSetChanged();
+            log("addMesagge: "+messages.size());
+        }
+
+    }
+
+    public void createInfoToShow(){
+        infoToShow.clear();
+        ListIterator<MegaChatMessage> itr = messages.listIterator();
+        while (itr.hasNext()) {
+            MegaChatMessage messageToShow = itr.next();
+            if(messageToShow.getUserHandle()==myUserHandle) {
+                log("MY message!!: "+messageToShow.getContent());
+                if(itr.nextIndex()==1){
+                    //First element
+                    infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                }
+                else{
+                    //Not first element
+                    MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
+                    log("previous message: "+previousMessage.getContent());
+                    if(previousMessage.getUserHandle()==myUserHandle) {
+                        log("Last message and previous is mine");
+                        //The last two messages are mine
+                        if(compareDate(messageToShow, previousMessage)==0){
+                            //Same date
+                            if(compareTime(messageToShow, previousMessage)==0){
+                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                            }
+                            else{
+                                //Different minute
+                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            }
+                        }
+                        else{
+                            //Different date
+                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        }
+                    }
+                    else{
+                        //The last message is mine, the previous not
+                        log("Last message is mine, NOT previous");
+                        if(compareDate(messageToShow, previousMessage)==0){
+                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                        else{
+                            //Different date
+                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        }
+                    }
+                }
+            }
+            else {
+                log("NOT MY message!! - CONTACT");
+
+                if(itr.nextIndex()==1){
+                    //First element
+                    infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                }
+                else{
+                    //Not first element
+                    MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
+                    log("previous message: "+previousMessage.getContent());
+                    if(previousMessage.getUserHandle()==messageToShow.getUserHandle()) {
+                        //The last message is also a contact's message
+                        if(compareDate(messageToShow, previousMessage)==0){
+                            //Same date
+                            if(compareTime(messageToShow, previousMessage)==0){
+                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                            }
+                            else{
+                                //Different minute
+                                infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            }
+                        }
+                        else{
+                            //Different date
+                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        }
+                    }
+                    else{
+                        //The last message is from contact, the previous not
+                        if(compareDate(messageToShow, previousMessage)==0){
+                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                        else{
+                            //Different date
+                            infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        }
+                    }
+                }
+            }
+//            log("Index: "+ messageToShow.getMsgIndex() + " Message: "+messageToShow.getContent());
+        }
     }
 
     public void showSnackbar(String s){
