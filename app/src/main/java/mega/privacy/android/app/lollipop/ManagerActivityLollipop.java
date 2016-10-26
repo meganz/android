@@ -12418,7 +12418,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		titleNameContactChatPanel.setText(chat.getTitle());
 
-		if(chat.getPeerCount()==1){
+		if(chat.isGroup()){
+			titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
+			addAvatarChatPanel(null, chat);
+		}
+		else{
 			long userHandle = chat.getPeerHandle(0);
 
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
@@ -12426,7 +12430,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(user!=null){
 				log("El email del user es: "+user.getEmail());
 				titleMailContactChatPanel.setText(user.getEmail());
-				addAvatarChatPanel(user.getEmail(), chat.getTitle());
+				addAvatarChatPanel(user.getEmail(), chat);
 			}
 			else{
 				log("El user es NULL");
@@ -12436,13 +12440,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setVisibility(View.GONE);
 		if(chat.isGroup()){
 			optionLeaveChat.setVisibility(View.VISIBLE);
-			optionClearHistory.setVisibility(View.GONE);
+			optionClearHistory.setVisibility(View.VISIBLE);
 		}
 		else{
 			optionLeaveChat.setVisibility(View.GONE);
 			optionClearHistory.setVisibility(View.VISIBLE);
 		}
 		slidingChatPanel.setVisibility(View.VISIBLE);
+//		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 	}
 
@@ -12457,7 +12462,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void addAvatarChatPanel(String contactMail, String title){
+	public void addAvatarChatPanel(String contactMail, MegaChatRoom chat){
 
 		File avatar = null;
 		if (getExternalCacheDir() != null){
@@ -12490,19 +12495,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 
-		MegaUser contact = megaApi.getContact(contactMail);
-		if (contact != null) {
-			String color = megaApi.getUserAvatarColor(contact);
-			if (color != null) {
-				log("The color to set the avatar is " + color);
-				p.setColor(Color.parseColor(color));
+		if(chat.isGroup()){
+			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		}
+		else{
+			MegaUser contact = megaApi.getContact(contactMail);
+			if (contact != null) {
+				String color = megaApi.getUserAvatarColor(contact);
+				if (color != null) {
+					log("The color to set the avatar is " + color);
+					p.setColor(Color.parseColor(color));
+				} else {
+					log("Default color to the avatar");
+					p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+				}
 			} else {
-				log("Default color to the avatar");
+				log("Contact is NULL");
 				p.setColor(getResources().getColor(R.color.lollipop_primary_color));
 			}
-		} else {
-			log("Contact is NULL");
-			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
 		}
 
 		int radius;
@@ -12521,9 +12531,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		boolean setInitialByMail = false;
 
-		if (title != null) {
-			if (title.trim().length() > 0) {
-				String firstLetter = title.charAt(0) + "";
+		if (chat.getTitle() != null) {
+			if (chat.getTitle().trim().length() > 0) {
+				String firstLetter = chat.getTitle().charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				chatInitialLetter.setText(firstLetter);
 				chatInitialLetter.setTextColor(Color.WHITE);

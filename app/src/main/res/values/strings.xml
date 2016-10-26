@@ -924,4 +924,6 @@
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Delete message?</string>
 
     <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat">cleared the chat history.</string>
+
+    <string name="group_chat_label" context="Label of the sliding panel of a group chat">Group chat</string>
 </resources>
