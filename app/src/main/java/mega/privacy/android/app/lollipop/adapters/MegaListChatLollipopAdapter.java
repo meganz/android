@@ -163,8 +163,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		log("ChatRoom handle: "+chat.getChatId());
 
 		long numberContacts = chat.getPeerCount();
-
-		if(numberContacts==1){
+		if(!chat.isGroup()){
 			log("Chat one to one");
 			long contactHandle = chat.getPeerHandle(0);
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
@@ -243,10 +242,29 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 			holder.contactStateIcon.setVisibility(View.VISIBLE);
+
+			holder.contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
+			holder.contactStateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
+
+			RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)holder.contactStateIcon.getLayoutParams();
+			stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
+			holder.contactStateIcon.setLayoutParams(stateIconParams);
+
+			int state = chat.getOnlineStatus();
+			if(state == MegaChatApi.STATUS_ONLINE){
+				log("This user is connected: "+chat.getTitle());
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+			}
+			else{
+				log("This user status is: "+state+  " " + chat.getTitle());
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+			}
 		}
 		else{
 			log("Group chat");
 			holder.contactStateIcon.setVisibility(View.GONE);
+			log("ChatRoom title: "+chat.getTitle());
+			holder.textViewContactName.setText(chat.getTitle());
 		}
 
 		int unreadMessages = chat.getUnreadCount();
@@ -373,23 +391,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		else{
 			log("Chat prefs is NULL");
 			holder.muteIcon.setVisibility(View.GONE);
-		}
-
-		holder.contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
-		holder.contactStateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
-
-		RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)holder.contactStateIcon.getLayoutParams();
-		stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
-		holder.contactStateIcon.setLayoutParams(stateIconParams);
-
-		int state = chat.getOnlineStatus();
-		if(state == MegaChatApi.STATUS_ONLINE){
-			log("This user is connected: "+chat.getTitle());
-			holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
-		}
-		else{
-			log("This user status is: "+state+  " " + chat.getTitle());
-			holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
 		}
 
 		holder.imageButtonThreeDots.setTag(holder);

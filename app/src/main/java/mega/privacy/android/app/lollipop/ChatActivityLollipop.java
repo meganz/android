@@ -483,7 +483,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(chatId!=-1){
                         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
                         aB.setTitle(chatRoom.getTitle());
-                        setStatus();
+                        if(!chatRoom.isGroup()){
+                            setStatus();
+                        }
                     }
                     else{
                         log("ChatRoom is -1");
@@ -527,7 +529,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         chatRoom = megaChatApi.getChatRoom(idChat);
                         aB.setTitle(chatRoom.getTitle());
-                        setStatus();
+                        if(!chatRoom.isGroup()){
+                            setStatus();
+                        }
 
                         log("Call to open chat");
                         boolean result = megaChatApi.openChatRoom(idChat, this);
