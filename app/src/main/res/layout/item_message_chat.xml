@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="@color/accentColor"
-                android:text="Message deleted!"
+                android:text="@string/text_deleted_message"
                 android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="@color/accentColor"
-                android:text="Message deleted!"
+                android:text="@string/text_deleted_message"
                 android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>

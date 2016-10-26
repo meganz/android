@@ -189,7 +189,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
         holder.ownDeletedMessage = (RelativeLayout) v.findViewById(R.id.own_deleted_message_layout);
+        //Margins
+        RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownDeletedMessage.getLayoutParams();
+        ownDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+        holder.ownDeletedMessage.setLayoutParams(ownDeleteParams);
+
         holder.contactDeletedMessage = (RelativeLayout) v.findViewById(R.id.contact_deleted_message_layout);
+        //Margins
+        RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactDeletedMessage.getLayoutParams();
+        contactDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+        holder.contactDeletedMessage.setLayoutParams(contactDeleteParams);
 
         holder.contactMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.contact_multiselection_layout);
         //Margins
@@ -522,7 +531,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     /*
      * Get list of all selected chats
      */
-    public List<MegaChatMessage> getSelectedMessages() {
+    public ArrayList<MegaChatMessage> getSelectedMessages() {
         ArrayList<MegaChatMessage> messages = new ArrayList<MegaChatMessage>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
@@ -556,6 +565,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     public void modifyMessage(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow, int position){
         this.messages = messages;
         this.infoToShow = infoToShow;
+        if(messages.get(position).isDeleted()){
+            log("Deleted the position message");
+        }
         notifyItemChanged(position);
     }
 

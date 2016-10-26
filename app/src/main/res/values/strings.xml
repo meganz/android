@@ -919,4 +919,8 @@
     <string name="offline_status" context="Info label about the status of the user">Offline</string>
     <string name="online_status" context="Info label about the status of the user">Online</string>
 
+    <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
+    <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Delete messages?</string>
+    <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Delete message?</string>
+
 </resources>
