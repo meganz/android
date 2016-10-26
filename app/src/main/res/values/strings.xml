@@ -923,4 +923,5 @@
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Delete messages?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Delete message?</string>
 
+    <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat">cleared the chat history.</string>
 </resources>
