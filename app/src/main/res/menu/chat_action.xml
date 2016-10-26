@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
-
-
+    
     <item
         android:id="@+id/cab_menu_call_chat"
         android:orderInCategory="100"
         android:title="@string/action_mute"
         MEGA:showAsAction="always"
-        android:icon="@drawable/ic_chat_white"
+        android:icon="@drawable/ic_phone_white"
         android:enabled="false"/>
 
     <item
@@ -16,7 +15,7 @@
         android:orderInCategory="105"
         android:title="@string/tab_archive_chat"
         MEGA:showAsAction="always"
-        android:icon="@drawable/ic_archive"
+        android:icon="@drawable/ic_videocam_white"
         android:enabled="false"/>
 
     <item

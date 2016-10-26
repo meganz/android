@@ -281,43 +281,52 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
             holder.contactMessageLayout.setVisibility(View.GONE);
-            String messageContent = message.getContent();
 
-            if(message.isEdited()){
-                log("Message is edited");
-                Spannable content = new SpannableString(messageContent);
-                content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.contentOwnMessageText.setText(messageContent);
-                Spannable edited = new SpannableString(" (edited)");
-                edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                String messageContent = message.getContent();
 
-                holder.contentOwnMessageText.append(edited);
-                holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                holder.ownDeletedMessage.setVisibility(View.GONE);
-            }
-            else if(message.isDeleted()){
-                log("Message is deleted");
-                holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownDeletedMessage.setVisibility(View.VISIBLE);
-            }
-            else{
-                int status = message.getStatus();
-                if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                    log("Show triangle retry!");
-                    holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                if(message.isEdited()){
+                    log("Message is edited");
+                    Spannable content = new SpannableString(messageContent);
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contentOwnMessageText.setText(messageContent);
+                    Spannable edited = new SpannableString(" (edited)");
+                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    holder.contentOwnMessageText.append(edited);
+                    holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+                    holder.ownDeletedMessage.setVisibility(View.GONE);
                 }
-                else if(status==MegaChatMessage.STATUS_SENDING){
-                    log("Sending message...");
-                    holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                else if(message.isDeleted()){
+                    log("Message is deleted");
+                    holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                    holder.ownDeletedMessage.setVisibility(View.VISIBLE);
                 }
                 else{
-                    holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                    int status = message.getStatus();
+                    if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                        log("Show triangle retry!");
+                        holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                    }
+                    else if(status==MegaChatMessage.STATUS_SENDING){
+                        log("Sending message...");
+                        holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                    }
+                    else{
+                        holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                    }
+                    holder.contentOwnMessageText.setText(messageContent);
+                    holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+                    holder.ownDeletedMessage.setVisibility(View.GONE);
                 }
-                holder.contentOwnMessageText.setText(messageContent);
-                holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                holder.ownDeletedMessage.setVisibility(View.GONE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                log("Message type TRUNCATE");
+                holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                holder.contentOwnMessageText.setText(context.getString(R.string.text_cleared_history));
+                holder.ownDeletedMessage.setVisibility(View.VISIBLE);
             }
         }
         else{
@@ -381,32 +390,39 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             holder.ownMessageLayout.setVisibility(View.GONE);
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
-            String messageContent = message.getContent();
-            if(message.isEdited()){
-                log("Message is edited");
-                Spannable content = new SpannableString(messageContent);
-                content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.contentContactMessageText.setText(messageContent);
-                Spannable edited = new SpannableString(" (edited)");
-                edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                String messageContent = message.getContent();
+                if(message.isEdited()){
+                    log("Message is edited");
+                    Spannable content = new SpannableString(messageContent);
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contentContactMessageText.setText(messageContent);
+                    Spannable edited = new SpannableString(" (edited)");
+                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                holder.contentContactMessageText.append(edited);
-                holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
-                holder.contactDeletedMessage.setVisibility(View.GONE);
+                    holder.contentContactMessageText.append(edited);
+                    holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+                    holder.contactDeletedMessage.setVisibility(View.GONE);
+                }
+                else if(message.isDeleted()){
+                    log("Message is deleted");
+                    holder.contentContactMessageLayout.setVisibility(View.GONE);
+                    holder.contactDeletedMessage.setVisibility(View.VISIBLE);
+                }
+                else{
+                    holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+                    holder.contactDeletedMessage.setVisibility(View.GONE);
+                    holder.contentContactMessageText.setText(message.getContent());
+                }
             }
-            else if(message.isDeleted()){
-                log("Message is deleted");
+            else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                log("Message type TRUNCATE");
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
+                holder.contentContactMessageText.setText(context.getString(R.string.text_cleared_history));
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
             }
-            else{
-                holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
-                holder.contactDeletedMessage.setVisibility(View.GONE);
-                holder.contentContactMessageText.setText(message.getContent());
-            }
-
         }
 
         //Check the next message to know the margin bottom the content message
