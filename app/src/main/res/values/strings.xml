@@ -925,5 +925,7 @@
 
     <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat">cleared the chat history.</string>
 
-    <string name="group_chat_label" context="Label of the sliding panel of a group chat">Group chat</string>
+    <string name="group_chat_label" context="Label for the sliding panel of a group chat">Group chat</string>
+    <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Leave chat</string>
+    <string name="participants_chat_label" context="Label for participants of a group chat">Participants</string>
 </resources>

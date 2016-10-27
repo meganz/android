@@ -680,8 +680,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatRoom!=null){
             if(chatRoom.isGroup()){
-                contactInfoMenuItem.setVisible(false);
-                clearHistoryMenuItem.setVisible(false);
+                contactInfoMenuItem.setVisible(true);
+                clearHistoryMenuItem.setVisible(true);
                 leaveMenuItem.setVisible(true);
             }
             else{
@@ -1669,6 +1669,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 //            log("Index: "+ messageToShow.getMsgIndex() + " Message: "+messageToShow.getContent());
         }
+    }
+
+    public boolean isGroup(){
+        return chatRoom.isGroup();
     }
 
     public void showSnackbar(String s){

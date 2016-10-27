@@ -8,6 +8,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatRoom;
@@ -42,11 +43,20 @@ public class ChatPanelListener implements View.OnClickListener {
                     log("Selected chat NULL");
                 }
 
-                Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
+                if(selectedChat.isGroup()){
+                    Intent i = new Intent(context, GroupChatInfoActivityLollipop.class);
 //                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
 //                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
-                i.putExtra("handle", selectedChat.getChatId());
-                context.startActivity(i);
+                    i.putExtra("handle", selectedChat.getChatId());
+                    context.startActivity(i);
+                }
+                else{
+                    Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
+//                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
+//                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
+                    i.putExtra("handle", selectedChat.getChatId());
+                    context.startActivity(i);
+                }
 
                 break;
             }
