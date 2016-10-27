@@ -154,7 +154,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         RelativeLayout itemLayout;
         int currentPosition;
         String contactMail;
-		long userHandle;
+		String userHandle;
     	String lastNameText="";
     	String firstNameText="";
     }
@@ -220,7 +220,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		
 		MegaChatParticipant participant = (MegaChatParticipant) getItem(position);
 		holder.contactMail = participant.getEmail();
-		holder.userHandle = participant.getHandle();
+		String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
+		holder.userHandle = userHandleEncoded;
 		log("participant: "+participant.getEmail()+" handle: "+participant.getHandle());
 	
 		if (!multipleSelect) {
@@ -253,56 +254,74 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 		}
 
-		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(participant.getHandle()));
-		if(contactDB!=null){
-			holder.firstNameText = contactDB.getName();
-			holder.lastNameText = contactDB.getLastName();
+		if(holder.contactMail!=null){
+			log("The participant is contact!!");
 
-			String fullName;
+			MegaUser contact = megaApi.getContact(holder.contactMail);
 
-			if (holder.firstNameText.trim().length() <= 0){
-				fullName = holder.lastNameText;
+			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(participant.getHandle()));
+			if(contactDB!=null){
+				holder.firstNameText = contactDB.getName();
+				holder.lastNameText = contactDB.getLastName();
+
+				String fullName;
+
+				if (holder.firstNameText.trim().length() <= 0){
+					fullName = holder.lastNameText;
+				}
+				else{
+					fullName = holder.firstNameText + " " + holder.lastNameText;
+				}
+
+				if (fullName.trim().length() <= 0){
+					log("Put email as fullname");
+					String email = participant.getEmail();
+					String[] splitEmail = email.split("[@._]");
+					fullName = splitEmail[0];
+				}
+
+				holder.textViewContactName.setText(fullName);
 			}
 			else{
-				fullName = holder.firstNameText + " " + holder.lastNameText;
-			}
-
-			if (fullName.trim().length() <= 0){
-				log("Put email as fullname");
 				String email = participant.getEmail();
 				String[] splitEmail = email.split("[@._]");
-				fullName = splitEmail[0];
+				String fullName = splitEmail[0];
+				holder.textViewContactName.setText(fullName);
 			}
 
-			holder.textViewContactName.setText(fullName);
-		}
-		else{
-			String email = participant.getEmail();
-			String[] splitEmail = email.split("[@._]");
-			String fullName = splitEmail[0];
-			holder.textViewContactName.setText(fullName);
-		}
+			createDefaultAvatar(holder, contact);
 
-		createDefaultAvatar(holder, participant);
-		
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
-		
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-		}
-		Bitmap bitmap = null;
-		if (avatar.exists()){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
+			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+			File avatar = null;
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+			}
+			else{
+				avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+			}
+			Bitmap bitmap = null;
+			if (avatar.exists()){
+				if (avatar.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (bitmap == null) {
+						avatar.delete();
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						}
+					}
+					else{
+						holder.contactInitialLetter.setVisibility(View.GONE);
+						holder.imageView.setImageBitmap(bitmap);
+					}
+				}
+				else{
 					if (context.getExternalCacheDir() != null){
 						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
@@ -310,34 +329,24 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
 				}
-				else{
-					holder.contactInitialLetter.setVisibility(View.GONE);
-					holder.imageView.setImageBitmap(bitmap);
-				}
 			}
 			else{
 				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
+					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 				}
 				else{
-					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
-				}			
-			}
-		}	
-		else{
-			if (context.getExternalCacheDir() != null){
-				megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-			}
-			else{
-				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
 			}
 		}
-		
-		ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact);
-		
-		String sharedNodesDescription = getDescription(sharedNodes);
-		
-		holder.textViewContent.setText(sharedNodesDescription);
+		else
+		{
+			log("Participant is NOT contact");
+			holder.textViewContactName.setText(participant.getFirstName());
+		}
+
+
+		holder.textViewContent.setText("A rellenar!");
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);	
@@ -350,7 +359,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(contact);
+		String color = megaApi.getUserAvatarColor(holder.userHandle);
 		if(color!=null){
 			log("The color to set the avatar is "+color);
 			p.setColor(Color.parseColor(color));
