@@ -34,6 +34,7 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaUser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollipopAdapter.ViewHolderMessageChatList> {
 
@@ -169,7 +170,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
         holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
         holder.contactText = (TextView) v.findViewById(R.id.message_chat_contact_text);
-        holder.contactText.setText(((ChatActivityLollipop) context).getShortContactName());
         //Margins
         RelativeLayout.LayoutParams contactTextParams = (RelativeLayout.LayoutParams)holder.contactText.getLayoutParams();
         contactTextParams.setMargins(Util.scaleWidthPx(37, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
@@ -331,6 +331,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         }
         else{
             log("Contact message!!");
+
+            if(((ChatActivityLollipop) context).isGroup()){
+                long userHandle = message.getUserHandle();
+
+                String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                holder.contactText.setText(userHandleEncoded);
+//                MegaUser user = megaApi.getContact(userHandleEncoded);
+//            user.get
+            }
+            else{
+                holder.contactText.setText(((ChatActivityLollipop) context).getShortContactName());
+            }
 
             if (!multipleSelect) {
 //            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);

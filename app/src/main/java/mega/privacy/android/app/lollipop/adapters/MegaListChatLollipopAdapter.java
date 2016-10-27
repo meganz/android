@@ -265,6 +265,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			holder.contactStateIcon.setVisibility(View.GONE);
 			log("ChatRoom title: "+chat.getTitle());
 			holder.textViewContactName.setText(chat.getTitle());
+
+			if (chat.getTitle().length() > 0){
+				String chatTitle = chat.getTitle().trim();
+				String firstLetter = chatTitle.charAt(0) + "";
+				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				holder.contactInitialLetter.setText(firstLetter);
+			}
+
+			createGroupChatAvatar(holder);
 		}
 
 		int unreadMessages = chat.getUnreadCount();
@@ -567,6 +576,37 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		holder.contactInitialLetter.setVisibility(View.GONE);
 		holder.multiselectIcon.setVisibility(View.VISIBLE);
+	}
+
+	public void createGroupChatAvatar(ViewHolderChatList holder){
+		log("createGroupChatAvatar()");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		holder.imageView.setImageBitmap(defaultAvatar);
+
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+		display.getMetrics(outMetrics);
+		float density  = context.getResources().getDisplayMetrics().density;
+
+		int avatarTextSize = getAvatarTextSize(density);
+		log("DENSITY: " + density + ":::: " + avatarTextSize);
+
+		holder.contactInitialLetter.setTextColor(Color.WHITE);
+		holder.contactInitialLetter.setVisibility(View.VISIBLE);
+		holder.contactInitialLetter.setTextSize(24);
 	}
 	
 	public void createDefaultAvatar(ViewHolderChatList holder){
