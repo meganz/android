@@ -312,6 +312,13 @@
 
                 </RelativeLayout>
 
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/chat_group_contact_properties_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/chat_group_contact_properties_participants_title"
+                    android:choiceMode="multipleChoice" />
+
             </LinearLayout>
 
         </ScrollView>
