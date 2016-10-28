@@ -30,6 +30,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -228,8 +229,38 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				}
 			}
 			else{
-				log("4 PIN else");
-				add4DigitsPin();
+				log("Pin lock type is NULL");
+
+				String code = prefs.getPinLockCode();
+				if(code!=null){
+					boolean atleastOneAlpha = code.matches(".*[a-zA-Z]+.*");
+					if (atleastOneAlpha) {
+						log("Alphanumeric");
+						prefs.setPinLockType(Constants.PIN_ALPHANUMERIC);
+						dbH.setPinLockType(Constants.PIN_ALPHANUMERIC);
+						addAlphanumericPin();
+					}
+					else{
+						if(code.length()==4){
+							log("FOUR PIN detected");
+							prefs.setPinLockType(Constants.PIN_4);
+							dbH.setPinLockType(Constants.PIN_4);
+							add4DigitsPin();
+						}
+						else if(code.length()==6){
+							log("SIX PIN detected");
+							prefs.setPinLockType(Constants.PIN_6);
+							dbH.setPinLockType(Constants.PIN_6);
+							add6DigitsPin();
+						}
+						else{
+							log("DEFAULT FOUR PIN");
+							prefs.setPinLockType(Constants.PIN_4);
+							dbH.setPinLockType(Constants.PIN_4);
+							add4DigitsPin();
+						}
+					}
+				}
 			}
 		}
 	}
@@ -805,7 +836,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
         });
 	}
 
-
 	private void setPin(String pin){
 		log("setPin");
 
@@ -1035,7 +1065,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	 */
 	private void submitFormAlphanumeric(String code) {
 //		String code = sbSecond
-
+		choosenTypePin = Constants.PIN_ALPHANUMERIC;
 		switch(mode){
 			case UNLOCK:{
 				String codePref = prefs.getPinLockCode();
