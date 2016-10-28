@@ -2,8 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@color/white">
     
-     <mega.privacy.android.app.components.MEGAPreferenceCategory 
+     <PreferenceCategory
         android:key="settings_pin_lock"
+		android:layout="@layout/my_category_preference"
         android:title="@string/settings_pin_lock">
  <!--        android:textColor="@color/pressed_mega">  -->
         
@@ -15,12 +16,12 @@
 		<Preference
 	        android:key="settings_pin_lock_code"
 	        android:title="@string/settings_reset_lock_code"/>
-    </mega.privacy.android.app.components.MEGAPreferenceCategory>
+    </PreferenceCategory>
     
     <PreferenceCategory 
         android:key="settings_camera_upload"
-        android:title="@string/section_photo_sync"
-        android:textColor="@color/pressed_mega">
+		android:layout="@layout/my_category_preference"
+        android:title="@string/section_photo_sync">
         
 		<Preference
 	        android:key="settings_camera_upload_on"
@@ -73,8 +74,8 @@
 	
     <PreferenceCategory 
         android:key="settings_storage"
-        android:title="@string/settings_storage"
-        android:textColor="@color/pressed_mega">
+		android:layout="@layout/my_category_preference"
+        android:title="@string/settings_storage">
 		
         <mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_storage_ask_me_always"
@@ -95,7 +96,7 @@
 	
 	<PreferenceCategory
 	    android:key="advanced_features"
-	    android:textColor="@color/pressed_mega"
+		android:layout="@layout/my_category_preference"
 	    android:title="@string/settings_advanced_features" >
 		
 	    <Preference
@@ -110,7 +111,7 @@
     <PreferenceCategory 
         android:key="settings_about"
         android:title="@string/settings_about"
-        android:textColor="@color/pressed_mega">
+		android:layout="@layout/my_category_preference">
 		
         <Preference
             android:key="settings_about_privacy_policy"

@@ -78,4 +78,6 @@
 	<color name="tour_bar_red">#cc0000</color>
 
     <color name="small_letter_upgrade_account">#8a333333</color>
+
+    <color name="preference_category_title">#f2f2f2</color>
 </resources>
