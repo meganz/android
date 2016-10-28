@@ -668,7 +668,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		MegaUser user = megaApi.getContact(email);
 		if (user != null){
 			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
 			String[] longArray = new String[1];		
 			longArray[0] = email;		
 			intent.putExtra("SELECTED_CONTACTS", longArray);
@@ -676,9 +676,8 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		}
 	}
 
-
-
-	@SuppressLint("NewApi") public void onFileClick(ArrayList<Long> handleList) {
+	@SuppressLint("NewApi")
+	public void onFileClick(ArrayList<Long> handleList) {
 		long size = 0;
 		long[] hashes = new long[handleList.size()];
 		for (int i = 0; i < handleList.size(); i++) {
