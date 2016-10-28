@@ -49,6 +49,13 @@
         </LinearLayout>
     </TabHost>
 
+    <FrameLayout
+        android:id="@+id/cloudDriveFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_explorer"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/file_logging_in_layout"
         android:layout_width="fill_parent"
