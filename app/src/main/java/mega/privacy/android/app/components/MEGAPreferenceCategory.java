@@ -3,10 +3,13 @@ package mega.privacy.android.app.components;
 import android.content.Context;
 import android.graphics.Color;
 import android.preference.PreferenceCategory;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import mega.privacy.android.app.R;
 
 public class MEGAPreferenceCategory extends PreferenceCategory{
 
@@ -30,8 +33,7 @@ public class MEGAPreferenceCategory extends PreferenceCategory{
 	@Override
 	protected View onCreateView (ViewGroup parent){
 		View  categoryTitle = (View)super.onCreateView(parent);
-//		categoryTitle.setBackgroundColor(Color.WHITE);
-//		categoryTitle.setTextColor(context.getResources().getColor(R.color.pressed_mega));
+		categoryTitle.setBackgroundColor(ContextCompat.getColor(context, R.color.background_secondary));
 
 		return categoryTitle;
 	}
