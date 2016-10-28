@@ -281,8 +281,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             paramsPartTitle.leftMargin = Util.scaleWidthPx(72, outMetrics);
             participantsTitle.setLayoutParams(paramsPartTitle);
 
-            recyclerView = (RecyclerView) findViewById(R.id.contacts_list_view);
-            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+            recyclerView = (RecyclerView) findViewById(R.id.chat_group_contact_properties_list);
+//            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
             recyclerView.setClipToPadding(false);
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
             recyclerView.setHasFixedSize(true);
@@ -296,6 +296,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             for(int i=0;i<participantsCount;i++){
                 long peerHandle = chat.getPeerHandle(i);
                 int peerPrivilege = chat.getPeerPrivilege(i);
+                String name = chat.getPeerName(i);
+                log("Name of the peer: "+name);
                 MegaChatParticipant participant = null;
                 String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
                 MegaUser participantContact = megaApi.getContact(userHandleEncoded);
