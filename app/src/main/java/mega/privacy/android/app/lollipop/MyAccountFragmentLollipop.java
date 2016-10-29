@@ -208,7 +208,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		}
 		else{
-			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+			mkButton.setBackgroundResource(R.drawable.black_button_border);
 		}
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
@@ -283,7 +283,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		}
 		else{
-			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+			logoutButton.setBackgroundResource(R.drawable.black_button_border);
 		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
