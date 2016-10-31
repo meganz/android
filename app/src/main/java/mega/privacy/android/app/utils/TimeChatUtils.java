@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import nz.mega.sdk.MegaChatMessage;
 
 public class TimeChatUtils implements Comparator<Calendar> {
