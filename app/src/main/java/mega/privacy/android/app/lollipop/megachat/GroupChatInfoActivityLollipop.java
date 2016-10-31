@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,15 +15,18 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -32,10 +36,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaParticipantsChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -59,6 +65,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     MegaUser user;
     long chatHandle;
     MegaChatRoom chat;
+
+    MegaChatParticipant selectedParticipant;
 
     private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
@@ -104,6 +112,19 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     TextView participantsTitle;
     long participantsCount;
+
+    //CHAT PANEL
+    private SlidingUpPanelLayout slidingParticipantPanel;
+    public TextView titleNameContactChatPanel;
+    public TextView titleMailContactChatPanel;
+    public FrameLayout contactOutLayout;
+    public RoundedImageView contactImageView;
+    public TextView contactInitialLetter;
+    public LinearLayout contactLayout;
+    public LinearLayout optionChangePermissionsChat;
+    public LinearLayout optionRemoveChat;
+    private ChatPanelListener chatPanelListener;
+    ////
 
     RecyclerView recyclerView;
     MegaParticipantsChatLollipopAdapter adapter;
@@ -296,17 +317,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             for(int i=0;i<participantsCount;i++){
                 long peerHandle = chat.getPeerHandle(i);
                 int peerPrivilege = chat.getPeerPrivilege(i);
-                String name = chat.getPeerName(i);
-                log("Name of the peer: "+name);
+                String participantName = chat.getPeerName(i);
+                log("Name of the peer: "+participantName);
+
+
+                String tempFullName = "";
+                tempFullName = participantName.substring(1);
+                participantName = tempFullName;
+
                 MegaChatParticipant participant = null;
                 String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
                 MegaUser participantContact = megaApi.getContact(userHandleEncoded);
                 if(participantContact!=null){
-                    participant = new MegaChatParticipant(peerHandle, null, null, participantContact.getEmail(), peerPrivilege);
+                    participant = new MegaChatParticipant(peerHandle, participantName, participantContact.getEmail(), peerPrivilege);
 
                 }
                 else{
-                    participant = new MegaChatParticipant(peerHandle, "Z", null, null, peerPrivilege);
+                    participant = new MegaChatParticipant(peerHandle, participantName, null, peerPrivilege);
                 }
 
                 participants.add(participant);
@@ -322,7 +349,38 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             adapter.setPositionClicked(-1);
             recyclerView.setAdapter(adapter);
 
+            //Sliding CHAT panel
+            slidingParticipantPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_group_participants_chat);
+            titleNameContactChatPanel = (TextView) findViewById(R.id.group_participants_chat_name_text);
+            titleMailContactChatPanel = (TextView) findViewById(R.id.group_participants_chat_mail_text);
+            contactLayout = (LinearLayout) findViewById(R.id.group_participants_chat);
+            contactImageView = (RoundedImageView) findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
+            contactInitialLetter = (TextView) findViewById(R.id.sliding_group_participants_chat_list_initial_letter);
+            contactOutLayout = (FrameLayout) findViewById(R.id.out_group_participants_chat);
+            optionChangePermissionsChat = (LinearLayout) findViewById(R.id.change_permissions_group_participants_chat_layout);
+            optionRemoveChat= (LinearLayout) findViewById(R.id.remove_group_participants_chat_layout);
+
+            chatPanelListener = new ChatPanelListener(this);
+
+            optionChangePermissionsChat.setOnClickListener(chatPanelListener);
+            optionRemoveChat.setOnClickListener(chatPanelListener);
+            contactOutLayout.setOnClickListener(chatPanelListener);
+
+            slidingParticipantPanel.setVisibility(View.INVISIBLE);
+            slidingParticipantPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+            //////
         }
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home: {
+                finish();
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void createGroupChatAvatar(){
@@ -381,10 +439,123 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         return (int)textSize;
     }
 
+    public void showParticipantsOptionsPanel(MegaChatParticipant participant){
+        log("showParticipantsOptionsPanel");
+
+        if(selectedParticipant!=null){
+            this.selectedParticipant = participant;
+        }
+
+        titleNameContactChatPanel.setText(participant.getFullName());
+
+        titleMailContactChatPanel.setText("Permissions");
+
+        addAvatarParticipantPanel(participant);
+
+        slidingParticipantPanel.setVisibility(View.VISIBLE);
+//		slidingParticipantPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        slidingParticipantPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+    }
+
+    public void hideParticipantsOptionsPanel(){
+        log("hideChatPanel");
+
+        slidingParticipantPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        slidingParticipantPanel.setVisibility(View.GONE);
+
+        adapter.setPositionClicked(-1);
+    }
+
+    public void addAvatarParticipantPanel(MegaChatParticipant participant){
+
+        File avatar = null;
+        if(participant.getEmail()!=null){
+            log("isContact selected!");
+
+            //Ask for avatar
+            if (getExternalCacheDir() != null){
+                avatar = new File(getExternalCacheDir().getAbsolutePath(), participant.getEmail() + ".jpg");
+            }
+            else{
+                avatar = new File(getCacheDir().getAbsolutePath(), participant.getEmail() + ".jpg");
+            }
+            Bitmap bitmap = null;
+            if (avatar.exists()){
+                if (avatar.length() > 0){
+                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                    bOpts.inPurgeable = true;
+                    bOpts.inInputShareable = true;
+                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                    if (bitmap == null) {
+                        avatar.delete();
+                    }
+                    else{
+                        contactInitialLetter.setVisibility(View.GONE);
+                        contactImageView.setImageBitmap(bitmap);
+                        return;
+                    }
+                }
+            }
+        }
+
+        log("Set default avatar");
+        ////DEfault AVATAR
+        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(defaultAvatar);
+        Paint p = new Paint();
+        p.setAntiAlias(true);
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
+        String color = megaApi.getUserAvatarColor(userHandleEncoded);
+        if(color!=null){
+            log("The color to set the avatar is "+color);
+            p.setColor(Color.parseColor(color));
+        }
+        else{
+            log("Default color to the avatar");
+            p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+        }
+
+        int radius;
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+            radius = defaultAvatar.getWidth()/2;
+        else
+            radius = defaultAvatar.getHeight()/2;
+
+        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+        contactImageView.setImageBitmap(defaultAvatar);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        float density  = getResources().getDisplayMetrics().density;
+
+//		String fullName;
+        String firstLetter = participant.getFullName().charAt(0) + "";
+        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+        contactInitialLetter.setText(firstLetter);
+        contactInitialLetter.setTextColor(Color.WHITE);
+        contactInitialLetter.setVisibility(View.VISIBLE);
+
+        contactInitialLetter.setTextSize(24);
+        ////
+    }
 
     @Override
     public void onClick(View view) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        log("onBackPressed");
+
+        if(slidingParticipantPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingParticipantPanel.getVisibility()==View.VISIBLE){
+            log("slidingUploadPanel()!=PanelState.HIDDEN");
+            hideParticipantsOptionsPanel();
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     @Override

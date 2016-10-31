@@ -28,13 +28,13 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
-import mega.privacy.android.app.lollipop.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaChatRoom;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollipopAdapter.ViewHolderMessageChatList> {
 
@@ -104,6 +104,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         TextView contentContactMessageText;
 
         RelativeLayout ownDeletedMessage;
+        TextView contactDeletedMessageText;
         RelativeLayout contactDeletedMessage;
 
         RelativeLayout contactMultiselectionLayout;
@@ -114,7 +115,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     @Override
     public ViewHolderMessageChatList onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCReateViewHolder");
+        log("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -193,6 +194,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownDeletedMessage.getLayoutParams();
         ownDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
         holder.ownDeletedMessage.setLayoutParams(ownDeleteParams);
+
+        holder.contactDeletedMessageText = (TextView) v.findViewById(R.id.contact_deleted_message_text);
 
         holder.contactDeletedMessage = (RelativeLayout) v.findViewById(R.id.contact_deleted_message_layout);
         //Margins
@@ -334,11 +337,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
             if(((ChatActivityLollipop) context).isGroup()){
                 long userHandle = message.getUserHandle();
-
-                String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-                holder.contactText.setText(userHandleEncoded);
-//                MegaUser user = megaApi.getContact(userHandleEncoded);
-//            user.get
+                String participantName = ((ChatActivityLollipop) context).getParticipantName(userHandle);
+                if(participantName!=null){
+                    if(participantName.trim().length()<=0){
+                        holder.contactText.setText("Participant left");
+                    }
+                    else{
+                        holder.contactText.setText(participantName);
+                    }
+                }
+                else{
+                    holder.contactText.setText("Participant left");
+                }
             }
             else{
                 holder.contactText.setText(((ChatActivityLollipop) context).getShortContactName());
@@ -433,6 +443,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 log("Message type TRUNCATE");
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
                 holder.contentContactMessageText.setText(context.getString(R.string.text_cleared_history));
+                holder.contactDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
+                log("Message type ALTER PARTICIPANTS");
+                holder.contentContactMessageLayout.setVisibility(View.GONE);
+                holder.contactDeletedMessageText.setText("Alter participants");
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
             }
         }

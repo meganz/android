@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.megachat;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -34,14 +33,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -54,12 +50,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.tempMegaChatClasses.ChatRoom;
-import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
-import mega.privacy.android.app.lollipop.tempMegaChatClasses.RecentChat;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -72,7 +65,6 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaChatRoomListener;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
@@ -81,7 +73,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MegaChatApiAndroid megaChatApi;
     Handler handler;
 
-    RecentChat recentChat;
     MegaChatRoom chatRoom;
     long idChat;
 
@@ -248,7 +239,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
-        recentChat = new RecentChat();
         chatActivity = this;
 
         setContentView(R.layout.activity_chat);
@@ -529,8 +519,36 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         chatRoom = megaChatApi.getChatRoom(idChat);
                         aB.setTitle(chatRoom.getTitle());
+
                         if(!chatRoom.isGroup()){
+                            log("One to one chat");
                             setStatus();
+                            long userHandle = chatRoom.getPeerHandle(0);
+
+                            //Falta parte de BD
+                            MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+                            if(contactDB!=null){
+
+                                String firstNameText = contactDB.getName();
+                                String lastNameText = contactDB.getLastName();
+
+                                if (firstNameText.trim().length() <= 0){
+                                    shortContactName = lastNameText;
+                                }
+                                else{
+                                    shortContactName = firstNameText;
+                                }
+
+                                if (shortContactName.trim().length() <= 0){
+                                    log("Put karere first name as fullname");
+                                    String[] words = chatRoom.getTitle().split(" ");
+                                    shortContactName=words[0];
+                                }
+                            }
+                            else{
+                                String[] words = chatRoom.getTitle().split(" ");
+                                shortContactName=words[0];
+                            }
                         }
 
                         log("Call to open chat");
@@ -543,9 +561,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Result of open chat: "+result);
                         log("Start to get Messages!!!");
                         stateHistory = megaChatApi.loadMessages(idChat, 16);
-
-                        String[] words = chatRoom.getTitle().split(" ");
-                        shortContactName=words[0];
 
                         mLayoutManager.setStackFromEnd(true);
                         listView.setVisibility(View.VISIBLE);
@@ -1292,6 +1307,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public String getShortContactName() {
         return shortContactName;
+    }
+
+    public String getParticipantName(long handle) {
+        return chatRoom.getPeerNameByHandle(handle);
     }
 
     public void setShortContactName(String shortContactName) {

@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -39,10 +38,9 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferences;
-import mega.privacy.android.app.lollipop.tempMegaChatClasses.Message;
 import mega.privacy.android.app.utils.Constants;
 
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -175,34 +173,34 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("El user es NULL");
 			}
 			holder.contactMail = user.getEmail();
-			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contactHandle));
-//				MegaContact contactDB = dbH.findContactByHandle("6135453135");
-			if(contactDB!=null){
-				holder.firstNameText = contactDB.getName();
-				holder.lastNameText = contactDB.getLastName();
-
-				if (holder.firstNameText.trim().length() <= 0){
-					holder.fullName = holder.lastNameText;
-				}
-				else{
-					holder.fullName = holder.firstNameText + " " + holder.lastNameText;
-				}
-
-				if (holder.fullName.trim().length() <= 0){
-					log("Put email as fullname");
-					String email = holder.contactMail;
-					String[] splitEmail = email.split("[@._]");
-					holder.fullName = splitEmail[0];
-				}
-
-//				holder.textViewContactName.setText(holder.fullName);
-			}
-			else{
-				String email = holder.contactMail;
-				String[] splitEmail = email.split("[@._]");
-				holder.fullName = splitEmail[0];
-//				holder.textViewContactName.setText(holder.fullName);
-			}
+//			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contactHandle));
+////				MegaContact contactDB = dbH.findContactByHandle("6135453135");
+//			if(contactDB!=null){
+//				holder.firstNameText = contactDB.getName();
+//				holder.lastNameText = contactDB.getLastName();
+//
+//				if (holder.firstNameText.trim().length() <= 0){
+//					holder.fullName = holder.lastNameText;
+//				}
+//				else{
+//					holder.fullName = holder.firstNameText + " " + holder.lastNameText;
+//				}
+//
+//				if (holder.fullName.trim().length() <= 0){
+//					log("Put email as fullname");
+//					String email = holder.contactMail;
+//					String[] splitEmail = email.split("[@._]");
+//					holder.fullName = splitEmail[0];
+//				}
+//
+////				holder.textViewContactName.setText(holder.fullName);
+//			}
+//			else{
+//				String email = holder.contactMail;
+//				String[] splitEmail = email.split("[@._]");
+//				holder.fullName = splitEmail[0];
+////				holder.textViewContactName.setText(holder.fullName);
+//			}
 
 			log("ChatRoom title: "+chat.getTitle());
 			holder.textViewContactName.setText(chat.getTitle());
@@ -585,7 +583,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+		p.setColor(context.getResources().getColor(R.color.divider_upgrade_account));
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
