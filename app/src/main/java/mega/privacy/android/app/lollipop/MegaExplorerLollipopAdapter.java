@@ -100,6 +100,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	@Override
 	public int getItemCount() {
+		if (nodes == null){
+			nodes = new ArrayList<MegaNode>();
+		}
+
 		return nodes.size();
 	}
 
