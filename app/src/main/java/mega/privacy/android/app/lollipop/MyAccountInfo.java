@@ -469,7 +469,9 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                     if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
                         MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
                         if(mAF!=null){
-                            mAF.setAccountDetails();
+                            if(mAF.isAdded()){
+                                mAF.setAccountDetails();
+                            }
                         }
                     }
                     else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
