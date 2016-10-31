@@ -462,8 +462,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void setAccountDetails(){
 		log("setAccountDetails");
 
-		if(context==null){
-			log("Context is NULL");
+		if((getActivity() == null) || (!isAdded())){
+			log("Fragment MyAccount NOT Attached!");
 			return;
 		}
 		//Set account details
@@ -760,6 +760,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
+
 		if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			log("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
