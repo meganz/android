@@ -8475,6 +8475,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			optionShare.setVisibility(View.GONE);
 		}
 
+		optionPublicLink.setVisibility(View.VISIBLE);
+		if(sNode.isExported()){
+			optionPublicLinkText.setText(R.string.edit_link_option);
+			optionRemoveLink.setVisibility(View.VISIBLE);
+		}
+		else{
+			optionPublicLinkText.setText(R.string.context_get_link_menu);
+			optionRemoveLink.setVisibility(View.GONE);
+		}
+
 		optionDownload.setVisibility(View.VISIBLE);
 		optionProperties.setVisibility(View.VISIBLE);
 		optionDelete.setVisibility(View.VISIBLE);
