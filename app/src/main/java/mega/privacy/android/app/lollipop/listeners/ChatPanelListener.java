@@ -19,7 +19,7 @@ public class ChatPanelListener implements View.OnClickListener {
     ChatController chatC;
 
     public ChatPanelListener(Context context){
-        log("UploadPanelListener created");
+        log("ChatPanelListener created");
         this.context = context;
         chatC = new ChatController(context);
     }
@@ -27,7 +27,7 @@ public class ChatPanelListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         log("onClick ChatPanelListener");
-        log("onClick NodeOptionsPanelListener");
+
         MegaChatRoom selectedChat = null;
         if(context instanceof ManagerActivityLollipop){
             selectedChat = ((ManagerActivityLollipop) context).getSelectedChat();

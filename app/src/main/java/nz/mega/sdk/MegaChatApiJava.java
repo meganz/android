@@ -177,6 +177,75 @@ public class MegaChatApiJava {
         megaChatApi.inviteToChat(chatid, userhandle, privs, createDelegateRequestListener(listener));
     }
 
+    /**
+     * Remove another user from a chat. To remove a user you need to have the
+     * operator/moderator privilege. Only groupchats can be left.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_REMOVE_FROM_CHATROOM
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns the MegaChatHandle of the user to be removed
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to remove peers.
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatid.
+     * - MegaChatError::ERROR_ARGS - If the chat is not a group chat (cannot remove peers)
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param uh MegaChatHandle that identifies the user.
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void removeFromChat(long chatid, long uh, MegaChatRequestListenerInterface listener){
+        megaChatApi.removeFromChat(chatid, uh,createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Leave a chatroom. Only groupchats can be left.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_REMOVE_FROM_CHATROOM
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to remove peers.
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatid.
+     * - MegaChatError::ERROR_ARGS - If the chat is not a group chat (cannot remove peers)
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void leaveChat(long chatid, MegaChatRequestListenerInterface listener){
+        megaChatApi.leaveChat(chatid,createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Allows a logged in operator/moderator to adjust the permissions on any other user
+     * in their group chat. This does not work for a 1:1 chat.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_UPDATE_PEER_PERMISSIONS
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns the MegaChatHandle of the user whose permission
+     * is to be upgraded
+     * - MegaChatRequest::getPrivilege - Returns the privilege level wanted for the user
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to update the privilege level.
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatid.
+     * - MegaChatError::ERROR_ARGS - If the chatid or user handle are invalid
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param uh MegaChatHandle that identifies the user
+     * @param privilege Privilege level for the existing peer. Valid values are:
+     * - MegaChatPeerList::PRIV_RO = 0
+     * - MegaChatPeerList::PRIV_STANDARD = 2
+     * - MegaChatPeerList::PRIV_MODERATOR = 3
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void updateChatPermissions(long chatid, long uh, int privilege, MegaChatRequestListenerInterface listener){
+        megaChatApi.updateChatPermissions(chatid, uh, privilege, createDelegateRequestListener(listener));
+    }
+
     public ArrayList<MegaChatRoom> getChatRooms()
     {
         return chatRoomListToArray(megaChatApi.getChatRooms());
@@ -233,21 +302,6 @@ public class MegaChatApiJava {
     public void removeFromChat(long chatid, long userhandle)
     {
         megaChatApi.removeFromChat(chatid, userhandle);
-    }
-
-    public void removeFromChat(long chatid, long userhandle, MegaChatRequestListenerInterface listener)
-    {
-        megaChatApi.removeFromChat(chatid, userhandle, createDelegateRequestListener(listener));
-    }
-
-    public void updateChatPermissions(long chatid, long userhandle, int privilege)
-    {
-        megaChatApi.updateChatPermissions(chatid, userhandle, privilege);
-    }
-
-    public void updateChatPermissions(long chatid, long userhandle, int privilege, MegaChatRequestListenerInterface listener)
-    {
-        megaChatApi.updateChatPermissions(chatid, userhandle, privilege, createDelegateRequestListener(listener));
     }
 
     public void truncateChat(long chatid, long messageid)

@@ -42,10 +42,12 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
@@ -88,6 +90,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         TextView textViewContent;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
+		ImageView permissionsIcon;
         int currentPosition;
         String contactMail;
 		String userHandle;
@@ -133,6 +136,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		holderList.textViewContactName = (TextView) v.findViewById(R.id.participant_list_name);
 		holderList.textViewContent = (TextView) v.findViewById(R.id.participant_list_content);
 		holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.participant_list_three_dots);
+		holderList.permissionsIcon = (ImageView) v.findViewById(R.id.participant_list_permissions);
 
 		//Right margin
 		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
@@ -263,6 +267,18 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 
 		holder.textViewContent.setText("A rellenar!");
+
+		int permission = participant.getPrivilege();
+
+		if(permission== MegaChatRoom.PRIV_STANDARD) {
+			holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+		}
+		else if(permission==MegaChatRoom.PRIV_MODERATOR){
+			holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+		}
+		else{
+			holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);	
