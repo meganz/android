@@ -455,8 +455,17 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		
-		root = new File(Environment.getExternalStorageDirectory().toString());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			root = new File(Environment.getExternalStorageDirectory().toString());
+			if (root == null){
+				root = new File("/");
+			}
+		}
+		else{
+			root = new File("/");
+		}
+
 				
 		prefs = dbH.getPreferences();
 		if (prefs == null){

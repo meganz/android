@@ -50,11 +50,11 @@ public class EditTextCursorWatcher extends EditText {
 	    			 }
 	    		 }
 	    		 Log.d("EditTextCursorWatcher", "Text: " + getText() + "_lastSelectedPos: " + lastSelectedPos + "_selStart: " + selStart + "_selEnd: " + selEnd);
-	    		 if (selEnd > lastSelectedPos){
-	    			 selStart = lastSelectedPos;
-	    			 selEnd = lastSelectedPos;
-	    			 setSelection(selStart, selEnd);
-	    		 }
+//	    		 if (selEnd > lastSelectedPos){
+//	    			 selStart = lastSelectedPos;
+//	    			 selEnd = lastSelectedPos;
+//	    			 setSelection(selStart, selEnd);
+//	    		 }
 	    	 }
     	 }
      }

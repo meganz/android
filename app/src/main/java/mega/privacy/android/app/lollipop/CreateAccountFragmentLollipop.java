@@ -388,12 +388,9 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 return;
             }
         }
-        onRegister();
-    }
-
-    @SuppressLint("NewApi")
-    private void onRegister() {
-        ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
+        else{
+            ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
+        }
     }
 
     @Override

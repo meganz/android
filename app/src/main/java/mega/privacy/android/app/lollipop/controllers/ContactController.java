@@ -45,7 +45,7 @@ public class ContactController {
     public void pickFolderToShare(List<MegaUser> users){
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
         ArrayList<String> longArray = new ArrayList<String>();
         for (int i=0; i<users.size(); i++){
             longArray.add(users.get(i).getEmail());
