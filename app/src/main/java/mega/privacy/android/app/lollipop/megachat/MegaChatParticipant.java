@@ -8,14 +8,16 @@ public class MegaChatParticipant {
     private String email;
     private long handle;
     private int privilege;
+    private int status;
 
-    public MegaChatParticipant(long handle, String firstName, String lastName, String fullName, String email, int privilege) {
+    public MegaChatParticipant(long handle, String firstName, String lastName, String fullName, String email, int privilege, int status) {
         this.fullName = fullName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.handle = handle;
         this.email = email;
         this.privilege = privilege;
+        this.status = status;
     }
 
     public long getHandle() {
@@ -64,5 +66,13 @@ public class MegaChatParticipant {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

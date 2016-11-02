@@ -30,15 +30,17 @@ public class ParticipantPanelListener implements View.OnClickListener {
         log("onClick ParticipantPanelListener");
 
         MegaChatParticipant selectedParticipant = null;
-        if(context instanceof ManagerActivityLollipop){
+        MegaChatRoom selectedChat = null;
+        if(context instanceof GroupChatInfoActivityLollipop){
             selectedParticipant = ((GroupChatInfoActivityLollipop) context).getSelectedParticipant();
+            selectedChat = ((GroupChatInfoActivityLollipop) context).getChat();
         }
 
         switch(v.getId()){
 
             case R.id.change_permissions_group_participants_chat_layout: {
                 log("change permissions participants panel");
-                ((GroupChatInfoActivityLollipop) context).changePermissions(selectedParticipant);
+                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(selectedParticipant, selectedChat);
                 break;
             }
 

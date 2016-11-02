@@ -246,6 +246,29 @@ public class MegaChatApiJava {
         megaChatApi.updateChatPermissions(chatid, uh, privilege, createDelegateRequestListener(listener));
     }
 
+    /**
+     * Get the online status of a user.
+     *
+     * It can be one of the following values:
+     * - MegaChatApi::STATUS_OFFLINE = 1
+     * The user appears as being offline
+     *
+     * - MegaChatApi::STATUS_BUSY = 2
+     * The user is busy and don't want to be disturbed.
+     *
+     * - MegaChatApi::STATUS_AWAY = 3
+     * The user is away and might not answer.
+     *
+     * - MegaChatApi::STATUS_ONLINE = 4
+     * The user is connected and online.
+     *
+     * @param Handle of the peer whose name is requested.
+     * @return Online status of the user
+     */
+    public int getUserOnlineStatus(long userhandle){
+        return megaChatApi.getUserOnlineStatus(userhandle);
+    }
+
     public ArrayList<MegaChatRoom> getChatRooms()
     {
         return chatRoomListToArray(megaChatApi.getChatRooms());

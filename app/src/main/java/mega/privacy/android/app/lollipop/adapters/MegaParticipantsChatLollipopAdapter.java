@@ -42,6 +42,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -49,6 +50,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.R.string.offline_status;
 
 
 public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<MegaParticipantsChatLollipopAdapter.ViewHolderParticipants> implements OnClickListener {
@@ -266,9 +269,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			log("Participant is NOT contact");
 		}
 
-		holder.textViewContent.setText("A rellenar!");
+		int status = participant.getStatus();
 
-
+		if(status== MegaChatApi.STATUS_ONLINE){
+			holder.textViewContent.setText(context.getResources().getString(R.string.online_status));
+		}
+		else{
+			holder.textViewContent.setText(context.getResources().getString(R.string.offline_status));
+		}
 
 		int permission = participant.getPrivilege();
 
