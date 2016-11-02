@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@color/white">
     
-     <mega.privacy.android.app.components.MEGAPreferenceCategory 
+     <PreferenceCategory
         android:key="settings_pin_lock"
         android:title="@string/settings_pin_lock">
  <!--        android:textColor="@color/pressed_mega">  -->
@@ -15,8 +15,8 @@
 		<Preference
 	        android:key="settings_pin_lock_code"
 	        android:title="@string/settings_reset_lock_code"/>
-    </mega.privacy.android.app.components.MEGAPreferenceCategory>
-    
+    </PreferenceCategory>
+
     <PreferenceCategory 
         android:key="settings_camera_upload"
         android:title="@string/section_photo_sync"

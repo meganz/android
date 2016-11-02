@@ -254,13 +254,32 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		else {
 			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
 		}	
-		
-		if(selectFile)
-		{
-			separator.setVisibility(View.GONE);
-			optionsBar.setVisibility(View.GONE);
+
+		if(modeCloud==FileExplorerActivityLollipop.SELECT){
+			if(selectFile)
+			{
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
+			}
+			else{
+				if(parentHandle==-1||parentHandle==megaApi.getRootNode().getHandle()){
+					separator.setVisibility(View.GONE);
+					optionsBar.setVisibility(View.GONE);
+				}
+				else{
+					separator.setVisibility(View.VISIBLE);
+					optionsBar.setVisibility(View.VISIBLE);
+				}
+			}
 		}
-		
+//		else{
+//			if(selectFile)
+//			{
+//				separator.setVisibility(View.GONE);
+//				optionsBar.setVisibility(View.GONE);
+//			}
+//		}
+
 		adapter.setPositionClicked(-1);		
 		
 		listView.setAdapter(adapter);
@@ -356,10 +375,28 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if(n.getType() != MegaNode.TYPE_ROOT)
 			{
 				changeActionBarTitle(name);
+				if(modeCloud==FileExplorerActivityLollipop.SELECT){
+					if(!selectFile)
+					{
+						separator.setVisibility(View.VISIBLE);
+						optionsBar.setVisibility(View.VISIBLE);
+
+					}
+					else
+					{
+						separator.setVisibility(View.GONE);
+						optionsBar.setVisibility(View.GONE);
+
+					}
+				}
 			}
 			else
 			{
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				if(modeCloud==FileExplorerActivityLollipop.SELECT){
+					separator.setVisibility(View.GONE);
+					optionsBar.setVisibility(View.GONE);
+				}
 			}
 			
 			parentHandle = nodes.get(position).getHandle();
@@ -426,6 +463,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				if(modeCloud==FileExplorerActivityLollipop.SELECT){
+					separator.setVisibility(View.GONE);
+					optionsBar.setVisibility(View.GONE);
+				}
 			}
 			else{
 				String path=parentNode.getName();	
@@ -434,7 +475,20 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				name = temp[temp.length-1];
 
 				changeActionBarTitle(name);
-				
+				if(modeCloud==FileExplorerActivityLollipop.SELECT){
+					if(!selectFile)
+					{
+						separator.setVisibility(View.VISIBLE);
+						optionsBar.setVisibility(View.VISIBLE);
+
+					}
+					else
+					{
+						separator.setVisibility(View.GONE);
+						optionsBar.setVisibility(View.GONE);
+
+					}
+				}
 				parentHandle = parentNode.getHandle();
 			}
 			

@@ -41,6 +41,7 @@
             MEGA:showAsAction="ifRoom|collapseActionView"
             android:title="@string/action_search" />
     -->
+
 	<item
 		android:id="@+id/action_menu_kill_all_sessions"
 		android:orderInCategory="90"
@@ -189,13 +190,6 @@
 		android:id="@+id/action_menu_upgrade_account"
 		android:orderInCategory="140"
 		android:title="@string/action_upgrade_account"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
-
-	<item
-		android:id="@+id/action_menu_settings"
-		android:orderInCategory="145"
-		android:title="@string/action_settings"
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never" />
 

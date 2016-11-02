@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -380,7 +381,13 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						if (myAccountInfo.getProIYearly() != null) {
 							log("ProIAnnualy already subscribed: " + myAccountInfo.getProIYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
-							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+							}
+							else{
+								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							}
+
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -477,7 +484,13 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						if (myAccountInfo.getProIIYearly() != null) {
 							log("ProIIAnnualy already subscribed: " + myAccountInfo.getProIIYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
-							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+
+							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+							}
+							else{
+								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							}
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -574,7 +587,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						if (myAccountInfo.getProIIIYearly() != null) {
 							log("ProIIIAnnualy already subscribed: " + myAccountInfo.getProIIIYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
-							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+							}
+							else{
+								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							}
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -653,13 +671,25 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
 						priceAnnualyLayout.setVisibility(View.GONE);
-						priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+							priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+						}
+						else{
+							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+						}
 						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
 						priceAnnualyLayout.setVisibility(View.GONE);
-						priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+							priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+						}
+						else{
+							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+						}
 						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						break;
 					}
@@ -675,7 +705,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						if (myAccountInfo.getProLiteYearly() != null) {
 							log("ProLiteAnnualy already subscribed: " + myAccountInfo.getProLiteYearly().getOriginalJson());
 							priceAnnualyLayout.setVisibility(View.GONE);
-							priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+								priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+							}
+							else{
+								priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+							}
 							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 
@@ -911,14 +946,24 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 			{
 				log("PAYMENT_CC_YEAR selected");
 				selectedSubscription = Constants.PAYMENT_CC_YEAR;
-				priceAnnualyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+					priceAnnualyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+				}
+				else{
+					priceAnnualyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+				}
 				priceMonthlyLayout.setBackground(null);
 				break;
 			}
 			case R.id.monthly_annualy_monthly_layout:{
 				log("PAYMENT_CC_MONTH selected");
 				selectedSubscription = Constants.PAYMENT_CC_MONTH;
-				priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+					priceMonthlyLayout.setBackgroundResource(R.drawable.red_border_upgrade_account);
+				}
+				else{
+					priceMonthlyLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.red_border_upgrade_account));
+				}
 				priceAnnualyLayout.setBackground(null);
 				break;
 			}

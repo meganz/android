@@ -299,8 +299,10 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			else{
 				log("The contactDB is null: ");
 			}			
-						
-			createDefaultAvatar(holder);
+
+			MegaUser user = megaApi.getContact(holder.contactMail);
+
+			createDefaultAvatar(holder, user);
 			
 			int accessLevel = share.getAccess();
 			switch(accessLevel){
@@ -381,15 +383,24 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 	}
 	
-	public void createDefaultAvatar(ViewHolderShareList holder){
+	public void createDefaultAvatar(ViewHolderShareList holder, MegaUser contact){
 		log("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
-		
+		if(contact!=null){
+			String color = megaApi.getUserAvatarColor(contact);
+			if(color!=null){
+				log("The color to set the avatar is "+color);
+				p.setColor(Color.parseColor(color));
+			}
+			else{
+				log("Default color to the avatar");
+				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			}
+		}
 		
 		int radius; 
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

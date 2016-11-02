@@ -25,6 +25,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -781,7 +785,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			storageAdvancedDevices.setChecked(false);
 		}
 	}
-	
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View v = super.onCreateView(inflater, container, savedInstanceState);
+		if(v != null) {
+			ListView lv = (ListView) v.findViewById(android.R.id.list);
+			lv.setPadding(0, 0, 0, 0);
+		}
+		return v;
+	}
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

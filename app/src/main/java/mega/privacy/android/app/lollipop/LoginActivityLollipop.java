@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -160,6 +161,8 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				FragmentTransaction ft = getFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, confirmEmailFragment);
 				ft.commit();
+				FragmentManager fragmentManager = getFragmentManager();
+				fragmentManager.executePendingTransactions();
 				break;
 			}
 		}

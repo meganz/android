@@ -90,4 +90,5 @@
     <color name="status_connected">#13e03c</color>
 
     <color name="participants_layout">#f2f2f2</color>
+    <color name="preference_category_title">#f2f2f2</color>
 </resources>

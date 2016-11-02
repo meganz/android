@@ -214,7 +214,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		}
 		else{
-			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+			mkButton.setBackgroundResource(R.drawable.black_button_border);
 		}
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
@@ -289,7 +289,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		}
 		else{
-			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.black_button_border));
+			logoutButton.setBackgroundResource(R.drawable.black_button_border);
 		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
@@ -468,8 +468,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void setAccountDetails(){
 		log("setAccountDetails");
 
-		if(context==null){
-			log("Context is NULL");
+		if((getActivity() == null) || (!isAdded())){
+			log("Fragment MyAccount NOT Attached!");
 			return;
 		}
 		//Set account details
@@ -766,6 +766,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
+
 		if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			log("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){

@@ -175,12 +175,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		else {
 			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
 		}
-		
-		if(selectFile)
-		{
-			separator.setVisibility(View.GONE);
-			optionsBar.setVisibility(View.GONE);
-		}
 
 		if (parentHandle == -1){			
 			findNodes();	
@@ -202,8 +196,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionsBar.setVisibility(View.GONE);
 		}
 		else{
-			separator.setVisibility(View.VISIBLE);
-			optionsBar.setVisibility(View.VISIBLE);
+			if(selectFile){
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
+			}
+			else{
+				separator.setVisibility(View.VISIBLE);
+				optionsBar.setVisibility(View.VISIBLE);
+			}
 		}
 
 		if (adapter.getItemCount() != 0){
@@ -313,8 +313,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				optionsBar.setVisibility(View.GONE);
 			}
 			else{
-				separator.setVisibility(View.VISIBLE);
-				optionsBar.setVisibility(View.VISIBLE);
+				if(selectFile){
+					separator.setVisibility(View.GONE);
+					optionsBar.setVisibility(View.GONE);
+				}
+				else{
+					separator.setVisibility(View.VISIBLE);
+					optionsBar.setVisibility(View.VISIBLE);
+				}
 			}
 			
 			MegaNode n = nodes.get(position);			
@@ -437,8 +443,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				return 2;
 			}
 
-			separator.setVisibility(View.VISIBLE);
-			optionsBar.setVisibility(View.VISIBLE);
+			if(selectFile){
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
+			}
+			else{
+				separator.setVisibility(View.VISIBLE);
+				optionsBar.setVisibility(View.VISIBLE);
+			}
+
 			return 2;
 		}
 		else{
