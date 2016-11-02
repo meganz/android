@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "268821755439",
+    "firebase_url": "https://megapoc-25443.firebaseio.com",
+    "project_id": "megapoc-25443",
+    "storage_bucket": "megapoc-25443.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268821755439:android:9b611c50c9f7a503",
+        "android_client_info": {
+          "package_name": "mega.privacy.android.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "268821755439-tdjso866kpts8fgh2qbjg6m9db8sihdu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0c1JwVioqS4TLZ2COIjYgmgYqeBvWIro"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
