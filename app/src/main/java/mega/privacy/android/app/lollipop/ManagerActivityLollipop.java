@@ -45,6 +45,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -76,6 +77,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
 import java.io.IOException;
@@ -1599,6 +1602,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("rootNode != null");
 			megaChatApi.connect(this);
+
+			String token = FirebaseInstanceId.getInstance().getToken();
+			if (token != null) {
+				Log.d("TOKEN___", token);
+				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
+			}
 
 			if(myAccountInfo==null){
 				myAccountInfo = new MyAccountInfo(this);
