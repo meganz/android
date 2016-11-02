@@ -38,7 +38,7 @@ public class ParticipantPanelListener implements View.OnClickListener {
 
             case R.id.change_permissions_group_participants_chat_layout: {
                 log("change permissions participants panel");
-                ((GroupChatInfoActivityLollipop) context).changePermissions();
+                ((GroupChatInfoActivityLollipop) context).changePermissions(selectedParticipant);
                 break;
             }
 

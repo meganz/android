@@ -268,6 +268,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 		holder.textViewContent.setText("A rellenar!");
 
+
+
 		int permission = participant.getPrivilege();
 
 		if(permission== MegaChatRoom.PRIV_STANDARD) {
