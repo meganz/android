@@ -3,12 +3,16 @@ package mega.privacy.android.app.lollipop.megachat;
 public class MegaChatParticipant {
 
     private String fullName;
+    private String firstName;
+    private String lastName;
     private String email;
     private long handle;
     private int privilege;
 
-    public MegaChatParticipant(long handle, String fullName, String email, int privilege) {
+    public MegaChatParticipant(long handle, String firstName, String lastName, String fullName, String email, int privilege) {
         this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.handle = handle;
         this.email = email;
         this.privilege = privilege;
@@ -44,5 +48,21 @@ public class MegaChatParticipant {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

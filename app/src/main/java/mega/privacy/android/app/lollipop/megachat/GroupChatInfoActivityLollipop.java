@@ -304,7 +304,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             recyclerView = (RecyclerView) findViewById(R.id.chat_group_contact_properties_list);
 //            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
-            recyclerView.setClipToPadding(false);
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
             recyclerView.setHasFixedSize(true);
             MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(this);
@@ -317,23 +316,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             for(int i=0;i<participantsCount;i++){
                 long peerHandle = chat.getPeerHandle(i);
                 int peerPrivilege = chat.getPeerPrivilege(i);
-                String participantName = chat.getPeerName(i);
-                log("Name of the peer: "+participantName);
+                String participantFirstName = chat.getPeerFirstname(i);
+                String participantLastName = chat.getPeerLastname(i);
 
+                String fullName;
 
-                String tempFullName = "";
-                tempFullName = participantName.substring(1);
-                participantName = tempFullName;
+                if (participantFirstName.trim().length() <= 0){
+                    fullName = participantLastName;
+                }
+                else{
+                    fullName = participantFirstName + " " + participantLastName;
+                }
+                log("Name of the peer: "+fullName);
+
+//                String tempFullName = "";
+//                tempFullName = fullName.substring(1);
+//                fullName = tempFullName;
 
                 MegaChatParticipant participant = null;
                 String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
                 MegaUser participantContact = megaApi.getContact(userHandleEncoded);
                 if(participantContact!=null){
-                    participant = new MegaChatParticipant(peerHandle, participantName, participantContact.getEmail(), peerPrivilege);
+                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege);
 
                 }
                 else{
-                    participant = new MegaChatParticipant(peerHandle, participantName, null, peerPrivilege);
+                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege);
                 }
 
                 participants.add(participant);
