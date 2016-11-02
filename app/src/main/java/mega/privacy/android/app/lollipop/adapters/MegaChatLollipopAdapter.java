@@ -334,16 +334,34 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         }
         else{
             log("Contact message!!");
+            long userHandle = message.getUserHandle();
+
+            String fullName;
+            String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(userHandle);
+            String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(userHandle);
+
+            if(participantFirstName==null){
+                participantFirstName="";
+            }
+            if(participantLastName == null){
+                participantLastName="";
+            }
 
             if(((ChatActivityLollipop) context).isGroup()){
-                long userHandle = message.getUserHandle();
-                String participantName = ((ChatActivityLollipop) context).getParticipantName(userHandle);
-                if(participantName!=null){
-                    if(participantName.trim().length()<=0){
+
+                if (participantFirstName.trim().length() <= 0){
+                    fullName = participantLastName;
+                }
+                else{
+                    fullName = participantFirstName + " " + participantLastName;
+                }
+
+                if(fullName!=null){
+                    if(fullName.trim().length()<=0){
                         holder.contactText.setText("Participant left");
                     }
                     else{
-                        holder.contactText.setText(participantName);
+                        holder.contactText.setText(fullName);
                     }
                 }
                 else{
@@ -351,7 +369,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
             }
             else{
-                holder.contactText.setText(((ChatActivityLollipop) context).getShortContactName());
+                if (participantFirstName.trim().length() <= 0){
+                    fullName = participantLastName.trim();
+                }
+                else{
+                    fullName = participantFirstName.trim();
+                }
+
+                holder.contactText.setText(fullName);
             }
 
             if (!multipleSelect) {

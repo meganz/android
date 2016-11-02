@@ -146,7 +146,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     MegaContact contactChat;
     String fullName;
-    String shortContactName;
 
     int stateHistory;
 
@@ -523,32 +522,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(!chatRoom.isGroup()){
                             log("One to one chat");
                             setStatus();
-                            long userHandle = chatRoom.getPeerHandle(0);
-
-                            //Falta parte de BD
-                            MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
-                            if(contactDB!=null){
-
-                                String firstNameText = contactDB.getName();
-                                String lastNameText = contactDB.getLastName();
-
-                                if (firstNameText.trim().length() <= 0){
-                                    shortContactName = lastNameText;
-                                }
-                                else{
-                                    shortContactName = firstNameText;
-                                }
-
-                                if (shortContactName.trim().length() <= 0){
-                                    log("Put karere first name as fullname");
-                                    String[] words = chatRoom.getTitle().split(" ");
-                                    shortContactName=words[0];
-                                }
-                            }
-                            else{
-                                String[] words = chatRoom.getTitle().split(" ");
-                                shortContactName=words[0];
-                            }
                         }
 
                         log("Call to open chat");
@@ -1305,16 +1278,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.myMail = myMail;
     }
 
-    public String getShortContactName() {
-        return shortContactName;
+    public String getParticipantFirstName(long handle) {
+        return chatRoom.getPeerFirstnameByHandle(handle);
     }
 
-    public String getParticipantName(long handle) {
-        return chatRoom.getPeerNameByHandle(handle);
+    public String getParticipantLastName(long handle) {
+        return chatRoom.getPeerLastnameByHandle(handle);
     }
 
-    public void setShortContactName(String shortContactName) {
-        this.shortContactName = shortContactName;
+    public String getChatTitle(){
+        return chatRoom.getTitle();
     }
 
     @Override
