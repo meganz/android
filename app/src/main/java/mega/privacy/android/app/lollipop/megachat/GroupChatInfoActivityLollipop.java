@@ -73,7 +73,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     GroupChatInfoActivityLollipop groupChatInfoActivity;
 
-    MegaUser user;
     long chatHandle;
     MegaChatRoom chat;
 
@@ -349,6 +348,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
                 log("Name of the peer: "+fullName);
 
+                int status = megaChatApi.getUserOnlineStatus(peerHandle);
+
 //                String tempFullName = "";
 //                tempFullName = fullName.substring(1);
 //                fullName = tempFullName;
@@ -357,11 +358,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
                 MegaUser participantContact = megaApi.getContact(userHandleEncoded);
                 if(participantContact!=null){
-                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege);
+                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege, status);
 
                 }
                 else{
-                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege);
+                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
                 }
 
                 participants.add(participant);
@@ -400,7 +401,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void changePermissions(MegaChatParticipant participant){
+    public void showChangePermissionsDialog(MegaChatParticipant participant, MegaChatRoom chatToChange){
         //Change permissions
 
         final MegaChatParticipant participantToChange = participant;
@@ -437,7 +438,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         permissionsDialog.show();
 
-        int permission = chat.getPeerPrivilegeByHandle(participantToChange.getHandle());
+        int permission = chatToChange.getPeerPrivilegeByHandle(participantToChange.getHandle());
 
         if(permission==MegaChatRoom.PRIV_STANDARD) {
             administratorCheck.setChecked(false);
@@ -460,8 +461,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             @Override
             public void onClick(View v) {
-                ChatController cC = new ChatController(groupChatInfoActivity);
-                cC.alterParticipantsPermissions(chatHandle, participantToChange.getHandle(), MegaChatRoom.PRIV_MODERATOR);
+                changePermissions(MegaChatRoom.PRIV_MODERATOR);
                 if (dialog != null){
                     dialog.dismiss();
                 }
@@ -472,8 +472,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             @Override
             public void onClick(View v) {
-                ChatController cC = new ChatController(groupChatInfoActivity);
-                cC.alterParticipantsPermissions(chatHandle, participantToChange.getHandle(), MegaChatRoom.PRIV_STANDARD);
+                changePermissions(MegaChatRoom.PRIV_STANDARD);
                 if (dialog != null){
                     dialog.dismiss();
                 }
@@ -484,8 +483,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             @Override
             public void onClick(View v) {
-                ChatController cC = new ChatController(groupChatInfoActivity);
-                cC.alterParticipantsPermissions(chatHandle, participantToChange.getHandle(), MegaChatRoom.PRIV_RO);
+                changePermissions(MegaChatRoom.PRIV_RO);
                 if (dialog != null){
                     dialog.dismiss();
                 }
@@ -495,6 +493,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("Cambio permisos");
 
         adapter.clearSelections();
+    }
+
+    public void changePermissions(int newPermissions){
+        ChatController cC = new ChatController(groupChatInfoActivity);
+        cC.alterParticipantsPermissions(chatHandle, selectedParticipant.getHandle(), newPermissions);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -681,6 +684,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void setSelectedParticipant(MegaChatParticipant selectedParticipant) {
         this.selectedParticipant = selectedParticipant;
+    }
+
+    public MegaChatRoom getChat() {
+        return chat;
+    }
+
+    public void setChat(MegaChatRoom chat) {
+        this.chat = chat;
     }
 
     @Override
