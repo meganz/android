@@ -470,7 +470,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("ACTION_CHAT_NEW");
                     long chatId = newIntent.getLongExtra("CHAT_ID", -1);
                     if(chatId!=-1){
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                        chatRoom = megaChatApi.getChatRoom(chatId);
                         aB.setTitle(chatRoom.getTitle());
                         if(!chatRoom.isGroup()){
                             setStatus();
