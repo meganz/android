@@ -65,4 +65,13 @@
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
 
+    <ImageView
+        android:id="@+id/participant_list_permissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_permissions_full_access"
+        android:background="@null"
+        android:layout_toLeftOf="@id/participant_list_three_dots"
+        android:layout_centerVertical="true"/>
+
 </RelativeLayout>

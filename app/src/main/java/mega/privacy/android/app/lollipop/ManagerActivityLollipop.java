@@ -10683,6 +10683,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+			log("Create chat request finisf!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!");
 

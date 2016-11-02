@@ -1,6 +1,9 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -42,6 +45,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
+import mega.privacy.android.app.lollipop.listeners.ParticipantPanelListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -49,12 +53,14 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
@@ -68,10 +74,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     MegaChatParticipant selectedParticipant;
 
+    AlertDialog permissionsDialog;
+
     private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
-
-    private Handler handler;
 
     Display display;
     DisplayMetrics outMetrics;
@@ -123,7 +129,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public LinearLayout contactLayout;
     public LinearLayout optionChangePermissionsChat;
     public LinearLayout optionRemoveChat;
-    private ChatPanelListener chatPanelListener;
+    private ParticipantPanelListener participantPanelListener;
     ////
 
     RecyclerView recyclerView;
@@ -148,8 +154,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             MegaApplication app = (MegaApplication) getApplication();
             megaChatApi = app.getMegaChatApi();
         }
-
-        handler = new Handler();
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -309,6 +313,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
 //            recyclerView.addOnItemTouchListener(this);
+            recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
             participants = new ArrayList<>();
@@ -318,6 +323,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 int peerPrivilege = chat.getPeerPrivilege(i);
                 String participantFirstName = chat.getPeerFirstname(i);
                 String participantLastName = chat.getPeerLastname(i);
+
+//                chat.getOnlineStatus()
 
                 String fullName;
 
@@ -368,16 +375,53 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             optionChangePermissionsChat = (LinearLayout) findViewById(R.id.change_permissions_group_participants_chat_layout);
             optionRemoveChat= (LinearLayout) findViewById(R.id.remove_group_participants_chat_layout);
 
-            chatPanelListener = new ChatPanelListener(this);
+            participantPanelListener = new ParticipantPanelListener(this);
 
-            optionChangePermissionsChat.setOnClickListener(chatPanelListener);
-            optionRemoveChat.setOnClickListener(chatPanelListener);
-            contactOutLayout.setOnClickListener(chatPanelListener);
+            optionChangePermissionsChat.setOnClickListener(participantPanelListener);
+            optionRemoveChat.setOnClickListener(participantPanelListener);
+            contactOutLayout.setOnClickListener(participantPanelListener);
 
             slidingParticipantPanel.setVisibility(View.INVISIBLE);
             slidingParticipantPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
             //////
         }
+    }
+
+    public void changePermissions(){
+        //Change permissions
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(groupChatInfoActivity);
+
+        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+
+        final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+        dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                switch(item) {
+                    case 0:{
+                        log("Change to Read Only");
+                        break;
+                    }
+                    case 1:{
+
+                        break;
+                    }
+                    case 2:{
+
+                        break;
+                    }
+                }
+            }
+        });
+
+        permissionsDialog = dialogBuilder.create();
+        permissionsDialog.show();
+
+        adapter.setMultipleSelect(false);
+
+        log("Cambio permisos");
+
+        adapter.clearSelections();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -456,7 +500,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         titleNameContactChatPanel.setText(participant.getFullName());
 
-        titleMailContactChatPanel.setText("Permissions");
+        int permission = chat.getPeerPrivilegeByHandle(participant.getHandle());
+
+        if(permission==MegaChatRoom.PRIV_STANDARD) {
+            titleMailContactChatPanel.setText("Member");
+        }
+        else if(permission==MegaChatRoom.PRIV_MODERATOR){
+            titleMailContactChatPanel.setText("Administrator");
+        }
+        else{
+            titleMailContactChatPanel.setText("Observer");
+        }
 
         addAvatarParticipantPanel(participant);
 
@@ -546,6 +600,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         contactInitialLetter.setTextSize(24);
         ////
+    }
+
+    public MegaChatParticipant getSelectedParticipant() {
+        return selectedParticipant;
+    }
+
+    public void setSelectedParticipant(MegaChatParticipant selectedParticipant) {
+        this.selectedParticipant = selectedParticipant;
     }
 
     @Override

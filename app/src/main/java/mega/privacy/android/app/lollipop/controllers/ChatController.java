@@ -11,6 +11,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -63,6 +64,10 @@ public class ChatController {
                 }
             }
         }
+    }
+
+    public void alterParticipantsPermissions(long chatid, long uh, int privilege){
+        megaChatApi.updateChatPermissions(chatid, uh, privilege, (GroupChatInfoActivityLollipop) context);
     }
 
     public static void log(String message) {
