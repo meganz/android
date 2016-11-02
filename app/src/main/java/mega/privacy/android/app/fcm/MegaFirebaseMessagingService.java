@@ -29,9 +29,9 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import mega.privacy.android.app.ManagerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -82,7 +82,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService {
      */
     private void sendNotification(String messageBody) {
         log("sendNotification: " + messageBody);
-        Intent intent = new Intent(this, ManagerActivity.class);
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
