@@ -17,10 +17,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -44,6 +48,7 @@ import mega.privacy.android.app.lollipop.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaParticipantsChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ParticipantPanelListener;
 import mega.privacy.android.app.utils.Constants;
@@ -84,6 +89,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     float density;
     float scaleW;
     float scaleH;
+    float scaleText;
 
     DatabaseHandler dbH = null;
     ChatPreferences chatPrefs = null;
@@ -162,6 +168,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
+
+        if (scaleH < scaleW){
+            scaleText = scaleH;
+        }
+        else{
+            scaleText = scaleW;
+        }
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -387,37 +400,97 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void changePermissions(){
+    public void changePermissions(MegaChatParticipant participant){
         //Change permissions
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(groupChatInfoActivity);
+        final MegaChatParticipant participantToChange = participant;
 
-        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+        LayoutInflater inflater = getLayoutInflater();
+        View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
 
-        final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-        dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                switch(item) {
-                    case 0:{
-                        log("Change to Read Only");
-                        break;
-                    }
-                    case 1:{
+        final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
+        administratorCheck.setText(getString(R.string.file_properties_shared_folder_full_access));
+        administratorCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
+        administratorMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
-                        break;
-                    }
-                    case 2:{
+        final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
+        memberCheck.setText(getString(R.string.file_properties_shared_folder_read_write));
+        memberCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
+        memberMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
-                        break;
-                    }
+        final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
+        observerCheck.setText(getString(R.string.file_properties_shared_folder_read_only));
+        observerCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
+        observerMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        builder.setView(dialoglayout);
+
+        builder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+        permissionsDialog = builder.create();
+
+        permissionsDialog.show();
+
+        int permission = chat.getPeerPrivilegeByHandle(participantToChange.getHandle());
+
+        if(permission==MegaChatRoom.PRIV_STANDARD) {
+            administratorCheck.setChecked(false);
+            memberCheck.setChecked(true);
+            observerCheck.setChecked(false);
+        }
+        else if(permission==MegaChatRoom.PRIV_MODERATOR){
+            administratorCheck.setChecked(true);
+            memberCheck.setChecked(false);
+            observerCheck.setChecked(false);
+        }
+        else{
+            administratorCheck.setChecked(false);
+            memberCheck.setChecked(false);
+            observerCheck.setChecked(true);
+        }
+
+        final AlertDialog dialog = permissionsDialog;
+        administratorCheck.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ChatController cC = new ChatController(groupChatInfoActivity);
+                cC.alterParticipantsPermissions(chatHandle, participantToChange.getHandle(), MegaChatRoom.PRIV_MODERATOR);
+                if (dialog != null){
+                    dialog.dismiss();
                 }
             }
         });
 
-        permissionsDialog = dialogBuilder.create();
-        permissionsDialog.show();
+        memberCheck.setOnClickListener(new View.OnClickListener() {
 
-        adapter.setMultipleSelect(false);
+            @Override
+            public void onClick(View v) {
+                ChatController cC = new ChatController(groupChatInfoActivity);
+                cC.alterParticipantsPermissions(chatHandle, participantToChange.getHandle(), MegaChatRoom.PRIV_STANDARD);
+                if (dialog != null){
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        observerCheck.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ChatController cC = new ChatController(groupChatInfoActivity);
+                cC.alterParticipantsPermissions(chatHandle, participantToChange.getHandle(), MegaChatRoom.PRIV_RO);
+                if (dialog != null){
+                    dialog.dismiss();
+                }
+            }
+        });
 
         log("Cambio permisos");
 
