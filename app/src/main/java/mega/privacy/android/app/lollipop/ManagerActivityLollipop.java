@@ -10232,6 +10232,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
+					log("create group chat with participants: "+peers.size());
 					megaChatApi.createChat(true, peers, this);
 				}
 			}
@@ -10692,7 +10693,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			log("Create chat request finisf!!!");
+			log("Create chat request finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!");
 
@@ -10702,6 +10703,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				String myMail = getMyAccountInfo().getMyUser().getEmail();
 				intent.putExtra("CHAT_ID", request.getChatHandle());
 				intent.putExtra("MY_MAIL", myMail);
+
+				boolean isGroup = request.getFlag();
+				if(isGroup){
+					log("GROUP");
+					MegaChatPeerList list = request.getMegaChatPeerList();
+					log("Size: "+list.size());
+
+				}
+				else{
+					log("NOT gropou");
+				}
+
+
 				this.startActivity(intent);
 			}
 			else{

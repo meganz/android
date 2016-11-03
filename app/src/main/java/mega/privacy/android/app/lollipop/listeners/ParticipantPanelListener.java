@@ -46,6 +46,7 @@ public class ParticipantPanelListener implements View.OnClickListener {
 
             case R.id.remove_group_participants_chat_layout: {
                 log("remove participants panel");
+                ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(selectedParticipant, selectedChat);
                 break;
             }
 

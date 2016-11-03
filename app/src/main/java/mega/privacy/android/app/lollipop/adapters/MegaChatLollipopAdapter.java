@@ -104,6 +104,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         TextView contentContactMessageText;
 
         RelativeLayout ownDeletedMessage;
+        TextView ownDeletedMessageText;
+
         TextView contactDeletedMessageText;
         RelativeLayout contactDeletedMessage;
 
@@ -138,6 +140,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
         holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
 
+        //Own messages
         holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
         holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
         holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
@@ -159,6 +162,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
         holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
+        holder.ownDeletedMessage = (RelativeLayout) v.findViewById(R.id.own_deleted_message_layout);
+        //Margins
+        RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownDeletedMessage.getLayoutParams();
+        ownDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+        holder.ownDeletedMessage.setLayoutParams(ownDeleteParams);
+
+        holder.ownDeletedMessageText = (TextView) v.findViewById(R.id.own_deleted_message_text);
+
         holder.ownMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.own_multiselection_layout);
         //Margins
         RelativeLayout.LayoutParams ownMultiselectionParams = (RelativeLayout.LayoutParams)holder.ownMultiselectionLayout.getLayoutParams();
@@ -168,6 +179,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.ownMultiselectionImageView = (ImageView) v.findViewById(R.id.own_multiselection_image_view);
         holder.ownMultiselectionTickIcon = (ImageView) v.findViewById(R.id.own_multiselection_tick_icon);
 
+        //Contact messages////////////////////////////////////////
         holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
         holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
         holder.contactText = (TextView) v.findViewById(R.id.message_chat_contact_text);
@@ -189,19 +201,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         contactMessageParams.setMargins(Util.scaleWidthPx(62, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
-        holder.ownDeletedMessage = (RelativeLayout) v.findViewById(R.id.own_deleted_message_layout);
-        //Margins
-        RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownDeletedMessage.getLayoutParams();
-        ownDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
-        holder.ownDeletedMessage.setLayoutParams(ownDeleteParams);
-
-        holder.contactDeletedMessageText = (TextView) v.findViewById(R.id.contact_deleted_message_text);
-
         holder.contactDeletedMessage = (RelativeLayout) v.findViewById(R.id.contact_deleted_message_layout);
         //Margins
         RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactDeletedMessage.getLayoutParams();
         contactDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
         holder.contactDeletedMessage.setLayoutParams(contactDeleteParams);
+
+        holder.contactDeletedMessageText = (TextView) v.findViewById(R.id.contact_deleted_message_text);
 
         holder.contactMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.contact_multiselection_layout);
         //Margins
@@ -305,6 +311,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 else if(message.isDeleted()){
                     log("Message is deleted");
                     holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                    holder.ownDeletedMessageText.setText(context.getString(R.string.text_deleted_message));
                     holder.ownDeletedMessage.setVisibility(View.VISIBLE);
                 }
                 else{
@@ -328,8 +335,33 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("Message type TRUNCATE");
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.contentOwnMessageText.setText(context.getString(R.string.text_cleared_history));
+                holder.ownDeletedMessageText.setText(context.getString(R.string.text_cleared_history));
                 holder.ownDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
+                log("Message type ALTER PARTICIPANTS: "+message.getContent());
+
+                holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                holder.ownDeletedMessageText.setText("Alter participants");
+                holder.ownDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
+                log("Message type PRIVILEGE CHANGE: "+message.getContent());
+
+                holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                holder.ownDeletedMessageText.setText("Privilege changed");
+                holder.ownDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
+                log("Message type TITLE CHANGE: "+message.getContent());
+
+                holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                holder.ownDeletedMessageText.setText("Title changed");
+                holder.ownDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("Type message: "+message.getType());
+                log("Content: "+message.getContent());
             }
         }
         else{
@@ -456,6 +488,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 else if(message.isDeleted()){
                     log("Message is deleted");
                     holder.contentContactMessageLayout.setVisibility(View.GONE);
+                    holder.contactDeletedMessageText.setText(context.getString(R.string.text_deleted_message));
                     holder.contactDeletedMessage.setVisibility(View.VISIBLE);
                 }
                 else{
@@ -467,7 +500,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("Message type TRUNCATE");
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contentContactMessageText.setText(context.getString(R.string.text_cleared_history));
+                holder.contactDeletedMessageText.setText(context.getString(R.string.text_cleared_history));
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
             }
             else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
@@ -475,6 +508,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
                 holder.contactDeletedMessageText.setText("Alter participants");
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
+                log("Message type PRIVILEGE CHANGE: "+message.getContent());
+
+                holder.contentContactMessageLayout.setVisibility(View.GONE);
+                holder.contactDeletedMessageText.setText("Privilege changed");
+                holder.contactDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
+                log("Message type CHANGE TITLE "+message.getContent());
+
+                holder.contentContactMessageLayout.setVisibility(View.GONE);
+                holder.contactDeletedMessageText.setText("Title changed");
+                holder.contactDeletedMessage.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("Type message: "+message.getType());
+                log("Content: "+message.getContent());
             }
         }
 

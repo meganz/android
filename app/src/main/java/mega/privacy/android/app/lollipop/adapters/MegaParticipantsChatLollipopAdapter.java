@@ -481,23 +481,16 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		int currentPosition = holder.currentPosition;
 		MegaChatParticipant p = (MegaChatParticipant) getItem(currentPosition);
 
+		if(p==null){
+			log("Participant is null");
+		}
+		else{
+			log("Selected: "+p.getFullName());
+		}
+
 		switch (v.getId()){
 			case R.id.participant_list_three_dots:{
 				log("contact_list_three_dots");
-				if (positionClicked == -1){
-					positionClicked = currentPosition;
-					notifyDataSetChanged();
-				}
-				else{
-					if (positionClicked == currentPosition){
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-					else{
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
-				}
 				((GroupChatInfoActivityLollipop) context).showParticipantsOptionsPanel(p);
 				break;
 			}
@@ -516,6 +509,20 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		this.participants = participants;
 		positionClicked = -1;
 		notifyDataSetChanged();
+	}
+
+	public void updateParticipant(int position, ArrayList<MegaChatParticipant> participants){
+		log("updateParticipant");
+		this.participants = participants;
+		positionClicked = -1;
+		notifyItemChanged(position);
+	}
+
+	public void removeParticipant(int position, ArrayList<MegaChatParticipant> participants){
+		log("updateParticipant");
+		this.participants = participants;
+		positionClicked = -1;
+		notifyItemRemoved(position);
 	}
 	
 	public String getDescription(ArrayList<MegaNode> nodes){
