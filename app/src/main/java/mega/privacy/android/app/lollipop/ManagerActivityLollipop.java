@@ -214,6 +214,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public FrameLayout chatOutLayout;
 	public RoundedImageView chatImageView;
 	public TextView chatInitialLetter;
+	public TextView infoChatText;
 	public LinearLayout chatLayout;
 	public LinearLayout optionInfoChat;
 	public LinearLayout optionLeaveChat;
@@ -1344,16 +1345,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//Sliding CHAT panel
 		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
-		titleNameContactChatPanel = (TextView) findViewById(R.id.file_list_chat_name_text);
-		titleMailContactChatPanel = (TextView) findViewById(R.id.file_list_chat_mail_text);
-		chatLayout = (LinearLayout) findViewById(R.id.file_list_chat);
+		titleNameContactChatPanel = (TextView) findViewById(R.id.chat_list_chat_name_text);
+		titleMailContactChatPanel = (TextView) findViewById(R.id.chat_list_chat_mail_text);
+		chatLayout = (LinearLayout) findViewById(R.id.chat_list_chat);
 		chatImageView = (RoundedImageView) findViewById(R.id.sliding_chat_list_thumbnail);
 		chatInitialLetter = (TextView) findViewById(R.id.sliding_chat_list_initial_letter);
-		chatOutLayout = (FrameLayout) findViewById(R.id.file_list_out_chat);
-		optionInfoChat = (LinearLayout) findViewById(R.id.file_list_info_chat_layout);
-		optionLeaveChat= (LinearLayout) findViewById(R.id.file_list_leave_chat_layout);
-		optionClearHistory = (LinearLayout) findViewById(R.id.file_list_clear_history_chat_layout);
-		optionMuteChat = (LinearLayout) findViewById(R.id.file_list_mute_chat_layout);
+		infoChatText = (TextView) findViewById(R.id.chat_list_info_chat_text);
+		chatOutLayout = (FrameLayout) findViewById(R.id.chat_list_out_chat);
+		optionInfoChat = (LinearLayout) findViewById(R.id.chat_list_info_chat_layout);
+		optionLeaveChat= (LinearLayout) findViewById(R.id.chat_list_leave_chat_layout);
+		optionClearHistory = (LinearLayout) findViewById(R.id.chat_list_clear_history_chat_layout);
+		optionMuteChat = (LinearLayout) findViewById(R.id.chat_list_mute_chat_layout);
 
 		chatPanelListener = new ChatPanelListener(this);
 
@@ -12470,10 +12472,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		fabButton.setVisibility(View.GONE);
 		if(chat.isGroup()){
+			infoChatText.setText(getString(R.string.group_chat_info_label));
 			optionLeaveChat.setVisibility(View.VISIBLE);
 			optionClearHistory.setVisibility(View.VISIBLE);
 		}
 		else{
+			infoChatText.setText(getString(R.string.contact_properties_activity));
 			optionLeaveChat.setVisibility(View.GONE);
 			optionClearHistory.setVisibility(View.VISIBLE);
 		}

@@ -35,7 +35,7 @@ public class ChatPanelListener implements View.OnClickListener {
 
         switch(v.getId()){
 
-            case R.id.file_list_info_chat_layout:{
+            case R.id.chat_list_info_chat_layout:{
                 log("click contact info");
                 ((ManagerActivityLollipop)context).hideChatPanel();
                 if(selectedChat==null){
@@ -60,7 +60,7 @@ public class ChatPanelListener implements View.OnClickListener {
                 break;
             }
 
-            case R.id.file_list_leave_chat_layout:{
+            case R.id.chat_list_leave_chat_layout:{
                 log("click leave chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
 //                Intent intent = new Intent();
@@ -72,7 +72,7 @@ public class ChatPanelListener implements View.OnClickListener {
                 break;
             }
 
-            case R.id.file_list_clear_history_chat_layout:{
+            case R.id.chat_list_clear_history_chat_layout:{
                 log("click clear history chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
                 if(selectedChat==null){
@@ -83,7 +83,7 @@ public class ChatPanelListener implements View.OnClickListener {
                 break;
             }
 
-            case R.id.file_list_mute_chat_layout:{
+            case R.id.chat_list_mute_chat_layout:{
                 log("click mute chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
 //                Intent intent = new Intent();
@@ -95,7 +95,7 @@ public class ChatPanelListener implements View.OnClickListener {
                 break;
             }
 
-            case R.id.file_list_out_chat:{
+            case R.id.chat_list_out_chat:{
                 log("click out chat panel");
                 ((ManagerActivityLollipop)context).hideChatPanel();
                 break;
