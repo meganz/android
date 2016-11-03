@@ -444,6 +444,32 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
         log("onChatListItemUpdate");
 //        chats=megaChatApi.getChatRooms();
+        int changes = item.getChanges();
+        if(changes==MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT){
+            log("Unread count change!!");
+        }
+        else{
+            log("Otro change");
+        }
+
+        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
+            log("Change status");
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
+            log("Change unread count: "+item.getTitle());
+            log("Unread: "+item.getUnreadCount());
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
+            log("Change participants");
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)){
+            log("Change visibility");
+
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)){
+            log("Change title");
+        }
+
     }
 
     @Override

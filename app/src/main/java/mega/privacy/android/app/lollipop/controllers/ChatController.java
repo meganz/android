@@ -67,7 +67,16 @@ public class ChatController {
     }
 
     public void alterParticipantsPermissions(long chatid, long uh, int privilege){
+        log("alterParticipantsPermissions: "+uh);
         megaChatApi.updateChatPermissions(chatid, uh, privilege, (GroupChatInfoActivityLollipop) context);
+    }
+
+    public void removeParticipant(long chatid, long uh){
+        log("removeParticipant: "+uh);
+        if(context==null){
+            log("Context is NULL");
+        }
+        megaChatApi.removeFromChat(chatid, uh, (GroupChatInfoActivityLollipop) context);
     }
 
     public static void log(String message) {
