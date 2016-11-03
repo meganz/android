@@ -240,6 +240,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTitleChatText.setText(chat.getTitle());
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
             participantsCount = chat.getPeerCount();
+            log("Participants count: "+participantsCount);
             infoNumParticipantsText.setText(participantsCount+ " "+ getString(R.string.participants_chat_label));
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
@@ -337,6 +338,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 String participantLastName = chat.getPeerLastname(i);
 
 //                chat.getOnlineStatus()
+                log("First of the peer: "+participantFirstName);
+                log("Last of the peer: "+participantLastName);
 
                 String fullName;
 
@@ -346,7 +349,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 else{
                     fullName = participantFirstName + " " + participantLastName;
                 }
-                log("Name of the peer: "+fullName);
+                log("FullName of the peer: "+fullName);
 
                 int status = megaChatApi.getUserOnlineStatus(peerHandle);
 
@@ -615,13 +618,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         int permission = chat.getPeerPrivilegeByHandle(participant.getHandle());
 
         if(permission==MegaChatRoom.PRIV_STANDARD) {
-            titleMailContactChatPanel.setText("Member");
+            titleMailContactChatPanel.setText(getString(R.string.member_permission_label_participants_panel));
         }
         else if(permission==MegaChatRoom.PRIV_MODERATOR){
-            titleMailContactChatPanel.setText("Administrator");
+            titleMailContactChatPanel.setText(getString(R.string.administrator_permission_label_participants_panel));
         }
         else{
-            titleMailContactChatPanel.setText("Observer");
+            titleMailContactChatPanel.setText(getString(R.string.observer_permission_label_participants_panel));
         }
 
         addAvatarParticipantPanel(participant);
