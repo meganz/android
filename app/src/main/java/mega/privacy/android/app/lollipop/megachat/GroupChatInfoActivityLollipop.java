@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -132,8 +133,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public RoundedImageView contactImageView;
     public TextView contactInitialLetter;
     public LinearLayout contactLayout;
+    public LinearLayout optionContactInfoChat;
+    public LinearLayout optionStartConversationChat;
+    public LinearLayout optionEditProfileChat;
+    public LinearLayout optionLeaveChat;
     public LinearLayout optionChangePermissionsChat;
-    public LinearLayout optionRemoveChat;
+    public LinearLayout optionRemoveParticipantChat;
     private ParticipantPanelListener participantPanelListener;
     ////
 
@@ -329,13 +334,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+            //Sliding panel layout
+
+
             participants = new ArrayList<>();
+
+            //Set the first element = me
+            MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), MegaChatApi.STATUS_ONLINE);
+            participants.add(me);
 
             for(int i=0;i<participantsCount;i++){
                 long peerHandle = chat.getPeerHandle(i);
                 int peerPrivilege = chat.getPeerPrivilege(i);
-                String participantFirstName = chat.getPeerFirstname(i);
-                String participantLastName = chat.getPeerLastname(i);
+//                String participantFirstName = chat.getPeerFirstname(i);
+                String participantFirstName = "Pepe";
+                String participantLastName = "Botella";
 
 //                chat.getOnlineStatus()
                 log("First of the peer: "+participantFirstName);
@@ -371,6 +384,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 participants.add(participant);
             }
 
+
+
             if (adapter == null){
                 adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
             }
@@ -389,13 +404,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             contactImageView = (RoundedImageView) findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
             contactInitialLetter = (TextView) findViewById(R.id.sliding_group_participants_chat_list_initial_letter);
             contactOutLayout = (FrameLayout) findViewById(R.id.out_group_participants_chat);
+            optionContactInfoChat = (LinearLayout) findViewById(R.id.contact_info_group_participants_chat_layout);
+            optionStartConversationChat = (LinearLayout) findViewById(R.id.start_chat_group_participants_chat_layout);
+            optionEditProfileChat = (LinearLayout) findViewById(R.id.edit_profile_group_participants_chat_layout);
+            optionLeaveChat = (LinearLayout) findViewById(R.id.leave_group_participants_chat_layout);
             optionChangePermissionsChat = (LinearLayout) findViewById(R.id.change_permissions_group_participants_chat_layout);
-            optionRemoveChat= (LinearLayout) findViewById(R.id.remove_group_participants_chat_layout);
+            optionRemoveParticipantChat= (LinearLayout) findViewById(R.id.remove_group_participants_chat_layout);
 
             participantPanelListener = new ParticipantPanelListener(this);
 
             optionChangePermissionsChat.setOnClickListener(participantPanelListener);
-            optionRemoveChat.setOnClickListener(participantPanelListener);
+            optionRemoveParticipantChat.setOnClickListener(participantPanelListener);
             contactOutLayout.setOnClickListener(participantPanelListener);
 
             slidingParticipantPanel.setVisibility(View.INVISIBLE);
@@ -614,7 +633,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         titleNameContactChatPanel.setText(participant.getFullName());
-
         int permission = chat.getPeerPrivilegeByHandle(participant.getHandle());
 
         if(permission==MegaChatRoom.PRIV_STANDARD) {
@@ -625,6 +643,46 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             titleMailContactChatPanel.setText(getString(R.string.observer_permission_label_participants_panel));
+        }
+
+        if(participant.getHandle() == megaApi.getMyUser().getHandle()){
+            log("Participant selected its me");
+            optionEditProfileChat.setVisibility(View.VISIBLE);
+            optionLeaveChat.setVisibility(View.VISIBLE);
+            optionContactInfoChat.setVisibility(View.GONE);
+            optionStartConversationChat.setVisibility(View.GONE);
+
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                optionChangePermissionsChat.setVisibility(View.VISIBLE);
+                optionRemoveParticipantChat.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionChangePermissionsChat.setVisibility(View.GONE);
+                optionRemoveParticipantChat.setVisibility(View.GONE);
+            }
+        }
+        else{
+            optionEditProfileChat.setVisibility(View.GONE);
+            optionLeaveChat.setVisibility(View.GONE);
+
+            if(participant.getEmail()!=null){
+                optionContactInfoChat.setVisibility(View.VISIBLE);
+                optionStartConversationChat.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionContactInfoChat.setVisibility(View.GONE);
+                optionStartConversationChat.setVisibility(View.GONE);
+            }
+
+            log("Other participant selected its me");
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                optionChangePermissionsChat.setVisibility(View.VISIBLE);
+                optionRemoveParticipantChat.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionChangePermissionsChat.setVisibility(View.GONE);
+                optionRemoveParticipantChat.setVisibility(View.GONE);
+            }
         }
 
         addAvatarParticipantPanel(participant);

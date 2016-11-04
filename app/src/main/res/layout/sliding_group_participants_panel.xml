@@ -141,37 +141,6 @@
                 android:textSize="16sp"/>
         </LinearLayout>
 
-        <!--Add contact-->
-        <LinearLayout
-            android:id="@+id/add_contact_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
-
-            <ImageView
-                android:id="@+id/add_contact_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:layout_marginLeft="5dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_add_contact"
-                android:visibility="visible" />
-
-            <TextView
-                android:id="@+id/add_contact_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/menu_add_contact"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
-
         <!--Start conversation-->
         <LinearLayout
             android:id="@+id/start_chat_group_participants_chat_layout"
@@ -296,7 +265,7 @@
                 android:textSize="16sp"/>
         </LinearLayout>
 
-        <!--Edit profile-->
+        <!--Leave chat-->
         <LinearLayout
             android:id="@+id/leave_group_participants_chat_layout"
             android:layout_width="match_parent"

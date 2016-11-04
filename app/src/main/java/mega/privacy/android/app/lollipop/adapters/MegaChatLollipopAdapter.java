@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -23,16 +24,20 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -44,6 +49,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     ArrayList<Integer> infoToShow;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
     int type;
     private SparseBooleanArray selectedItems;
@@ -62,6 +68,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        }
+
         listFragment = _listView;
 
         if(messages!=null)
@@ -74,12 +84,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     }
 
     /*private view holder class*/
-    public class ViewHolderMessageChatList extends RecyclerView.ViewHolder {
+    public static class ViewHolderMessageChatList extends RecyclerView.ViewHolder {
         public ViewHolderMessageChatList(View view) {
             super(view);
         }
 
         int currentPosition;
+        long userHandle;
+        String fullName;
+        String firstNameText;
+        String lastNameText;
+        boolean firstNameReceived;
+        boolean lastNameReceived;
 
         RelativeLayout itemLayout;
 
@@ -112,6 +128,51 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         RelativeLayout contactMultiselectionLayout;
         ImageView contactMultiselectionImageView;
         ImageView contactMultiselectionTickIcon;
+
+        public long getUserHandle (){
+            return userHandle;
+        }
+
+        public void setFirstNameReceived (){
+            this.firstNameReceived=true;
+        }
+        public void setLastNameReceived (){
+            this.lastNameReceived=true;
+        }
+
+        public void setFirstNameText(String firstNameText){
+            log("First name: "+firstNameText);
+            this.firstNameText = firstNameText;
+        }
+
+        public void setLastNameText(String lastNameText){
+            log("Last name: "+lastNameText);
+            this.lastNameText=lastNameText;
+        }
+        public int getCurrentPosition (){
+            return currentPosition;
+        }
+
+        public void setNameNonContact(){
+            log("setNameNonContact: "+currentPosition);
+            if(firstNameReceived && lastNameReceived) {
+                log("Name and First Name received!");
+                firstNameReceived= false;
+                lastNameReceived = false;
+
+                if (firstNameText.trim().length() <= 0){
+                    fullName = lastNameText;
+                }
+                else{
+                    fullName = firstNameText + " " + lastNameText;
+                }
+
+                if (fullName.trim().length() > 0){
+                    this.contactText.setText(fullName);
+                }
+
+            }
+        }
     }
     ViewHolderMessageChatList holder;
 
@@ -225,9 +286,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     @Override
     public void onBindViewHolder(ViewHolderMessageChatList holder, int position) {
-        log("onBindViewHolder");
+        log("onBindViewHolder: "+position);
         holder.currentPosition = position;
+
         MegaChatMessage message = messages.get(position);
+        holder.userHandle = message.getUserHandle();
 
 //        String myMail = ((ChatActivityLollipop) context).getMyMail();
         if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
@@ -368,7 +431,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             log("Contact message!!");
             long userHandle = message.getUserHandle();
 
-            String fullName;
             String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(userHandle);
             String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(userHandle);
 
@@ -382,33 +444,41 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(((ChatActivityLollipop) context).isGroup()){
 
                 if (participantFirstName.trim().length() <= 0){
-                    fullName = participantLastName;
+                    holder.fullName = participantLastName;
                 }
                 else{
-                    fullName = participantFirstName + " " + participantLastName;
+                    holder.fullName = participantFirstName + " " + participantLastName;
                 }
 
-                if(fullName!=null){
-                    if(fullName.trim().length()<=0){
+                if(holder.fullName!=null){
+                    if(holder.fullName.trim().length()<=0){
                         holder.contactText.setText("Participant left");
+
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                        megaChatApi.getUserFirstname(holder.userHandle, listener);
+                        megaChatApi.getUserLastname(holder.userHandle, listener);
                     }
                     else{
-                        holder.contactText.setText(fullName);
+                        holder.contactText.setText(holder.fullName);
                     }
                 }
                 else{
                     holder.contactText.setText("Participant left");
+
+                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                    megaChatApi.getUserFirstname(holder.userHandle, listener);
+                    megaChatApi.getUserLastname(holder.userHandle, listener);
                 }
             }
             else{
                 if (participantFirstName.trim().length() <= 0){
-                    fullName = participantLastName.trim();
+                    holder.fullName = participantLastName.trim();
                 }
                 else{
-                    fullName = participantFirstName.trim();
+                    holder.fullName = participantFirstName.trim();
                 }
 
-                holder.contactText.setText(fullName);
+                holder.contactText.setText(holder.fullName);
             }
 
             if (!multipleSelect) {
