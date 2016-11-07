@@ -893,7 +893,7 @@
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Call ringtone</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Notification sound</string>
 
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Clear all messages?\nAfter cleared, neither %s nor you will be able to see messages of this chat.</string>
+    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">After cleared, neither %s nor you will be able to see messages of this chat.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Clear</string>
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
@@ -938,10 +938,12 @@
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     <string name="administrator_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Administrator</string>
 
-    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat. Leave final space.">changed the group chat name to </string>
-    <string name="edited_message_text" context="Text appended to a edited message. Leave initial space."> (edited)</string>
+    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">changed the group chat name to</string>
+    <string name="edited_message_text" context="Text appended to a edited message.">(edited)</string>
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">If you leave, you will no longer have access to read or send messages.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Leave group chat?</string>
 
+    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">After cleared, you won\'t be able to see messages of this chat.</string>
+    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear all messages?</string>
 </resources>

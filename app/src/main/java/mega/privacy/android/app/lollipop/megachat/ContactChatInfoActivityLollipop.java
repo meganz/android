@@ -767,7 +767,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		String message= getResources().getString(R.string.confirmation_clear_chat,chat.getTitle());
-
+		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}

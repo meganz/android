@@ -368,7 +368,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    holder.contentOwnMessageText.append(edited);
+                    holder.contentOwnMessageText.append(" "+edited);
                     holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
                     holder.ownDeletedMessage.setVisibility(View.GONE);
                 }
@@ -427,10 +427,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
                 content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.ownDeletedMessageText.setText(content);
-                Spannable edited = new SpannableString(messageContent);
-                edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                Spannable newTitle = new SpannableString(messageContent);
+                newTitle.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                holder.ownDeletedMessageText.append(edited);
+                holder.ownDeletedMessageText.append(" "+newTitle);
                 holder.ownDeletedMessageText.setGravity(Gravity.RIGHT);
 
                 holder.ownDeletedMessage.setVisibility(View.VISIBLE);
@@ -569,7 +569,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    holder.contentContactMessageText.append(edited);
+                    holder.contentContactMessageText.append(" "+edited);
                     holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                     holder.contactDeletedMessage.setVisibility(View.GONE);
                 }
@@ -615,10 +615,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
                 content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.contactDeletedMessageText.setText(content);
-                Spannable edited = new SpannableString(messageContent);
-                edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                Spannable newTitle = new SpannableString(messageContent);
+                newTitle.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                holder.contactDeletedMessageText.append(edited);
+                holder.contactDeletedMessageText.append(" "+newTitle);
                 holder.contactDeletedMessageText.setGravity(Gravity.LEFT);
 
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);

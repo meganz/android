@@ -59,6 +59,9 @@ public class ChatController {
         else if(context instanceof ContactChatInfoActivityLollipop){
             megaChatApi.clearChatHistory(chat.getChatId(), (ContactChatInfoActivityLollipop) context);
         }
+        else if(context instanceof GroupChatInfoActivityLollipop){
+            megaChatApi.clearChatHistory(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
+        }
     }
 
     public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
