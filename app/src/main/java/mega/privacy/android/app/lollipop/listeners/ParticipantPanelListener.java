@@ -38,6 +38,18 @@ public class ParticipantPanelListener implements View.OnClickListener {
 
         switch(v.getId()){
 
+            case R.id.contact_info_group_participants_chat_layout: {
+                log("contact info participants panel");
+//                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(selectedParticipant, selectedChat);
+                break;
+            }
+
+            case R.id.start_chat_group_participants_chat_layout: {
+                log("stasrt chat participants panel");
+//                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(selectedParticipant, selectedChat);
+                break;
+            }
+
             case R.id.change_permissions_group_participants_chat_layout: {
                 log("change permissions participants panel");
                 ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(selectedParticipant, selectedChat);
@@ -47,6 +59,19 @@ public class ParticipantPanelListener implements View.OnClickListener {
             case R.id.remove_group_participants_chat_layout: {
                 log("remove participants panel");
                 ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(selectedParticipant, selectedChat);
+                break;
+            }
+
+            case R.id.edit_profile_group_participants_chat_layout: {
+                log("edit profile participants panel");
+//                ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(selectedParticipant, selectedChat);
+                break;
+            }
+
+            case R.id.leave_group_participants_chat_layout: {
+                log("leave chat participants panel");
+                ((GroupChatInfoActivityLollipop) context).hideParticipantsOptionsPanel();
+                ((GroupChatInfoActivityLollipop) context).showConfirmationLeaveChat(selectedChat);
                 break;
             }
 
