@@ -90,6 +90,15 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
 
+                <ImageView
+                    android:id="@+id/chat_list_contact_state"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_alignTop="@id/chat_list_chat_name_text"
+                    android:layout_toRightOf="@id/chat_list_chat_name_text"
+                    android:background="@null"
+                    android:src="@drawable/circle_status_contact_not_connected" />
+
                 <TextView
                     android:id="@+id/chat_list_chat_mail_text"
                     android:layout_width="wrap_content"

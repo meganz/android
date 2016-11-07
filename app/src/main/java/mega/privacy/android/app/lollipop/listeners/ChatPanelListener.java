@@ -59,19 +59,16 @@ public class ChatPanelListener implements View.OnClickListener {
 
                 break;
             }
-
             case R.id.chat_list_leave_chat_layout:{
                 log("click leave chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
-//                Intent intent = new Intent();
-//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//                intent.setType("*/*");
-//                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                if(selectedChat==null){
+                    log("Selected chat NULL");
+                }
+                log("Leave chat with: "+selectedChat.getTitle());
+                ((ManagerActivityLollipop)context).showConfirmationLeaveChat(selectedChat);
                 break;
             }
-
             case R.id.chat_list_clear_history_chat_layout:{
                 log("click clear history chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
@@ -82,7 +79,6 @@ public class ChatPanelListener implements View.OnClickListener {
                 chatC.clearHistory(selectedChat);
                 break;
             }
-
             case R.id.chat_list_mute_chat_layout:{
                 log("click mute chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
