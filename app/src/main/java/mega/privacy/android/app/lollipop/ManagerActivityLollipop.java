@@ -71,6 +71,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -113,6 +114,7 @@ import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
@@ -137,6 +139,7 @@ import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -210,6 +213,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	//CHAT PANEL
 	private SlidingUpPanelLayout slidingChatPanel;
 	public TextView titleNameContactChatPanel;
+	public ImageView iconStateChatPanel;
 	public TextView titleMailContactChatPanel;
 	public FrameLayout chatOutLayout;
 	public RoundedImageView chatImageView;
@@ -1345,6 +1349,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		//Sliding CHAT panel
 		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
+		iconStateChatPanel = (ImageView) findViewById(R.id.chat_list_contact_state);
+
+		iconStateChatPanel.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
+		iconStateChatPanel.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
+
+		RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)iconStateChatPanel.getLayoutParams();
+		stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
+		iconStateChatPanel.setLayoutParams(stateIconParams);
+
 		titleNameContactChatPanel = (TextView) findViewById(R.id.chat_list_chat_name_text);
 		titleMailContactChatPanel = (TextView) findViewById(R.id.chat_list_chat_mail_text);
 		chatLayout = (LinearLayout) findViewById(R.id.chat_list_chat);
@@ -8445,6 +8458,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationLeaveChat (final MegaChatRoom c){
+		log("showConfirmationLeaveChat");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						ChatController chatC = new ChatController(managerActivity);
+						chatC.leaveChat(c);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+		String message= getResources().getString(R.string.confirmation_leave_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
 	public void showConfirmationResetPasswordFromMyAccount (){
 		log("showConfirmationResetPasswordFromMyAccount: ");
 
@@ -10728,6 +10767,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
 			}
 		}
+		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
+			log("remove from chat finish!!!");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				//Update chat view
+				if(rChatFL!=null){
+					rChatFL.setChats();
+				}
+			}
+			else{
+				log("EEEERRRRROR WHEN leaving CHAT " + e.getErrorString());
+			}
+		}
 	}
 
 	@Override
@@ -12457,10 +12508,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(chat.isGroup()){
 			titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
+			iconStateChatPanel.setVisibility(View.GONE);
 			addAvatarChatPanel(null, chat);
 		}
 		else{
 			long userHandle = chat.getPeerHandle(0);
+
+			iconStateChatPanel.setVisibility(View.VISIBLE);
+			int state = chat.getOnlineStatus();
+			if(state == MegaChatApi.STATUS_ONLINE){
+				log("This user is connected: "+chat.getTitle());
+				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_connected));
+			}
+			else{
+				log("This user status is: "+state+  " " + chat.getTitle());
+				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_not_connected));
+			}
 
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 			MegaUser user = megaApi.getContact(userHandleEncoded);

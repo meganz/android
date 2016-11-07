@@ -941,4 +941,7 @@
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat. Leave final space.">changed the group chat name to </string>
     <string name="edited_message_text" context="Text appended to a edited message. Leave initial space."> (edited)</string>
 
+    <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">If you leave, you will no longer have access to read or send messages.</string>
+    <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Leave group chat?</string>
+
 </resources>

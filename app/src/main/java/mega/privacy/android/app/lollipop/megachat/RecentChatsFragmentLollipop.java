@@ -478,8 +478,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
                     while (itrReplace.hasNext()) {
                         MegaChatRoom chat = itrReplace.next();
-                        if(chat.getChatId()==chatHandleToUpdate){
-                            indexToReplace = itrReplace.nextIndex()-1;
+                        if(chat!=null){
+                            if(chat.getChatId()==chatHandleToUpdate){
+                                indexToReplace = itrReplace.nextIndex()-1;
+                                break;
+                            }
+                        }
+                        else{
                             break;
                         }
                     }

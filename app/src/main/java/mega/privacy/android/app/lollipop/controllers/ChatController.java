@@ -40,6 +40,14 @@ public class ChatController {
         }
     }
 
+    public void leaveChat(MegaChatRoom chat){
+        if(context instanceof ManagerActivityLollipop){
+            megaChatApi.leaveChat(chat.getChatId(), (ManagerActivityLollipop) context);
+        }
+        else if(context instanceof GroupChatInfoActivityLollipop){
+            megaChatApi.leaveChat(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
+        }
+    }
     public void clearHistory(MegaChatRoom chat){
         log("clearHistory: "+chat.getTitle());
         if(context instanceof ManagerActivityLollipop){

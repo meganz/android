@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -137,6 +138,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     //CHAT PANEL
     private SlidingUpPanelLayout slidingParticipantPanel;
     public TextView titleNameContactChatPanel;
+    ImageView stateIcon;
     public TextView titleMailContactChatPanel;
     public FrameLayout contactOutLayout;
     public RoundedImageView contactImageView;
@@ -352,9 +354,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-            //Sliding panel layout
-
-
             participants = new ArrayList<>();
 
             //Set the first element = me
@@ -417,6 +416,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             //Sliding CHAT panel
             slidingParticipantPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_group_participants_chat);
             titleNameContactChatPanel = (TextView) findViewById(R.id.group_participants_chat_name_text);
+            stateIcon = (ImageView) findViewById(R.id.group_participants_state_circle);
+
+            stateIcon.setVisibility(View.VISIBLE);
+
+            stateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
+            stateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
+
+            RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)stateIcon.getLayoutParams();
+            stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
+            stateIcon.setLayoutParams(stateIconParams);
+
             titleMailContactChatPanel = (TextView) findViewById(R.id.group_participants_chat_mail_text);
             contactLayout = (LinearLayout) findViewById(R.id.group_participants_chat);
             contactImageView = (RoundedImageView) findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
@@ -669,6 +679,16 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             titleMailContactChatPanel.setText(getString(R.string.observer_permission_label_participants_panel));
         }
 
+        int state = participant.getStatus();
+        if(state == MegaChatApi.STATUS_ONLINE){
+            log("This user is connected: "+chat.getTitle());
+            stateIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.circle_status_contact_connected));
+        }
+        else{
+            log("This user status is: "+state+  " " + chat.getTitle());
+            stateIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.circle_status_contact_not_connected));
+        }
+
         if(participant.getHandle() == megaApi.getMyUser().getHandle()){
             log("Participant selected its me");
             optionEditProfileChat.setVisibility(View.VISIBLE);
@@ -825,6 +845,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 showRenameGroupDialog();
                 break;
             }
+            case R.id.chat_group_contact_properties_leave_layout: {
+                showConfirmationLeaveChat(chat);
+                break;
+            }
         }
 
     }
@@ -927,6 +951,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
+    public void showConfirmationLeaveChat (final MegaChatRoom c){
+        log("showConfirmationLeaveChat");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE: {
+                        ChatController chatC = new ChatController(groupChatInfoActivity);
+                        chatC.leaveChat(c);
+                        break;
+                    }
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+        String message= getResources().getString(R.string.confirmation_leave_group_chat);
+        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
     @Override
     public void onBackPressed() {
         log("onBackPressed");
@@ -1019,6 +1069,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 log("NEW title: "+request.getText());
                 infoTitleChatText.setText(request.getText());
                 aB.setTitle(request.getText());
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
+            log("remove from chat finish!!!");
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                finish();
+            }
+            else{
+                log("EEEERRRRROR WHEN leaving CHAT " + e.getErrorString());
             }
         }
     }
