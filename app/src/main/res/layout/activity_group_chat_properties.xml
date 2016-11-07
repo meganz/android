@@ -80,7 +80,7 @@
                         android:id="@+id/chat_group_contact_properties_info_text_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/chat_group_properties_avatar_container_layout">                       >
+                        android:layout_toRightOf="@+id/chat_group_properties_avatar_container_layout">
 
                         <TextView
                             android:id="@+id/chat_group_contact_properties_info_title"

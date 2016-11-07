@@ -10699,6 +10699,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!");
 
+				//Update chat view
+				if(rChatFL!=null){
+					rChatFL.setChats();
+				}
+
 				log("open new chat");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
 				intent.setAction(Constants.ACTION_CHAT_NEW);
@@ -10714,9 +10719,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				}
 				else{
-					log("NOT gropou");
+					log("NOT group");
 				}
-
 
 				this.startActivity(intent);
 			}

@@ -59,7 +59,7 @@
         <RelativeLayout
             android:id="@+id/own_deleted_message_layout"
             android:layout_width="match_parent"
-            android:layout_height="26dp"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_below="@+id/title_own_message_layout"
             android:visibility="gone">
@@ -155,7 +155,7 @@
         <RelativeLayout
             android:id="@+id/contact_deleted_message_layout"
             android:layout_width="match_parent"
-            android:layout_height="26dp"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_below="@+id/title_contact_message_layout"
             android:visibility="gone">
