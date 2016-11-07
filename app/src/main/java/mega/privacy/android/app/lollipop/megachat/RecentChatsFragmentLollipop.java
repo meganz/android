@@ -29,12 +29,14 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -152,6 +154,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
 
+        this.setChats();
+
+        return v;
+    }
+
+    public static RecentChatsFragmentLollipop newInstance() {
+        log("newInstance");
+        RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
+        return fragment;
+    }
+
+    public void setChats(){
         chats = megaChatApi.getChatRooms();
 
         if (adapterList == null){
@@ -174,14 +188,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             listView.setVisibility(View.VISIBLE);
             emptyLayout.setVisibility(View.GONE);
         }
-
-        return v;
-    }
-
-    public static RecentChatsFragmentLollipop newInstance() {
-        log("newInstance");
-        RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
-        return fragment;
     }
 
     @Override
@@ -443,14 +449,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
         log("onChatListItemUpdate");
-//        chats=megaChatApi.getChatRooms();
-        int changes = item.getChanges();
-        if(changes==MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT){
-            log("Unread count change!!");
-        }
-        else{
-            log("Otro change");
-        }
 
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("Change status");
@@ -468,6 +466,45 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)){
             log("Change title");
+
+            if(item!=null){
+
+                if (adapterList == null || adapterList.getItemCount()==0){
+                    setChats();
+                }
+                else{
+                    long chatHandleToUpdate = item.getChatId();
+                    int indexToReplace = -1;
+                    ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatRoom chat = itrReplace.next();
+                        if(chat.getChatId()==chatHandleToUpdate){
+                            indexToReplace = itrReplace.nextIndex()-1;
+                            break;
+                        }
+                    }
+                    if(indexToReplace!=-1){
+                        log("Index to replace: "+indexToReplace);
+                        MegaChatRoom chatToReplace = megaChatApi.getChatRoom(item.getChatId());
+                        chats.set(indexToReplace, chatToReplace);
+
+                        adapterList.modifyChat(chats, indexToReplace);
+                        adapterList.setPositionClicked(-1);
+
+                        if (adapterList.getItemCount() == 0){
+                            log("adapterList.getItemCount() == 0");
+                            listView.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            log("adapterList.getItemCount() NOT = 0");
+                            listView.setVisibility(View.VISIBLE);
+                            emptyLayout.setVisibility(View.GONE);
+                        }
+                    }
+                }
+            }
+
         }
 
     }
@@ -475,6 +512,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         log("onChatRoomUpdate");
+
+
 
     }
 

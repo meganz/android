@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
@@ -909,6 +910,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		
 		return info;
+	}
+
+	public void modifyChat(ArrayList<MegaChatRoom> chats, int position){
+		this.chats = chats;
+		notifyItemChanged(position);
 	}
 	
 	private static void log(String log) {

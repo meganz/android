@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,16 +17,21 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,6 +46,7 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -64,6 +71,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -80,6 +88,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     MegaChatParticipant selectedParticipant;
 
     AlertDialog permissionsDialog;
+    AlertDialog changeTitleDialog;
 
     private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
@@ -246,12 +255,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
             participantsCount = chat.getPeerCount();
             log("Participants count: "+participantsCount);
-            infoNumParticipantsText.setText(participantsCount+ " "+ getString(R.string.participants_chat_label));
+            long participantsLabel = participantsCount+1; //Add one to include me
+            infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
             paramsEditIcon.leftMargin = Util.scaleWidthPx(15, outMetrics);
             editImageView.setLayoutParams(paramsEditIcon);
+            editImageView.setOnClickListener(this);
+
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                editImageView.setVisibility(View.VISIBLE);
+            }
+            else{
+                editImageView.setVisibility(View.GONE);
+            }
 
             //Notifications Layout
 
@@ -453,6 +471,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.removeParticipant(chatHandle, selectedParticipant.getHandle());
         hideParticipantsOptionsPanel();
+    }
+
+    public void changeTitle(String title){
+        log("changeTitle: "+title);
+        ChatController cC = new ChatController(groupChatInfoActivity);
+        cC.changeTitle(chatHandle, title);
     }
 
     public void showChangePermissionsDialog(MegaChatParticipant participant, MegaChatRoom chatToChange){
@@ -794,6 +818,113 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     public void onClick(View view) {
 
+        log("onClick");
+        switch (view.getId()) {
+
+            case R.id.chat_group_contact_properties_edit_icon: {
+                showRenameGroupDialog();
+                break;
+            }
+        }
+
+    }
+
+    public void showRenameGroupDialog(){
+        log("showRenameGroupDialog");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        final EditText input = new EditText(this);
+        layout.addView(input, params);
+
+        input.setSingleLine();
+        input.setHint(chat.getTitle());
+        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+
+        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    String title = input.getText().toString();
+                    if(title.equals("")||title.isEmpty()){
+                        log("input is empty");
+                        input.setError(getString(R.string.invalid_string));
+                        input.requestFocus();
+                    }
+                    else {
+                        log("action DONE ime - change title");
+                        changeTitle(title);
+                        changeTitleDialog.dismiss();
+                    }
+                }
+                else{
+                    log("other IME" + actionId);
+                }
+                return false;
+            }
+        });
+        input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+        builder.setTitle(getString(R.string.context_rename));
+        builder.setPositiveButton(getString(R.string.context_rename),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String title = input.getText().toString();
+                        if(title.equals("")||title.isEmpty()){
+                            log("input is empty");
+                            input.setError(getString(R.string.invalid_string));
+                            input.requestFocus();
+                        }
+                        else {
+                            log("positive button pressed - change title");
+                            changeTitle(title);
+                            changeTitleDialog.dismiss();
+                        }
+                    }
+                });
+
+
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                View view = getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+            }
+        });
+
+        builder.setNegativeButton(getString(android.R.string.cancel), null);
+        builder.setView(layout);
+        changeTitleDialog = builder.create();
+        changeTitleDialog.show();
+
+        changeTitleDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("OK BTTN CHANGE");
+                String title = input.getText().toString();
+                if(title.equals("")||title.isEmpty()){
+                    log("input is empty");
+                    input.setError(getString(R.string.invalid_string));
+                    input.requestFocus();
+                }
+                else {
+                    log("positive button pressed - change title");
+                    changeTitle(title);
+                    changeTitleDialog.dismiss();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -880,6 +1011,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 adapter.removeParticipant(index, participants);
             }
 
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
+            log("Change title");
+
+            if(request.getText()!=null) {
+                log("NEW title: "+request.getText());
+                infoTitleChatText.setText(request.getText());
+                aB.setTitle(request.getText());
+            }
         }
     }
 

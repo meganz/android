@@ -79,6 +79,10 @@ public class ChatController {
         megaChatApi.removeFromChat(chatid, uh, (GroupChatInfoActivityLollipop) context);
     }
 
+    public void changeTitle(long chatid, String title){
+        megaChatApi.setChatTitle(chatid, title, (GroupChatInfoActivityLollipop) context);
+    }
+
     public static void log(String message) {
         Util.log("ChatController", message);
     }
