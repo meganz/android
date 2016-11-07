@@ -25,6 +25,8 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +93,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     AlertDialog permissionsDialog;
     AlertDialog changeTitleDialog;
+
+    MenuItem addParticipantItem;
+    MenuItem changeTitleItem;
 
     private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
@@ -461,6 +466,51 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        log("onCreateOptionsMenuLollipop");
+
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_group_chat_info, menu);
+
+        addParticipantItem = menu.findItem(R.id.action_add_participants);
+        changeTitleItem =menu.findItem(R.id.action_rename);
+
+        int permission = chat.getOwnPrivilege();
+
+        if(permission==MegaChatRoom.PRIV_MODERATOR) {
+            addParticipantItem.setVisible(true);
+            changeTitleItem.setVisible(true);
+        }
+        else {
+            addParticipantItem.setVisible(false);
+            changeTitleItem.setVisible(false);
+        }
+
+        log("Call to super onCreateOptionsMenu");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home: {
+                finish();
+                break;
+            }
+            case R.id.action_add_participants:{
+                break;
+            }
+            case R.id.action_rename:{
+                showRenameGroupDialog();
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void showRemoveParticipantConfirmation (MegaChatParticipant participant, MegaChatRoom chatToChange){
         log("showRemoveParticipantConfirmation");
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -596,17 +646,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.alterParticipantsPermissions(chatHandle, selectedParticipant.getHandle(), newPermissions);
         hideParticipantsOptionsPanel();
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home: {
-                finish();
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void createGroupChatAvatar(){

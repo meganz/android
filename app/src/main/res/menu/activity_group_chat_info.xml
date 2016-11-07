@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+	<item
+		android:id="@+id/action_add_participants"
+		android:orderInCategory="100"
+		android:title="@string/add_participants_menu_item"
+		MEGA:showAsAction="never" />
+
+	<item
+		android:id="@+id/action_rename"
+		android:orderInCategory="101"
+		android:title="@string/change_title_option"
+		MEGA:showAsAction="never"/>
+
+</menu>
