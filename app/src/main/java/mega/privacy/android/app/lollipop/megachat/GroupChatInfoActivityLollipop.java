@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -40,6 +41,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -55,12 +57,15 @@ import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.listeners.ParticipantPanelListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -71,6 +76,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -113,6 +119,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     CoordinatorLayout fragmentContainer;
     TextView initialLetter;
     RoundedImageView avatarImageView;
+
+    ScrollView scrollView;
 
     LinearLayout infoLayout;
     RelativeLayout avatarLayout;
@@ -222,6 +230,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             aB.setDisplayHomeAsUpEnabled(true);
 
             aB.setTitle(chat.getTitle());
+
+            scrollView = (ScrollView) findViewById(R.id.scroll_view_group_chat_properties);
 
             initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
@@ -363,62 +373,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //            recyclerView.addOnItemTouchListener(this);
             recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setNestedScrollingEnabled(false);
 
             participants = new ArrayList<>();
 
-            //Set the first element = me
-            MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), MegaChatApi.STATUS_ONLINE);
-            participants.add(me);
-
-            for(int i=0;i<participantsCount;i++){
-                long peerHandle = chat.getPeerHandle(i);
-                int peerPrivilege = chat.getPeerPrivilege(i);
-//                String participantFirstName = chat.getPeerFirstname(i);
-                String participantFirstName = "Pepe";
-                String participantLastName = "Botella";
-
-//                chat.getOnlineStatus()
-                log("First of the peer: "+participantFirstName);
-                log("Last of the peer: "+participantLastName);
-
-                String fullName;
-
-                if (participantFirstName.trim().length() <= 0){
-                    fullName = participantLastName;
-                }
-                else{
-                    fullName = participantFirstName + " " + participantLastName;
-                }
-                log("FullName of the peer: "+fullName);
-
-                int status = megaChatApi.getUserOnlineStatus(peerHandle);
-
-//                String tempFullName = "";
-//                tempFullName = fullName.substring(1);
-//                fullName = tempFullName;
-
-                MegaChatParticipant participant = null;
-                String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
-                MegaUser participantContact = megaApi.getContact(userHandleEncoded);
-                if(participantContact!=null){
-                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege, status);
-
-                }
-                else{
-                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
-                }
-
-                participants.add(participant);
-            }
-
-
-
-            if (adapter == null){
-                adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
-            }
-            else{
-                adapter.setParticipants(participants);
-            }
+            setParticipants();
 
             adapter.setPositionClicked(-1);
             recyclerView.setAdapter(adapter);
@@ -466,6 +425,63 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
+    public void setParticipants(){
+        log("setParticipants");
+        //Set the first element = me
+        MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), MegaChatApi.STATUS_ONLINE);
+        participants.add(me);
+
+        participantsCount = chat.getPeerCount();
+        for(int i=0;i<participantsCount;i++){
+            long peerHandle = chat.getPeerHandle(i);
+            int peerPrivilege = chat.getPeerPrivilege(i);
+//                String participantFirstName = chat.getPeerFirstname(i);
+            String participantFirstName = "Pepe";
+            String participantLastName = "Botella";
+
+//                chat.getOnlineStatus()
+            log("First of the peer: "+participantFirstName);
+            log("Last of the peer: "+participantLastName);
+
+            String fullName;
+
+            if (participantFirstName.trim().length() <= 0){
+                fullName = participantLastName;
+            }
+            else{
+                fullName = participantFirstName + " " + participantLastName;
+            }
+            log("FullName of the peer: "+fullName);
+
+            int status = megaChatApi.getUserOnlineStatus(peerHandle);
+
+//                String tempFullName = "";
+//                tempFullName = fullName.substring(1);
+//                fullName = tempFullName;
+
+            MegaChatParticipant participant = null;
+            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
+            MegaUser participantContact = megaApi.getContact(userHandleEncoded);
+            if(participantContact!=null){
+                participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege, status);
+
+            }
+            else{
+                participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
+            }
+
+            participants.add(participant);
+        }
+
+        log("number of participants: "+participants.size());
+        if (adapter == null){
+            adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
+        }
+        else{
+            adapter.setParticipants(participants);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenuLollipop");
@@ -501,6 +517,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 break;
             }
             case R.id.action_add_participants:{
+                //
+                chooseAddParticipantDialog();
                 break;
             }
             case R.id.action_rename:{
@@ -509,6 +527,55 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void chooseAddParticipantDialog(){
+        log("chooseAddContactDialog");
+
+        Intent in = new Intent(this, AddContactActivityLollipop.class);
+//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        log("-------------------onActivityResult "+requestCode + "____" + resultCode);
+
+        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+            log("onActivityResult REQUEST_CREATE_CHAT OK");
+
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            MultipleGroupChatRequestListener multipleListener = null;
+
+            if (contactsData != null) {
+
+                if (contactsData.size() == 1) {
+                    MegaUser user = megaApi.getContact(contactsData.get(0));
+                    if (user != null) {
+                        megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
+                    }
+                } else {
+                    log("Add multiple participants "+contactsData.size());
+                    multipleListener = new MultipleGroupChatRequestListener(this);
+                    for (int i = 0; i < contactsData.size(); i++) {
+                        MegaUser user = megaApi.getContact(contactsData.get(i));
+                        if (user != null) {
+                            megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            log("Error onActivityResult: REQUEST_ADD_PARTICIPANTS");
+        }
     }
 
     public void showRemoveParticipantConfirmation (MegaChatParticipant participant, MegaChatRoom chatToChange){
@@ -1142,6 +1209,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     //                adapter.setParticipants(participants);
                         adapter.removeParticipant(index, participants);
                     }
+                    scrollView.invalidate();
                 }
             }
             else{
@@ -1170,6 +1238,25 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             else{
                 log("Error clearing history: "+e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM) {
+            log("Invite to chatroom request finish!!!");
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                log("Ok. Invited");
+                showSnackbar(getString(R.string.add_participant_success));
+                chat = megaChatApi.getChatRoom(chatHandle);
+                participants.clear();
+                setParticipants();
+                scrollView.invalidate();
+            }
+            else if (e.getErrorCode() == -12){
+                log("Error inviting ARGS: "+e.getErrorString());
+                showSnackbar(getString(R.string.add_participant_error_already_exists));
+            }
+            else{
+                log("Error inviting: "+e.getErrorString()+" "+e.getErrorCode());
+                showSnackbar(getString(R.string.add_participant_error));
             }
         }
     }

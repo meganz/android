@@ -947,4 +947,8 @@
 
     <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">After cleared, you won\'t be able to see messages of this chat.</string>
     <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear all messages?</string>
+
+    <string name="add_participant_success" context="Message show when a participant has been successfully invited to chat">The participant has been correctly invited</string>
+    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to chat">Error. The participant has not been invited correctly</string>
+    <string name="add_participant_error_already_exists" context="Message show when a participant hasn't been successfully invited to chat">The participant is already included in this group chat</string>
 </resources>

@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_participant_list_item_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="72dp"
+    android:descendantFocusability="blocksDescendants" >
+
+    <RelativeLayout
+        android:id="@+id/add_participant_list_relative_layout"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="18dp"
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:id="@+id/add_participant_list_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_add_contact"
+            android:tint="@color/black"
+            android:gravity="center_horizontal|center_vertical"
+            android:paddingBottom="3dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/add_participant_list_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/add_participant_list_relative_layout"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="13dp"
+        android:layout_centerVertical="true"
+        android:textAllCaps="true"
+        android:text="@string/add_participants_menu_item"
+        android:textColor="@color/accentColor"
+        android:ellipsize="end"
+        android:textSize="14sp"
+        android:maxLines="1"/>
+
+</RelativeLayout>
