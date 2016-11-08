@@ -1206,10 +1206,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                     if(index!=-1&&participantToUpdate!=null){
                         participants.remove(index);
-    //                adapter.setParticipants(participants);
-                        adapter.removeParticipant(index, participants);
+                        participants.clear();
+                        setParticipants();
+//                        adapter.removeParticipant(index, participants);
                     }
                     scrollView.invalidate();
+                    scrollView.setFillViewport(false);
                 }
             }
             else{
@@ -1249,6 +1251,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 participants.clear();
                 setParticipants();
                 scrollView.invalidate();
+                scrollView.setFillViewport(false);
             }
             else if (e.getErrorCode() == -12){
                 log("Error inviting ARGS: "+e.getErrorString());

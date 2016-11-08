@@ -81,7 +81,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 	
 	/*private view holder class*/
-    public class ViewHolderParticipants extends RecyclerView.ViewHolder{
+    public static class ViewHolderParticipants extends RecyclerView.ViewHolder{
     	public ViewHolderParticipants(View v) {
 			super(v);
 		}   	
@@ -91,7 +91,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		RelativeLayout itemLayout;
     }
     
-    public class ViewHolderParticipantsList extends ViewHolderParticipants{
+    public static class ViewHolderParticipantsList extends ViewHolderParticipants{
     	public ViewHolderParticipantsList(View v) {
 			super(v);
 		}
@@ -115,7 +115,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
     }
 
-	public class ViewHolderAddParticipant extends ViewHolderParticipants {
+	public static class ViewHolderAddParticipant extends ViewHolderParticipants {
 		public ViewHolderAddParticipant(View v) {
 			super(v);
 		}
