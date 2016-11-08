@@ -172,6 +172,29 @@ public class MegaChatApiJava {
         megaChatApi.inviteToChat(chatid, userhandle, privs);
     }
 
+    /**
+     * Adds a user to an existing chat. To do this you must have the
+     * moderator privilege in the chat, and the chat must be a group chat.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_INVITE_TO_CHATROOM
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getUserHandle - Returns the MegaChatHandle of the user to be invited
+     * - MegaChatRequest::getPrivilege - Returns the privilege level wanted for the user
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to invite peers.
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatid.
+     * - MegaChatError::ERROR_ARGS - If the chat is not a group chat (cannot invite peers)
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param uh MegaChatHandle that identifies the user
+     * @param privilege Privilege level for the new peers. Valid values are:
+     * - MegaChatPeerList::PRIV_RO = 0
+     * - MegaChatPeerList::PRIV_STANDARD = 2
+     * - MegaChatPeerList::PRIV_MODERATOR = 3
+     * @param listener MegaChatRequestListener to track this request
+     */
     public void inviteToChat(long chatid, long userhandle, int privs, MegaChatRequestListenerInterface listener)
     {
         megaChatApi.inviteToChat(chatid, userhandle, privs, createDelegateRequestListener(listener));
