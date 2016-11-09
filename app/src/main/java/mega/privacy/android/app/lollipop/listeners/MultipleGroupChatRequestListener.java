@@ -4,6 +4,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -66,29 +67,14 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
         if(counter==0){
             switch (requestType) {
 
-                case MegaRequest.TYPE_INVITE_CONTACT:{
+                case MegaChatRequest.TYPE_INVITE_TO_CHATROOM:{
 
-                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
-                        log("remind contact request finished");
-                        message = context.getString(R.string.number_correctly_reinvite_contact_request, max_items);
+                    log("invite to chatRoom request finished");
+                    if(error>0){
+                        message = context.getString(R.string.number_no_add_participant_request, max_items-error, error);
                     }
-                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE){
-                        log("delete contact request finished");
-                        if(error>0){
-                            message = context.getString(R.string.number_no_delete_contact_request, max_items-error, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_delete_contact_request, max_items);
-                        }
-                    }
-                    else if (request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
-                        log("invite contact request finished");
-                        if(error>0){
-                            message = context.getString(R.string.number_no_invite_contact_request, max_items-error, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_invite_contact_request, max_items);
-                        }
+                    else{
+                        message = context.getString(R.string.number_correctly_add_participant, max_items);
                     }
                     break;
                 }
@@ -96,7 +82,8 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
                 default:
                     break;
             }
-            ((ManagerActivityLollipop) context).showSnackbar(message);
+            ((GroupChatInfoActivityLollipop) context).setParticipants();
+            ((GroupChatInfoActivityLollipop) context).showSnackbar(message);
         }
     }
 

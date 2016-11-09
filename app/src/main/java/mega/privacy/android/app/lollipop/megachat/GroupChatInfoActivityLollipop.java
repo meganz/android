@@ -75,6 +75,8 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
@@ -88,7 +90,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, View.OnClickListener, MegaRequestListenerInterface, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
+public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
 
     GroupChatInfoActivityLollipop groupChatInfoActivity;
 
@@ -190,6 +192,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaChatApi = app.getMegaChatApi();
         }
 
+        megaChatApi.addChatListener(this);
+
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -271,10 +275,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTitleChatText = (TextView) findViewById(R.id.chat_group_contact_properties_info_title);
             infoTitleChatText.setText(chat.getTitle());
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
-            participantsCount = chat.getPeerCount();
-            log("Participants count: "+participantsCount);
-            long participantsLabel = participantsCount+1; //Add one to include me
-            infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
@@ -426,18 +426,28 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void setParticipants(){
-        log("setParticipants");
+        log("setParticipants: "+participants.size());
         //Set the first element = me
+        participantsCount = chat.getPeerCount();
+        log("Participants count: "+participantsCount);
+        long participantsLabel = participantsCount+1; //Add one to include me
+        infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
+
         MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), MegaChatApi.STATUS_ONLINE);
         participants.add(me);
 
-        participantsCount = chat.getPeerCount();
         for(int i=0;i<participantsCount;i++){
-            long peerHandle = chat.getPeerHandle(i);
             int peerPrivilege = chat.getPeerPrivilege(i);
+            if(peerPrivilege==MegaChatRoom.PRIV_RM){
+                log("Continue");
+                continue;
+            }
+            long peerHandle = chat.getPeerHandle(i);
+
 //                String participantFirstName = chat.getPeerFirstname(i);
-            String participantFirstName = "Pepe";
-            String participantLastName = "Botella";
+            String participantFirstName = chat.getPeerFirstname(i);
+//            String participantFirstName = "Pepe";
+            String participantLastName = chat.getPeerLastname(i);
 
 //                chat.getOnlineStatus()
             log("First of the peer: "+participantFirstName);
@@ -463,10 +473,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
             MegaUser participantContact = megaApi.getContact(userHandleEncoded);
             if(participantContact!=null){
+                log("Email of the participant: "+participantContact.getEmail());
                 participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege, status);
 
             }
             else{
+                log("Email of the participant: NON CONTACT");
                 participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
             }
 
@@ -604,7 +616,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void removeParticipant(){
-        log("removeParticipant: ");
+        log("removeParticipant: "+selectedParticipant.getFullName());
+        log("before remove, participants: "+chat.getPeerCount());
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.removeParticipant(chatHandle, selectedParticipant.getHandle());
         hideParticipantsOptionsPanel();
@@ -1192,30 +1205,31 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         finish();
                 }
                 else{
-                    log("Participants count: "+participantsCount);
-                    for(int i=0;i<participantsCount;i++){
+                    log("Removed from chat");
+                    //
 
-                        if(request.getUserHandle()==participants.get(i).getHandle()){
-                            participantToUpdate = participants.get(i);
-
-                            participantToUpdate.setPrivilege(request.getPrivilege());
-                            index=i;
-                            break;
-                        }
-                    }
-
-                    if(index!=-1&&participantToUpdate!=null){
-                        participants.remove(index);
-                        participants.clear();
-                        setParticipants();
+//                    for(int i=0;i<participantsCount;i++){
+//
+//                        if(request.getUserHandle()==participants.get(i).getHandle()){
+//                            participantToUpdate = participants.get(i);
+//
+//                            participantToUpdate.setPrivilege(request.getPrivilege());
+//                            index=i;
+//                            break;
+//                        }
+//                    }
+//
+//                    if(index!=-1&&participantToUpdate!=null){
+//                        participants.remove(index);
 //                        adapter.removeParticipant(index, participants);
-                    }
-                    scrollView.invalidate();
-                    scrollView.setFillViewport(false);
+//                    }
+
+                    showSnackbar(getString(R.string.remove_participant_success));
                 }
             }
             else{
                 log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
+                showSnackbar(getString(R.string.remove_participant_error));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
@@ -1247,11 +1261,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 log("Ok. Invited");
                 showSnackbar(getString(R.string.add_participant_success));
-                chat = megaChatApi.getChatRoom(chatHandle);
-                participants.clear();
-                setParticipants();
-                scrollView.invalidate();
-                scrollView.setFillViewport(false);
+//                chat = megaChatApi.getChatRoom(chatHandle);
+//                participants.clear();
+//                setParticipants(chat);
+//                scrollView.invalidate();
+//                scrollView.setFillViewport(false);
             }
             else if (e.getErrorCode() == -12){
                 log("Error inviting ARGS: "+e.getErrorString());
@@ -1300,5 +1314,42 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public static void log(String message) {
         Util.log("GroupChatInfoActivity", message);
+    }
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+        log("onChatListItemUpdate");
+        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
+            log("Change participants");
+            if(item.getChatId()==chatHandle){
+                log("Changes in my chat");
+                chat = megaChatApi.getChatRoom(chatHandle);
+                log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
+//                chat = megaChatApi.getChatRoom(chatHandle);
+                participants.clear();
+                setParticipants();
+//                scrollView.invalidate();
+//                scrollView.setFillViewport(false);
+            }
+            else{
+                log("Changes NOT interested in");
+            }
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
+            chat = megaChatApi.getChatRoom(chatHandle);
+            log("NEW title: "+chat.getTitle());
+            infoTitleChatText.setText(chat.getTitle());
+            aB.setTitle(chat.getTitle());
+        }
+        else{
+            log("Changes other: "+item.getChanges());
+        }
+    }
+
+    @Override
+    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
+        log("onChatRoomUpdate");
+
+
     }
 }
