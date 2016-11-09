@@ -1319,6 +1319,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
         log("onChatListItemUpdate");
+
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("Change participants");
             if(item.getChatId()==chatHandle){
@@ -1341,9 +1342,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTitleChatText.setText(chat.getTitle());
             aB.setTitle(chat.getTitle());
         }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {
+            log("CHANGE_TYPE_VISIBILITY");
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {
+            log("CHANGE_TYPE_VISIBILITY");
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
+            log("CHANGE_TYPE_CLOSED");
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+            log("CHANGE_TYPE_UNREAD_COUNT");
+        }
         else{
             log("Changes other: "+item.getChanges());
+            log("Chat title: "+item.getTitle());
         }
+
     }
 
     @Override

@@ -69,12 +69,15 @@ import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
+    public static int NUMBER_MESSAGES_TO_LOAD = 16;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     Handler handler;
 
     MegaChatRoom chatRoom;
     long idChat;
+
+    boolean scrollingUp = false;
 
     long myUserHandle;
 
@@ -386,13 +389,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 // Get the first visible item
 //                            int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
-                int pos = mLayoutManager.findFirstVisibleItemPosition();
+
+                if(stateHistory!=MegaChatApi.SOURCE_NONE){
+                    if (dy > 0) {
+                        // Scrolling up
+                        scrollingUp = true;
+                    } else {
+                        // Scrolling down
+                        scrollingUp = false;
+                    }
+
+                    if(!scrollingUp){
+                        int pos = mLayoutManager.findFirstVisibleItemPosition();
 //                if(mLayoutManager.findViewByPosition(pos).getTop()==0 && pos==0){
 //                    showSnackbar("loadMoreMessages!!!");
 //                }
 
-                if(pos==5){
-                    showSnackbar("loadMoreMessages!!!");
+                        if(pos==5){
+                            showSnackbar("loadMoreMessages!!!");
+                            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                            log("Get more history------------------------");
+                        }
+                    }
                 }
             }
         });
@@ -533,7 +551,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         log("Result of open chat: "+result);
                         log("Start to get Messages!!!");
-                        stateHistory = megaChatApi.loadMessages(idChat, 16);
+                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
 
                         mLayoutManager.setStackFromEnd(true);
                         listView.setVisibility(View.VISIBLE);
@@ -668,11 +686,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatRoom!=null){
             if(chatRoom.isGroup()){
+                contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                 contactInfoMenuItem.setVisible(true);
                 clearHistoryMenuItem.setVisible(true);
                 leaveMenuItem.setVisible(true);
             }
             else{
+                contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                 contactInfoMenuItem.setVisible(true);
                 clearHistoryMenuItem.setVisible(true);
                 leaveMenuItem.setVisible(false);
@@ -707,20 +727,85 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_contact_info_chat:{
+                if(chatRoom.isGroup()){
+                    Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
+                    i.putExtra("handle", chatRoom.getChatId());
+                    this.startActivity(i);
+                }
+                else{
+                    Intent i = new Intent(this, ContactChatInfoActivityLollipop.class);
+                    i.putExtra("handle", chatRoom.getChatId());
+                    this.startActivity(i);
+                }
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{
                 log("Clear history selected!");
-                ChatController chatC = new ChatController(this);
-                chatC.clearHistory(chatRoom);
+                showConfirmationClearChat(chatRoom);
                 break;
             }
             case R.id.cab_menu_leave_chat:{
                 log("Leave selected!");
+                showConfirmationLeaveChat(chatRoom);
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showConfirmationClearChat(final MegaChatRoom c){
+        log("showConfirmationClearChat");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        log("Clear chat!");
+//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
+                        log("Clear history selected!");
+                        ChatController chatC = new ChatController(chatActivity);
+                        chatC.clearHistory(c);
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        String message= getResources().getString(R.string.confirmation_clear_group_chat);
+        builder.setTitle(R.string.title_confirmation_clear_group_chat);
+        builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    public void showConfirmationLeaveChat (final MegaChatRoom c){
+        log("showConfirmationLeaveChat");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE: {
+                        ChatController chatC = new ChatController(chatActivity);
+                        chatC.leaveChat(c);
+                        break;
+                    }
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+        String message= getResources().getString(R.string.confirmation_leave_group_chat);
+        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     @Override
@@ -1297,7 +1382,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageLoaded!");
+        log("onMessageLoaded!------------------------");
 
         log("Show messages screen");
         chatRelativeLayout.setVisibility(View.VISIBLE);
@@ -1552,6 +1637,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void loadPreviousMessage(MegaChatMessage msg){
         messages.add(0, msg);
+        log("loadPreviousMessage: "+messages.size()+" messages in list");
 
         createInfoToShow();
 
@@ -1579,7 +1665,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         while (itr.hasNext()) {
             MegaChatMessage messageToShow = itr.next();
             if(messageToShow.getUserHandle()==myUserHandle) {
-                log("MY message!!: "+messageToShow.getContent());
+//                log("MY message!!: "+messageToShow.getContent());
                 if(itr.nextIndex()==1){
                     //First element
                     infoToShow.add(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -1587,7 +1673,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     //Not first element
                     MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
-                    log("previous message: "+previousMessage.getContent());
+//                    log("previous message: "+previousMessage.getContent());
                     if(previousMessage.getUserHandle()==myUserHandle) {
                         log("Last message and previous is mine");
                         //The last two messages are mine
@@ -1629,7 +1715,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     //Not first element
                     MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
-                    log("previous message: "+previousMessage.getContent());
+//                    log("previous message: "+previousMessage.getContent());
                     if(previousMessage.getUserHandle()==messageToShow.getUserHandle()) {
                         //The last message is also a contact's message
                         if(compareDate(messageToShow, previousMessage)==0){
@@ -1699,6 +1785,42 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("Error clearing history: "+e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
+            log("Remove participant");
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                if(megaApi.getMyUser().getHandle()==request.getUserHandle()){
+                    log("I left the chatroom");
+                    finish();
+                }
+                else{
+                    log("Removed from chat");
+                    //
+
+//                    for(int i=0;i<participantsCount;i++){
+//
+//                        if(request.getUserHandle()==participants.get(i).getHandle()){
+//                            participantToUpdate = participants.get(i);
+//
+//                            participantToUpdate.setPrivilege(request.getPrivilege());
+//                            index=i;
+//                            break;
+//                        }
+//                    }
+//
+//                    if(index!=-1&&participantToUpdate!=null){
+//                        participants.remove(index);
+//                        adapter.removeParticipant(index, participants);
+//                    }
+
+                    showSnackbar(getString(R.string.remove_participant_success));
+                }
+            }
+            else{
+                log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
+                showSnackbar(getString(R.string.remove_participant_error));
             }
         }
     }

@@ -511,6 +511,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             }
 
         }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
+            log("Change closed");
+        }
+        else{
+            log("Other change");
+            if(item!=null){
+                log("New chat: "+item.getTitle());
+            }
+            else{
+                log("The chat is NULL");
+            }
+
+        }
 
     }
 
