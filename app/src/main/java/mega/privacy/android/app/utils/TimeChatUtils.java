@@ -134,4 +134,8 @@ public class TimeChatUtils implements Comparator<Calendar> {
             }
         }
     }
+
+    private static void log(String message) {
+        Util.log("TimeChatUtils", message);
+    }
 }
