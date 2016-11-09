@@ -175,32 +175,27 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			return holderAddParticipant;
 		}
 	}
-	
+
 	@Override
 	public void onBindViewHolder(ViewHolderParticipants holder, int position) {
 		log("onBindViewHolder");
-		onBindViewHolderList(holderList, position);
-	}
-
-	public void onBindViewHolderList(ViewHolderParticipantsList holder, int position){
-		log("onBindViewHolderList");
 
 		final int itemType = getItemViewType(position);
 
 		if(itemType==ITEM_VIEW_TYPE_NORMAL) {
-			holder.currentPosition = position;
-			holder.imageView.setImageBitmap(null);
-			holder.contactInitialLetter.setText("");
+			((ViewHolderParticipantsList)holder).currentPosition = position;
+			((ViewHolderParticipantsList)holder).imageView.setImageBitmap(null);
+			((ViewHolderParticipantsList)holder).contactInitialLetter.setText("");
 
 			MegaChatParticipant participant = (MegaChatParticipant) getItem(position);
-			holder.contactMail = participant.getEmail();
+			((ViewHolderParticipantsList)holder).contactMail = participant.getEmail();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
-			holder.userHandle = userHandleEncoded;
+			((ViewHolderParticipantsList)holder).userHandle = userHandleEncoded;
 			log("participant: " + participant.getEmail() + " handle: " + participant.getHandle());
-			holder.fullName = participant.getFullName();
+			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
 
 			if (!multipleSelect) {
-				holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 
 				if (positionClicked != -1) {
 					if (positionClicked == position) {
@@ -217,7 +212,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 				}
 			} else {
-				holder.imageButtonThreeDots.setVisibility(View.GONE);
+				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setVisibility(View.GONE);
 
 				if (this.isItemChecked(position)) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
@@ -226,23 +221,23 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				}
 			}
 
-			holder.textViewContactName.setText(holder.fullName);
+			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);
 
-			createDefaultAvatar(holder);
+			createDefaultAvatar(((ViewHolderParticipantsList)holder));
 
-			if (holder.contactMail != null) {
+			if (((ViewHolderParticipantsList)holder).contactMail != null) {
 				log("The participant is contact!!");
 
-				MegaUser contact = megaApi.getContact(holder.contactMail);
+				MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
 
 
-				ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, holder, this);
+				ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
 
 				File avatar = null;
 				if (context.getExternalCacheDir() != null) {
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
 				} else {
-					avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
 				}
 				Bitmap bitmap = null;
 				if (avatar.exists()) {
@@ -259,8 +254,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 							}
 						} else {
-							holder.contactInitialLetter.setVisibility(View.GONE);
-							holder.imageView.setImageBitmap(bitmap);
+							((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
+							((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
 						}
 					} else {
 						if (context.getExternalCacheDir() != null) {
@@ -283,27 +278,27 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			int status = participant.getStatus();
 
 			if (status == MegaChatApi.STATUS_ONLINE) {
-				holder.textViewContent.setText(context.getResources().getString(R.string.online_status));
+				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.online_status));
 			} else {
-				holder.textViewContent.setText(context.getResources().getString(R.string.offline_status));
+				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.offline_status));
 			}
 
 			int permission = participant.getPrivilege();
 
 			if (permission == MegaChatRoom.PRIV_STANDARD) {
-				holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
 			} else if (permission == MegaChatRoom.PRIV_MODERATOR) {
-				holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
 			} else {
-				holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
 			}
 
-			holder.imageButtonThreeDots.setTag(holder);
-			holder.imageButtonThreeDots.setOnClickListener(this);
+			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setTag(holder);
+			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
 		}
 		else{
 			log("Bind item add participant");
-			holder.itemLayout.setOnClickListener(this);
+			((ViewHolderAddParticipant)holder).itemLayout.setOnClickListener(this);
 		}
 	}
 	
@@ -534,7 +529,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 	
 	public void setParticipants (ArrayList<MegaChatParticipant> participants){
-		log("setParticipants");
+		log("setParticipants: "+participants.size());
 		this.participants = participants;
 		positionClicked = -1;
 		notifyDataSetChanged();
