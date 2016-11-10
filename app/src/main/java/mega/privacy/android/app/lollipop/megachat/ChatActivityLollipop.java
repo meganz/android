@@ -980,8 +980,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
             }
-            adapter.appendMessage(messages, infoToShow);
-//            adapter.setMessages(messages, infoToShow);
+            if (adapter == null){
+                adapter = new MegaChatLollipopAdapter(this, messages, infoToShow, listView);
+                listView.setLayoutManager(mLayoutManager);
+                listView.setAdapter(adapter);
+                adapter.appendMessage(messages, infoToShow);
+            }
+            else{
+                adapter.appendMessage(messages, infoToShow);
+                adapter.setMessages(messages, infoToShow);
+            }
         }
         else{
             log("Error al enviar mensaje!");
