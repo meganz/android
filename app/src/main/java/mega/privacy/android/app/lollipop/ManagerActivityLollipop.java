@@ -1621,7 +1621,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			String token = FirebaseInstanceId.getInstance().getToken();
 			if (token != null) {
 				Log.d("TOKEN___", token);
-				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
+//				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
 			}
 
 			if(myAccountInfo==null){
