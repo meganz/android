@@ -453,10 +453,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("Change status");
         }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
-            log("Change unread count: "+item.getTitle());
-            log("Unread: "+item.getUnreadCount());
-        }
+//        else if(){
+//            log("Change unread count: "+item.getTitle());
+//            log("Unread: "+item.getUnreadCount());
+//
+//
+//        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("Change participants");
         }
@@ -464,8 +466,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             log("Change visibility");
 
         }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)){
-            log("Change title");
+        else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))||(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT))){
+            log("Change title or unread count: "+item.getChanges());
 
             if(item!=null){
 

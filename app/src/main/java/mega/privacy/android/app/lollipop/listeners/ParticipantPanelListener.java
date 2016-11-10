@@ -2,13 +2,16 @@ package mega.privacy.android.app.lollipop.listeners;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 
 import java.security.acl.Group;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Util;
@@ -40,7 +43,10 @@ public class ParticipantPanelListener implements View.OnClickListener {
 
             case R.id.contact_info_group_participants_chat_layout: {
                 log("contact info participants panel");
-//                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(selectedParticipant, selectedChat);
+                ((GroupChatInfoActivityLollipop) context).hideParticipantsOptionsPanel();
+                Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
+                i.putExtra("name", selectedParticipant.getEmail());
+                context.startActivity(i);
                 break;
             }
 

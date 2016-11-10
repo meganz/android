@@ -295,7 +295,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
 //        String myMail = ((ChatActivityLollipop) context).getMyMail();
         if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
-            log("MY message!!");
+            log("MY message!!:");
+            log("MY message handle!!: "+message.getMsgId());
             if (!multipleSelect) {
                 holder.ownMultiselectionLayout.setVisibility(View.GONE);
 //            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
@@ -329,6 +330,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
             }
 
+            log("START check infoToShow");
+
             if(infoToShow!=null){
                 switch (infoToShow.get(position)){
                     case Constants.CHAT_ADAPTER_SHOW_ALL:{
@@ -352,10 +355,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
             }
 
+            log("END check infoToShow");
+
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
             holder.contactMessageLayout.setVisibility(View.GONE);
 
             if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                log("Message type NORMAL: "+message.getMsgId());
                 String messageContent = message.getContent();
 
                 if(message.isEdited()){
@@ -403,14 +409,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownDeletedMessage.setVisibility(View.VISIBLE);
             }
             else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
-                log("Message type ALTER PARTICIPANTS: "+message.getContent());
+//                log("Message type ALTER PARTICIPANTS: "+message.getContent());
 
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
                 holder.ownDeletedMessageText.setText("Alter participants");
                 holder.ownDeletedMessage.setVisibility(View.VISIBLE);
             }
             else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
-                log("Message type PRIVILEGE CHANGE: "+message.getContent());
+//                log("Message type PRIVILEGE CHANGE: "+message.getContent());
 
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
                 holder.ownDeletedMessageText.setText("Privilege changed");
@@ -442,7 +448,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             }
             else{
                 log("Type message: "+message.getType());
-                log("Content: "+message.getContent());
+//                log("Content: "+message.getContent());
             }
         }
         else{
@@ -462,9 +468,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(((ChatActivityLollipop) context).isGroup()){
 
                 if (participantFirstName.trim().length() <= 0){
+                    log("Participant1: "+participantFirstName);
                     holder.fullName = participantLastName;
                 }
                 else{
+                    log("Participant2: "+participantLastName);
                     holder.fullName = participantFirstName + " " + participantLastName;
                 }
 
@@ -806,6 +814,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         this.messages = messages;
         this.infoToShow = infoToShow;
         notifyItemInserted(0);
+    }
+
+    public void loadPreviousMessages(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow, int counter){
+        log("loadPreviousMessages: "+counter);
+        this.messages = messages;
+        this.infoToShow = infoToShow;
+        notifyItemRangeInserted(0, counter);
     }
 
     private static void log(String log) {

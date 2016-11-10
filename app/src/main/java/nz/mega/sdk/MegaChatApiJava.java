@@ -606,6 +606,22 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Sets the last-seen-by-us pointer to the specified message
+     *
+     * The last-seen-by-us pointer is persisted in the account, so every client will
+     * be aware of the last-seen message.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param msgid MegaChatHandle that identifies the message
+     *
+     * @return False if the \c chatid is invalid or the message is older
+     * than last-seen-by-us message. True if success.
+     */
+    public boolean setMessageSeen(long chatid, long msgid){
+        return megaChatApi.setMessageSeen(chatid, msgid);
+    }
+
+    /**
      * Returns the last-seen-by-us message
      *
      * @param chatid MegaChatHandle that identifies the chat room

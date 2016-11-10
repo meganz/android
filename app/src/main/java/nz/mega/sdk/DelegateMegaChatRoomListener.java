@@ -46,12 +46,22 @@ class DelegateMegaChatRoomListener extends MegaChatRoomListener {
     @Override
     public void onMessageLoaded(MegaChatApi api, MegaChatMessage msg){
         if (listener != null) {
-            final MegaChatMessage megaChatMessage = msg.copy();
-            megaChatApi.runCallback(new Runnable() {
-                public void run() {
-                    listener.onMessageLoaded(megaChatApi, megaChatMessage);
-                }
-            });
+            if(msg!=null){
+                final MegaChatMessage megaChatMessage = msg.copy();
+                megaChatApi.runCallback(new Runnable() {
+                    public void run() {
+                        listener.onMessageLoaded(megaChatApi, megaChatMessage);
+                    }
+                });
+            }
+            else{
+                megaChatApi.runCallback(new Runnable() {
+                    public void run() {
+                        listener.onMessageLoaded(megaChatApi, null);
+                    }
+                });
+            }
+
         }
     }
 
