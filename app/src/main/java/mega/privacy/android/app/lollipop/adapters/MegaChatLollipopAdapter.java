@@ -300,130 +300,47 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.userHandle = message.getUserHandle();
 
 //        String myMail = ((ChatActivityLollipop) context).getMyMail();
-        if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
-            log("MY message!!:");
-            log("MY message handle!!: "+message.getMsgId());
-            if (!multipleSelect) {
-                holder.ownMultiselectionLayout.setVisibility(View.GONE);
-//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-                if (positionClicked != -1){
-                    if (positionClicked == position){
-                        holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
-                        listFragment.smoothScrollToPosition(positionClicked);
-                    }
-                    else{
-                        holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                    }
-                }
-                else{
-                    holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                }
-            } else {
-                log("Multiselect ON");
-//            holder.imageButtonThreeDots.setVisibility(View.GONE);
-                holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
-                if(this.isItemChecked(position)){
-                    log("Selected: "+message.getContent());
-                    holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
-                    holder.ownMultiselectionTickIcon.setVisibility(View.VISIBLE);
-                    holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
-                }
-                else{
-                    log("NOT selected");
-                    holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
-                    holder.ownMultiselectionTickIcon.setVisibility(View.GONE);
-                    holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                }
-            }
 
-            log("START check infoToShow");
+        if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
+            log("ALTER PARTICIPANT MESSAGE!!");
 
-            if(infoToShow!=null){
-                switch (infoToShow.get(position)){
-                    case Constants.CHAT_ADAPTER_SHOW_ALL:{
-                        holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
-                        holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
-                        break;
-                    }
-                    case Constants.CHAT_ADAPTER_SHOW_TIME:{
-                        holder.dateLayout.setVisibility(View.GONE);
-                        holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
-                        break;
-                    }
-                    case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
-                        holder.dateLayout.setVisibility(View.GONE);
-                        holder.titleOwnMessage.setVisibility(View.GONE);
-                        break;
-                    }
-                }
-            }
-
-            log("END check infoToShow");
-
-            holder.ownMessageLayout.setVisibility(View.VISIBLE);
-            holder.contactMessageLayout.setVisibility(View.GONE);
-
-            if(message.getType()==MegaChatMessage.TYPE_NORMAL){
-                log("Message type NORMAL: "+message.getMsgId());
-                String messageContent = message.getContent();
-
-                if(message.isEdited()){
-                    log("Message is edited");
-                    Spannable content = new SpannableString(messageContent);
-                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.contentOwnMessageText.setText(messageContent);
-                    Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
-                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    holder.contentOwnMessageText.append(" "+edited);
-                    holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                    holder.ownManagementMessage.setVisibility(View.GONE);
-                }
-                else if(message.isDeleted()){
-                    log("Message is deleted");
-                    holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                    holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-                    holder.ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
-                    holder.ownManagementMessage.setVisibility(View.VISIBLE);
-                }
-                else{
-                    int status = message.getStatus();
-                    if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                        log("Show triangle retry!");
-                        holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                    }
-                    else if(status==MegaChatMessage.STATUS_SENDING){
-                        log("Sending message...");
-                        holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                    }
-                    else{
-                        holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-                    }
-                    holder.contentOwnMessageText.setText(messageContent);
-                    holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                    holder.ownManagementMessage.setVisibility(View.GONE);
-                }
-            }
-            else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                log("Message type TRUNCATE");
-                holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownManagementMessageText.setText(context.getString(R.string.text_cleared_history));
-                holder.ownManagementMessage.setVisibility(View.VISIBLE);
-            }
-            else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
-//                log("Message type ALTER PARTICIPANTS: "+message.getContent());
-
+            if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
                 log("UserHandle of Action: "+message.getUserHandleOfAction());
                 log("My handle: "+megaApi.getMyUser().getHandle());
                 log("Owns the message: "+message.getUserHandle());
 
                 log("Name: "+((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction()));
                 log("LastName: "+((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction()));
+
+                log("START check infoToShow");
+
+                if(infoToShow!=null){
+                    switch (infoToShow.get(position)){
+                        case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                            holder.dateLayout.setVisibility(View.VISIBLE);
+                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleOwnMessage.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
+
+                log("END check infoToShow");
+
+                holder.ownMessageLayout.setVisibility(View.VISIBLE);
+                holder.contactMessageLayout.setVisibility(View.GONE);
 
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
@@ -457,231 +374,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
                 holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
             }
-            else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
-//                log("Message type PRIVILEGE CHANGE: "+message.getContent());
-
-                int privilege = message.getPrivilege();
-                log("Privilege of the user: "+privilege);
-                log("UserHandle of Action: "+message.getUserHandleOfAction());
-                log("My handle: "+megaApi.getMyUser().getHandle());
-                log("Owns the message: "+message.getUserHandle());
-
-                String privilegeString = "";
-                if(privilege==MegaChatRoom.PRIV_MODERATOR){
-                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
-                }
-                else if(privilege==MegaChatRoom.PRIV_STANDARD){
-                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
-                }
-                else if(privilege==MegaChatRoom.PRIV_RO){
-                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
-                }
-                else {
-                    log("Change to other");
-                    privilegeString = "Unknow";
-                }
-
-                String textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, message.getUserHandleOfAction()+"");
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
-
-                holder.ownManagementMessageText.setText(result);
-
-                holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownManagementMessage.setVisibility(View.VISIBLE);
-
-                holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
-                //Margins
-                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
-                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
-                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
-            }
-            else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
-                log("Message type TITLE CHANGE: "+message.getContent());
-
-                holder.contentOwnMessageLayout.setVisibility(View.GONE);
-
-                String messageContent = message.getContent();
-                //Set text
-                Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
-                content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.ownManagementMessageText.setText(content);
-                Spannable newTitle = new SpannableString(messageContent);
-                newTitle.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                holder.ownManagementMessageText.append(" "+newTitle);
-                holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
-
-                holder.ownManagementMessage.setVisibility(View.VISIBLE);
-                //Margins
-                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
-                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
-                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
-            }
             else{
-                log("Type message: "+message.getType());
-//                log("Content: "+message.getContent());
-            }
-        }
-        else{
-            log("Contact message!!");
-            long userHandle = message.getUserHandle();
-
-            String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(userHandle);
-            String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(userHandle);
-
-            if(participantFirstName==null){
-                participantFirstName="";
-            }
-            if(participantLastName == null){
-                participantLastName="";
-            }
-
-            if(((ChatActivityLollipop) context).isGroup()){
-
-                if (participantFirstName.trim().length() <= 0){
-                    log("Participant1: "+participantFirstName);
-                    holder.fullName = participantLastName;
-                }
-                else{
-                    log("Participant2: "+participantLastName);
-                    holder.fullName = participantFirstName + " " + participantLastName;
-                }
-
-                if(holder.fullName!=null){
-                    if(holder.fullName.trim().length()<=0){
-                        holder.contactText.setText("Participant left");
-
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-                        megaChatApi.getUserFirstname(holder.userHandle, listener);
-                        megaChatApi.getUserLastname(holder.userHandle, listener);
-                    }
-                    else{
-                        holder.contactText.setText(holder.fullName);
-                    }
-                }
-                else{
-                    holder.contactText.setText("Participant left");
-
-                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-                    megaChatApi.getUserFirstname(holder.userHandle, listener);
-                    megaChatApi.getUserLastname(holder.userHandle, listener);
-                }
-            }
-            else{
-                if (participantFirstName.trim().length() <= 0){
-                    holder.fullName = participantLastName.trim();
-                }
-                else{
-                    holder.fullName = participantFirstName.trim();
-                }
-
-                holder.contactText.setText(holder.fullName);
-            }
-
-            if (!multipleSelect) {
-//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-                holder.contactMultiselectionLayout.setVisibility(View.GONE);
-                if (positionClicked != -1){
-                    if (positionClicked == position){
-                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
-                        listFragment.smoothScrollToPosition(positionClicked);
-                    }
-                    else{
-                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                    }
-                }
-                else{
-                    holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                }
-            } else {
-                log("Multiselect ON");
-//            holder.imageButtonThreeDots.setVisibility(View.GONE);
-                holder.contactMultiselectionLayout.setVisibility(View.VISIBLE);
-                if(this.isItemChecked(position)){
-                    log("Selected: "+message.getContent());
-                    holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
-                    holder.contactMultiselectionTickIcon.setVisibility(View.VISIBLE);
-                    holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
-                }
-                else{
-                    log("NOT selected");
-                    holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
-                    holder.contactMultiselectionTickIcon.setVisibility(View.GONE);
-                    holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                }
-            }
-
-            if(infoToShow!=null){
-                switch (infoToShow.get(position)){
-                    case Constants.CHAT_ADAPTER_SHOW_ALL:{
-                        holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
-                        holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
-                        break;
-                    }
-                    case Constants.CHAT_ADAPTER_SHOW_TIME:{
-                        holder.dateLayout.setVisibility(View.GONE);
-                        holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
-                        break;
-                    }
-                    case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
-                        holder.dateLayout.setVisibility(View.GONE);
-                        holder.titleContactMessage.setVisibility(View.GONE);
-                        break;
-                    }
-                }
-            }
-            holder.ownMessageLayout.setVisibility(View.GONE);
-            holder.contactMessageLayout.setVisibility(View.VISIBLE);
-
-            if(message.getType()==MegaChatMessage.TYPE_NORMAL){
-                String messageContent = message.getContent();
-                if(message.isEdited()){
-                    log("Message is edited");
-                    Spannable content = new SpannableString(messageContent);
-                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.contentContactMessageText.setText(messageContent);
-//                    holder.contentContactMessageText.setText(content);
-
-                    Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
-                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.contentContactMessageText.append(" "+edited);
-                    holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
-                    holder.contactManagementMessage.setVisibility(View.GONE);
-                }
-                else if(message.isDeleted()){
-                    log("Message is deleted");
-                    holder.contentContactMessageLayout.setVisibility(View.GONE);
-                    holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-                    holder.contactManagementMessageText.setText(context.getString(R.string.text_deleted_message));
-                    holder.contactManagementMessage.setVisibility(View.VISIBLE);
-                }
-                else{
-                    holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
-                    holder.contactManagementMessage.setVisibility(View.GONE);
-                    holder.contentContactMessageText.setText(message.getContent());
-                }
-            }
-            else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                log("Message type TRUNCATE");
-                message.getUserHandleOfAction();
-                //Check if me
-                holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contactManagementMessageText.setText(context.getString(R.string.text_cleared_history));
-                holder.contactManagementMessage.setVisibility(View.VISIBLE);
-            }
-            else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
                 log("CONTACT Message type ALTER PARTICIPANTS");
                 log("UserHandle of Action: "+message.getUserHandleOfAction());
                 log("My handle: "+megaApi.getMyUser().getHandle());
@@ -692,15 +385,41 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
+                if(infoToShow!=null){
+                    switch (infoToShow.get(position)){
+                        case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                            holder.dateLayout.setVisibility(View.VISIBLE);
+                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleContactMessage.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
+                holder.ownMessageLayout.setVisibility(View.GONE);
+                holder.contactMessageLayout.setVisibility(View.VISIBLE);
+
                 String textToShow = "";
-                if(privilege==MegaChatRoom.PRIV_RM){
+                if(privilege!=MegaChatRoom.PRIV_RM){
                     log("Participant was added");
                     if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
                         textToShow = String.format(context.getString(R.string.message_add_participant), context.getString(R.string.chat_me_text));
                     }
                     else{
-                        String firstNameAction = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction());
-                        String lastNameAction = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction());
+//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getUserHandleOfAction()+"");
+                        String firstNameAction = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandle());
+                        String lastNameAction = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandle());
                         String fullNameAction = "";
 
                         if(firstNameAction==null){
@@ -743,6 +462,47 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             textToShow = String.format(context.getString(R.string.message_add_participant), fullNameAction);
                         }
 
+                        String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction());
+                        String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction());
+
+                        if(participantFirstName==null){
+                            participantFirstName="";
+                        }
+                        if(participantLastName == null){
+                            participantLastName="";
+                        }
+
+
+
+                        if (participantFirstName.trim().length() <= 0){
+                            log("Participant1: "+participantFirstName);
+                            holder.fullName = participantLastName;
+                        }
+                        else{
+                            log("Participant2: "+participantLastName);
+                            holder.fullName = participantFirstName + " " + participantLastName;
+                        }
+
+                        if(holder.fullName!=null){
+                            if(holder.fullName.trim().length()<=0){
+                                holder.contactText.setText("Participant left");
+
+                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                                megaChatApi.getUserFirstname(holder.userHandle, listener);
+                                megaChatApi.getUserLastname(holder.userHandle, listener);
+                            }
+                            else{
+                                holder.contactText.setText(holder.fullName);
+                            }
+                        }
+                        else{
+                            holder.contactText.setText("Participant left");
+
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                            megaChatApi.getUserFirstname(holder.userHandle, listener);
+                            megaChatApi.getUserLastname(holder.userHandle, listener);
+                        }
+
                     }
 
                 }
@@ -752,8 +512,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         textToShow = String.format(context.getString(R.string.message_remove_participant), context.getString(R.string.chat_me_text));
                     }
                     else{
-                        String firstNameAction = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction());
-                        String lastNameAction = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction());
+
+                        String firstNameAction = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandle());
+                        String lastNameAction = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandle());
                         String fullNameAction = "";
 
                         if(firstNameAction==null){
@@ -795,6 +556,48 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                            megaChatApi.getUserLastname(holder.userHandle, listener);
                             textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
                         }
+
+                        String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction());
+                        String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction());
+
+                        if(participantFirstName==null){
+                            participantFirstName="";
+                        }
+                        if(participantLastName == null){
+                            participantLastName="";
+                        }
+
+
+
+                        if (participantFirstName.trim().length() <= 0){
+                            log("Participant1: "+participantFirstName);
+                            holder.fullName = participantLastName;
+                        }
+                        else{
+                            log("Participant2: "+participantLastName);
+                            holder.fullName = participantFirstName + " " + participantLastName;
+                        }
+
+                        if(holder.fullName!=null){
+                            if(holder.fullName.trim().length()<=0){
+                                holder.contactText.setText("Participant left");
+
+                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                                megaChatApi.getUserFirstname(holder.userHandle, listener);
+                                megaChatApi.getUserLastname(holder.userHandle, listener);
+                            }
+                            else{
+                                holder.contactText.setText(holder.fullName);
+                            }
+                        }
+                        else{
+                            holder.contactText.setText("Participant left");
+
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                            megaChatApi.getUserFirstname(holder.userHandle, listener);
+                            megaChatApi.getUserLastname(holder.userHandle, listener);
+                        }
+//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getUserHandleOfAction()+"");
                     }
                 }
 
@@ -818,8 +621,111 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
                 holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
             }
-            else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
+        }
+        else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
+            log("PRIVILEGE CHANGE message");
+            if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
+                log("my privilege change");
+                int privilege = message.getPrivilege();
+                log("Privilege of the user: "+privilege);
+                log("UserHandle of Action: "+message.getUserHandleOfAction());
+                log("My handle: "+megaApi.getMyUser().getHandle());
+                log("Owns the message: "+message.getUserHandle());
+
+
+                log("START check infoToShow");
+
+                if(infoToShow!=null){
+                    switch (infoToShow.get(position)){
+                        case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                            holder.dateLayout.setVisibility(View.VISIBLE);
+                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleOwnMessage.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
+
+                log("END check infoToShow");
+
+                holder.ownMessageLayout.setVisibility(View.VISIBLE);
+                holder.contactMessageLayout.setVisibility(View.GONE);
+
+                String privilegeString = "";
+                if(privilege==MegaChatRoom.PRIV_MODERATOR){
+                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
+                }
+                else if(privilege==MegaChatRoom.PRIV_STANDARD){
+                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
+                }
+                else if(privilege==MegaChatRoom.PRIV_RO){
+                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
+                }
+                else {
+                    log("Change to other");
+                    privilegeString = "Unknow";
+                }
+
+                String textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, message.getUserHandleOfAction()+"");
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+
+                holder.ownManagementMessageText.setText(result);
+
+                holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                holder.ownManagementMessage.setVisibility(View.VISIBLE);
+
+                holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
+                //Margins
+                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
+                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
+                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+                holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
+            }
+            else{
+                log("Participant privilege change!");
                 log("Message type PRIVILEGE CHANGE: "+message.getContent());
+
+                if(infoToShow!=null){
+                    switch (infoToShow.get(position)){
+                        case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                            holder.dateLayout.setVisibility(View.VISIBLE);
+                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleContactMessage.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
+                holder.ownMessageLayout.setVisibility(View.GONE);
+                holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
                 int privilege = message.getPrivilege();
                 String privilegeString = "";
@@ -863,35 +769,335 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
                 holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
             }
-            else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
-                log("Message type CHANGE TITLE "+message.getContent());
+        }
+        else{
+            if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
+                log("MY message!!:");
+                log("MY message handle!!: "+message.getMsgId());
+                if (!multipleSelect) {
+                    holder.ownMultiselectionLayout.setVisibility(View.GONE);
+//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+                    if (positionClicked != -1){
+                        if (positionClicked == position){
+                            holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                            listFragment.smoothScrollToPosition(positionClicked);
+                        }
+                        else{
+                            holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
+                    else{
+                        holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                    holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
+                    if(this.isItemChecked(position)){
+                        log("Selected: "+message.getContent());
+                        holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                        holder.ownMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                        holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                    }
+                    else{
+                        log("NOT selected");
+                        holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                        holder.ownMultiselectionTickIcon.setVisibility(View.GONE);
+                        holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                }
 
-                holder.contentContactMessageLayout.setVisibility(View.GONE);
+                log("START check infoToShow");
 
-                String messageContent = message.getContent();
+                if(infoToShow!=null){
+                    switch (infoToShow.get(position)){
+                        case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                            holder.dateLayout.setVisibility(View.VISIBLE);
+                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleOwnMessage.setVisibility(View.VISIBLE);
+                            holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleOwnMessage.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
 
-                //Set text
-                Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
-                content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.contactManagementMessageText.setText(content);
-                Spannable newTitle = new SpannableString(messageContent);
-                newTitle.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                log("END check infoToShow");
 
-                holder.contactManagementMessageText.append(" "+newTitle);
-                holder.contactManagementMessageText.setGravity(Gravity.LEFT);
+                holder.ownMessageLayout.setVisibility(View.VISIBLE);
+                holder.contactMessageLayout.setVisibility(View.GONE);
 
-                holder.contactManagementMessage.setVisibility(View.VISIBLE);
-                //Margins
-                RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
-                contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
-                contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
+                if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                    log("Message type NORMAL: "+message.getMsgId());
+                    String messageContent = message.getContent();
+
+                    if(message.isEdited()){
+                        log("Message is edited");
+                        Spannable content = new SpannableString(messageContent);
+                        content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.contentOwnMessageText.setText(messageContent);
+                        Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                        edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        holder.contentOwnMessageText.append(" "+edited);
+                        holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+                        holder.ownManagementMessage.setVisibility(View.GONE);
+                    }
+                    else if(message.isDeleted()){
+                        log("Message is deleted");
+                        holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                        holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                        holder.ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
+                        holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        int status = message.getStatus();
+                        if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                            log("Show triangle retry!");
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                        }
+                        else if(status==MegaChatMessage.STATUS_SENDING){
+                            log("Sending message...");
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                        }
+                        else{
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                        }
+                        holder.contentOwnMessageText.setText(messageContent);
+                        holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+                        holder.ownManagementMessage.setVisibility(View.GONE);
+                    }
+                }
+                else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                    log("Message type TRUNCATE");
+                    holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                    holder.ownManagementMessageText.setText(context.getString(R.string.text_cleared_history));
+                    holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                }
+                else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
+                    log("Message type TITLE CHANGE: "+message.getContent());
+
+                    holder.contentOwnMessageLayout.setVisibility(View.GONE);
+
+                    String messageContent = message.getContent();
+                    //Set text
+                    Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.ownManagementMessageText.setText(content);
+                    Spannable newTitle = new SpannableString(messageContent);
+                    newTitle.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    holder.ownManagementMessageText.append(" "+newTitle);
+                    holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
+
+                    holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                    //Margins
+                    RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
+                    ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
+                    ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+                    holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
+                }
+                else{
+                    log("Type message: "+message.getType());
+//                log("Content: "+message.getContent());
+                }
             }
             else{
-                log("Type message: "+message.getType());
-                log("Content: "+message.getContent());
+                log("Contact message!!");
+                long userHandle = message.getUserHandle();
+
+                String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(userHandle);
+                String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(userHandle);
+
+                if(participantFirstName==null){
+                    participantFirstName="";
+                }
+                if(participantLastName == null){
+                    participantLastName="";
+                }
+
+                if(((ChatActivityLollipop) context).isGroup()){
+
+                    if (participantFirstName.trim().length() <= 0){
+                        log("Participant1: "+participantFirstName);
+                        holder.fullName = participantLastName;
+                    }
+                    else{
+                        log("Participant2: "+participantLastName);
+                        holder.fullName = participantFirstName + " " + participantLastName;
+                    }
+
+                    if(holder.fullName!=null){
+                        if(holder.fullName.trim().length()<=0){
+                            holder.contactText.setText("Participant left");
+
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                            megaChatApi.getUserFirstname(holder.userHandle, listener);
+                            megaChatApi.getUserLastname(holder.userHandle, listener);
+                        }
+                        else{
+                            holder.contactText.setText(holder.fullName);
+                        }
+                    }
+                    else{
+                        holder.contactText.setText("Participant left");
+
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                        megaChatApi.getUserFirstname(holder.userHandle, listener);
+                        megaChatApi.getUserLastname(holder.userHandle, listener);
+                    }
+                }
+                else{
+                    if (participantFirstName.trim().length() <= 0){
+                        holder.fullName = participantLastName.trim();
+                    }
+                    else{
+                        holder.fullName = participantFirstName.trim();
+                    }
+
+                    holder.contactText.setText(holder.fullName);
+                }
+
+                if (!multipleSelect) {
+//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+                    holder.contactMultiselectionLayout.setVisibility(View.GONE);
+                    if (positionClicked != -1){
+                        if (positionClicked == position){
+                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                            listFragment.smoothScrollToPosition(positionClicked);
+                        }
+                        else{
+                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
+                    else{
+                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                    holder.contactMultiselectionLayout.setVisibility(View.VISIBLE);
+                    if(this.isItemChecked(position)){
+                        log("Selected: "+message.getContent());
+                        holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                        holder.contactMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                    }
+                    else{
+                        log("NOT selected");
+                        holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                        holder.contactMultiselectionTickIcon.setVisibility(View.GONE);
+                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                }
+
+                if(infoToShow!=null){
+                    switch (infoToShow.get(position)){
+                        case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                            holder.dateLayout.setVisibility(View.VISIBLE);
+                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleContactMessage.setVisibility(View.VISIBLE);
+                            holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                            break;
+                        }
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            holder.dateLayout.setVisibility(View.GONE);
+                            holder.titleContactMessage.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
+                holder.ownMessageLayout.setVisibility(View.GONE);
+                holder.contactMessageLayout.setVisibility(View.VISIBLE);
+
+                if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                    String messageContent = message.getContent();
+                    if(message.isEdited()){
+                        log("Message is edited");
+                        Spannable content = new SpannableString(messageContent);
+                        content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.contentContactMessageText.setText(messageContent);
+//                    holder.contentContactMessageText.setText(content);
+
+                        Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                        edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.contentContactMessageText.append(" "+edited);
+                        holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+                        holder.contactManagementMessage.setVisibility(View.GONE);
+                    }
+                    else if(message.isDeleted()){
+                        log("Message is deleted");
+                        holder.contentContactMessageLayout.setVisibility(View.GONE);
+                        holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                        holder.contactManagementMessageText.setText(context.getString(R.string.text_deleted_message));
+                        holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+                        holder.contactManagementMessage.setVisibility(View.GONE);
+                        holder.contentContactMessageText.setText(message.getContent());
+                    }
+                }
+                else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                    log("Message type TRUNCATE");
+                    message.getUserHandleOfAction();
+                    //Check if me
+                    holder.contentContactMessageLayout.setVisibility(View.GONE);
+                    holder.contactManagementMessageText.setText(context.getString(R.string.text_cleared_history));
+                    holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                }
+                else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
+                    log("Message type CHANGE TITLE "+message.getContent());
+
+                    holder.contentContactMessageLayout.setVisibility(View.GONE);
+
+                    String messageContent = message.getContent();
+
+                    //Set text
+                    Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contactManagementMessageText.setText(content);
+                    Spannable newTitle = new SpannableString(messageContent);
+                    newTitle.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    holder.contactManagementMessageText.append(" "+newTitle);
+                    holder.contactManagementMessageText.setGravity(Gravity.LEFT);
+
+                    holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                    //Margins
+                    RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
+                    contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
+                    contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+                    holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
+                }
+                else{
+                    log("Type message: "+message.getType());
+                    log("Content: "+message.getContent());
+                }
             }
         }
+
+
 
         //Check the next message to know the margin bottom the content message
         //        Message nextMessage = messages.get(position+1);
