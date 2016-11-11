@@ -6,8 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
@@ -161,15 +163,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 firstNameReceived= false;
                 lastNameReceived = false;
 
-                if (firstNameText.trim().length() <= 0){
-                    fullName = lastNameText;
-                }
-                else{
-                    fullName = firstNameText + " " + lastNameText;
-                }
+                if(firstNameText!=null){
+                    if (firstNameText.trim().length() <= 0){
+                        fullName = lastNameText;
+                    }
+                    else{
+                        fullName = firstNameText + " " + lastNameText;
+                    }
 
-                if (fullName.trim().length() > 0){
-                    this.contactText.setText(fullName);
+                    if(fullName!=null){
+                        if (fullName.trim().length() > 0){
+                            this.contactText.setText(fullName);
+                        }
+                    }
                 }
 
             }
@@ -381,6 +387,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 else if(message.isDeleted()){
                     log("Message is deleted");
                     holder.contentOwnMessageLayout.setVisibility(View.GONE);
+                    holder.ownDeletedMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                     holder.ownDeletedMessageText.setText(context.getString(R.string.text_deleted_message));
                     holder.ownDeletedMessage.setVisibility(View.VISIBLE);
                 }
@@ -411,16 +418,96 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
 //                log("Message type ALTER PARTICIPANTS: "+message.getContent());
 
+                log("UserHandle of Action: "+message.getUserHandleOfAction());
+                log("My handle: "+megaApi.getMyUser().getHandle());
+                log("Owns the message: "+message.getUserHandle());
+
+                log("Name: "+((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction()));
+                log("LastName: "+((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction()));
+
+                int privilege = message.getPrivilege();
+                log("Privilege of the user: "+privilege);
+
+                if(privilege==MegaChatRoom.PRIV_RM){
+                    log("I was added");
+
+                    Spannable content = new SpannableString("joined the group chat by invitation from");
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.ownDeletedMessageText.setText(content);
+
+                    Spannable edited = new SpannableString(" "+message.getUserHandleOfAction());
+//                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.ownDeletedMessageText.append(" "+edited);
+                }
+                else{
+                    log("I was removed");
+
+                    Spannable content = new SpannableString("was removed from group chat by");
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.ownDeletedMessageText.setText(content);
+
+                    Spannable edited = new SpannableString(" "+message.getUserHandleOfAction());
+//                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.ownDeletedMessageText.append(" "+edited);
+                }
+
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownDeletedMessageText.setText("Alter participants");
+
+                holder.ownDeletedMessageText.setGravity(Gravity.RIGHT);
                 holder.ownDeletedMessage.setVisibility(View.VISIBLE);
+                //Margins
+                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownDeletedMessage.getLayoutParams();
+                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
+                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+                holder.ownDeletedMessage.setLayoutParams(ownDeleteParams);
             }
             else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
 //                log("Message type PRIVILEGE CHANGE: "+message.getContent());
 
+                int privilege = message.getPrivilege();
+                log("Privilege of the user: "+privilege);
+                log("UserHandle of Action: "+message.getUserHandleOfAction());
+                log("My handle: "+megaApi.getMyUser().getHandle());
+                log("Owns the message: "+message.getUserHandle());
+
+                String privilegeString = "";
+                if(privilege==MegaChatRoom.PRIV_MODERATOR){
+                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
+                }
+                else if(privilege==MegaChatRoom.PRIV_STANDARD){
+                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
+                }
+                else if(privilege==MegaChatRoom.PRIV_RO){
+                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
+                }
+                else {
+                    log("Change to other");
+                    privilegeString = "Unknow";
+                }
+
+                String textToShow = String.format(context.getString(R.string.was_changed), privilegeString, message.getUserHandleOfAction()+"");
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+
+                holder.ownDeletedMessageText.setText(result);
+
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownDeletedMessageText.setText("Privilege changed");
                 holder.ownDeletedMessage.setVisibility(View.VISIBLE);
+
+                holder.ownDeletedMessageText.setGravity(Gravity.RIGHT);
+                //Margins
+                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownDeletedMessage.getLayoutParams();
+                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
+                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+                holder.ownDeletedMessage.setLayoutParams(ownDeleteParams);
             }
             else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
                 log("Message type TITLE CHANGE: "+message.getContent());
@@ -428,7 +515,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
 
                 String messageContent = message.getContent();
-
                 //Set text
                 Spannable content = new SpannableString(context.getString(R.string.change_title_messages));
                 content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -572,11 +658,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     Spannable content = new SpannableString(messageContent);
                     content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     holder.contentContactMessageText.setText(messageContent);
+//                    holder.contentContactMessageText.setText(content);
+
                     Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                     edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
                     holder.contentContactMessageText.append(" "+edited);
                     holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                     holder.contactDeletedMessage.setVisibility(View.GONE);
@@ -584,6 +671,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 else if(message.isDeleted()){
                     log("Message is deleted");
                     holder.contentContactMessageLayout.setVisibility(View.GONE);
+                    holder.ownDeletedMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                     holder.contactDeletedMessageText.setText(context.getString(R.string.text_deleted_message));
                     holder.contactDeletedMessage.setVisibility(View.VISIBLE);
                 }
@@ -595,21 +683,90 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             }
             else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("Message type TRUNCATE");
+                message.getUserHandleOfAction();
+                //Check if me
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
                 holder.contactDeletedMessageText.setText(context.getString(R.string.text_cleared_history));
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
             }
             else if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
-                log("Message type ALTER PARTICIPANTS");
+                log("CONTACT Message type ALTER PARTICIPANTS");
+                log("UserHandle of Action: "+message.getUserHandleOfAction());
+                log("My handle: "+megaApi.getMyUser().getHandle());
+                log("Owns the message: "+message.getUserHandle());
+
+                log("Name: "+((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction()));
+                log("Last Name: "+((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction()));
+                int privilege = message.getPrivilege();
+                log("Privilege of the user: "+privilege);
+                if(privilege==MegaChatRoom.PRIV_RM){
+                    log("The participant was removed");
+
+                    Spannable content = new SpannableString("was removed from group chat by");
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contactDeletedMessageText.setText(content);
+
+                    Spannable edited = new SpannableString(" "+message.getUserHandleOfAction());
+//                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contactDeletedMessageText.append(" "+edited);
+                }
+                else{
+                    log("The participant was added");
+
+                    Spannable content = new SpannableString("joined the group chat by invitation from");
+                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contactDeletedMessageText.setText(content);
+
+                    Spannable edited = new SpannableString(" "+message.getUserHandleOfAction());
+//                    edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    holder.contactDeletedMessageText.append(" "+edited);
+                }
+
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contactDeletedMessageText.setText("Alter participants");
+
+                holder.contactDeletedMessageText.setGravity(Gravity.LEFT);
+
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
+                //Margins
+                RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactDeletedMessage.getLayoutParams();
+                contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
+                contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+                holder.contactDeletedMessage.setLayoutParams(contactDeleteParams);
             }
             else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
                 log("Message type PRIVILEGE CHANGE: "+message.getContent());
 
+                int privilege = message.getPrivilege();
+                String privilegeString = "";
+                if(privilege==MegaChatRoom.PRIV_MODERATOR){
+                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
+                }
+                else if(privilege==MegaChatRoom.PRIV_STANDARD){
+                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
+                }
+                else if(privilege==MegaChatRoom.PRIV_RO){
+                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
+                }
+                else {
+                    log("Change to other");
+                    privilegeString = "Unknow";
+                }
+
+                String textToShow = String.format(context.getString(R.string.was_changed), privilegeString, message.getUserHandleOfAction()+"");
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+
+                holder.contactDeletedMessageText.setText(result);
+
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contactDeletedMessageText.setText("Privilege changed");
                 holder.contactDeletedMessage.setVisibility(View.VISIBLE);
             }
             else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
