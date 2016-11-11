@@ -959,5 +959,7 @@
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
-    <string name="was_changed" context="success message when inviting multiple contacts to a group chat"><![CDATA[was changed to <b>%1$s</b> by <font color=\'#00BFA5\'>%2$s</font>]]></string>
+    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[was changed to <b>%1$s</b> by <font color=\'#00BFA5\'>%2$s</font>]]></string>
+    <string name="message_add_participant" context="chat message when a participant was added to a group chat"><![CDATA[joined the group chat by invitation from <font color=\'#00BFA5\'>%1$s</font>]]></string>
+    <string name="message_remove_participant" context="chat message when a particpant was removed from a group chat"><![CDATA[was removed from group chat by <font color=\'#00BFA5\'>%1$s</font>]]></string>
 </resources>
