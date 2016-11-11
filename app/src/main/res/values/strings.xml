@@ -936,7 +936,8 @@
 
     <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Observer</string>
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
-    <string name="administrator_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Administrator</string>
+    <string name="standard_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Standard</string>
+    <string name="administrator_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Moderator</string>
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">changed the group chat name to</string>
     <string name="edited_message_text" context="Text appended to a edited message.">(edited)</string>
@@ -957,4 +958,6 @@
 
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
+
+    <string name="was_changed" context="success message when inviting multiple contacts to a group chat"><![CDATA[was changed to <b>%1$s</b> by <font color=\'#00BFA5\'>%2$s</font>]]></string>
 </resources>
