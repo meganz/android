@@ -1208,6 +1208,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     log("Removed from chat");
                     //
 
+                    log("Changes in my chat");
+                    chat = megaChatApi.getChatRoom(chatHandle);
+                    log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
+//                chat = megaChatApi.getChatRoom(chatHandle);
+                    participants.clear();
+                    setParticipants();
+
 //                    for(int i=0;i<participantsCount;i++){
 //
 //                        if(request.getUserHandle()==participants.get(i).getHandle()){
@@ -1261,13 +1268,26 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 log("Ok. Invited");
                 showSnackbar(getString(R.string.add_participant_success));
+                if(request.getChatHandle()==chatHandle){
+                    log("Changes in my chat");
+                    chat = megaChatApi.getChatRoom(chatHandle);
+                    log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
+//                chat = megaChatApi.getChatRoom(chatHandle);
+                    participants.clear();
+                    setParticipants();
+//                scrollView.invalidate();
+//                scrollView.setFillViewport(false);
+                }
+                else{
+                    log("Changes NOT interested in");
+                }
 //                chat = megaChatApi.getChatRoom(chatHandle);
 //                participants.clear();
 //                setParticipants(chat);
 //                scrollView.invalidate();
 //                scrollView.setFillViewport(false);
             }
-            else if (e.getErrorCode() == -12){
+            else if (e.getErrorCode() == MegaChatError.ERROR_EXIST){
                 log("Error inviting ARGS: "+e.getErrorString());
                 showSnackbar(getString(R.string.add_participant_error_already_exists));
             }
