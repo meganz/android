@@ -305,14 +305,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             log("ALTER PARTICIPANT MESSAGE!!");
 
             if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
-                log("UserHandle of Action: "+message.getUserHandleOfAction());
-                log("My handle: "+megaApi.getMyUser().getHandle());
-                log("Owns the message: "+message.getUserHandle());
-
-                log("Name: "+((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction()));
-                log("LastName: "+((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction()));
-
-                log("START check infoToShow");
+                log("me alter participant");
 
                 if(infoToShow!=null){
                     switch (infoToShow.get(position)){
@@ -337,22 +330,39 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                log("END check infoToShow");
-
                 holder.ownMessageLayout.setVisibility(View.VISIBLE);
                 holder.contactMessageLayout.setVisibility(View.GONE);
 
                 int privilege = message.getPrivilege();
-                log("Privilege of the user: "+privilege);
+                log("Privilege of me: "+privilege);
                 String textToShow = "";
-                if(privilege==MegaChatRoom.PRIV_RM){
+                String fullNameAction = getParticipantFullName(message.getUserHandle());
+                if(fullNameAction!=null){
+                    if(fullNameAction.trim().length()<=0){
+                        fullNameAction = "Participant left";
+//                                holder.contactText.setText("Participant left");
+//
+//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+//                                megaChatApi.getUserFirstname(holder.userHandle, listener);
+//                                megaChatApi.getUserLastname(holder.userHandle, listener);
+
+                    }
+                }
+                else{
+                    fullNameAction = "Participant left";
+//                            holder.contactText.setText("Participant left");
+
+//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+//                            megaChatApi.getUserFirstname(holder.userHandle, listener);
+//                            megaChatApi.getUserLastname(holder.userHandle, listener);
+                }
+                if(privilege!=MegaChatRoom.PRIV_RM){
                     log("I was added");
-                    textToShow = String.format(context.getString(R.string.message_add_participant), message.getUserHandleOfAction()+"");
+                    textToShow = String.format(context.getString(R.string.message_add_participant), fullNameAction);
                 }
                 else{
                     log("I was removed");
-                    textToShow = String.format(context.getString(R.string.message_remove_participant), message.getUserHandleOfAction()+"");
-
+                    textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
                 }
 
                 Spanned result = null;
@@ -376,12 +386,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             }
             else{
                 log("CONTACT Message type ALTER PARTICIPANTS");
-                log("UserHandle of Action: "+message.getUserHandleOfAction());
-                log("My handle: "+megaApi.getMyUser().getHandle());
-                log("Owns the message: "+message.getUserHandle());
 
-                log("Name: "+((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction()));
-                log("Last Name: "+((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction()));
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
@@ -410,33 +415,39 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
+                holder.fullName = getParticipantFullName(message.getUserHandleOfAction());
+
+                if(holder.fullName!=null){
+                    if(holder.fullName.trim().length()<=0){
+                        holder.contactText.setText("Participant left");
+
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, false);
+                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
+                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                    }
+                    else{
+                        holder.contactText.setText(holder.fullName);
+                    }
+                }
+                else{
+                    holder.contactText.setText("Participant left");
+
+                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, false);
+                    megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
+                    megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                }
+
                 String textToShow = "";
                 if(privilege!=MegaChatRoom.PRIV_RM){
                     log("Participant was added");
-                    if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
+                    if(message.getUserHandle()==megaApi.getMyUser().getHandle()){
+                        log("By me");
                         textToShow = String.format(context.getString(R.string.message_add_participant), context.getString(R.string.chat_me_text));
                     }
                     else{
 //                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getUserHandleOfAction()+"");
-                        String firstNameAction = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandle());
-                        String lastNameAction = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandle());
-                        String fullNameAction = "";
-
-                        if(firstNameAction==null){
-                            firstNameAction="";
-                        }
-                        if(lastNameAction == null){
-                            lastNameAction="";
-                        }
-
-                        if (firstNameAction.trim().length() <= 0){
-                            log("Participant1: "+firstNameAction);
-                            fullNameAction = lastNameAction;
-                        }
-                        else{
-                            log("Participant2: "+lastNameAction);
-                            fullNameAction = firstNameAction + " " + lastNameAction;
-                        }
+                        log("By other");
+                        String fullNameAction = getParticipantFullName(message.getUserHandle());
 
                         if(fullNameAction!=null){
                             if(fullNameAction.trim().length()<=0){
@@ -446,10 +457,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                                megaChatApi.getUserFirstname(holder.userHandle, listener);
 //                                megaChatApi.getUserLastname(holder.userHandle, listener);
-                                textToShow = String.format(context.getString(R.string.message_add_participant), fullNameAction);
-                            }
-                            else{
-                                textToShow = String.format(context.getString(R.string.message_add_participant), fullNameAction);
                             }
                         }
                         else{
@@ -459,79 +466,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                            megaChatApi.getUserFirstname(holder.userHandle, listener);
 //                            megaChatApi.getUserLastname(holder.userHandle, listener);
-                            textToShow = String.format(context.getString(R.string.message_add_participant), fullNameAction);
                         }
-
-                        String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction());
-                        String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction());
-
-                        if(participantFirstName==null){
-                            participantFirstName="";
-                        }
-                        if(participantLastName == null){
-                            participantLastName="";
-                        }
-
-
-
-                        if (participantFirstName.trim().length() <= 0){
-                            log("Participant1: "+participantFirstName);
-                            holder.fullName = participantLastName;
-                        }
-                        else{
-                            log("Participant2: "+participantLastName);
-                            holder.fullName = participantFirstName + " " + participantLastName;
-                        }
-
-                        if(holder.fullName!=null){
-                            if(holder.fullName.trim().length()<=0){
-                                holder.contactText.setText("Participant left");
-
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-                                megaChatApi.getUserFirstname(holder.userHandle, listener);
-                                megaChatApi.getUserLastname(holder.userHandle, listener);
-                            }
-                            else{
-                                holder.contactText.setText(holder.fullName);
-                            }
-                        }
-                        else{
-                            holder.contactText.setText("Participant left");
-
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-                            megaChatApi.getUserFirstname(holder.userHandle, listener);
-                            megaChatApi.getUserLastname(holder.userHandle, listener);
-                        }
+                        textToShow = String.format(context.getString(R.string.message_add_participant), fullNameAction);
 
                     }
-
-                }
+                }//END participant was added
                 else{
                     log("Participant was removed");
-                    if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
+                    if(message.getUserHandle()==megaApi.getMyUser().getHandle()){
                         textToShow = String.format(context.getString(R.string.message_remove_participant), context.getString(R.string.chat_me_text));
                     }
                     else{
-
-                        String firstNameAction = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandle());
-                        String lastNameAction = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandle());
-                        String fullNameAction = "";
-
-                        if(firstNameAction==null){
-                            firstNameAction="";
-                        }
-                        if(lastNameAction == null){
-                            lastNameAction="";
-                        }
-
-                        if (firstNameAction.trim().length() <= 0){
-                            log("Participant1: "+firstNameAction);
-                            fullNameAction = lastNameAction;
-                        }
-                        else{
-                            log("Participant2: "+lastNameAction);
-                            fullNameAction = firstNameAction + " " + lastNameAction;
-                        }
+                        String fullNameAction = getParticipantFullName(message.getUserHandle());
 
                         if(fullNameAction!=null){
                             if(fullNameAction.trim().length()<=0){
@@ -541,10 +487,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                                megaChatApi.getUserFirstname(holder.userHandle, listener);
 //                                megaChatApi.getUserLastname(holder.userHandle, listener);
-                                textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
-                            }
-                            else{
-                                textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
                             }
                         }
                         else{
@@ -554,52 +496,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                            megaChatApi.getUserFirstname(holder.userHandle, listener);
 //                            megaChatApi.getUserLastname(holder.userHandle, listener);
-                            textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
+
                         }
+                        textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
 
-                        String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(message.getUserHandleOfAction());
-                        String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(message.getUserHandleOfAction());
-
-                        if(participantFirstName==null){
-                            participantFirstName="";
-                        }
-                        if(participantLastName == null){
-                            participantLastName="";
-                        }
-
-
-
-                        if (participantFirstName.trim().length() <= 0){
-                            log("Participant1: "+participantFirstName);
-                            holder.fullName = participantLastName;
-                        }
-                        else{
-                            log("Participant2: "+participantLastName);
-                            holder.fullName = participantFirstName + " " + participantLastName;
-                        }
-
-                        if(holder.fullName!=null){
-                            if(holder.fullName.trim().length()<=0){
-                                holder.contactText.setText("Participant left");
-
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-                                megaChatApi.getUserFirstname(holder.userHandle, listener);
-                                megaChatApi.getUserLastname(holder.userHandle, listener);
-                            }
-                            else{
-                                holder.contactText.setText(holder.fullName);
-                            }
-                        }
-                        else{
-                            holder.contactText.setText("Participant left");
-
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-                            megaChatApi.getUserFirstname(holder.userHandle, listener);
-                            megaChatApi.getUserLastname(holder.userHandle, listener);
-                        }
 //                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getUserHandleOfAction()+"");
                     }
-                }
+                } //END participant removed
 
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -607,7 +510,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 } else {
                     result = Html.fromHtml(textToShow);
                 }
-
                 holder.contactManagementMessageText.setText(result);
 
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
@@ -620,7 +522,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
                 contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
                 holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
-            }
+            } //END CONTACT MANAGEMENT MESSAGE
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
             log("PRIVILEGE CHANGE message");
@@ -628,12 +530,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 log("my privilege change");
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
-                log("UserHandle of Action: "+message.getUserHandleOfAction());
-                log("My handle: "+megaApi.getMyUser().getHandle());
-                log("Owns the message: "+message.getUserHandle());
-
-
-                log("START check infoToShow");
 
                 if(infoToShow!=null){
                     switch (infoToShow.get(position)){
@@ -658,8 +554,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                log("END check infoToShow");
-
                 holder.ownMessageLayout.setVisibility(View.VISIBLE);
                 holder.contactMessageLayout.setVisibility(View.GONE);
 
@@ -678,7 +572,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     privilegeString = "Unknow";
                 }
 
-                String textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, message.getUserHandleOfAction()+"");
+                String fullNameAction = getParticipantFullName(message.getUserHandle());
+
+                if(fullNameAction!=null){
+                    if(fullNameAction.trim().length()<=0){
+                        fullNameAction = "Participant left";
+//                                holder.contactText.setText("Participant left");
+//
+//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+//                                megaChatApi.getUserFirstname(holder.userHandle, listener);
+//                                megaChatApi.getUserLastname(holder.userHandle, listener);
+                    }
+                }
+                else{
+                    fullNameAction = "Participant left";
+//                            holder.contactText.setText("Participant left");
+
+//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+//                            megaChatApi.getUserFirstname(holder.userHandle, listener);
+//                            megaChatApi.getUserLastname(holder.userHandle, listener);
+                }
+                String textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, fullNameAction);
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -771,6 +685,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             }
         }
         else{
+            //OTHER TYPE OF MESSAGES
             if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
                 log("MY message!!:");
                 log("MY message handle!!: "+message.getMsgId());
@@ -807,8 +722,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                log("START check infoToShow");
-
                 if(infoToShow!=null){
                     switch (infoToShow.get(position)){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
@@ -831,8 +744,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         }
                     }
                 }
-
-                log("END check infoToShow");
 
                 holder.ownMessageLayout.setVisibility(View.VISIBLE);
                 holder.contactMessageLayout.setVisibility(View.GONE);
@@ -918,32 +829,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 log("Contact message!!");
                 long userHandle = message.getUserHandle();
 
-                String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(userHandle);
-                String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(userHandle);
-
-                if(participantFirstName==null){
-                    participantFirstName="";
-                }
-                if(participantLastName == null){
-                    participantLastName="";
-                }
-
                 if(((ChatActivityLollipop) context).isGroup()){
 
-                    if (participantFirstName.trim().length() <= 0){
-                        log("Participant1: "+participantFirstName);
-                        holder.fullName = participantLastName;
-                    }
-                    else{
-                        log("Participant2: "+participantLastName);
-                        holder.fullName = participantFirstName + " " + participantLastName;
-                    }
+                    holder.fullName = getParticipantFullName(userHandle);
 
                     if(holder.fullName!=null){
                         if(holder.fullName.trim().length()<=0){
                             holder.contactText.setText("Participant left");
 
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, true);
                             megaChatApi.getUserFirstname(holder.userHandle, listener);
                             megaChatApi.getUserLastname(holder.userHandle, listener);
                         }
@@ -954,20 +848,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     else{
                         holder.contactText.setText("Participant left");
 
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, true);
                         megaChatApi.getUserFirstname(holder.userHandle, listener);
                         megaChatApi.getUserLastname(holder.userHandle, listener);
                     }
                 }
                 else{
-                    if (participantFirstName.trim().length() <= 0){
-                        holder.fullName = participantLastName.trim();
-                    }
-                    else{
-                        holder.fullName = participantFirstName.trim();
-                    }
 
-                    holder.contactText.setText(holder.fullName);
+                    holder.contactText.setText("Hide name");
                 }
 
                 if (!multipleSelect) {
@@ -1105,6 +993,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+    }
+
+    public String getParticipantFullName(long userHandle){
+        String participantFirstName = ((ChatActivityLollipop) context).getParticipantFirstName(userHandle);
+        String participantLastName = ((ChatActivityLollipop) context).getParticipantLastName(userHandle);
+
+        if(participantFirstName==null){
+            participantFirstName="";
+        }
+        if(participantLastName == null){
+            participantLastName="";
+        }
+
+        if (participantFirstName.trim().length() <= 0){
+            log("Participant1: "+participantFirstName);
+            return participantLastName;
+        }
+        else{
+            log("Participant2: "+participantLastName);
+            return participantFirstName + " " + participantLastName;
+        }
     }
 
     @Override

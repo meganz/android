@@ -24,11 +24,13 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     Context context;
     MegaChatLollipopAdapter.ViewHolderMessageChatList holder;
     MegaChatLollipopAdapter adapter;
+    boolean isUserHandle;
 
-    public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChatList holder, MegaChatLollipopAdapter adapter) {
+    public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChatList holder, MegaChatLollipopAdapter adapter, boolean isUserHandle) {
         this.context = context;
         this.holder = holder;
         this.adapter = adapter;
+        this.isUserHandle = isUserHandle;
     }
 
     private static void log(String log) {
@@ -51,24 +53,38 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         if (e.getErrorCode() == MegaError.API_OK){
             if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
                 log("Update firstname: "+holder.getCurrentPosition());
-                if(holder.getUserHandle()==request.getUserHandle()){
+                if(isUserHandle){
+                    if(holder.getUserHandle()==request.getUserHandle()){
+                        holder.setFirstNameText(request.getText());
+                        holder.setFirstNameReceived();
+                        holder.setNameNonContact();
+                    }
+                    else{
+                        log("Not match!!");
+                    }
+                }
+                else{
                     holder.setFirstNameText(request.getText());
                     holder.setFirstNameReceived();
                     holder.setNameNonContact();
                 }
-                else{
-                    log("Not match!!");
-                }
+
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
                 log("Update lastname: "+holder.getCurrentPosition());
-                if(holder.getUserHandle()==request.getUserHandle()){
+                if(isUserHandle) {
+                    if (holder.getUserHandle() == request.getUserHandle()) {
+                        holder.setLastNameText(request.getText());
+                        holder.setLastNameReceived();
+                        holder.setNameNonContact();
+                    } else {
+                        log("Not match!!");
+                    }
+                }
+                else{
                     holder.setLastNameText(request.getText());
                     holder.setLastNameReceived();
                     holder.setNameNonContact();
-                }
-                else{
-                    log("Not match!!");
                 }
             }
 
