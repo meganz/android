@@ -1697,7 +1697,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ListIterator<MegaChatMessage> itr = messages.listIterator();
         while (itr.hasNext()) {
             MegaChatMessage messageToShow = itr.next();
-            if(messageToShow.getUserHandle()==myUserHandle) {
+            long userHandleToCompare = -1;
+            if((messageToShow.getType()==MegaChatMessage.TYPE_PRIV_CHANGE)||(messageToShow.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS)){
+                userHandleToCompare = messageToShow.getUserHandleOfAction();
+            }
+            else{
+                userHandleToCompare = messageToShow.getUserHandle();
+            }
+
+            if(userHandleToCompare==myUserHandle) {
 //                log("MY message!!: "+messageToShow.getContent());
                 if(itr.nextIndex()==1){
                     //First element
@@ -1706,8 +1714,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     //Not first element
                     MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
+                    long previousUserHandleToCompare = -1;
+                    if((previousMessage.getType()==MegaChatMessage.TYPE_PRIV_CHANGE)||(messageToShow.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS)){
+                        previousUserHandleToCompare = previousMessage.getUserHandleOfAction();
+                    }
+                    else{
+                        previousUserHandleToCompare = previousMessage.getUserHandle();
+                    }
+
 //                    log("previous message: "+previousMessage.getContent());
-                    if(previousMessage.getUserHandle()==myUserHandle) {
+                    if(previousUserHandleToCompare==myUserHandle) {
                         log("Last message and previous is mine");
                         //The last two messages are mine
                         if(compareDate(messageToShow, previousMessage)==0){
@@ -1749,7 +1765,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     //Not first element
                     MegaChatMessage previousMessage = messages.get(itr.previousIndex()-1);
 //                    log("previous message: "+previousMessage.getContent());
-                    if(previousMessage.getUserHandle()==messageToShow.getUserHandle()) {
+                    long previousUserHandleToCompare = -1;
+                    if((previousMessage.getType()==MegaChatMessage.TYPE_PRIV_CHANGE)||(messageToShow.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS)){
+                        previousUserHandleToCompare = previousMessage.getUserHandleOfAction();
+                    }
+                    else{
+                        previousUserHandleToCompare = previousMessage.getUserHandle();
+                    }
+
+                    if(previousUserHandleToCompare==userHandleToCompare) {
                         //The last message is also a contact's message
                         if(compareDate(messageToShow, previousMessage)==0){
                             //Same date
