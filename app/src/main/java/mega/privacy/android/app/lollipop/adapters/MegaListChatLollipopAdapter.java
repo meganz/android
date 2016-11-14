@@ -916,6 +916,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		this.chats = chats;
 		notifyItemChanged(position);
 	}
+
+	public void removeChat(ArrayList<MegaChatRoom> chats, int position){
+		this.chats = chats;
+		notifyItemRemoved(position);
+	}
 	
 	private static void log(String log) {
 		Util.log("MegaListChatLollipopAdapter", log);
