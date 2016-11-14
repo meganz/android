@@ -69,9 +69,9 @@ import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
-    public static int NUMBER_MESSAGES_TO_LOAD = 20;
-    public static int NUMBER_MESSAGES_TO_UPDATE_UI = 10;
-    public static int NUMBER_MESSAGES_BEFORE_LOAD = 10;
+    public static int NUMBER_MESSAGES_TO_LOAD = 16;
+    public static int NUMBER_MESSAGES_TO_UPDATE_UI = 7;
+    public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     int counterMsgReceived = 0;
     boolean firstMessageReceived = true;
 
@@ -229,6 +229,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        log("onCreate");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -419,6 +420,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         });
+        listView.setAdapter(null);
+        adapter = null;
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
 
@@ -691,9 +694,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatRoom!=null){
             if(chatRoom.isGroup()){
+
+                int permission = chatRoom.getOwnPrivilege();
+
+                if(permission==MegaChatRoom.PRIV_MODERATOR) {
+                    inviteMenuItem.setVisible(true);
+                    clearHistoryMenuItem.setVisible(true);
+                }
+                else {
+                    inviteMenuItem.setVisible(false);
+                    clearHistoryMenuItem.setVisible(false);
+                }
+
                 contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                 contactInfoMenuItem.setVisible(true);
-                clearHistoryMenuItem.setVisible(true);
                 leaveMenuItem.setVisible(true);
             }
             else{
@@ -1403,8 +1417,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 firstMessageReceived = false;
             }
 
-            messages.add(0, msg);
             counterMsgReceived++;
+            messages.add(0, msg);
             log("Counter: "+counterMsgReceived);
             log("Size of messages: "+messages.size());
             if(counterMsgReceived==NUMBER_MESSAGES_TO_UPDATE_UI){
