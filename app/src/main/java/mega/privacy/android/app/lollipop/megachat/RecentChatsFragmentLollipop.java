@@ -38,6 +38,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -479,6 +480,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 //        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("Change participants");
+            MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
+            updateCacheForNonContacts(chatToCheck);
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)){
             log("Change visibility");
@@ -555,7 +558,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     }
                     if(indexToRemove!=-1){
                         log("Index to replace: "+indexToRemove);
-                        MegaChatRoom chatToReplace = megaChatApi.getChatRoom(item.getChatId());
                         chats.remove(indexToRemove);
 
                         adapterList.removeChat(chats, indexToRemove);
@@ -573,22 +575,68 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                         }
                     }
                 }
-
             }
-
         }
         else{
             log("Other change");
             if(item!=null){
                 log("New chat: "+item.getTitle());
                 setChats();
+                MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
+                updateCacheForNonContacts(chatToCheck);
             }
             else{
                 log("The chat is NULL");
             }
+        }
+    }
 
+    public String getParticipantFullName(MegaChatRoom chat, long i){
+        String participantFirstName = chat.getPeerFirstname(i);
+        String participantLastName = chat.getPeerLastname(i);
+
+        if(participantFirstName==null){
+            participantFirstName="";
+        }
+        if(participantLastName == null){
+            participantLastName="";
         }
 
+        if (participantFirstName.trim().length() <= 0){
+            log("Participant1: "+participantFirstName);
+            return participantLastName;
+        }
+        else{
+            log("Participant2: "+participantLastName);
+            return participantFirstName + " " + participantLastName;
+        }
+    }
+
+    public void updateCacheForNonContacts(MegaChatRoom chatToCheck){
+        if(chatToCheck!=null){
+            long peers = chatToCheck.getPeerCount();
+            for(int i=0; i<peers; i++){
+//                    long peerHandle = chatToCheck.getPeerHandle(i);
+                String fullName = getParticipantFullName(chatToCheck, i);
+                if(fullName!=null){
+                    if(fullName.trim().length()<=0){
+                        log("Ask for name!");
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
+                        megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), listener);
+                        megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), listener);
+                    }
+                    else{
+                        log("Exists name!");
+                    }
+                }
+                else{
+                    log("Ask for name!");
+                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
+                    megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), listener);
+                    megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), listener);
+                }
+            }
+        }
     }
 
     @Override
