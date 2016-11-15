@@ -578,7 +578,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             }
         }
         else{
-            log("Other change");
+            log("Other change: "+item.getChanges());
             if(item!=null){
                 log("New chat: "+item.getTitle());
                 setChats();
