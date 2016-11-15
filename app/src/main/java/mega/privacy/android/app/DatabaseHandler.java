@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import mega.privacy.android.app.lollipop.megachat.ChatPreferences;
+import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -28,6 +29,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_OFFLINE = "offline";
     private static final String TABLE_CONTACTS = "contacts";
 	private static final String TABLE_CHAT = "chat";
+	private static final String TABLE_NON_CONTACTS = "noncontacts";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -86,6 +88,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_NOTIFICATIONS = "chatnotifications";
 	private static final String KEY_CHAT_RINGTONE = "chatringtone";
 	private static final String KEY_CHAT_SOUND_NOTIFICATION = "chatnotificationsound";
+
+	private static final String KEY_NONCONTACT_HANDLE = "noncontacthandle";
+	private static final String KEY_NONCONTACT_FULLNAME = "noncontactfullname";
     
     private static DatabaseHandler instance;
     
@@ -153,6 +158,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_NOTIFICATIONS + " BOOLEAN, " +
 				KEY_CHAT_RINGTONE+ " TEXT, "+KEY_CHAT_SOUND_NOTIFICATION+ " TEXT"+")";
 		db.execSQL(CREATE_CHAT_TABLE);
+
+		String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NONCONTACT_HANDLE + " TEXT, " + KEY_NONCONTACT_FULLNAME + " TEXT"+")";
+		db.execSQL(CREATE_NONCONTACT_TABLE);
   
 	}
 
@@ -351,6 +360,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_NOTIFICATIONS + " BOOLEAN, " +
 					KEY_CHAT_RINGTONE + " TEXT, " + KEY_CHAT_SOUND_NOTIFICATION + " TEXT" + ")";
 			db.execSQL(CREATE_CHAT_TABLE);
+
+			String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NONCONTACT_HANDLE + " TEXT, " + KEY_NONCONTACT_FULLNAME + " TEXT"+")";
+			db.execSQL(CREATE_NONCONTACT_TABLE);
 		}
 	} 
 	
@@ -644,6 +657,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 		
 		return attr;
+	}
+
+	public void setNonContact (NonContactInfo nonContact){
+		log("setNonContact: "+nonContact.getHandle());
+		ContentValues values = new ContentValues();
+		values.put(KEY_NONCONTACT_HANDLE,  encrypt(nonContact.getHandle()));
+		values.put(KEY_NONCONTACT_FULLNAME, encrypt(nonContact.getFullName()));
+
+		db.insert(TABLE_NON_CONTACTS, null, values);
+	}
+
+//	public int setNonContactFullName (String fullName, String handle){
+//		log("setNonContactFullName: "+fullName);
+//
+//		ContentValues values = new ContentValues();
+//		values.put(KEY_NONCONTACT_FULLNAME, encrypt(fullName));
+//		return db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_FULLNAME + " = '" + encrypt(handle) + "'", null);
+//	}
+
+	public NonContactInfo findNonContactByHandle(String handle){
+		log("findNONContactByHandle: "+handle);
+		NonContactInfo noncontact = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_NON_CONTACTS + " WHERE " + KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle)+ "'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+
+				int _id = -1;
+				String _handle = null;
+				String _fullName = null;
+
+				_id = Integer.parseInt(cursor.getString(0));
+				_handle = decrypt(cursor.getString(1));
+				_fullName = decrypt(cursor.getString(2));
+
+				noncontact = new NonContactInfo(handle, _fullName);
+				cursor.close();
+				return noncontact;
+			}
+		}
+		cursor.close();
+		return null;
 	}
 	
 	public void setContact (MegaContact contact){
