@@ -1405,6 +1405,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         log("onChatRoomUpdate!");
+
+        if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CLOSED)){
+            log("CHANGE_TYPE_CLOSED for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
+            log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
+            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_PARTICIPANTS)){
+            log("CHANGE_TYPE_PARTICIPANTS for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)){
+            log("CHANGE_TYPE_TITLE for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CHAT_STATE)){
+            log("CHANGE_TYPE_CHAT_STATE for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_TYPING)){
+            log("CHANGE_TYPE_USER_TYPING for the chat: "+chat.getChatId());
+        }
     }
 
     @Override
