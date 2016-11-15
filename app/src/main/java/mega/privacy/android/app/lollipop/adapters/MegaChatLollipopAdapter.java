@@ -545,7 +545,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
             log("PRIVILEGE CHANGE message");
             if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
-                log("my privilege change");
+                log("a moderator change my privilege");
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
@@ -590,27 +590,37 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     privilegeString = "Unknow";
                 }
 
-                String fullNameAction = getParticipantFullName(message.getUserHandle());
+                String textToShow = "";
 
-                if(fullNameAction!=null){
-                    if(fullNameAction.trim().length()<=0){
-                        fullNameAction = "Participant left";
+                if(message.getUserHandle()==megaApi.getMyUser().getHandle()){
+                    log("I changed my Own permission");
+                    textToShow = String.format(context.getString(R.string.message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, context.getString(R.string.chat_me_text));
+                }
+                else{
+                    log("I was change by someone");
+                    String fullNameAction = getParticipantFullName(message.getUserHandle());
+
+                    if(fullNameAction!=null){
+                        if(fullNameAction.trim().length()<=0){
+                            fullNameAction = "Participant left";
 //                                holder.contactText.setText("Participant left");
 //
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                                megaChatApi.getUserFirstname(holder.userHandle, listener);
 //                                megaChatApi.getUserLastname(holder.userHandle, listener);
+                        }
                     }
-                }
-                else{
-                    fullNameAction = "Participant left";
+                    else{
+                        fullNameAction = "Participant left";
 //                            holder.contactText.setText("Participant left");
 
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                            megaChatApi.getUserFirstname(holder.userHandle, listener);
 //                            megaChatApi.getUserLastname(holder.userHandle, listener);
+                    }
+                    textToShow = String.format(context.getString(R.string.message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, fullNameAction);
                 }
-                String textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, fullNameAction);
+
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -699,8 +709,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 String textToShow = "";
                 if(message.getUserHandle()==megaApi.getMyUser().getHandle()){
-                    textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, context.getString(R.string.chat_me_text));
-                    log("By me");
+                    log("The privilege was change by me");
+                    textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, context.getString(R.string.chat_me_text));
+
                 }
                 else{
                     log("By other");
@@ -725,7 +736,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                            megaChatApi.getUserLastname(holder.userHandle, listener);
                     }
 
-                    textToShow = String.format(context.getString(R.string.message_permissions_changed), privilegeString, fullNameAction);
+                    textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, fullNameAction);
                 }
 
                 Spanned result = null;
@@ -859,7 +870,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                     log("Message type TRUNCATE");
                     holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                    holder.ownManagementMessageText.setText(context.getString(R.string.text_cleared_history));
+
+                    String textToShow = String.format(context.getString(R.string.text_cleared_history), context.getString(R.string.chat_I_text));
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+
+                    holder.ownManagementMessageText.setText(result);
                     holder.ownManagementMessage.setVisibility(View.VISIBLE);
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
@@ -1023,10 +1043,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                     log("Message type TRUNCATE");
-                    message.getUserHandleOfAction();
+
                     //Check if me
                     holder.contentContactMessageLayout.setVisibility(View.GONE);
-                    holder.contactManagementMessageText.setText(context.getString(R.string.text_cleared_history));
+                    String textToShow = String.format(context.getString(R.string.text_cleared_history), holder.fullNameTitle);
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+
+                    holder.contactManagementMessageText.setText(result);
                     holder.contactManagementMessage.setVisibility(View.VISIBLE);
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
