@@ -358,11 +358,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 if(privilege!=MegaChatRoom.PRIV_RM){
                     log("I was added");
-                    textToShow = String.format(context.getString(R.string.message_add_participant), context.getString(R.string.chat_me_text), fullNameAction);
+                    textToShow = String.format(context.getString(R.string.message_add_participant), context.getString(R.string.chat_I_text), fullNameAction);
                 }
                 else{
-                    log("I was removed");
-                    textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
+                    log("I was removed or left");
+                    if(message.getUserHandle()==message.getUserHandleOfAction()){
+                        log("I left the chat");
+
+                        textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), context.getString(R.string.chat_I_text));
+
+                    }
+                    else{
+                        textToShow = String.format(context.getString(R.string.message_remove_participant), context.getString(R.string.chat_I_text), fullNameAction);
+                    }
                 }
 
                 Spanned result = null;
@@ -475,18 +483,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 else{
                     log("Participant was removed or left");
                     if(message.getUserHandle()==megaApi.getMyUser().getHandle()){
-                        textToShow = String.format(context.getString(R.string.message_remove_participant), context.getString(R.string.chat_me_text));
+                        textToShow = String.format(context.getString(R.string.message_remove_participant), holder.fullNameTitle, context.getString(R.string.chat_me_text));
                     }
                     else{
 
                         if(message.getUserHandle()==message.getUserHandleOfAction()){
-                            log("The partipant left the chat");
+                            log("The participant left the chat");
 
-                            textToShow = context.getString(R.string.message_participant_left_group_chat);
+                            textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), holder.fullNameTitle);
 
                         }
                         else{
-                            log("The partipant was removed");
+                            log("The participant was removed");
                             String fullNameAction = getParticipantFullName(message.getUserHandle());
 
                             if(fullNameAction!=null){
@@ -508,11 +516,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                            megaChatApi.getUserLastname(holder.userHandle, listener);
 
                             }
-                            textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameAction);
+                            textToShow = String.format(context.getString(R.string.message_remove_participant), holder.fullNameTitle, fullNameAction);
                         }
-
-
-
 //                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getUserHandleOfAction()+"");
                     }
                 } //END participant removed
@@ -815,13 +820,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         log("Message is edited");
                         Spannable content = new SpannableString(messageContent);
                         content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.contentOwnMessageText.setText(messageContent);
+                        holder.contentOwnMessageText.setText(content+" ");
+
                         Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                         edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                        holder.contentOwnMessageText.append(" "+edited);
+                        holder.contentOwnMessageText.append(edited);
                         holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
                         holder.ownManagementMessage.setVisibility(View.GONE);
                     }
@@ -863,7 +869,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     String messageContent = message.getContent();
 
-                    String textToShow = String.format(context.getString(R.string.change_title_messages), messageContent);
+                    String textToShow = String.format(context.getString(R.string.change_title_messages), context.getString(R.string.chat_I_text), messageContent);
 
                     Spanned result = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -980,28 +986,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 if(message.getType()==MegaChatMessage.TYPE_NORMAL){
 
-                    Spannable name = new SpannableString(holder.fullNameTitle);
+                    Spannable name = new SpannableString(holder.fullNameTitle+"\n");
 //                    name.setSpan(new RelativeSizeSpan(0.85f), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    name.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //                    name.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.contentContactMessageText.setText(name+"\n");
-
-                    String messageContent = message.getContent();
-
-
+                    holder.contentContactMessageText.setText(name);
+//                    String messageContent = ;
 
                     if(message.isEdited()){
                         log("Message is edited");
-                        Spannable content = new SpannableString(messageContent);
-                        content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.contentContactMessageText.append(messageContent);
+                        Spannable content = new SpannableString(message.getContent());
+                        content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        holder.contentContactMessageText.append(content+" ");
 //                    holder.contentContactMessageText.setText(content);
 
                         Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                         edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        holder.contentContactMessageText.append(" "+edited);
+                        holder.contentContactMessageText.append(edited);
                         holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                         holder.contactManagementMessage.setVisibility(View.GONE);
                     }
@@ -1033,7 +1036,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     String messageContent = message.getContent();
 
-                    String textToShow = String.format(context.getString(R.string.change_title_messages), messageContent);
+                    String textToShow = String.format(context.getString(R.string.change_title_messages), holder.fullNameTitle, messageContent);
 
                     Spanned result = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
