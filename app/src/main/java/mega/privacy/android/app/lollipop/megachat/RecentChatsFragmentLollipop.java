@@ -166,6 +166,24 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     }
 
     public void setChats(){
+//        ArrayList<MegaChatRoom> temporalChats = megaChatApi.getChatRooms();
+//        chats.clear();
+//
+//        for(int i=0;i<chats.size();i++){
+//            MegaChatRoom chat = chats.get(i);
+//            int privilege = chat.getOwnPrivilege();
+//            if(privilege==MegaChatRoom.PRIV_RM){
+//                log("Borradooooo");
+//            }
+//            else if(privilege==MegaChatRoom.PRIV_UNKNOWN){
+//                log("Unknow");
+//            }
+//            else{
+//                log("otro privilegio");
+//                chats.add(chat);
+//            }
+//        }
+
         chats = megaChatApi.getChatRooms();
 
         if (adapterList == null){
@@ -563,6 +581,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             log("Other change");
             if(item!=null){
                 log("New chat: "+item.getTitle());
+                setChats();
             }
             else{
                 log("The chat is NULL");
