@@ -1428,6 +1428,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(msg!=null){
             if(firstMessageReceived){
                 megaChatApi.setMessageSeen(idChat, msg.getMsgId());
+                log("set Message Seen: "+msg.getMsgIndex());
                 firstMessageReceived = false;
             }
 
@@ -1502,6 +1503,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Status change");
+            if(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                log("STATUS_SENDING_MANUAL");
+            }
+            else{
+                log("Status : "+msg.getStatus());
+            }
             modifyMessageReceived(msg);
         }
 //        if(msg!=null){

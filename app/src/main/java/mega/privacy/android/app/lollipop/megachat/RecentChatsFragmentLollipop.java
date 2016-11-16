@@ -471,6 +471,33 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("Change status");
+
+            if(item!=null) {
+
+                long chatHandleToUpdate = item.getChatId();
+                int indexToReplace = -1;
+                ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatRoom chat = itrReplace.next();
+                    if (chat != null) {
+                        if (chat.getChatId() == chatHandleToUpdate) {
+                            indexToReplace = itrReplace.nextIndex() - 1;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (indexToReplace != -1) {
+                    log("Index to replace: " + indexToReplace);
+                    MegaChatRoom chatToReplace = megaChatApi.getChatRoom(item.getChatId());
+                    log("Check the chatroom: "+chatToReplace.getOnlineStatus());
+                    log("Item status: "+item.getOnlineStatus());
+                    chats.set(indexToReplace, chatToReplace);
+
+                    adapterList.modifyChat(chats, indexToReplace);
+                }
+            }
         }
 //        else if(){
 //            log("Change unread count: "+item.getTitle());
@@ -640,11 +667,61 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     }
 
     @Override
-    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
+    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chatRoom) {
         log("onChatRoomUpdate");
 
+//        MegaChatRoom chatUpdated = megaChatApi.getChatRoom(chat.getChatId());
+//        if(chatUpdated!=null){
+//            log("chat updated: "+chat.getTitle());
+//            log("unread count: "+chat.getUnreadCount());
+//            log("change type: "+chat.getChanges());
+//        }
 
+        if(chatRoom.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
+            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+chatRoom.getChatId());
+            if(chatRoom!=null){
 
+                if (adapterList == null || adapterList.getItemCount()==0){
+                    setChats();
+                }
+                else{
+                    long chatHandleToUpdate = chatRoom.getChatId();
+                    int indexToReplace = -1;
+                    ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatRoom chat = itrReplace.next();
+                        if(chat!=null){
+                            if(chat.getChatId()==chatHandleToUpdate){
+                                indexToReplace = itrReplace.nextIndex()-1;
+                                break;
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if(indexToReplace!=-1){
+                        log("Index to replace: "+indexToReplace);
+                        MegaChatRoom chatToReplace = megaChatApi.getChatRoom(chatRoom.getChatId());
+                        chats.set(indexToReplace, chatToReplace);
+
+                        adapterList.modifyChat(chats, indexToReplace);
+                        adapterList.setPositionClicked(-1);
+
+                        if (adapterList.getItemCount() == 0){
+                            log("adapterList.getItemCount() == 0");
+                            listView.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            log("adapterList.getItemCount() NOT = 0");
+                            listView.setVisibility(View.VISIBLE);
+                            emptyLayout.setVisibility(View.GONE);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static void log(String log) {

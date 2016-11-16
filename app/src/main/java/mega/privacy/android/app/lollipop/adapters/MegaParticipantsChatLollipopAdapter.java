@@ -375,11 +375,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
     public int getItemCount() {
-
+		log("getItemCount");
 		int permission = participants.get(0).getPrivilege();
+		log("Participant name: "+participants.get(0).getFullName()+" privilege "+participants.get(0).getPrivilege());
 
 		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			return participants.size()+1;
+			int participantNumber = participants.size()+1;
+			log("return value: "+participantNumber);
+			return participantNumber;
 		} else {
 			return participants.size();
 		}
@@ -387,12 +390,15 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
 	public int getItemViewType(int position) {
+		log("getItemViewType: "+position);
 		int permission = participants.get(0).getPrivilege();
+		log("Participant name: "+participants.get(0).getFullName()+" privilege "+participants.get(0).getPrivilege());
 
 		if (permission == MegaChatRoom.PRIV_MODERATOR) {
 			if (position<participants.size()) {
 				return ITEM_VIEW_TYPE_NORMAL;
 			} else {
+				log("Type ADD_PARTICIPANT");
 				return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
 			}
 		} else {
