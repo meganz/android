@@ -531,23 +531,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("I was change by someone");
                     String fullNameAction = getParticipantFullName(message.getUserHandle());
 
-                    if(fullNameAction!=null){
-                        if(fullNameAction.trim().length()<=0){
-                            fullNameAction = "Unknown name";
-//                                holder.contactText.setText("Unknown name");
-//
-//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-//                                megaChatApi.getUserFirstname(holder.userHandle, listener);
-//                                megaChatApi.getUserLastname(holder.userHandle, listener);
+                    if(fullNameAction.trim().length()<=0){
+                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+                        if(nonContact!=null){
+                            fullNameAction = nonContact.getFullName();
                         }
-                    }
-                    else{
-                        fullNameAction = "Unknown name";
-//                            holder.contactText.setText("Unknown name");
+                        else{
+                            fullNameAction = "Unknown name";
+                            log("5-Call for nonContactName: "+ message.getUserHandle());
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        }
 
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
-//                            megaChatApi.getUserFirstname(holder.userHandle, listener);
-//                            megaChatApi.getUserLastname(holder.userHandle, listener);
                     }
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, fullNameAction);
                 }
@@ -595,23 +591,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 holder.fullNameTitle = getParticipantFullName(message.getUserHandleOfAction());
 
-                if(holder.fullNameTitle!=null){
-                    if(holder.fullNameTitle.trim().length()<=0){
-                        holder.fullNameTitle = "Unknown name";
-//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-//                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-//                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                if(holder.fullNameTitle.trim().length()<=0){
+                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
+                    if(nonContact!=null){
+                        holder.fullNameTitle = nonContact.getFullName();
                     }
                     else{
-
+                        holder.fullNameTitle = "Unknown name";
+                        log("6-Call for nonContactName: "+ message.getUserHandle());
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
+                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
+                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
                     }
-                }
-                else{
 
-                    holder.fullNameTitle = "Unknown name";
-//                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-//                    megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-//                    megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
                 }
 
                 int privilege = message.getPrivilege();
@@ -641,19 +633,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     String fullNameAction = getParticipantFullName(message.getUserHandle());
 
                     if(fullNameAction.trim().length()<=0){
-//                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
                         NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
                         if(nonContact!=null){
                             fullNameAction = nonContact.getFullName();
                         }
                         else{
                             fullNameAction = "Unknown name";
-//
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            log("8-Call for nonContactName: "+ message.getUserHandle());
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
                         }
-
                     }
 
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, fullNameAction);
