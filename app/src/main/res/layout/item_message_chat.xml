@@ -41,9 +41,10 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:textColor="@color/file_list_second_row"
+                android:gravity="right"
                 android:layout_centerVertical="true"/>
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/message_chat_me_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -52,7 +53,7 @@
                 android:gravity="right"
                 android:text="@string/chat_me_text"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/message_chat_time_text"/>
+                android:layout_toRightOf="@+id/message_chat_time_text"/>-->
 
         </RelativeLayout>
 
@@ -60,7 +61,7 @@
             android:id="@+id/own_deleted_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="right"
             android:layout_below="@+id/title_own_message_layout"
             android:visibility="gone">
 
@@ -68,6 +69,7 @@
                 android:id="@+id/own_deleted_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="right"
                 android:textSize="14sp"
                 android:textColor="@color/name_my_account"
                 android:layout_centerHorizontal="true"/>
@@ -131,7 +133,7 @@
             android:layout_width="match_parent"
             android:layout_height="26dp"
             android:gravity="left">
-
+<!--
             <TextView
                 android:id="@+id/message_chat_contact_text"
                 android:layout_width="wrap_content"
@@ -139,16 +141,16 @@
                 android:textSize="14sp"
                 android:textColor="@color/name_my_account"
                 android:gravity="left"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"/>-->
 
             <TextView
                 android:id="@+id/contact_message_chat_time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
+                android:gravity="left"
                 android:textColor="@color/file_list_second_row"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/message_chat_contact_text"/>
+                android:layout_centerVertical="true"/>
 
         </RelativeLayout>
 
@@ -156,7 +158,7 @@
             android:id="@+id/contact_deleted_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="left"
             android:layout_below="@+id/title_contact_message_layout"
             android:visibility="gone">
 
@@ -165,6 +167,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
+                android:gravity="left"
                 android:textColor="@color/name_my_account"
                 android:layout_centerHorizontal="true"/>
 
@@ -174,7 +177,6 @@
             android:id="@+id/content_contact_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/orange"
             android:layout_below="@+id/title_contact_message_layout">
 
             <RelativeLayout
