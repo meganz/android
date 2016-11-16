@@ -111,28 +111,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                         addToDB(request.getUserHandle());
                         updateAdapter(holder.getCurrentPosition());
                     }
-
-
-
-
-                    log("MEgaChatAdapter->Update firstname: "+holder.getCurrentPosition());
-                    if(isUserHandle){
-                        if(holder.getUserHandle()==request.getUserHandle()){
-                            holder.setFirstNameText(request.getText());
-                            holder.setFirstNameReceived();
-                            holder.setNameNonContact();
-
-                        }
-                        else{
-                            log("MEgaChatAdapter->Not match!!");
-                        }
-                    }
-                    else{
-                        holder.setFirstNameText(request.getText());
-                        holder.setFirstNameReceived();
-                        holder.setNameNonContact();
-                    }
-
                 }
                 else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
                     log("MEgaChatAdapter->Update lastname: "+holder.getCurrentPosition());
@@ -144,24 +122,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                         addToDB(request.getUserHandle());
                         updateAdapter(holder.getCurrentPosition());
                     }
-
-
-                    if(isUserHandle) {
-                        if (holder.getUserHandle() == request.getUserHandle()) {
-                            holder.setLastNameText(request.getText());
-                            holder.setLastNameReceived();
-                            holder.setNameNonContact();
-                        } else {
-                            log("MEgaChatAdapter->Not match!!");
-                        }
-                    }
-                    else{
-                        holder.setLastNameText(request.getText());
-                        holder.setLastNameReceived();
-                        holder.setNameNonContact();
-                    }
                 }
-
             }
             else{
                 log("Error asking for name!");

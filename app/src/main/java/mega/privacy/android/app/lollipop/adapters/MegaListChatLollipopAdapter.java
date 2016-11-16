@@ -511,6 +511,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
 		nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
 		holder.textViewContactName.setLayoutParams(nameTextViewParams);
+		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);

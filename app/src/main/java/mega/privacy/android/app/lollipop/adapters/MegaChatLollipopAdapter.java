@@ -97,10 +97,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         int currentPosition;
         long userHandle;
         String fullNameTitle;
-        String firstNameText;
-        String lastNameText;
-        boolean firstNameReceived;
-        boolean lastNameReceived;
 
         RelativeLayout itemLayout;
 
@@ -108,7 +104,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         TextView dateText;
         RelativeLayout ownMessageLayout;
         RelativeLayout titleOwnMessage;
-        TextView meText;
+//        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
         TextView contentOwnMessageText;
@@ -119,7 +115,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
         RelativeLayout contactMessageLayout;
         RelativeLayout titleContactMessage;
-        TextView contactText;
+//        TextView contactText;
         TextView timeContactText;
         RelativeLayout contentContactMessageLayout;
         TextView contentContactMessageText;
@@ -138,49 +134,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             return userHandle;
         }
 
-        public void setFirstNameReceived (){
-            this.firstNameReceived=true;
-        }
-        public void setLastNameReceived (){
-            this.lastNameReceived=true;
-        }
-
-        public void setFirstNameText(String firstNameText){
-            log("First name: "+firstNameText);
-            this.firstNameText = firstNameText;
-        }
-
-        public void setLastNameText(String lastNameText){
-            log("Last name: "+lastNameText);
-            this.lastNameText=lastNameText;
-        }
         public int getCurrentPosition (){
             return currentPosition;
-        }
-
-        public void setNameNonContact(){
-            log("setNameNonContact: "+currentPosition);
-            if(firstNameReceived && lastNameReceived) {
-                log("Name and First Name received!");
-                firstNameReceived= false;
-                lastNameReceived = false;
-
-                if(firstNameText!=null){
-                    if (firstNameText.trim().length() <= 0){
-                        fullNameTitle = lastNameText;
-                    }
-                    else{
-                        fullNameTitle = firstNameText + " " + lastNameText;
-                    }
-
-                    if(fullNameTitle!=null){
-                        if (fullNameTitle.trim().length() > 0){
-                            this.contactText.setText(fullNameTitle);
-                        }
-                    }
-                }
-
-            }
         }
     }
     ViewHolderMessageChatList holder;
@@ -213,13 +168,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         //Own messages
         holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
         holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
-        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
-        //Margins
-        RelativeLayout.LayoutParams meTextParams = (RelativeLayout.LayoutParams)holder.meText.getLayoutParams();
-        meTextParams.setMargins(Util.scaleWidthPx(7, outMetrics), 0, Util.scaleWidthPx(37, outMetrics), 0);
-        holder.meText.setLayoutParams(meTextParams);
+//        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
 
         holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
+        //Margins
+        RelativeLayout.LayoutParams timeOwnTextParams = (RelativeLayout.LayoutParams)holder.timeOwnText.getLayoutParams();
+        timeOwnTextParams.setMargins(Util.scaleWidthPx(7, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+        holder.timeOwnText.setLayoutParams(timeOwnTextParams);
+
         holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
         //Margins
         RelativeLayout.LayoutParams ownLayoutParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageLayout.getLayoutParams();
@@ -229,14 +185,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentOwnMessageText = (WrapTextView) v.findViewById(R.id.content_own_message_text);
         //Margins
         RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-        ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
+        ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
         holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
         holder.ownManagementMessage = (RelativeLayout) v.findViewById(R.id.own_deleted_message_layout);
         //Margins
-        RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
-        ownDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
-        holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
+        RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
+        ownManagementParams.addRule(RelativeLayout.ALIGN_RIGHT);
+        ownManagementParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(15, outMetrics));
+        holder.ownManagementMessage.setLayoutParams(ownManagementParams);
 
         holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_deleted_message_text);
 
@@ -252,13 +209,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         //Contact messages////////////////////////////////////////
         holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
         holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
-        holder.contactText = (TextView) v.findViewById(R.id.message_chat_contact_text);
-        //Margins
-        RelativeLayout.LayoutParams contactTextParams = (RelativeLayout.LayoutParams)holder.contactText.getLayoutParams();
-        contactTextParams.setMargins(Util.scaleWidthPx(37, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
-        holder.contactText.setLayoutParams(contactTextParams);
+//        holder.contactText = (TextView) v.findViewById(R.id.message_chat_contact_text);
 
         holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
+        //Margins
+        RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+        timeContactTextParams.setMargins(Util.scaleWidthPx(75, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+        holder.timeContactText.setLayoutParams(timeContactTextParams);
+
         holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
         //Margins
         RelativeLayout.LayoutParams contactLayoutParams = (RelativeLayout.LayoutParams)holder.contentContactMessageLayout.getLayoutParams();
@@ -268,14 +226,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
         //Margins
         RelativeLayout.LayoutParams contactMessageParams = (RelativeLayout.LayoutParams)holder.contentContactMessageText.getLayoutParams();
-        contactMessageParams.setMargins(Util.scaleWidthPx(62, outMetrics), 0, Util.scaleWidthPx(62, outMetrics), 0);
+        contactMessageParams.setMargins(Util.scaleWidthPx(68, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
         holder.contactManagementMessage = (RelativeLayout) v.findViewById(R.id.contact_deleted_message_layout);
+
         //Margins
-        RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
-        contactDeleteParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
-        holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
+        RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
+        contactManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
+        contactManagementParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+        holder.contactManagementMessage.setLayoutParams(contactManagementParams);
 
         holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_deleted_message_text);
 
@@ -349,13 +309,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     else{
                         log("Ask for name non-contact");
                         fullNameAction = "Participant left";
-                        holder.contactText.setText("Participant left");
                         log("1-Call for nonContactName: "+ message.getUserHandle());
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
                         megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                         megaChatApi.getUserLastname(message.getUserHandle(), listener);
                     }
-
                 }
 
                 if(privilege!=MegaChatRoom.PRIV_RM){
@@ -385,14 +343,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownManagementMessageText.setText(result);
 
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
-
-                holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
                 holder.ownManagementMessage.setVisibility(View.VISIBLE);
-                //Margins
-                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
-                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
-                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
             }
             else{
                 log("CONTACT Message type ALTER PARTICIPANTS");
@@ -433,8 +384,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         holder.fullNameTitle = nonContact.getFullName();
                     }
                     else{
-                        holder.fullNameTitle = "Participant left";
-                        holder.contactText.setText("Participant left");
+                        holder.fullNameTitle = "Unknown name";
                         log("3-Call for nonContactName: "+ message.getUserHandle());
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
                         megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
@@ -460,8 +410,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                                 fullNameAction = nonContact.getFullName();
                             }
                             else{
-                                fullNameAction = "Participant left";
-                                holder.contactText.setText("Participant left");
+                                fullNameAction = "Unknown name";
                                 log("2-Call for nonContactName: "+ message.getUserHandle());
                                 ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
                                 megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -496,8 +445,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                                     fullNameAction = nonContact.getFullName();
                                 }
                                 else{
-                                    fullNameAction = "Participant left";
-                                    holder.contactText.setText("Participant left");
+                                    fullNameAction = "Unknown name";
                                     log("4-Call for nonContactName: "+ message.getUserHandle());
                                     ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
                                     megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -521,15 +469,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.contactManagementMessageText.setText(result);
 
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
-
-                holder.contactManagementMessageText.setGravity(Gravity.LEFT);
-
                 holder.contactManagementMessage.setVisibility(View.VISIBLE);
-                //Margins
-                RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
-                contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
-                contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
+
             } //END CONTACT MANAGEMENT MESSAGE
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
@@ -592,8 +533,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     if(fullNameAction!=null){
                         if(fullNameAction.trim().length()<=0){
-                            fullNameAction = "Participant left";
-//                                holder.contactText.setText("Participant left");
+                            fullNameAction = "Unknown name";
+//                                holder.contactText.setText("Unknown name");
 //
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                                megaChatApi.getUserFirstname(holder.userHandle, listener);
@@ -601,8 +542,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         }
                     }
                     else{
-                        fullNameAction = "Participant left";
-//                            holder.contactText.setText("Participant left");
+                        fullNameAction = "Unknown name";
+//                            holder.contactText.setText("Unknown name");
 
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this);
 //                            megaChatApi.getUserFirstname(holder.userHandle, listener);
@@ -622,13 +563,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
                 holder.ownManagementMessage.setVisibility(View.VISIBLE);
-
-                holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
-                //Margins
-                RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
-                ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
-                ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
             }
             else{
                 log("Participant privilege change!");
@@ -663,19 +597,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 if(holder.fullNameTitle!=null){
                     if(holder.fullNameTitle.trim().length()<=0){
-                        holder.contactText.setText("Participant left");
-                        holder.fullNameTitle = "Participant left";
+                        holder.fullNameTitle = "Unknown name";
 //                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
 //                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
 //                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
                     }
                     else{
-                        holder.contactText.setText(holder.fullNameTitle);
+
                     }
                 }
                 else{
-                    holder.contactText.setText("Participant left");
-                    holder.fullNameTitle = "Participant left";
+
+                    holder.fullNameTitle = "Unknown name";
 //                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
 //                    megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
 //                    megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
@@ -714,8 +647,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             fullNameAction = nonContact.getFullName();
                         }
                         else{
-                            fullNameAction = "Participant left";
-                            holder.contactText.setText("Participant left");
+                            fullNameAction = "Unknown name";
 //
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
@@ -737,13 +669,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.contactManagementMessageText.setText(result);
 
                 holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contactManagementMessageText.setGravity(Gravity.LEFT);
                 holder.contactManagementMessage.setVisibility(View.VISIBLE);
-                //Margins
-                RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
-                contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
-                contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
             }
         }
         else{
@@ -887,14 +813,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
 
                     holder.ownManagementMessageText.setText(result);
-                    holder.ownManagementMessageText.setGravity(Gravity.RIGHT);
 
                     holder.ownManagementMessage.setVisibility(View.VISIBLE);
-                    //Margins
-                    RelativeLayout.LayoutParams ownDeleteParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
-                    ownDeleteParams.addRule(RelativeLayout.ALIGN_RIGHT);
-                    ownDeleteParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                    holder.ownManagementMessage.setLayoutParams(ownDeleteParams);
+
                 }
                 else{
                     log("Type message: "+message.getType());
@@ -909,29 +830,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     holder.fullNameTitle = getParticipantFullName(userHandle);
 
-                    if(holder.fullNameTitle!=null){
-                        if(holder.fullNameTitle.trim().length()<=0){
-                            holder.contactText.setText("Participant left");
-                            holder.fullNameTitle = "Participant left";
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                    if(holder.fullNameTitle.trim().length()<=0){
+//                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
+                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+                        if(nonContact!=null){
+                            holder.fullNameTitle = nonContact.getFullName();
                         }
                         else{
-                            holder.contactText.setText(holder.fullNameTitle);
+                            holder.fullNameTitle = "Unknown name";
+//
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
                         }
-                    }
-                    else{
-                        holder.contactText.setText("Participant left");
-                        holder.fullNameTitle = "Participant left";
-//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
                     }
                 }
                 else{
                     holder.fullNameTitle = ("Hide name");
-                    holder.contactText.setText("Hide name");
                 }
 
                 if (!multipleSelect) {
@@ -994,23 +909,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 if(message.getType()==MegaChatMessage.TYPE_NORMAL){
 
-                    Spannable name = new SpannableString(holder.fullNameTitle+"\n");
+                    if(((ChatActivityLollipop) context).isGroup()){
+                        Spannable name = new SpannableString(holder.fullNameTitle+"\n");
 //                    name.setSpan(new RelativeSizeSpan(0.85f), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    String handleString = megaApi.userHandleToBase64(holder.userHandle);
-                    String color = megaApi.getUserAvatarColor(handleString);
-                    if(color!=null){
-                        log("The color to set the avatar is "+color);
-                        name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    }
-                    else{
-                        log("Default color to the avatar");
-                        name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    }
+                        String handleString = megaApi.userHandleToBase64(holder.userHandle);
+                        String color = megaApi.getUserAvatarColor(handleString);
+                        if(color!=null){
+                            log("The color to set the avatar is "+color);
+                            name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        else{
+                            log("Default color to the avatar");
+                            name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
 
 //                    name.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    holder.contentContactMessageText.setText(name);
-//                    String messageContent = ;
+                        holder.contentContactMessageText.setText(name);
+                    }
+                    else{
+                        holder.contentContactMessageText.setText("");
+                    }
 
                     if(message.isEdited()){
                         log("Message is edited");
@@ -1073,14 +992,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
 
                     holder.contactManagementMessageText.setText(result);
-                    holder.contactManagementMessageText.setGravity(Gravity.LEFT);
-
                     holder.contactManagementMessage.setVisibility(View.VISIBLE);
-                    //Margins
-                    RelativeLayout.LayoutParams contactDeleteParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
-                    contactDeleteParams.addRule(RelativeLayout.ALIGN_LEFT);
-                    contactDeleteParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
-                    holder.contactManagementMessage.setLayoutParams(contactDeleteParams);
                 }
                 else{
                     log("Type message: "+message.getType());
@@ -1151,7 +1063,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             log("delete pos: "+pos);
             selectedItems.delete(pos);
             if(view!=null){
-                log("Start animation: "+view.meText.getText());
+                log("Start animation");
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
                 MegaChatMessage message = messages.get(pos);
 //                String myMail = ((ChatActivityLollipop) context).getMyMail();
@@ -1171,7 +1083,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             log("PUT pos: "+pos);
             selectedItems.put(pos, true);
             if(view!=null){
-                log("Start animation: "+view.meText.getText());
+                log("Start animation");
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
                 MegaChatMessage message = messages.get(pos);
                 String myMail = ((ChatActivityLollipop) context).getMyMail();

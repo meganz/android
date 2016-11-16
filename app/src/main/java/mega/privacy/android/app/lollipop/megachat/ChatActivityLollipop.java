@@ -152,9 +152,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     String intentAction;
     MegaChatLollipopAdapter adapter;
 
-    MegaContact contactChat;
-    String fullName;
-
     int stateHistory;
 
     DatabaseHandler dbH = null;
@@ -619,11 +616,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public static float dpToPx(Context context, float valueInDp) {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
-    }
-
     EmojiconsFragment emojiconsFragment = null;
     boolean firstTimeEmoji = true;
     boolean shouldShowEmojiKeyboard = false;
@@ -1047,18 +1039,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             ArrayList<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
             switch(item.getItemId()){
-                case R.id.cab_menu_select_all:{
-                    selectAll();
-                    actionMode.invalidate();
-                    break;
-                }
-                case R.id.cab_menu_unselect_all:{
-                    clearSelections();
-                    hideMultipleSelect();
-                    actionMode.invalidate();
-                    break;
-                }
-                case R.id.cab_menu_edit:{
+//                case R.id.cab_menu_select_all:{
+//                    selectAll();
+//                    actionMode.invalidate();
+//                    break;
+//                }
+//                case R.id.cab_menu_unselect_all:{
+//                    clearSelections();
+//                    hideMultipleSelect();
+//                    actionMode.invalidate();
+//                    break;
+//                }
+                case R.id.chat_cab_menu_edit:{
                     log("Edit text");
                     editingMessage = true;
                     messageToEdit = messagesSelected.get(0);
@@ -1067,14 +1059,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     break;
                 }
-                case R.id.cab_menu_copy:{
+                case R.id.chat_cab_menu_copy:{
                     clearSelections();
                     hideMultipleSelect();
                     //Archive
                     Toast.makeText(chatActivity, "Copy: "+messagesSelected.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case R.id.cab_menu_delete:{
+                case R.id.chat_cab_menu_delete:{
                     clearSelections();
                     hideMultipleSelect();
                     //Delete
@@ -1107,71 +1099,71 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             List<MegaChatMessage> selected = adapter.getSelectedMessages();
 
             if (selected.size() !=0) {
-                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+//                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if (selected.size() == 1) {
                     MegaChatMessage message = selected.get(0);
                     if(message.getUserHandle()==myUserHandle){
                         if(message.isEditable()){
-                            menu.findItem(R.id.cab_menu_edit).setVisible(true);
-                            menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(true);
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                         }
                     }
                     else{
-                        menu.findItem(R.id.cab_menu_edit).setVisible(false);
-                        menu.findItem(R.id.cab_menu_delete).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                     }
 
-                    menu.findItem(R.id.cab_menu_copy).setVisible(true);
+                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
 
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    unselect.setTitle(getString(R.string.action_unselect_one));
-                    unselect.setVisible(true);
+//                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+//                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+//                    unselect.setTitle(getString(R.string.action_unselect_one));
+//                    unselect.setVisible(true);
                 }
                 else if (selected.size()==adapter.getItemCount()){
-                    menu.findItem(R.id.cab_menu_edit).setVisible(false);
-                    menu.findItem(R.id.cab_menu_copy).setVisible(true);
-                    menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     for(int i=0; i<selected.size();i++){
                         if(messages.get(i).getUserHandle()==myUserHandle){
                             if(!(messages.get(i).isEditable())){
-                                menu.findItem(R.id.cab_menu_delete).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
                         }
                         else{
-                            menu.findItem(R.id.cab_menu_delete).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
+//                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+//                    unselect.setTitle(getString(R.string.action_unselect_all));
+//                    unselect.setVisible(true);
                 }
                 else{
-                    menu.findItem(R.id.cab_menu_edit).setVisible(false);
-                    menu.findItem(R.id.cab_menu_copy).setVisible(true);
-                    menu.findItem(R.id.cab_menu_delete).setVisible(true);
-                    menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     for(int i=0; i<selected.size();i++){
                         if(messages.get(i).getUserHandle()==myUserHandle){
                             if(!(messages.get(i).isEditable())){
-                                menu.findItem(R.id.cab_menu_delete).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
                         }
                         else{
-                            menu.findItem(R.id.cab_menu_delete).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
+//                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+//                    unselect.setTitle(getString(R.string.action_unselect_all));
+//                    unselect.setVisible(true);
                 }
             }
-            else{
-                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-            }
+//            else{
+//                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+//                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+//            }
 
             return false;
         }
