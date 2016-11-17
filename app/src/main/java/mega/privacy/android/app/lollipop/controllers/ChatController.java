@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
@@ -67,12 +68,12 @@ public class ChatController {
         }
     }
 
-    public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
+    public void deleteMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
         log("deleteMessages: "+messages.size());
         MegaChatMessage messageToDelete;
         if(messages!=null){
             for(int i=0; i<messages.size();i++){
-                messageToDelete = megaChatApi.deleteMessage(chat.getChatId(), messages.get(i).getMsgId());
+                messageToDelete = megaChatApi.deleteMessage(chat.getChatId(), messages.get(i).getMessage().getMsgId());
                 if(messageToDelete==null){
                     log("The message cannot be deleted");
                 }

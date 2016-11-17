@@ -541,6 +541,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
                         MegaChatRoom chatToReplace = megaChatApi.getChatRoom(item.getChatId());
+                        int checkUnread = chatToReplace.getUnreadCount();
+                        log("Unread count: "+chatToReplace.getUnreadCount());
                         chats.set(indexToReplace, chatToReplace);
 
                         adapterList.modifyChat(chats, indexToReplace);
@@ -703,6 +705,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
                         MegaChatRoom chatToReplace = megaChatApi.getChatRoom(chatRoom.getChatId());
+
+                        log("Unread count: "+chatToReplace.getUnreadCount());
                         chats.set(indexToReplace, chatToReplace);
 
                         adapterList.modifyChat(chats, indexToReplace);

@@ -36,6 +36,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
@@ -50,8 +51,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     Context context;
     int positionClicked;
-    ArrayList<MegaChatMessage> messages;
-    ArrayList<Integer> infoToShow;
+    ArrayList<AndroidMegaChatMessage> messages;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -62,12 +62,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
 
-    public MegaChatLollipopAdapter(Context _context, ArrayList<MegaChatMessage> _messages, ArrayList<Integer> infoToShow, RecyclerView _listView) {
+    public MegaChatLollipopAdapter(Context _context, ArrayList<AndroidMegaChatMessage> _messages, RecyclerView _listView) {
         log("new adapter");
         this.context = _context;
         this.messages = _messages;
         this.positionClicked = -1;
-        this.infoToShow = infoToShow;
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -258,7 +257,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         log("onBindViewHolder: "+position);
         holder.currentPosition = position;
 
-        MegaChatMessage message = messages.get(position);
+        MegaChatMessage message = messages.get(position).getMessage();
         holder.userHandle = message.getUserHandle();
 
 //        String myMail = ((ChatActivityLollipop) context).getMyMail();
@@ -269,8 +268,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(message.getUserHandleOfAction()==megaApi.getMyUser().getHandle()){
                 log("me alter participant");
 
-                if(infoToShow!=null){
-                    switch (infoToShow.get(position)){
+                if(messages.get(position).getInfoToShow()!=-1){
+                    switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
                             holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
@@ -351,8 +350,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
-                if(infoToShow!=null){
-                    switch (infoToShow.get(position)){
+                if(messages.get(position).getInfoToShow()!=-1){
+                    switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
                             holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
@@ -480,8 +479,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
-                if(infoToShow!=null){
-                    switch (infoToShow.get(position)){
+                if(messages.get(position).getInfoToShow()!=-1){
+                    switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
                             holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
@@ -564,8 +563,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 log("Participant privilege change!");
                 log("Message type PRIVILEGE CHANGE: "+message.getContent());
 
-                if(infoToShow!=null){
-                    switch (infoToShow.get(position)){
+                if(messages.get(position).getInfoToShow()!=-1){
+                    switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
                             holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
@@ -700,8 +699,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                if(infoToShow!=null){
-                    switch (infoToShow.get(position)){
+                if(messages.get(position).getInfoToShow()!=-1){
+                    switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
                             holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
@@ -872,8 +871,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                if(infoToShow!=null){
-                    switch (infoToShow.get(position)){
+                if(messages.get(position).getInfoToShow()!=-1){
+                    switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
                             holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
@@ -946,6 +945,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     else{
                         holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                         holder.contactManagementMessage.setVisibility(View.GONE);
+                        holder.contactManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                         holder.contentContactMessageText.append(message.getContent());
                     }
                 }
@@ -1024,7 +1024,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     @Override
     public int getItemCount() {
-        return infoToShow.size();
+        return messages.size();
     }
 
 
@@ -1055,7 +1055,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(view!=null){
                 log("Start animation");
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                MegaChatMessage message = messages.get(pos);
+                MegaChatMessage message = messages.get(pos).getMessage();
 //                String myMail = ((ChatActivityLollipop) context).getMyMail();
                 if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
                     view.ownMultiselectionTickIcon.setVisibility(View.GONE);
@@ -1075,7 +1075,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             if(view!=null){
                 log("Start animation");
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                MegaChatMessage message = messages.get(pos);
+                MegaChatMessage message = messages.get(pos).getMessage();
                 String myMail = ((ChatActivityLollipop) context).getMyMail();
                 if(message.getUserHandle()==megaApi.getMyUser().getHandle()) {
                     view.ownMultiselectionLayout.startAnimation(flipAnimation);
@@ -1123,7 +1123,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     /*
      * Get request at specified position
      */
-    public MegaChatMessage getMessageAt(int position) {
+    public AndroidMegaChatMessage getMessageAt(int position) {
         try {
             if (messages != null) {
                 return messages.get(position);
@@ -1136,12 +1136,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     /*
      * Get list of all selected chats
      */
-    public ArrayList<MegaChatMessage> getSelectedMessages() {
-        ArrayList<MegaChatMessage> messages = new ArrayList<MegaChatMessage>();
+    public ArrayList<AndroidMegaChatMessage> getSelectedMessages() {
+        ArrayList<AndroidMegaChatMessage> messages = new ArrayList<AndroidMegaChatMessage>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
             if (selectedItems.valueAt(i) == true) {
-                MegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
+                AndroidMegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
                 if (m != null){
                     messages.add(m);
                 }
@@ -1161,37 +1161,33 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         notifyDataSetChanged();
     }
 
-    public void setMessages (ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow){
+    public void setMessages (ArrayList<AndroidMegaChatMessage> messages){
         this.messages = messages;
-        this.infoToShow = infoToShow;
         notifyDataSetChanged();
     }
 
-    public void modifyMessage(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow, int position){
+    public void modifyMessage(ArrayList<AndroidMegaChatMessage> messages, int position){
         this.messages = messages;
-        this.infoToShow = infoToShow;
-        if(messages.get(position).isDeleted()){
+
+        if(messages.get(position).getMessage().isDeleted()){
             log("Deleted the position message");
         }
         notifyItemChanged(position);
     }
 
-    public void appendMessage(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow){
+    public void appendMessage(ArrayList<AndroidMegaChatMessage> messages){
         this.messages = messages;
-        this.infoToShow = infoToShow;
         notifyItemInserted(messages.size() - 1);
     }
 
-    public void loadPreviousMessage(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow){
+    public void loadPreviousMessage(ArrayList<AndroidMegaChatMessage> messages){
         this.messages = messages;
-        this.infoToShow = infoToShow;
         notifyItemInserted(0);
     }
 
-    public void loadPreviousMessages(ArrayList<MegaChatMessage> messages, ArrayList<Integer> infoToShow, int counter){
+    public void loadPreviousMessages(ArrayList<AndroidMegaChatMessage> messages, int counter){
         log("loadPreviousMessages: "+counter);
         this.messages = messages;
-        this.infoToShow = infoToShow;
         notifyItemRangeInserted(0, counter);
     }
 
