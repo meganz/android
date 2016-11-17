@@ -571,6 +571,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                         if(unread == 0){
                             lastMessageSeen = null;
+                            lastSeenReceived=true;
                             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                         }
                         else{
