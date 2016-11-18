@@ -1532,10 +1532,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         if (!Util.isOnline(this)){
         	log("No network: intent to OfflineActivityLollipop");
-        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
-			startActivity(offlineIntent);
-			finish();
-        	return;
+//        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
+//			startActivity(offlineIntent);
+//			finish();
+//        	return;
         }
 
         dbH.setAttrOnline(true);
