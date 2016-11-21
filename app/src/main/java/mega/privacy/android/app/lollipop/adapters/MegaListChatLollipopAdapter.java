@@ -174,34 +174,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("El user es NULL");
 			}
 			holder.contactMail = user.getEmail();
-//			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contactHandle));
-////				MegaContact contactDB = dbH.findContactByHandle("6135453135");
-//			if(contactDB!=null){
-//				holder.firstNameText = contactDB.getName();
-//				holder.lastNameText = contactDB.getLastName();
-//
-//				if (holder.firstNameText.trim().length() <= 0){
-//					holder.fullName = holder.lastNameText;
-//				}
-//				else{
-//					holder.fullName = holder.firstNameText + " " + holder.lastNameText;
-//				}
-//
-//				if (holder.fullName.trim().length() <= 0){
-//					log("Put email as fullname");
-//					String email = holder.contactMail;
-//					String[] splitEmail = email.split("[@._]");
-//					holder.fullName = splitEmail[0];
-//				}
-//
-////				holder.textViewContactName.setText(holder.fullName);
-//			}
-//			else{
-//				String email = holder.contactMail;
-//				String[] splitEmail = email.split("[@._]");
-//				holder.fullName = splitEmail[0];
-////				holder.textViewContactName.setText(holder.fullName);
-//			}
 
 			log("ChatRoom title: "+chat.getTitle());
 			holder.textViewContactName.setText(chat.getTitle());

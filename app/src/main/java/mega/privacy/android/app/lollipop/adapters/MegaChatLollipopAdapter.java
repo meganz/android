@@ -728,7 +728,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 if(message.getType()==MegaChatMessage.TYPE_NORMAL){
                     log("Message type NORMAL: "+message.getMsgId());
 
-                    String messageContent = message.getContent();
+                    String messageContent = "";
+                    if(message.getContent()!=null){
+                        messageContent = message.getContent();
+                    }
 
                     if(message.isEdited()){
                         log("Message is edited");
@@ -922,7 +925,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     if(message.isEdited()){
                         log("Message is edited");
-                        Spannable content = new SpannableString(message.getContent());
+                        String messageContent = "";
+                        if(message.getContent()!=null){
+                            messageContent = message.getContent();
+                        }
+
+                        Spannable content = new SpannableString(messageContent);
                         content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         holder.contentContactMessageText.append(content+" ");
 //                    holder.contentContactMessageText.setText(content);
@@ -946,7 +954,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                         holder.contactManagementMessage.setVisibility(View.GONE);
                         holder.contactManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-                        holder.contentContactMessageText.append(message.getContent());
+                        String messageContent = "";
+                        if(message.getContent()!=null){
+                            messageContent = message.getContent();
+                        }
+                        holder.contentContactMessageText.append(messageContent);
                     }
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
