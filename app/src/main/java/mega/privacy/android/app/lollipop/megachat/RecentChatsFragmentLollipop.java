@@ -186,6 +186,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 //        }
 
         chats = megaChatApi.getChatRooms();
+        megaChatApi.getChatListItems();
 
         if (adapterList == null){
             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);

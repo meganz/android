@@ -3869,7 +3869,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
 		if (searchView != null){
-			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 			searchView.setIconifiedByDefault(true);
 		}
 

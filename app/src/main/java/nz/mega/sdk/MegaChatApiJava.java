@@ -359,6 +359,25 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Get all chatrooms (1on1 and groupal) with limited information
+     *
+     * It is needed to have successfully completed the \c MegaChatApi::init request
+     * before calling this function.
+     *
+     * Note that MegaChatListItem objects don't include as much information as
+     * MegaChatRoom objects, but a limited set of data that is usually displayed
+     * at the list of chatrooms, like the title of the chat or the unread count.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return List of MegaChatListItemList objects with all chatrooms of this account.
+     */
+    public ArrayList<MegaChatListItem> getChatListItems(){
+        return chatRoomListItemToArray(megaChatApi.getChatListItems());
+
+    }
+
+    /**
      * Get the MegaChatRoom that has a specific handle
      *
      * You can get the handle of a MegaChatRoom using MegaChatRoom::getChatId or
@@ -371,6 +390,7 @@ public class MegaChatApiJava {
      *
      * @return List of MegaChatRoom objects with all chatrooms of this account.
      */
+
     public MegaChatRoom getChatRoom(long chatid){
         return megaChatApi.getChatRoom(chatid);
     }
@@ -712,6 +732,20 @@ public class MegaChatApiJava {
         ArrayList<MegaChatRoom> result = new ArrayList<MegaChatRoom>((int)chatRoomList.size());
         for (int i = 0; i < chatRoomList.size(); i++) {
             result.add(chatRoomList.get(i).copy());
+        }
+
+        return result;
+    }
+
+    static ArrayList<MegaChatListItem> chatRoomListItemToArray(MegaChatListItemList chatRoomItemList) {
+
+        if (chatRoomItemList == null) {
+            return null;
+        }
+
+        ArrayList<MegaChatListItem> result = new ArrayList<MegaChatListItem>((int)chatRoomItemList.size());
+        for (int i = 0; i < chatRoomItemList.size(); i++) {
+            result.add(chatRoomItemList.get(i).copy());
         }
 
         return result;
