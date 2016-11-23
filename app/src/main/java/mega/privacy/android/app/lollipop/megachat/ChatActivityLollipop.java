@@ -1432,10 +1432,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return chatRoom.getPeerLastnameByHandle(handle);
     }
 
-    public String getChatTitle(){
-        return chatRoom.getTitle();
-    }
-
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         log("onChatRoomUpdate!");

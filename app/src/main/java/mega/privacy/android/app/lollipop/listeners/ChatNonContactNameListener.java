@@ -43,7 +43,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChatList holder, MegaChatLollipopAdapter adapter, long userHandle) {
         this.context = context;
-        this.holder = holder;
+//        this.holder = holder;
         this.adapter = adapter;
         this.isUserHandle = true;
         this.userHandle = userHandle;
@@ -109,6 +109,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                         firstName = request.getText();
                         receivedFirstName = true;
                         addToDB(request.getUserHandle());
+                        log("Update holder: "+holder.getUserHandle());
                         updateAdapter(holder.getCurrentPosition());
                     }
                 }
@@ -120,6 +121,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                         lastName = request.getText();
                         receivedLastName = true;
                         addToDB(request.getUserHandle());
+                        log("Update holder: "+holder.getUserHandle());
                         updateAdapter(holder.getCurrentPosition());
                     }
                 }

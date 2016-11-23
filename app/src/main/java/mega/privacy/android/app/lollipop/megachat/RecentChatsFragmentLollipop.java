@@ -499,12 +499,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                 }
             }
         }
-//        else if(){
-//            log("Change unread count: "+item.getTitle());
-//            log("Unread: "+item.getUnreadCount());
-//
-//
-//        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
