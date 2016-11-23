@@ -10,6 +10,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
 public class ChatPanelListener implements View.OnClickListener {
@@ -28,9 +29,9 @@ public class ChatPanelListener implements View.OnClickListener {
     public void onClick(View v) {
         log("onClick ChatPanelListener");
 
-        MegaChatRoom selectedChat = null;
+        MegaChatListItem selectedChatItem = null;
         if(context instanceof ManagerActivityLollipop){
-            selectedChat = ((ManagerActivityLollipop) context).getSelectedChat();
+            selectedChatItem = ((ManagerActivityLollipop) context).getSelectedChat();
         }
 
         switch(v.getId()){
@@ -38,22 +39,22 @@ public class ChatPanelListener implements View.OnClickListener {
             case R.id.chat_list_info_chat_layout:{
                 log("click contact info");
                 ((ManagerActivityLollipop)context).hideChatPanel();
-                if(selectedChat==null){
+                if(selectedChatItem==null){
                     log("Selected chat NULL");
                 }
 
-                if(selectedChat.isGroup()){
+                if(selectedChatItem.isGroup()){
                     Intent i = new Intent(context, GroupChatInfoActivityLollipop.class);
-//                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
+//                i.putExtra("userEmail", selectedChatItem.getContacts().get(0).getMail());
 //                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
-                    i.putExtra("handle", selectedChat.getChatId());
+                    i.putExtra("handle", selectedChatItem.getChatId());
                     context.startActivity(i);
                 }
                 else{
                     Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
-//                i.putExtra("userEmail", selectedChat.getContacts().get(0).getMail());
+//                i.putExtra("userEmail", selectedChatItem.getContacts().get(0).getMail());
 //                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
-                    i.putExtra("handle", selectedChat.getChatId());
+                    i.putExtra("handle", selectedChatItem.getChatId());
                     context.startActivity(i);
                 }
 
@@ -62,21 +63,21 @@ public class ChatPanelListener implements View.OnClickListener {
             case R.id.chat_list_leave_chat_layout:{
                 log("click leave chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
-                if(selectedChat==null){
+                if(selectedChatItem==null){
                     log("Selected chat NULL");
                 }
-                log("Leave chat with: "+selectedChat.getTitle());
-                ((ManagerActivityLollipop)context).showConfirmationLeaveChat(selectedChat);
+                log("Leave chat with: "+selectedChatItem.getTitle());
+                ((ManagerActivityLollipop)context).showConfirmationLeaveChat(selectedChatItem);
                 break;
             }
             case R.id.chat_list_clear_history_chat_layout:{
                 log("click clear history chat");
                 ((ManagerActivityLollipop)context).hideChatPanel();
-                if(selectedChat==null){
+                if(selectedChatItem==null){
                     log("Selected chat NULL");
                 }
-                log("Clear chat with: "+selectedChat.getTitle());
-                chatC.clearHistory(selectedChat);
+                log("Clear chat with: "+selectedChatItem.getTitle());
+                chatC.clearHistory(selectedChatItem.getChatId());
                 break;
             }
             case R.id.chat_list_mute_chat_layout:{

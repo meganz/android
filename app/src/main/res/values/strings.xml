@@ -966,4 +966,6 @@
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#00BFA5\'>%1$s</font> changed the group chat name to <font color=\'#00BFA5\'>%2$s</font>]]></string>
 
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> <b>left</b> the group chat]]></string>
+
+    <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 </resources>

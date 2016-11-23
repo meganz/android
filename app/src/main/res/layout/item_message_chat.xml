@@ -105,19 +105,49 @@
 
             </RelativeLayout>
 
-            <mega.privacy.android.app.components.WrapTextView
-                android:id="@+id/content_own_message_text"
+            <RelativeLayout
+                android:id="@+id/own_text_and_triangle_layout"
+                android:layout_width="match_parent"
+                android:gravity="right"
+                android:layout_height="wrap_content">
+
+                <mega.privacy.android.app.components.WrapTextView
+                    android:id="@+id/content_own_message_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/name_my_account"
+                    android:layout_alignParentRight="true"
+                    android:textSize="14sp"
+                    android:inputType="textMultiLine|textNoSuggestions"
+                    android:background="@drawable/rounded_text_view_chat_own_message"
+                    android:padding="11dp"
+                    android:gravity="right"/>
+
+                <ImageView
+                    android:id="@+id/own_triangle_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/content_own_message_text"
+                    android:gravity="right"
+                    android:background="@drawable/ic_warning_not_sent"/>
+             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/not_sent_own_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/own_text_and_triangle_layout"
                 android:textColor="@color/name_my_account"
                 android:layout_alignParentRight="true"
-                android:textSize="14sp"
+                android:text="@string/manual_retry_alert"
+                android:textSize="11sp"
                 android:inputType="textMultiLine|textNoSuggestions"
-                android:background="@drawable/rounded_text_view_chat_own_message"
-                android:padding="11dp"
                 android:gravity="right"/>
 
         </RelativeLayout>
+
+
 
     </RelativeLayout>
 

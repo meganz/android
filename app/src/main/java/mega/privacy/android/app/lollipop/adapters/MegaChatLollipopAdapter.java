@@ -108,6 +108,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         RelativeLayout contentOwnMessageLayout;
         TextView contentOwnMessageText;
 
+        TextView retryAlert;
+        ImageView triangleIcon;
+
         RelativeLayout ownMultiselectionLayout;
         ImageView ownMultiselectionImageView;
         ImageView ownMultiselectionTickIcon;
@@ -187,6 +190,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
         holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
+        holder.retryAlert = (TextView) v.findViewById(R.id.not_sent_own_message_text);
+        //Margins
+        RelativeLayout.LayoutParams ownRetryAlertParams = (RelativeLayout.LayoutParams)holder.retryAlert.getLayoutParams();
+        ownRetryAlertParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+        holder.retryAlert.setLayoutParams(ownRetryAlertParams);
+
+        holder.triangleIcon = (ImageView)  v.findViewById(R.id.own_triangle_icon);
+        //Margins
+        RelativeLayout.LayoutParams ownTriangleParams = (RelativeLayout.LayoutParams)holder.triangleIcon.getLayoutParams();
+        ownTriangleParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(4, outMetrics), 0);
+        holder.triangleIcon.setLayoutParams(ownTriangleParams);
+
         holder.ownManagementMessage = (RelativeLayout) v.findViewById(R.id.own_deleted_message_layout);
         //Margins
         RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
@@ -256,6 +271,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     public void onBindViewHolder(ViewHolderMessageChatList holder, int position) {
         log("onBindViewHolder: "+position);
         holder.currentPosition = position;
+
+        holder.triangleIcon.setVisibility(View.GONE);
+        holder.retryAlert.setVisibility(View.GONE);
 
         MegaChatMessage message = messages.get(position).getMessage();
         holder.userHandle = message.getUserHandle();
@@ -728,6 +746,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 if(message.getType()==MegaChatMessage.TYPE_NORMAL){
                     log("Message type NORMAL: "+message.getMsgId());
 
+                    //Margins
+                    RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                    ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                    holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
                     String messageContent = "";
                     if(message.getContent()!=null){
                         messageContent = message.getContent();
@@ -760,12 +783,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             log("Show triangle retry!");
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                            //Margins
+                            ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                            ownMessageParams.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
+                            holder.triangleIcon.setVisibility(View.VISIBLE);
+                            holder.retryAlert.setVisibility(View.VISIBLE);
                         }
-                        else if(status==MegaChatMessage.STATUS_SENDING){
-                            log("Sending message...");
+                        else if((status==MegaChatMessage.STATUS_SENDING)){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
                         }
                         else{
+                            log("Status: "+message.getStatus());
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                         }
                         holder.contentOwnMessageText.setText(messageContent);

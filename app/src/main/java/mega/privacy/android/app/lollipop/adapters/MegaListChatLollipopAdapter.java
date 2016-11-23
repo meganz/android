@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
@@ -60,7 +61,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	Context context;
 	int positionClicked;
-	ArrayList<MegaChatRoom> chats;
+	ArrayList<MegaChatListItem> chats;
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
@@ -74,7 +75,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	int adapterType;
 
-	public MegaListChatLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaChatRoom> _chats, RecyclerView _listView, int type) {
+	public MegaListChatLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaChatListItem> _chats, RecyclerView _listView, int type) {
 		log("new adapter");
 		this.context = _context;
 		this.chats = _chats;
@@ -158,13 +159,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.contactInitialLetter.setText("");
 		
 		log("Get the ChatRoom: "+position);
-		MegaChatRoom chat = (MegaChatRoom) getItem(position);
+		MegaChatListItem chat = (MegaChatListItem) getItem(position);
 		log("ChatRoom handle: "+chat.getChatId());
 
-		long numberContacts = chat.getPeerCount();
 		if(!chat.isGroup()){
 			log("Chat one to one");
-			long contactHandle = chat.getPeerHandle(0);
+			long contactHandle = chat.getPeerHandle();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
 			MegaUser user = megaApi.getContact(userHandleEncoded);
 			if(user!=null){
@@ -752,7 +752,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	/*
 	 * Get request at specified position
 	 */
-	public MegaChatRoom getChatAt(int position) {
+	public MegaChatListItem getChatAt(int position) {
 		try {
 			if (chats != null) {
 				return chats.get(position);
@@ -765,12 +765,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	/*
 	 * Get list of all selected chats
 	 */
-	public List<MegaChatRoom> getSelectedChats() {
-		ArrayList<MegaChatRoom> chats = new ArrayList<MegaChatRoom>();
+	public List<MegaChatListItem> getSelectedChats() {
+		ArrayList<MegaChatListItem> chats = new ArrayList<MegaChatListItem>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {
 			if (selectedItems.valueAt(i) == true) {
-				MegaChatRoom r = getChatAt(selectedItems.keyAt(i));
+				MegaChatListItem r = getChatAt(selectedItems.keyAt(i));
 				if (r != null){
 					chats.add(r);
 				}
@@ -802,7 +802,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void onClick(View v) {
 		ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 		int currentPosition = holder.currentPosition;
-		MegaChatRoom c = (MegaChatRoom) getItem(currentPosition);
+		MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
 
 		switch (v.getId()){	
 			case R.id.recent_chat_list_three_dots:{
@@ -837,7 +837,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 	
-	public void setChats (ArrayList<MegaChatRoom> chats){
+	public void setChats (ArrayList<MegaChatListItem> chats){
 		log("SETCONTACTS!!!!");
 		this.chats = chats;
 		if(chats!=null)
@@ -882,12 +882,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		return info;
 	}
 
-	public void modifyChat(ArrayList<MegaChatRoom> chats, int position){
+	public void modifyChat(ArrayList<MegaChatListItem> chats, int position){
 		this.chats = chats;
 		notifyItemChanged(position);
 	}
 
-	public void removeChat(ArrayList<MegaChatRoom> chats, int position){
+	public void removeChat(ArrayList<MegaChatListItem> chats, int position){
 		this.chats = chats;
 		notifyItemRemoved(position);
 	}
