@@ -470,11 +470,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                fullName = tempFullName;
 
             MegaChatParticipant participant = null;
-            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
-            MegaUser participantContact = megaApi.getContact(userHandleEncoded);
-            if(participantContact!=null){
-                log("Email of the participant: "+participantContact.getEmail());
-                participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantContact.getEmail(), peerPrivilege, status);
+//            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
+//            MegaUser participantContact = megaApi.getContact(userHandleEncoded);
+            String participantEmail = megaChatApi.getUserEmail(peerHandle);
+            if(participantEmail!=null){
+                log("Email of the participant: "+participantEmail);
+                participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
 
             }
             else{

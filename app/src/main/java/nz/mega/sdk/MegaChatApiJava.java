@@ -335,6 +335,21 @@ public class MegaChatApiJava {
         megaChatApi.getUserLastname(userhandle, createDelegateRequestListener(listener));
     }
 
+    /**
+     * Returns the current email address of the user
+     *
+     * This function is useful to get the email address of users you are contact with.
+     * Note that for any other user without contact relationship, this function will return NULL.
+     *
+     * You take the ownership of the returned value
+     *
+     * @param userhandle Handle of the user whose name is requested.
+     * @return The email address of the contact, or NULL if not found.
+     */
+    public String getUserEmail(long userhandle){
+        return megaChatApi.getUserEmail(userhandle);
+    }
+
     public ArrayList<MegaChatRoom> getChatRooms()
     {
         return chatRoomListToArray(megaChatApi.getChatRooms());
@@ -375,6 +390,41 @@ public class MegaChatApiJava {
     public ArrayList<MegaChatListItem> getChatListItems(){
         return chatRoomListItemToArray(megaChatApi.getChatListItems());
 
+    }
+
+    /**
+     * Get the MegaChatListItem that has a specific handle
+     *
+     * You can get the handle of the chatroom using MegaChatRoom::getChatId or
+     * MegaChatListItem::getChatId.
+     *
+     * It is needed to have successfully completed the \c MegaChatApi::init request
+     * before calling this function.
+     *
+     * Note that MegaChatListItem objects don't include as much information as
+     * MegaChatRoom objects, but a limited set of data that is usually displayed
+     * at the list of chatrooms, like the title of the chat or the unread count.
+     *
+     * You take the ownership of the returned value
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @return MegaChatListItem object for the specified \c chatid
+     */
+    public MegaChatListItem getChatListItem(long chatid){
+        return megaChatApi.getChatListItem(chatid);
+    }
+
+    /**
+     * Get the chat id for the 1on1 chat with the specified user
+     *
+     * If the 1on1 chat with the user specified doesn't exist, this function will
+     * return MEGACHAT_INVALID_HANDLE.
+     *
+     * @param userhandle MegaChatHandle that identifies the user
+     * @return MegaChatHandle that identifies the 1on1 chatroom
+     */
+    long getChatHandleByUser(long userhandle){
+        return megaChatApi.getChatHandleByUser(userhandle);
     }
 
     /**

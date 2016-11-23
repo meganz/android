@@ -61,7 +61,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
     RecyclerView.LayoutManager mLayoutManager;
 
-    ArrayList<MegaChatRoom> chats;
+    ArrayList<MegaChatListItem> chats;
 
     //Empty screen
     TextView emptyTextView;
@@ -185,7 +185,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 //            }
 //        }
 
-        chats = megaChatApi.getChatRooms();
+        chats = megaChatApi.getChatListItems();
         megaChatApi.getChatListItems();
 
         if (adapterList == null){
@@ -272,7 +272,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            List<MegaChatRoom> chats = adapterList.getSelectedChats();
+            List<MegaChatListItem> chats = adapterList.getSelectedChats();
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
@@ -326,7 +326,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            List<MegaChatRoom> selected = adapterList.getSelectedChats();
+            List<MegaChatListItem> selected = adapterList.getSelectedChats();
 
             if (selected.size() != 0) {
                 menu.findItem(R.id.cab_menu_mute).setVisible(true);
@@ -383,7 +383,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         if (actionMode == null || getActivity() == null) {
             return;
         }
-        List<MegaChatRoom> chats = adapterList.getSelectedChats();
+        List<MegaChatListItem> chats = adapterList.getSelectedChats();
 
         actionMode.setTitle(context.getString(R.string.selected_items, chats.size()));
 
@@ -425,7 +425,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         log("itemClick");
         if (adapterList.isMultipleSelect()){
             adapterList.toggleSelection(position);
-            List<MegaChatRoom> chats = adapterList.getSelectedChats();
+            List<MegaChatListItem> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
 //                adapterList.notifyDataSetChanged();
@@ -477,9 +477,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
                 long chatHandleToUpdate = item.getChatId();
                 int indexToReplace = -1;
-                ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
                 while (itrReplace.hasNext()) {
-                    MegaChatRoom chat = itrReplace.next();
+                    MegaChatListItem chat = itrReplace.next();
                     if (chat != null) {
                         if (chat.getChatId() == chatHandleToUpdate) {
                             indexToReplace = itrReplace.nextIndex() - 1;
@@ -491,10 +491,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                 }
                 if (indexToReplace != -1) {
                     log("Index to replace: " + indexToReplace);
-                    MegaChatRoom chatToReplace = megaChatApi.getChatRoom(item.getChatId());
-                    log("Check the chatroom: "+chatToReplace.getOnlineStatus());
+
                     log("Item status: "+item.getOnlineStatus());
-                    chats.set(indexToReplace, chatToReplace);
+                    chats.set(indexToReplace, item);
 
                     adapterList.modifyChat(chats, indexToReplace);
                 }
@@ -515,8 +514,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             log("Change visibility");
 
         }
-        else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))||(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT))){
-            log("Change title or unread count: "+item.getChanges());
+        else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))||(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT))||(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG))){
+            log("Change title or unread count or last message: "+item.getChanges());
 
             if(item!=null){
 
@@ -526,9 +525,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                 else{
                     long chatHandleToUpdate = item.getChatId();
                     int indexToReplace = -1;
-                    ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
                     while (itrReplace.hasNext()) {
-                        MegaChatRoom chat = itrReplace.next();
+                        MegaChatListItem chat = itrReplace.next();
                         if(chat!=null){
                             if(chat.getChatId()==chatHandleToUpdate){
                                 indexToReplace = itrReplace.nextIndex()-1;
@@ -541,10 +540,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     }
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
-                        MegaChatRoom chatToReplace = megaChatApi.getChatRoom(item.getChatId());
-                        int checkUnread = chatToReplace.getUnreadCount();
-                        log("Unread count: "+chatToReplace.getUnreadCount());
-                        chats.set(indexToReplace, chatToReplace);
+                        int checkUnread = item.getUnreadCount();
+                        log("Unread count: "+item.getUnreadCount());
+                        chats.set(indexToReplace, item);
 
                         adapterList.modifyChat(chats, indexToReplace);
                         adapterList.setPositionClicked(-1);
@@ -573,9 +571,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
                     long chatHandleToRemove = item.getChatId();
                     int indexToRemove = -1;
-                    ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
                     while (itrReplace.hasNext()) {
-                        MegaChatRoom chat = itrReplace.next();
+                        MegaChatListItem chat = itrReplace.next();
                         if(chat!=null){
                             if(chat.getChatId()==chatHandleToRemove){
                                 indexToRemove = itrReplace.nextIndex()-1;
@@ -670,7 +668,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     }
 
     @Override
-    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chatRoom) {
+    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom item) {
         log("onChatRoomUpdate");
 
 //        MegaChatRoom chatUpdated = megaChatApi.getChatRoom(chat.getChatId());
@@ -680,19 +678,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 //            log("change type: "+chat.getChanges());
 //        }
 
-        if(chatRoom.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
-            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+chatRoom.getChatId());
-            if(chatRoom!=null){
+        if(item.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
+            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+item.getChatId());
+            if(item!=null){
 
                 if (adapterList == null || adapterList.getItemCount()==0){
                     setChats();
                 }
                 else{
-                    long chatHandleToUpdate = chatRoom.getChatId();
+                    long chatHandleToUpdate = item.getChatId();
                     int indexToReplace = -1;
-                    ListIterator<MegaChatRoom> itrReplace = chats.listIterator();
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
                     while (itrReplace.hasNext()) {
-                        MegaChatRoom chat = itrReplace.next();
+                        MegaChatListItem chat = itrReplace.next();
                         if(chat!=null){
                             if(chat.getChatId()==chatHandleToUpdate){
                                 indexToReplace = itrReplace.nextIndex()-1;
@@ -705,8 +703,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     }
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
-                        MegaChatRoom chatToReplace = megaChatApi.getChatRoom(chatRoom.getChatId());
-
+                        MegaChatListItem chatToReplace = megaChatApi.getChatListItem(item.getChatId());
                         log("Unread count: "+chatToReplace.getUnreadCount());
                         chats.set(indexToReplace, chatToReplace);
 

@@ -143,6 +143,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -196,7 +197,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaOffline selectedOfflineNode;
 	MegaUser selectedUser;
 	MegaContactRequest selectedRequest;
-	MegaChatRoom selectedChat;
+	MegaChatListItem selectedChatItem;
 //	String fullNameChat;
 
 	//UPLOAD PANEL
@@ -8483,6 +8484,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationLeaveChat (final MegaChatListItem c){
+		log("showConfirmationLeaveChat");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						ChatController chatC = new ChatController(managerActivity);
+						chatC.leaveChat(c.getChatId());
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+		String message= getResources().getString(R.string.confirmation_leave_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
 	public void showConfirmationResetPasswordFromMyAccount (){
 		log("showConfirmationResetPasswordFromMyAccount: ");
 
@@ -12482,11 +12509,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingUploadPanel.setVisibility(View.GONE);
 	}
 
-	public void showChatPanel(MegaChatRoom chat){
+	public void showChatPanel(MegaChatListItem chat){
 		log("showChatPanel");
 
 		if(chat!=null){
-			this.selectedChat = chat;
+			this.selectedChatItem = chat;
 		}
 //		if(fullName!=null){
 //			this.fullNameChat = fullName;
@@ -12511,7 +12538,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			addAvatarChatPanel(null, chat);
 		}
 		else{
-			long userHandle = chat.getPeerHandle(0);
+			long userHandle = chat.getPeerHandle();
 
 			iconStateChatPanel.setVisibility(View.VISIBLE);
 			int state = chat.getOnlineStatus();
@@ -12563,7 +12590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void addAvatarChatPanel(String contactMail, MegaChatRoom chat){
+	public void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
 
 		File avatar = null;
 		if (getExternalCacheDir() != null){
@@ -12994,12 +13021,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.displayedAccountType = displayedAccountType;
 	}
 
-	public MegaChatRoom getSelectedChat() {
-		return selectedChat;
+	public MegaChatListItem getSelectedChat() {
+		return selectedChatItem;
 	}
 
-	public void setSelectedChat(MegaChatRoom selectedChat) {
-		this.selectedChat = selectedChat;
+	public void setSelectedChat(MegaChatListItem selectedChatItem) {
+		this.selectedChatItem = selectedChatItem;
 	}
 
 //	public String getFullNameChat() {

@@ -52,6 +52,19 @@ public class ChatController {
             megaChatApi.leaveChat(chat.getChatId(), (ChatActivityLollipop) context);
         }
     }
+
+    public void leaveChat(long chatId){
+        if(context instanceof ManagerActivityLollipop){
+            megaChatApi.leaveChat(chatId, (ManagerActivityLollipop) context);
+        }
+        else if(context instanceof GroupChatInfoActivityLollipop){
+            megaChatApi.leaveChat(chatId, (GroupChatInfoActivityLollipop) context);
+        }
+        else if(context instanceof ChatActivityLollipop){
+            megaChatApi.leaveChat(chatId, (ChatActivityLollipop) context);
+        }
+    }
+
     public void clearHistory(MegaChatRoom chat){
         log("clearHistory: "+chat.getTitle());
         if(context instanceof ManagerActivityLollipop){
@@ -65,6 +78,22 @@ public class ChatController {
         }
         else if(context instanceof GroupChatInfoActivityLollipop){
             megaChatApi.clearChatHistory(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
+        }
+    }
+
+    public void clearHistory(long chatId){
+        log("clearHistory: "+chatId);
+        if(context instanceof ManagerActivityLollipop){
+            megaChatApi.clearChatHistory(chatId, (ManagerActivityLollipop) context);
+        }
+        else if(context instanceof ChatActivityLollipop){
+            megaChatApi.clearChatHistory(chatId, (ChatActivityLollipop) context);
+        }
+        else if(context instanceof ContactChatInfoActivityLollipop){
+            megaChatApi.clearChatHistory(chatId, (ContactChatInfoActivityLollipop) context);
+        }
+        else if(context instanceof GroupChatInfoActivityLollipop){
+            megaChatApi.clearChatHistory(chatId, (GroupChatInfoActivityLollipop) context);
         }
     }
 
