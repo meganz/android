@@ -65,7 +65,7 @@
         android:orientation="horizontal" >
         
        <TextView
-            android:id="@+id/folder_link_cancel_button"
+            android:id="@+id/folder_link_import_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
