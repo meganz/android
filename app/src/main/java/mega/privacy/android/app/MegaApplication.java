@@ -102,7 +102,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
@@ -129,6 +129,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 
 		Util.setFileLogger(fileLogger);
+		if (fileLogger){
+			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		}
+		else{
+			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+		}
 		
 //		initializeGA();
 		
