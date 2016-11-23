@@ -75,16 +75,22 @@ public class TimeChatUtils implements Comparator<Calendar> {
         calYesterday.add(Calendar.DATE, -1);
         TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
-            return "Today";
+            String time = formatTime(lastMessage);
+            String formattedDate = "Today" + " " + time;
+            return formattedDate;
         }
         else if(tc.compare(cal, calYesterday)==0){
-            return "Yesterday";
+            String time = formatTime(lastMessage);
+            String formattedDate = "Yesterday" + " " + time;
+            return formattedDate;
         }
         else{
             if(tc.calculateDifferenceDays(cal, calToday)<7){
                 Date date = cal.getTime();
                 String dayWeek = new SimpleDateFormat("EEEE").format(date);
-                return dayWeek;
+                String time = formatTime(lastMessage);
+                String formattedDate = dayWeek + " " + time;
+                return formattedDate;
             }
             else{
                 TimeZone tz = cal.getTimeZone();
