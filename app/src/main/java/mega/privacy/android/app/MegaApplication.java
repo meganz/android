@@ -29,7 +29,7 @@ import nz.mega.sdk.MegaUser;
 public class MegaApplication extends Application implements MegaListenerInterface
 {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.0.12.2";
+	static final String USER_AGENT = "MEGAAndroid/3.0.12.2.1";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -128,12 +128,16 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
-		Util.setFileLogger(fileLogger);
-		if (fileLogger){
+		if (Util.DEBUG){
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 		}
-		else{
-			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+		else {
+			Util.setFileLogger(fileLogger);
+			if (fileLogger) {
+				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+			} else {
+				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+			}
 		}
 		
 //		initializeGA();
