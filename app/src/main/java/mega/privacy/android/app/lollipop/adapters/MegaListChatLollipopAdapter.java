@@ -102,7 +102,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 	
 	/*private view holder class*/
-    public class ViewHolderChatList extends ViewHolder{
+    public static class ViewHolderChatList extends ViewHolder{
     	public ViewHolderChatList(View arg0) {
 			super(arg0);
 			// TODO Auto-generated constructor stub
@@ -156,6 +156,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     
 	@Override
 	public void onBindViewHolder(ViewHolderChatList holder, int position) {
+		log("onBindViewHolder");
 
 		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
@@ -316,24 +317,37 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 					}
 
-					Spannable name = new SpannableString(fullNameAction+": ");
-					name.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.setText(name);
+					if(chat.isGroup()){
+						Spannable name = new SpannableString(fullNameAction+": ");
+						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						holder.textViewContent.setText(name);
 
+						if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
+							log("Message READ");
+							Spannable myMessage = new SpannableString(lastMessage.getContent());
+							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							holder.textViewContent.append(myMessage);
+						}
+						else{
+							log("Message NOt read");
 
-					if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
-						log("Message READ");
-						Spannable myMessage = new SpannableString(lastMessage.getContent());
-						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.append(myMessage);
+							Spannable myMessage = new SpannableString(lastMessage.getContent());
+							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							holder.textViewContent.append(myMessage);
+						}
 					}
 					else{
-						log("Message NOt read");
-
-						Spannable myMessage = new SpannableString(lastMessage.getContent());
-						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.append(myMessage);
+						if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
+							log("Message READ");
+							holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+						}
+						else{
+							log("Message NOt read");
+							holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+						}
+						holder.textViewContent.setText(lastMessage.getContent());
 					}
+
 				}
 			}
 		}
@@ -899,7 +913,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	positionClicked = p;
 		notifyDataSetChanged();
     }
-    
+
+
+
 	@Override
 	public void onClick(View v) {
 		ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
