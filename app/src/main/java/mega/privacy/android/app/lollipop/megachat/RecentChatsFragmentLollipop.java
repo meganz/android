@@ -536,21 +536,28 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                         log("Index to replace: "+indexToReplace);
                         int checkUnread = item.getUnreadCount();
                         log("Unread count: "+item.getUnreadCount());
-                        chats.set(indexToReplace, item);
 
-                        adapterList.modifyChat(chats, indexToReplace);
-                        adapterList.setPositionClicked(-1);
 
-                        if (adapterList.getItemCount() == 0){
-                            log("adapterList.getItemCount() == 0");
-                            listView.setVisibility(View.GONE);
-                            emptyLayout.setVisibility(View.VISIBLE);
-                        }
-                        else{
-                            log("adapterList.getItemCount() NOT = 0");
-                            listView.setVisibility(View.VISIBLE);
-                            emptyLayout.setVisibility(View.GONE);
-                        }
+                        findViewHolder(indexToReplace);
+
+
+//                        chats.set(indexToReplace, item);
+
+//                        adapterList.modifyChat(chats, indexToReplace);
+//                        adapterList.setPositionClicked(-1);
+//
+//                        if (adapterList.getItemCount() == 0){
+//                            log("adapterList.getItemCount() == 0");
+//                            listView.setVisibility(View.GONE);
+//                            emptyLayout.setVisibility(View.VISIBLE);
+//                        }
+//                        else{
+//                            log("adapterList.getItemCount() NOT = 0");
+//                            listView.setVisibility(View.VISIBLE);
+//                            emptyLayout.setVisibility(View.GONE);
+//                        }
+//
+//                        findViewHolder(indexToReplace);
                     }
                 }
             }
@@ -611,6 +618,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                 log("The chat is NULL");
             }
         }
+    }
+
+    public void findViewHolder(int position){
+        View holder = mLayoutManager.findViewByPosition(position);
+
+        TextView unreadCount = (TextView) holder.findViewById(R.id.recent_chat_list_unread_number);
+        log("getTextUnread:  ------------------------------------------------"+unreadCount.getText());
+        unreadCount.setText("16");
+        log("getTextUnread:  ------------------------------------------------"+unreadCount.getText());
+        unreadCount.invalidate();
+
+//        myRecyclerView.findViewHolderForAdapterPosition(pos);
     }
 
     public String getParticipantFullName(MegaChatRoom chat, long i){
