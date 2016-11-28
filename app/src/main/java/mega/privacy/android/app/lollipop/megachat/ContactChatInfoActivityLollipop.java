@@ -116,7 +116,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	float scaleH;
 
 	DatabaseHandler dbH = null;
-	ChatPreferences chatPrefs = null;
+	ChatItemPreferences chatPrefs = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -559,12 +559,12 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				if(chatPrefs==null){
 					Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
 
-					chatPrefs = new ChatPreferences(Long.toString(chatHandle), Boolean.toString(true), chosenRingtone, defaultSoundUri.toString());
-					dbH.setChatPreferences(chatPrefs);
+					chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), chosenRingtone, defaultSoundUri.toString());
+					dbH.setChatItemPreferences(chatPrefs);
 				}
 				else{
 					chatPrefs.setRingtone(chosenRingtone);
-					dbH.setRingtoneChat(chosenRingtone, Long.toString(chatHandle));
+					dbH.setRingtoneChatItem(chosenRingtone, Long.toString(chatHandle));
 				}
 			}
 			else
@@ -591,12 +591,12 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				if(chatPrefs==null){
 					Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
 
-					chatPrefs = new ChatPreferences(Long.toString(chatHandle), Boolean.toString(true), defaultRingtoneUri.toString(), chosenSound);
-					dbH.setChatPreferences(chatPrefs);
+					chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), defaultRingtoneUri.toString(), chosenSound);
+					dbH.setChatItemPreferences(chatPrefs);
 				}
 				else{
 					chatPrefs.setNotificationsSound(chosenSound);
-					dbH.setNotificationSoundChat(chosenSound, Long.toString(chatHandle));
+					dbH.setNotificationSoundChatItem(chosenSound, Long.toString(chatHandle));
 				}
 			}
 			else
@@ -640,12 +640,12 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
 			Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
 
-			chatPrefs = new ChatPreferences(Long.toString(chatHandle), Boolean.toString(isChecked), defaultRingtoneUri.toString(), defaultSoundUri.toString());
-			dbH.setChatPreferences(chatPrefs);
+			chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(isChecked), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+			dbH.setChatItemPreferences(chatPrefs);
 		}
 		else{
 			chatPrefs.setNotificationsEnabled(Boolean.toString(isChecked));
-			dbH.setNotificationEnabledChat(Boolean.toString(isChecked), Long.toString(chatHandle));
+			dbH.setNotificationEnabledChatItem(Boolean.toString(isChecked), Long.toString(chatHandle));
 		}
 	}
 

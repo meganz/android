@@ -12,7 +12,8 @@ import android.util.Base64;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import mega.privacy.android.app.lollipop.megachat.ChatPreferences;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -28,8 +29,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_ATTRIBUTES = "attributes";
     private static final String TABLE_OFFLINE = "offline";
     private static final String TABLE_CONTACTS = "contacts";
-	private static final String TABLE_CHAT = "chat";
+	private static final String TABLE_CHAT_ITEMS = "chat";
 	private static final String TABLE_NON_CONTACTS = "noncontacts";
+	private static final String TABLE_CHAT_SETTINGS = "chatsettings";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -85,12 +87,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp";
 
 	private static final String KEY_CHAT_HANDLE = "chathandle";
-	private static final String KEY_CHAT_NOTIFICATIONS = "chatnotifications";
-	private static final String KEY_CHAT_RINGTONE = "chatringtone";
-	private static final String KEY_CHAT_SOUND_NOTIFICATION = "chatnotificationsound";
+	private static final String KEY_CHAT_ITEM_NOTIFICATIONS = "chatitemnotifications";
+	private static final String KEY_CHAT_ITEM_RINGTONE = "chatitemringtone";
+	private static final String KEY_CHAT_ITEM_SOUND_NOTIFICATIONS = "chatitemnotificationsound";
 
 	private static final String KEY_NONCONTACT_HANDLE = "noncontacthandle";
 	private static final String KEY_NONCONTACT_FULLNAME = "noncontactfullname";
+
+	private static final String KEY_CHAT_ENABLED = "chatenabled";
+	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
+	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
+	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
     
     private static DatabaseHandler instance;
     
@@ -154,14 +161,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_CONTACT_NAME+ " TEXT, "+KEY_CONTACT_LAST_NAME+ " TEXT"+")";
         db.execSQL(CREATE_CONTACTS_TABLE);
 
-		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_NOTIFICATIONS + " BOOLEAN, " +
-				KEY_CHAT_RINGTONE+ " TEXT, "+KEY_CHAT_SOUND_NOTIFICATION+ " TEXT"+")";
-		db.execSQL(CREATE_CHAT_TABLE);
+		String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
+				KEY_CHAT_ITEM_RINGTONE+ " TEXT, "+KEY_CHAT_ITEM_SOUND_NOTIFICATIONS+ " TEXT"+")";
+		db.execSQL(CREATE_CHAT_ITEM_TABLE);
 
 		String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NONCONTACT_HANDLE + " TEXT, " + KEY_NONCONTACT_FULLNAME + " TEXT"+")";
 		db.execSQL(CREATE_NONCONTACT_TABLE);
+
+		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
+				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
+		db.execSQL(CREATE_CHAT_TABLE);
   
 	}
 
@@ -356,14 +368,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if(oldVersion <= 22) {
-			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_NOTIFICATIONS + " BOOLEAN, " +
-					KEY_CHAT_RINGTONE + " TEXT, " + KEY_CHAT_SOUND_NOTIFICATION + " TEXT" + ")";
-			db.execSQL(CREATE_CHAT_TABLE);
+			String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
+					KEY_CHAT_ITEM_RINGTONE + " TEXT, " + KEY_CHAT_ITEM_SOUND_NOTIFICATIONS + " TEXT" + ")";
+			db.execSQL(CREATE_CHAT_ITEM_TABLE);
 
 			String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
 					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NONCONTACT_HANDLE + " TEXT, " + KEY_NONCONTACT_FULLNAME + " TEXT"+")";
 			db.execSQL(CREATE_NONCONTACT_TABLE);
+
+			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
+					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
+			db.execSQL(CREATE_CHAT_TABLE);
 		}
 	} 
 	
@@ -527,46 +544,140 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return prefs;
 	}
 
-	public void setChatPreferences (ChatPreferences chatPrefs){
+	public ChatSettings getChatSettings(){
+		log("getChatSettings");
+		ChatSettings chatSettings = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			int id = Integer.parseInt(cursor.getString(0));
+			String enabled = decrypt(cursor.getString(1));
+			String notificationsEnabled = decrypt(cursor.getString(2));
+			String notificationSound = decrypt(cursor.getString(3));
+			String vibrationEnabled = decrypt(cursor.getString(4));
+			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled);
+		}
+		cursor.close();
+
+		return chatSettings;
+	}
+
+	public void setChatSettings(ChatSettings chatSettings){
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHAT_ENABLED, encrypt(chatSettings.getEnabled()));
+		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
+		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
+		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
+
+		db.insert(TABLE_CHAT_SETTINGS, null, values);
+	}
+
+	public void setEnabledChat(String enabled){
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
+			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setNotificationEnabledChat(String enabled){
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_NOTIFICATIONS_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(enabled));
+			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setNotificationSoundChat(String sound){
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SOUND_NOTIFICATIONS + "= '" + encrypt(sound) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(sound));
+			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setVibrationEnabledChat(String enabled){
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_VIBRATION_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(enabled));
+			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setChatItemPreferences(ChatItemPreferences chatPrefs){
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_HANDLE, encrypt(chatPrefs.getChatHandle()));
-		values.put(KEY_CHAT_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsEnabled()));
-		values.put(KEY_CHAT_RINGTONE, encrypt(chatPrefs.getRingtone()));
-		values.put(KEY_CHAT_SOUND_NOTIFICATION, encrypt(chatPrefs.getNotificationsSound()));
+		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsEnabled()));
+		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(chatPrefs.getRingtone()));
+		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsSound()));
 
-		db.insert(TABLE_CHAT, null, values);
+		db.insert(TABLE_CHAT_ITEMS, null, values);
 	}
 
-	public int setRingtoneChat (String ringtone, String handle){
-		log("setRingtoneChat: "+ringtone+" "+handle);
+	public int setRingtoneChatItem(String ringtone, String handle){
+		log("setRingtoneChatItem: "+ringtone+" "+handle);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_RINGTONE, encrypt(ringtone));
-		return db.update(TABLE_CHAT, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(ringtone));
+		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
 	}
 
-	public int setNotificationSoundChat (String sound, String handle){
-		log("setNotificationSoundChat: "+sound+" "+handle);
+	public int setNotificationSoundChatItem(String sound, String handle){
+		log("setNotificationSoundChatItem: "+sound+" "+handle);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_SOUND_NOTIFICATION, encrypt(sound));
-		return db.update(TABLE_CHAT, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(sound));
+		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
 	}
 
-	public int setNotificationEnabledChat (String enabled, String handle){
-		log("setNotificationEnabledChat: "+enabled+" "+handle);
+	public int setNotificationEnabledChatItem(String enabled, String handle){
+		log("setNotificationEnabledChatItem: "+enabled+" "+handle);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_NOTIFICATIONS, encrypt(enabled));
-		return db.update(TABLE_CHAT, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(enabled));
+		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
 	}
 
-
-	public ChatPreferences findChatPreferencesByHandle (String handle){
+	public ChatItemPreferences findChatPreferencesByHandle (String handle){
 		log("findChatPreferencesByHandle: "+handle);
-		ChatPreferences prefs = null;
+		ChatItemPreferences prefs = null;
 
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
 		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -579,7 +690,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String ringtone = decrypt(cursor.getString(3));
 				String notificationsSound = decrypt(cursor.getString(4));
 
-				prefs = new ChatPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound);
+				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound);
 				cursor.close();
 				return prefs;
 			}

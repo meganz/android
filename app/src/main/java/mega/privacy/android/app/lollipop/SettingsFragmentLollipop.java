@@ -40,6 +40,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
@@ -66,12 +67,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	private static int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
 	
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
+	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
+	public static String KEY_CHAT_ENABLE = "settings_chat_enable";
+
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
 	public static String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
@@ -109,12 +113,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
 	
 	PreferenceCategory pinLockCategory;
+	PreferenceCategory chatEnabledCategory;
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
 	PreferenceCategory advancedFeaturesCategory;
 
 	SwitchPreference pinLockEnableSwitch;
 	TwoLineCheckPreference pinLockEnableCheck;
+	SwitchPreference chatEnableSwitch;
+	TwoLineCheckPreference chatEnableCheck;
 	Preference pinLockCode;
 	Preference downloadLocation;
 	Preference downloadLocationPreference;
@@ -144,6 +151,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	boolean secondaryUpload = false;
 	boolean charging = false;
 	boolean pinLock = false;
+	boolean chatEnabled = false;
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
@@ -151,6 +159,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	DatabaseHandler dbH;
 	
 	MegaPreferences prefs;
+	ChatSettings chatSettings;
 	String wifi = "";
 	String camSyncLocalPath = "";
 	boolean isExternalSDCard = false;
@@ -180,6 +189,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
+		chatSettings = dbH.getChatSettings();
 		
 		super.onCreate(savedInstanceState);	
         
@@ -188,18 +198,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         storageCategory = (PreferenceCategory) findPreference(CATEGORY_STORAGE);
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);	
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
+		chatEnabledCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_ENABLED);
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
 			pinLockEnableSwitch.setOnPreferenceClickListener(this);
+
+			chatEnableSwitch = (SwitchPreference) findPreference(KEY_CHAT_ENABLE);
+			chatEnableSwitch.setOnPreferenceClickListener(this);
+
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
 			pinLockEnableCheck.setOnPreferenceClickListener(this);
+
+			chatEnableCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ENABLE);
+			chatEnableCheck.setOnPreferenceClickListener(this);
 		}
 
-		
 		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
 		pinLockCode.setOnPreferenceClickListener(this);
 		
@@ -600,7 +617,59 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					dbH.setStorageAdvancedDevices(false);
 				}
 			}
-		}		
+		}
+
+		if(chatSettings==null){
+			chatEnabled=true;
+			dbH.setEnabledChat(true+"");
+			dbH.setNotificationEnabledChat(true+"");
+			dbH.setVibrationEnabledChat(true+"");
+		}
+		else{
+			if (chatSettings.getEnabled() == null){
+				dbH.setEnabledChat(true+"");
+				chatEnabled = true;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					chatEnableSwitch.setChecked(chatEnabled);
+					if (chatEnabled){
+						chatEnableSwitch.setTitle(getString(R.string.settings_chat_off));
+					}
+					else{
+						chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
+					}
+				}
+				else{
+					chatEnableCheck.setChecked(chatEnabled);
+					if (chatEnabled){
+						chatEnableCheck.setTitle(getString(R.string.settings_chat_off));
+					}
+					else{
+						chatEnableCheck.setTitle(getString(R.string.settings_chat_on));
+					}
+				}
+			}
+			else{
+				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					chatEnableSwitch.setChecked(chatEnabled);
+					if (chatEnabled){
+						chatEnableSwitch.setTitle(getString(R.string.settings_chat_off));
+					}
+					else{
+						chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
+					}
+				}
+				else{
+					chatEnableCheck.setChecked(chatEnabled);
+					if (chatEnabled){
+						chatEnableCheck.setTitle(getString(R.string.settings_chat_off));
+					}
+					else{
+						chatEnableCheck.setTitle(getString(R.string.settings_chat_on));
+					}
+				}
+			}
+		}
 
 		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
 		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_calculating));
@@ -1296,6 +1365,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setPinLockCode("");
 //				pinLockEnableSwitch.setTitle(getString(R.string.settings_pin_lock_on));
 				pinLockCategory.removePreference(pinLockCode);
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_CHAT_ENABLE) == 0){
+			log("KEY_CHAT_ENABLE");
+			chatEnabled = !chatEnabled;
+			if (chatEnabled){
+				//Intent to set the PIN
+				log("CONNECT CHAT!!!");
+				Toast.makeText(context, "Not implemented yet: "+getString(R.string.settings_chat_on), Toast.LENGTH_SHORT).show();
+				dbH.setEnabledChat(true+"");
+				chatEnableSwitch.setTitle(getString(R.string.settings_chat_off));
+			}
+			else{
+				dbH.setEnabledChat(false+"");
+				Toast.makeText(context, "Not implemented yet: "+getString(R.string.settings_chat_off), Toast.LENGTH_SHORT).show();
+				chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){

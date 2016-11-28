@@ -577,6 +577,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         else{
                             lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
+                            log("Id of last message seen: "+lastMessageSeen.getMsgId());
                             lastSeenReceived=false;
                             if(unread<0){
                                 log("A->Load history of "+chatRoom.getUnreadCount());
@@ -1497,10 +1498,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 if(positionToScroll>=0){
+                    log("Position to scroll up!");
                     positionToScroll++;
                 }
             }
-
 
             bufferMessages.add(androidMsg);
             log("Counter: "+bufferMessages.size());
