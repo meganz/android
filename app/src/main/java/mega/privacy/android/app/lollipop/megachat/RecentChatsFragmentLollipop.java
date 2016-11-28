@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -42,10 +45,12 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
 public class RecentChatsFragmentLollipop extends Fragment implements MegaChatListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
@@ -186,7 +191,27 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 //        }
 
         chats = megaChatApi.getChatListItems();
-        megaChatApi.getChatListItems();
+
+        //Order by last interaction
+        Collections.sort(chats, new Comparator<MegaChatListItem> (){
+
+            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                MegaChatMessage message1 = c1.getLastMessage();
+                long timestamp1 = -1;
+                if(message1!=null){
+                    timestamp1 = message1.getTimestamp();
+                }
+
+                MegaChatMessage message2 = c2.getLastMessage();
+                long timestamp2 = -1;
+                if(message2!=null){
+                    timestamp2 = message2.getTimestamp();
+                }
+
+                long result = timestamp2 - timestamp1;
+                return (int)result;
+            }
+        });
 
         if (adapterList == null){
             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
@@ -468,34 +493,34 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-        log("onChatListItemUpdate");
+        log("onChatListItemUpdate: "+item.getTitle());
 
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("Change status");
 
             if(item!=null) {
 
-                long chatHandleToUpdate = item.getChatId();
-                int indexToReplace = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
+                if(!(item.isGroup())){
+                    long chatHandleToUpdate = item.getChatId();
+                    int indexToReplace = -1;
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatListItem chat = itrReplace.next();
+                        if (chat != null) {
+                            if (chat.getChatId() == chatHandleToUpdate) {
+                                indexToReplace = itrReplace.nextIndex() - 1;
+                                break;
+                            }
+                        } else {
                             break;
                         }
-                    } else {
-                        break;
                     }
-                }
-                if (indexToReplace != -1) {
-                    log("Index to replace: " + indexToReplace);
-
-                    log("Item status: "+item.getOnlineStatus());
-                    chats.set(indexToReplace, item);
-
-                    adapterList.modifyChat(chats, indexToReplace);
+                    if (indexToReplace != -1) {
+                        log("Index to replace: " + indexToReplace);
+                        log("Item status: "+item.getOnlineStatus());
+                        chats.set(indexToReplace, item);
+                        onStatusChange(indexToReplace);
+                    }
                 }
             }
         }
@@ -506,10 +531,48 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)){
             log("Change visibility");
-
         }
-        else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))||(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT))||(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG))){
-            log("Change title or unread count or last message: "+item.getChanges());
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
+            log("Change unread count: "+item.getTitle());
+            if(item!=null){
+
+                if (adapterList == null || adapterList.getItemCount()==0){
+                    setChats();
+                }
+                else{
+                    long chatHandleToUpdate = item.getChatId();
+                    int indexToReplace = -1;
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatListItem chat = itrReplace.next();
+                        if(chat!=null){
+                            if(chat.getChatId()==chatHandleToUpdate){
+                                indexToReplace = itrReplace.nextIndex()-1;
+                                break;
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if(indexToReplace!=-1){
+                        log("Index to replace: "+indexToReplace);
+                        log("Unread count: "+item.getUnreadCount());
+
+                        chats.set(indexToReplace, item);
+                        if(item.getUnreadCount()==0){
+                            onUnreadCountChange(indexToReplace, false);
+                        }
+                        else{
+                            onUnreadCountChange(indexToReplace, true);
+                        }
+
+                    }
+                }
+            }
+        }
+        else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
+            log("Change title: "+item.getTitle());
 
             if(item!=null){
 
@@ -534,30 +597,43 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     }
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
-                        int checkUnread = item.getUnreadCount();
-                        log("Unread count: "+item.getUnreadCount());
+                        log("New title: "+item.getTitle());
 
+                        chats.set(indexToReplace, item);
+                        onTitleChange(indexToReplace);
+                    }
+                }
+            }
 
-                        findViewHolder(indexToReplace);
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
+            log("Change last message: "+item.getChanges());
 
+            if(item!=null){
 
-//                        chats.set(indexToReplace, item);
-
-//                        adapterList.modifyChat(chats, indexToReplace);
-//                        adapterList.setPositionClicked(-1);
-//
-//                        if (adapterList.getItemCount() == 0){
-//                            log("adapterList.getItemCount() == 0");
-//                            listView.setVisibility(View.GONE);
-//                            emptyLayout.setVisibility(View.VISIBLE);
-//                        }
-//                        else{
-//                            log("adapterList.getItemCount() NOT = 0");
-//                            listView.setVisibility(View.VISIBLE);
-//                            emptyLayout.setVisibility(View.GONE);
-//                        }
-//
-//                        findViewHolder(indexToReplace);
+                if (adapterList == null || adapterList.getItemCount()==0){
+                    setChats();
+                }
+                else{
+                    long chatHandleToUpdate = item.getChatId();
+                    int indexToReplace = -1;
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatListItem chat = itrReplace.next();
+                        if(chat!=null){
+                            if(chat.getChatId()==chatHandleToUpdate){
+                                indexToReplace = itrReplace.nextIndex()-1;
+                                break;
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if(indexToReplace!=-1){
+                        log("Index to replace: "+indexToReplace);
+                        chats.set(indexToReplace, item);
+                        onLastMessageChange(indexToReplace);
                     }
                 }
             }
@@ -620,16 +696,42 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
     }
 
-    public void findViewHolder(int position){
-        View holder = mLayoutManager.findViewByPosition(position);
+    public void onStatusChange(int position){
+        log("onStatusChange");
 
-        TextView unreadCount = (TextView) holder.findViewById(R.id.recent_chat_list_unread_number);
-        log("getTextUnread:  ------------------------------------------------"+unreadCount.getText());
-        unreadCount.setText("16");
-        log("getTextUnread:  ------------------------------------------------"+unreadCount.getText());
-        unreadCount.invalidate();
+        adapterList.setStatus(position, null);
+    }
 
-//        myRecyclerView.findViewHolderForAdapterPosition(pos);
+    public void onLastMessageChange(int position){
+        log("onLastMessageChange");
+
+        adapterList.setLastMessage(position, null);
+
+        interactionUpdate(position);
+    }
+
+    public void onTitleChange(int position){
+        log("onTitleChange");
+
+        adapterList.setTitle(position, null);
+
+        interactionUpdate(position);
+    }
+
+    public void onUnreadCountChange(int position, boolean updateOrder){
+        log("onUnreadCountChange");
+
+        adapterList.setPendingMessages(position, null);
+
+        if(updateOrder){
+            interactionUpdate(position);
+        }
+    }
+
+    public void interactionUpdate(int position){
+        MegaChatListItem chat = chats.remove(position);
+        chats.add(0, chat);
+        adapterList.notifyItemMoved(position, 0);
     }
 
     public String getParticipantFullName(MegaChatRoom chat, long i){
