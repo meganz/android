@@ -968,4 +968,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> <b>left</b> the group chat]]></string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
+
+    <string name="settings_chat_on" context="settings of the pin lock">Enable chat</string>
+    <string name="settings_chat_off" context="settings of the pin lock">Disable chat</string>
 </resources>

@@ -703,6 +703,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     }
 
     public void onLastMessageChange(int position){
+
         log("onLastMessageChange");
 
         adapterList.setLastMessage(position, null);

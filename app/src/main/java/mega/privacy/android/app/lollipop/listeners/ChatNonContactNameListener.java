@@ -43,7 +43,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChatList holder, MegaChatLollipopAdapter adapter, long userHandle) {
         this.context = context;
-//        this.holder = holder;
+        this.holder = holder;
         this.adapter = adapter;
         this.isUserHandle = true;
         this.userHandle = userHandle;

@@ -71,6 +71,19 @@
 	        android:key="settings_mega_secondary_media_folder"
 	        android:title="@string/settings_mega_secondary_folder" />
 	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_chat"
+		android:layout="@layout/my_category_preference"
+		android:title="@string/section_chat">
+		<!--        android:textColor="@color/pressed_mega">  -->
+
+		<SwitchPreference
+			android:key="settings_chat_enable"
+			android:title="@string/settings_chat_off"
+			android:defaultValue="true"/>
+
+	</PreferenceCategory>
 	
     <PreferenceCategory 
         android:key="settings_storage"

@@ -1,14 +1,14 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 
-public class ChatPreferences {
+public class ChatItemPreferences {
 
     String chatHandle = "";
     String notificationsEnabled = "";
     String ringtone= "";
     String notificationsSound = "";
 
-    public ChatPreferences(String chatHandle, String notificationsEnabled, String ringtone, String notificationsSound) {
+    public ChatItemPreferences(String chatHandle, String notificationsEnabled, String ringtone, String notificationsSound) {
         this.chatHandle = chatHandle;
         this.notificationsEnabled = notificationsEnabled;
         this.notificationsSound = notificationsSound;
