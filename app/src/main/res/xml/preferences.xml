@@ -83,6 +83,26 @@
 			android:defaultValue="true"/>
 
 	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_status_chat"
+		android:layout="@layout/my_category_preference"
+		android:title="@string/settings_chat_status">
+		<!--        android:textColor="@color/pressed_mega">  -->
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_status_chat_online"
+			android:title="@string/settings_chat_status_online" />
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_status_chat_invisible"
+			android:title="@string/settings_chat_status_invisible" />
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_status_chat_offline"
+			android:title="@string/settings_chat_status_offline" />
+
+	</PreferenceCategory>
 	
     <PreferenceCategory 
         android:key="settings_storage"
