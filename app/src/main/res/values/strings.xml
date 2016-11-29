@@ -969,6 +969,19 @@
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 
-    <string name="settings_chat_on" context="settings of the pin lock">Enable chat</string>
-    <string name="settings_chat_off" context="settings of the pin lock">Disable chat</string>
+    <string name="settings_chat_on" context="settings of the chat">Enable chat</string>
+    <string name="settings_chat_off" context="settings of the chat">Disable chat</string>
+
+    <string name="settings_chat_status" context="settings of the chat to choose the status">Status</string>
+    <string name="settings_chat_status_online" context="settings of the chat to choose the status online">Online</string>
+    <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
+    <string name="settings_chat_status_invisible" context="settings of the chat to choose the status invisible">Invisible</string>
+    <string name="settings_chat_summary_invisible" context="summary of the status invisible in settings">You can interact with your contacts but you will appear offline for them.</string>
+    <string name="settings_chat_status_offline" context="settings of the chat to choose the status offline">Offline</string>
+    <string name="settings_chat_summary_offline" context="summary of the status invisible in settings">You will appear offline to your contacts and you will not be able to chat with them.</string>
+
+    <string name="changing_status_to_online_success" context="message shown when the status of the user successfully changed to online">You\'re now online</string>
+    <string name="changing_status_to_invisible_success" context="message shown when the status of the user successfully changed to invisible">You\'re now invisible</string>
+    <string name="changing_status_to_offline_success" context="message shown when the status of the user successfully changed to offline">You\'re now offline</string>
+    <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">Error. You status has not been changed</string>
 </resources>

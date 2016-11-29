@@ -10797,12 +10797,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("remove from chat finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				//Update chat view
-				if(rChatFL!=null){
-					rChatFL.setChats();
+//				if(rChatFL!=null){
+//					rChatFL.setChats();
+//				}
+			}
+			else{
+				log("EEEERRRRROR WHEN leaving CHAT " + e.getErrorString());
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Status changed to: "+request.getNumber());
+				int status = (int) request.getNumber();
+				switch(status){
+					case MegaChatApi.STATUS_ONLINE:{
+						showSnackbar(getString(R.string.changing_status_to_online_success));
+						break;
+					}
+					case MegaChatApi.STATUS_AWAY:{
+						showSnackbar(getString(R.string.changing_status_to_invisible_success));
+						break;
+					}
+					case MegaChatApi.STATUS_OFFLINE:{
+						showSnackbar(getString(R.string.changing_status_to_offline_success));
+						break;
+					}
+				}
+				if(sttFLol!=null){
+					if(sttFLol.isAdded()){
+						sttFLol.verifyStatusChat(status);
+					}
 				}
 			}
 			else{
 				log("EEEERRRRROR WHEN leaving CHAT " + e.getErrorString());
+				showSnackbar(getString(R.string.changing_status_error));
 			}
 		}
 	}
