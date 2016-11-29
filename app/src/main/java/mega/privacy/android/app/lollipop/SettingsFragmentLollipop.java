@@ -48,6 +48,8 @@ import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 //import android.support.v4.preference.PreferenceFragment;
@@ -57,6 +59,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	Context context;
 	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
 	Handler handler = new Handler();
 	
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
@@ -68,13 +71,19 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
 	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
+	public static String CATEGORY_CHAT_STATUS = "settings_status_chat";
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
+
 	public static String KEY_CHAT_ENABLE = "settings_chat_enable";
+
+	public static String KEY_CHAT_ONLINE_STATUS = "settings_status_chat_online";
+	public static String KEY_CHAT_INVISIBLE_STATUS = "settings_status_chat_invisible";
+	public static String KEY_CHAT_OFFLINE_STATUS = "settings_status_chat_offline";
 
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
@@ -114,6 +123,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory chatEnabledCategory;
+	PreferenceCategory chatStatusCategory;
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
 	PreferenceCategory advancedFeaturesCategory;
@@ -122,6 +132,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference pinLockEnableCheck;
 	SwitchPreference chatEnableSwitch;
 	TwoLineCheckPreference chatEnableCheck;
+	TwoLineCheckPreference chatStatusOnlineCheck;
+	TwoLineCheckPreference chatStatusInvisibleCheck;
+	TwoLineCheckPreference chatStatusOfflineCheck;
 	Preference pinLockCode;
 	Preference downloadLocation;
 	Preference downloadLocationPreference;
@@ -170,6 +183,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	String downloadLocationPath = "";
 	String ast = "";
 	String pinLockCodeTxt = "";
+	int chatStatus = -1;
 	
 	//Secondary Folder
 	String localSecondaryFolderPath = "";
@@ -186,6 +200,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		if (megaChatApi == null){
+			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+		}
 		
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
@@ -199,6 +217,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);	
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
 		chatEnabledCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_ENABLED);
+		chatStatusCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_STATUS);
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -216,6 +235,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatEnableCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ENABLE);
 			chatEnableCheck.setOnPreferenceClickListener(this);
 		}
+
+		chatStatusOnlineCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ONLINE_STATUS);
+		chatStatusOnlineCheck.setSummary(getString(R.string.settings_chat_summary_online));
+		chatStatusOnlineCheck.setOnPreferenceClickListener(this);
+		chatStatusInvisibleCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_INVISIBLE_STATUS);
+		chatStatusInvisibleCheck.setSummary(getString(R.string.settings_chat_summary_invisible));
+		chatStatusInvisibleCheck.setOnPreferenceClickListener(this);
+		chatStatusOfflineCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_OFFLINE_STATUS);
+		chatStatusOfflineCheck.setSummary(getString(R.string.settings_chat_summary_offline));
+		chatStatusOfflineCheck.setOnPreferenceClickListener(this);
 
 		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
 		pinLockCode.setOnPreferenceClickListener(this);
@@ -264,6 +293,27 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		megaSecondaryFolder= findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER);	
 		megaSecondaryFolder.setOnPreferenceClickListener(this);
+
+
+
+
+		//Get chat status
+		chatStatus = megaChatApi.getOnlineStatus();
+		if(chatStatus== MegaChatApi.STATUS_ONLINE){
+			chatStatusOnlineCheck.setChecked(true);
+			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusOfflineCheck.setChecked(false);
+		}
+		else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+			chatStatusOnlineCheck.setChecked(false);
+			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusOfflineCheck.setChecked(true);
+		}
+		else{
+			chatStatusOnlineCheck.setChecked(false);
+			chatStatusInvisibleCheck.setChecked(true);
+			chatStatusOfflineCheck.setChecked(false);
+		}
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			log("lollipop version check storage");
@@ -1383,6 +1433,24 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
 			}
 		}
+		else if(preference.getKey().compareTo(KEY_CHAT_ONLINE_STATUS) == 0){
+			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
+			chatStatusOnlineCheck.setChecked(true);
+			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusOfflineCheck.setChecked(false);
+		}
+		else if(preference.getKey().compareTo(KEY_CHAT_INVISIBLE_STATUS) == 0){
+			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
+			chatStatusOnlineCheck.setChecked(false);
+			chatStatusInvisibleCheck.setChecked(true);
+			chatStatusOfflineCheck.setChecked(false);
+		}
+		else if(preference.getKey().compareTo(KEY_CHAT_OFFLINE_STATUS) == 0){
+			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, (ManagerActivityLollipop) context);
+			chatStatusOnlineCheck.setChecked(false);
+			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusOfflineCheck.setChecked(true);
+		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
 			log("KEY_PIN_LOCK_CODE");
@@ -1787,6 +1855,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
 		this.startActivity(intent);
+	}
+
+	public void verifyStatusChat(int status){
+		switch(status){
+			case MegaChatApi.STATUS_ONLINE:{
+				chatStatusOnlineCheck.setChecked(true);
+				chatStatusInvisibleCheck.setChecked(false);
+				chatStatusOfflineCheck.setChecked(false);
+				break;
+			}
+			case MegaChatApi.STATUS_AWAY:{
+				chatStatusOnlineCheck.setChecked(false);
+				chatStatusInvisibleCheck.setChecked(true);
+				chatStatusOfflineCheck.setChecked(false);
+				break;
+			}
+			case MegaChatApi.STATUS_OFFLINE:{
+				chatStatusOnlineCheck.setChecked(false);
+				chatStatusInvisibleCheck.setChecked(false);
+				chatStatusOfflineCheck.setChecked(true);
+				break;
+			}
+		}
 	}
 
 	private static void log(String log) {

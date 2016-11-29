@@ -160,6 +160,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
 
+//        megaChatApi.getUserOnlineStatus();
         this.setChats();
 
         return v;

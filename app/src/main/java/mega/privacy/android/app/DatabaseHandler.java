@@ -98,7 +98,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
-    
+
     private static DatabaseHandler instance;
     
     private static SQLiteDatabase db;
