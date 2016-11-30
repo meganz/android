@@ -984,4 +984,6 @@
     <string name="changing_status_to_invisible_success" context="message shown when the status of the user successfully changed to invisible">You\'re now invisible</string>
     <string name="changing_status_to_offline_success" context="message shown when the status of the user successfully changed to offline">You\'re now offline</string>
     <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">Error. You status has not been changed</string>
+
+    <string name="settings_chat_vibration" context="settings of the chat to choose the status">Vibration</string>
 </resources>

@@ -22,4 +22,7 @@
     <dimen name="status_bar_height">24dp</dimen>
     <dimen name="left_margin_back_arrow">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="status_layout">24dp</dimen>
+
 </resources>

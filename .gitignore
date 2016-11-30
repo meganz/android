@@ -40,3 +40,4 @@ captures
 /app/src/main/java/nz/mega/sdk/MegaChatMessage.java
 /app/src/main/java/nz/mega/sdk/MegaChatRoomListener.java
 /app/src/main/java/nz/mega/sdk/MegaChatLogger.java
+/app/src/main/java/nz/mega/sdk/MegaChatListItemList.java

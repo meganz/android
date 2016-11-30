@@ -1,75 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white" >
+    android:background="@color/white">
 
-        <LinearLayout
-            android:id="@+id/linear_empty_layout_chat_recent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/empty_text_chat_recent_invite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/recent_chat_empty_invite"
-                android:textColor="@color/mail_my_account"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:id="@+id/empty_image_view_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_empty_chat_list"/>
-
-            <TextView
-                android:id="@+id/empty_text_chat_recent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/recent_chat_empty"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/adapters_background"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/invite_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:paddingTop="-3dp"
-                android:paddingBottom="-3dp"
-                android:textColor="@color/white"
-                android:text="@string/contact_invite"
-                android:background="@drawable/ripple_upgrade"
-                android:elevation="@dimen/elevation_upgrade_low"
-                android:stateListAnimator="@anim/button_upgrade_elevation"
-                android:tint="@android:color/white" />
-
-    <!--        <Button
-                android:id="@+id/get_started_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:text="@string/get_started_button"
-                android:background="@drawable/white_rounded_corners_button"
-                android:elevation="@dimen/elevation_upgrade_low"
-                android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
-        </LinearLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/chat_recent_list_view"
+    <LinearLayout
+        android:id="@+id/main_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="multipleChoice" />
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/status_text_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/status_layout"
+            android:background="@color/content_text_background">
+
+            <TextView
+                android:id="@+id/status_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textAllCaps="true"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:text="Offline"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chat_recent_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="multipleChoice" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_empty_layout_chat_recent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/status_text_layout"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/empty_text_chat_recent_invite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/recent_chat_empty_invite"
+            android:textColor="@color/mail_my_account"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/empty_image_view_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_empty_chat_list"/>
+
+        <TextView
+            android:id="@+id/empty_text_chat_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/recent_chat_empty"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/adapters_background"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/invite_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="-3dp"
+            android:paddingBottom="-3dp"
+            android:textColor="@color/white"
+            android:text="@string/contact_invite"
+            android:background="@drawable/ripple_upgrade"
+            android:elevation="@dimen/elevation_upgrade_low"
+            android:stateListAnimator="@anim/button_upgrade_elevation"
+            android:tint="@android:color/white" />
+
+<!--        <Button
+            android:id="@+id/get_started_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accentColor"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:text="@string/get_started_button"
+            android:background="@drawable/white_rounded_corners_button"
+            android:elevation="@dimen/elevation_upgrade_low"
+            android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
+    </LinearLayout>
 
 </RelativeLayout>

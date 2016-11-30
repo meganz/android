@@ -69,34 +69,6 @@
         <item name="android:maxHeight">2dp</item>
     </style>
 
-    <!-- Base application theme. -->
-    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
-
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
-
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
-
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-
-        <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/lollipop_primary_color</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
-
-    </style>
-
     <style name="Theme.Megaactionbar.Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="actionBarItemBackground">@drawable/selectable_background_megaactionbar</item>
         <item name="popupMenuStyle">@style/PopupMenu.Megaactionbar</item>
