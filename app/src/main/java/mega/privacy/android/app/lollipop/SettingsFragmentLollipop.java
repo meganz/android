@@ -40,6 +40,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
@@ -72,6 +73,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
 	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
 	public static String CATEGORY_CHAT_STATUS = "settings_status_chat";
+	public static String CATEGORY_CHAT_NOTIFICATIONS = "settings_notifications_chat";
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
@@ -84,6 +86,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_CHAT_ONLINE_STATUS = "settings_status_chat_online";
 	public static String KEY_CHAT_INVISIBLE_STATUS = "settings_status_chat_invisible";
 	public static String KEY_CHAT_OFFLINE_STATUS = "settings_status_chat_offline";
+
+	public static String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
@@ -124,6 +128,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory chatEnabledCategory;
 	PreferenceCategory chatStatusCategory;
+	PreferenceCategory chatNotificationsCategory;
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
 	PreferenceCategory advancedFeaturesCategory;
@@ -135,6 +140,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference chatStatusOnlineCheck;
 	TwoLineCheckPreference chatStatusInvisibleCheck;
 	TwoLineCheckPreference chatStatusOfflineCheck;
+	Preference nestedNotificationsChat;
 	Preference pinLockCode;
 	Preference downloadLocation;
 	Preference downloadLocationPreference;
@@ -218,6 +224,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
 		chatEnabledCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_ENABLED);
 		chatStatusCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_STATUS);
+		chatNotificationsCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_NOTIFICATIONS);
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -245,6 +252,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		chatStatusOfflineCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_OFFLINE_STATUS);
 		chatStatusOfflineCheck.setSummary(getString(R.string.settings_chat_summary_offline));
 		chatStatusOfflineCheck.setOnPreferenceClickListener(this);
+
+		nestedNotificationsChat = findPreference(KEY_CHAT_NESTED_NOTIFICATIONS);
+		nestedNotificationsChat.setOnPreferenceClickListener(this);
 
 		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
 		pinLockCode.setOnPreferenceClickListener(this);
@@ -293,9 +303,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		megaSecondaryFolder= findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER);	
 		megaSecondaryFolder.setOnPreferenceClickListener(this);
-
-
-
 
 		//Get chat status
 		chatStatus = megaChatApi.getOnlineStatus();
@@ -1450,6 +1457,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatStatusOnlineCheck.setChecked(false);
 			chatStatusInvisibleCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(true);
+		}
+		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
+			//Intent to new activity Chat Settings
+			Intent i = new Intent(context, ChatPreferencesActivity.class);
+			startActivity(i);
+
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN

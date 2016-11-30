@@ -1,5 +1,9 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -22,9 +27,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +74,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     MegaListChatLollipopAdapter adapterList;
     GestureDetectorCompat detector;
 
+    RelativeLayout chatStatusLayout;
+    TextView chatStatusText;
+    LinearLayout mainLinearLayout;
+
+    RelativeLayout mainRelativeLayout;
+
     RecyclerView.LayoutManager mLayoutManager;
 
     ArrayList<MegaChatListItem> chats;
@@ -74,6 +90,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     TextView emptyTextViewInvite;
     ImageView emptyImageView;
     Button inviteButton;
+    int chatStatus;
 
     float scaleH, scaleW;
     float density;
@@ -160,8 +177,217 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
 
+        mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
+        mainLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout);
+        chatStatusLayout= (RelativeLayout)  v.findViewById(R.id.status_text_layout);
+        chatStatusText = (TextView)  v.findViewById(R.id.status_text);
+
+        //Get chat status
+        chatStatus = megaChatApi.getOnlineStatus();
+        if(chatStatus== MegaChatApi.STATUS_ONLINE){
+            chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_connected));
+            chatStatusText.setText(getString(R.string.settings_chat_status_online));
+            chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.white));
+        }
+        else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+            chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_properties_text_available));
+            chatStatusText.setText(getString(R.string.settings_chat_status_offline));
+            chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.white));
+        }
+        else{
+            chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.participants_layout));
+            chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
+            chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+        }
+
+
+
+//        chatStatusLayout.animate().translationYBy(-24.0f).start();
+
+//        TranslateAnimation animation2 = new TranslateAnimation(
+//                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+//                Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -24.0f);
+//        animation2.setDuration(2000);
+//        animation2.setStartOffset(3200);
+//        chatStatusLayout.startAnimation(animation2);
+
 //        megaChatApi.getUserOnlineStatus();
         this.setChats();
+
+//        float height = chatStatusLayout.getHeight();
+//
+//        TranslateAnimation animation2 = new TranslateAnimation(
+//                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+//                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -50.0f);
+//        animation2.setDuration(2000);
+//        animation2.setStartOffset(1000);
+////        animation2.setFillAfter(true);
+//        mainLinearLayout.startAnimation(animation2);
+//
+//        animation2.setAnimationListener(new Animation.AnimationListener() {
+//            @Override
+//            public void onAnimationStart(Animation animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animation animation) {
+//                chatStatusLayout.setVisibility(View.GONE);
+////                listView.setVisibility(View.VISIBLE);
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animation animation) {
+//
+//            }
+//        });
+
+
+//        ObjectAnimator animX = ObjectAnimator.ofFloat(listView, "x", 50f);
+
+
+//        chatStatusLayout.setVisibility(View.GONE);
+
+//        float height = chatStatusLayout.getHeight();
+        float dimen = getResources().getDimensionPixelOffset(R.dimen.status_layout);
+//        ObjectAnimator animA = ObjectAnimator.ofFloat(mainLinearLayout, "y", 0.0f, -dimen);
+//        animA.setDuration(2000);
+//        animA.start();
+
+
+        TranslateAnimation animation2 = new TranslateAnimation(
+        Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+        Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -dimen);
+        animation2.setDuration(2000);
+
+        animation2.setFillAfter(true);
+        mainLinearLayout.startAnimation(animation2);
+
+//        mainRelativeLayout.animate().scaleY(dimen).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(2000);
+
+//        float dimenFloat = new Float(dimen);
+        ValueAnimator anim = ValueAnimator.ofInt(0, (int)dimen);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)mainRelativeLayout.getLayoutParams();
+                layoutParams.height = val;
+                mainRelativeLayout.setLayoutParams(layoutParams);
+            }
+        });
+        anim.setDuration(2000);
+        anim.start();
+
+        animation2.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+//                chatStatusLayout.setVisibility(View.GONE);
+//                listView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+
+//        animA.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animator) {
+////                chatStatusLayout.setVisibility(View.GONE);
+//
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animator) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        });
+
+//        ObjectAnimator animB = ObjectAnimator.ofFloat(chatStatusLayout, "y", -height, 0.0f);
+//        animB.setDuration(2000);
+//        AnimatorSet animSetAB = new AnimatorSet();
+//        animSetAB.playTogether(animA, animB);
+//        animSetAB.start();
+//
+//        animSetAB.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//                chatStatusLayout.setVisibility(View.VISIBLE);
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animator) {
+//                chatStatusLayout.setVisibility(View.VISIBLE);
+//                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)listView.getLayoutParams();
+//                layoutParams.addRule(RelativeLayout.BELOW, chatStatusLayout.getId());
+//                listView.setLayoutParams(layoutParams);
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animator) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        });
+//
+//
+//
+//        ObjectAnimator animC = ObjectAnimator.ofFloat(listView, "y", 0.0f, -height);
+//        animC.setDuration(2000);
+//        ObjectAnimator animD = ObjectAnimator.ofFloat(chatStatusLayout, "y", 0.0f, -height);
+//        animD.setDuration(2000);
+//        AnimatorSet animSetCD = new AnimatorSet();
+//        animSetCD.playTogether(animC, animD);
+//        animSetCD.setStartDelay(3000);
+//        animSetCD.start();
+//
+//        animSetCD.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//                chatStatusLayout.setVisibility(View.VISIBLE);
+//                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)listView.getLayoutParams();
+//                layoutParams.addRule(RelativeLayout.BELOW, chatStatusLayout.getId());
+//                listView.setLayoutParams(layoutParams);
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animator) {
+//                chatStatusLayout.setVisibility(View.INVISIBLE);
+//                listView.setVisibility(View.VISIBLE);
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animator) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//
+//            }
+//        });
 
         return v;
     }
