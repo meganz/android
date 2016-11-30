@@ -61,7 +61,6 @@ class DelegateMegaChatRoomListener extends MegaChatRoomListener {
                     }
                 });
             }
-
         }
     }
 
