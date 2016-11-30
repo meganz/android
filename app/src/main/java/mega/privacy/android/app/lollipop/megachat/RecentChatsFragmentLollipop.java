@@ -76,7 +76,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
     RelativeLayout chatStatusLayout;
     TextView chatStatusText;
-    LinearLayout mainLinearLayout;
 
     RelativeLayout mainRelativeLayout;
 
@@ -178,7 +177,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         inviteButton.setOnClickListener(this);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
-        mainLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout);
         chatStatusLayout= (RelativeLayout)  v.findViewById(R.id.status_text_layout);
         chatStatusText = (TextView)  v.findViewById(R.id.status_text);
 
@@ -200,95 +198,33 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
         }
 
-
-
-//        chatStatusLayout.animate().translationYBy(-24.0f).start();
-
-//        TranslateAnimation animation2 = new TranslateAnimation(
-//                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
-//                Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -24.0f);
-//        animation2.setDuration(2000);
-//        animation2.setStartOffset(3200);
-//        chatStatusLayout.startAnimation(animation2);
-
-//        megaChatApi.getUserOnlineStatus();
         this.setChats();
 
-//        float height = chatStatusLayout.getHeight();
-//
-//        TranslateAnimation animation2 = new TranslateAnimation(
-//                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
-//                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -50.0f);
-//        animation2.setDuration(2000);
-//        animation2.setStartOffset(1000);
-////        animation2.setFillAfter(true);
-//        mainLinearLayout.startAnimation(animation2);
-//
-//        animation2.setAnimationListener(new Animation.AnimationListener() {
-//            @Override
-//            public void onAnimationStart(Animation animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animation animation) {
-//                chatStatusLayout.setVisibility(View.GONE);
-////                listView.setVisibility(View.VISIBLE);
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animation animation) {
-//
-//            }
-//        });
-
-
-//        ObjectAnimator animX = ObjectAnimator.ofFloat(listView, "x", 50f);
-
-
-//        chatStatusLayout.setVisibility(View.GONE);
-
-//        float height = chatStatusLayout.getHeight();
+        chatStatusLayout.setVisibility(View.GONE);
         float dimen = getResources().getDimensionPixelOffset(R.dimen.status_layout);
-//        ObjectAnimator animA = ObjectAnimator.ofFloat(mainLinearLayout, "y", 0.0f, -dimen);
-//        animA.setDuration(2000);
-//        animA.start();
 
+        TranslateAnimation animation1 = new TranslateAnimation(
+                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+                Animation.ABSOLUTE, -dimen, Animation.ABSOLUTE, 0.0f);
+        animation1.setDuration(1000);
+        chatStatusLayout.startAnimation(animation1);
 
-        TranslateAnimation animation2 = new TranslateAnimation(
-        Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
-        Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -dimen);
-        animation2.setDuration(2000);
+        final TranslateAnimation animation2 = new TranslateAnimation(
+                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -dimen);
+        animation2.setDuration(1000);
+        animation2.setStartOffset(1000);
 
-        animation2.setFillAfter(true);
-        mainLinearLayout.startAnimation(animation2);
-
-//        mainRelativeLayout.animate().scaleY(dimen).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(2000);
-
-//        float dimenFloat = new Float(dimen);
-        ValueAnimator anim = ValueAnimator.ofInt(0, (int)dimen);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)mainRelativeLayout.getLayoutParams();
-                layoutParams.height = val;
-                mainRelativeLayout.setLayoutParams(layoutParams);
-            }
-        });
-        anim.setDuration(2000);
-        anim.start();
-
-        animation2.setAnimationListener(new Animation.AnimationListener() {
+        animation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
+                chatStatusLayout.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-//                chatStatusLayout.setVisibility(View.GONE);
-//                listView.setVisibility(View.VISIBLE);
+                chatStatusLayout.setVisibility(View.VISIBLE);
+                chatStatusLayout.startAnimation(animation2);
             }
 
             @Override
@@ -297,97 +233,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             }
         });
 
+        animation2.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                chatStatusLayout.setVisibility(View.VISIBLE);
+            }
 
-//        animA.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animator) {
-////                chatStatusLayout.setVisibility(View.GONE);
-//
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//
-//            }
-//        });
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                chatStatusLayout.setVisibility(View.GONE);
+            }
 
-//        ObjectAnimator animB = ObjectAnimator.ofFloat(chatStatusLayout, "y", -height, 0.0f);
-//        animB.setDuration(2000);
-//        AnimatorSet animSetAB = new AnimatorSet();
-//        animSetAB.playTogether(animA, animB);
-//        animSetAB.start();
-//
-//        animSetAB.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//                chatStatusLayout.setVisibility(View.VISIBLE);
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animator) {
-//                chatStatusLayout.setVisibility(View.VISIBLE);
-//                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)listView.getLayoutParams();
-//                layoutParams.addRule(RelativeLayout.BELOW, chatStatusLayout.getId());
-//                listView.setLayoutParams(layoutParams);
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//
-//            }
-//        });
-//
-//
-//
-//        ObjectAnimator animC = ObjectAnimator.ofFloat(listView, "y", 0.0f, -height);
-//        animC.setDuration(2000);
-//        ObjectAnimator animD = ObjectAnimator.ofFloat(chatStatusLayout, "y", 0.0f, -height);
-//        animD.setDuration(2000);
-//        AnimatorSet animSetCD = new AnimatorSet();
-//        animSetCD.playTogether(animC, animD);
-//        animSetCD.setStartDelay(3000);
-//        animSetCD.start();
-//
-//        animSetCD.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animation) {
-//                chatStatusLayout.setVisibility(View.VISIBLE);
-//                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)listView.getLayoutParams();
-//                layoutParams.addRule(RelativeLayout.BELOW, chatStatusLayout.getId());
-//                listView.setLayoutParams(layoutParams);
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animator) {
-//                chatStatusLayout.setVisibility(View.INVISIBLE);
-//                listView.setVisibility(View.VISIBLE);
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//
-//            }
-//        });
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
 
         return v;
     }

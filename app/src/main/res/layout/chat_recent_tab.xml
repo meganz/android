@@ -5,37 +5,24 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <LinearLayout
-        android:id="@+id/main_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/status_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/status_layout"
+        android:background="@color/content_text_background">
 
-        <RelativeLayout
-            android:id="@+id/status_text_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/status_layout"
-            android:background="@color/content_text_background">
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textAllCaps="true"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:text="Offline"
+            android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/status_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textAllCaps="true"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                android:text="Offline"
-                android:textSize="14sp" />
-
-        </RelativeLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/chat_recent_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="multipleChoice" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/linear_empty_layout_chat_recent"
@@ -99,5 +86,11 @@
             android:elevation="@dimen/elevation_upgrade_low"
             android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
     </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_recent_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="multipleChoice" />
 
 </RelativeLayout>
