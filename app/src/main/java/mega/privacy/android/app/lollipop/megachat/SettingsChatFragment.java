@@ -39,8 +39,8 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
     Preference chatSoundPreference;
     SwitchPreference chatVibrateSwitch;
 
-    SwitchPreference chatVibrateCheck;
-    SwitchPreference chatNotificationsCheck;
+    TwoLineCheckPreference chatVibrateCheck;
+    TwoLineCheckPreference chatNotificationsCheck;
 
     boolean chatNotifications;
     boolean chatVibration;
@@ -75,11 +75,11 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
 
         }
         else{
-//            chatVibrateCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
-//            chatVibrateCheck.setOnPreferenceClickListener(this);
-//
-//            chatNotificationsCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ENABLE);
-//            chatNotificationsCheck.setOnPreferenceClickListener(this);
+            chatVibrateCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_VIBRATE);
+            chatVibrateCheck.setOnPreferenceClickListener(this);
+
+            chatNotificationsCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_NOTIFICATIONS);
+            chatNotificationsCheck.setOnPreferenceClickListener(this);
         }
 
         if(chatSettings==null){
