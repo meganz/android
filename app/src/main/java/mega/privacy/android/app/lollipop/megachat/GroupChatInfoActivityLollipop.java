@@ -21,6 +21,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -266,6 +267,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTextContainerLayout.setLayoutParams(paramsInfoText);
 
             infoTitleChatText = (TextView) findViewById(R.id.chat_group_contact_properties_info_title);
+            log("The full title of chat: "+chat.getTitle());
             infoTitleChatText.setText(chat.getTitle());
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
 
@@ -1110,6 +1112,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
         final EditText input = new EditText(this);
+        int maxLength = 30;
+        input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+
         layout.addView(input, params);
 
         input.setSingleLine();

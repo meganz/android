@@ -522,7 +522,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.circlePendingMessages.setImageBitmap(circle);
 
 		holder.layoutPendingMessages.setVisibility(View.VISIBLE);
-		holder.numberPendingMessages.setText(unreadMessages+"");
+
+		if(unreadMessages<0){
+			unreadMessages = Math.abs(unreadMessages);
+			holder.numberPendingMessages.setText("+"+unreadMessages);
+		}
+		else{
+			holder.numberPendingMessages.setText(unreadMessages+"");
+		}
 	}
 
 	public void createMultiselectTick (ViewHolderChatList holder){
@@ -554,7 +561,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.divider_upgrade_account));
+		p.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
