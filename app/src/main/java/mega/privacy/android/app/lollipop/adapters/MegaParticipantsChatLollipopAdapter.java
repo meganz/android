@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -154,7 +155,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 
 			holderList.itemLayout.setTag(holderList);
-			holderList.itemLayout.setOnClickListener(this);
 			v.setTag(holderList);
 			return holderList;
 		}
@@ -271,13 +271,23 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 						}
 					}
+					((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
+					((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
 				}
 				else{
 					log("Participant is NOT contact");
+					if(position!=0){
+						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+						((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
+					}
 				}
 
 			} else {
 				log("NOT email- Participant is NOT contact");
+				if(position!=0){
+					((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+					((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
+				}
 			}
 
 			int status = participant.getStatus();
@@ -299,7 +309,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 
 			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setTag(holder);
-			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
 		}
 		else{
 			log("Bind item add participant");
@@ -534,18 +543,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				((GroupChatInfoActivityLollipop) context).showParticipantsOptionsPanel(p);
 				break;
 			}
-			case R.id.participant_list_item_layout:{
-				log("contact_list_item_layout");
-//				if (fragment != null){
-//					((ContactsFragmentLollipop) fragment).itemClick(currentPosition);
-//				}
-				break;
-			}
 			case R.id.add_participant_list_item_layout:{
 				log("add_participant_item_layout");
-//				if (fragment != null){
-//					((ContactsFragmentLollipop) fragment).itemClick(currentPosition);
-//				}
 				((GroupChatInfoActivityLollipop) context).chooseAddParticipantDialog();
 				break;
 			}
