@@ -138,4 +138,6 @@ public class Constants {
 	final public static int CONTACT_TYPE_MEGA = 0;
 	final public static int CONTACT_TYPE_DEVICE = 1;
 
+	public static int SELECT_RINGTONE = 2000;
+	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
 }

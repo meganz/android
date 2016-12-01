@@ -1,6 +1,10 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 
+import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
@@ -14,11 +18,13 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import mega.privacy.android.app.R;
 
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 public class ChatPreferencesActivity extends AppCompatActivity {
 
     FrameLayout fragmentContainer;
+    SettingsChatFragment sttChat;
     Toolbar tB;
     ActionBar aB;
 
@@ -61,10 +67,51 @@ public class ChatPreferencesActivity extends AppCompatActivity {
 //        fm.beginTransaction().replace(R.id.fragment_container, new SettingsChatFragment()).commit();
 
         android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, new SettingsChatFragment());
+        sttChat = new SettingsChatFragment();
+        ft.replace(R.id.fragment_container, sttChat);
         ft.commit();
     }
 
+    public void changeSound(){
+        log("Change sound");
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+        this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        log("onActivityResult, resultCode: " + resultCode);
+
+        if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
+        {
+            log("Selected notification sound OK");
+
+            Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            if (uri != null) {
+                if(sttChat!=null){
+                    if(sttChat.isAdded()){
+                        sttChat.setNotificationSound(uri);
+                    }
+                }
+
+            }
+            else{
+                log("Error uri NULL");
+            }
+
+        }
+        super.onActivityResult(requestCode, resultCode, intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     private static void log(String log) {
         Util.log("ChatPreferencesActivity", log);
