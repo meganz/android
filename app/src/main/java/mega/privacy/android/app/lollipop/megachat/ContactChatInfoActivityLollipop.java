@@ -50,6 +50,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -67,9 +68,6 @@ import nz.mega.sdk.MegaUser;
 
 @SuppressLint("NewApi")
 public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
-
-	public static int SELECT_RINGTONE = 2000;
-	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
 
 	RelativeLayout imageLayout;
 
@@ -518,7 +516,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.call_ringtone_title));
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
-				this.startActivityForResult(intent, SELECT_RINGTONE);
+				this.startActivityForResult(intent, Constants.SELECT_RINGTONE);
 
 				break;
 			}
@@ -529,7 +527,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
 				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
-				this.startActivityForResult(intent, SELECT_NOTIFICATION_SOUND);
+				this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
 				break;
 			}
 		}
@@ -540,7 +538,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		log("onActivityResult, resultCode: "+resultCode);
 
-		if (resultCode == RESULT_OK && requestCode == SELECT_RINGTONE)
+		if (resultCode == RESULT_OK && requestCode == Constants.SELECT_RINGTONE)
 		{
 			log("Selected ringtone OK");
 
@@ -572,7 +570,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				log("Error not chosen ringtone");
 			}
 		}
-		else if (resultCode == RESULT_OK && requestCode == SELECT_NOTIFICATION_SOUND)
+		else if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
 		{
 			log("Selected notification sound OK");
 
@@ -604,9 +602,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				log("Error not chosen notification sound");
 			}
 		}
-		{
-			super.onActivityResult(requestCode, resultCode, intent);
-		}
+
+		super.onActivityResult(requestCode, resultCode, intent);
+
 	}
 
 	@Override
