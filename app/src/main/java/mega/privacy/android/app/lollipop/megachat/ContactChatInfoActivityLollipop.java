@@ -21,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -35,7 +36,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.File;
@@ -78,7 +78,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
 	LinearLayout notificationsLayout;
-	Switch notificationsSwitch;
+	SwitchCompat notificationsSwitch;
 	TextView notificationsTitle;
 
 	RelativeLayout messageSoundLayout;
@@ -204,7 +204,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 			notificationsTitle = (TextView) findViewById(R.id.chat_contact_properties_notifications_text);
 
-			notificationsSwitch = (Switch) findViewById(R.id.chat_contact_properties_switch);
+			notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_contact_properties_switch);
 			notificationsSwitch.setOnCheckedChangeListener(this);
 			LinearLayout.LayoutParams paramsSwitch = (LinearLayout.LayoutParams) notificationsSwitch.getLayoutParams();
 			paramsSwitch.rightMargin = Util.scaleWidthPx(16, outMetrics);
