@@ -2269,6 +2269,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					break;
 				}
+				case CHAT:{
+					if (rChatFL != null){
+						if(rChatFL.isAdded()){
+							rChatFL.setChats();
+						}
+
+					}
+				}
     		}
     	}
 	}

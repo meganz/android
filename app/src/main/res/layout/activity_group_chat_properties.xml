@@ -90,8 +90,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
                             android:textColor="@color/accentColor"
-                            android:layout_weight="5"
-                            android:text="@string/title_properties_chat_contact_notifications"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:textSize="16dp" />
 
                         <ImageView
@@ -108,8 +108,6 @@
                             android:layout_gravity="left|center_vertical"
                             android:layout_below="@+id/chat_group_contact_properties_info_title"
                             android:textColor="@color/name_my_account"
-                            android:layout_weight="5"
-                            android:text="@string/title_properties_chat_contact_notifications"
                             android:textSize="14dp" />
 
                     </RelativeLayout>
