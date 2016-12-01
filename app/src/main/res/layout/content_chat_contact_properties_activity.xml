@@ -35,7 +35,7 @@
                 android:text="@string/title_properties_chat_contact_notifications"
                 android:textSize="16dp" />
 
-            <Switch
+            <android.support.v7.widget.SwitchCompat
                 android:id="@+id/chat_contact_properties_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

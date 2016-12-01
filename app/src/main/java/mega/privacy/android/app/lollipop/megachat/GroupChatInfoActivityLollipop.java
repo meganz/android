@@ -9,6 +9,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -16,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -121,7 +125,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     ImageView editImageView;
 
     LinearLayout notificationsLayout;
-    Switch notificationsSwitch;
+    SwitchCompat notificationsSwitch;
     TextView notificationsTitle;
     TextView notificationSelectedText;
 
@@ -222,7 +226,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
 
-            aB.setTitle(chat.getTitle());
+            aB.setTitle(getString(R.string.group_chat_info_label));
 
             scrollView = (ScrollView) findViewById(R.id.scroll_view_group_chat_properties);
 
@@ -280,9 +284,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             notificationsLayout.setLayoutParams(paramsNotifications);
 
             notificationsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_title);
-            notificationSelectedText = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_option);
+//            notificationSelectedText = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_option);
 
-            notificationsSwitch = (Switch) findViewById(R.id.chat_group_contact_properties_switch);
+            notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnCheckedChangeListener(this);
             LinearLayout.LayoutParams paramsSwitch = (LinearLayout.LayoutParams) notificationsSwitch.getLayoutParams();
             paramsSwitch.rightMargin = Util.scaleWidthPx(16, outMetrics);
@@ -364,6 +368,45 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setNestedScrollingEnabled(false);
 
+            //SET Preferences (if exist)
+            if(chatPrefs!=null){
+
+                boolean notificationsEnabled = true;
+                if (chatPrefs.getNotificationsEnabled() != null){
+                    notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
+                }
+                notificationsSwitch.setChecked(notificationsEnabled);
+
+                if(!notificationsEnabled){
+                    ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+                    messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+                }
+
+                String ringtoneString = chatPrefs.getRingtone();
+                Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(ringtoneString));
+                String title = ringtone.getTitle(this);
+                ringtoneText.setText(title);
+
+                String soundString = chatPrefs.getNotificationsSound();
+                Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
+                String titleSound = sound.getTitle(this);
+                messageSoundText.setText(titleSound);
+
+            }
+            else{
+                Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+                Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
+                ringtoneText.setText(defaultRingtone.getTitle(this));
+
+                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
+                messageSoundText.setText(defaultSound.getTitle(this));
+
+                notificationsSwitch.setChecked(true);
+            }
+
+
+            //Set participants
             participants = new ArrayList<>();
 
             setParticipants();
@@ -541,45 +584,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        log("-------------------onActivityResult "+requestCode + "____" + resultCode);
-
-        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_CREATE_CHAT OK");
-
-            if (intent == null) {
-                log("Return.....");
-                return;
-            }
-
-            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-            MultipleGroupChatRequestListener multipleListener = null;
-
-            if (contactsData != null) {
-
-                if (contactsData.size() == 1) {
-                    MegaUser user = megaApi.getContact(contactsData.get(0));
-                    if (user != null) {
-                        megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
-                    }
-                } else {
-                    log("Add multiple participants "+contactsData.size());
-                    multipleListener = new MultipleGroupChatRequestListener(this);
-                    for (int i = 0; i < contactsData.size(); i++) {
-                        MegaUser user = megaApi.getContact(contactsData.get(i));
-                        if (user != null) {
-                            megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
-                        }
-                    }
-                }
-            }
-        }
-        else{
-            log("Error onActivityResult: REQUEST_ADD_PARTICIPANTS");
-        }
-    }
-
     public void showRemoveParticipantConfirmation (MegaChatParticipant participant, MegaChatRoom chatToChange){
         log("showRemoveParticipantConfirmation");
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -725,7 +729,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+        p.setColor(ContextCompat.getColor(this,R.color.divider_upgrade_account));
 
         int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -966,8 +970,135 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 showConfirmationClearChat();
                 break;
             }
+            case R.id.chat_group_contact_properties_ringtone_layout: {
+                log("Ringtone option");
+
+                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.call_ringtone_title));
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+                this.startActivityForResult(intent, Constants.SELECT_RINGTONE);
+
+                break;
+            }
+            case R.id.chat_group_contact_properties_messages_sound_layout: {
+                log("Message sound option");
+
+                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+                this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
+                break;
+            }
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        log("onActivityResult, resultCode: "+resultCode);
+
+        if (resultCode == RESULT_OK && requestCode == Constants.SELECT_RINGTONE)
+        {
+            log("Selected ringtone OK");
+
+            Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+            String title = ringtone.getTitle(this);
+
+            if(title!=null){
+                log("Title ringtone: "+title);
+                ringtoneText.setText(title);
+            }
+
+            if (uri != null)
+            {
+                String chosenRingtone = uri.toString();
+                if(chatPrefs==null){
+                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
+
+                    chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), chosenRingtone, defaultSoundUri.toString());
+                    dbH.setChatItemPreferences(chatPrefs);
+                }
+                else{
+                    chatPrefs.setRingtone(chosenRingtone);
+                    dbH.setRingtoneChatItem(chosenRingtone, Long.toString(chatHandle));
+                }
+            }
+            else
+            {
+                log("Error not chosen ringtone");
+            }
+        }
+        else if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
+        {
+            log("Selected notification sound OK");
+
+            Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            Ringtone sound = RingtoneManager.getRingtone(this, uri);
+            String title = sound.getTitle(this);
+
+            if(title!=null){
+                log("Title sound notification: "+title);
+                messageSoundText.setText(title);
+            }
+
+            if (uri != null)
+            {
+                String chosenSound = uri.toString();
+                if(chatPrefs==null){
+                    Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+
+                    chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), defaultRingtoneUri.toString(), chosenSound);
+                    dbH.setChatItemPreferences(chatPrefs);
+                }
+                else{
+                    chatPrefs.setNotificationsSound(chosenSound);
+                    dbH.setNotificationSoundChatItem(chosenSound, Long.toString(chatHandle));
+                }
+            }
+            else
+            {
+                log("Error not chosen notification sound");
+            }
+        }
+        else if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+            log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
+
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            MultipleGroupChatRequestListener multipleListener = null;
+
+            if (contactsData != null) {
+
+                if (contactsData.size() == 1) {
+                    MegaUser user = megaApi.getContact(contactsData.get(0));
+                    if (user != null) {
+                        megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
+                    }
+                } else {
+                    log("Add multiple participants "+contactsData.size());
+                    multipleListener = new MultipleGroupChatRequestListener(this);
+                    for (int i = 0; i < contactsData.size(); i++) {
+                        MegaUser user = megaApi.getContact(contactsData.get(i));
+                        if (user != null) {
+                            megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            log("Error onActivityResult: REQUEST_ADD_PARTICIPANTS");
+        }
+
+        super.onActivityResult(requestCode, resultCode, intent);
     }
 
     public void showRenameGroupDialog(){
@@ -1142,8 +1273,31 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+        log("onCheckedChanged");
 
+        notificationsSwitch.setChecked(isChecked);
+
+        if(!isChecked){
+            ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+            messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+        }
+        else{
+            ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+        }
+
+        if(chatPrefs==null){
+            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
+
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(isChecked), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+            dbH.setChatItemPreferences(chatPrefs);
+        }
+        else{
+            chatPrefs.setNotificationsEnabled(Boolean.toString(isChecked));
+            dbH.setNotificationEnabledChatItem(Boolean.toString(isChecked), Long.toString(chatHandle));
+        }
     }
 
     @Override

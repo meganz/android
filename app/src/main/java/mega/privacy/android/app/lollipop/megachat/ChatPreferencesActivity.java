@@ -6,12 +6,12 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -110,7 +110,18 @@ public class ChatPreferencesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        log("onOptionsItemSelectedLollipop");
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home: {
+                finish();
+            }
+        }
+        return true;
     }
 
     private static void log(String log) {

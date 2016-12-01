@@ -141,7 +141,7 @@
                             android:text="@string/title_properties_chat_contact_notifications"
                             android:textSize="16dp" />
 
-                        <TextView
+                      <!--  <TextView
                             android:id="@+id/chat_group_contact_properties_notifications_option"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -150,11 +150,11 @@
                             android:textColor="@color/mail_my_account"
                             android:layout_weight="5"
                             android:text="Prueba"
-                            android:textSize="14dp" />
+                            android:textSize="14dp" />-->
 
                     </RelativeLayout>
 
-                    <Switch
+                    <android.support.v7.widget.SwitchCompat
                         android:id="@+id/chat_group_contact_properties_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -195,7 +195,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/chat_group_contact_properties_messages_sound_label"
-                            android:text="Probando"
                             android:textColor="@color/accentColor"
                             android:textSize="14dp" />
 
@@ -236,7 +235,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/chat_group_contact_properties_ringtone_label"
-                            android:text="Probando"
                             android:textColor="@color/accentColor"
                             android:textSize="14dp" />
 
