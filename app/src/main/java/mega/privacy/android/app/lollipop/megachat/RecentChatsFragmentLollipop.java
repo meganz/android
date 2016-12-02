@@ -44,6 +44,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
@@ -68,6 +69,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    DatabaseHandler dbH;
+    ChatSettings chatSettings;
+
     Context context;
     ActionBar aB;
     RecyclerView listView;
@@ -91,6 +95,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     Button inviteButton;
     int chatStatus;
 
+    boolean chatEnabled = true;
     float scaleH, scaleW;
     float density;
     DisplayMetrics outMetrics;
@@ -127,11 +132,37 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-        }
+        dbH = DatabaseHandler.getDbHandler(getActivity());
+        chatSettings = dbH.getChatSettings();
 
-        megaChatApi.addChatListener(this);
+        if(chatSettings!=null){
+            if(chatSettings.getEnabled()!=null){
+                chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+                if(chatEnabled){
+                    if (megaChatApi == null){
+                        megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                    }
+
+                    megaChatApi.addChatListener(this);
+                }
+            }
+            else{
+                chatEnabled=true;
+                if (megaChatApi == null){
+                    megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                }
+
+                megaChatApi.addChatListener(this);
+            }
+        }
+        else{
+            chatEnabled=true;
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
+
+            megaChatApi.addChatListener(this);
+        }
     }
 
     @Override
@@ -180,74 +211,83 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         chatStatusLayout= (RelativeLayout)  v.findViewById(R.id.status_text_layout);
         chatStatusText = (TextView)  v.findViewById(R.id.status_text);
 
-        //Get chat status
-        chatStatus = megaChatApi.getOnlineStatus();
-        if(chatStatus== MegaChatApi.STATUS_ONLINE){
-            chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_connected));
-            chatStatusText.setText(getString(R.string.settings_chat_status_online));
-            chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.white));
-        }
-        else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
-            chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_properties_text_available));
-            chatStatusText.setText(getString(R.string.settings_chat_status_offline));
-            chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.white));
+        if(chatEnabled){
+            log("Chat ENABLED");
+            //Get chat status
+            chatStatus = megaChatApi.getOnlineStatus();
+            if(chatStatus== MegaChatApi.STATUS_ONLINE){
+                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_connected));
+                chatStatusText.setText(getString(R.string.settings_chat_status_online));
+                chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.white));
+            }
+            else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_properties_text_available));
+                chatStatusText.setText(getString(R.string.settings_chat_status_offline));
+                chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.white));
+            }
+            else{
+                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.participants_layout));
+                chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
+                chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            }
+
+            this.setChats();
+
+            chatStatusLayout.setVisibility(View.GONE);
+            float dimen = getResources().getDimensionPixelOffset(R.dimen.status_layout);
+
+            TranslateAnimation animation1 = new TranslateAnimation(
+                    Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+                    Animation.ABSOLUTE, -dimen, Animation.ABSOLUTE, 0.0f);
+            animation1.setDuration(1000);
+            chatStatusLayout.startAnimation(animation1);
+
+            final TranslateAnimation animation2 = new TranslateAnimation(
+                    Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
+                    Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -dimen);
+            animation2.setDuration(1000);
+            animation2.setStartOffset(1000);
+
+            animation1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    chatStatusLayout.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    chatStatusLayout.setVisibility(View.VISIBLE);
+                    chatStatusLayout.startAnimation(animation2);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            animation2.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    chatStatusLayout.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    chatStatusLayout.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
         }
         else{
-            chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.participants_layout));
-            chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
-            chatStatusText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            log("Chat DISABLED");
+            listView.setVisibility(View.GONE);
+            chatStatusLayout.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
         }
-
-        this.setChats();
-
-        chatStatusLayout.setVisibility(View.GONE);
-        float dimen = getResources().getDimensionPixelOffset(R.dimen.status_layout);
-
-        TranslateAnimation animation1 = new TranslateAnimation(
-                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
-                Animation.ABSOLUTE, -dimen, Animation.ABSOLUTE, 0.0f);
-        animation1.setDuration(1000);
-        chatStatusLayout.startAnimation(animation1);
-
-        final TranslateAnimation animation2 = new TranslateAnimation(
-                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f,
-                Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -dimen);
-        animation2.setDuration(1000);
-        animation2.setStartOffset(1000);
-
-        animation1.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                chatStatusLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                chatStatusLayout.setVisibility(View.VISIBLE);
-                chatStatusLayout.startAnimation(animation2);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        animation2.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                chatStatusLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                chatStatusLayout.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
 
         return v;
     }
