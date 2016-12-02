@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -162,7 +163,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
         //Margins
         RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams)holder.dateLayout.getLayoutParams();
-        dateLayoutParams.setMargins(0, Util.scaleHeightPx(12, outMetrics), 0, Util.scaleHeightPx(12, outMetrics));
+        dateLayoutParams.setMargins(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
         holder.dateLayout.setLayoutParams(dateLayoutParams);
 
         holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
@@ -181,7 +182,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
         //Margins
         RelativeLayout.LayoutParams ownLayoutParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageLayout.getLayoutParams();
-        ownLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(16, outMetrics));
+        ownLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
         holder.contentOwnMessageLayout.setLayoutParams(ownLayoutParams);
 
         holder.contentOwnMessageText = (WrapTextView) v.findViewById(R.id.content_own_message_text);
@@ -206,7 +207,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         //Margins
         RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
         ownManagementParams.addRule(RelativeLayout.ALIGN_RIGHT);
-        ownManagementParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(15, outMetrics));
+        ownManagementParams.setMargins(Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(13, outMetrics));
         holder.ownManagementMessage.setLayoutParams(ownManagementParams);
 
         holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_deleted_message_text);
@@ -234,13 +235,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
         //Margins
         RelativeLayout.LayoutParams contactLayoutParams = (RelativeLayout.LayoutParams)holder.contentContactMessageLayout.getLayoutParams();
-        contactLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(16, outMetrics));
+        contactLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
         holder.contentContactMessageLayout.setLayoutParams(contactLayoutParams);
 
         holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
         //Margins
         RelativeLayout.LayoutParams contactMessageParams = (RelativeLayout.LayoutParams)holder.contentContactMessageText.getLayoutParams();
-        contactMessageParams.setMargins(Util.scaleWidthPx(68, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+        contactMessageParams.setMargins(Util.scaleWidthPx(73, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
         holder.contactManagementMessage = (RelativeLayout) v.findViewById(R.id.contact_deleted_message_layout);
@@ -248,7 +249,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         //Margins
         RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
         contactManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
-        contactManagementParams.setMargins(Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(15, outMetrics));
+        contactManagementParams.setMargins(Util.scaleWidthPx(42, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(13, outMetrics));
         holder.contactManagementMessage.setLayoutParams(contactManagementParams);
 
         holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_deleted_message_text);
@@ -392,6 +393,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
+
+                RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                holder.timeContactText.setLayoutParams(timeContactTextParams);
 
                 holder.fullNameTitle = getParticipantFullName(message.getUserHandleOfAction());
 
@@ -605,6 +610,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
+
+                RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                holder.timeContactText.setLayoutParams(timeContactTextParams);
 
                 holder.fullNameTitle = getParticipantFullName(message.getUserHandleOfAction());
 
@@ -868,7 +877,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
                 else{
-                    holder.fullNameTitle = ("Hide name");
+                    holder.fullNameTitle = getContactFullName(holder.userHandle);
                 }
 
                 if (!multipleSelect) {
@@ -1006,6 +1015,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     holder.contactManagementMessageText.setText(result);
                     holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
                     log("Message type CHANGE TITLE "+message.getContent());
@@ -1025,6 +1037,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     holder.contactManagementMessageText.setText(result);
                     holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
                 }
                 else{
                     log("Type message: "+message.getType());
@@ -1032,8 +1047,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
             }
         }
-
-
 
         //Check the next message to know the margin bottom the content message
         //        Message nextMessage = messages.get(position+1);
@@ -1061,6 +1074,45 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         else{
             log("Participant2: "+participantLastName);
             return participantFirstName + " " + participantLastName;
+        }
+    }
+
+    public String getContactFullName(long userHandle){
+        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        if(contactDB!=null){
+
+            String name = contactDB.getName();
+            String lastName = contactDB.getLastName();
+
+            if(name==null){
+                name="";
+            }
+            if(lastName==null){
+                lastName="";
+            }
+            String fullName = "";
+
+            if (name.trim().length() <= 0){
+                    fullName = lastName;
+            }
+            else{
+                fullName = name + " " + lastName;
+            }
+
+            if (fullName.trim().length() <= 0){
+                log("Put email as fullname");
+                String email = contactDB.getMail();
+                String[] splitEmail = email.split("[@._]");
+                fullName = splitEmail[0];
+            }
+
+            return fullName;
+        }
+        else{
+            String email = contactDB.getMail();
+            String[] splitEmail = email.split("[@._]");
+            String fullName = splitEmail[0];
+            return fullName;
         }
     }
 

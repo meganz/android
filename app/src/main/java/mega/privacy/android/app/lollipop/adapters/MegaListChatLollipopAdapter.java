@@ -934,9 +934,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						Spannable me = new SpannableString("Me: ");
 						me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						holder.textViewContent.setText(me);
-						Spannable myMessage = new SpannableString(lastMessage.getContent());
-						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.append(myMessage);
+						if(lastMessage.isDeleted()){
+							Spannable myMessage = new SpannableString(context.getString(R.string.text_deleted_message));
+							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							holder.textViewContent.append(myMessage);
+						}else{
+							Spannable myMessage = new SpannableString(lastMessage.getContent());
+							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							holder.textViewContent.append(myMessage);
+						}
 					}
 					else{
 						log("The last message NOT mine");
@@ -955,8 +961,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMessage.getUserHandle());
 //							megaChatApi.getUserFirstname(lastMessage.getUserHandle(), listener);
 //							megaChatApi.getUserLastname(lastMessage.getUserHandle(), listener);
-
-
 							}
 						}
 
@@ -999,9 +1003,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.textViewDate.setVisibility(View.GONE);
 			}
 		}
-
 	}
-
 	
 	public void setChats (ArrayList<MegaChatListItem> chats){
 		log("SETCONTACTS!!!!");

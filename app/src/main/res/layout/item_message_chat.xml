@@ -120,7 +120,7 @@
                     android:textSize="14sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_own_message"
-                    android:padding="11dp"
+                    android:padding="9dp"
                     android:gravity="right"/>
 
                 <ImageView
@@ -239,7 +239,7 @@
                 android:textSize="14sp"
                 android:inputType="textMultiLine|textNoSuggestions"
                 android:background="@drawable/rounded_text_view_chat_contact_message"
-                android:padding="11dp"
+                android:padding="9dp"
                 android:gravity="left"/>
 
         </RelativeLayout>
