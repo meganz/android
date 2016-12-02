@@ -337,7 +337,8 @@
                 android:id="@+id/messages_chat_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:choiceMode="multipleChoice"/>
+                android:choiceMode="multipleChoice"
+                android:paddingBottom="12dp"/>
 
         </RelativeLayout>
 
