@@ -33,13 +33,17 @@
             android:id="@+id/writing_linear_layout_chat"
             android:layout_width="match_parent"
             android:focusableInTouchMode="true"
+            android:background="@color/white"
             android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/keyboard_icon_chat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_emoticon_grey"
+                android:background="@null"
+                android:tint="@color/transparency_white"
+                android:src="@drawable/ic_insert_emoticon"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="16dp"/>
 
             <ImageButton
@@ -48,6 +52,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="16dp"
+                android:background="@null"
+                android:layout_centerVertical="true"
+                android:tint="@color/transparency_white"
                 android:src="@drawable/ic_send_black" />
 
             <io.github.rockerhieu.emojicon.EmojiconEditText
