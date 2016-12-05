@@ -455,14 +455,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     clearSelections();
                     hideMultipleSelect();
                     //Archive
-                    Toast.makeText(context, "Archive: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Not yet implemented! Archive: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case R.id.cab_menu_delete:{
                     clearSelections();
                     hideMultipleSelect();
                     //Delete
-                    Toast.makeText(context, "Delete: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Not yet implemented! Delete: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
             }
