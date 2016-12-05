@@ -99,7 +99,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toRightOf="@+id/chat_group_contact_properties_info_title"
-                            android:src="@drawable/ic_edit" />
+                            android:src="@drawable/ic_shared_read_write" />
 
                         <TextView
                             android:id="@+id/chat_group_contact_properties_info_participants"
