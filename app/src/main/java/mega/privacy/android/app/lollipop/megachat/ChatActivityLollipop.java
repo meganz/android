@@ -1066,7 +1066,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
         if(msgEdited!=null){
             log("Edited message");
-            modifyMessageReceived(androidMsgEdited);
+            modifyMessageReceived(androidMsgEdited, false);
         }
         else{
             log("Message cannot be edited!");
@@ -1594,7 +1594,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.isDeleted()){
                 log("Message deleted!!");
             }
-            modifyMessageReceived(androidMsg);
+            modifyMessageReceived(androidMsg, false);
         }
         else{
             log("Status change");
@@ -1604,26 +1604,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.getStatus()==MegaChatMessage.STATUS_SEEN){
                 log("STATUS_SEEN");
             }
+            if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
+                log("STATUS_SEEN");
+                modifyMessageReceived(androidMsg, true);
+            }
             else{
                 log("-----------Status : "+msg.getStatus());
                 log("-----------Timestamp: "+msg.getTimestamp());
                 log("-----------Content: "+msg.getContent());
 
-                modifyMessageReceived(androidMsg);
+                modifyMessageReceived(androidMsg, false);
             }
         }
     }
 
-    public void modifyMessageReceived(AndroidMegaChatMessage msg){
+    public void modifyMessageReceived(AndroidMegaChatMessage msg, boolean markAsSent){
         int indexToChange = -1;
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator();
 
+
         while (itr.hasNext()) {
             AndroidMegaChatMessage messageToCheck = itr.next();
-            if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                log("Found message status !!: " + messageToCheck.getMessage().getContent());
-                indexToChange = itr.nextIndex()-1;
-                break;
+            if(markAsSent){
+                if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+                    log("Mark as sent: " + messageToCheck.getMessage().getContent());
+                    indexToChange = itr.nextIndex()-1;
+                    break;
+                }
+            }
+            else{
+                if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
+                    log("Found message status !!: " + messageToCheck.getMessage().getContent());
+                    indexToChange = itr.nextIndex()-1;
+                    break;
+                }
             }
         }
 
