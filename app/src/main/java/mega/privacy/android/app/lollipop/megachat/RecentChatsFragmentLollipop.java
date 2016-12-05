@@ -241,7 +241,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
             this.setChats();
 
-            chatStatusLayout.setVisibility(View.GONE);
+            chatStatusLayout.setVisibility(View.VISIBLE);
             float dimen = getResources().getDimensionPixelOffset(R.dimen.status_layout);
 
             TranslateAnimation animation1 = new TranslateAnimation(
@@ -259,6 +259,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             animation1.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
+                    log("Animation starts");
                     chatStatusLayout.setVisibility(View.VISIBLE);
                 }
 

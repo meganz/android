@@ -80,7 +80,7 @@
 
 		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_chat_enable"
-			android:title="@string/settings_chat_off"
+			android:title="@string/section_chat"
 			android:defaultValue="true"/>
 
 	</PreferenceCategory>

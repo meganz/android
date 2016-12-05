@@ -969,11 +969,6 @@
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 
-    <string name="settings_chat_on" context="settings of the chat">Enable chat</string>
-    <string name="settings_chat_off" context="settings of the chat">Disable chat</string>
-    <string name="settings_summary_chat_off" context="settings of the chat">You will be offline.</string>
-    <string name="settings_summary_chat_on" context="settings of the chat">You will be online.</string>
-
     <string name="settings_chat_status" context="settings of the chat to choose the status">Status</string>
     <string name="settings_chat_status_online" context="settings of the chat to choose the status online">Online</string>
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
