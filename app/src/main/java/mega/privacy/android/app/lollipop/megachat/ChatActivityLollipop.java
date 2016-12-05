@@ -1605,7 +1605,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("STATUS_SEEN");
             }
             if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
-                log("STATUS_SEEN");
+                log("STATUS_SERVER_RECEIVED");
                 modifyMessageReceived(androidMsg, true);
             }
             else{
@@ -1619,9 +1619,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void modifyMessageReceived(AndroidMegaChatMessage msg, boolean markAsSent){
+        log("modifyMessageReceived");
         int indexToChange = -1;
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator();
-
 
         while (itr.hasNext()) {
             AndroidMegaChatMessage messageToCheck = itr.next();
