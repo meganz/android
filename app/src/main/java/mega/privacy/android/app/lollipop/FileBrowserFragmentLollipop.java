@@ -358,6 +358,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
 
+		if(!isAdded()){
+			return null;
+		}
+
+		log("fragment ADDED");
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}

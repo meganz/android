@@ -169,6 +169,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
+        if(aB!=null){
+            aB.setTitle(getString(R.string.section_chat));
+            aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+            ((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+        }
+
         detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();

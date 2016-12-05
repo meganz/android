@@ -217,10 +217,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			holder.contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
 			holder.contactStateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
 
-			RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)holder.contactStateIcon.getLayoutParams();
-			stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
-			holder.contactStateIcon.setLayoutParams(stateIconParams);
-
 			setStatus(position, holder);
 		}
 		else{
@@ -333,9 +329,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if (!notificationsEnabled) {
 				log("Chat is MUTE");
 				holder.muteIcon.setVisibility(View.VISIBLE);
-				RelativeLayout.LayoutParams muteIconParams = (RelativeLayout.LayoutParams)holder.muteIcon.getLayoutParams();
-				muteIconParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(14, outMetrics), 0, 0);
-				holder.muteIcon.setLayoutParams(muteIconParams);
 			}
 			else{
 				log("Chat with notifications enabled!!");
@@ -476,10 +469,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
-		//Set margin
-		RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-		nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
-		holder.textViewContactName.setLayoutParams(nameTextViewParams);
 		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
@@ -854,14 +843,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			int state = chat.getOnlineStatus();
-			if(state == MegaChatApi.STATUS_ONLINE){
-				log("This user is connected: "+chat.getTitle());
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+			if(chat!=null){
+				int state = chat.getOnlineStatus();
+				if(state == MegaChatApi.STATUS_ONLINE){
+					log("This user is connected: "+chat.getTitle());
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+				}
+				else{
+					log("This user status is: "+state+  " " + chat.getTitle());
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+				}
 			}
 			else{
-				log("This user status is: "+state+  " " + chat.getTitle());
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+				log("Chat is NULL");
 			}
 		}
 	}
@@ -925,9 +919,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					log("The last message is text!");
 
 					//Set margin contentTextView - more margin bottom duration
-					RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-					contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
-					holder.textViewContent.setLayoutParams(contentTextViewParams);
+//					RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
+//					contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
+//					holder.textViewContent.setLayoutParams(contentTextViewParams);
 
 					if(lastMessage.getUserHandle()==megaApi.getMyUser().getHandle()){
 						log("The last message is mine");

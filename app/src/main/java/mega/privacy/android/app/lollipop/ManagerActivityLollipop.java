@@ -3310,7 +3310,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
-    	log("selectDrawerItemLollipop");
+    	log("selectDrawerItemLollipop: "+item);
 
     	switch (item){
     		case CLOUD_DRIVE:{
