@@ -17,6 +17,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -125,6 +126,7 @@ import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
@@ -225,6 +227,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout optionLeaveChat;
 	public LinearLayout optionClearHistory;
 	public LinearLayout optionMuteChat;
+	public ImageView optionMuteChatIcon;
+	public TextView optionMuteChatText;
 	private ChatPanelListener chatPanelListener;
 	////
 
@@ -1370,6 +1374,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		optionLeaveChat= (LinearLayout) findViewById(R.id.chat_list_leave_chat_layout);
 		optionClearHistory = (LinearLayout) findViewById(R.id.chat_list_clear_history_chat_layout);
 		optionMuteChat = (LinearLayout) findViewById(R.id.chat_list_mute_chat_layout);
+		optionMuteChatIcon = (ImageView) findViewById(R.id.chat_list_mute_chat_image);
+		optionMuteChatText = (TextView) findViewById(R.id.chat_list_mute_chat_text);
 
 		chatPanelListener = new ChatPanelListener(this);
 
@@ -12611,6 +12617,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			optionLeaveChat.setVisibility(View.GONE);
 			optionClearHistory.setVisibility(View.VISIBLE);
 		}
+
+		ChatItemPreferences chatPrefs;
+		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+		if(chatPrefs!=null) {
+			log("Chat prefs exists!!!");
+			boolean notificationsEnabled = true;
+			if (chatPrefs.getNotificationsEnabled() != null) {
+				notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
+			}
+
+			if (!notificationsEnabled) {
+				log("Chat is MUTE");
+				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_notifications_black));
+				optionMuteChatText.setText(getString(R.string.general_unmute));
+			}
+			else{
+				log("Chat with notifications enabled!!");
+				optionMuteChatText.setText(getString(R.string.general_mute));
+				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_notifications_off_black));
+			}
+		}
+		else{
+			log("Chat prefs is NULL");
+			optionMuteChatText.setText(getString(R.string.general_mute));
+			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_notifications_off_black));
+		}
+
 		slidingChatPanel.setVisibility(View.VISIBLE);
 //		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
