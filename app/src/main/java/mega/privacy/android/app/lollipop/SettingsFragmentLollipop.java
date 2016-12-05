@@ -677,50 +677,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				chatEnabled = true;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					chatEnableSwitch.setChecked(chatEnabled);
-					if (chatEnabled){
-						chatEnableSwitch.setTitle(getString(R.string.settings_chat_off));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_off));
-					}
-					else{
-						chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_on));
-					}
 				}
 				else{
 					chatEnableCheck.setChecked(chatEnabled);
-					if (chatEnabled){
-						chatEnableCheck.setTitle(getString(R.string.settings_chat_off));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_off));
-					}
-					else{
-						chatEnableCheck.setTitle(getString(R.string.settings_chat_on));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_on));
-					}
 				}
 			}
 			else{
 				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					chatEnableSwitch.setChecked(chatEnabled);
-					if (chatEnabled){
-						chatEnableSwitch.setTitle(getString(R.string.settings_chat_off));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_off));
-					}
-					else{
-						chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_on));
-					}
 				}
 				else{
 					chatEnableCheck.setChecked(chatEnabled);
-					if (chatEnabled){
-						chatEnableCheck.setTitle(getString(R.string.settings_chat_off));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_off));
-					}
-					else{
-						chatEnableCheck.setTitle(getString(R.string.settings_chat_on));
-						chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_on));
-					}
 				}
 			}
 		}
@@ -748,6 +716,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatStatusOnlineCheck.setChecked(false);
 			chatStatusInvisibleCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(false);
+			preferenceScreen.removePreference(chatStatusCategory);
 			preferenceScreen.removePreference(chatNotificationsCategory);
 		}
 
@@ -1461,36 +1430,28 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				if (chatEnabled){
 					//Intent to set the PIN
 					log("CONNECT CHAT!!!");
-					Toast.makeText(context, "Not implemented yet: "+getString(R.string.settings_chat_on), Toast.LENGTH_SHORT).show();
 					dbH.setEnabledChat(true+"");
-					chatEnableSwitch.setTitle(getString(R.string.settings_chat_off));
-					chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_off));
 					preferenceScreen.addPreference(chatNotificationsCategory);
+					preferenceScreen.addPreference(chatStatusCategory);
 				}
 				else{
 					dbH.setEnabledChat(false+"");
-					Toast.makeText(context, "Not implemented yet: "+getString(R.string.settings_chat_off), Toast.LENGTH_SHORT).show();
-					chatEnableSwitch.setTitle(getString(R.string.settings_chat_on));
-					chatEnableSwitch.setSummary(getString(R.string.settings_summary_chat_on));
 					preferenceScreen.removePreference(chatNotificationsCategory);
+					preferenceScreen.removePreference(chatStatusCategory);
 				}
 			}
 			else{
 				if (chatEnabled){
 					//Intent to set the PIN
 					log("CONNECT CHAT!!!");
-					Toast.makeText(context, "Not implemented yet: "+getString(R.string.settings_chat_on), Toast.LENGTH_SHORT).show();
 					dbH.setEnabledChat(true+"");
-					chatEnableCheck.setTitle(getString(R.string.settings_chat_off));
-					chatEnableCheck.setSummary(getString(R.string.settings_summary_chat_off));
 					preferenceScreen.addPreference(chatNotificationsCategory);
+					preferenceScreen.addPreference(chatStatusCategory);
 				}
 				else{
 					dbH.setEnabledChat(false+"");
-					Toast.makeText(context, "Not implemented yet: "+getString(R.string.settings_chat_off), Toast.LENGTH_SHORT).show();
-					chatEnableCheck.setTitle(getString(R.string.settings_chat_on));
-					chatEnableCheck.setSummary(getString(R.string.settings_summary_chat_on));
 					preferenceScreen.removePreference(chatNotificationsCategory);
+					preferenceScreen.removePreference(chatStatusCategory);
 				}
 			}
 		}

@@ -85,13 +85,7 @@ public class ChatPanelListener implements View.OnClickListener {
                 ((ManagerActivityLollipop)context).hideChatPanel();
                 ChatController chatC = new ChatController(context);
                 chatC.muteChat(selectedChatItem);
-//                setChats();
-//                Intent intent = new Intent();
-//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//                intent.setType("*/*");
-//                ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                ((ManagerActivityLollipop)context).setChats();
                 break;
             }
 

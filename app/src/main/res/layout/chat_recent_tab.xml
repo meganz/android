@@ -5,30 +5,10 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <RelativeLayout
-        android:id="@+id/status_text_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/status_layout"
-        android:background="@color/content_text_background">
-
-        <TextView
-            android:id="@+id/status_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textAllCaps="true"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:text="Offline"
-            android:textSize="14sp" />
-
-    </RelativeLayout>
-
     <LinearLayout
         android:id="@+id/linear_empty_layout_chat_recent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/status_text_layout"
         android:orientation="vertical">
 
         <TextView
@@ -92,5 +72,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="multipleChoice" />
+
+    <RelativeLayout
+        android:id="@+id/status_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/status_layout"
+        android:background="@color/content_text_background">
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textAllCaps="true"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:text="Offline"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

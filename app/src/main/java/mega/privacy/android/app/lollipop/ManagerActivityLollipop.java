@@ -2282,9 +2282,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 
 					}
+					break;
 				}
     		}
     	}
+	}
+
+	public void setChats(){
+		if(drawerItem==DrawerItem.CHAT){
+			if (rChatFL != null) {
+				if (rChatFL.isAdded()) {
+					rChatFL.setChats();
+				}
+
+			}
+		}
 	}
 
 	public void setProfileAvatar(){
