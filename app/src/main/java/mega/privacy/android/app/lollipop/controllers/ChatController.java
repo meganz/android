@@ -16,6 +16,7 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -125,6 +126,16 @@ public class ChatController {
 
     public void changeTitle(long chatid, String title){
         megaChatApi.setChatTitle(chatid, title, (GroupChatInfoActivityLollipop) context);
+    }
+
+    public void muteChats(ArrayList<MegaChatListItem> chats){
+        for(int i=0; i<chats.size();i++){
+            muteChat(chats.get(i));
+        }
+    }
+
+    public void muteChat(MegaChatListItem chat){
+        dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chat.getChatId()));
     }
 
     public static void log(String message) {

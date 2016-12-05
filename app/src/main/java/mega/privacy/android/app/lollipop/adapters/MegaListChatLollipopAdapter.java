@@ -803,7 +803,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	/*
 	 * Get list of all selected chats
 	 */
-	public List<MegaChatListItem> getSelectedChats() {
+	public ArrayList<MegaChatListItem> getSelectedChats() {
 		ArrayList<MegaChatListItem> chats = new ArrayList<MegaChatListItem>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {

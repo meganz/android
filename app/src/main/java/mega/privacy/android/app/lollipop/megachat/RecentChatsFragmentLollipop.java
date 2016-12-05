@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -70,6 +71,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     MegaChatApiAndroid megaChatApi;
 
     DatabaseHandler dbH;
+    ChatItemPreferences chatPrefs = null;
     ChatSettings chatSettings;
 
     Context context;
@@ -430,7 +432,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            List<MegaChatListItem> chats = adapterList.getSelectedChats();
+            ArrayList<MegaChatListItem> chats = adapterList.getSelectedChats();
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
@@ -447,8 +449,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                 case R.id.cab_menu_mute:{
                     clearSelections();
                     hideMultipleSelect();
-                    //Mute
-                    Toast.makeText(context, "Mute: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
+                    ChatController chatC = new ChatController(context);
+                    chatC.muteChats(chats);
+                    setChats();
                     break;
                 }
                 case R.id.cab_menu_archive:{

@@ -866,7 +866,6 @@
     <string name="videocall_item" context="Info shown about the last action in a chat is a videocall">Video call</string>
 
     <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d selected</string>
-    <string name="action_mute" context="Menu item">Mute</string>
 
     <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">The contact %s will be removed from the shared folder.</string>
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts will be removed from the shared folder.</string>
@@ -884,6 +883,7 @@
     <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Type a message</string>
 
     <string name="general_mute" context="button">Mute</string>
+    <string name="general_unmute" context="button">Unmute</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Chat message sound</string>
