@@ -223,14 +223,56 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			log("Group chat");
 			holder.contactStateIcon.setVisibility(View.GONE);
 
-			if (chat.getTitle().length() > 0){
-				String chatTitle = chat.getTitle().trim();
-				String firstLetter = chatTitle.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				holder.contactInitialLetter.setText(firstLetter);
-			}
+			if (!multipleSelect) {
+				//Multiselect OFF
+				holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+				if (positionClicked != -1){
+					if (positionClicked == position){
+						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+						listFragment.smoothScrollToPosition(positionClicked);
+					}
+					else{
+						holder.itemLayout.setBackgroundColor(Color.WHITE);
+					}
+				}
+				else{
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+				}
+				holder.multiselectIcon.setVisibility(View.GONE);
 
-			createGroupChatAvatar(holder);
+				if (chat.getTitle().length() > 0){
+					String chatTitle = chat.getTitle().trim();
+					String firstLetter = chatTitle.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					holder.contactInitialLetter.setText(firstLetter);
+				}
+
+				createGroupChatAvatar(holder);
+			} else {
+				log("Multiselect ON");
+
+				if(this.isItemChecked(position)){
+//					holder.imageButtonThreeDots.setVisibility(View.GONE);
+					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					createMultiselectTick(holder);
+				}
+				else{
+					log("NOT selected");
+					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.multiselectIcon.setVisibility(View.GONE);
+
+					if (chat.getTitle().length() > 0){
+						String chatTitle = chat.getTitle().trim();
+						String firstLetter = chatTitle.charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						holder.contactInitialLetter.setText(firstLetter);
+					}
+
+					createGroupChatAvatar(holder);
+				}
+			}
 		}
 
 		setPendingMessages(position, holder);
