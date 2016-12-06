@@ -1477,7 +1477,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Intent to new activity Chat Settings
 			Intent i = new Intent(context, ChatPreferencesActivity.class);
 			startActivity(i);
-
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
