@@ -61,6 +61,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private SparseBooleanArray selectedItems;
 	ContactsFragmentLollipop fragment;
 	int adapterType;
+	SparseBooleanArray selectedContacts;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -132,6 +133,23 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 		
 	}
+
+	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView, RecyclerView _listView, int adapterType, SparseBooleanArray selectedContacts) {
+		this.context = _context;
+		this.contacts = _contacts;
+		this.fragment = _fragment;
+		this.positionClicked = -1;
+		this.adapterType = adapterType;
+
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		emptyImageViewFragment = _emptyImageView;
+		emptyTextViewFragment = _emptyTextView;
+		listFragment = _listView;
+		this.selectedContacts = selectedContacts;
+	}
 	
 	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView, RecyclerView _listView, int adapterType) {
 		this.context = _context;
@@ -147,6 +165,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		emptyImageViewFragment = _emptyImageView;
 		emptyTextViewFragment = _emptyTextView;
 		listFragment = _listView;
+		this.selectedContacts = null;
 	}
 	
 	/*private view holder class*/
@@ -414,8 +433,111 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 
 	public void onBindViewHolderListAddContact(ViewHolderContactsList holder, int position){
-		onBindViewHolderList(holder, position);
-		holderList.imageButtonThreeDots.setVisibility(View.GONE);
+		log("onBindViewHolderListAddContact");
+
+		holder.currentPosition = position;
+		holder.imageView.setImageBitmap(null);
+		holder.contactInitialLetter.setText("");
+		holder.imageButtonThreeDots.setVisibility(View.GONE);
+
+		MegaUser contact = (MegaUser) getItem(position);
+		holder.contactMail = contact.getEmail();
+		log("contact: "+contact.getEmail()+" handle: "+contact.getHandle());
+
+		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+		if(contactDB!=null){
+			holder.firstNameText = contactDB.getName();
+			holder.lastNameText = contactDB.getLastName();
+
+			String fullName;
+
+			if (holder.firstNameText.trim().length() <= 0){
+				fullName = holder.lastNameText;
+			}
+			else{
+				fullName = holder.firstNameText + " " + holder.lastNameText;
+			}
+
+			if (fullName.trim().length() <= 0){
+				log("Put email as fullname");
+				String email = contact.getEmail();
+				String[] splitEmail = email.split("[@._]");
+				fullName = splitEmail[0];
+			}
+
+			holder.textViewContactName.setText(fullName);
+		}
+		else{
+			String email = contact.getEmail();
+			String[] splitEmail = email.split("[@._]");
+			String fullName = splitEmail[0];
+			holder.textViewContactName.setText(fullName);
+		}
+
+		createDefaultAvatar(holder, contact);
+
+		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+		File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		}
+		Bitmap bitmap = null;
+		if (avatar.exists()){
+			if (avatar.length() > 0){
+				BitmapFactory.Options bOpts = new BitmapFactory.Options();
+				bOpts.inPurgeable = true;
+				bOpts.inInputShareable = true;
+				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				if (bitmap == null) {
+					avatar.delete();
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
+					else{
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
+				}
+				else{
+					holder.contactInitialLetter.setVisibility(View.GONE);
+					holder.imageView.setImageBitmap(bitmap);
+				}
+			}
+			else{
+				if (context.getExternalCacheDir() != null){
+					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
+				else{
+					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
+			}
+		}
+		else{
+			if (context.getExternalCacheDir() != null){
+				megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			}
+			else{
+				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			}
+		}
+
+		if (selectedContacts != null) {
+			for (int i = 0; i < selectedContacts.size(); i++) {
+				if (selectedContacts.get(position) == true) {
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				}
+				else{
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+				}
+			}
+		}
+		else{
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
+		}
+//		onBindViewHolderList(holder, position);
 	}
 	
 	public void onBindViewHolderList(ViewHolderContactsList holder, int position){
@@ -904,11 +1026,25 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			switch (v.getId()){
 				case R.id.contact_list_item_layout: {
 					log("contact_list_item_layout");
-					((AddContactActivityLollipop) context).itemClick(c.getEmail());
+					((AddContactActivityLollipop) context).itemClick(c.getEmail(), currentPosition);
 					break;
 				}
 			}
 		}
+	}
+
+	public void setSelectedContacts(SparseBooleanArray selectedContacts){
+		this.selectedContacts = selectedContacts;
+		notifyDataSetChanged();
+	}
+
+	public MegaUser getDocumentAt(int position) {
+		if(position < contacts.size())
+		{
+			return contacts.get(position);
+		}
+
+		return null;
 	}
 	
 	public void setContacts (ArrayList<MegaUser> contacts){

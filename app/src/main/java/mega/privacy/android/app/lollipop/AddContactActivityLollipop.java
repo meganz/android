@@ -19,15 +19,23 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import mega.privacy.android.app.components.tokenautocomplete.TokenCompleteTextView;
 
@@ -78,6 +86,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     ImageView emptyImageView;
     TextView emptyTextView;
     ProgressBar progressBar;
+    EditText addContactEditText;
 
     ContactInfo[] people;
     MegaContactsLollipopAdapter adapterMEGA;
@@ -86,11 +95,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     PhoneContactsLollipopAdapter adapterPhone;
 
     ArrayList<PhoneContactInfo> phoneContacts;
+//    ArrayList<PhoneContactInfo> selectedContactsPhone = new ArrayList<PhoneContactInfo>();
+    SparseBooleanArray selectedContactsPhone = new SparseBooleanArray();
+    SparseBooleanArray selectedContactsMEGA = new SparseBooleanArray();
     ArrayList<PhoneContactInfo> filteredContactsPhone = new ArrayList<PhoneContactInfo>();
 
     ArrayList<MegaUser> contactsMEGA;
     ArrayList<MegaUser> visibleContactsMEGA = new ArrayList<MegaUser>();
-    ArrayList<MegaUser> filteredContactsMEGA = new ArrayList<MegaUser>();
 
     boolean itemClickPressed = false;
 
@@ -99,6 +110,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     public static String EXTRA_NODE_HANDLE = "node_handle";
     public static String EXTRA_EMAIL = "extra_email";
     public static String EXTRA_PHONE = "extra_phone";
+
+    private MenuItem sendInvitationMenuItem;
 
     public class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -163,7 +176,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             }
 
             if (adapterPhone == null){
-                adapterPhone = new PhoneContactsLollipopAdapter(addContactActivityLollipop, filteredContactsPhone);
+                adapterPhone = new PhoneContactsLollipopAdapter(addContactActivityLollipop, phoneContacts);
 
                 recyclerView.setAdapter(adapterPhone);
 
@@ -176,7 +189,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 });
             }
             else{
-                adapterPhone.setContacts(filteredContactsPhone);
+                adapterPhone.setContacts(phoneContacts);
             }
 
             if (adapterPhone.getItemCount() == 0){
@@ -197,6 +210,41 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 onTextChanged(text, -1, -1, -1);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        log("onCreateOptionsMenu");
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_add_contact, menu);
+
+        sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        log("onOptionsItemSelected");
+        int id = item.getItemId();
+        switch(id) {
+            case android.R.id.home: {
+                onBackPressed();
+                break;
+            }
+            case R.id.action_send_invitation:{
+                List<ContactInfo> tokens = completionView.getObjects();
+                if (contactType == Constants.CONTACT_TYPE_DEVICE){
+                    inviteContacts(selectedContactsPhone);
+                }
+                else if (contactType == Constants.CONTACT_TYPE_MEGA){
+                    setResultContacts(selectedContactsMEGA, true);
+                }
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -240,6 +288,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         dbH = DatabaseHandler.getDbHandler(this);
 
         setContentView(R.layout.activity_add_contact);
+
+        tB = (Toolbar) findViewById(R.id.add_contact_toolbar);
+        if(tB==null){
+            log("Tb is Null");
+            return;
+        }
+
+        tB.setVisibility(View.VISIBLE);
+        setSupportActionBar(tB);
+        aB = getSupportActionBar();
+        log("aB.setHomeAsUpIndicator_1");
+        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
 
 //        people = new ContactInfo[]{
 //                new ContactInfo("Marshall Weir", "marshall@example.com"),
@@ -361,6 +423,189 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 //            }
 //        });
 
+        addContactEditText = (EditText) findViewById(R.id.add_contact_edittext);
+        addContactEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+
+                String text = "";
+                for (int i=0;i<s.toString().length();i++){
+                    if (s.toString().charAt(i) != ','){
+                        text = text + s.toString().charAt(i);
+                    }
+                }
+
+                log("text: _" + text + "_");
+
+                if (contactType == Constants.CONTACT_TYPE_MEGA){
+                    ArrayList<MegaUser> filteredContactsAfterText = new ArrayList<MegaUser>();
+                    if (visibleContactsMEGA != null) {
+                        for (int i = 0; i < visibleContactsMEGA.size(); i++) {
+                            try {
+                                String email = visibleContactsMEGA.get(i).getEmail();
+                                String emailPart = "";
+
+                                if (email != null){
+                                    if (email.length() >= text.trim().length()){
+                                        emailPart = email.substring(0, text.trim().length());
+                                    }
+                                }
+
+                                Collator collator = Collator.getInstance(Locale.getDefault());
+                                collator.setStrength(Collator.PRIMARY);
+
+                                if (collator.compare(text.trim(), emailPart) == 0){
+                                    filteredContactsAfterText.add(visibleContactsMEGA.get(i));
+                                }
+                                else {
+                                    MegaContact contactDB = dbH.findContactByHandle(String.valueOf(visibleContactsMEGA.get(i).getHandle()));
+                                    if (contactDB != null) {
+                                        String name = contactDB.getName();
+                                        String lastName = contactDB.getLastName();
+                                        String namePart = "";
+                                        String lastNamePart = "";
+                                        String fullNamePart = "";
+
+                                        if (name != null){
+                                            if (name.length() >= text.trim().length()){
+                                                namePart = name.substring(0, text.trim().length());
+                                            }
+                                        }
+
+                                        if (lastName != null){
+                                            if (lastName.length() >= text.trim().length()){
+                                                lastNamePart = lastName.substring(0, text.trim().length());
+                                            }
+                                        }
+
+                                        if ((name != null) && (lastName != null)) {
+                                            String fullName = name + " " + lastName;
+                                            if (fullName != null) {
+                                                if (fullName.trim().length() >= text.trim().length()){
+                                                    fullNamePart = fullName.substring(0, text.trim().length());
+                                                }
+                                            }
+                                        }
+
+                                        if (collator.compare(text.trim(), namePart) == 0){
+                                            filteredContactsAfterText.add(visibleContactsMEGA.get(i));
+                                        }
+                                        else if (collator.compare(text.trim(), lastNamePart) == 0){
+                                            filteredContactsAfterText.add(visibleContactsMEGA.get(i));
+                                        }
+                                        else if (collator.compare(text.trim(), fullNamePart) == 0){
+                                            filteredContactsAfterText.add(visibleContactsMEGA.get(i));
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception e) { log ("Exception: " + e.getMessage()); }
+                        }
+
+                        if (adapterMEGA != null) {
+                            adapterMEGA.setContacts(filteredContactsAfterText);
+                            adapterMEGA.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
+
+                            if (adapterMEGA.getItemCount() == 0) {
+
+                                emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+                                emptyTextView.setText(R.string.contacts_list_empty_text);
+                                recyclerView.setVisibility(View.GONE);
+                                emptyImageView.setVisibility(View.VISIBLE);
+                                emptyTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                recyclerView.setVisibility(View.VISIBLE);
+                                emptyImageView.setVisibility(View.GONE);
+                                emptyTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    }
+                }
+                else if (contactType == Constants.CONTACT_TYPE_DEVICE){
+                    ArrayList<PhoneContactInfo> filteredContactsAfterText = new ArrayList<PhoneContactInfo>();
+                    if (filteredContactsPhone != null) {
+                        for (int i = 0; i < filteredContactsPhone.size(); i++) {
+                            try {
+                                String email = filteredContactsPhone.get(i).getEmail();
+                                String name = filteredContactsPhone.get(i).getName();
+                                String phoneNumber = filteredContactsPhone.get(i).getPhoneNumber();
+                                String emailPart = "";
+                                String namePart = "";
+                                String phoneNumberPart = "";
+
+                                if (email != null){
+                                    if (email.length() >= text.trim().length()){
+                                        emailPart = email.substring(0, text.trim().length());
+                                    }
+                                }
+
+                                if (name != null){
+                                    if (name.trim().length() >= text.trim().length()){
+                                        namePart = name.substring(0, text.trim().length());
+                                    }
+                                }
+
+                                if (phoneNumber != null){
+                                    if (phoneNumber.length() >= text.trim().length()){
+                                        phoneNumberPart = phoneNumber.substring(0, text.trim().length());
+                                    }
+                                }
+
+                                Collator collator = Collator.getInstance(Locale.getDefault());
+                                collator.setStrength(Collator.PRIMARY);
+
+                                if (collator.compare(text.trim(), emailPart) == 0){
+                                    filteredContactsAfterText.add(filteredContactsPhone.get(i));
+                                }
+                                else if (collator.compare(text.trim(), namePart) == 0){
+                                    filteredContactsAfterText.add(filteredContactsPhone.get(i));
+                                }
+                                else if (collator.compare(text.trim(), phoneNumberPart) == 0){
+                                    filteredContactsAfterText.add(filteredContactsPhone.get(i));
+                                }
+//                        if (filteredContactsPhone.get(i).getEmail().startsWith(text.trim()) == true) {
+//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+//                        } else if (filteredContactsPhone.get(i).getName().startsWith(text.trim()) == true) {
+//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+//                        } else if (filteredContactsPhone.get(i).getPhoneNumber().startsWith(text.trim()) == true) {
+//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+//                        }
+                            }
+                            catch (Exception e) { log ("Exception: " + e.getMessage()); }
+                        }
+
+                        if (adapterPhone != null) {
+                            adapterPhone.setContacts(filteredContactsAfterText);
+
+                            if (adapterPhone.getItemCount() == 0) {
+
+                                emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+                                emptyTextView.setText(R.string.contacts_list_empty_text);
+                                recyclerView.setVisibility(View.GONE);
+                                emptyImageView.setVisibility(View.VISIBLE);
+                                emptyTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                recyclerView.setVisibility(View.VISIBLE);
+                                emptyImageView.setVisibility(View.GONE);
+                                emptyTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         sendButton = (ImageView) findViewById(R.id.add_contact_send);
         if (completionView.getObjects().size() > 0) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sendButton.getLayoutParams();
@@ -393,9 +638,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 
         //Get MEGA contacts and phone contacts: first name, last name and email
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
+            aB.setTitle("Choose contact");
+
+            if (sendInvitationMenuItem != null){
+                sendInvitationMenuItem.setVisible(false);
+            }
+
             contactsMEGA = megaApi.getContacts();
             visibleContactsMEGA.clear();
-            filteredContactsMEGA.clear();
 
             for (int i = 0; i < contactsMEGA.size(); i++) {
 
@@ -409,35 +659,35 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             if (tokens != null) {
                 log("tokens.size() = " + tokens.size());
 
-                if (tokens.size() == 0) {
-                    for (int i = 0; i < visibleContactsMEGA.size(); i++) {
-                        log("filteredContacts.add(visibleContacts.get(" + i + ") = " + visibleContactsMEGA.get(i).getEmail());
-                        filteredContactsMEGA.add(visibleContactsMEGA.get(i));
-                    }
-                } else {
-                    for (int i = 0; i < visibleContactsMEGA.size(); i++) {
-                        boolean found = false;
-                        for (int j = 0; j < tokens.size(); j++) {
-                            log("tokens.get(" + j + ").getEmail() = " + tokens.get(j).getEmail());
-                            log("visibleContacts.get(" + i + ").getEmail() = " + visibleContactsMEGA.get(i).getEmail());
-                            if (tokens.get(j).getEmail().compareTo(visibleContactsMEGA.get(i).getEmail()) == 0) {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found) {
-                            log("!found -> filteredContacts.add(visibleContacts.get(" + i + ") = " + visibleContactsMEGA.get(i).getEmail());
-                            filteredContactsMEGA.add(visibleContactsMEGA.get(i));
-                        }
-                    }
-                }
+//                if (tokens.size() == 0) {
+//                    for (int i = 0; i < visibleContactsMEGA.size(); i++) {
+//                        log("filteredContacts.add(visibleContacts.get(" + i + ") = " + visibleContactsMEGA.get(i).getEmail());
+//                        filteredContactsMEGA.add(visibleContactsMEGA.get(i));
+//                    }
+//                } else {
+//                    for (int i = 0; i < visibleContactsMEGA.size(); i++) {
+//                        boolean found = false;
+//                        for (int j = 0; j < tokens.size(); j++) {
+//                            log("tokens.get(" + j + ").getEmail() = " + tokens.get(j).getEmail());
+//                            log("visibleContacts.get(" + i + ").getEmail() = " + visibleContactsMEGA.get(i).getEmail());
+//                            if (tokens.get(j).getEmail().compareTo(visibleContactsMEGA.get(i).getEmail()) == 0) {
+//                                found = true;
+//                                break;
+//                            }
+//                        }
+//
+//                        if (!found) {
+//                            log("!found -> filteredContacts.add(visibleContacts.get(" + i + ") = " + visibleContactsMEGA.get(i).getEmail());
+//                            filteredContactsMEGA.add(visibleContactsMEGA.get(i));
+//                        }
+//                    }
+//                }
             }
 
             if (adapterMEGA == null) {
-                adapterMEGA = new MegaContactsLollipopAdapter(this, null, filteredContactsMEGA, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
+                adapterMEGA = new MegaContactsLollipopAdapter(this, null, visibleContactsMEGA, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
             } else {
-                adapterMEGA.setContacts(filteredContactsMEGA);
+                adapterMEGA.setContacts(visibleContactsMEGA);
                 adapterMEGA.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
             }
 
@@ -458,6 +708,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             }
         }
         else {
+            aB.setTitle("Add contact");
+
+            if (sendInvitationMenuItem != null){
+                sendInvitationMenuItem.setVisible(false);
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
                 if (!hasReadContactsPermission) {
@@ -528,210 +784,208 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     }
 
     public void onTextChanged(CharSequence s, int start, int before, int count){
-        log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
-
-//        String [] spl = s.toString().split(",,");
-//        for (int i=0;i<spl.length;i++){
-//            log("SS: _" + spl[i] + "_");
-//        }
+//        log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
 //
-//        log("INDEXOF: " + s.toString().indexOf(",, "));
-//        String text = "" + s.toString();
-//        int ind = text.indexOf(",, ");
-//        while(ind >= 0){
-//            log("IND: " + ind);
-//            if (ind >= 0){
-//                text = text.substring(ind+3, text.length());
+////        String [] spl = s.toString().split(",,");
+////        for (int i=0;i<spl.length;i++){
+////            log("SS: _" + spl[i] + "_");
+////        }
+////
+////        log("INDEXOF: " + s.toString().indexOf(",, "));
+////        String text = "" + s.toString();
+////        int ind = text.indexOf(",, ");
+////        while(ind >= 0){
+////            log("IND: " + ind);
+////            if (ind >= 0){
+////                text = text.substring(ind+3, text.length());
+////            }
+////            ind = text.indexOf(",, ");
+////        }
+////
+////        log("text: _" + text + "_");
+//
+//        String text = "";
+//        for (int i=0;i<s.toString().length();i++){
+//            if (s.toString().charAt(i) != ','){
+//                text = text + s.toString().charAt(i);
 //            }
-//            ind = text.indexOf(",, ");
 //        }
 //
 //        log("text: _" + text + "_");
-
-        String text = "";
-        for (int i=0;i<s.toString().length();i++){
-            if (s.toString().charAt(i) != ','){
-                text = text + s.toString().charAt(i);
-            }
-        }
-
-        log("text: _" + text + "_");
-
-        if (contactType == Constants.CONTACT_TYPE_MEGA){
-            ArrayList<MegaUser> filteredContactsAfterText = new ArrayList<MegaUser>();
-            if (filteredContactsMEGA != null) {
-                for (int i = 0; i < filteredContactsMEGA.size(); i++) {
-                    try {
-                        String email = filteredContactsMEGA.get(i).getEmail();
-                        String emailPart = "";
-
-                        if (email != null){
-                            if (email.length() >= text.trim().length()){
-                                emailPart = email.substring(0, text.trim().length());
-                            }
-                        }
-
-                        Collator collator = Collator.getInstance(Locale.getDefault());
-                        collator.setStrength(Collator.PRIMARY);
-
-                        if (collator.compare(text.trim(), emailPart) == 0){
-                            filteredContactsAfterText.add(filteredContactsMEGA.get(i));
-                        }
-                        else {
-                            MegaContact contactDB = dbH.findContactByHandle(String.valueOf(filteredContactsMEGA.get(i).getHandle()));
-                            if (contactDB != null) {
-                                String name = contactDB.getName();
-                                String lastName = contactDB.getLastName();
-                                String namePart = "";
-                                String lastNamePart = "";
-                                String fullNamePart = "";
-
-                                if (name != null){
-                                    if (name.length() >= text.trim().length()){
-                                        namePart = name.substring(0, text.trim().length());
-                                    }
-                                }
-
-                                if (lastName != null){
-                                    if (lastName.length() >= text.trim().length()){
-                                        lastNamePart = lastName.substring(0, text.trim().length());
-                                    }
-                                }
-
-                                if ((name != null) && (lastName != null)) {
-                                    String fullName = name + " " + lastName;
-                                    if (fullName != null) {
-                                        if (fullName.trim().length() >= text.trim().length()){
-                                            fullNamePart = fullName.substring(0, text.trim().length());
-                                        }
-                                    }
-                                }
-
-                                if (collator.compare(text.trim(), namePart) == 0){
-                                    filteredContactsAfterText.add(filteredContactsMEGA.get(i));
-                                }
-                                else if (collator.compare(text.trim(), lastNamePart) == 0){
-                                    filteredContactsAfterText.add(filteredContactsMEGA.get(i));
-                                }
-                                else if (collator.compare(text.trim(), fullNamePart) == 0){
-                                    filteredContactsAfterText.add(filteredContactsMEGA.get(i));
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e) { log ("Exception: " + e.getMessage()); }
-                }
-
-                if (adapterMEGA != null) {
-                    adapterMEGA.setContacts(filteredContactsAfterText);
-                    adapterMEGA.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-
-                    if (adapterMEGA.getItemCount() == 0) {
-
-                        emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-                        emptyTextView.setText(R.string.contacts_list_empty_text);
-                        recyclerView.setVisibility(View.GONE);
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        emptyTextView.setVisibility(View.VISIBLE);
-                    } else {
-                        recyclerView.setVisibility(View.VISIBLE);
-                        emptyImageView.setVisibility(View.GONE);
-                        emptyTextView.setVisibility(View.GONE);
-                    }
-                }
-            }
-        }
-        else if (contactType == Constants.CONTACT_TYPE_DEVICE){
-            ArrayList<PhoneContactInfo> filteredContactsAfterText = new ArrayList<PhoneContactInfo>();
-            if (filteredContactsPhone != null) {
-                for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                    try {
-                        String email = filteredContactsPhone.get(i).getEmail();
-                        String name = filteredContactsPhone.get(i).getName();
-                        String phoneNumber = filteredContactsPhone.get(i).getPhoneNumber();
-                        String emailPart = "";
-                        String namePart = "";
-                        String phoneNumberPart = "";
-
-                        if (email != null){
-                            if (email.length() >= text.trim().length()){
-                                emailPart = email.substring(0, text.trim().length());
-                            }
-                        }
-
-                        if (name != null){
-                            if (name.trim().length() >= text.trim().length()){
-                                namePart = name.substring(0, text.trim().length());
-                            }
-                        }
-
-                        if (phoneNumber != null){
-                            if (phoneNumber.length() >= text.trim().length()){
-                                phoneNumberPart = phoneNumber.substring(0, text.trim().length());
-                            }
-                        }
-
-                        Collator collator = Collator.getInstance(Locale.getDefault());
-                        collator.setStrength(Collator.PRIMARY);
-
-                        if (collator.compare(text.trim(), emailPart) == 0){
-                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
-                        }
-                        else if (collator.compare(text.trim(), namePart) == 0){
-                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
-                        }
-                        else if (collator.compare(text.trim(), phoneNumberPart) == 0){
-                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
-                        }
-//                        if (filteredContactsPhone.get(i).getEmail().startsWith(text.trim()) == true) {
-//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
-//                        } else if (filteredContactsPhone.get(i).getName().startsWith(text.trim()) == true) {
-//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
-//                        } else if (filteredContactsPhone.get(i).getPhoneNumber().startsWith(text.trim()) == true) {
+//
+//        if (contactType == Constants.CONTACT_TYPE_MEGA){
+//            ArrayList<MegaUser> filteredContactsAfterText = new ArrayList<MegaUser>();
+//            if (filteredContactsMEGA != null) {
+//                for (int i = 0; i < filteredContactsMEGA.size(); i++) {
+//                    try {
+//                        String email = filteredContactsMEGA.get(i).getEmail();
+//                        String emailPart = "";
+//
+//                        if (email != null){
+//                            if (email.length() >= text.trim().length()){
+//                                emailPart = email.substring(0, text.trim().length());
+//                            }
+//                        }
+//
+//                        Collator collator = Collator.getInstance(Locale.getDefault());
+//                        collator.setStrength(Collator.PRIMARY);
+//
+//                        if (collator.compare(text.trim(), emailPart) == 0){
+//                            filteredContactsAfterText.add(filteredContactsMEGA.get(i));
+//                        }
+//                        else {
+//                            MegaContact contactDB = dbH.findContactByHandle(String.valueOf(filteredContactsMEGA.get(i).getHandle()));
+//                            if (contactDB != null) {
+//                                String name = contactDB.getName();
+//                                String lastName = contactDB.getLastName();
+//                                String namePart = "";
+//                                String lastNamePart = "";
+//                                String fullNamePart = "";
+//
+//                                if (name != null){
+//                                    if (name.length() >= text.trim().length()){
+//                                        namePart = name.substring(0, text.trim().length());
+//                                    }
+//                                }
+//
+//                                if (lastName != null){
+//                                    if (lastName.length() >= text.trim().length()){
+//                                        lastNamePart = lastName.substring(0, text.trim().length());
+//                                    }
+//                                }
+//
+//                                if ((name != null) && (lastName != null)) {
+//                                    String fullName = name + " " + lastName;
+//                                    if (fullName != null) {
+//                                        if (fullName.trim().length() >= text.trim().length()){
+//                                            fullNamePart = fullName.substring(0, text.trim().length());
+//                                        }
+//                                    }
+//                                }
+//
+//                                if (collator.compare(text.trim(), namePart) == 0){
+//                                    filteredContactsAfterText.add(filteredContactsMEGA.get(i));
+//                                }
+//                                else if (collator.compare(text.trim(), lastNamePart) == 0){
+//                                    filteredContactsAfterText.add(filteredContactsMEGA.get(i));
+//                                }
+//                                else if (collator.compare(text.trim(), fullNamePart) == 0){
+//                                    filteredContactsAfterText.add(filteredContactsMEGA.get(i));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    catch (Exception e) { log ("Exception: " + e.getMessage()); }
+//                }
+//
+//                if (adapterMEGA != null) {
+//                    adapterMEGA.setContacts(filteredContactsAfterText);
+//                    adapterMEGA.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
+//
+//                    if (adapterMEGA.getItemCount() == 0) {
+//
+//                        emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+//                        emptyTextView.setText(R.string.contacts_list_empty_text);
+//                        recyclerView.setVisibility(View.GONE);
+//                        emptyImageView.setVisibility(View.VISIBLE);
+//                        emptyTextView.setVisibility(View.VISIBLE);
+//                    } else {
+//                        recyclerView.setVisibility(View.VISIBLE);
+//                        emptyImageView.setVisibility(View.GONE);
+//                        emptyTextView.setVisibility(View.GONE);
+//                    }
+//                }
+//            }
+//        }
+//        else if (contactType == Constants.CONTACT_TYPE_DEVICE){
+//            ArrayList<PhoneContactInfo> filteredContactsAfterText = new ArrayList<PhoneContactInfo>();
+//            if (filteredContactsPhone != null) {
+//                for (int i = 0; i < filteredContactsPhone.size(); i++) {
+//                    try {
+//                        String email = filteredContactsPhone.get(i).getEmail();
+//                        String name = filteredContactsPhone.get(i).getName();
+//                        String phoneNumber = filteredContactsPhone.get(i).getPhoneNumber();
+//                        String emailPart = "";
+//                        String namePart = "";
+//                        String phoneNumberPart = "";
+//
+//                        if (email != null){
+//                            if (email.length() >= text.trim().length()){
+//                                emailPart = email.substring(0, text.trim().length());
+//                            }
+//                        }
+//
+//                        if (name != null){
+//                            if (name.trim().length() >= text.trim().length()){
+//                                namePart = name.substring(0, text.trim().length());
+//                            }
+//                        }
+//
+//                        if (phoneNumber != null){
+//                            if (phoneNumber.length() >= text.trim().length()){
+//                                phoneNumberPart = phoneNumber.substring(0, text.trim().length());
+//                            }
+//                        }
+//
+//                        Collator collator = Collator.getInstance(Locale.getDefault());
+//                        collator.setStrength(Collator.PRIMARY);
+//
+//                        if (collator.compare(text.trim(), emailPart) == 0){
 //                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
 //                        }
-                    }
-                    catch (Exception e) { log ("Exception: " + e.getMessage()); }
-                }
-
-                if (adapterPhone != null) {
-                    adapterPhone.setContacts(filteredContactsAfterText);
-
-                    if (adapterPhone.getItemCount() == 0) {
-
-                        emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-                        emptyTextView.setText(R.string.contacts_list_empty_text);
-                        recyclerView.setVisibility(View.GONE);
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        emptyTextView.setVisibility(View.VISIBLE);
-                    } else {
-                        recyclerView.setVisibility(View.VISIBLE);
-                        emptyImageView.setVisibility(View.GONE);
-                        emptyTextView.setVisibility(View.GONE);
-                    }
-                }
-            }
-        }
+//                        else if (collator.compare(text.trim(), namePart) == 0){
+//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+//                        }
+//                        else if (collator.compare(text.trim(), phoneNumberPart) == 0){
+//                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+//                        }
+////                        if (filteredContactsPhone.get(i).getEmail().startsWith(text.trim()) == true) {
+////                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+////                        } else if (filteredContactsPhone.get(i).getName().startsWith(text.trim()) == true) {
+////                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+////                        } else if (filteredContactsPhone.get(i).getPhoneNumber().startsWith(text.trim()) == true) {
+////                            filteredContactsAfterText.add(filteredContactsPhone.get(i));
+////                        }
+//                    }
+//                    catch (Exception e) { log ("Exception: " + e.getMessage()); }
+//                }
+//
+//                if (adapterPhone != null) {
+//                    adapterPhone.setContacts(filteredContactsAfterText);
+//
+//                    if (adapterPhone.getItemCount() == 0) {
+//
+//                        emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+//                        emptyTextView.setText(R.string.contacts_list_empty_text);
+//                        recyclerView.setVisibility(View.GONE);
+//                        emptyImageView.setVisibility(View.VISIBLE);
+//                        emptyTextView.setVisibility(View.VISIBLE);
+//                    } else {
+//                        recyclerView.setVisibility(View.VISIBLE);
+//                        emptyImageView.setVisibility(View.GONE);
+//                        emptyTextView.setVisibility(View.GONE);
+//                    }
+//                }
+//            }
+//        }
     }
 
-    public void itemClick(String email){
+    public void itemClick(String email, int position){
 
         log("itemClick");
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             ContactInfo c = new ContactInfo();
 
-            for (int i = 0; i < filteredContactsMEGA.size(); i++) {
-                if (filteredContactsMEGA.get(i).getEmail().compareTo(email) == 0) {
-                    c.setEmail(filteredContactsMEGA.get(i).getEmail());
-                    MegaContact contactDB = dbH.findContactByHandle(String.valueOf(filteredContactsMEGA.get(i).getHandle()));
+            for (int i = 0; i < visibleContactsMEGA.size(); i++) {
+                if (visibleContactsMEGA.get(i).getEmail().compareTo(email) == 0) {
+                    c.setEmail(visibleContactsMEGA.get(i).getEmail());
+                    MegaContact contactDB = dbH.findContactByHandle(String.valueOf(visibleContactsMEGA.get(i).getHandle()));
                     if (contactDB != null) {
                         String name = contactDB.getName();
                         String lastName = contactDB.getLastName();
                         c.setName(name + " " + lastName);
                     }
-
-                    filteredContactsMEGA.remove(i);
                     break;
                 }
             }
@@ -741,18 +995,62 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 itemClickPressed = true;
                 completionView.addObject(c);
             }
+
+            if (selectedContactsMEGA.get(position) == false){
+                selectedContactsMEGA.put(position, true);
+            }
+            else{
+                selectedContactsMEGA.put(position, false);
+            }
+
+            if (adapterMEGA != null){
+                adapterMEGA.setSelectedContacts(selectedContactsMEGA);
+            }
+
+            if (selectedContactsMEGA.size() == 0){
+                aB.setTitle("Choose contact");
+                if (sendInvitationMenuItem != null){
+                    sendInvitationMenuItem.setVisible(false);
+                }
+            }
+            else{
+                int counter = 0;
+                for (int i=0;i<selectedContactsMEGA.size();i++){
+                    if (selectedContactsMEGA.valueAt(i) == true){
+                        counter++;
+                    }
+                }
+                if (counter == 0){
+                    aB.setTitle("Choose contact");
+                    if (sendInvitationMenuItem != null){
+                        sendInvitationMenuItem.setVisible(false);
+                    }
+                }
+                else if (counter == 1){
+                    aB.setTitle(counter + " contact");
+                    if (sendInvitationMenuItem != null){
+                        sendInvitationMenuItem.setVisible(true);
+                    }
+                }
+                else{
+                    aB.setTitle(counter + " contacts");
+                    if (sendInvitationMenuItem != null){
+                        sendInvitationMenuItem.setVisible(true);
+                    }
+                }
+            }
         }
     }
 
     public void itemClick(View view, int position) {
         log("on item click");
 
-        final PhoneContactInfo contact = adapterPhone.getDocumentAt(position);
-        if(contact == null) {
-            return;
-        }
-
         if (contactType == Constants.CONTACT_TYPE_DEVICE){
+
+            final PhoneContactInfo contact = adapterPhone.getDocumentAt(position);
+            if(contact == null) {
+                return;
+            }
 
             ContactInfo c = new ContactInfo();
 
@@ -770,6 +1068,50 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 log("completionView.getText() =  " + completionView.getText());
                 itemClickPressed = true;
                 completionView.addObject(c);
+            }
+
+            if (selectedContactsPhone.get(position) == false){
+                selectedContactsPhone.put(position, true);
+            }
+            else{
+                selectedContactsPhone.put(position, false);
+            }
+
+            if (adapterPhone != null){
+                adapterPhone.setSelectedContacts(selectedContactsPhone);
+            }
+
+            if (selectedContactsPhone.size() == 0){
+                aB.setTitle("Add contact");
+                if (sendInvitationMenuItem != null){
+                    sendInvitationMenuItem.setVisible(false);
+                }
+            }
+            else{
+                int counter = 0;
+                for (int i=0;i<selectedContactsPhone.size();i++){
+                    if (selectedContactsPhone.valueAt(i) == true){
+                        counter++;
+                    }
+                }
+                if (counter == 0){
+                    aB.setTitle("Add contact");
+                    if (sendInvitationMenuItem != null){
+                        sendInvitationMenuItem.setVisible(false);
+                    }
+                }
+                else if (counter == 1){
+                    aB.setTitle(counter + " contact");
+                    if (sendInvitationMenuItem != null){
+                        sendInvitationMenuItem.setVisible(true);
+                    }
+                }
+                else{
+                    aB.setTitle(counter + " contacts");
+                    if (sendInvitationMenuItem != null){
+                        sendInvitationMenuItem.setVisible(true);
+                    }
+                }
             }
         }
 
@@ -802,36 +1144,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             List<ContactInfo> tokens = completionView.getObjects();
-            if ((tokens != null) && (visibleContactsMEGA != null) && (filteredContactsMEGA != null)) {
-                filteredContactsMEGA.clear();
+//            if ((tokens != null) && (visibleContactsMEGA != null) && (filteredContactsMEGA != null)) {
+            if ((tokens != null) && (visibleContactsMEGA != null)){
                 log("tokens.size() = " + tokens.size());
 
-                if (tokens.size() == 0) {
-                    for (int i = 0; i < visibleContactsMEGA.size(); i++) {
-                        log("filteredContacts.add(visibleContacts.get(" + i + ") = " + visibleContactsMEGA.get(i).getEmail());
-                        filteredContactsMEGA.add(visibleContactsMEGA.get(i));
-                    }
-                } else {
-                    for (int i = 0; i < visibleContactsMEGA.size(); i++) {
-                        boolean found = false;
-                        for (int j = 0; j < tokens.size(); j++) {
-                            log("tokens.get(" + j + ").getEmail() = " + tokens.get(j).getEmail());
-                            log("visibleContacts.get(" + i + ").getEmail() = " + visibleContactsMEGA.get(i).getEmail());
-                            if (tokens.get(j).getEmail().compareTo(visibleContactsMEGA.get(i).getEmail()) == 0) {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found) {
-                            log("!found -> filteredContacts.add(visibleContacts.get(" + i + ") = " + visibleContactsMEGA.get(i).getEmail());
-                            filteredContactsMEGA.add(visibleContactsMEGA.get(i));
-                        }
-                    }
-                }
-
                 if (adapterMEGA != null) {
-                    adapterMEGA.setContacts(filteredContactsMEGA);
+                    adapterMEGA.setContacts(visibleContactsMEGA);
                     adapterMEGA.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
                 }
             }
@@ -878,7 +1196,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 }
 
                 if (adapterPhone != null) {
-                    adapterPhone.setContacts(filteredContactsPhone);
+                    adapterPhone.setContacts(phoneContacts);
                 }
             }
 
@@ -926,26 +1244,42 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 
                 List<ContactInfo> tokens = completionView.getObjects();
                 if (contactType == Constants.CONTACT_TYPE_DEVICE){
-                    inviteContacts(tokens);
+                    inviteContacts(selectedContactsPhone);
                 }
                 else if (contactType == Constants.CONTACT_TYPE_MEGA){
-                    setResultContacts(tokens, true);
+                    setResultContacts(selectedContactsMEGA, true);
                 }
                 break;
             }
         }
     }
 
-    private void setResultContacts(List<ContactInfo> tokens, boolean megaContacts){
+    private void setResultContacts(SparseBooleanArray selectedContacts, boolean megaContacts){
         ArrayList<String> contactsSelected = new ArrayList<String>();
-        if (tokens != null) {
-            for (int i = 0; i < tokens.size(); i++) {
-                String contactEmail = tokens.get(i).getEmail();
-                if (contactEmail != null){
-                    contactsSelected.add(contactEmail);
+
+        if (selectedContacts != null){
+            for (int i=0;i<selectedContacts.size();i++) {
+                if (selectedContacts.valueAt(i) == true) {
+                    int key = selectedContacts.keyAt(i);
+                    if (adapterMEGA != null){
+                        MegaUser contact = adapterMEGA.getDocumentAt(key);
+                        String contactEmail = contact.getEmail();
+                        if (contactEmail != null){
+                            contactsSelected.add(contactEmail);
+                        }
+                    }
                 }
             }
         }
+
+//        if (tokens != null) {
+//            for (int i = 0; i < tokens.size(); i++) {
+//                String contactEmail = tokens.get(i).getEmail();
+//                if (contactEmail != null){
+//                    contactsSelected.add(contactEmail);
+//                }
+//            }
+//        }
 
         Intent intent = new Intent();
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contactsSelected);
@@ -982,13 +1316,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         finish();
     }
 
-    private void inviteContacts(List<ContactInfo> tokens){
+    private void inviteContacts(SparseBooleanArray selectedContacts){
         ArrayList<String> contactsSelected = new ArrayList<String>();
-        if (tokens != null) {
-            for (int i = 0; i < tokens.size(); i++) {
-                String contactEmail = tokens.get(i).getEmail();
-                if (contactEmail != null){
-                    contactsSelected.add(contactEmail);
+
+        if (selectedContacts != null) {
+            for (int i=0;i<selectedContacts.size();i++) {
+                if (selectedContacts.valueAt(i) == true) {
+                    int key = selectedContacts.keyAt(i);
+                    if (adapterPhone != null){
+                        PhoneContactInfo contact = adapterPhone.getDocumentAt(key);
+                        String contactEmail = contact.getEmail();
+                        if (contactEmail != null){
+                            contactsSelected.add(contactEmail);
+                        }
+                    }
                 }
             }
         }
