@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,10 +105,21 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	MegaApiAndroid megaApi;
 	OnItemClickListener mItemClickListener;
 	private List<PhoneContactInfo> phoneContacts;
+//	private List<PhoneContactInfo> selectedContacts;
 //	private List<PhoneContactInfo> contactsFromPhone;
+	SparseBooleanArray selectedContacts;
 //	private boolean megaContacts = true;
 
 	private OnItemCheckClickListener checkClickListener;
+
+	public PhoneContactsLollipopAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts, SparseBooleanArray selectedContacts) {
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+		setContext(context);
+		this.phoneContacts = phoneContacts;
+		this.selectedContacts = selectedContacts;
+	}
 
 	public PhoneContactsLollipopAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts) {
 		if (megaApi == null){
@@ -115,6 +127,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		}
 		setContext(context);
 		this.phoneContacts = phoneContacts;
+		this.selectedContacts = null;
 	}
 
 	public void setContext(Context context) {
@@ -128,6 +141,11 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	// Set new contacts
 	public void setContacts(List<PhoneContactInfo> phoneContacts){
 		this.phoneContacts = phoneContacts;
+		notifyDataSetChanged();
+	}
+
+	public void setSelectedContacts(SparseBooleanArray selectedContacts){
+		this.selectedContacts = selectedContacts;
 		notifyDataSetChanged();
 	}
 
@@ -168,6 +186,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
     }
 
 	public class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements OnClickListener{
+		RelativeLayout contactLayout;
 		TextView contactNameTextView;
 		TextView phoneEmailTextView;
 		RoundedImageView imageView;
@@ -210,6 +229,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
 		ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
 
+		holder.contactLayout = (RelativeLayout) rowView.findViewById(R.id.contact_list_item_layout);
 		holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_explorer_name);
 		holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
 //		holder.phoneEmailTextView.setVisibility(View.GONE);
@@ -237,7 +257,23 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		holder.contactNameTextView.setText(contact.getName());
 		holder.phoneEmailTextView.setText(contact.getEmail());
-		
+
+		if (selectedContacts != null) {
+			for (int i = 0; i < selectedContacts.size(); i++) {
+				if (selectedContacts.get(position) == true) {
+					holder.contactLayout.setBackgroundColor(mContext.getResources().getColor(R.color.file_list_selected_row));
+				}
+				else{
+					holder.contactLayout.setBackgroundColor(Color.WHITE);
+				}
+			}
+		}
+		else{
+			holder.contactLayout.setBackgroundColor(Color.WHITE);
+		}
+
+		createDefaultAvatar(holder, false);
+
 //		if (isCheckable) {
 //			View checkArea = rowView.findViewById(R.id.checkbox);
 //			checkArea.setOnClickListener(new OnClickListener() {
@@ -247,8 +283,8 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 //				}
 //			});
 //		}
-		
-		createDefaultAvatar(holder, false);
+
+
 
 //		ContactPicture task = new ContactPicture(mContext, holder, this);
 
