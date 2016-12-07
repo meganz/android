@@ -3,6 +3,7 @@
     android:id="@+id/recent_chat_list_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="87dp"
+    android:paddingRight="12dp"
     android:descendantFocusability="blocksDescendants" >
 
     <RelativeLayout
@@ -49,8 +50,8 @@
         android:ellipsize="end"
         android:textSize="16sp"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
-        android:layout_marginLeft="13dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="13dp"
         android:maxLines="1"
         android:textColor="@color/file_list_first_row" />
 
@@ -100,7 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/recent_chat_list_name"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
-        android:layout_marginLeft="13dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginRight="65dp"
         android:textSize="14sp"
         android:ellipsize="end"
@@ -113,7 +114,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/recent_chat_list_content"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
-        android:layout_marginLeft="13dp"
+        android:layout_marginLeft="16dp"
         android:textSize="12sp"
         android:ellipsize="end"
         android:maxLines="1"
@@ -125,7 +126,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:background="@null"
-        android:paddingLeft="10dp"
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
 

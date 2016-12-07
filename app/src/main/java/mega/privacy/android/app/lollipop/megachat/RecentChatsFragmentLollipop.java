@@ -7,6 +7,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +19,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -187,8 +189,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
 
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
-        listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
-        listView.setClipToPadding(false);
 
         listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
         mLayoutManager = new MegaLinearLayoutManager(context);
@@ -226,16 +226,38 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             log("chatStatus: "+chatStatus);
             if(chatStatus== MegaChatApi.STATUS_ONLINE){
                 chatStatusLayout.setVisibility(View.GONE);
+
+                Resources res = getResources();
+                int valuePaddingTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, res.getDisplayMetrics());
+                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
+
+                listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
+                listView.setClipToPadding(false);
+                listView.setPadding(0, valuePaddingTop, 0, valuePaddingBottom);
             }
             else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
                 chatStatusLayout.setVisibility(View.VISIBLE);
                 chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
                 chatStatusText.setText(getString(R.string.settings_chat_status_offline));
+
+                Resources res = getResources();
+                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
+
+                listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
+                listView.setClipToPadding(false);
+                listView.setPadding(0, 0, 0, valuePaddingBottom);
             }
             else{
                 chatStatusLayout.setVisibility(View.VISIBLE);
                 chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_invisible_layout));
                 chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
+
+                Resources res = getResources();
+                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
+
+                listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
+                listView.setClipToPadding(false);
+                listView.setPadding(0, 0, 0, valuePaddingBottom);
             }
 
             this.setChats();
