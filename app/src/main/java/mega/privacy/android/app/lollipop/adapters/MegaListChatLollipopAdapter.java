@@ -516,10 +516,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
-		//Right margin
-		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
-		holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
 		holder.circlePendingMessages = (RoundedImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
