@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -30,6 +31,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	DatabaseHandler dbH = null;
 	
 	@Override
@@ -38,6 +40,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		
 		app = (MegaApplication) getApplication();
 		megaApi = app.getMegaApi();
+		megaChatApi = app.getMegaChatApi();
 		
 		Intent intent = getIntent();
 		String url = intent.getDataString();
@@ -77,8 +80,9 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		// Confirmation link
 		if (url != null && (url.matches("^https://mega.co.nz/#confirm.+$") || url.matches("^https://mega.nz/#confirm.+$"))) {
 			log("confirmation url");
+//			megaApi.localLogout();
 			AccountController aC = new AccountController(this);
-			aC.logout(this, megaApi, true);
+			aC.logout(this, megaApi, megaChatApi, true);
 
 			Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
 			confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);

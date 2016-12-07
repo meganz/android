@@ -205,8 +205,9 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(((Activity)context).getApplicationContext());
         if (dbH.getCredentials() == null){
-            AccountController aC = new AccountController(context);
-            aC.logout(context, megaApi, megaChatApi, false);
+//            megaApi.localLogout();
+//            AccountController aC = new AccountController(context);
+//            aC.logout(context, megaApi, megaChatApi, false);
             //Show Login Fragment
             ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
         }

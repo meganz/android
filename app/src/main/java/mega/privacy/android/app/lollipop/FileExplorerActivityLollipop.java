@@ -238,8 +238,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 		if (credentials == null){
 			log("User credentials NULL");
-			AccountController aC = new AccountController(this);
-			aC.logout(this, megaApi, megaChatApi, false);
+//			megaApi.localLogout();
+//			AccountController aC = new AccountController(this);
+//			aC.logout(this, megaApi, megaChatApi, false);
 			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);

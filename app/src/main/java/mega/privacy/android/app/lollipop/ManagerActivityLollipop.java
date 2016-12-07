@@ -1170,8 +1170,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    }
 
 	    	if (!openLink){
-				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, megaChatApi, false);
+//				megaApi.localLogout();
+//				AccountController aC = new AccountController(this);
+//				aC.logout(this, megaApi, megaChatApi, false);
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					startActivity(intent);
+					finish();
+				}
+
 		    }
 
 	    	return;
@@ -1981,8 +1990,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     	if(dbH.getCredentials() == null){
     		if (!openLink){
-				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, megaChatApi, false);
+//				megaApi.localLogout();
+//				AccountController aC = new AccountController(this);
+//				aC.logout(this, megaApi, megaChatApi, false);
     			return;
     		}
     		else{

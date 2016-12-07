@@ -250,7 +250,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         dbH.clearCredentials();
-        megaApi.logout();
+//        megaApi.localLogout();
 
         if (!validateForm()) {
             return;
