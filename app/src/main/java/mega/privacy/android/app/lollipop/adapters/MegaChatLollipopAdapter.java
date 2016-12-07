@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
@@ -16,7 +15,6 @@ import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -36,7 +33,6 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
-import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -123,15 +119,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         RelativeLayout contentContactMessageLayout;
         TextView contentContactMessageText;
 
-        RelativeLayout ownManagementMessage;
+        RelativeLayout ownManagementMessageLayout;
         TextView ownManagementMessageText;
 
         TextView contactManagementMessageText;
-        RelativeLayout contactManagementMessage;
+        RelativeLayout contactManagementMessageLayout;
 
         RelativeLayout contactMultiselectionLayout;
         ImageView contactMultiselectionImageView;
         ImageView contactMultiselectionTickIcon;
+
+        RelativeLayout contactManagementMultiselectionLayout;
+        ImageView contactManagementMultiselectionImageView;
+        ImageView contactManagementMultiselectionTickIcon;
+
+        RelativeLayout ownManagementMultiselectionLayout;
+        ImageView ownManagementMultiselectionImageView;
+        ImageView ownManagementMultiselectionTickIcon;
 
         public long getUserHandle (){
             return userHandle;
@@ -151,9 +155,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = context.getResources().getDisplayMetrics().density;
-
-        float scaleW = Util.getScaleW(outMetrics, density);
-        float scaleH = Util.getScaleH(outMetrics, density);
 
         dbH = DatabaseHandler.getDbHandler(context);
 
@@ -203,14 +204,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         ownTriangleParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(4, outMetrics), 0);
         holder.triangleIcon.setLayoutParams(ownTriangleParams);
 
-        holder.ownManagementMessage = (RelativeLayout) v.findViewById(R.id.own_deleted_message_layout);
+        holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
         //Margins
-        RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessage.getLayoutParams();
+        RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessageLayout.getLayoutParams();
         ownManagementParams.addRule(RelativeLayout.ALIGN_RIGHT);
-        ownManagementParams.setMargins(Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(13, outMetrics));
-        holder.ownManagementMessage.setLayoutParams(ownManagementParams);
+        ownManagementParams.setMargins(0, Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(13, outMetrics));
+        holder.ownManagementMessageLayout.setLayoutParams(ownManagementParams);
 
-        holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_deleted_message_text);
+        holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_management_message_text);
+        RelativeLayout.LayoutParams ownManagementTextParams = (RelativeLayout.LayoutParams)holder.ownManagementMessageText.getLayoutParams();
+        ownManagementTextParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+        holder.ownManagementMessageText.setLayoutParams(ownManagementTextParams);
 
         holder.ownMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.own_multiselection_layout);
         //Margins
@@ -220,6 +224,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
         holder.ownMultiselectionImageView = (ImageView) v.findViewById(R.id.own_multiselection_image_view);
         holder.ownMultiselectionTickIcon = (ImageView) v.findViewById(R.id.own_multiselection_tick_icon);
+
+        holder.ownManagementMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.own_management_multiselection_layout);
+        //Margins
+        RelativeLayout.LayoutParams ownManagementMultiselectionParams = (RelativeLayout.LayoutParams)holder.ownManagementMultiselectionLayout.getLayoutParams();
+        ownManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
+        ownManagementMultiselectionParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, 0);
+        holder.ownManagementMultiselectionLayout.setLayoutParams(ownManagementMultiselectionParams);
+
+        holder.ownManagementMultiselectionImageView = (ImageView) v.findViewById(R.id.own_management_multiselection_image_view);
+        holder.ownManagementMultiselectionTickIcon = (ImageView) v.findViewById(R.id.own_management_multiselection_tick_icon);
 
         //Contact messages////////////////////////////////////////
         holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
@@ -244,15 +258,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         contactMessageParams.setMargins(Util.scaleWidthPx(73, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
         holder.contentContactMessageText.setLayoutParams(contactMessageParams);
 
-        holder.contactManagementMessage = (RelativeLayout) v.findViewById(R.id.contact_deleted_message_layout);
-
+        holder.contactManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.contact_management_message_layout);
         //Margins
-        RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams)holder.contactManagementMessage.getLayoutParams();
+        RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageLayout.getLayoutParams();
         contactManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
-        contactManagementParams.setMargins(Util.scaleWidthPx(42, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(64, outMetrics), Util.scaleHeightPx(13, outMetrics));
-        holder.contactManagementMessage.setLayoutParams(contactManagementParams);
+        contactManagementParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
+        holder.contactManagementMessageLayout.setLayoutParams(contactManagementParams);
 
-        holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_deleted_message_text);
+        holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_management_message_text);
+        //Margins
+        RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+        contactManagementTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+        holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
 
         holder.contactMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.contact_multiselection_layout);
         //Margins
@@ -262,6 +279,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
         holder.contactMultiselectionImageView = (ImageView) v.findViewById(R.id.contact_multiselection_image_view);
         holder.contactMultiselectionTickIcon = (ImageView) v.findViewById(R.id.contact_multiselection_tick_icon);
+
+        holder.contactManagementMultiselectionLayout = (RelativeLayout) v.findViewById(R.id.contact_management_multiselection_layout);
+        //Margins
+        RelativeLayout.LayoutParams contactManagementMultiselectionParams = (RelativeLayout.LayoutParams)holder.contactManagementMultiselectionLayout.getLayoutParams();
+        contactManagementMultiselectionParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, 0);
+        holder.contactManagementMultiselectionLayout.setLayoutParams(contactManagementMultiselectionParams);
+
+        holder.contactManagementMultiselectionImageView = (ImageView) v.findViewById(R.id.contact_management_multiselection_image_view);
+        holder.contactManagementMultiselectionTickIcon = (ImageView) v.findViewById(R.id.contact_management_multiselection_tick_icon);
 
         v.setTag(holder);
 
@@ -361,7 +387,40 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownManagementMessageText.setText(result);
 
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                holder.ownManagementMessageLayout.setVisibility(View.VISIBLE);
+
+                if (!multipleSelect) {
+                    holder.ownManagementMultiselectionLayout.setVisibility(View.GONE);
+//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+                    if (positionClicked != -1){
+                        if (positionClicked == position){
+                            holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                            listFragment.smoothScrollToPosition(positionClicked);
+                        }
+                        else{
+                            holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
+                    else{
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                    holder.ownManagementMultiselectionLayout.setVisibility(View.VISIBLE);
+                    if(this.isItemChecked(position)){
+                        log("Selected: "+message.getContent());
+                        holder.ownManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                        holder.ownManagementMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                        holder.ownManagementMultiselectionLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                    }
+                    else{
+                        log("NOT selected");
+                        holder.ownManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                        holder.ownManagementMultiselectionTickIcon.setVisibility(View.GONE);
+                        holder.ownManagementMultiselectionLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                }
             }
             else{
                 log("CONTACT Message type ALTER PARTICIPANTS");
@@ -394,9 +453,61 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
-                RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
-                timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
-                holder.timeContactText.setLayoutParams(timeContactTextParams);
+                holder.contentContactMessageLayout.setVisibility(View.GONE);
+                holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
+
+                if (!multipleSelect) {
+                    holder.contactManagementMultiselectionLayout.setVisibility(View.GONE);
+
+                    //Margins
+                    RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+                    contactManagementTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                    holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
+
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                    if (positionClicked != -1){
+                        if (positionClicked == position){
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                            listFragment.smoothScrollToPosition(positionClicked);
+                        }
+                        else{
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
+                    else{
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                    holder.contactManagementMultiselectionLayout.setVisibility(View.VISIBLE);
+
+                    //Margins
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                    //Set more margins
+                    RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+                    contactManagementTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                    holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
+
+                    if (this.isItemChecked(position)) {
+                        log("Selected: " + message.getContent());
+                        holder.contactManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                        holder.contactManagementMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+
+                    } else {
+                        log("NOT selected");
+                        holder.contactManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                        holder.contactManagementMultiselectionTickIcon.setVisibility(View.GONE);
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                }
 
                 holder.fullNameTitle = getParticipantFullName(message.getUserHandleOfAction());
 
@@ -490,9 +601,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 holder.contactManagementMessageText.setText(result);
 
-                holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contactManagementMessage.setVisibility(View.VISIBLE);
-
             } //END CONTACT MANAGEMENT MESSAGE
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
@@ -580,7 +688,42 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownManagementMessageText.setText(result);
 
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
-                holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                holder.ownManagementMessageLayout.setVisibility(View.VISIBLE);
+                log("Visible own management message!");
+
+                if (!multipleSelect) {
+                    holder.ownManagementMultiselectionLayout.setVisibility(View.GONE);
+
+                    if (positionClicked != -1){
+                        if (positionClicked == position){
+                            holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                            listFragment.smoothScrollToPosition(positionClicked);
+                        }
+                        else{
+                            holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
+                    else{
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    log("Multiselect ON");
+
+                    holder.ownManagementMultiselectionLayout.setVisibility(View.VISIBLE);
+
+                    if (this.isItemChecked(position)) {
+                        log("Selected: " + message.getContent());
+                        holder.ownManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                        holder.ownManagementMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+
+                    } else {
+                        log("NOT selected");
+                        holder.ownManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                        holder.ownManagementMultiselectionTickIcon.setVisibility(View.GONE);
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                }
             }
             else{
                 log("Participant privilege change!");
@@ -611,9 +754,61 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
-                RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
-                timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
-                holder.timeContactText.setLayoutParams(timeContactTextParams);
+                holder.contentContactMessageLayout.setVisibility(View.GONE);
+                holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
+
+                if (!multipleSelect) {
+                    holder.contactManagementMultiselectionLayout.setVisibility(View.GONE);
+
+                    //Margins
+                    RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+                    contactManagementTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                    holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
+
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                    if (positionClicked != -1){
+                        if (positionClicked == position){
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                            listFragment.smoothScrollToPosition(positionClicked);
+                        }
+                        else{
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
+                    else{
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                    holder.contactManagementMultiselectionLayout.setVisibility(View.VISIBLE);
+
+                    //Margins
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                    //Set more margins
+                    RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+                    contactManagementTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                    holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
+
+                    if (this.isItemChecked(position)) {
+                        log("Selected: " + message.getContent());
+                        holder.contactManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                        holder.contactManagementMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+
+                    } else {
+                        log("NOT selected");
+                        holder.contactManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                        holder.contactManagementMultiselectionTickIcon.setVisibility(View.GONE);
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                }
 
                 holder.fullNameTitle = getParticipantFullName(message.getUserHandleOfAction());
 
@@ -674,7 +869,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, fullNameAction);
                 }
-
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -683,9 +877,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
 
                 holder.contactManagementMessageText.setText(result);
-
-                holder.contentContactMessageLayout.setVisibility(View.GONE);
-                holder.contactManagementMessage.setVisibility(View.VISIBLE);
             }
         }
         else{
@@ -778,14 +969,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                         holder.contentOwnMessageText.append(edited);
                         holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                        holder.ownManagementMessage.setVisibility(View.GONE);
+                        holder.ownManagementMessageLayout.setVisibility(View.GONE);
                     }
                     else if(message.isDeleted()){
                         log("Message is deleted");
                         holder.contentOwnMessageLayout.setVisibility(View.GONE);
                         holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                         holder.ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
-                        holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                        holder.ownManagementMessageLayout.setVisibility(View.VISIBLE);
                     }
                     else{
                         int status = message.getStatus();
@@ -809,7 +1000,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         }
                         holder.contentOwnMessageText.setText(messageContent);
                         holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                        holder.ownManagementMessage.setVisibility(View.GONE);
+                        holder.ownManagementMessageLayout.setVisibility(View.GONE);
                     }
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
@@ -825,7 +1016,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
 
                     holder.ownManagementMessageText.setText(result);
-                    holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                    holder.ownManagementMessageLayout.setVisibility(View.VISIBLE);
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
                     log("Message type TITLE CHANGE: "+message.getContent());
@@ -845,7 +1036,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     holder.ownManagementMessageText.setText(result);
 
-                    holder.ownManagementMessage.setVisibility(View.VISIBLE);
+                    holder.ownManagementMessageLayout.setVisibility(View.VISIBLE);
 
                 }
                 else{
@@ -878,39 +1069,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 else{
                     holder.fullNameTitle = getContactFullName(holder.userHandle);
-                }
-
-                if (!multipleSelect) {
-//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-                    holder.contactMultiselectionLayout.setVisibility(View.GONE);
-                    if (positionClicked != -1){
-                        if (positionClicked == position){
-                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
-                            listFragment.smoothScrollToPosition(positionClicked);
-                        }
-                        else{
-                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                        }
-                    }
-                    else{
-                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                    }
-                } else {
-                    log("Multiselect ON");
-//            holder.imageButtonThreeDots.setVisibility(View.GONE);
-                    holder.contactMultiselectionLayout.setVisibility(View.VISIBLE);
-                    if(this.isItemChecked(position)){
-                        log("Selected: "+message.getContent());
-                        holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
-                        holder.contactMultiselectionTickIcon.setVisibility(View.VISIBLE);
-                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
-                    }
-                    else{
-                        log("NOT selected");
-                        holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
-                        holder.contactMultiselectionTickIcon.setVisibility(View.GONE);
-                        holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                    }
                 }
 
                 if(messages.get(position).getInfoToShow()!=-1){
@@ -980,24 +1138,62 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         holder.contentContactMessageText.append(edited);
                         holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
-                        holder.contactManagementMessage.setVisibility(View.GONE);
+                        holder.contactManagementMessageLayout.setVisibility(View.GONE);
                     }
                     else if(message.isDeleted()){
                         log("Message is deleted");
                         holder.contentContactMessageLayout.setVisibility(View.GONE);
                         holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                         holder.contactManagementMessageText.setText(context.getString(R.string.text_deleted_message));
-                        holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                        holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
                     }
                     else{
                         holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
-                        holder.contactManagementMessage.setVisibility(View.GONE);
+                        holder.contactManagementMessageLayout.setVisibility(View.GONE);
                         holder.contactManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                         String messageContent = "";
                         if(message.getContent()!=null){
                             messageContent = message.getContent();
                         }
                         holder.contentContactMessageText.append(messageContent);
+                    }
+
+                    //Margins
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                    if (!multipleSelect) {
+//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+                        holder.contactMultiselectionLayout.setVisibility(View.GONE);
+                        if (positionClicked != -1){
+                            if (positionClicked == position){
+                                holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                                listFragment.smoothScrollToPosition(positionClicked);
+                            }
+                            else{
+                                holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                            }
+                        }
+                        else{
+                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    } else {
+                        log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                        holder.contactMultiselectionLayout.setVisibility(View.VISIBLE);
+                        if(this.isItemChecked(position)){
+                            log("Selected: "+message.getContent());
+                            holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                            holder.contactMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                        }
+                        else{
+                            log("NOT selected");
+                            holder.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                            holder.contactMultiselectionTickIcon.setVisibility(View.GONE);
+                            holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
                     }
                 }
                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
@@ -1014,7 +1210,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
 
                     holder.contactManagementMessageText.setText(result);
-                    holder.contactManagementMessage.setVisibility(View.VISIBLE);
+                    holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
                     RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
                     timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
                     holder.timeContactText.setLayoutParams(timeContactTextParams);
@@ -1023,6 +1219,61 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("Message type CHANGE TITLE "+message.getContent());
 
                     holder.contentContactMessageLayout.setVisibility(View.GONE);
+
+                    holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
+
+                    if (!multipleSelect) {
+                        holder.contactManagementMultiselectionLayout.setVisibility(View.GONE);
+
+                        //Margins
+                        RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+                        contactManagementTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                        holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
+
+                        RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                        timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                        holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                        if (positionClicked != -1){
+                            if (positionClicked == position){
+                                holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                                listFragment.smoothScrollToPosition(positionClicked);
+                            }
+                            else{
+                                holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                            }
+                        }
+                        else{
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    } else {
+                        log("Multiselect ON");
+//            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                        holder.contactManagementMultiselectionLayout.setVisibility(View.VISIBLE);
+
+                        //Margins
+                        RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                        timeContactTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                        holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                        //Set more margins
+                        RelativeLayout.LayoutParams contactManagementTextParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageText.getLayoutParams();
+                        contactManagementTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(68, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                        holder.contactManagementMessageText.setLayoutParams(contactManagementTextParams);
+
+                        if (this.isItemChecked(position)) {
+                            log("Selected: " + message.getContent());
+                            holder.contactManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
+                            holder.contactManagementMultiselectionTickIcon.setVisibility(View.VISIBLE);
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+
+                        } else {
+                            log("NOT selected");
+                            holder.contactManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
+                            holder.contactManagementMultiselectionTickIcon.setVisibility(View.GONE);
+                            holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        }
+                    }
 
                     String messageContent = message.getContent();
 
@@ -1036,10 +1287,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
 
                     holder.contactManagementMessageText.setText(result);
-                    holder.contactManagementMessage.setVisibility(View.VISIBLE);
-                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
-                    timeContactTextParams.setMargins(Util.scaleWidthPx(42, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
-                    holder.timeContactText.setLayoutParams(timeContactTextParams);
                 }
                 else{
                     log("Type message: "+message.getType());
