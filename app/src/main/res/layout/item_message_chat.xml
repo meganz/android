@@ -58,15 +58,38 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/own_deleted_message_layout"
+            android:id="@+id/own_management_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right"
             android:layout_below="@+id/title_own_message_layout"
             android:visibility="gone">
 
+            <RelativeLayout
+                android:id="@+id/own_management_multiselection_layout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:gravity="left"
+                android:layout_marginRight="3dp">
+
+                <ImageView
+                    android:id="@+id/own_management_multiselection_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/message_multiselection_empty"/>
+
+                <ImageView
+                    android:id="@+id/own_management_multiselection_tick_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_done_white_18dp"/>
+
+            </RelativeLayout>
+
             <TextView
-                android:id="@+id/own_deleted_message_text"
+                android:id="@+id/own_management_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="right"
@@ -185,15 +208,37 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/contact_deleted_message_layout"
+            android:id="@+id/contact_management_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
             android:layout_below="@+id/title_contact_message_layout"
             android:visibility="gone">
 
+            <RelativeLayout
+                android:id="@+id/contact_management_multiselection_layout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="3dp">
+
+                <ImageView
+                    android:id="@+id/contact_management_multiselection_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/message_multiselection_empty"/>
+
+                <ImageView
+                    android:id="@+id/contact_management_multiselection_tick_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_done_white_18dp"/>
+
+            </RelativeLayout>
+
             <TextView
-                android:id="@+id/contact_deleted_message_text"
+                android:id="@+id/contact_management_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
