@@ -367,7 +367,7 @@ public class AccountController {
 
         if (!logoutBadSession){
             megaApi.logout();
-//            megaChatApi.logout(((ManagerActivityLollipop)context));
+            megaChatApi.logout(((ManagerActivityLollipop)context));
         }
 
         if (!confirmAccount){

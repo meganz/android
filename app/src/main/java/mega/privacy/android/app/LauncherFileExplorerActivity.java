@@ -177,10 +177,13 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
 
+		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+
 		if (credentials == null){
 			log("User credentials NULL");
-			AccountController aC = new AccountController(this);
-			aC.logout(this, megaApi, false);
+//			megaApi.localLogout();
+//			AccountController aC = new AccountController(this);
+//			aC.logout(this, megaApi, false);
 
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -196,7 +199,7 @@ public class LauncherFileExplorerActivity extends PinActivity implements MegaReq
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 		}
 
-		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+
 
 		megaApi.addGlobalListener(this);
 
