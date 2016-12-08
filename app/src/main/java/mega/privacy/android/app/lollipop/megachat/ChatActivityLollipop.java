@@ -203,18 +203,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             View view = listView.findChildViewUnder(e.getX(), e.getY());
             int position = listView.getChildLayoutPosition(view);
 
-            AndroidMegaChatMessage messageClicked = (AndroidMegaChatMessage) adapter.getItem(position);
-            if(messageClicked!=null){
-                if(!(messageClicked.getMessage().isDeleted())){
-                    // handle long press
-                    if (!adapter.isMultipleSelect()){
-                        adapter.setMultipleSelect(true);
+            if (!adapter.isMultipleSelect()){
+                adapter.setMultipleSelect(true);
 
-                        actionMode = startSupportActionMode(new ActionBarCallBack());
+                actionMode = startSupportActionMode(new ActionBarCallBack());
 
-                        itemClick(position);
-                    }
-                }
+                itemClick(position);
             }
 
             super.onLongPress(e);
