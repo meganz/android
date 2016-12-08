@@ -1003,16 +1003,30 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
 								log("Message READ");
-								Spannable myMessage = new SpannableString(lastMessage.getContent());
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								holder.textViewContent.append(myMessage);
+								if(lastMessage.isDeleted()){
+									Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
+									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+									holder.textViewContent.append(myMessage);
+								}
+								else{
+									Spannable myMessage = new SpannableString(lastMessage.getContent());
+									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+									holder.textViewContent.append(myMessage);
+								}
 							}
 							else{
 								log("Message NOt read");
 
-								Spannable myMessage = new SpannableString(lastMessage.getContent());
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								holder.textViewContent.append(myMessage);
+								if(lastMessage.isDeleted()){
+									Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
+									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+									holder.textViewContent.append(myMessage);
+								}
+								else{
+									Spannable myMessage = new SpannableString(lastMessage.getContent());
+									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+									holder.textViewContent.append(myMessage);
+								}
 							}
 						}
 						else{
@@ -1024,7 +1038,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								log("Message NOt read");
 								holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 							}
-							holder.textViewContent.setText(lastMessage.getContent());
+							if(lastMessage.isDeleted()){
+								holder.textViewContent.setText(context.getString(R.string.list_message_deleted));
+							}
+							else{
+								holder.textViewContent.setText(lastMessage.getContent());
+							}
 						}
 
 					}

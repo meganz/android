@@ -921,10 +921,11 @@
     <string name="online_status" context="Info label about the status of the user">Online</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
+    <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Delete messages?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Delete message?</string>
 
-    <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> cleared the chat history]]></string>
+    <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat"><![CDATA[<font color=\'#060000\'>%1$s</font> <font color=\'#868686\'> cleared the chat history</font>]]></string>
 
     <string name="group_chat_label" context="Label for the sliding panel of a group chat">Group chat</string>
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Group info</string>
@@ -959,13 +960,13 @@
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
-    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> was changed to <b>%2$s</b> by <font color=\'#00BFA5\'>%3$s</font>]]></string>
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> was added to this group chat by invitation from <font color=\'#00BFA5\'>%2$s</font>]]></string>
-    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> was removed from group chat by <font color=\'#00BFA5\'>%2$s</font>]]></string>
+    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was changed to </font><font color=\'#060000\'>%2$s</font><font color=\'#868686\'> by </font><font color=\'#060000\'>%3$s</font>]]></string>
+    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was added to this group chat by invitation from </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'>was removed from group chat by </font><font color=\'#060000\'>%2$s</font>]]></string>
 
-    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#00BFA5\'>%1$s</font> changed the group chat name to <font color=\'#00BFA5\'>%2$s</font>]]></string>
+    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> changed the group chat name to </font><font color=\'#060000\'>\"%2$s\"</font>]]></string>
 
-    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#00BFA5\'>%1$s</font> <b>left</b> the group chat]]></string>
+    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> left the group chat</font>]]></string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 
@@ -983,4 +984,7 @@
     <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">Error. You status has not been changed</string>
 
     <string name="settings_chat_vibration" context="settings of the chat to choose the status">Vibration</string>
+
+    <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
+
 </resources>
