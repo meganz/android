@@ -1542,9 +1542,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("last message seen received");
                     if(positionToScroll>0){
                         log("message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
-                        int newPosition= positionToScroll+1;
-                        log("message position to scroll: "+newPosition+" content: "+messages.get(newPosition).getMessage().getContent());
-
                         log("Scroll to position: "+positionToScroll);
                         messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                         adapter.notifyItemChanged(positionToScroll);
