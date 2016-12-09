@@ -514,6 +514,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
+		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
@@ -1006,6 +1008,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(lastMessage.isDeleted()){
 									Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
 									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+									log("My message: "+myMessage);
 									holder.textViewContent.append(myMessage);
 								}
 								else{

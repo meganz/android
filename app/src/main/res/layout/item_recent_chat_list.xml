@@ -102,7 +102,6 @@
         android:layout_below="@id/recent_chat_list_name"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="65dp"
         android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="1"
