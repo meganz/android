@@ -1322,20 +1322,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void itemClick(int position) {
         log("itemClick: "+position);
         if (adapter.isMultipleSelect()){
-            AndroidMegaChatMessage messageClicked = (AndroidMegaChatMessage) adapter.getItem(position);
-            if(messageClicked!=null){
-                if(!(messageClicked.getMessage().isDeleted())){
-                    adapter.toggleSelection(position);
+            adapter.toggleSelection(position);
 
-                    List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
-                    if (messages.size() > 0){
-                        updateActionModeTitle();
+            List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
+            if (messages.size() > 0){
+                updateActionModeTitle();
 //                adapter.notifyDataSetChanged();
-                    }
-                    else{
-                        hideMultipleSelect();
-                    }
-                }
+            }
+            else{
+                hideMultipleSelect();
             }
         }
 //        else{
