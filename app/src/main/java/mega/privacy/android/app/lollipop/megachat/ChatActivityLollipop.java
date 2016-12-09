@@ -1046,6 +1046,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 adapter.appendMessage(messages);
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        log("Now I update the recyclerview");
+                        mLayoutManager.scrollToPosition(adapter.getItemCount()-1);
+                    }
+                }, 100);
+
+//                mLayoutManager.setStackFromEnd(true);
+//                mLayoutManager.scrollToPosition(messages.size());
             }
         }
         else{
