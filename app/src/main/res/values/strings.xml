@@ -921,7 +921,10 @@
     <string name="online_status" context="Info label about the status of the user">Online</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
+    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
+    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#00BFA5\'>Chat history cleared by </font><font color=\'#060000\'>%1$s</font>]]></string>
+
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Delete messages?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Delete message?</string>
 
