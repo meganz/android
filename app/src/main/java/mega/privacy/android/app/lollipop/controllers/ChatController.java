@@ -11,6 +11,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -136,6 +137,31 @@ public class ChatController {
 
     public void muteChat(MegaChatListItem chat){
         dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chat.getChatId()));
+    }
+
+    public void enableChat(){
+        dbH.setEnabledChat(true+"");
+    }
+
+    public boolean isChatEnabled(){
+
+        ChatSettings chatSettings = dbH.getChatSettings();
+        boolean chatEnabled;
+
+        if(chatSettings!=null){
+            if(chatSettings.getEnabled()!=null){
+                chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+                return chatEnabled;
+            }
+            else{
+                chatEnabled=true;
+                return chatEnabled;
+            }
+        }
+        else{
+            chatEnabled=true;
+            return chatEnabled;
+        }
     }
 
     public static void log(String message) {

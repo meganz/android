@@ -137,30 +137,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
-        chatSettings = dbH.getChatSettings();
 
-        if(chatSettings!=null){
-            if(chatSettings.getEnabled()!=null){
-                chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                if(chatEnabled){
-                    if (megaChatApi == null){
-                        megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                    }
+        ChatController chatController = new ChatController(context);
 
-                    megaChatApi.addChatListener(this);
-                }
+        if(chatController.isChatEnabled()){
+            chatEnabled=true;
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
             }
-            else{
-                chatEnabled=true;
-                if (megaChatApi == null){
-                    megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                }
 
-                megaChatApi.addChatListener(this);
-            }
+            megaChatApi.addChatListener(this);
         }
         else{
-            chatEnabled=true;
+            log("Chat not enabled!");
+            chatEnabled=false;
+            //Remove this later
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
             }
@@ -264,9 +255,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
         else{
             log("Chat DISABLED");
-            listView.setVisibility(View.GONE);
-            chatStatusLayout.setVisibility(View.GONE);
-            emptyLayout.setVisibility(View.VISIBLE);
+            showDisableChatScreen();
         }
 
         return v;
@@ -297,49 +286,64 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 //            }
 //        }
 
-        chats = megaChatApi.getChatListItems();
+        if(chatEnabled){
+            chats = megaChatApi.getChatListItems();
 
-        //Order by last interaction
-        Collections.sort(chats, new Comparator<MegaChatListItem> (){
+            //Order by last interaction
+            Collections.sort(chats, new Comparator<MegaChatListItem> (){
 
-            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                MegaChatMessage message1 = c1.getLastMessage();
-                long timestamp1 = -1;
-                if(message1!=null){
-                    timestamp1 = message1.getTimestamp();
+                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                    MegaChatMessage message1 = c1.getLastMessage();
+                    long timestamp1 = -1;
+                    if(message1!=null){
+                        timestamp1 = message1.getTimestamp();
+                    }
+
+                    MegaChatMessage message2 = c2.getLastMessage();
+                    long timestamp2 = -1;
+                    if(message2!=null){
+                        timestamp2 = message2.getTimestamp();
+                    }
+
+                    long result = timestamp2 - timestamp1;
+                    return (int)result;
                 }
+            });
 
-                MegaChatMessage message2 = c2.getLastMessage();
-                long timestamp2 = -1;
-                if(message2!=null){
-                    timestamp2 = message2.getTimestamp();
-                }
-
-                long result = timestamp2 - timestamp1;
-                return (int)result;
+            if (adapterList == null){
+                adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
             }
-        });
+            else{
+                adapterList.setChats(chats);
+            }
 
-        if (adapterList == null){
-            adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+            adapterList.setPositionClicked(-1);
+            listView.setAdapter(adapterList);
+
+            if (adapterList.getItemCount() == 0){
+                log("adapterList.getItemCount() == 0");
+                listView.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("adapterList.getItemCount() NOT = 0");
+                listView.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+            }
         }
         else{
-            adapterList.setChats(chats);
+            showDisableChatScreen();
         }
+    }
 
-        adapterList.setPositionClicked(-1);
-        listView.setAdapter(adapterList);
-
-        if (adapterList.getItemCount() == 0){
-            log("adapterList.getItemCount() == 0");
-            listView.setVisibility(View.GONE);
-            emptyLayout.setVisibility(View.VISIBLE);
-        }
-        else{
-            log("adapterList.getItemCount() NOT = 0");
-            listView.setVisibility(View.VISIBLE);
-            emptyLayout.setVisibility(View.GONE);
-        }
+    public void showDisableChatScreen(){
+        listView.setVisibility(View.GONE);
+        chatStatusLayout.setVisibility(View.GONE);
+        ((ManagerActivityLollipop)context).hideFabButton();
+        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_enable_chat));
+        inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
+        emptyTextView.setText(R.string.recent_chat_enable_chat);
+        emptyLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -393,7 +397,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         log("onClick");
         switch (v.getId()) {
             case R.id.invite_button:{
-                ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                if(chatEnabled){
+                    ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                }
+                else{
+                    ChatController chatController = new ChatController(context);
+                    chatController.enableChat();
+                    getActivity().supportInvalidateOptionsMenu();
+                    chatEnabled=!chatEnabled;
+                    setChats();
+                }
+
                 break;
             }
         }

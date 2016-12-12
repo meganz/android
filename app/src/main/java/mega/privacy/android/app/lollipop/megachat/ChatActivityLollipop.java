@@ -1035,6 +1035,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             if (adapter == null){
                 adapter = new MegaChatLollipopAdapter(this, messages, listView);
+                adapter.setHasStableIds(true);
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
                 adapter.setMessages(messages);
@@ -1648,6 +1649,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //Create adapter
                 if (adapter == null) {
                     adapter = new MegaChatLollipopAdapter(this, messages, listView);
+                    adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
                     adapter.setPositionClicked(-1);
                 } else {
@@ -1925,6 +1927,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if (adapter == null) {
             adapter = new MegaChatLollipopAdapter(this, messages, listView);
+            adapter.setHasStableIds(true);
             listView.setAdapter(adapter);
             adapter.setPositionClicked(-1);
             adapter.setMessages(messages);
