@@ -132,22 +132,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			imageView.setImageBitmap(bitmap);
 			contactInitialLetter.setVisibility(View.GONE);
 		}
-
-		public void setContactName(String contactName){
-			textViewContactName.setText(contactName);
-		}
-
-		public void setContactInitialLetter(String initialLetter){
-			contactInitialLetter.setText(initialLetter);
-		}
-
-		public void setFirstNameText(String firstName){
-			firstNameText=firstName;
-		}
-
-		public void setLastNameText(String lastName){
-			lastNameText = lastName;
-		}
     }
     ViewHolderChatList holder;
     
@@ -969,13 +953,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						holder.textViewContent.setText(me);
 						if(lastMessage.isDeleted()){
-							Spannable myMessage = new SpannableString(context.getString(R.string.text_deleted_message));
+							Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
 							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							holder.textViewContent.append(myMessage);
 						}else{
-							Spannable myMessage = new SpannableString(lastMessage.getContent());
-							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							if(lastMessage.getContent()!=null) {
+								Spannable myMessage = new SpannableString(lastMessage.getContent());
+								myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								holder.textViewContent.append(myMessage);
+							}
 						}
 					}
 					else{

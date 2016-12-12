@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -153,10 +154,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     TextView authenticityTitle;
     TextView confidentialityTitle;
 
-    int diffMeasure;
     boolean focusChanged=false;
-
-    KeyboardListener keyboardListener;
 
     String intentAction;
     MegaChatLollipopAdapter adapter;
@@ -534,8 +532,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     emptyScrollView.setVisibility(View.VISIBLE);
 //                    inviteText.setVisibility(View.VISIBLE);
                     textChat.setOnFocusChangeListener(focus);
-                    keyboardListener = new KeyboardListener();
-                    emptyScrollView.getViewTreeObserver().addOnGlobalLayoutListener(keyboardListener);
                     textChat.setText("Hi there!\nLet's chat!");
                 }
                 else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
@@ -752,6 +748,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 leaveMenuItem.setVisible(true);
             }
             else{
+                inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                 contactInfoMenuItem.setVisible(true);
                 clearHistoryMenuItem.setVisible(true);
@@ -893,13 +890,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.home:{
-                emptyScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
                 break;
             }
 			case R.id.send_message_icon_chat:{
                 log("click on Send message");
-                emptyScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(keyboardListener);
-
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
 
@@ -994,6 +988,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         MegaChatMessage msgSent = megaChatApi.sendMessage(idChat, text);
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
+
         if(msgSent!=null){
             log("Mensaje enviado con id temp: "+msgSent.getTempId());
             log("State of the message: "+msgSent.getStatus());
@@ -1052,8 +1047,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     @Override
                     public void run() {
-                        log("Now I update the recyclerview");
+                        log("Now I update the recyclerview (send)");
                         mLayoutManager.scrollToPosition(adapter.getItemCount()-1);
+
                     }
                 }, 100);
 
@@ -1357,37 +1353,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //        }
     }
     /////END Multiselect/////
-
-    private class KeyboardListener implements ViewTreeObserver.OnGlobalLayoutListener{
-        @Override
-        public void onGlobalLayout() {
-
-//            if(!focusChanged){
-//                diffMeasure = emptyScrollView.getHeight();
-//                log("Store Scroll height: "+emptyScrollView.getHeight());
-//                RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
-//                inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-//                inviteText.setLayoutParams(inviteTextViewParams);
-//            }
-//            else{
-//                int newMeasure = emptyScrollView.getHeight();
-//                log("New Scroll height: "+emptyScrollView.getHeight());
-//                if(newMeasure < (diffMeasure-200)){
-//                    log("Keyboard shown!!!");
-//                    RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
-//                    inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-//                    inviteText.setLayoutParams(inviteTextViewParams);
-//                }
-//                else{
-//                    log("Keyboard hidden!!!");
-//                    RelativeLayout.LayoutParams inviteTextViewParams = (RelativeLayout.LayoutParams)inviteText.getLayoutParams();
-//                    inviteTextViewParams.setMargins(Util.scaleWidthPx(43, outMetrics), Util.scaleHeightPx(150, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-//                    inviteText.setLayoutParams(inviteTextViewParams);
-//                }
-//            }
-        }
-    }
-
 
     @Override
     public boolean onDown(MotionEvent e) {
@@ -1704,10 +1669,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
-//    public void createInfoToShow(){
-//
-//    }
-
     public void loadMessages(){
         ListIterator<AndroidMegaChatMessage> itr = bufferMessages.listIterator();
         while (itr.hasNext()) {
@@ -1719,6 +1680,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             adapter = new MegaChatLollipopAdapter(this, messages, listView);
+            adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
@@ -1927,6 +1889,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             adapter = new MegaChatLollipopAdapter(this, messages, listView);
+            adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
@@ -1999,7 +1962,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
-            log("Remove participant");
+            log("Remove participant: "+request.getUserHandle()+" my user: "+megaApi.getMyUser().getHandle());
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(megaApi.getMyUser().getHandle()==request.getUserHandle()){

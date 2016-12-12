@@ -965,7 +965,7 @@
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was changed to </font><font color=\'#060000\'>%2$s</font><font color=\'#868686\'> by </font><font color=\'#060000\'>%3$s</font>]]></string>
     <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was added to this group chat by invitation from </font><font color=\'#060000\'>%2$s</font>]]></string>
-    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'>was removed from group chat by </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was removed from group chat by </font><font color=\'#060000\'>%2$s</font>]]></string>
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> changed the group chat name to </font><font color=\'#060000\'>\"%2$s\"</font>]]></string>
 
