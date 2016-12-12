@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -374,7 +375,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("I was removed or left");
                     if(message.getUserHandle()==message.getUserHandleOfAction()){
                         log("I left the chat");
-
                         textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), context.getString(R.string.chat_I_text));
 
                     }
@@ -418,13 +418,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         log("Selected: "+message.getContent());
                         holder.ownManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
                         holder.ownManagementMultiselectionTickIcon.setVisibility(View.VISIBLE);
-                        holder.ownManagementMultiselectionLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_list_selected_row));
                     }
                     else{
                         log("NOT selected");
                         holder.ownManagementMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
                         holder.ownManagementMultiselectionTickIcon.setVisibility(View.GONE);
-                        holder.ownManagementMultiselectionLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                     }
                 }
             }
@@ -1785,6 +1785,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         return messages.get(position);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
     public void setPositionClicked(int p){
         log("setPositionClicked: "+p);
