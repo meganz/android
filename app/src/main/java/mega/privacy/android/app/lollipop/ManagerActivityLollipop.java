@@ -4751,35 +4751,67 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    }
 		else if (drawerItem == DrawerItem.CHAT){
 			log("in Chat Section");
-			if (rChatFL != null){
-				newChatMenuItem.setVisible(true);
-				addContactMenuItem.setVisible(true);
-				selectMenuItem.setVisible(true);
-			}
+			ChatController chatController = new ChatController(this);
+			if(chatController.isChatEnabled()){
 
-			//Hide
-			searchMenuItem.setVisible(false);
-			createFolderMenuItem.setVisible(false);
-			addMenuItem.setVisible(false);
-			sortByMenuItem.setVisible(false);
-			unSelectMenuItem.setVisible(false);
-			thumbViewMenuItem.setVisible(false);
-			addMenuItem.setEnabled(false);
-			rubbishBinMenuItem.setVisible(false);
-			clearRubbishBinMenuitem.setVisible(false);
-			importLinkMenuItem.setVisible(false);
-			takePicture.setVisible(false);
-			refreshMenuItem.setVisible(false);
-			helpMenuItem.setVisible(false);
-			upgradeAccountMenuItem.setVisible(false);
-			changePass.setVisible(false);
-			cancelSubscription.setVisible(false);
-			killAllSessions.setVisible(false);
-			logoutMenuItem.setVisible(false);
-			cancelAllTransfersMenuItem.setVisible(false);
-			forgotPassMenuItem.setVisible(false);
-			playTransfersMenuIcon.setVisible(false);
-			pauseTransfersMenuIcon.setVisible(false);
+				if (rChatFL != null){
+					newChatMenuItem.setVisible(true);
+					addContactMenuItem.setVisible(true);
+					selectMenuItem.setVisible(true);
+				}
+
+				//Hide
+				searchMenuItem.setVisible(false);
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(false);
+				changePass.setVisible(false);
+				cancelSubscription.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				cancelAllTransfersMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+			}
+			else{
+				//Hide ALL
+				newChatMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				selectMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(false);
+				changePass.setVisible(false);
+				cancelSubscription.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				cancelAllTransfersMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+			}
 		}
 		log("Call to super onCreateOptionsMenu");
 	    return super.onCreateOptionsMenu(menu);
@@ -12821,6 +12853,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			fabButtonsLayout.setVisibility(View.VISIBLE);
 			log("open COLLECTION FAB");
 		}
+	}
+
+	public void hideFabButton(){
+		fabButton.setVisibility(View.GONE);
 	}
 
 	public void showFabButton(){
