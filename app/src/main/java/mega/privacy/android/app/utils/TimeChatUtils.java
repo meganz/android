@@ -141,6 +141,18 @@ public class TimeChatUtils implements Comparator<Calendar> {
         }
     }
 
+    public static String formatShortDateTime(long timestamp){
+
+        java.text.DateFormat df;
+
+        df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, Locale.getDefault());
+
+        Calendar cal = Util.calculateDateFromTimestamp(timestamp);
+        Date date = cal.getTime();
+        String formattedDate = df.format(date);
+        return formattedDate;
+    }
+
     private static void log(String message) {
         Util.log("TimeChatUtils", message);
     }
