@@ -18,6 +18,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -57,6 +59,7 @@ import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1034,7 +1037,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             if (adapter == null){
-                adapter = new MegaChatLollipopAdapter(this, messages, listView);
+                adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
                 adapter.setHasStableIds(true);
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
@@ -1124,8 +1127,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 case R.id.chat_cab_menu_copy:{
                     clearSelections();
                     hideMultipleSelect();
-                    //Archive
-                    Toast.makeText(chatActivity, "Copy: "+messagesSelected.size()+" chats",Toast.LENGTH_SHORT).show();
+
+                    String text = copyMessages(messagesSelected);
+                    log("Copy: "+text);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                        android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setText(text);
+                    } else {
+                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+                        clipboard.setPrimaryClip(clip);
+                    }
+                    Snackbar.make(fragmentContainer, getString(R.string.messages_copied_clipboard), Snackbar.LENGTH_LONG).show();
+
                     break;
                 }
                 case R.id.chat_cab_menu_delete:{
@@ -1138,6 +1152,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             return false;
+        }
+
+        public String copyMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
+            ChatController chatC = new ChatController(chatActivity);
+            StringBuilder builder = new StringBuilder();
+
+            for(int i=0;i<messagesSelected.size();i++){
+                AndroidMegaChatMessage messageSelected = messagesSelected.get(i);
+                builder.append("[");
+                String timestamp = TimeChatUtils.formatShortDateTime(messageSelected.getMessage().getTimestamp());
+                builder.append(timestamp);
+                builder.append("] ");
+                String messageString = chatC.createManagementString(messageSelected, chatRoom);
+                builder.append(messageString);
+                builder.append("\n");
+            }
+            return builder.toString();
         }
 
         @Override
@@ -1408,14 +1439,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.myMail = myMail;
     }
 
-    public String getParticipantFirstName(long handle) {
-        return chatRoom.getPeerFirstnameByHandle(handle);
-    }
-
-    public String getParticipantLastName(long handle) {
-        return chatRoom.getPeerLastnameByHandle(handle);
-    }
-
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         log("onChatRoomUpdate!");
@@ -1648,7 +1671,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 //Create adapter
                 if (adapter == null) {
-                    adapter = new MegaChatLollipopAdapter(this, messages, listView);
+                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
                     adapter.setPositionClicked(-1);
@@ -1681,7 +1704,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Create adapter
         if(adapter==null){
-            adapter = new MegaChatLollipopAdapter(this, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
@@ -1890,7 +1913,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Create adapter
         if(adapter==null){
-            adapter = new MegaChatLollipopAdapter(this, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
@@ -1926,7 +1949,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.messages = messages;
         //Create adapter
         if (adapter == null) {
-            adapter = new MegaChatLollipopAdapter(this, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
             adapter.setHasStableIds(true);
             listView.setAdapter(adapter);
             adapter.setPositionClicked(-1);

@@ -26,4 +26,5 @@ public class AndroidMegaChatMessage {
     public void setMessage(MegaChatMessage message) {
         this.message = message;
     }
+
 }
