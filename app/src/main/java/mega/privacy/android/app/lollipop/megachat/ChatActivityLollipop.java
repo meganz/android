@@ -1096,6 +1096,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
                 adapter.setMessages(messages);
+                if(adapter.getItemCount()>0){
+                    listView.setVisibility(View.VISIBLE);
+                    chatRelativeLayout.setVisibility(View.VISIBLE);
+                    emptyScrollView.setVisibility(View.GONE);
+                }
             }
             else{
                 adapter.appendMessage(messages);
