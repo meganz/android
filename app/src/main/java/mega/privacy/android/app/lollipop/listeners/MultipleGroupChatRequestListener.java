@@ -4,6 +4,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -82,8 +83,15 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
                 default:
                     break;
             }
-            ((GroupChatInfoActivityLollipop) context).setParticipants();
-            ((GroupChatInfoActivityLollipop) context).showSnackbar(message);
+
+            if(context instanceof GroupChatInfoActivityLollipop){
+                ((GroupChatInfoActivityLollipop) context).setParticipants();
+                ((GroupChatInfoActivityLollipop) context).showSnackbar(message);
+            }
+            else if(context instanceof ChatActivityLollipop){
+                ((ChatActivityLollipop) context).showSnackbar(message);
+            }
+
         }
     }
 
