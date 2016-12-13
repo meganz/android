@@ -10834,31 +10834,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				//Update chat view
 				if(rChatFL!=null){
-					rChatFL.setChats();
+//					rChatFL.setChats();
 				}
 
 				log("open new chat");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
 				intent.setAction(Constants.ACTION_CHAT_NEW);
-				String myMail = getMyAccountInfo().getMyUser().getEmail();
 				intent.putExtra("CHAT_ID", request.getChatHandle());
-				intent.putExtra("MY_MAIL", myMail);
-
-				boolean isGroup = request.getFlag();
-				if(isGroup){
-					log("GROUP");
-					MegaChatPeerList list = request.getMegaChatPeerList();
-					log("Size: "+list.size());
-
-				}
-				else{
-					log("NOT group");
-				}
-
 				this.startActivity(intent);
+
+//				log("open new chat");
+//				Intent intent = new Intent(this, ChatActivityLollipop.class);
+//				intent.setAction(Constants.ACTION_CHAT_NEW);
+//				String myMail = getMyAccountInfo().getMyUser().getEmail();
+//				intent.putExtra("CHAT_ID", request.getChatHandle());
+//				intent.putExtra("MY_MAIL", myMail);
+//
+//				boolean isGroup = request.getFlag();
+//				if(isGroup){
+//					log("GROUP");
+//					MegaChatPeerList list = request.getMegaChatPeerList();
+//					log("Size: "+list.size());
+//
+//				}
+//				else{
+//					log("NOT group");
+//				}
+//
+//				this.startActivity(intent);
 			}
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+				showSnackbar(getString(R.string.create_chat_error));
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
@@ -10871,6 +10878,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				log("EEEERRRRROR WHEN leaving CHAT " + e.getErrorString());
+				showSnackbar(getString(R.string.leave_chat_error));
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
@@ -12861,6 +12869,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showFabButton(){
 		log("showFabButton");
+		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
 				log("Cloud Drive SECTION");
@@ -12966,9 +12975,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case CHAT:{
 				if(megaChatApi.getChatRooms().size()==0){
 					fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
-				}
-				else{
-					fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
 				}
 				fabButton.setVisibility(View.VISIBLE);
 				break;

@@ -406,6 +406,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         listView.setNestedScrollingEnabled(false);
 
         mLayoutManager = new MegaLinearLayoutManager(this);
+        mLayoutManager.setStackFromEnd(true);
         listView.setLayoutManager(mLayoutManager);
         listView.addOnItemTouchListener(this);
 
@@ -510,111 +511,97 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (newIntent != null){
             intentAction = newIntent.getAction();
             if (intentAction != null){
-                if (intentAction.equals(Constants.ACTION_CHAT_NEW)){
-                    log("ACTION_CHAT_NEW");
-                    long chatId = newIntent.getLongExtra("CHAT_ID", -1);
-                    if(chatId!=-1){
-                        chatRoom = megaChatApi.getChatRoom(chatId);
-                        aB.setTitle(chatRoom.getTitle());
-                        if(!chatRoom.isGroup()){
-                            setStatus();
-                        }
-                    }
-                    else{
-                        log("ChatRoom is -1");
-                    }
 
-                    log("I have chat!!!: "+chatId);
-                    fab.setVisibility(View.VISIBLE);
-                    listView.setVisibility(View.GONE);
-                    chatRelativeLayout.setVisibility(View.GONE);
-                    emptyScrollView.setVisibility(View.VISIBLE);
-//                    inviteText.setVisibility(View.VISIBLE);
-                    textChat.setOnFocusChangeListener(focus);
-                }
-                else if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
-                    fab.setVisibility(View.GONE);
-                    listView.setVisibility(View.GONE);
-                    chatRelativeLayout.setVisibility(View.GONE);
-                    emptyScrollView.setVisibility(View.VISIBLE);
-//                    inviteText.setVisibility(View.VISIBLE);
-                    textChat.setOnFocusChangeListener(focus);
-                    textChat.setText("Hi there!\nLet's chat!");
-                }
-                else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)){
-                    log("ACTION_CHAT_SHOW_MESSAGES");
-                    fab.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
 
-                    idChat = newIntent.getLongExtra("CHAT_ID", -1);
+                idChat = newIntent.getLongExtra("CHAT_ID", -1);
 //                    idChat=8179160514871859886L;
-                    myMail = megaApi.getMyEmail();
-                    myUserHandle = megaApi.getMyUser().getHandle();
+                myMail = megaApi.getMyEmail();
+                myUserHandle = megaApi.getMyUser().getHandle();
 
-                    log("Show empty screen");
-                    chatRelativeLayout.setVisibility(View.GONE);
-                    emptyScrollView.setVisibility(View.VISIBLE);
+                log("Show empty screen");
+                chatRelativeLayout.setVisibility(View.GONE);
+                emptyScrollView.setVisibility(View.VISIBLE);
 
-                    if(idChat!=-1){
-                        //REcover chat
-                        log("Recover chat with id: "+idChat);
+                if(idChat!=-1) {
+                    //REcover chat
+                    log("Recover chat with id: " + idChat);
 
-                        chatRoom = megaChatApi.getChatRoom(idChat);
-                        aB.setTitle(chatRoom.getTitle());
+                    chatRoom = megaChatApi.getChatRoom(idChat);
+                    aB.setTitle(chatRoom.getTitle());
 
-                        if(!chatRoom.isGroup()){
-                            log("One to one chat");
-                            setStatus();
-                        }
+                    if (!chatRoom.isGroup()) {
+                        log("One to one chat");
+                        setStatus();
+                    }
 
-                        log("Call to open chat");
-                        boolean result = megaChatApi.openChatRoom(idChat, this);
+                    log("Call to open chat");
+                    boolean result = megaChatApi.openChatRoom(idChat, this);
 
-                        messages = new ArrayList<AndroidMegaChatMessage>();
-                        bufferMessages = new ArrayList<AndroidMegaChatMessage>();
+                    messages = new ArrayList<AndroidMegaChatMessage>();
+                    bufferMessages = new ArrayList<AndroidMegaChatMessage>();
 
-                        log("Result of open chat: "+result);
+                    log("Result of open chat: " + result);
+
+                    if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
+                        log("ACTION_CHAT_NEW");
+
+                        fab.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.GONE);
+                        chatRelativeLayout.setVisibility(View.GONE);
+                        emptyScrollView.setVisibility(View.VISIBLE);
+                        //                    inviteText.setVisibility(View.VISIBLE);
+                        textChat.setOnFocusChangeListener(focus);
+                    } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
+                        log("ACTION_CHAT_SHOW_MESSAGES");
 
                         long unread = chatRoom.getUnreadCount();
-//                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                        if(unread == 0){
+                        //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                        if (unread == 0) {
                             lastMessageSeen = null;
-                            lastSeenReceived=true;
+                            lastSeenReceived = true;
                             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                        }
-                        else{
+                        } else {
                             lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
-                            if(lastMessageSeen!=null){
-                                log("Id of last message seen: "+lastMessageSeen.getMsgId());
-                            }
-                            else{
+                            if (lastMessageSeen != null) {
+                                log("Id of last message seen: " + lastMessageSeen.getMsgId());
+                            } else {
                                 log("Error the last message seen shouldn't be NULL");
                             }
 
-                            lastSeenReceived=false;
-                            if(unread<0){
-                                log("A->Load history of "+chatRoom.getUnreadCount());
+                            lastSeenReceived = false;
+                            if (unread < 0) {
+                                log("A->Load history of " + chatRoom.getUnreadCount());
                                 long unreadAbs = Math.abs(unread);
-                                stateHistory = megaChatApi.loadMessages(idChat, (int)unreadAbs);
-                            }
-                            else if(unread>=0 && unread<=NUMBER_MESSAGES_TO_LOAD){
-                                log("B->Load history of "+chatRoom.getUnreadCount());
+                                stateHistory = megaChatApi.loadMessages(idChat, (int) unreadAbs);
+                            } else if (unread >= 0 && unread <= NUMBER_MESSAGES_TO_LOAD) {
+                                log("B->Load history of " + chatRoom.getUnreadCount());
                                 stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                            }
-                            else if(unread<NUMBER_MESSAGES_TO_LOAD){
-                                log("C->Load history of "+chatRoom.getUnreadCount());
+                            } else if (unread < NUMBER_MESSAGES_TO_LOAD) {
+                                log("C->Load history of " + chatRoom.getUnreadCount());
                                 stateHistory = megaChatApi.loadMessages(idChat, chatRoom.getUnreadCount());
-                            }
-                            else{
-                                log("D->Load history of "+chatRoom.getUnreadCount());
+                            } else {
+                                log("D->Load history of " + chatRoom.getUnreadCount());
                                 stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                             }
+                            listView.setVisibility(View.VISIBLE);
                         }
-
-                        mLayoutManager.setStackFromEnd(true);
-                        listView.setVisibility(View.VISIBLE);
                     }
+                    //                else if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
+//                    fab.setVisibility(View.GONE);
+//                    listView.setVisibility(View.GONE);
+//                    chatRelativeLayout.setVisibility(View.GONE);
+//                    emptyScrollView.setVisibility(View.VISIBLE);
+////                    inviteText.setVisibility(View.VISIBLE);
+//                    textChat.setOnFocusChangeListener(focus);
+//                    textChat.setText("Hi there!\nLet's chat!");
+//                }
+                }
+                else{
+                    log("Chat ID -1 error");
                 }
             }
+
         }
     }
 
