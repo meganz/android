@@ -116,7 +116,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     TextView initialLetter;
     RoundedImageView avatarImageView;
 
-    ScrollView scrollView;
+    android.support.v4.widget.NestedScrollView scrollView;
 
     LinearLayout infoLayout;
     RelativeLayout avatarLayout;
@@ -229,7 +229,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             aB.setTitle(getString(R.string.group_chat_info_label));
 
-            scrollView = (ScrollView) findViewById(R.id.scroll_view_group_chat_properties);
+            scrollView = (android.support.v4.widget.NestedScrollView) findViewById(R.id.scroll_view_group_chat_properties);
 
             initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
@@ -365,7 +365,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView.setHasFixedSize(true);
             MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
-//            recyclerView.addOnItemTouchListener(this);
             recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setNestedScrollingEnabled(false);
@@ -412,9 +411,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             participants = new ArrayList<>();
 
             setParticipants();
-
-            adapter.setPositionClicked(-1);
-            recyclerView.setAdapter(adapter);
 
             //Sliding CHAT panel
             slidingParticipantPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_group_participants_chat);
@@ -523,6 +519,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("number of participants: "+participants.size());
         if (adapter == null){
             adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
+            adapter.setHasStableIds(true);
+            adapter.setPositionClicked(-1);
+            recyclerView.setAdapter(adapter);
+
         }
         else{
             adapter.setParticipants(participants);
