@@ -931,11 +931,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.textViewDate.setVisibility(View.VISIBLE);
 
 				if(lastMessage.isManagementMessage()){
-					if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
-						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+					if(lastMessage.getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
+						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 					}
 					else{
-						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 					}
 					holder.textViewContent.setText("Management message");
 				}
