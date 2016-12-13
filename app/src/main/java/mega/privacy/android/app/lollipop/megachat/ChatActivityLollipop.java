@@ -56,10 +56,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -69,10 +71,12 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
@@ -783,7 +787,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_invite_chat:{
-
+                chooseAddParticipantDialog();
                 break;
             }
             case R.id.cab_menu_contact_info_chat:{
@@ -811,6 +815,56 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void chooseAddParticipantDialog(){
+        log("chooseAddContactDialog");
+
+        Intent in = new Intent(this, AddContactActivityLollipop.class);
+        in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        log("onActivityResult, resultCode: " + resultCode);
+
+        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+            log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
+
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            MultipleGroupChatRequestListener multipleListener = null;
+
+            if (contactsData != null) {
+
+                if (contactsData.size() == 1) {
+                    MegaUser user = megaApi.getContact(contactsData.get(0));
+                    if (user != null) {
+                        megaChatApi.inviteToChat(chatRoom.getChatId(), user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
+                    }
+                } else {
+                    log("Add multiple participants "+contactsData.size());
+                    multipleListener = new MultipleGroupChatRequestListener(this);
+                    for (int i = 0; i < contactsData.size(); i++) {
+                        MegaUser user = megaApi.getContact(contactsData.get(i));
+                        if (user != null) {
+                            megaChatApi.inviteToChat(chatRoom.getChatId(), user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            log("Error onActivityResult: REQUEST_ADD_PARTICIPANTS");
+        }
+
+        super.onActivityResult(requestCode, resultCode, intent);
     }
 
     public void showConfirmationClearChat(final MegaChatRoom c){
@@ -2021,6 +2075,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
                 showSnackbar(getString(R.string.remove_participant_error));
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM){
+            log("Request type: "+MegaChatRequest.TYPE_INVITE_TO_CHATROOM);
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                showSnackbar(getString(R.string.add_participant_success));
+            }
+            else{
+                showSnackbar(getString(R.string.add_participant_error));
             }
         }
     }
