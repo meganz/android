@@ -929,10 +929,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
 
                     if(message.isEdited()){
-                        //Margins
-                        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-                        ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-                        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
                         log("Message is edited");
                         Spannable content = new SpannableString(messageContent);
@@ -949,6 +945,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         holder.ownManagementMessageLayout.setVisibility(View.GONE);
 
                         if (!multipleSelect) {
+                            //Margins
+                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                            ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
                             holder.ownMultiselectionLayout.setVisibility(View.GONE);
 //            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
                             if (positionClicked != -1){
@@ -967,6 +968,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             log("Multiselect ON");
 //            holder.imageButtonThreeDots.setVisibility(View.GONE);
                             holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
+                            //Margins
+                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                            ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
                             if(this.isItemChecked(position)){
                                 log("Selected: "+message.getContent());
                                 holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));
@@ -1028,17 +1034,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         }
                     }
                     else{
-                        //Margins
-                        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-                        ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-                        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
                         int status = message.getStatus();
                         if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             log("Show triangle retry!");
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
                             //Margins
-                            ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
                             ownMessageParams.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
                             holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
@@ -1057,6 +1059,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         holder.ownManagementMessageLayout.setVisibility(View.GONE);
 
                         if (!multipleSelect) {
+                            //Margins
+                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                            ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
                             holder.ownMultiselectionLayout.setVisibility(View.GONE);
 //            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
                             if (positionClicked != -1){
@@ -1074,6 +1080,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         } else {
                             log("Multiselect ON");
 //            holder.imageButtonThreeDots.setVisibility(View.GONE);
+                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                            ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
                             holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
                             if(this.isItemChecked(position)){
                                 log("Selected: "+message.getContent());
