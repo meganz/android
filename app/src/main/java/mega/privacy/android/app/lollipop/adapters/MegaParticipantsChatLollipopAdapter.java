@@ -228,37 +228,71 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			createDefaultAvatar(((ViewHolderParticipantsList)holder));
 
-			if (((ViewHolderParticipantsList)holder).contactMail != null) {
-				log("The participant is contact!!");
-
-				MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
-
-				if(contact!=null){
-					ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
-
-					File avatar = null;
-					if (context.getExternalCacheDir() != null) {
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
-					} else {
-						avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.getMyUser().getHandle());
+			if((((ViewHolderParticipantsList)holder).userHandle).equals(myUserHandleEncoded)){
+				log("It's me!!!");
+				File avatar = null;
+				if (context.getExternalCacheDir() != null) {
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+				} else {
+					avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+				}
+				Bitmap bitmap = null;
+				if (avatar.exists()) {
+					if (avatar.length() > 0) {
+						BitmapFactory.Options bOpts = new BitmapFactory.Options();
+						bOpts.inPurgeable = true;
+						bOpts.inInputShareable = true;
+						bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						if (bitmap != null) {
+							((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
+							((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
+						}
 					}
-					Bitmap bitmap = null;
-					if (avatar.exists()) {
-						if (avatar.length() > 0) {
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (bitmap == null) {
-								avatar.delete();
+				}
+				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
+				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
+			}
+			else{
+				log("NOOOT me!!!");
+				if (((ViewHolderParticipantsList)holder).contactMail != null) {
+					log("The participant is contact!!");
+
+					MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
+
+					if(contact!=null){
+						ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
+
+						File avatar = null;
+						if (context.getExternalCacheDir() != null) {
+							avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+						} else {
+							avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+						}
+						Bitmap bitmap = null;
+						if (avatar.exists()) {
+							if (avatar.length() > 0) {
+								BitmapFactory.Options bOpts = new BitmapFactory.Options();
+								bOpts.inPurgeable = true;
+								bOpts.inInputShareable = true;
+								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+								if (bitmap == null) {
+									avatar.delete();
+									if (context.getExternalCacheDir() != null) {
+										megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+									} else {
+										megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+									}
+								} else {
+									((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
+									((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
+								}
+							} else {
 								if (context.getExternalCacheDir() != null) {
 									megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 								} else {
 									megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 								}
-							} else {
-								((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
-								((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
 							}
 						} else {
 							if (context.getExternalCacheDir() != null) {
@@ -267,29 +301,23 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 							}
 						}
-					} else {
-						if (context.getExternalCacheDir() != null) {
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-						} else {
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
+						((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
+					}
+					else{
+						log("Participant is NOT contact");
+						if(position!=0){
+							((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+							((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
 						}
 					}
-					((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
-					((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
-				}
-				else{
-					log("Participant is NOT contact");
+
+				} else {
+					log("NOT email- Participant is NOT contact");
 					if(position!=0){
 						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
 						((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
 					}
-				}
-
-			} else {
-				log("NOT email- Participant is NOT contact");
-				if(position!=0){
-					((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
-					((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
 				}
 			}
 
@@ -297,7 +325,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			if (status == MegaChatApi.STATUS_ONLINE) {
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.online_status));
-			} else {
+			}
+			else if (status == MegaChatApi.STATUS_AWAY) {
+				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.settings_chat_status_invisible));
+			}
+			else {
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.offline_status));
 			}
 
