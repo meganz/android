@@ -140,6 +140,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		View v = null;
 		if(viewType == ITEM_VIEW_TYPE_NORMAL) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_participant_chat_list, parent, false);
+//			v = LayoutInflater.from(context).inflate(R.layout.item_participant_chat_list, null);
 			holderList = new ViewHolderParticipantsList(v);
 			holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.participant_list_item_layout);
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.participant_list_thumbnail);
@@ -161,6 +162,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		else{
 			log("Last element - type add participant");
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_add_participant_chat_list, parent, false);
+//			v = LayoutInflater.from(context).inflate(R.layout.item_add_participant_chat_list, null);
 			holderAddParticipant = new ViewHolderAddParticipant(v);
 			holderAddParticipant.itemLayout = (RelativeLayout) v.findViewById(R.id.add_participant_list_item_layout);
 			//Right margin
@@ -178,9 +180,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
 	public void onBindViewHolder(ViewHolderParticipants holder, int position) {
-		log("onBindViewHolder");
+		log("onBindViewHolder: "+position);
 
 		final int itemType = getItemViewType(position);
+		log("itemType: "+itemType);
 
 		if(itemType==ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderParticipantsList)holder).currentPosition = position;
@@ -386,9 +389,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     public int getItemCount() {
 		log("getItemCount");
 		int permission = participants.get(0).getPrivilege();
-		log("Participant name: "+participants.get(0).getFullName()+" privilege "+participants.get(0).getPrivilege());
 
 		if (permission == MegaChatRoom.PRIV_MODERATOR) {
+			log("getItemCount: moderator type");
 			int participantNumber = participants.size()+1;
 			log("return value: "+participantNumber);
 			return participantNumber;
@@ -399,11 +402,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	@Override
 	public int getItemViewType(int position) {
-		log("getItemViewType: "+position);
+		log("getItemViewType: position"+position);
 		int permission = participants.get(0).getPrivilege();
-		log("Participant name: "+participants.get(0).getFullName()+" privilege "+participants.get(0).getPrivilege());
 
 		if (permission == MegaChatRoom.PRIV_MODERATOR) {
+			log("getItemViewType: moderator type");
 			if (position<participants.size()) {
 				return ITEM_VIEW_TYPE_NORMAL;
 			} else {
@@ -612,6 +615,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	public RecyclerView getListFragment() {
 		return listFragment;
 	}
+
 
 	public void setListFragment(RecyclerView listFragment) {
 		this.listFragment = listFragment;
