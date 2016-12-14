@@ -36,6 +36,8 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -46,7 +48,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
-public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollipopAdapter.ViewHolderMessageChatList> {
+public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollipopAdapter.ViewHolderMessageChatList> implements View.OnClickListener {
 
     public static int LEFT_MARGIN_CONTACT_MSG_MANAGEMENT = 40;
     public static int RIGHT_MARGIN_CONTACT_MSG_MANAGEMENT = 68;
@@ -1046,6 +1048,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                             holder.triangleIcon.setVisibility(View.VISIBLE);
                             holder.retryAlert.setVisibility(View.VISIBLE);
+                            holder.retryAlert.setOnClickListener(this);
                         }
                         else if((status==MegaChatMessage.STATUS_SENDING)){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
@@ -1817,6 +1820,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         log("loadPreviousMessages: "+counter);
         this.messages = messages;
         notifyItemRangeInserted(0, counter);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.not_sent_own_message_text:{
+                log("not_sent_own_message_text");
+                MegaChatLollipopAdapter.ViewHolderMessageChatList holder = (MegaChatLollipopAdapter.ViewHolderMessageChatList) v.getTag();
+                int currentPosition = holder.currentPosition;
+                AndroidMegaChatMessage m = (AndroidMegaChatMessage) getItem(currentPosition);
+                if(m==null){
+                    log("Message is null");
+                    break;
+                }
+                ((ChatActivityLollipop) context).showMessagePanel(m);
+                break;
+            }
+        }
     }
 
     private static void log(String log) {

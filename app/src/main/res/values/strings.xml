@@ -1011,4 +1011,7 @@
 
     <string name="messages_copied_clipboard" context="success alert when the user copy some messages to the clipboard">Copied to the clipboard</string>
 
+    <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Chat Error!</string>
+    <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">The chat has not been correctly opened</string>
+
 </resources>

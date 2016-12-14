@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -25,6 +26,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,7 +59,9 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -85,6 +89,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
 
     boolean firstMessageReceived = true;
+
+    private AlertDialog errorOpenChatDialog;
 
     ProgressDialog dialog;
 
@@ -538,56 +544,75 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Call to open chat");
                     boolean result = megaChatApi.openChatRoom(idChat, this);
 
-                    messages = new ArrayList<AndroidMegaChatMessage>();
-                    bufferMessages = new ArrayList<AndroidMegaChatMessage>();
+                    if(!result){
+                        log("----Error on openChatRoom");
+                        if(errorOpenChatDialog==null){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                            builder.setTitle(getString(R.string.chat_error_open_title));
+                            builder.setMessage(getString(R.string.chat_error_open_message));
 
-                    log("Result of open chat: " + result);
-
-                    if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
-                        log("ACTION_CHAT_NEW");
-
-                        fab.setVisibility(View.VISIBLE);
-                        listView.setVisibility(View.GONE);
-                        chatRelativeLayout.setVisibility(View.GONE);
-                        emptyScrollView.setVisibility(View.VISIBLE);
-                        //                    inviteText.setVisibility(View.VISIBLE);
-                        textChat.setOnFocusChangeListener(focus);
-                    } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
-                        log("ACTION_CHAT_SHOW_MESSAGES");
-
-                        long unread = chatRoom.getUnreadCount();
-                        //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                        if (unread == 0) {
-                            lastMessageSeen = null;
-                            lastSeenReceived = true;
-                            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                        } else {
-                            lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
-                            if (lastMessageSeen != null) {
-                                log("Id of last message seen: " + lastMessageSeen.getMsgId());
-                            } else {
-                                log("Error the last message seen shouldn't be NULL");
-                            }
-
-                            lastSeenReceived = false;
-                            if (unread < 0) {
-                                log("A->Load history of " + chatRoom.getUnreadCount());
-                                long unreadAbs = Math.abs(unread);
-                                stateHistory = megaChatApi.loadMessages(idChat, (int) unreadAbs);
-                            } else if (unread >= 0 && unread <= NUMBER_MESSAGES_TO_LOAD) {
-                                log("B->Load history of " + chatRoom.getUnreadCount());
-                                stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                            } else if (unread < NUMBER_MESSAGES_TO_LOAD) {
-                                log("C->Load history of " + chatRoom.getUnreadCount());
-                                stateHistory = megaChatApi.loadMessages(idChat, chatRoom.getUnreadCount());
-                            } else {
-                                log("D->Load history of " + chatRoom.getUnreadCount());
-                                stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                            }
-                            listView.setVisibility(View.VISIBLE);
+                            builder.setPositiveButton(getString(R.string.cam_sync_ok),
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                            finish();
+                                        }
+                                    }
+                            );
+                            errorOpenChatDialog = builder.create();
+                            errorOpenChatDialog.show();
                         }
                     }
-                    //                else if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
+                    else{
+                        messages = new ArrayList<AndroidMegaChatMessage>();
+                        bufferMessages = new ArrayList<AndroidMegaChatMessage>();
+
+                        log("Result of open chat: " + result);
+
+                        if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
+                            log("ACTION_CHAT_NEW");
+
+                            fab.setVisibility(View.VISIBLE);
+                            listView.setVisibility(View.GONE);
+                            chatRelativeLayout.setVisibility(View.GONE);
+                            emptyScrollView.setVisibility(View.VISIBLE);
+                            //                    inviteText.setVisibility(View.VISIBLE);
+                            textChat.setOnFocusChangeListener(focus);
+                        } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
+                            log("ACTION_CHAT_SHOW_MESSAGES");
+
+                            long unread = chatRoom.getUnreadCount();
+                            //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                            if (unread == 0) {
+                                lastMessageSeen = null;
+                                lastSeenReceived = true;
+                                stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                            } else {
+                                lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
+                                if (lastMessageSeen != null) {
+                                    log("Id of last message seen: " + lastMessageSeen.getMsgId());
+                                } else {
+                                    log("Error the last message seen shouldn't be NULL");
+                                }
+
+                                lastSeenReceived = false;
+                                if (unread < 0) {
+                                    log("A->Load history of " + chatRoom.getUnreadCount());
+                                    long unreadAbs = Math.abs(unread);
+                                    stateHistory = megaChatApi.loadMessages(idChat, (int) unreadAbs);
+                                } else if (unread >= 0 && unread <= NUMBER_MESSAGES_TO_LOAD) {
+                                    log("B->Load history of " + chatRoom.getUnreadCount());
+                                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                                } else if (unread < NUMBER_MESSAGES_TO_LOAD) {
+                                    log("C->Load history of " + chatRoom.getUnreadCount());
+                                    stateHistory = megaChatApi.loadMessages(idChat, chatRoom.getUnreadCount());
+                                } else {
+                                    log("D->Load history of " + chatRoom.getUnreadCount());
+                                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                                }
+                                listView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        //                else if (intentAction.equals(Constants.ACTION_CHAT_INVITE)){
 //                    fab.setVisibility(View.GONE);
 //                    listView.setVisibility(View.GONE);
 //                    chatRelativeLayout.setVisibility(View.GONE);
@@ -596,6 +621,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    textChat.setOnFocusChangeListener(focus);
 //                    textChat.setText("Hi there!\nLet's chat!");
 //                }
+                    }
+
                 }
                 else{
                     log("Chat ID -1 error");
@@ -1977,6 +2004,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public boolean isGroup(){
         return chatRoom.isGroup();
+    }
+
+    public void showMessagePanel(AndroidMegaChatMessage message){
+        showSnackbar("Not yet implemented!");
     }
 
     public void showSnackbar(String s){

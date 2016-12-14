@@ -464,6 +464,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
         MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), MegaChatApi.STATUS_ONLINE);
+
         participants.add(me);
 
         for(int i=0;i<participantsCount;i++){
