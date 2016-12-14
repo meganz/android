@@ -538,6 +538,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(unreadMessages<0){
 			unreadMessages = Math.abs(unreadMessages);
+			log("unread number: "+unreadMessages);
 			holder.numberPendingMessages.setText("+"+unreadMessages);
 		}
 		else{
