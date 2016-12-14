@@ -7,7 +7,7 @@
         android:orderInCategory="105"
         android:title="@string/title_edit_profile_info"
         MEGA:showAsAction="always"
-        android:icon="@drawable/ic_edit"/>
+        android:icon="@drawable/ic_mode_edit_white_24dp"/>
 
     <item
         android:id="@+id/chat_cab_menu_copy"
