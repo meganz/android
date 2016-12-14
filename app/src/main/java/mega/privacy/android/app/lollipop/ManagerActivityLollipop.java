@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -8181,8 +8182,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 		}
 		else{
-			in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
-			startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
+
+			Dialog addContactDialog;
+			String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
+			AlertDialog.Builder b=new AlertDialog.Builder(this);
+
+			b.setTitle(getResources().getString(R.string.menu_add_contact));
+			b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch(which){
+						case 0:{
+							showNewContactDialog();
+							break;
+						}
+						case 1:{
+							addContactFromPhone();
+							break;
+						}
+					}
+				}
+			});
+			b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+			addContactDialog = b.create();
+			addContactDialog.show();
 		}
 
 //		Dialog addContactDialog;
@@ -8218,19 +8248,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void addContactFromPhone(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-			if (!hasReadContactsPermission) {
-				log("No read contacts permission");
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-						new String[]{Manifest.permission.READ_CONTACTS},
-						Constants.REQUEST_READ_CONTACTS);
-				return;
-			}
-		}
 
-		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
-		this.startActivity(phoneContactIntent);
+		Intent in = new Intent(this, AddContactActivityLollipop.class);
+		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
+
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
+//			if (!hasReadContactsPermission) {
+//				log("No read contacts permission");
+//				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
+//						new String[]{Manifest.permission.READ_CONTACTS},
+//						Constants.REQUEST_READ_CONTACTS);
+//				return;
+//			}
+//		}
+//
+//		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
+//		this.startActivity(phoneContactIntent);
 	}
 
 	public void showNewContactDialog(){
