@@ -537,6 +537,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		else{
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		}
+
+		holder.textViewContent.setText(holder.contactMail);
+
 //		onBindViewHolderList(holder, position);
 	}
 	
