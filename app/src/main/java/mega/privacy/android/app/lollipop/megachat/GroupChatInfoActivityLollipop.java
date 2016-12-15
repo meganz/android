@@ -455,6 +455,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
+    @Override
+    protected void onDestroy(){
+        log("onDestroy()");
+
+        megaChatApi.removeChatListener(this);
+
+        super.onDestroy();
+    }
+
     public void setParticipants(){
         log("setParticipants: "+participants.size());
         //Set the first element = me

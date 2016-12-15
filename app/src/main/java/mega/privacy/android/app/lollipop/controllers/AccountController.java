@@ -271,6 +271,18 @@ public class AccountController {
     static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount, boolean logoutBadSession) {
         log("logout");
 
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if (megaChatApi == null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        }
+
+        if (!logoutBadSession){
+            megaApi.logout((ManagerActivityLollipop)context);
+        }
+
         File offlineDirectory = null;
         if (Environment.getExternalStorageDirectory() != null){
             offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
@@ -356,55 +368,6 @@ public class AccountController {
         dbH.clearOffline();
 
         dbH.clearContacts();
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-        }
-
-        if (!logoutBadSession){
-            megaApi.logout();
-            megaChatApi.logout(((ManagerActivityLollipop)context));
-        }
-
-        if (!confirmAccount){
-            if(context != null)	{
-                Intent intent = new Intent(context, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-                if (context instanceof Activity) {
-                    ((Activity) context).startActivity(intent);
-                    ((Activity) context).finish();
-                }
-                context = null;
-            }
-            else{
-                Intent intent = new Intent(context, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                }
-                try{
-                    context.startActivity(intent);
-                }
-                catch (AndroidRuntimeException e){
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                }
-                if (context instanceof Activity){
-                    ((Activity)context).finish();
-                }
-                context = null;
-            }
-        }
-        else{
-            ((Activity)context).finish();
-        }
     }
 
     public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
