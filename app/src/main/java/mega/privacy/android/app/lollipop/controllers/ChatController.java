@@ -156,6 +156,10 @@ public class ChatController {
         dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chat.getChatId()));
     }
 
+    public void unmuteChat(MegaChatListItem chat){
+        dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chat.getChatId()));
+    }
+
     public void enableChat(){
         dbH.setEnabledChat(true+"");
     }

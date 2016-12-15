@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:emojicon="http://schemas.android.com/apk/res-auto"
@@ -10,358 +10,364 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_chat"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        tools:context=".lollipop.megachat.ChatActivityLollipop" />
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/writing_container_layout_chat_layout"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/chat_background"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:id="@+id/writing_linear_layout_chat"
-            android:layout_width="match_parent"
-            android:focusableInTouchMode="true"
-            android:background="@color/white"
-            android:layout_height="48dp">
-
-            <ImageButton
-                android:id="@+id/keyboard_icon_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:tint="@color/transparency_white"
-                android:src="@drawable/ic_insert_emoticon"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"/>
-
-            <ImageButton
-                android:id="@+id/send_message_icon_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="16dp"
-                android:background="@null"
-                android:layout_centerVertical="true"
-                android:tint="@color/transparency_white"
-                android:src="@drawable/ic_send_black" />
-
-            <io.github.rockerhieu.emojicon.EmojiconEditText
-                android:id="@+id/edit_text_chat"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:layout_toRightOf="@+id/keyboard_icon_chat"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_centerVertical="true"
-                android:textSize="14sp"
-                android:hint="@string/type_message_hint"
-                android:layout_toLeftOf="@+id/send_message_icon_chat"
-                android:inputType="textMultiLine|textShortMessage"
-                emojicon:emojiconSize="16sp"/>
-
-            <RelativeLayout
-                android:id="@+id/writing_disabled_linear_layout_chat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:background="@color/transparent_white">
-            </RelativeLayout>
-
-        </RelativeLayout>
-
-        <FrameLayout
-            android:id="@+id/chat_emoji_keyboard"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_below="@id/writing_linear_layout_chat"
-            />
-
-    </RelativeLayout>
-
     <RelativeLayout
-        android:id="@+id/upload_panel_chat"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_above="@+id/writing_container_layout_chat_layout"
-        android:visibility="gone"
-        android:background="@color/accentColor">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_chat"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            tools:context=".lollipop.megachat.ChatActivityLollipop" />
 
-            <RelativeLayout
-                android:id="@+id/upload_from_gallery_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_upload_image"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/upload_audio_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_upload_audio"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/upload_from_cloud_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_cloud_drive"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/upload_from_filesystem_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_upload_pick_file"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/upload_contact_chat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_contacts"/>
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/message_container_chat_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_chat"
-        android:background="@color/chat_background"
-        android:layout_above="@id/writing_container_layout_chat_layout"
-        android:orientation="vertical">
-
-        <!-- Layout to empty chat -->
-        <ScrollView
-            android:id="@+id/layout_empty_scroll_view"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/writing_container_layout_chat_layout"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/chat_background"
-            android:fillViewport="true">
+            android:orientation="vertical">
 
             <RelativeLayout
+                android:id="@+id/writing_linear_layout_chat"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:focusableInTouchMode="true"
+                android:background="@color/white"
+                android:layout_height="48dp">
 
-                <LinearLayout
-                    android:id="@+id/mega_info_layout"
+                <ImageButton
+                    android:id="@+id/keyboard_icon_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:background="@null"
+                    android:tint="@color/transparency_white"
+                    android:src="@drawable/ic_insert_emoticon"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"/>
 
-                    <RelativeLayout
-                        android:id="@+id/mega_icon_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/mega_icon_image"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_accept"
-                            android:visibility="invisible"/>
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/mega_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/title_mega_info_empty_screen"
-                            android:textColor="@color/name_my_account"
-                            android:textSize="16sp"/>
-
-                        <TextView
-                            android:id="@+id/mega_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/mega_info_empty_screen"
-                            android:textColor="@color/mail_my_account"
-                            android:textSize="14sp"
-                            android:layout_below="@+id/mega_title"/>
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/confidentiality_info"
+                <ImageButton
+                    android:id="@+id/send_message_icon_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/mega_info_layout">
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:background="@null"
+                    android:layout_centerVertical="true"
+                    android:tint="@color/transparency_white"
+                    android:src="@drawable/ic_send_black" />
 
-                    <RelativeLayout
-                        android:id="@+id/confidentiality_icon_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/confidentiality_icon_image"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:src="@drawable/ic_accept"/>
-                    </RelativeLayout>
+                <io.github.rockerhieu.emojicon.EmojiconEditText
+                    android:id="@+id/edit_text_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:layout_toRightOf="@+id/keyboard_icon_chat"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_centerVertical="true"
+                    android:textSize="14sp"
+                    android:hint="@string/type_message_hint"
+                    android:layout_toLeftOf="@+id/send_message_icon_chat"
+                    android:inputType="textMultiLine|textShortMessage"
+                    emojicon:emojiconSize="16sp"/>
 
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/confidentiality_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/title_mega_confidentiality_empty_screen"
-                            android:textColor="@color/name_my_account"
-                            android:textSize="16sp"/>
-
-                        <TextView
-                            android:id="@+id/confidentiality_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/mega_confidentiality_empty_screen"
-                            android:textColor="@color/mail_my_account"
-                            android:textSize="14sp"
-                            android:layout_below="@+id/confidentiality_title"/>
-
-                    </RelativeLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/authenticity_info"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/writing_disabled_linear_layout_chat"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@+id/confidentiality_info">
-
-                    <RelativeLayout
-                        android:id="@+id/authenticity_icon_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:id="@+id/authenticity_icon_image"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:src="@drawable/ic_accept"/>
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:id="@+id/authenticity_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/title_mega_authenticity_empty_screen"
-                            android:textColor="@color/name_my_account"
-                            android:textSize="16sp"/>
-
-                        <TextView
-                            android:id="@+id/authenticity_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/mega_authenticity_empty_screen"
-                            android:textColor="@color/mail_my_account"
-                            android:textSize="14sp"
-                            android:layout_below="@+id/authenticity_title"/>
-
-                    </RelativeLayout>
-                </LinearLayout>
+                    android:visibility="gone"
+                    android:background="@color/transparent_white">
+                </RelativeLayout>
 
             </RelativeLayout>
-        </ScrollView>
 
-        <!-- Layout with chat content -->
-        <RelativeLayout
-            android:id="@+id/relative_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/chat_background">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/messages_chat_list_view"
+            <FrameLayout
+                android:id="@+id/chat_emoji_keyboard"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:choiceMode="multipleChoice"
-                android:paddingBottom="12dp"/>
+                android:layout_height="0dp"
+                android:layout_below="@id/writing_linear_layout_chat"
+                />
 
         </RelativeLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_chat"
-            android:layout_width="@dimen/fab_button_small_diameter"
-            android:layout_height="@dimen/fab_button_small_diameter"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            app:elevation="6dp"
-            android:scaleType="center"
-            app:backgroundTint="@color/accentColor"
-            app:pressedTranslationZ="12dp"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_add_white" />
+        <RelativeLayout
+            android:id="@+id/upload_panel_chat"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_above="@+id/writing_container_layout_chat_layout"
+            android:visibility="gone"
+            android:background="@color/accentColor">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:id="@+id/upload_from_gallery_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_upload_image"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/upload_audio_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_upload_audio"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/upload_from_cloud_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_cloud_drive"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/upload_from_filesystem_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_upload_pick_file"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/upload_contact_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_contacts"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/message_container_chat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_chat"
+            android:background="@color/chat_background"
+            android:layout_above="@id/writing_container_layout_chat_layout"
+            android:orientation="vertical">
+
+            <!-- Layout to empty chat -->
+            <ScrollView
+                android:id="@+id/layout_empty_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/chat_background"
+                android:fillViewport="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/mega_info_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:id="@+id/mega_icon_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+                            <ImageView
+                                android:id="@+id/mega_icon_image"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_accept"
+                                android:visibility="invisible"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/mega_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/title_mega_info_empty_screen"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/mega_info"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mega_info_empty_screen"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="14sp"
+                                android:layout_below="@+id/mega_title"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/confidentiality_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_below="@+id/mega_info_layout">
+
+                        <RelativeLayout
+                            android:id="@+id/confidentiality_icon_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+                            <ImageView
+                                android:id="@+id/confidentiality_icon_image"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/ic_accept"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/confidentiality_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/title_mega_confidentiality_empty_screen"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/confidentiality_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mega_confidentiality_empty_screen"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="14sp"
+                                android:layout_below="@+id/confidentiality_title"/>
+
+                        </RelativeLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/authenticity_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_below="@+id/confidentiality_info">
+
+                        <RelativeLayout
+                            android:id="@+id/authenticity_icon_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+                            <ImageView
+                                android:id="@+id/authenticity_icon_image"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/ic_accept"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/authenticity_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/title_mega_authenticity_empty_screen"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16sp"/>
+
+                            <TextView
+                                android:id="@+id/authenticity_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mega_authenticity_empty_screen"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="14sp"
+                                android:layout_below="@+id/authenticity_title"/>
+
+                        </RelativeLayout>
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </ScrollView>
+
+            <!-- Layout with chat content -->
+            <RelativeLayout
+                android:id="@+id/relative_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/chat_background">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/messages_chat_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice"
+                    android:paddingBottom="12dp"/>
+
+            </RelativeLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_chat"
+                android:layout_width="@dimen/fab_button_small_diameter"
+                android:layout_height="@dimen/fab_button_small_diameter"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                app:elevation="6dp"
+                android:scaleType="center"
+                app:backgroundTint="@color/accentColor"
+                app:pressedTranslationZ="12dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add_white" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

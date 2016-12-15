@@ -18,13 +18,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -46,7 +46,6 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.Time;
-import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
@@ -74,7 +73,6 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -121,18 +119,17 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
-import mega.privacy.android.app.lollipop.listeners.ChatPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ContactOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -214,25 +211,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public LinearLayout uploadVideo;
 	public LinearLayout uploadFromSystem;
 	private UploadPanelListener uploadPanelListener;
-	////
-
-	//CHAT PANEL
-	private SlidingUpPanelLayout slidingChatPanel;
-	public TextView titleNameContactChatPanel;
-	public ImageView iconStateChatPanel;
-	public TextView titleMailContactChatPanel;
-	public FrameLayout chatOutLayout;
-	public RoundedImageView chatImageView;
-	public TextView chatInitialLetter;
-	public TextView infoChatText;
-	public LinearLayout chatLayout;
-	public LinearLayout optionInfoChat;
-	public LinearLayout optionLeaveChat;
-	public LinearLayout optionClearHistory;
-	public LinearLayout optionMuteChat;
-	public ImageView optionMuteChatIcon;
-	public TextView optionMuteChatText;
-	private ChatPanelListener chatPanelListener;
 	////
 
 	//Sliding NODES OPTIONS panel
@@ -1364,44 +1342,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		slidingUploadPanel.setVisibility(View.INVISIBLE);
 		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		//////
-
-		//Sliding CHAT panel
-		slidingChatPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_chat);
-		iconStateChatPanel = (ImageView) findViewById(R.id.chat_list_contact_state);
-
-		iconStateChatPanel.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
-		iconStateChatPanel.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
-
-		RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)iconStateChatPanel.getLayoutParams();
-		stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
-		iconStateChatPanel.setLayoutParams(stateIconParams);
-
-		titleNameContactChatPanel = (TextView) findViewById(R.id.chat_list_chat_name_text);
-		titleMailContactChatPanel = (TextView) findViewById(R.id.chat_list_chat_mail_text);
-		chatLayout = (LinearLayout) findViewById(R.id.chat_list_chat);
-		chatImageView = (RoundedImageView) findViewById(R.id.sliding_chat_list_thumbnail);
-		chatInitialLetter = (TextView) findViewById(R.id.sliding_chat_list_initial_letter);
-		infoChatText = (TextView) findViewById(R.id.chat_list_info_chat_text);
-		chatOutLayout = (FrameLayout) findViewById(R.id.chat_list_out_chat);
-		optionInfoChat = (LinearLayout) findViewById(R.id.chat_list_info_chat_layout);
-		optionLeaveChat= (LinearLayout) findViewById(R.id.chat_list_leave_chat_layout);
-		optionClearHistory = (LinearLayout) findViewById(R.id.chat_list_clear_history_chat_layout);
-		optionMuteChat = (LinearLayout) findViewById(R.id.chat_list_mute_chat_layout);
-		optionMuteChatIcon = (ImageView) findViewById(R.id.chat_list_mute_chat_image);
-		optionMuteChatText = (TextView) findViewById(R.id.chat_list_mute_chat_text);
-
-		chatPanelListener = new ChatPanelListener(this);
-
-		optionInfoChat.setOnClickListener(chatPanelListener);
-		optionMuteChat.setOnClickListener(chatPanelListener);
-		optionLeaveChat.setOnClickListener(chatPanelListener);
-		optionClearHistory.setOnClickListener(chatPanelListener);
-		chatOutLayout.setOnClickListener(chatPanelListener);
-
-		slidingChatPanel.setVisibility(View.INVISIBLE);
-		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		//////
+		/////
 
 		//Sliding OPTIONS panel
 		slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
@@ -6524,13 +6465,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		log("Sliding AVATAR options not shown");
-
-		if(slidingChatPanel.getVisibility()==View.VISIBLE||slidingChatPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
-			hideChatPanel();
-			return;
-		}
-
-		log("Sliding CHaT options not shown");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -12675,203 +12609,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(chat!=null){
 			this.selectedChatItem = chat;
 		}
-//		if(fullName!=null){
-//			this.fullNameChat = fullName;
-//		}
 
-		//Set title of screen
-//		ArrayList<MegaContact> contacts = chat.getContacts();
-//
-//		if(contacts.size()==1) {
-//			log("Chat one to one");
-//			titleNameContactChatPanel.setText(fullName);
-//			titleMailContactChatPanel.setText(contacts.get(0).getMail());
-//
-//			addAvatarChatPanel(contacts.get(0).getMail(), fullName);
-//		}
-
-		titleNameContactChatPanel.setText(chat.getTitle());
-
-		if(chat.isGroup()){
-			titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
-			iconStateChatPanel.setVisibility(View.GONE);
-			addAvatarChatPanel(null, chat);
-		}
-		else{
-			long userHandle = chat.getPeerHandle();
-
-			iconStateChatPanel.setVisibility(View.VISIBLE);
-			int state = chat.getOnlineStatus();
-			if(state == MegaChatApi.STATUS_ONLINE){
-				log("This user is connected: "+chat.getTitle());
-				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_connected));
-			}
-			else{
-				log("This user status is: "+state+  " " + chat.getTitle());
-				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_not_connected));
-			}
-
-			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-			MegaUser user = megaApi.getContact(userHandleEncoded);
-			if(user!=null){
-				log("El email del user es: "+user.getEmail());
-				titleMailContactChatPanel.setText(user.getEmail());
-				addAvatarChatPanel(user.getEmail(), chat);
-			}
-			else{
-				log("El user es NULL");
-			}
-		}
-
-		fabButton.setVisibility(View.GONE);
-		if(chat.isGroup()){
-			infoChatText.setText(getString(R.string.group_chat_info_label));
-			optionLeaveChat.setVisibility(View.VISIBLE);
-			optionClearHistory.setVisibility(View.VISIBLE);
-		}
-		else{
-			infoChatText.setText(getString(R.string.contact_properties_activity));
-			optionLeaveChat.setVisibility(View.GONE);
-			optionClearHistory.setVisibility(View.VISIBLE);
-		}
-
-		ChatItemPreferences chatPrefs;
-		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-		if(chatPrefs!=null) {
-			log("Chat prefs exists!!!");
-			boolean notificationsEnabled = true;
-			if (chatPrefs.getNotificationsEnabled() != null) {
-				notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-			}
-
-			if (!notificationsEnabled) {
-				log("Chat is MUTE");
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_notifications_black));
-				optionMuteChatText.setText(getString(R.string.general_unmute));
-			}
-			else{
-				log("Chat with notifications enabled!!");
-				optionMuteChatText.setText(getString(R.string.general_mute));
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_notifications_off_black));
-			}
-		}
-		else{
-			log("Chat prefs is NULL");
-			optionMuteChatText.setText(getString(R.string.general_mute));
-			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_notifications_off_black));
-		}
-
-		slidingChatPanel.setVisibility(View.VISIBLE);
-//		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+		ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void hideChatPanel(){
-		log("hideChatPanel");
-		fabButton.setVisibility(View.VISIBLE);
-		slidingChatPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingChatPanel.setVisibility(View.GONE);
 
-		if (rChatFL != null){
-			rChatFL.resetAdapter();
-		}
-	}
+		View bottomSheet = fragmentContainer.findViewById(R.id.chat_item_bottom_sheet);
+		BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+		behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-	public void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
 
-		File avatar = null;
-		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-		}
-		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-		}
-		Bitmap bitmap = null;
-		if (avatar.exists()){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
-				}
-				else{
-					chatInitialLetter.setVisibility(View.GONE);
-					chatImageView.setImageBitmap(bitmap);
-					return;
-				}
-			}
-		}
-
-		////DEfault AVATAR
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-
-		if(chat.isGroup()){
-			p.setColor(getResources().getColor(R.color.divider_upgrade_account));
-		}
-		else{
-			MegaUser contact = megaApi.getContact(contactMail);
-			if (contact != null) {
-				String color = megaApi.getUserAvatarColor(contact);
-				if (color != null) {
-					log("The color to set the avatar is " + color);
-					p.setColor(Color.parseColor(color));
-				} else {
-					log("Default color to the avatar");
-					p.setColor(getResources().getColor(R.color.lollipop_primary_color));
-				}
-			} else {
-				log("Contact is NULL");
-				p.setColor(getResources().getColor(R.color.lollipop_primary_color));
-			}
-		}
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth() / 2;
-		else
-			radius = defaultAvatar.getHeight() / 2;
-
-		c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
-		chatImageView.setImageBitmap(defaultAvatar);
-
-		Display display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
-		float density = getResources().getDisplayMetrics().density;
-
-		boolean setInitialByMail = false;
-
-		if (chat.getTitle() != null) {
-			if (chat.getTitle().trim().length() > 0) {
-				String firstLetter = chat.getTitle().charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				chatInitialLetter.setText(firstLetter);
-				chatInitialLetter.setTextColor(Color.WHITE);
-				chatInitialLetter.setVisibility(View.VISIBLE);
-			} else {
-				setInitialByMail = true;
-			}
-		} else {
-			setInitialByMail = true;
-		}
-		if (setInitialByMail) {
-			if (contactMail != null) {
-				if (contactMail.length() > 0) {
-					String firstLetter = contactMail.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					chatInitialLetter.setText(firstLetter);
-					chatInitialLetter.setTextColor(Color.WHITE);
-					chatInitialLetter.setVisibility(View.VISIBLE);
-				}
-			}
-		}
-		chatInitialLetter.setTextSize(22);
-		////
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){

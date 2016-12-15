@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chat_item_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/chat_list_chat_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:id="@+id/recent_chat_list_relative_layout_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/sliding_chat_list_thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:scaleType="fitCenter"
+                rounded:border_color="@color/border_file_properties"
+                rounded:border_width="0dp"
+                rounded:corner_radius="20dp" />
+
+            <TextView
+                android:id="@+id/sliding_chat_list_initial_letter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center_horizontal|center_vertical"
+                android:paddingBottom="3dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp">
+
+            <TextView
+                android:id="@+id/chat_list_chat_name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+
+            <ImageView
+                android:id="@+id/chat_list_contact_state"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_alignTop="@id/chat_list_chat_name_text"
+                android:layout_toRightOf="@id/chat_list_chat_name_text"
+                android:background="@null"
+                android:src="@drawable/circle_status_contact_not_connected" />
+
+            <TextView
+                android:id="@+id/chat_list_chat_mail_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/mail_my_account"
+                android:gravity="center_vertical"
+                android:layout_below="@+id/chat_list_chat_name_text"
+                android:textSize="14sp"/>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="72dp"
+        android:background="@color/chat_sliding_panel_separator"/>
+
+    <LinearLayout
+        android:id="@+id/chat_list_info_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/chat_list_info_chat_image"
+            style="@style/dialogActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="2dp"
+            android:src="@drawable/info_ic"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/chat_list_info_chat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:layout_marginLeft="18dp"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chat_list_leave_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/file_leave_chat_image"
+            style="@style/dialogActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:src="@drawable/ic_ignore"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/chat_list_leave_chat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:layout_marginLeft="18dp"
+            android:text="@string/general_leave"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chat_list_clear_history_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/file_clear_history_chat_image"
+            style="@style/dialogActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:src="@drawable/ic_ignore"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/chat_list_clear_history_chat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:layout_marginLeft="18dp"
+            android:text="@string/general_clear"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chat_list_mute_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/chat_list_mute_chat_image"
+            style="@style/dialogActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:src="@drawable/ic_notifications_off_black"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/chat_list_mute_chat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:layout_marginLeft="18dp"
+            android:text="@string/general_mute"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</LinearLayout>
