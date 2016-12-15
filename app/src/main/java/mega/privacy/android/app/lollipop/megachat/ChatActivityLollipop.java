@@ -7,26 +7,23 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,17 +52,15 @@ import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ChatModalBottomSheetDialog;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -122,7 +117,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     GestureDetectorCompat detector;
 
-    RelativeLayout fragmentContainer;
+    CoordinatorLayout fragmentContainer;
     RelativeLayout writingContainerLayout;
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
@@ -292,7 +287,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
-        fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_chat);
+        fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
@@ -802,6 +797,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_video_chat:{
+                log("onClick cab_menu_video_chat");
+
+                ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+                bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 
                 break;
             }

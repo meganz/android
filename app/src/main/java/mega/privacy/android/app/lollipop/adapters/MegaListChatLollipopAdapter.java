@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -829,20 +830,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		switch (v.getId()){	
 			case R.id.recent_chat_list_three_dots:{
-				if (positionClicked == -1){
-					positionClicked = currentPosition;
-					notifyDataSetChanged();
-				}
-				else{
-					if (positionClicked == currentPosition){
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-					else{
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
-				}
 				log("click three dots!");
 				((ManagerActivityLollipop) context).showChatPanel(c);
 				break;
