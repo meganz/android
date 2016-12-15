@@ -51,6 +51,18 @@ public class MegaChatApiJava {
         megaChatApi.addChatListener(createDelegateChatListener(listener));
     }
 
+    public void removeChatRequestListener(MegaChatRequestListenerInterface listener) {
+        megaChatApi.removeChatRequestListener(createDelegateRequestListener(listener, false));
+    }
+
+    public void removeChatRoomListener(MegaChatRoomListenerInterface listener) {
+        megaChatApi.removeChatRoomListener(createDelegateChatRoomListener(listener));
+    }
+
+    public void removeChatListener(MegaChatListenerInterface listener) {
+        megaChatApi.removeChatListener(createDelegateChatListener(listener));
+    }
+
     public void init(boolean resumeSession)
     {
         megaChatApi.init();

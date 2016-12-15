@@ -148,6 +148,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             }
 
             megaChatApi.addChatListener(this);
+
+            if (context instanceof ManagerActivityLollipop){
+                ((ManagerActivityLollipop)context).setChatListenerRecentChatsFragmentLollipop(this);
+            }
         }
         else{
             log("Chat not enabled!");
@@ -158,6 +162,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             }
 
             megaChatApi.addChatListener(this);
+
+            if (context instanceof ManagerActivityLollipop){
+                ((ManagerActivityLollipop)context).setChatListenerRecentChatsFragmentLollipop(this);
+            }
         }
     }
 
@@ -260,6 +268,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
 
         return v;
+    }
+
+    @Override
+    public void onDestroy(){
+        log("onDestroy");
+
+        if (megaChatApi != null){
+            megaChatApi.removeChatListener(this);
+        }
+
+        super.onDestroy();
     }
 
     public static RecentChatsFragmentLollipop newInstance() {

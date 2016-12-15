@@ -46,6 +46,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.Time;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
@@ -147,6 +148,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -493,6 +495,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem newChatMenuItem;
 
 	boolean fromTakePicture = false;
+
+	MegaChatListenerInterface recentChatsFragmentLollipopListener = null;
 
 	//Billing
 
@@ -10945,6 +10949,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showSnackbar(getString(R.string.changing_status_error));
 			}
 		}
+		else if(request.getType() == MegaChatRequest.TYPE_LOGOUT){
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+			startActivity(intent);
+			finish();
+		}
 	}
 
 	@Override
@@ -10980,6 +10993,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
+
+			if (recentChatsFragmentLollipopListener != null){
+				log("remove chatlistener");
+				megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
+			}
+
+			megaChatApi.logout(this);
 //			if (request.getType() == MegaRequest.TYPE_LOGOUT){
 //				log("type_logout");
 //				if (e.getErrorCode() == MegaError.API_ESID){
@@ -13196,6 +13216,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setSelectedChat(MegaChatListItem selectedChatItem) {
 		this.selectedChatItem = selectedChatItem;
+	}
+
+	public void setChatListenerRecentChatsFragmentLollipop(MegaChatListenerInterface recentChatsFragmentLollipopListener){
+		log("setChatListenerRecentChatsFragmentLollipop");
+		this.recentChatsFragmentLollipopListener = recentChatsFragmentLollipopListener;
 	}
 
 //	public String getFullNameChat() {
