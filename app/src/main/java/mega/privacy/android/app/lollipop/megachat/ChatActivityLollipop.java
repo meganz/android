@@ -789,6 +789,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
+                if(uploadPanel.getVisibility()==View.VISIBLE){
+                    hideUploadPanel();
+                    break;
+                }
+
                 finish();
                 break;
             }
