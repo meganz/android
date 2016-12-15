@@ -864,4 +864,11 @@
 
     <string name="no_results_found" context="Text shown after searching and no results found">No se encontraron resultados</string>
 
+    <string name="menu_choose_contact" context="Menu option to add a contact to your contact list.">Elegir contacto</string>
+
+    <plurals name="general_selection_num_contacts">
+        <item context="referring to a contact in the contact list of the user" quantity="one">%1$d contacto</item>
+        <item context="Title of the contact list" quantity="other">%1$d contactos</item>
+    </plurals>
+
 </resources>

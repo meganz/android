@@ -708,7 +708,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             }
         }
         else {
-            aB.setTitle("Add contact");
+            aB.setTitle(getString(R.string.menu_add_contact));
 
             if (sendInvitationMenuItem != null){
                 sendInvitationMenuItem.setVisible(false);
@@ -1008,7 +1008,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             }
 
             if (selectedContactsMEGA.size() == 0){
-                aB.setTitle("Choose contact");
+                aB.setTitle(getString(R.string.menu_choose_contact));
                 if (sendInvitationMenuItem != null){
                     sendInvitationMenuItem.setVisible(false);
                 }
@@ -1021,19 +1021,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                     }
                 }
                 if (counter == 0){
-                    aB.setTitle("Choose contact");
+                    aB.setTitle(getString(R.string.menu_choose_contact));
                     if (sendInvitationMenuItem != null){
                         sendInvitationMenuItem.setVisible(false);
                     }
                 }
-                else if (counter == 1){
-                    aB.setTitle(counter + " contact");
-                    if (sendInvitationMenuItem != null){
-                        sendInvitationMenuItem.setVisible(true);
-                    }
-                }
                 else{
-                    aB.setTitle(counter + " contacts");
+                    aB.setTitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts, counter, counter));
                     if (sendInvitationMenuItem != null){
                         sendInvitationMenuItem.setVisible(true);
                     }
@@ -1082,7 +1076,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             }
 
             if (selectedContactsPhone.size() == 0){
-                aB.setTitle("Add contact");
+                aB.setTitle(getString(R.string.menu_add_contact));
                 if (sendInvitationMenuItem != null){
                     sendInvitationMenuItem.setVisible(false);
                 }
@@ -1095,19 +1089,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                     }
                 }
                 if (counter == 0){
-                    aB.setTitle("Add contact");
+                    aB.setTitle(getString(R.string.menu_add_contact));
                     if (sendInvitationMenuItem != null){
                         sendInvitationMenuItem.setVisible(false);
                     }
                 }
-                else if (counter == 1){
-                    aB.setTitle(counter + " contact");
-                    if (sendInvitationMenuItem != null){
-                        sendInvitationMenuItem.setVisible(true);
-                    }
-                }
                 else{
-                    aB.setTitle(counter + " contacts");
+                    aB.setTitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts, counter, counter));
                     if (sendInvitationMenuItem != null){
                         sendInvitationMenuItem.setVisible(true);
                     }
