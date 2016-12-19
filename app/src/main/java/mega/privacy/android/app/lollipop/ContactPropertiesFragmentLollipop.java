@@ -626,9 +626,11 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		log("onItemClick");
 		overflowMenuLayout.setVisibility(View.GONE);
 		String itemText = (String) parent.getItemAtPosition(position);
 		if (itemText.compareTo(getString(R.string.context_share_folder)) == 0){
+			log("User email to share: "+userEmail);
 			((ContactPropertiesActivityLollipop)context).pickFolderToShare(userEmail);
 		}
 		else if (itemText.compareTo(getString(R.string.context_view_shared_folders)) == 0){

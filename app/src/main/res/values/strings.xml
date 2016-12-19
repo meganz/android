@@ -839,4 +839,8 @@
     <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">This cancel link has expired, please try again.</string>
 
     <string name="no_results_found" context="Text shown after searching and no results found">No results were found</string>
+
+    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Error sharing the folder. Please, try again.</string>
+
+    <string name="incoming_shares_label" context="title of the section that shows all the incoming shared items">Incoming shares</string>
 </resources>
