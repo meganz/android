@@ -575,7 +575,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				else{
 					log("Selected: "+p.getFullName());
 				}
-				((GroupChatInfoActivityLollipop) context).showParticipantsOptionsPanel(p);
+				((GroupChatInfoActivityLollipop) context).showParticipantsPanel(p);
 				break;
 			}
 			case R.id.add_participant_list_item_layout:{
