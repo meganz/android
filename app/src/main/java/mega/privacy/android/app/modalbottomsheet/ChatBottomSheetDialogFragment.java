@@ -335,8 +335,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     log("Selected chat NULL");
                 }
                 log("Clear chat with: "+chat.getTitle());
-                ChatController chatC = new ChatController(context);
-                chatC.clearHistory(chat.getChatId());
+                ((ManagerActivityLollipop)context).showConfirmationClearChat(chat);
+
                 break;
             }
             case R.id.chat_list_mute_chat_layout:{

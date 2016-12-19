@@ -8551,6 +8551,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationClearChat(final MegaChatListItem c){
+		log("showConfirmationClearChat");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Clear chat!");
+//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
+						log("Clear history selected!");
+						ChatController chatC = new ChatController(managerActivity);
+						chatC.clearHistory(c.getChatId());
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		String message= getResources().getString(R.string.confirmation_clear_group_chat);
+		builder.setTitle(R.string.title_confirmation_clear_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
 	public void showConfirmationResetPasswordFromMyAccount (){
 		log("showConfirmationResetPasswordFromMyAccount: ");
 
@@ -12612,15 +12641,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	public void hideChatPanel(){
-
-		View bottomSheet = fragmentContainer.findViewById(R.id.chat_item_bottom_sheet);
-		BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-		behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){
