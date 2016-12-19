@@ -29,6 +29,8 @@
 
 %runtime
 %{
+
+#ifndef KARERE_DISABLE_WEBRTC
     extern JavaVM *MEGAjvm;
     namespace webrtc 
     {
@@ -38,10 +40,14 @@
                 static void Initialize(JavaVM* jvm, jobject context);
         };
     };
+#endif
+
 %}
 
 %typemap(check) mega::MegaApi *megaApi
 %{
+
+#ifndef KARERE_DISABLE_WEBRTC
     if (!MEGAjvm)
     { 
         jenv->GetJavaVM(&MEGAjvm);
@@ -55,7 +61,10 @@
     // Initialize the Java environment (currently only used by the audio manager).
     webrtc::JVM::Initialize(MEGAjvm, context);
     //MEGAjvm->DetachCurrentThread();
+#endif
+
 %}
+
 #endif
 
 //Generate inheritable wrappers for listener objects
