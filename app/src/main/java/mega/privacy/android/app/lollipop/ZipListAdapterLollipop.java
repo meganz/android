@@ -132,9 +132,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 			holder.textViewFileSize.setText(info);
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			
-			//TODO: how to know the files & folders inside
-			
-			
 		}
 		else{
 			int	index = nameFile.lastIndexOf("/");			
