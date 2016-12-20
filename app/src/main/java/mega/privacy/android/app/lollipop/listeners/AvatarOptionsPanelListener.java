@@ -42,7 +42,6 @@ public class AvatarOptionsPanelListener implements View.OnClickListener {
             case R.id.avatar_list_choose_photo_layout:{
                 log("option choose photo avatar");
                 ((ManagerActivityLollipop) context).hideAvatarOptionsPanel();
-                ((ManagerActivityLollipop)context).hideUploadPanel();
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
