@@ -164,7 +164,7 @@
         </activity>
         
        <activity 
-            android:name="LauncherFileExplorerActivity"
+            android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -182,12 +182,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/app_name">
-        </activity>
-        
         <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
                 android:label="@string/app_name">                
        </activity>

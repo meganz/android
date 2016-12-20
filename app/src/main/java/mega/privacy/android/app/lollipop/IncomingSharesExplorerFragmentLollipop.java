@@ -19,8 +19,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
-
-import mega.privacy.android.app.LauncherFileExplorerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
@@ -77,12 +75,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		deepBrowserTree=0;
 		parentHandle = -1;
-		
-		Bundle bundle = this.getArguments();
-		if (bundle != null) {
-		    modeCloud = bundle.getInt("MODE", FileExplorerActivityLollipop.COPY);
-		    selectFile = bundle.getBoolean("SELECTFILE", false);
-		}
 	}
 
 	@Override
@@ -159,6 +151,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			adapter.setNodes(nodes);
 			adapter.setSelectFile(selectFile);
 		}
+
+		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
+		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionText.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));			
@@ -265,14 +260,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 	
 	public void changeActionBarTitle(String folder){
-		if (context instanceof LauncherFileExplorerActivity){
-			((LauncherFileExplorerActivity) context).changeTitle(folder);
-			((LauncherFileExplorerActivity)context).supportInvalidateOptionsMenu();
-		}
-		else if (context instanceof FileExplorerActivityLollipop){
-			((FileExplorerActivityLollipop) context).changeTitle(folder);
-			((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
-		}
+		((FileExplorerActivityLollipop) context).changeTitle(folder);
+		((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
 	}
 	
 	@Override
@@ -284,24 +273,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.action_text:{	
-				if (context instanceof LauncherFileExplorerActivity){
-					((LauncherFileExplorerActivity) context).buttonClick(parentHandle);
-				}
-				else if (context instanceof FileExplorerActivityLollipop){
-					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
-				}
+			case R.id.action_text:{
+				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
 				break;
 			}
 			case R.id.cancel_text:{
-				if (context instanceof LauncherFileExplorerActivity){
-					log("Cancel back to Cloud");
-					((LauncherFileExplorerActivity) context).backToCloud(-1);
-					((LauncherFileExplorerActivity) context).finish();
-				}
-				else if (context instanceof FileExplorerActivityLollipop){
-					((FileExplorerActivityLollipop) context).finish();
-				}
+				((FileExplorerActivityLollipop) context).finish();
 				break;
 			}
 		}
@@ -372,12 +349,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					MegaNode parentFile = megaApi.getParentNode(nFile);
 					if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
 					{
-						if (context instanceof LauncherFileExplorerActivity){
-							((LauncherFileExplorerActivity) context).buttonClick(nFile.getHandle());
-						}
-						else if (context instanceof FileExplorerActivityLollipop){
-							((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
-						}
+						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
 					}
 					else{
 						Toast.makeText(context, getString(R.string.context_send_no_permission), Toast.LENGTH_LONG).show();

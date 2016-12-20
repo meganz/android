@@ -27,7 +27,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.LauncherFileExplorerActivity;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -80,7 +80,7 @@ public class ShareInfo {
 	public static List<ShareInfo> processIntent(Intent intent, Context context) {
 		log(intent.getAction() + " of action");
 		
-		if (intent.getAction() == null || intent.getAction().equals(LauncherFileExplorerActivity.ACTION_PROCESSED)||intent.getAction().equals(LauncherFileExplorerActivity.ACTION_PROCESSED)) {
+		if (intent.getAction() == null || intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)||intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)) {
 			return null;
 		}
 		if (context == null) {
@@ -131,10 +131,10 @@ public class ShareInfo {
 			return null;
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(LauncherFileExplorerActivity.ACTION_PROCESSED);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		}
 		else{
-			intent.setAction(LauncherFileExplorerActivity.ACTION_PROCESSED);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		}
 		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
@@ -173,10 +173,10 @@ public class ShareInfo {
 		}
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(LauncherFileExplorerActivity.ACTION_PROCESSED);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		}
 		else{
-			intent.setAction(LauncherFileExplorerActivity.ACTION_PROCESSED);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		}
 		
 		return result;
@@ -208,13 +208,9 @@ public class ShareInfo {
 			}
 			result.add(info);
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(LauncherFileExplorerActivity.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(LauncherFileExplorerActivity.ACTION_PROCESSED);
-		}
-		
+
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+
 		return result;
 	}
 	
