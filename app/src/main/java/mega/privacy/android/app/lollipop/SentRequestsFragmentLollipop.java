@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
+	TextView contentText;
+	RelativeLayout contentTextLayout;
 	RecyclerView.LayoutManager mLayoutManager;
 	MegaContactRequest selectedRequest = null;
 	
@@ -274,6 +277,11 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 			} else {
 				adapterList.setContacts(contacts);
 			}
+
+			if (contacts.size() > 0) {
+				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
+			}
+
 			adapterList.setPositionClicked(-1);
 
 			if (adapterList.getItemCount() == 0) {
@@ -281,11 +289,13 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 				emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				emptyTextView.setText(R.string.sent_requests_empty);
 				listView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			} else {
 				log("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -337,11 +347,19 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 			emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 			emptyTextView.setText(R.string.sent_requests_empty);
 
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_requests_list_content_text_layout);
+
+			contentText = (TextView) v.findViewById(R.id.contact_requests_list_content_text);
+
 			if (adapterList == null){
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
+			}
+
+			if (contacts.size() > 0) {
+				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
 			}
 		
 			adapterList.setPositionClicked(-1);
@@ -352,13 +370,14 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 				emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				emptyTextView.setText(R.string.sent_requests_empty);
 				listView.setVisibility(View.GONE);
-
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				log("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
