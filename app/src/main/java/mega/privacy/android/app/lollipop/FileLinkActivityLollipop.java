@@ -302,7 +302,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.alert_decryption_key));
 		builder.setMessage(getString(R.string.message_decryption_key));
 		builder.setPositiveButton(getString(R.string.general_decryp),

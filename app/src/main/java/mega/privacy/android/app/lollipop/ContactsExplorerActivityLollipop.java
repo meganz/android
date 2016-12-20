@@ -301,7 +301,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.menu_add_contact_and_share));
 		builder.setPositiveButton(getString(R.string.general_add),
 				new DialogInterface.OnClickListener() {
