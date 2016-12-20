@@ -7940,7 +7940,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_remove_contact,c.getEmail());
+		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
+		builder.setTitle(title);
+		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
@@ -7963,14 +7965,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		};
 
-		String message="";
 		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
-		if(c.size()==1){
-			message= getResources().getString(R.string.confirmation_remove_contact,c.get(0).getEmail());
-		}else{
-			message= getResources().getString(R.string.confirmation_remove_multiple_contacts,c.size());
-		}
-
+		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, c.size());
+		builder.setTitle(title);
+		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, c.size());
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
