@@ -28,33 +28,7 @@
         android:layout_height="48dp"
         android:scaleType="fitCenter"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/file_list_saved_offline" />    
-   
-    
-    <TextView
-        android:id="@+id/file_list_filename"
-        android:layout_width="225dp"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/file_list_thumbnail"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="13dp"
-        android:textColor="@color/file_list_first_row"
-        android:maxLines="2"
-		android:ellipsize="end"
-		android:singleLine="false"
-        android:textSize="14sp"/>
-    
-    <TextView
-        android:id="@+id/file_list_filesize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/file_list_thumbnail"
-        android:layout_below="@+id/file_list_filename"
-        android:textColor="@color/file_list_second_row"
-        android:layout_marginLeft="13dp"
-        android:textSize="14sp"
-        android:ellipsize="end"
-        android:maxLines="1"/>
+        android:layout_toRightOf="@id/file_list_saved_offline" />
 <!--    
         <TextView
         android:id="@+id/file_list_owner"
@@ -73,8 +47,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_dots_vertical_grey"
-		android:background="@null" 
-		android:paddingLeft="10dp"
+		android:background="@null"
+		android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
 		android:layout_centerVertical="true" />
 
@@ -84,6 +58,8 @@
 		android:layout_height="wrap_content"
 		android:src="@drawable/ic_permissions_full_access"
 		android:background="@null"
+		android:layout_marginRight="12dp"
+		android:layout_marginLeft="12dp"
 		android:layout_toLeftOf="@id/file_list_three_dots"
 		android:layout_centerVertical="true"
 		android:visibility="gone"/>
@@ -96,19 +72,36 @@
 		android:background="@null" 
 		android:tint="@color/transparency_white"
         android:layout_centerVertical="true"
+		android:layout_marginRight="12dp"
+		android:layout_marginLeft="12dp"
         android:layout_toLeftOf="@id/file_list_three_dots"/> 
         
-    <ImageView
-        android:id="@+id/file_list_public_link_multiselect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/link_ic"
-		android:background="@null"
-		android:tint="@color/transparency_white"
-        android:layout_marginRight="10dp"
-		android:layout_centerVertical="true"
-		android:layout_alignParentRight="true"/>
+	<TextView
+		android:id="@+id/file_list_filename"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/file_list_thumbnail"
+		android:layout_toLeftOf="@id/file_list_public_link"
+		android:layout_marginTop="15dp"
+		android:layout_marginLeft="12dp"
+		android:textColor="@color/file_list_first_row"
+		android:maxLines="1"
+		android:singleLine="true"
+		android:ellipsize="middle"
+		android:textSize="16sp"/>
 
+	<TextView
+		android:id="@+id/file_list_filesize"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/file_list_thumbnail"
+		android:layout_toLeftOf="@id/file_list_public_link"
+		android:layout_below="@+id/file_list_filename"
+		android:textColor="@color/file_list_second_row"
+		android:layout_marginLeft="13dp"
+		android:textSize="14sp"
+		android:ellipsize="end"
+		android:maxLines="1"/>
     
      <ProgressBar
 	    android:id="@+id/transfers_list_browser_bar"

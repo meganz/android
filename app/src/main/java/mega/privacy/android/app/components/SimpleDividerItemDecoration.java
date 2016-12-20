@@ -21,22 +21,18 @@ import android.view.View;
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
     DisplayMetrics outMetrics;
+    Context context;
  
     public SimpleDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
         mDivider = context.getResources().getDrawable(R.drawable.line_divider);
         this.outMetrics = outMetrics;
+        this.context = context;
     }
 
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        int left;
-        if(outMetrics!=null){
-            left = parent.getPaddingLeft()+ Util.scaleWidthPx(73, outMetrics);
-        }
-        else{
-            left = parent.getPaddingLeft()+ 212;
-        }
 
+        int left = (int) context.getResources().getDimension(R.dimen.recycler_view_separator);
         int right = parent.getWidth() - parent.getPaddingRight();
  
         int childCount = parent.getChildCount();

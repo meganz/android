@@ -20,4 +20,6 @@
     
     <dimen name="status_bar_height">24dp</dimen>
     <dimen name="left_margin_back_arrow">16dp</dimen>
+
+    <dimen name="recycler_view_separator">72dp</dimen>
 </resources>
