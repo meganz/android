@@ -151,7 +151,7 @@ if [ "$1" == "bindings" ]; then
     createMEGABindings
     echo "* Bindings ready!"
     echo "* Running ndk-build"
-    ${NDK_BUILD}
+    ${NDK_BUILD} -j8
     echo "* ndk-build finished"
     echo "* Task finished OK"
     exit 0
@@ -164,17 +164,17 @@ if [ "$1" == "clean" ]; then
     
     echo "* Deleting source folders"    
     rm -rf ${CRYPTOPP_SOURCE_FOLDER}
-	rm -rf ${SQLITE_SOURCE_FOLDER} ${SQLITE}/${SQLITE_BASE_NAME}
-	rm -rf ${CURL}/${CURL_SOURCE_FOLDER}
-	rm -rf ${CURL}/${CURL}
-	rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
-	rm -rf ${CURL}/ares
-	rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}
-	rm -rf ${OPENSSL}/${OPENSSL}
-	rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
-	rm -rf ${SODIUM}/${SODIUM}
-	rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
-	rm -rf ${LIBUV}/${LIBUV}
+    rm -rf ${SQLITE_SOURCE_FOLDER} ${SQLITE}/${SQLITE_BASE_NAME}
+    rm -rf ${CURL}/${CURL_SOURCE_FOLDER}
+    rm -rf ${CURL}/${CURL}
+    rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
+    rm -rf ${CURL}/ares
+    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}
+    rm -rf ${OPENSSL}/${OPENSSL}
+    rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
+    rm -rf ${SODIUM}/${SODIUM}
+    rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
+    rm -rf ${LIBUV}/${LIBUV}
     rm -rf ${LIBEXPAT}/${LIBEXPAT}
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
     rm -rf megachat/karere-native
@@ -182,16 +182,16 @@ if [ "$1" == "clean" ]; then
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready
-	rm -rf ${SQLITE}/${SQLITE_SOURCE_FILE}
+    rm -rf ${SQLITE}/${SQLITE_SOURCE_FILE}
     rm -rf ${SQLITE}/${SQLITE_SOURCE_FILE}.ready
-	rm -rf ${CURL}/${CURL_SOURCE_FILE}
-	rm -rf ${CURL}/${ARES_SOURCE_FILE}
+    rm -rf ${CURL}/${CURL_SOURCE_FILE}
+    rm -rf ${CURL}/${ARES_SOURCE_FILE}
     rm -rf ${CURL}/${CURL_SOURCE_FILE}.ready
-	rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}
+    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}
     rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready
-	rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}
+    rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
-	rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
+    rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready
@@ -246,6 +246,7 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     pushd ${SODIUM}/${SODIUM} &> ${LOG_FILE}
     export ANDROID_NDK_HOME=${NDK_ROOT}
     ./autogen.sh &> ${LOG_FILE}
+    sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
     echo "* Prebuilding libsodium for ARM"
     dist-build/android-arm.sh &> ${LOG_FILE}
     echo "* Prebuilding libsodium for x86"
@@ -320,7 +321,7 @@ echo "* cURL with c-ares is ready"
 
 echo "* All dependencies are prepared!"
 echo "* Running ndk-build"
-${NDK_BUILD}
+${NDK_BUILD} -j8
 echo "* ndk-build finished"
 echo "* Task finished OK"
 
