@@ -1,5 +1,5 @@
 APP_PLATFORM=android-21
-NDK_TOOLCHAIN_VERSION=clang3.5
+NDK_TOOLCHAIN_VERSION=clang
 APP_STL := c++_static
 APP_ABI := armeabi x86
 APP_OPTIM := release
