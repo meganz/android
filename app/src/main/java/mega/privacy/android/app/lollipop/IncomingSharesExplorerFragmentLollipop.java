@@ -56,6 +56,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	TextView cancelText;
 	LinearLayout optionsBar;
 
+	public static IncomingSharesExplorerFragmentLollipop newInstance() {
+		log("newInstance");
+		IncomingSharesExplorerFragmentLollipop fragment = new IncomingSharesExplorerFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);

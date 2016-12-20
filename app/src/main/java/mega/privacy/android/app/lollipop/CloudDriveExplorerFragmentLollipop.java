@@ -58,6 +58,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	TextView cancelText;
 	View separator;
 
+	public static CloudDriveExplorerFragmentLollipop newInstance() {
+		log("newInstance");
+		CloudDriveExplorerFragmentLollipop fragment = new CloudDriveExplorerFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -77,8 +83,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (bundle != null) {
 		    modeCloud = bundle.getInt("MODE", LauncherFileExplorerActivity.COPY);
 		    selectFile = bundle.getBoolean("SELECTFILE", false);
+			log("onCreate mode: "+modeCloud);
 		}
-		log("onCreate mode: "+modeCloud);
+		else{
+			log("onCreate NOT BUNDLE!!");
+		}
+
 //		first=true;
 	}
 
