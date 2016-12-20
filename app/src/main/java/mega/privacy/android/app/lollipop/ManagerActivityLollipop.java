@@ -8855,6 +8855,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("hideAvatarOptionsPanel");
 		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		slidingAvatarOptionsPanel.setVisibility(View.GONE);
+		fabButton.setVisibility(View.GONE);
 	}
 
 	private void showOverquotaAlert(){
