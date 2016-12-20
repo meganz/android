@@ -56,7 +56,7 @@
 #define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the <arpa/nameser_compat.h> header file. */
-#define HAVE_ARPA_NAMESER_COMPAT_H 1
+/* #undef HAVE_ARPA_NAMESER_COMPAT_H */
 
 /* Define to 1 if you have the <arpa/nameser.h> header file. */
 #define HAVE_ARPA_NAMESER_H 1
@@ -390,7 +390,7 @@
 #define RECVFROM_TYPE_ARG3 size_t
 
 /* Define to the type of arg 4 for recvfrom. */
-#define RECVFROM_TYPE_ARG4 int
+#define RECVFROM_TYPE_ARG4 unsigned int
 
 /* Define to the type pointed by arg 5 for recvfrom. */
 #define RECVFROM_TYPE_ARG5 struct sockaddr
@@ -417,7 +417,7 @@
 #define RECV_TYPE_ARG3 size_t
 
 /* Define to the type of arg 4 for recv. */
-#define RECV_TYPE_ARG4 int
+#define RECV_TYPE_ARG4 unsigned int
 
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV int
@@ -438,7 +438,7 @@
 #define SEND_TYPE_ARG3 size_t
 
 /* Define to the type of arg 4 for send. */
-#define SEND_TYPE_ARG4 int
+#define SEND_TYPE_ARG4 unsigned int
 
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV int
