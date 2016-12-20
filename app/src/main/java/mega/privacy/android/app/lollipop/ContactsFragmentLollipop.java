@@ -125,9 +125,9 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 					break;
 				}
 				case R.id.cab_menu_delete:{
+					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
 
 					break;
 				}

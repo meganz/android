@@ -469,7 +469,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		});
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.alert_decryption_key));
 		builder.setMessage(getString(R.string.message_decryption_key));
 		builder.setPositiveButton(getString(R.string.general_decryp),
@@ -998,7 +998,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					else{
 						try{
 							log("API_EARGS - show alert dialog");
-							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 							builder.setMessage(getString(R.string.general_error_folder_not_found));
 							builder.setTitle(getString(R.string.general_error_word));
 
@@ -1029,7 +1029,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				else{
 					try{
 						log("no link - show alert dialog");
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);
+						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 
@@ -1102,7 +1102,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(request.getFlag()){
 						log("Login into a folder with invalid decryption key");
 						try{
-							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 							builder.setMessage(getString(R.string.general_error_invalid_decryption_key));
 							builder.setTitle(getString(R.string.general_error_word));
 
@@ -1148,7 +1148,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 				else{
 					try{ 
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);					
+						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			            builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 						
@@ -1176,7 +1176,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			else{
 				log("Error: "+e.getErrorCode()+" "+e.getErrorString());
 				try{
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 					if(e.getErrorCode() == MegaError.API_EBLOCKED){
 						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));
