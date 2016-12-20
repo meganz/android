@@ -230,12 +230,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.textViewContactName = (TextView) v.findViewById(R.id.shared_folder_contact_name);
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.shared_folder_contact_three_dots);
-		
-		//Right margin
-		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-		holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);	
-		
+
 		v.setTag(holder); 
 		
 		return holder;
@@ -247,7 +242,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		log("onBindViewHolder");
 		
 		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			log("positionClicked: "+positionClicked+" position: "+position);
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
@@ -266,7 +260,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				holder.itemLayout.setBackgroundColor(Color.WHITE);				
 			}
 		} else {
-			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
@@ -298,6 +291,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			}
 			else{
 				log("The contactDB is null: ");
+				holder.textViewContactName.setText(holder.contactMail);
 			}			
 
 			MegaUser user = megaApi.getContact(holder.contactMail);
@@ -411,7 +405,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 		holder.imageView.setImageBitmap(defaultAvatar);
 		
-		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -419,17 +412,27 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	    
 	    int avatarTextSize = getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
-	    
-	    if (holder.contactMail != null){
-		    if (holder.contactMail.length() > 0){
-		    	String firstLetter = holder.contactMail.charAt(0) + "";
-		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		    	holder.initialLetter.setVisibility(View.VISIBLE);
-		    	holder.initialLetter.setText(firstLetter);
-		    	holder.initialLetter.setTextSize(32);
-		    	holder.initialLetter.setTextColor(Color.WHITE);
-		    }
-	    }
+		String firstLetter = "";
+
+		if(holder.textViewContactName!=null){
+			String fullName = holder.textViewContactName.getText().toString();
+			firstLetter = fullName.charAt(0) + "";
+			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+		}
+		else{
+			if (holder.contactMail != null){
+				if (holder.contactMail.length() > 0){
+					firstLetter = holder.contactMail.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				}
+			}
+		}
+
+		holder.initialLetter.setVisibility(View.VISIBLE);
+		holder.initialLetter.setText(firstLetter);
+		holder.initialLetter.setTextSize(24);
+		holder.initialLetter.setTextColor(Color.WHITE);
+
 	}
 	
 	private int getAvatarTextSize (float density){
