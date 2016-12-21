@@ -882,6 +882,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			MegaChatListItem chat = chats.get(position);
 			log("ChatRoom title: "+chat.getTitle());
 			holder.textViewContactName.setText(chat.getTitle());
+			if(!chat.isGroup()){
+				holder.fullName = chat.getTitle();
+			}
 		}
 	}
 
