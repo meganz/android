@@ -638,7 +638,7 @@ public class Util {
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
-		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
+		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, "[clientApp] "+ origin + ": " + message, origin);
 
 //		try {
 //			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

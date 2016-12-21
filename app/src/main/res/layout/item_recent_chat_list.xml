@@ -25,9 +25,10 @@
 
         <TextView
             android:id="@+id/recent_chat_list_initial_letter"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:textSize="22sp"
             android:gravity="center_horizontal|center_vertical"
             android:paddingBottom="3dp" />
 
@@ -51,7 +52,7 @@
         android:textSize="16sp"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="10dp"
         android:singleLine="true"
         android:maxLines="1"
         android:textColor="@color/file_list_first_row" />
@@ -62,7 +63,7 @@
         android:layout_height="6dp"
         android:layout_alignTop="@id/recent_chat_list_name"
         android:layout_toRightOf="@id/recent_chat_list_name"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="3dp"
         android:layout_marginLeft="6dp"
         android:background="@null"
         android:src="@drawable/circle_status_contact_not_connected" />
@@ -116,6 +117,7 @@
         android:layout_below="@id/recent_chat_list_content"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="16dp"
+        android:layout_marginTop="2dp"
         android:textSize="12sp"
         android:ellipsize="end"
         android:singleLine="true"

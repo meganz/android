@@ -445,13 +445,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                fullName = tempFullName;
 
             MegaChatParticipant participant = null;
-//            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerHandle);
-//            MegaUser participantContact = megaApi.getContact(userHandleEncoded);
-            String participantEmail = megaChatApi.getUserEmail(peerHandle);
-            if(participantEmail!=null){
-                log("Email of the participant: "+participantEmail);
-                participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
-
+            String userHandleEncoded = megaApi.userHandleToBase64(peerHandle);
+            MegaUser participantContact = megaApi.getContact(userHandleEncoded);
+            if(participantContact!=null){
+                String participantEmail = megaChatApi.getUserEmail(peerHandle);
+                if (participantContact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                    log("Email of the participant: "+participantEmail);
+                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
+                }
+                else{
+                    log("Email of the participant: NOT VISIBLE any more: "+participantEmail);
+                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
+                }
             }
             else{
                 log("Email of the participant: NON CONTACT");
@@ -567,6 +572,24 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("changeTitle: "+title);
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.changeTitle(chatHandle, title);
+    }
+
+    public void startConversation(MegaChatParticipant participant){
+        log("startConversation");
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(participant.getHandle());
+        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+        if(chat==null){
+            log("No chat, create it!");
+            peers.addPeer(participant.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+            megaChatApi.createChat(false, peers, this);
+        }
+        else{
+            log("There is already a chat, open it!");
+            Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+            this.startActivity(intentOpenChat);
+        }
     }
 
     public void showChangePermissionsDialog(MegaChatParticipant participant, MegaChatRoom chatToChange){
@@ -1238,6 +1261,22 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             else{
                 log("Error inviting: "+e.getErrorString()+" "+e.getErrorCode());
                 showSnackbar(getString(R.string.add_participant_error));
+            }
+        }
+        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+            log("Create chat request finish!!!");
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
+                log("open new chat");
+                Intent intent = new Intent(this, ChatActivityLollipop.class);
+                intent.setAction(Constants.ACTION_CHAT_NEW);
+                intent.putExtra("CHAT_ID", request.getChatHandle());
+                this.startActivity(intent);
+
+            }
+            else{
+                log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+                showSnackbar(getString(R.string.create_chat_error));
             }
         }
     }
