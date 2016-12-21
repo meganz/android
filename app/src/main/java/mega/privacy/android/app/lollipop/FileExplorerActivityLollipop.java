@@ -284,11 +284,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		log("aB.setHomeAsUpIndicator_65");
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setDisplayShowHomeEnabled(true);
+		if(aB!=null){
+			aB.hide();
+		}
+		else{
+			log("aB is null");
+		}
 
 		//TABS
 		fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
@@ -308,7 +309,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         		
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
+			log("hide action bar");
 			getSupportActionBar().hide();
+			fileExplorerSectionLayout.setVisibility(View.GONE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
 			loginLoggingIn.setVisibility(View.VISIBLE);
@@ -324,9 +327,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else{
 			afterLoginAndFetch();
-		}		
-	
-		aB.setTitle(getString(R.string.section_cloud_drive));	
+		}
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -335,8 +336,20 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private void afterLoginAndFetch(){
 		log("afterLoginAndFetch");
 		
-		handler = new Handler();		
-		
+		handler = new Handler();
+
+		log("SHOW action bar");
+		if(aB==null){
+			aB=getSupportActionBar();
+		}
+		aB.show();
+		log("aB.setHomeAsUpIndicator_65");
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setDisplayShowHomeEnabled(true);
+		aB.setTitle(getString(R.string.section_cloud_drive));
+
 		if ((intent != null) && (intent.getAction() != null)){
 			log("intent OK: "+intent.getAction());
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
@@ -1277,9 +1290,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				dbH.saveCredentials(credentials);
 				
 				loginLoggingIn.setVisibility(View.GONE);
-				getSupportActionBar().show();
-				afterLoginAndFetch();				
- 
+
+				afterLoginAndFetch();
 			}	
 		}
 	}
