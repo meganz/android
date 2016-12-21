@@ -289,7 +289,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             case R.id.start_chat_group_participants_chat_layout: {
                 log("start chat participants panel");
-                ((GroupChatInfoActivityLollipop) context).showSnackbar("Not yet implemented!");
+                ((GroupChatInfoActivityLollipop) context).startConversation(selectedParticipant);
                 break;
             }
 
