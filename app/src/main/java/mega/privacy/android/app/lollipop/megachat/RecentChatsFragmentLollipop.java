@@ -193,6 +193,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
         mLayoutManager = new MegaLinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
+        listView.setHasFixedSize(true);
         //Just onClick implemented
         listView.addOnItemTouchListener(this);
         listView.setItemAnimator(new DefaultItemAnimator());
