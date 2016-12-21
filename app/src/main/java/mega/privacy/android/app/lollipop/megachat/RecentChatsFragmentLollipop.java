@@ -332,13 +332,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
             if (adapterList == null){
                 adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                listView.setAdapter(adapterList);
             }
             else{
                 adapterList.setChats(chats);
             }
 
             adapterList.setPositionClicked(-1);
-            listView.setAdapter(adapterList);
 
             if (adapterList.getItemCount() == 0){
                 log("adapterList.getItemCount() == 0");
