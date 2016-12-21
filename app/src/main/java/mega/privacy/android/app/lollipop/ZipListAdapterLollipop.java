@@ -46,7 +46,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 		RelativeLayout itemLayout;
 
 		public ImageView publicLinkImage;
-		public ImageView publicLinkImageMultiselect;
 		//ImageView arrowSelection;
 		LinearLayout optionsLayout;
 		//ImageView optionDownload;
@@ -101,7 +100,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_browser_bar);
 			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
-			holder.publicLinkImageMultiselect = (ImageView) convertView.findViewById(R.id.file_list_public_link_multiselect);
 			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
@@ -114,8 +112,7 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 
 		holder.savedOffline.setVisibility(View.INVISIBLE);
 		holder.transferProgressBar.setVisibility(View.GONE);
-		holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-		holder.publicLinkImage.setVisibility(View.GONE);
+		holder.publicLinkImage.setVisibility(View.INVISIBLE);
 		holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 		ZipEntry zipNode = (ZipEntry) getItem(position);		
@@ -134,9 +131,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 			
 			holder.textViewFileSize.setText(info);
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			
-			//TODO: how to know the files & folders inside
-			
 			
 		}
 		else{

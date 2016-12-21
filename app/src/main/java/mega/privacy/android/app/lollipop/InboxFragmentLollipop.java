@@ -375,11 +375,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
-			
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -472,11 +468,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
-			
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}

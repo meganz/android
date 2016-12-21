@@ -158,7 +158,7 @@
                     android:layout_centerVertical="true"
                     android:layout_gravity="left|center_vertical"
                     android:layout_toRightOf="@id/contact_properties_shared_folder_icon"
-                    android:text="@string/section_shared_items"
+                    android:text="@string/incoming_shares_label"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
 

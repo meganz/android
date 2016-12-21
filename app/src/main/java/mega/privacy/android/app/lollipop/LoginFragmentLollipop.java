@@ -1117,14 +1117,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             dbH.setFileLogger(true);
                             Util.setFileLogger(true);
                             numberOfClicks = 0;
+                            MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
                             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
+                            log("App Version: " + Util.getVersion(context));
                         }
                     }
                     else{
                         dbH.setFileLogger(true);
                         Util.setFileLogger(true);
                         numberOfClicks = 0;
+                        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
                         ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
+                        log("App Version: " + Util.getVersion(context));
                     }
                 }
             }

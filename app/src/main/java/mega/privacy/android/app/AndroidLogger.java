@@ -18,16 +18,28 @@ public class AndroidLogger implements MegaLoggerInterface {
 
 	public void log(String time, int loglevel, String source, String message) {
 
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentDateandTime = sdf.format(new Date());
-
-			message = "(" + currentDateandTime + ") - " + message;
-		}
-		catch (Exception e){}
-
 		if (Util.DEBUG){
-			Log.d("AndroidLogger", source + ": " + message);
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String currentDateandTime = sdf.format(new Date());
+
+				message = "(" + currentDateandTime + ") - " + message;
+			}
+			catch (Exception e){}
+
+			String sourceMessage = "";
+			if (source != null) {
+				String[] s = source.split("jni/mega");
+				if (s != null) {
+					if (s.length > 1) {
+						sourceMessage = s[1] + "";
+					} else {
+						sourceMessage = source + "";
+					}
+				}
+			}
+
+			Log.d("AndroidLogger", sourceMessage + ": " + message);
 //			addRecordToLog("AndroidLogger: " + source + ": " + message);
 		}
 
@@ -35,6 +47,26 @@ public class AndroidLogger implements MegaLoggerInterface {
 		boolean fileLogger = Util.getFileLogger();
 		if (fileLogger) {
 			//Send the log to a file
+
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String currentDateandTime = sdf.format(new Date());
+
+				message = "(" + currentDateandTime + ") - " + message;
+			}
+			catch (Exception e){}
+
+			String sourceMessage = "";
+			if (source != null) {
+				String[] s = source.split("jni/mega");
+				if (s != null) {
+					if (s.length > 1) {
+						sourceMessage = s[1] + "";
+					} else {
+						sourceMessage = source + "";
+					}
+				}
+			}
 
 			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
 			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
@@ -63,7 +95,19 @@ public class AndroidLogger implements MegaLoggerInterface {
 			}
 
 			if (logFile != null && logFile.exists()) {
-				Util.appendStringToFile(source + ": " + message + "\n", logFile);
+//				String sourceMessage = "";
+//				if (source != null) {
+//					String[] s = source.split("jni/mega");
+//					if (s != null) {
+//						if (s.length > 1) {
+//							sourceMessage = s[1] + "";
+//						} else {
+//							sourceMessage = source + "";
+//						}
+//					}
+//				}
+
+				Util.appendStringToFile(sourceMessage + ": " + message + "\n", logFile);
 			}
 		}
 

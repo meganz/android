@@ -99,7 +99,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			super(v);
 		}			
 
-		public ImageView publicLinkImageMultiselect;
 		public RelativeLayout itemLayout;
 		public ImageView permissionsIcon;
 	}
@@ -255,17 +254,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
-		
-//		Toast.makeText(context, "VIEWTYPE: " + viewType, Toast.LENGTH_SHORT).show();
-		// set the view's size, margins, paddings and layout parameters
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 
 		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 		
@@ -276,30 +269,19 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderList.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
 			holderList.savedOffline = (ImageView) v.findViewById(R.id.file_list_saved_offline);
 			
-			holderList.publicLinkImageMultiselect = (ImageView) v.findViewById(R.id.file_list_public_link_multiselect);
 			holderList.publicLinkImage = (ImageView) v.findViewById(R.id.file_list_public_link);
 			holderList.permissionsIcon = (ImageView) v.findViewById(R.id.file_list_incoming_permissions);
 			
 			holderList.textViewFileName = (TextView) v.findViewById(R.id.file_list_filename);			
-			holderList.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holderList.textViewFileName.getLayoutParams().width = Util.scaleWidthPx(210, outMetrics);
-			
-//			holderList.textViewFileName.getViewTreeObserver().addOnGlobalLayoutListener(new MyGlobalLayoutListener(holderList));		
-			
+
 			holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
 			holderList.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_browser_bar);
 			
 			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_list_three_dots);
-			
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
-		
+
 			holderList.savedOffline.setVisibility(View.INVISIBLE);
 		
-			holderList.publicLinkImage.setVisibility(View.GONE);
-			holderList.publicLinkImageMultiselect.setVisibility(View.GONE);
+			holderList.publicLinkImage.setVisibility(View.INVISIBLE);
 			
 			holderList.transferProgressBar.setVisibility(View.GONE);
 			holderList.textViewFileSize.setVisibility(View.VISIBLE);
@@ -394,8 +376,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.textViewFileSize.setText("");
 		
 		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			
+
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -422,7 +403,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	
 		} 
 		else {
-			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
@@ -439,11 +419,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.publicLinkImage.setVisibility(View.VISIBLE);
 			if(node.isExpired()){
 				log("Node exported but expired!!");
-				holder.publicLinkImage.setVisibility(View.GONE);
+				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 			}
 		}
 		else{
-			holder.publicLinkImage.setVisibility(View.GONE);
+			holder.publicLinkImage.setVisibility(View.INVISIBLE);
 		}
 		
 		if (node.isFolder()) {
@@ -681,16 +661,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	
 	public void onBindViewHolderList(ViewHolderBrowserList holder, int position){
 		log("onBindViewHolderList");
-//		listFragment = (RecyclerView) parent;
-//		final int _position = position;	
-		
+
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
-
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 
 		holder.currentPosition = position;
 	
@@ -702,8 +677,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.textViewFileName.setText(node.getName());	
 		
 		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			
+
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -726,7 +700,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	
 		} 
 		else {
-			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
@@ -738,34 +711,21 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	
 		holder.textViewFileSize.setText("");
 		
-		holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-		holder.publicLinkImage.setVisibility(View.GONE);
+		holder.publicLinkImage.setVisibility(View.INVISIBLE);
 		holder.permissionsIcon.setVisibility(View.GONE);
-		
+
 		if(node.isExported()){
 			//Node has public link
+			holder.publicLinkImage.setVisibility(View.VISIBLE);
 			if(node.isExpired()){
 				log("Node exported but expired!!");
-				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-				holder.publicLinkImage.setVisibility(View.GONE);
-			}
-			else{
-				if(multipleSelect){
-					holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
-					holder.publicLinkImage.setVisibility(View.GONE);
-				}
-				else
-				{
-					holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-					holder.publicLinkImage.setVisibility(View.VISIBLE);
-				}
+				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 			}
 		}
 		else{
-			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-			holder.publicLinkImage.setVisibility(View.GONE);
+			holder.publicLinkImage.setVisibility(View.INVISIBLE);
 		}
-		
+
 		if (node.isFolder()) {
 			
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -784,8 +744,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			
 			if(type==Constants.INCOMING_SHARES_ADAPTER||type==Constants.CONTACT_FILE_ADAPTER){
-				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-				holder.publicLinkImage.setVisibility(View.GONE);
+				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 				//Show the owner of the shared folder
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
