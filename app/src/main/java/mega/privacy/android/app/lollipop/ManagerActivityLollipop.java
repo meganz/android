@@ -1735,6 +1735,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_MY_ACCOUNT)){
+						log("intent from chat - show my account");
+						drawerItem=DrawerItem.ACCOUNT;
+						accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
 				}
 	        }
 
@@ -3176,6 +3183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			default:{
 				log("Show myAccount Fragment");
+				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 				if (maFLol == null){
 					log("New MyAccountFragment");
 					maFLol = new MyAccountFragmentLollipop();

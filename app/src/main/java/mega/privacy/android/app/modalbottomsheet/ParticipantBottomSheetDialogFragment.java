@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -32,6 +33,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Constants;
@@ -307,7 +309,10 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             case R.id.edit_profile_group_participants_chat_layout: {
                 log("edit profile participants panel");
-                ((GroupChatInfoActivityLollipop) context).showSnackbar("Not yet implemented!");
+                Intent editProfile = new Intent(context, ManagerActivityLollipop.class);
+                editProfile.setAction(Constants.ACTION_SHOW_MY_ACCOUNT);
+                startActivity(editProfile);
+                dismissAllowingStateLoss();
                 break;
             }
 
