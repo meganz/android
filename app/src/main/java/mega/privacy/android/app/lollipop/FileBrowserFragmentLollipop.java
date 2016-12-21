@@ -458,10 +458,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -555,11 +551,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
-			
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}

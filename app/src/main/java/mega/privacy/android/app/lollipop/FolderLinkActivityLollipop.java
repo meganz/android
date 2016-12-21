@@ -100,7 +100,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     RelativeLayout fragmentContainer;
 	TextView downloadButton;
 	View separator;
-	private TextView cancelButton;
+	private TextView importButton;
 	LinearLayout optionsBar;
 	DisplayMetrics outMetrics;
 	long parentHandle = -1;
@@ -335,20 +335,32 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		LinearLayout.LayoutParams donwlTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
 		donwlTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
 		downloadButton.setLayoutParams(donwlTextParams);
+
+		importButton = (TextView) findViewById(R.id.folder_link_import_button);
+		importButton.setOnClickListener(this);
+		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
 		
-		cancelButton = (TextView) findViewById(R.id.folder_link_cancel_button);
-		cancelButton.setOnClickListener(this);		
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));		
-		
-		android.view.ViewGroup.LayoutParams paramsb2 = cancelButton.getLayoutParams();		
+		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();
 		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
 //		paramsb1.width = Util.scaleWidthPx(145, metrics);
-		cancelButton.setLayoutParams(paramsb1);
+		importButton.setLayoutParams(paramsb1);
 		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		cancelButton.setLayoutParams(cancelTextParams);	
-		
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)importButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
+		importButton.setLayoutParams(cancelTextParams);
+
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+		if (dbH != null){
+			if (dbH.getCredentials() != null){
+				importButton.setVisibility(View.VISIBLE);
+			}
+			else{
+				importButton.setVisibility(View.INVISIBLE);
+			}
+		}
+
 		contentText = (TextView) findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
 		
@@ -457,7 +469,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		});
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.alert_decryption_key));
 		builder.setMessage(getString(R.string.message_decryption_key));
 		builder.setPositiveButton(getString(R.string.general_decryp),
@@ -510,11 +522,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		this.selectedNode = sNode;
 		
 		optionDownload.setVisibility(View.VISIBLE);
-		if(sNode.isFolder()){
-			optionImport.setVisibility(View.INVISIBLE);
-//			slidingOptionsPanel.setPanelHeight(optionDownload.getHeight());
-		}
-		else{
+//		if(sNode.isFolder()){
+//			optionImport.setVisibility(View.INVISIBLE);
+////			slidingOptionsPanel.setPanelHeight(optionDownload.getHeight());
+//		}
+//		else{
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
@@ -527,7 +539,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 			}			
 //			slidingOptionsPanel.setPanelHeight(optionImport.getHeight()*2);
-		}				
+//		}
 					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
@@ -934,6 +946,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			if(selectedNode!=null){
 				if (target != null){
 					log("Target node: "+target.getName());
+					selectedNode = megaApiFolder.authorizeNode(selectedNode);
 					megaApi.copyNode(selectedNode, target, this);
 				}
 				else{
@@ -985,7 +998,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					else{
 						try{
 							log("API_EARGS - show alert dialog");
-							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 							builder.setMessage(getString(R.string.general_error_folder_not_found));
 							builder.setTitle(getString(R.string.general_error_word));
 
@@ -1016,7 +1029,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				else{
 					try{
 						log("no link - show alert dialog");
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);
+						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 
@@ -1089,7 +1102,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(request.getFlag()){
 						log("Login into a folder with invalid decryption key");
 						try{
-							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 							builder.setMessage(getString(R.string.general_error_invalid_decryption_key));
 							builder.setTitle(getString(R.string.general_error_word));
 
@@ -1135,7 +1148,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 				else{
 					try{ 
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);					
+						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			            builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 						
@@ -1163,7 +1176,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			else{
 				log("Error: "+e.getErrorCode()+" "+e.getErrorString());
 				try{
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 					if(e.getErrorCode() == MegaError.API_EBLOCKED){
 						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));
@@ -1622,8 +1635,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				hideOptionsPanel();
 				break;				
 			}
-			case R.id.folder_link_cancel_button:{
-				finish();
+			case R.id.folder_link_import_button:{
+				if (megaApiFolder.getRootNode() != null){
+					this.selectedNode = megaApiFolder.getRootNode();
+					importNode();
+				}
 				break;
 			}
 			case R.id.folder_link_list_option_download_layout: {

@@ -225,7 +225,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.menu_new_folder));
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {
@@ -665,14 +665,26 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	public void pickFolderToShare(String email){
 
-		MegaUser user = megaApi.getContact(email);
-		if (user != null){
+//		MegaUser user = megaApi.getContact(email);
+		if (email != null){
 			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
-			String[] longArray = new String[1];		
-			longArray[0] = email;		
-			intent.putExtra("SELECTED_CONTACTS", longArray);
+			ArrayList<String> contacts = new ArrayList<String>();
+//			String[] longArray = new String[1];
+//			longArray[0] = email;
+			contacts.add(email);
+			intent.putExtra("SELECTED_CONTACTS", contacts);
 			startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
+		}
+		else{
+			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+			if(coordinatorFragment!=null){
+				showSnackbar(getString(R.string.error_sharing_folder), coordinatorFragment);
+			}
+			else{
+				showSnackbar(getString(R.string.error_sharing_folder), fragmentContainer);
+			}
+			log("Error sharing folder");
 		}
 	}
 
@@ -1255,7 +1267,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				return;
 			}
 
-			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
 			final long folderHandle = intent.getLongExtra("SELECT", 0);			
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
@@ -1283,22 +1295,25 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 						switch(item) {
 						case 0:{
-							for (int i=0;i<selectedContacts.length;i++){
-								MegaUser user= megaApi.getContact(selectedContacts[i]);
+							for (int i=0;i<selectedContacts.size();i++){
+								MegaUser user= megaApi.getContact(selectedContacts.get(i));
+								log("user: "+user);
+								log("useremail: "+userEmail);
+								log("parentNode: "+parent.getName()+"_"+parent.getHandle());
 								megaApi.share(parent, user, MegaShare.ACCESS_READ,contactPropertiesMainActivity);
 							}
 							break;
 						}
 						case 1:{	                    	
-							for (int i=0;i<selectedContacts.length;i++){
-								MegaUser user= megaApi.getContact(selectedContacts[i]);
+							for (int i=0;i<selectedContacts.size();i++){
+								MegaUser user= megaApi.getContact(selectedContacts.get(i));
 								megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,contactPropertiesMainActivity);
 							}
 							break;
 						}
 						case 2:{                   	
-							for (int i=0;i<selectedContacts.length;i++){
-								MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+							for (int i=0;i<selectedContacts.size();i++){
+								MegaUser user= megaApi.getContact(selectedContacts.get(i));
 								megaApi.share(parent, user, MegaShare.ACCESS_FULL,contactPropertiesMainActivity);
 							}
 							break;
@@ -1696,6 +1711,9 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		else if (request.getType() == MegaRequest.TYPE_COPY) {
 			log("copy request start");
 		}
+		else if (request.getType() == MegaRequest.TYPE_SHARE) {
+			log("share request start");
+		}
 	}
 
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
@@ -1744,8 +1762,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
 
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
@@ -1938,6 +1955,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
+				log("Shared folder correctly: "+request.getNodeHandle());
 				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
 			}
 			else{

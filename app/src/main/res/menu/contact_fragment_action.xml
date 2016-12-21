@@ -13,13 +13,6 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_unselect_all"
-        MEGA:showAsAction="never" /> 
-    
-    <item
-        android:id="@+id/cab_menu_delete"
-        android:orderInCategory="105"
-        android:title="@string/context_delete"
-        android:showAsAction="never"
         MEGA:showAsAction="never" />
     
     <item
@@ -56,7 +49,14 @@
         android:orderInCategory="125"
         android:title="@string/action_settings"
         android:showAsAction="never"
-        MEGA:showAsAction="never" />           
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_delete"
+        android:orderInCategory="135"
+        android:title="@string/context_remove"
+        android:showAsAction="never"
+        MEGA:showAsAction="never" />
     
 </menu>
 

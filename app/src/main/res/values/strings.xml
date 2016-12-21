@@ -59,7 +59,6 @@
 
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
-    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact %s?</string>
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these %d contacts?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish Bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
@@ -1019,6 +1018,20 @@
     <plurals name="general_selection_num_contacts">
         <item context="referring to a contact in the contact list of the user" quantity="one">%1$d contact</item>
         <item context="Title of the contact list" quantity="other">%1$d contacts</item>
+    </plurals>
+
+    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Error sharing the folder. Please, try again.</string>
+
+    <string name="incoming_shares_label" context="title of the section that shows all the incoming shared items">Incoming shares</string>
+
+    <plurals name="confirmation_remove_contact" context="confirmation message before removing a contact">
+        <item context="Singular" quantity="one">All data associated with the selected contact will be permanently lost.</item>
+        <item context="Plural" quantity="other">All data associated with the selected contacts will be permanently lost.</item>
+    </plurals>
+
+    <plurals name="title_confirmation_remove_contact" context="title of confirmation alert before removing a contact">
+        <item context="Singular" quantity="one">Remove contact?</item>
+        <item context="Plural" quantity="other">Remove contacts?</item>
     </plurals>
 
 </resources>

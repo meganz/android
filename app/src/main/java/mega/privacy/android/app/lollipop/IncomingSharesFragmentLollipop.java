@@ -356,11 +356,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			transferArrow.setLayoutParams(lp);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);			
+			contentText = (TextView) v.findViewById(R.id.content_text);
 			
 			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
@@ -472,11 +468,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
-			
+
 			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 

@@ -471,10 +471,6 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
 
 			findNodes();
 
@@ -535,10 +531,6 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(73, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
 
 			findNodes();
 			
