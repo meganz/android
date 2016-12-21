@@ -360,14 +360,28 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
 
                 String ringtoneString = chatPrefs.getRingtone();
-                Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(ringtoneString));
-                String title = ringtone.getTitle(this);
-                ringtoneText.setText(title);
+                if(ringtoneString.isEmpty()){
+                    Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
+                    Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
+                    ringtoneText.setText(defaultRingtone.getTitle(this));
+                }
+                else{
+                    Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(ringtoneString));
+                    String title = ringtone.getTitle(this);
+                    ringtoneText.setText(title);
+                }
 
                 String soundString = chatPrefs.getNotificationsSound();
-                Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
-                String titleSound = sound.getTitle(this);
-                messageSoundText.setText(titleSound);
+                if(soundString.isEmpty()){
+                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
+                    messageSoundText.setText(defaultSound.getTitle(this));
+                }
+                else{
+                    Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
+                    String titleSound = sound.getTitle(this);
+                    messageSoundText.setText(titleSound);
+                }
 
             }
             else{

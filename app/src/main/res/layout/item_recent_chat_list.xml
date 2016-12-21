@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/recent_chat_list_item_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="87dp"
+    android:layout_width="match_parent"
+    android:layout_height="88dp"
     android:paddingRight="12dp"
     android:descendantFocusability="blocksDescendants" >
 
@@ -11,7 +11,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="18dp">
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/recent_chat_list_thumbnail"
@@ -52,7 +52,7 @@
         android:textSize="16sp"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="13dp"
         android:singleLine="true"
         android:maxLines="1"
         android:textColor="@color/file_list_first_row" />

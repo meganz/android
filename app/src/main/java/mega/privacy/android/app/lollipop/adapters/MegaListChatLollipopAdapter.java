@@ -480,11 +480,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public ViewHolderChatList onCreateViewHolder(ViewGroup parent, int viewType) {
-		
+
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 
 		dbH = DatabaseHandler.getDbHandler(context);
 
@@ -1043,6 +1042,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		{
 			log("num requests: "+chats.size());
 		}
+
 		positionClicked = -1;
 //		listFragment.invalidate();
 		notifyDataSetChanged();
