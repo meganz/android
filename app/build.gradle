@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
-        minSdkVersion 11
+        minSdkVersion 21
         targetSdkVersion 23
-        versionCode 100
-        versionName "3.1.alfa.0"
+        versionCode 103
+        versionName "3.1.alfa.1"
     }
 
     sourceSets.main {
