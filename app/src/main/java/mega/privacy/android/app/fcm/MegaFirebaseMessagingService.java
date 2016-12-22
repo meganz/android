@@ -25,6 +25,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -36,6 +37,18 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 public class MegaFirebaseMessagingService extends FirebaseMessagingService {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        log("onCreateFCM");
+    }
+
+    @Override
+    public void onDestroy() {
+        log("onDestroyFCM");
+        super.onDestroy();
+    }
 
     /**
      * Called when message is received.
@@ -63,11 +76,24 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             log("Message data payload: " + remoteMessage.getData());
+            sendNotification(remoteMessage.getData().get("message"));
         }
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             log("Message Notification Body: " + remoteMessage.getNotification().getBody());
+            sendNotification(remoteMessage.getNotification().getBody());
+        }
+
+        MegaApplication app = (MegaApplication) getApplication();
+
+        MegaApiAndroid megaApi = app.getMegaApi();
+
+        if (megaApi.getRootNode() != null) {
+            log("nullll!!!!!!!");
+        }
+        else{
+            log("Tengo root node!!!!!");
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -90,11 +116,20 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService {
         MegaApplication app = (MegaApplication) getApplication();
         MegaApiAndroid megaApi = app.getMegaApi();
 
+        String email = "MegaApi not logged in";
+
+        if (megaApi != null){
+            if (megaApi.getMyUser() != null){
+                if (megaApi.getMyUser().getEmail() != null){
+                    email = megaApi.getMyUser().getEmail();
+                }
+            }
+        }
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_notify_download)
                 .setContentTitle("FCM Message")
-                .setContentText(megaApi.getMyUser().getEmail() + ": " + messageBody)
+                .setContentText(email + ": " + messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
