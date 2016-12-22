@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="102"
-    android:versionName="3.0.12.3" >
+    android:versionCode="103"
+    android:versionName="3.1.alfa.1" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="21"
         android:targetSdkVersion="23" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
