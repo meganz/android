@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -61,7 +62,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
 
     Context context;
     private AlertDialog insertMailDialog;
@@ -150,147 +151,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-        if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
-//            megaChatApi.connect(this);
-            if((action!=null)&&(url!=null)) {
-                if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
-                    log("Action change mail after fetch nodes");
-                    Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
-                    changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
-                    changeMailIntent.setData(Uri.parse(url));
-                    startActivity(changeMailIntent);
-                    ((LoginActivityLollipop) context).finish();
-                }
-                else if(action.equals(Constants.ACTION_RESET_PASS)) {
-                    log("Action reset pass after fetch nodes");
-                    Intent resetPassIntent = new Intent(context, ManagerActivityLollipop.class);
-                    resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
-                    resetPassIntent.setData(Uri.parse(url));
-                    startActivity(resetPassIntent);
-                    ((LoginActivityLollipop) context).finish();
-                }
-                else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)) {
-                    log("Action cancel Account after fetch nodes");
-                    Intent cancelAccountIntent = new Intent(context, ManagerActivityLollipop.class);
-                    cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
-                    cancelAccountIntent.setData(Uri.parse(url));
-                    startActivity(cancelAccountIntent);
-                    ((LoginActivityLollipop) context).finish();
-                }
-            }
-
-            if (!backWhileLogin){
-                log("NOT backWhileLogin");
-                if (parentHandle != -1){
-                    Intent intent = new Intent();
-                    intent.putExtra("PARENT_HANDLE", parentHandle);
-                    ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
-                    ((LoginActivityLollipop) context).finish();
-                }
-                else{
-                    Intent intent = null;
-                    if (firstTime){
-                        log("First time");
-                        intent = new Intent(context,ManagerActivityLollipop.class);
-                        intent.putExtra("firstTimeCam", true);
-                        if (action != null){
-                            log("Action not NULL");
-                            if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
-                                log("ACTION_EXPORT_MK");
-                                intent.setAction(action);
-                            }
-                        }
-                    }
-                    else{
-                        boolean initialCam = false;
-//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-                        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                        MegaPreferences prefs = dbH.getPreferences();
-                        prefs = dbH.getPreferences();
-                        if (prefs != null){
-                            if (prefs.getCamSyncEnabled() != null){
-                                if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
-                                }
-                            }
-                            else{
-                                ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
-                                initialCam = true;
-                            }
-                        }
-                        else{
-                            intent = new Intent(context,ManagerActivityLollipop.class);
-                            intent.putExtra("firstTimeCam", true);
-                            initialCam = true;
-                        }
-
-                        if (!initialCam){
-                            log("NOT initialCam");
-                            intent = new Intent(context,ManagerActivityLollipop.class);
-                            if (action != null){
-                                log("The action is: "+action);
-//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//											intent = new Intent(this, FileExplorerActivityLollipop.class);
-//											if(extras != null)
-//											{
-//												intent.putExtras(extras);
-//											}
-//											intent.setData(uriData);
-//										}
-                                if (action.equals(Constants.ACTION_FILE_PROVIDER)){
-                                    intent = new Intent(context, FileProviderActivity.class);
-                                    if(extras != null)
-                                    {
-                                        intent.putExtras(extras);
-                                    }
-                                    if(uriData != null)
-                                    {
-                                        intent.setData(uriData);
-                                    }
-                                }
-                                intent.setAction(action);
-                                if (url != null){
-                                    intent.setData(Uri.parse(url));
-                                }
-                            }
-                        }
-                        else{
-                            log("initialCam YESSSS");
-                            intent = new Intent(context,ManagerActivityLollipop.class);
-                            if (action != null){
-                                log("The action is: "+action);
-                                intent.setAction(action);
-                            }
-                        }
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    }
-
-                    startActivity(intent);
-                    ((LoginActivityLollipop)context).finish();
-                }
-            }
-
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
     }
 
     /*
@@ -882,6 +742,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         resumeSesion = true;
+        int ret = megaChatApi.init(gSession);
+        if (ret == MegaChatApi.INIT_NO_CACHE)
+        {
+            megaApi.invalidateCache();
+        }
+        else if (ret == MegaChatApi.INIT_ERROR)
+        {
+            // chat cannot initialize, disable chat completely
+            // megachatapi.logout() y megachatapi = null
+            //base de datos disable
+        }
         megaApi.fastLogin(gSession, this);
     }
 
@@ -998,6 +869,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("fastLogin con publicKey y privateKey");
         resumeSesion = false;
+
+        int ret = megaChatApi.init(null);
+        if ((ret == MegaChatApi.INIT_ERROR) || (ret !=MegaChatApi.INIT_WAITING_NEW_SESSION)){
+            //disable chat, logut, etc..
+        }
+
         megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
     }
 
@@ -1454,23 +1331,140 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else{
                     log("OK fetch nodes");
                     log("value of resumeSession: "+resumeSesion);
-                    megaChatApi.init(resumeSesion, this);
 
-                    loginLogin.setVisibility(View.GONE);
-                    loginDelimiter.setVisibility(View.GONE);
-                    loginCreateAccount.setVisibility(View.GONE);
-                    queryingSignupLinkText.setVisibility(View.GONE);
-                    confirmingAccountText.setVisibility(View.GONE);
-                    loginLoggingIn.setVisibility(View.VISIBLE);
-                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-//				generatingKeysText.setVisibility(View.VISIBLE);
-                    loginProgressBar.setVisibility(View.VISIBLE);
-                    loginFetchNodesProgressBar.setVisibility(View.GONE);
-                    loggingInText.setVisibility(View.VISIBLE);
-                    fetchingNodesText.setVisibility(View.GONE);
-                    prepareNodesText.setVisibility(View.GONE);
-                    initizalizingChatText.setVisibility(View.VISIBLE);
-                    serversBusyText.setVisibility(View.GONE);
+                    if((action!=null)&&(url!=null)) {
+                        if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
+                            log("Action change mail after fetch nodes");
+                            Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
+                            changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+                            changeMailIntent.setData(Uri.parse(url));
+                            startActivity(changeMailIntent);
+                            ((LoginActivityLollipop) context).finish();
+                        }
+                        else if(action.equals(Constants.ACTION_RESET_PASS)) {
+                            log("Action reset pass after fetch nodes");
+                            Intent resetPassIntent = new Intent(context, ManagerActivityLollipop.class);
+                            resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+                            resetPassIntent.setData(Uri.parse(url));
+                            startActivity(resetPassIntent);
+                            ((LoginActivityLollipop) context).finish();
+                        }
+                        else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)) {
+                            log("Action cancel Account after fetch nodes");
+                            Intent cancelAccountIntent = new Intent(context, ManagerActivityLollipop.class);
+                            cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+                            cancelAccountIntent.setData(Uri.parse(url));
+                            startActivity(cancelAccountIntent);
+                            ((LoginActivityLollipop) context).finish();
+                        }
+                    }
+
+                    if (!backWhileLogin){
+                        log("NOT backWhileLogin");
+                        if (parentHandle != -1){
+                            Intent intent = new Intent();
+                            intent.putExtra("PARENT_HANDLE", parentHandle);
+                            ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
+                            ((LoginActivityLollipop) context).finish();
+                        }
+                        else{
+                            Intent intent = null;
+                            if (firstTime){
+                                log("First time");
+                                intent = new Intent(context,ManagerActivityLollipop.class);
+                                intent.putExtra("firstTimeCam", true);
+                                if (action != null){
+                                    log("Action not NULL");
+                                    if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
+                                        log("ACTION_EXPORT_MK");
+                                        intent.setAction(action);
+                                    }
+                                }
+                            }
+                            else{
+                                boolean initialCam = false;
+//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+                                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                                MegaPreferences prefs = dbH.getPreferences();
+                                prefs = dbH.getPreferences();
+                                if (prefs != null){
+                                    if (prefs.getCamSyncEnabled() != null){
+                                        if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+                                            ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                        }
+                                    }
+                                    else{
+                                        ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                        initialCam = true;
+                                    }
+                                }
+                                else{
+                                    intent = new Intent(context,ManagerActivityLollipop.class);
+                                    intent.putExtra("firstTimeCam", true);
+                                    initialCam = true;
+                                }
+
+                                if (!initialCam){
+                                    log("NOT initialCam");
+                                    intent = new Intent(context,ManagerActivityLollipop.class);
+                                    if (action != null){
+                                        log("The action is: "+action);
+//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//											intent = new Intent(this, FileExplorerActivityLollipop.class);
+//											if(extras != null)
+//											{
+//												intent.putExtras(extras);
+//											}
+//											intent.setData(uriData);
+//										}
+                                        if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                                            intent = new Intent(context, FileProviderActivity.class);
+                                            if(extras != null)
+                                            {
+                                                intent.putExtras(extras);
+                                            }
+                                            if(uriData != null)
+                                            {
+                                                intent.setData(uriData);
+                                            }
+                                        }
+                                        intent.setAction(action);
+                                        if (url != null){
+                                            intent.setData(Uri.parse(url));
+                                        }
+                                    }
+                                }
+                                else{
+                                    log("initialCam YESSSS");
+                                    intent = new Intent(context,ManagerActivityLollipop.class);
+                                    if (action != null){
+                                        log("The action is: "+action);
+                                        intent.setAction(action);
+                                    }
+                                }
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            }
+
+                            startActivity(intent);
+                            ((LoginActivityLollipop)context).finish();
+                        }
+                    }
+
+//                    loginLogin.setVisibility(View.GONE);
+//                    loginDelimiter.setVisibility(View.GONE);
+//                    loginCreateAccount.setVisibility(View.GONE);
+//                    queryingSignupLinkText.setVisibility(View.GONE);
+//                    confirmingAccountText.setVisibility(View.GONE);
+//                    loginLoggingIn.setVisibility(View.VISIBLE);
+//                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+////				generatingKeysText.setVisibility(View.VISIBLE);
+//                    loginProgressBar.setVisibility(View.VISIBLE);
+//                    loginFetchNodesProgressBar.setVisibility(View.GONE);
+//                    loggingInText.setVisibility(View.VISIBLE);
+//                    fetchingNodesText.setVisibility(View.GONE);
+//                    prepareNodesText.setVisibility(View.GONE);
+//                    initizalizingChatText.setVisibility(View.VISIBLE);
+//                    serversBusyText.setVisibility(View.GONE);
                 }
             }
             else{

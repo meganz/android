@@ -63,15 +63,15 @@ public class MegaChatApiJava {
         megaChatApi.removeChatListener(createDelegateChatListener(listener));
     }
 
-    public void init(boolean resumeSession)
+    public int init(String sid)
     {
-        megaChatApi.init();
+        return megaChatApi.init(sid);
     }
 
-    public void init(boolean resumeSession, MegaChatRequestListenerInterface listener)
-    {
-        megaChatApi.init(createDelegateRequestListener(listener));
-    }
+//    public void init(boolean resumeSession, MegaChatRequestListenerInterface listener)
+//    {
+//        megaChatApi.init(createDelegateRequestListener(listener));
+//    }
 
     public void connect()
     {
@@ -166,8 +166,8 @@ public class MegaChatApiJava {
      * - MegaChatError::ERROR_ARGS - If the chat is not a group chat (cannot invite peers)
      *
      * @param chatid MegaChatHandle that identifies the chat room
-     * @param uh MegaChatHandle that identifies the user
-     * @param privilege Privilege level for the new peers. Valid values are:
+     * @param userhandle MegaChatHandle that identifies the user
+     * @param privs Privilege level for the new peers. Valid values are:
      * - MegaChatPeerList::PRIV_RO = 0
      * - MegaChatPeerList::PRIV_STANDARD = 2
      * - MegaChatPeerList::PRIV_MODERATOR = 3
@@ -263,7 +263,7 @@ public class MegaChatApiJava {
      * - MegaChatApi::STATUS_ONLINE = 4
      * The user is connected and online.
      *
-     * @param Handle of the peer whose name is requested.
+     * @param userhandle of the peer whose name is requested.
      * @return Online status of the user
      */
     public int getUserOnlineStatus(long userhandle){
