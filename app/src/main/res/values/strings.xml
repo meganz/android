@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
+
     <string name="app_version" context="Not translate">3.1.alfa.0</string>
     <string name="sdk_version" context="Not translate">d86e6dc</string>
     
