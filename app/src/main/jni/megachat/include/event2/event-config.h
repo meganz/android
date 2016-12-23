@@ -24,7 +24,7 @@
 /* #undef EVENT__DISABLE_THREAD_SUPPORT */
 
 /* Define to 1 if you have the `accept4' function. */
-#define EVENT__HAVE_ACCEPT4 1
+/* #undef EVENT__HAVE_ACCEPT4 */
 
 /* Define to 1 if you have the `arc4random' function. */
 #define EVENT__HAVE_ARC4RANDOM 1
@@ -64,10 +64,13 @@
 #define EVENT__HAVE_EPOLL 1
 
 /* Define to 1 if you have the `epoll_create1' function. */
-#define EVENT__HAVE_EPOLL_CREATE1 1
+/* #undef EVENT__HAVE_EPOLL_CREATE1 */
 
 /* Define to 1 if you have the `epoll_ctl' function. */
 #define EVENT__HAVE_EPOLL_CTL 1
+
+/* Define to 1 if you have the <errno.h> header file. */
+#define EVENT__HAVE_ERRNO_H 1
 
 /* Define to 1 if you have ERR_remove_thread_stat(). */
 /* #undef EVENT__HAVE_ERR_REMOVE_THREAD_STATE */
@@ -136,7 +139,7 @@
 #define EVENT__HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `issetugid' function. */
-#define EVENT__HAVE_ISSETUGID 1
+/* #undef EVENT__HAVE_ISSETUGID */
 
 /* Define to 1 if you have the `kqueue' function. */
 /* #undef EVENT__HAVE_KQUEUE */
@@ -223,10 +226,10 @@
 #define EVENT__HAVE_SIGACTION 1
 
 /* Define to 1 if you have the `signal' function. */
-#define EVENT__HAVE_SIGNAL 1
+/* #undef EVENT__HAVE_SIGNAL */
 
 /* Define to 1 if you have the `splice' function. */
-#define EVENT__HAVE_SPLICE 1
+/* #undef EVENT__HAVE_SPLICE */
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define EVENT__HAVE_STDARG_H 1
@@ -337,7 +340,7 @@
 /* #undef EVENT__HAVE_SYS_SYSCTL_H */
 
 /* Define to 1 if you have the <sys/timerfd.h> header file. */
-#define EVENT__HAVE_SYS_TIMERFD_H 1
+/* #undef EVENT__HAVE_SYS_TIMERFD_H */
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define EVENT__HAVE_SYS_TIME_H 1
@@ -364,7 +367,7 @@
 #define EVENT__HAVE_TIMERCMP 1
 
 /* Define to 1 if you have the `timerfd_create' function. */
-#define EVENT__HAVE_TIMERFD_CREATE 1
+/* #undef EVENT__HAVE_TIMERFD_CREATE */
 
 /* Define if timerisset is defined in <sys/time.h> */
 #define EVENT__HAVE_TIMERISSET 1
@@ -399,6 +402,9 @@
 /* Define to 1 if you have the `vasprintf' function. */
 #define EVENT__HAVE_VASPRINTF 1
 
+/* Define if waitpid() supports WNOWAIT */
+/* #undef EVENT__HAVE_WAITPID_WITH_WNOWAIT */
+
 /* Define if kqueue works correctly with pipes */
 /* #undef EVENT__HAVE_WORKING_KQUEUE */
 
@@ -410,7 +416,7 @@
 #define EVENT__LT_OBJDIR ".libs/"
 
 /* Numeric representation of the version */
-#define EVENT__NUMERIC_VERSION 0x02010500
+#define EVENT__NUMERIC_VERSION 0x02010600
 
 /* Name of package */
 #define EVENT__PACKAGE "libevent"
@@ -422,7 +428,7 @@
 #define EVENT__PACKAGE_NAME "libevent"
 
 /* Define to the full name and version of this package. */
-#define EVENT__PACKAGE_STRING "libevent 2.1.5-beta"
+#define EVENT__PACKAGE_STRING "libevent 2.1.6-beta"
 
 /* Define to the one symbol short name of this package. */
 #define EVENT__PACKAGE_TARNAME "libevent"
@@ -431,7 +437,7 @@
 #define EVENT__PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define EVENT__PACKAGE_VERSION "2.1.5-beta"
+#define EVENT__PACKAGE_VERSION "2.1.6-beta"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -490,7 +496,7 @@
 
 
 /* Version number of package */
-#define EVENT__VERSION "2.1.5-beta"
+#define EVENT__VERSION "2.1.6-beta"
 
 /* Enable large inode numbers on Mac OS X 10.5.  */
 #ifndef EVENT___DARWIN_USE_64_BIT_INODE
