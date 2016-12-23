@@ -191,10 +191,10 @@
 /* #undef HAVE_FREEIFADDRS */
 
 /* Define to 1 if you have the fsetxattr function. */
-#define HAVE_FSETXATTR 1
+/* #undef HAVE_FSETXATTR */
 
 /* fsetxattr() takes 5 args */
-#define HAVE_FSETXATTR_5 1
+/* #undef HAVE_FSETXATTR_5 */
 
 /* fsetxattr() takes 6 args */
 /* #undef HAVE_FSETXATTR_6 */
@@ -266,7 +266,7 @@
 #define HAVE_GETPWUID 1
 
 /* Define to 1 if you have the `getpwuid_r' function. */
-#define HAVE_GETPWUID_R 1
+/* #undef HAVE_GETPWUID_R */
 
 /* Define to 1 if you have the `getrlimit' function. */
 #define HAVE_GETRLIMIT 1
@@ -572,7 +572,7 @@
 #define HAVE_SIGINTERRUPT 1
 
 /* Define to 1 if you have the signal function. */
-#define HAVE_SIGNAL 1
+/* #undef HAVE_SIGNAL */
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
@@ -713,7 +713,7 @@
 #define HAVE_SYS_WAIT_H 1
 
 /* Define to 1 if you have the <sys/xattr.h> header file. */
-#define HAVE_SYS_XATTR_H 1
+/* #undef HAVE_SYS_XATTR_H */
 
 /* Define to 1 if you have the <termios.h> header file. */
 #define HAVE_TERMIOS_H 1
@@ -845,7 +845,7 @@
 #define RECV_TYPE_ARG3 size_t
 
 /* Define to the type of arg 4 for recv. */
-#define RECV_TYPE_ARG4 int
+#define RECV_TYPE_ARG4 unsigned int
 
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV int
@@ -881,7 +881,7 @@
 #define SEND_TYPE_ARG3 size_t
 
 /* Define to the type of arg 4 for send. */
-#define SEND_TYPE_ARG4 int
+#define SEND_TYPE_ARG4 unsigned int
 
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV int
