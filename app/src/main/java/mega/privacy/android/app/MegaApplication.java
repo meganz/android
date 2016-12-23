@@ -36,7 +36,8 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface{
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.1.alfa.0";
+	static final String USER_AGENT = "MEGAAndroid/3.1.alfa.1";
+
 
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
@@ -111,9 +112,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
-//		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-//		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		MegaApiAndroid.setLoggerObject(new AndroidLogger());
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
@@ -142,7 +143,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
-		Util.setFileLogger(fileLogger);
+		if (Util.DEBUG){
+			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		}
+		else {
+			Util.setFileLogger(fileLogger);
+			if (fileLogger) {
+				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+			} else {
+				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+			}
+		}
 		
 //		initializeGA();
 		

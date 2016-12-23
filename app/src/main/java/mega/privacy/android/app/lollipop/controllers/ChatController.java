@@ -153,10 +153,12 @@ public class ChatController {
     }
 
     public void muteChat(MegaChatListItem chat){
+        log("muteChat");
         dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chat.getChatId()));
     }
 
     public void unmuteChat(MegaChatListItem chat){
+        log("UNmuteChat");
         dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chat.getChatId()));
     }
 

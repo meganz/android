@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="100"
-    android:versionName="3.1.alfa.0" >
+    android:versionCode="103"
+    android:versionName="3.1.alfa.1" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="21"
         android:targetSdkVersion="23" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
@@ -163,8 +163,8 @@
             android:configChanges="orientation|screenSize">
         </activity>
 
-        <activity
-            android:name="LauncherFileExplorerActivity"
+       <activity 
+            android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -180,12 +180,6 @@
 
                 <data android:mimeType="*/*" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/app_name">
         </activity>
 
         <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"

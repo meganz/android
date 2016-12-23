@@ -11,19 +11,26 @@
         android:layout_height="36dp"
         android:background="@color/content_text_background">
 
-        <TextView
-            android:id="@+id/inbox_list_content_text"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"  
-            android:layout_centerVertical="true"          
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+		<RelativeLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/inbox_list_content_text_nested_layout"
+			android:layout_centerVertical="true">
+
+			<TextView
+				android:id="@+id/inbox_list_content_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textColor="@color/mail_my_account"
+				android:layout_marginLeft="72dp"
+				android:textSize="14sp" />
+		</RelativeLayout>
         
        <ProgressBar
 		    android:id="@+id/inbox_list_download_progress_bar"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" 
-			android:layout_below="@id/inbox_list_content_text" 
+			android:layout_below="@id/inbox_list_content_text_nested_layout"
 			style="@style/UsedSpaceProgressBar"
 			android:visibility="gone"/>
        

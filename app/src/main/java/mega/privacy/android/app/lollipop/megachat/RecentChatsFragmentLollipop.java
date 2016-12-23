@@ -193,6 +193,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
         mLayoutManager = new MegaLinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
+        listView.setHasFixedSize(true);
         //Just onClick implemented
         listView.addOnItemTouchListener(this);
         listView.setItemAnimator(new DefaultItemAnimator());
@@ -332,13 +333,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
             if (adapterList == null){
                 adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                listView.setAdapter(adapterList);
             }
             else{
                 adapterList.setChats(chats);
             }
 
             adapterList.setPositionClicked(-1);
-            listView.setAdapter(adapterList);
 
             if (adapterList.getItemCount() == 0){
                 log("adapterList.getItemCount() == 0");
@@ -838,6 +839,16 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
     }
 
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
+
+    }
+
     public void onStatusChange(int position){
         log("onStatusChange");
 
@@ -925,64 +936,64 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
     }
 
-    @Override
-    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom item) {
-        log("onChatRoomUpdate");
-
-//        MegaChatRoom chatUpdated = megaChatApi.getChatRoom(chat.getChatId());
-//        if(chatUpdated!=null){
-//            log("chat updated: "+chat.getTitle());
-//            log("unread count: "+chat.getUnreadCount());
-//            log("change type: "+chat.getChanges());
+//    @Override
+//    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom item) {
+//        log("onChatRoomUpdate");
+//
+////        MegaChatRoom chatUpdated = megaChatApi.getChatRoom(chat.getChatId());
+////        if(chatUpdated!=null){
+////            log("chat updated: "+chat.getTitle());
+////            log("unread count: "+chat.getUnreadCount());
+////            log("change type: "+chat.getChanges());
+////        }
+//
+//        if(item.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
+//            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+item.getChatId());
+//            if(item!=null){
+//
+//                if (adapterList == null || adapterList.getItemCount()==0){
+//                    setChats();
+//                }
+//                else{
+//                    long chatHandleToUpdate = item.getChatId();
+//                    int indexToReplace = -1;
+//                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+//                    while (itrReplace.hasNext()) {
+//                        MegaChatListItem chat = itrReplace.next();
+//                        if(chat!=null){
+//                            if(chat.getChatId()==chatHandleToUpdate){
+//                                indexToReplace = itrReplace.nextIndex()-1;
+//                                break;
+//                            }
+//                        }
+//                        else{
+//                            break;
+//                        }
+//                    }
+//                    if(indexToReplace!=-1){
+//                        log("Index to replace: "+indexToReplace);
+//                        MegaChatListItem chatToReplace = megaChatApi.getChatListItem(item.getChatId());
+//                        log("Unread count: "+chatToReplace.getUnreadCount());
+//                        chats.set(indexToReplace, chatToReplace);
+//
+//                        adapterList.modifyChat(chats, indexToReplace);
+//                        adapterList.setPositionClicked(-1);
+//
+//                        if (adapterList.getItemCount() == 0){
+//                            log("adapterList.getItemCount() == 0");
+//                            listView.setVisibility(View.GONE);
+//                            emptyLayout.setVisibility(View.VISIBLE);
+//                        }
+//                        else{
+//                            log("adapterList.getItemCount() NOT = 0");
+//                            listView.setVisibility(View.VISIBLE);
+//                            emptyLayout.setVisibility(View.GONE);
+//                        }
+//                    }
+//                }
+//            }
 //        }
-
-        if(item.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
-            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+item.getChatId());
-            if(item!=null){
-
-                if (adapterList == null || adapterList.getItemCount()==0){
-                    setChats();
-                }
-                else{
-                    long chatHandleToUpdate = item.getChatId();
-                    int indexToReplace = -1;
-                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                    while (itrReplace.hasNext()) {
-                        MegaChatListItem chat = itrReplace.next();
-                        if(chat!=null){
-                            if(chat.getChatId()==chatHandleToUpdate){
-                                indexToReplace = itrReplace.nextIndex()-1;
-                                break;
-                            }
-                        }
-                        else{
-                            break;
-                        }
-                    }
-                    if(indexToReplace!=-1){
-                        log("Index to replace: "+indexToReplace);
-                        MegaChatListItem chatToReplace = megaChatApi.getChatListItem(item.getChatId());
-                        log("Unread count: "+chatToReplace.getUnreadCount());
-                        chats.set(indexToReplace, chatToReplace);
-
-                        adapterList.modifyChat(chats, indexToReplace);
-                        adapterList.setPositionClicked(-1);
-
-                        if (adapterList.getItemCount() == 0){
-                            log("adapterList.getItemCount() == 0");
-                            listView.setVisibility(View.GONE);
-                            emptyLayout.setVisibility(View.VISIBLE);
-                        }
-                        else{
-                            log("adapterList.getItemCount() NOT = 0");
-                            listView.setVisibility(View.VISIBLE);
-                            emptyLayout.setVisibility(View.GONE);
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    }
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);

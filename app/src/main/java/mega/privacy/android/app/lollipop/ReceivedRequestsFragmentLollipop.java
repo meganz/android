@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	MegaContactRequestLollipopAdapter adapterList;
 	ImageView emptyImageView;
 	TextView emptyTextView;
+	TextView contentText;
+	RelativeLayout contentTextLayout;
 	RecyclerView.LayoutManager mLayoutManager;
 
 	private ActionMode actionMode;
@@ -321,13 +324,21 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 			listView.setItemAnimator(new DefaultItemAnimator());		        
 	        
 	        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
-			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);			
+			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);
+
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_requests_list_content_text_layout);
+
+			contentText = (TextView) v.findViewById(R.id.contact_requests_list_content_text);
 			
 			if (adapterList == null){
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
+			}
+
+			if (contacts.size() > 0) {
+				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
 			}
 		
 			adapterList.setPositionClicked(-1);
@@ -338,12 +349,14 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 				emptyImageView.setImageResource(R.drawable.received_requests_empty);
 				emptyTextView.setText(R.string.received_requests_empty);
 				listView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				log("adapterList.getCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -371,6 +384,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 		else{
 			adapterList.setContacts(contacts);
 		}
+
+		if (contacts.size() > 0) {
+			contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
+		}
 	
 		adapterList.setPositionClicked(-1);
 		
@@ -379,12 +396,14 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 			emptyImageView.setImageResource(R.drawable.received_requests_empty);
 			emptyTextView.setText(R.string.received_requests_empty);
 			listView.setVisibility(View.GONE);
+			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 		}
 		else{
 			log("adapterList.getCount() NOT = 0");
 			listView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}		
@@ -426,6 +445,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
     		{
     			adapterList.setContacts(contacts);
         		adapterList.notifyDataSetChanged();
+
+				if (contacts.size() > 0) {
+					contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
+				}
     		}
     		else
     		{
@@ -438,12 +461,14 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 				emptyImageView.setImageResource(R.drawable.received_requests_empty);
 				emptyTextView.setText(R.string.received_requests_empty);
 				listView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				log("adapterList.getCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}

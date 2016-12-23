@@ -210,8 +210,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-    
+
 	    dbH = DatabaseHandler.getDbHandler(context);
 	    
 	    if (viewType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST){
@@ -225,12 +224,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 		    holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
-			
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
-			
+
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);	    
 		    
@@ -314,7 +308,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.contactMail = contact.getEmail();
 		
 		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
@@ -330,7 +323,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 		} 
 		else {
-			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
@@ -554,7 +546,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		log("contact: "+contact.getEmail()+" handle: "+contact.getHandle());
 	
 		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
@@ -573,7 +564,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 		} else {
-			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));

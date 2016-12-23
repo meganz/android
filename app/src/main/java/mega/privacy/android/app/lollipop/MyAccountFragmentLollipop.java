@@ -372,6 +372,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		if(myAccountInfo!=null){
+			log("myAccountInfo!=NULL");
 			if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
 				log("MyName is:"+ myAccountInfo.getFullName());
 				nameView.setText(myAccountInfo.getFullName());
@@ -385,6 +386,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 		else{
+			log("myAccountInfo is NULL");
 			myAccountInfo.setFirstName(false);
 			myAccountInfo.setLastName(false);
 

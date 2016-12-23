@@ -150,11 +150,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.participant_list_three_dots);
 			holderList.permissionsIcon = (ImageView) v.findViewById(R.id.participant_list_permissions);
 
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams) holderList.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
-
 			holderList.itemLayout.setTag(holderList);
 			v.setTag(holderList);
 			return holderList;
@@ -575,7 +570,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				else{
 					log("Selected: "+p.getFullName());
 				}
-				((GroupChatInfoActivityLollipop) context).showParticipantsOptionsPanel(p);
+				((GroupChatInfoActivityLollipop) context).showParticipantsPanel(p);
 				break;
 			}
 			case R.id.add_participant_list_item_layout:{

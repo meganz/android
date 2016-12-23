@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.LauncherFileExplorerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
@@ -58,6 +57,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	TextView cancelText;
 	View separator;
 
+	public static CloudDriveExplorerFragmentLollipop newInstance() {
+		log("newInstance");
+		CloudDriveExplorerFragmentLollipop fragment = new CloudDriveExplorerFragmentLollipop();
+		return fragment;
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -72,14 +77,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		parentHandle = -1;
 		dbH = DatabaseHandler.getDbHandler(context);
-		
-		Bundle bundle = this.getArguments();
-		if (bundle != null) {
-		    modeCloud = bundle.getInt("MODE", LauncherFileExplorerActivity.COPY);
-		    selectFile = bundle.getBoolean("SELECTFILE", false);
-		}
-		log("onCreate mode: "+modeCloud);
-//		first=true;
 	}
 
 	@Override
@@ -132,8 +129,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+
+		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
+		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 		
-		if(modeCloud==LauncherFileExplorerActivity.SELECT_CAMERA_FOLDER){
+		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			parentHandle = -1;
 		}
 		else{
@@ -209,13 +209,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			
 		}
 		
-		if (context instanceof LauncherFileExplorerActivity){
-			((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
-		}		
-		else if (context instanceof FileExplorerActivityLollipop){
-			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
-		}
-		
+		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
+
 		if (adapter == null){
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
 			
@@ -233,22 +228,22 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			adapter.setSelectFile(selectFile);
 		}
 		
-		if (modeCloud == LauncherFileExplorerActivity.MOVE) {
+		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionText.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));			
 		}
-		else if (modeCloud == LauncherFileExplorerActivity.COPY){
+		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionText.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));	
 		}
-		else if (modeCloud == LauncherFileExplorerActivity.UPLOAD){
+		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));	
 		}
-		else if (modeCloud == LauncherFileExplorerActivity.IMPORT){
+		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
 			optionText.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
 		}
-		else if (modeCloud == LauncherFileExplorerActivity.SELECT || modeCloud == LauncherFileExplorerActivity.SELECT_CAMERA_FOLDER){
+		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
 		}
-		else if(modeCloud == LauncherFileExplorerActivity.UPLOAD_SELFIE){
+		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
 			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}	
 		else {
@@ -314,12 +309,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 	
 	public void changeActionBarTitle(String folder){
-		if (context instanceof LauncherFileExplorerActivity){
-			((LauncherFileExplorerActivity) context).changeTitle(folder);
-		}
-		else if (context instanceof FileExplorerActivityLollipop){
-			((FileExplorerActivityLollipop) context).changeTitle(folder);
-		}
+		((FileExplorerActivityLollipop) context).changeTitle(folder);
 	}
 	
 //	public void setBackVisibility(boolean backVisibility){
@@ -337,24 +327,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		switch(v.getId()){
 			case R.id.action_text:{				
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
-				if (context instanceof LauncherFileExplorerActivity){
-					((LauncherFileExplorerActivity) context).buttonClick(parentHandle);
-				}
-				else if (context instanceof FileExplorerActivityLollipop){
-					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
-				}
+				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
 				break;
 			}
 			case R.id.cancel_text:{
-				if (context instanceof LauncherFileExplorerActivity){
-					log("Cancel back to Cloud");
-					((LauncherFileExplorerActivity) context).backToCloud(-1);
-					((LauncherFileExplorerActivity) context).finish();
-
-				}
-				else if (context instanceof FileExplorerActivityLollipop){
-					((FileExplorerActivityLollipop) context).finish();
-				}
+				((FileExplorerActivityLollipop) context).finish();
 			}
 			break;
 		}
@@ -400,12 +377,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 			
 			parentHandle = nodes.get(position).getHandle();
-			if (context instanceof LauncherFileExplorerActivity){
-				((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
-			}
-			else if (context instanceof FileExplorerActivityLollipop){
-				((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
-			}
+
+			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
+
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
@@ -440,12 +414,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				log("Selected node to send: "+n.getName());
 				if(nodes.get(position).isFile()){
 					MegaNode nFile = nodes.get(position);
-					if (context instanceof LauncherFileExplorerActivity){
-						((LauncherFileExplorerActivity) context).buttonClick(nFile.getHandle());
-					}
-					else if (context instanceof FileExplorerActivityLollipop){
-						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
-					}
+					((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
 				}
 				
 			}
@@ -500,13 +469,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
 			adapter.setParentHandle(parentHandle);
-			if (context instanceof LauncherFileExplorerActivity){
-				((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
-			}
-			else if (context instanceof FileExplorerActivityLollipop){
-				((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
-			}
-			
+			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
+
 			return 2;
 		}
 		else{
@@ -552,13 +516,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
 		}
-		
-		if (context instanceof LauncherFileExplorerActivity){
-			((LauncherFileExplorerActivity)context).setParentHandle(parentHandle);
-		}
-		else if (context instanceof FileExplorerActivityLollipop){
-			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
-		}
+		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
@@ -584,7 +542,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 		}
 	}
-	
+
 	public RecyclerView getListView(){
 		return listView;
 	}
