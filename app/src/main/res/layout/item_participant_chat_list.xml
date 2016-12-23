@@ -31,18 +31,42 @@
             android:paddingBottom="3dp" />
     </RelativeLayout>
 
+
+    <ImageButton
+        android:id="@+id/participant_list_three_dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:layout_marginRight="10dp"
+		android:layout_centerVertical="true"
+        android:src="@drawable/ic_dots_vertical_grey" />
+
+    <ImageView
+        android:id="@+id/participant_list_permissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_permissions_full_access"
+        android:background="@null"
+        android:layout_marginRight="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_toLeftOf="@id/participant_list_three_dots"
+        android:layout_centerVertical="true"/>
+
     <TextView
         android:id="@+id/participant_list_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/participant_list_relative_layout_avatar"
+        android:layout_toLeftOf="@id/participant_list_permissions"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
-        android:textColor="@color/file_list_first_row" 
-        android:ellipsize="end"
+        android:textColor="@color/file_list_first_row"
+        android:ellipsize="middle"
         android:textSize="16sp"
-        android:maxLines="1"/>
-   
+        android:maxLines="1"
+        android:singleLine="true"/>
+
     <TextView
         android:id="@+id/participant_list_content"
         android:layout_width="wrap_content"
@@ -54,24 +78,5 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/file_list_second_row" />
-
-    <ImageButton
-        android:id="@+id/participant_list_three_dots"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:background="@null"
-        android:paddingLeft="10dp"
-		android:layout_centerVertical="true"
-        android:src="@drawable/ic_dots_vertical_grey" />
-
-    <ImageView
-        android:id="@+id/participant_list_permissions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_permissions_full_access"
-        android:background="@null"
-        android:layout_toLeftOf="@id/participant_list_three_dots"
-        android:layout_centerVertical="true"/>
 
 </RelativeLayout>

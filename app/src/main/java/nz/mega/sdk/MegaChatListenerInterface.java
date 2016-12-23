@@ -17,5 +17,6 @@ package nz.mega.sdk;
 
 public interface MegaChatListenerInterface {
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item);
-    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat);
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState);
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status);
 }

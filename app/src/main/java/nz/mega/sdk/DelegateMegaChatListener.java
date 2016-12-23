@@ -43,15 +43,26 @@ class DelegateMegaChatListener extends MegaChatListener {
     }
 
     @Override
-    public void onChatRoomUpdate(MegaChatApi api, MegaChatRoom chat)
+    public void onChatInitStateUpdate(MegaChatApi api, final int newState)
     {
         if (listener != null) {
-            final MegaChatRoom megaChatRoom = chat.copy();
             megaChatApi.runCallback(new Runnable() {
                 public void run() {
-                    listener.onChatRoomUpdate(megaChatApi, megaChatRoom);
+                    listener.onChatInitStateUpdate(megaChatApi, newState);
                 }
             });
         }
     }
+
+//    @Override
+//    public void onChatOnlineStatusUpdate(MegaChatApi api, final int status)
+//    {
+//        if (listener != null) {
+//            megaChatApi.runCallback(new Runnable() {
+//                public void run() {
+//                    listener.onChatOnlineStatusUpdate(megaChatApi, status);
+//                }
+//            });
+//        }
+//    }
 }

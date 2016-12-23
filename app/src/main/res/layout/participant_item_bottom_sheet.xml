@@ -1,39 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mega.privacy.android.app.components.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/sliding_layout_group_participants_chat"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/participant_item_bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:visibility="gone"
-    android:gravity="bottom"
-    sothree:umanoDragView="@+id/dragView"
-    sothree:umanoOverlay="true"
-    sothree:umanoPanelHeight="120dp"
-    sothree:umanoParallaxOffset="100dp"
-    sothree:umanoShadowHeight="4dp"
-    android:elevation="16dp">
-
-    <!-- MAIN CONTENT -->
-
-    <FrameLayout
-        android:id="@+id/out_group_participants_chat"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/main_group_participants_chat"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:focusable="false"
-            android:focusableInTouchMode="true"
-            android:gravity="center" />
-    </FrameLayout>
-
-    <!-- SLIDING LAYOUT -->
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/group_participants_chat"
@@ -306,4 +282,4 @@
                 android:textSize="16sp"/>
         </LinearLayout>
     </LinearLayout>
-</mega.privacy.android.app.components.SlidingUpPanelLayout>
+</LinearLayout>

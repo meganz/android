@@ -1735,6 +1735,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_MY_ACCOUNT)){
+						log("intent from chat - show my account");
+						drawerItem=DrawerItem.ACCOUNT;
+						accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
 				}
 	        }
 
@@ -3176,6 +3183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			default:{
 				log("Show myAccount Fragment");
+				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 				if (maFLol == null){
 					log("New MyAccountFragment");
 					maFLol = new MyAccountFragmentLollipop();
@@ -8308,7 +8316,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_remove_contact,c.getEmail());
+		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
+		builder.setTitle(title);
+		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
@@ -8331,14 +8341,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		};
 
-		String message="";
 		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
-		if(c.size()==1){
-			message= getResources().getString(R.string.confirmation_remove_contact,c.get(0).getEmail());
-		}else{
-			message= getResources().getString(R.string.confirmation_remove_multiple_contacts,c.size());
-		}
-
+		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, c.size());
+		builder.setTitle(title);
+		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, c.size());
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
@@ -8416,7 +8422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -8548,6 +8554,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void showConfirmationClearChat(final MegaChatListItem c){
+		log("showConfirmationClearChat");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Clear chat!");
+//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
+						log("Clear history selected!");
+						ChatController chatC = new ChatController(managerActivity);
+						chatC.clearHistory(c.getChatId());
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		String message= getResources().getString(R.string.confirmation_clear_group_chat);
+		builder.setTitle(R.string.title_confirmation_clear_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
@@ -9275,6 +9310,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("hideAvatarOptionsPanel");
 		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		slidingAvatarOptionsPanel.setVisibility(View.GONE);
+		fabButton.setVisibility(View.GONE);
 	}
 
 	private void showOverquotaAlert(){
@@ -12612,15 +12648,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	public void hideChatPanel(){
-
-		View bottomSheet = fragmentContainer.findViewById(R.id.chat_item_bottom_sheet);
-		BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-		behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){

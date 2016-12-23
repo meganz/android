@@ -10,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -63,6 +65,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public TextView optionMuteChatText;
 
     boolean notificationsEnabled;
+    ChatItemPreferences chatPrefs;
 
     DisplayMetrics outMetrics;
 
@@ -165,7 +168,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			optionClearHistory.setVisibility(View.VISIBLE);
 		}
 
-		ChatItemPreferences chatPrefs;
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
 			log("Chat prefs exists!!!");
@@ -335,18 +337,31 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     log("Selected chat NULL");
                 }
                 log("Clear chat with: "+chat.getTitle());
-                ChatController chatC = new ChatController(context);
-                chatC.clearHistory(chat.getChatId());
+                ((ManagerActivityLollipop)context).showConfirmationClearChat(chat);
+
                 break;
             }
             case R.id.chat_list_mute_chat_layout:{
                 log("click mute chat");
-                ChatController chatC = new ChatController(context);
-                if(notificationsEnabled){
-                    chatC.muteChat(chat);
+                if(chatPrefs==null) {
+
+                    if(notificationsEnabled){
+                        chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(true), "", "");
+                    }
+                    else{
+                        chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(false), "", "");
+                    }
+
+                    dbH.setChatItemPreferences(chatPrefs);
                 }
                 else{
-                    chatC.unmuteChat(chat);
+                    ChatController chatC = new ChatController(context);
+                    if(notificationsEnabled){
+                        chatC.muteChat(chat);
+                    }
+                    else{
+                        chatC.unmuteChat(chat);
+                    }
                 }
 
                 ((ManagerActivityLollipop)context).setChats();

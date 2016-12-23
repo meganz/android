@@ -90,7 +90,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
@@ -638,6 +638,7 @@ public class Util {
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
+		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, "[clientApp] "+ origin + ": " + message, origin);
 
 //		try {
 //			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -647,11 +648,10 @@ public class Util {
 //		}
 //		catch (Exception e){}
 
-		File logFile=null;
-		if (DEBUG) {
-			message = origin +": " + message;
-			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
-		}
+//		File logFile=null;
+//		if (DEBUG) {
+//			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
+//		}
 
 //		if (fileLogger) {
 //			//Send the log to a file

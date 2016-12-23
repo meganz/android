@@ -105,6 +105,7 @@ public class Constants {
 	public static String ACTION_CHANGE_MAIL = "CHANGE_MAIL";
 	public static String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
 	public static String ACTION_IPC = "IPC";
+	public static String ACTION_SHOW_MY_ACCOUNT = "ACTION_SHOW_MY_ACCOUNT";
 
 	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";

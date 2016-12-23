@@ -13,9 +13,10 @@
 
         <TextView
             android:id="@+id/offline_content_text"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"            
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/mail_my_account"
+            android:layout_marginLeft="72dp"
             android:layout_centerVertical="true"
             android:textSize="14sp" />
     </RelativeLayout>

@@ -325,12 +325,6 @@
 
         </android.support.v4.widget.NestedScrollView>
 
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            layout="@layout/sliding_group_participants_panel"
-            android:visibility="gone"
-            android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
