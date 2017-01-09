@@ -757,19 +757,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					}
 				}
 
-				if (Util.isOnline(context)){
-					//With connection
-					log("Connection! - ManagerActivity instance!");
-					if(context instanceof ManagerActivityLollipop){
-						((ManagerActivityLollipop) context).showOptionsPanel(mOff);
-					}
-				}
-				else{
-					//No connection
-					log("No connection!");
-					if(context instanceof OfflineActivityLollipop){
-						((OfflineActivityLollipop) context).showOptionsPanel(mOff);
-					}
+				if(context instanceof ManagerActivityLollipop){
+					((ManagerActivityLollipop) context).showOptionsPanel(mOff);
 				}
 
 				break;

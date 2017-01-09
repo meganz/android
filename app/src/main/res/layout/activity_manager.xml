@@ -224,7 +224,6 @@
         android:visibility="gone"
         android:layout_alignParentBottom="true"/>
 
-
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"

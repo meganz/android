@@ -1500,7 +1500,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
 //			startActivity(offlineIntent);
 //			finish();
-//        	return;
+			showOfflineMode();
+
+//			selectDrawerItemPending=false;
+        	return;
         }
 
         dbH.setAttrOnline(true);
@@ -2818,6 +2821,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		viewPagerContacts.setVisibility(View.GONE);
+	}
+
+	public void showOfflineMode(){
+
+
+		Menu nVMenu = nV.getMenu();
+		drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
+		if (drawerMenuItem != null){
+			disableNavigationViewMenu(nVMenu);
+			drawerMenuItem.setChecked(true);
+			drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_red));
+		}
+
+		drawerItem=DrawerItem.SAVED_FOR_OFFLINE;
+		selectDrawerItemLollipop(drawerItem);
+
 	}
 
 	public void selectDrawerItemSharedItems(){
@@ -9122,38 +9141,63 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		long handle = Long.parseLong(sNode.getHandle());
-		this.selectedNode = megaApi.getNodeByHandle(handle);
-		this.selectedOfflineNode = sNode;
+		if (Util.isOnline(this)){
+			//With connection
+			log("Connection!");
+			long handle = Long.parseLong(sNode.getHandle());
+			this.selectedNode = megaApi.getNodeByHandle(handle);
+			this.selectedOfflineNode = sNode;
 
-		if(selectedNode!=null){
-			if (selectedNode.isFolder()) {
-				propertiesText.setText(R.string.general_folder_info);
-			}else{
-				propertiesText.setText(R.string.general_file_info);
+			if(selectedNode!=null){
+				if (selectedNode.isFolder()) {
+					propertiesText.setText(R.string.general_folder_info);
+				}else{
+					propertiesText.setText(R.string.general_file_info);
+				}
+
+				optionDownload.setVisibility(View.VISIBLE);
+				optionProperties.setVisibility(View.VISIBLE);
+				optionDeleteOffline.setVisibility(View.VISIBLE);
+				optionRemoveLink.setVisibility(View.GONE);
+				optionMoveTo.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionPermissions.setVisibility(View.GONE);
+				optionLeaveShare.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionCopyTo.setVisibility(View.GONE);
+				optionSendToInbox.setVisibility(View.GONE);
+				optionShare.setVisibility(View.GONE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRemoveLink.setVisibility(View.GONE);
+				optionOpenFolder.setVisibility(View.GONE);
 			}
+			else{
+				//No node handle
+				log("node not found with handle");
+				optionMoveTo.setVisibility(View.GONE);
+				optionRemoveTotal.setVisibility(View.GONE);
+				optionProperties.setVisibility(View.GONE);
+				optionClearShares.setVisibility(View.GONE);
+				optionPermissions.setVisibility(View.GONE);
+				optionLeaveShare.setVisibility(View.GONE);
+				optionDelete.setVisibility(View.GONE);
+				optionRename.setVisibility(View.GONE);
+				optionCopyTo.setVisibility(View.GONE);
+				optionSendToInbox.setVisibility(View.GONE);
+				optionShare.setVisibility(View.GONE);
+				optionDownload.setVisibility(View.GONE);
+				optionPublicLink.setVisibility(View.GONE);
+				optionRemoveLink.setVisibility(View.GONE);
+				optionOpenFolder.setVisibility(View.GONE);
+				optionDeleteOffline.setVisibility(View.VISIBLE);
 
-			optionDownload.setVisibility(View.VISIBLE);
-			optionProperties.setVisibility(View.VISIBLE);
-			optionDeleteOffline.setVisibility(View.VISIBLE);
-			optionRemoveLink.setVisibility(View.GONE);
-			optionMoveTo.setVisibility(View.GONE);
-			optionRemoveTotal.setVisibility(View.GONE);
-			optionClearShares.setVisibility(View.GONE);
-			optionPermissions.setVisibility(View.GONE);
-			optionLeaveShare.setVisibility(View.GONE);
-			optionDelete.setVisibility(View.GONE);
-			optionRename.setVisibility(View.GONE);
-			optionCopyTo.setVisibility(View.GONE);
-			optionSendToInbox.setVisibility(View.GONE);
-			optionShare.setVisibility(View.GONE);
-			optionPublicLink.setVisibility(View.GONE);
-			optionRemoveLink.setVisibility(View.GONE);
-			optionOpenFolder.setVisibility(View.GONE);
+			}
 		}
 		else{
-			//No node handle
-			log("node not found with handle");
+			//No connection
+			log("No connection!");
 			optionMoveTo.setVisibility(View.GONE);
 			optionRemoveTotal.setVisibility(View.GONE);
 			optionProperties.setVisibility(View.GONE);
@@ -9170,11 +9214,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			optionRemoveLink.setVisibility(View.GONE);
 			optionOpenFolder.setVisibility(View.GONE);
 			optionDeleteOffline.setVisibility(View.VISIBLE);
-
 		}
 
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
 		log("Show the slidingPanel offline");
 	}
 
@@ -10492,6 +10536,54 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
+	}
+
+	void disableNavigationViewMenu(Menu menu){
+		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.cloud_drive_grey));
+			mi.setChecked(false);
+			mi.setEnabled(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_grey));
+			mi.setChecked(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_camera_uploads);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.camera_uploads_grey));
+			mi.setChecked(false);
+			mi.setEnabled(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_inbox);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+			mi.setChecked(false);
+			mi.setEnabled(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_shared_items);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.shared_items_grey));
+			mi.setChecked(false);
+			mi.setEnabled(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_chat);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat));
+			mi.setChecked(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_contacts);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.contacts_grey));
+			mi.setChecked(false);
+			mi.setEnabled(false);
+		}
+		mi = menu.findItem(R.id.navigation_item_settings);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.settings_grey));
+			mi.setChecked(false);
+		}
 	}
 
 	void resetNavigationViewMenu(Menu menu){
