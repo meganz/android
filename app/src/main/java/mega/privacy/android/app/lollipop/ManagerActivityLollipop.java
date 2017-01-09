@@ -4094,8 +4094,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
     			searchMenuItem.setVisible(true);
 
-				//Hide
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
@@ -9764,15 +9763,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			case R.id.navigation_drawer_account_view:{
 //				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
-				drawerItem = DrawerItem.ACCOUNT;
-				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
-					resetNavigationViewMenu(nVMenu);
-					hidden.setChecked(true);
+				if (Util.isOnline(this)){
+					drawerItem = DrawerItem.ACCOUNT;
+					accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+					if (nV != null){
+						Menu nVMenu = nV.getMenu();
+						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+						resetNavigationViewMenu(nVMenu);
+						hidden.setChecked(true);
+					}
+					selectDrawerItemLollipop(drawerItem);
 				}
-				selectDrawerItemLollipop(drawerItem);
+
 				break;
 			}
 //			case R.id.top_control_bar:{
