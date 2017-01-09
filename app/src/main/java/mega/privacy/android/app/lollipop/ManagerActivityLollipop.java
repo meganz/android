@@ -108,6 +108,7 @@ import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
@@ -125,6 +126,7 @@ import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
@@ -276,6 +278,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
+	ChatSettings chatSettings = null;
 	MegaAttributes attr = null;
 	static ManagerActivityLollipop managerActivity = null;
 	MegaApplication app = null;
@@ -1578,7 +1581,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("rootNode != null");
-			megaChatApi.connect(this);
 
 			String token = FirebaseInstanceId.getInstance().getToken();
 			if (token != null) {
@@ -3262,6 +3264,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (rChatFL == null){
 			log("New REcentChatFragment");
 			rChatFL = new RecentChatsFragmentLollipop();
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.fragment_container, rChatFL, "rChat");
+			ft.commit();
 //			maFLol.setMyEmail(megaApi.getMyUser().getEmail());
 //			if(myAccountInfo==null){
 //				log("Not possibleeeeeee!!");
@@ -3273,6 +3278,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("REcentChatFragment is not null");
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.fragment_container, rChatFL, "rChat");
+			ft.commit();
+			rChatFL.setChats();
 //			rChatFL.setMyEmail(megaApi.getMyUser().getEmail());
 //			if(myAccountInfo==null){
 //				log("Not possibleeeeeee!!");
@@ -3283,10 +3292,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //
 //			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
-
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_container, rChatFL, "rChat");
-		ft.commit();
+		log("show chats");
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -9836,6 +9842,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Uri treeUri = intent.getData();
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
+		if (requestCode == Constants.ENABLE_CHAT && resultCode == RESULT_OK){
+			log("OnActivityResult-->connect");
+
+		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
 				log("Return.....");
@@ -10818,15 +10828,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestFinish(CHAT)");
 
-		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Connected to chat!");
-			}
-			else{
-				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
+		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
 			log("Truncate history request finisf!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				showSnackbar(getString(R.string.clear_history_success));
@@ -10920,13 +10922,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOGOUT){
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-			startActivity(intent);
-			finish();
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				showSnackbar("Chat disabled");
+			}
+			else{
+				log("EEEERRRRROR logout CHAT " + e.getErrorString());
+			}
 		}
 	}
 
@@ -10964,12 +10965,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
 
-			if (recentChatsFragmentLollipopListener != null){
-				log("remove chatlistener");
-				megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
-			}
+//			if (recentChatsFragmentLollipopListener != null){
+//				log("remove chatlistener");
+//				megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
+//			}
+//
+//			megaChatApi.logout(this);
 
-			megaChatApi.logout(this);
 //			if (request.getType() == MegaRequest.TYPE_LOGOUT){
 //				log("type_logout");
 //				if (e.getErrorCode() == MegaError.API_ESID){
@@ -12997,6 +12999,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setChatListenerRecentChatsFragmentLollipop(MegaChatListenerInterface recentChatsFragmentLollipopListener){
 		log("setChatListenerRecentChatsFragmentLollipop");
 		this.recentChatsFragmentLollipopListener = recentChatsFragmentLollipopListener;
+	}
+
+	public void enableChat(){
+		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+		intent.setAction(Constants.ACTION_ENABLE_CHAT);
+		startActivity(intent);
+		finish();
+//		UserCredentials credentials = dbH.getCredentials();
+//		String gSession = credentials.getSession();
+//		int ret = megaChatApi.init(gSession);
+//		megaApi.fetchNodes(this);
+	}
+
+
+	public void disableChat(){
+		log("disableChat");
+//		if(rChatFL!=null){
+//			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag("rChat");
+//			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//			ft.remove(rChatFL);
+//			ft.commit();
+//		}
+//
+		if(rChatFL!=null){
+			log("REcent Chat still there");
+			megaChatApi.removeChatListener(rChatFL);
+		}
+
+//		if (recentChatsFragmentLollipopListener != null){
+//			log("remove recentChatsFragmentLollipopListener");
+//			megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
+//			recentChatsFragmentLollipopListener=null;
+//		}
+//		rChatFL = null;
+
+		megaChatApi.logout(this);
 	}
 
 //	public String getFullNameChat() {
