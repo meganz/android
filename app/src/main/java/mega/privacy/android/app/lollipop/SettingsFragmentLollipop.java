@@ -1432,16 +1432,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatEnabled = !chatEnabled;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				if (chatEnabled){
-					//Intent to set the PIN
 					log("CONNECT CHAT!!!");
 					dbH.setEnabledChat(true+"");
 					preferenceScreen.addPreference(chatNotificationsCategory);
 					preferenceScreen.addPreference(chatStatusCategory);
+					((ManagerActivityLollipop)context).enableChat();
 				}
 				else{
 					dbH.setEnabledChat(false+"");
 					preferenceScreen.removePreference(chatNotificationsCategory);
 					preferenceScreen.removePreference(chatStatusCategory);
+					((ManagerActivityLollipop)context).disableChat();
 				}
 			}
 			else{

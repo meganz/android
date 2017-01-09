@@ -1034,4 +1034,6 @@
         <item context="Plural" quantity="other">Remove contacts?</item>
     </plurals>
 
+    <string name="chat_connection_error" context="error shown when the connection to the chat fails">Chat connection error</string>
+
 </resources>
