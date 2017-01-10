@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    
+    <item
+        android:id="@+id/cab_menu_share_folder"
+        android:orderInCategory="100"
+        android:title="@string/context_share_folder"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_view_shares"
+        android:orderInCategory="105"
+        android:title="@string/context_view_shared_folders"
+        MEGA:showAsAction="never" />
+
+</menu>

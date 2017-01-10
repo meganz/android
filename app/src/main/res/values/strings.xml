@@ -889,7 +889,7 @@
     <string name="general_mute" context="button">Mute</string>
     <string name="general_unmute" context="button">Unmute</string>
 
-    <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
+    <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Chat message sound</string>
     <string name="title_properties_chat_contact_call_sound" context="Title of the section to choose the ringtone of incoming calls in the Contact Properties screen">Call ringtone</string>
     <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat</string>
