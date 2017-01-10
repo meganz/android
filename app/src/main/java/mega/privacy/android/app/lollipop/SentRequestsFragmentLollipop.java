@@ -135,6 +135,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.sent_request_action, menu);
+			((ManagerActivityLollipop)context).hideFabButton();
 			return true;
 		}
 
@@ -142,6 +143,7 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapterList.setMultipleSelect(false);
 			clearSelections();
+			((ManagerActivityLollipop)context).showFabButton();
 		}
 
 		@Override

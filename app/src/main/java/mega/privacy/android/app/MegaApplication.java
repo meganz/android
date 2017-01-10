@@ -113,8 +113,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onCreate() {
 		super.onCreate();
 
-//		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-//		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+		MegaApiAndroid.setLoggerObject(new AndroidLogger());
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();

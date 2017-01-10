@@ -335,11 +335,13 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                     log("(1)request.getText(): "+request.getText());
                     firstNameText=request.getText();
                     firstName=true;
+                    dbH.saveMyFirstName(firstNameText);
                 }
                 else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
                     log("(2)request.getText(): "+request.getText());
                     lastNameText = request.getText();
                     lastName = true;
+                    dbH.saveMyLastName(lastNameText);
                 }
                 if(firstName && lastName){
                     log("Name and First Name received!");

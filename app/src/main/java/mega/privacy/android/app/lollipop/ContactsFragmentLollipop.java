@@ -150,6 +150,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
+			((ManagerActivityLollipop)context).hideFabButton();
 			return true;
 		}
 
@@ -157,6 +158,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapter.setMultipleSelect(false);
 			clearSelections();
+			((ManagerActivityLollipop)context).showFabButton();
 		}
 
 		@Override

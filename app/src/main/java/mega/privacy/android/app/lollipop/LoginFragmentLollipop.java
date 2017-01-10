@@ -45,6 +45,7 @@ import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.OldUserCredentials;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -62,7 +63,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     Context context;
     private AlertDialog insertMailDialog;
@@ -121,6 +122,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     DatabaseHandler dbH;
     Handler handler = new Handler();
+    ChatSettings chatSettings;
 
     private String lastEmail;
     private String lastPassword;
@@ -495,6 +497,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     startLoginInProcess();
                     return v;
                 }
+                else if (intentReceived.getAction().equals(Constants.ACTION_ENABLE_CHAT)){
+                    enableChat();
+                    return v;
+                }
                 else{
                     if(intentReceived.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
                         action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
@@ -695,6 +701,61 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         megaApi.fetchNodes(this);
     }
 
+    public void enableChat(){
+        log("enableChat");
+
+        UserCredentials credentials = dbH.getCredentials();
+        lastEmail = credentials.getEmail();
+        gSession = credentials.getSession();
+
+        loginLogin.setVisibility(View.GONE);
+        loginDelimiter.setVisibility(View.GONE);
+        loginCreateAccount.setVisibility(View.GONE);
+        queryingSignupLinkText.setVisibility(View.GONE);
+        confirmingAccountText.setVisibility(View.GONE);
+        loginLoggingIn.setVisibility(View.VISIBLE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+//					generatingKeysText.setVisibility(View.VISIBLE);
+//					megaApi.fastLogin(gSession, this);
+
+        loginProgressBar.setVisibility(View.VISIBLE);
+        loginFetchNodesProgressBar.setVisibility(View.GONE);
+        loggingInText.setVisibility(View.VISIBLE);
+        fetchingNodesText.setVisibility(View.GONE);
+        prepareNodesText.setVisibility(View.GONE);
+        initizalizingChatText.setVisibility(View.GONE);
+        serversBusyText.setVisibility(View.GONE);
+
+        initizalizingChatText.setText("Chat initialization...");
+        initizalizingChatText.setVisibility(View.VISIBLE);
+        int ret = megaChatApi.init(gSession);
+        chatSettings = dbH.getChatSettings();
+        if (ret == MegaChatApi.INIT_NO_CACHE)
+        {
+            megaApi.invalidateCache();
+            initizalizingChatText.setText("Chat correclty initialized");
+        }
+        else if (ret == MegaChatApi.INIT_ERROR)
+        {
+            // chat cannot initialize, disable chat completely
+
+            initizalizingChatText.setText("Chat error, not initialized");
+            if(chatSettings==null) {
+                chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                dbH.setChatSettings(chatSettings);
+            }
+            else{
+                dbH.setEnabledChat(false + "");
+            }
+            megaChatApi.logout(null);
+        }
+        else{
+            initizalizingChatText.setText("Chat correclty initialized");
+        }
+        fetchingNodesText.setVisibility(View.VISIBLE);
+        megaApi.fetchNodes(this);
+    }
+
     public void oldCredentialsLogin(){
         log("oldCredentialsLogin");
         loginLogin.setVisibility(View.GONE);
@@ -742,17 +803,34 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         resumeSesion = true;
+
         int ret = megaChatApi.init(gSession);
+        initizalizingChatText.setVisibility(View.VISIBLE);
+        initizalizingChatText.setText("Chat getting session...");
+        chatSettings = dbH.getChatSettings();
         if (ret == MegaChatApi.INIT_NO_CACHE)
         {
             megaApi.invalidateCache();
+
         }
         else if (ret == MegaChatApi.INIT_ERROR)
         {
             // chat cannot initialize, disable chat completely
-            // megachatapi.logout() y megachatapi = null
-            //base de datos disable
+
+            initizalizingChatText.setText("Chat error, not initialized");
+            if(chatSettings==null) {
+                chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                dbH.setChatSettings(chatSettings);
+            }
+            else{
+                dbH.setEnabledChat(false + "");
+            }
+            megaChatApi.logout(null);
         }
+        else{
+            initizalizingChatText.setText("Chat correclty initialized");
+        }
+        initizalizingChatText.setVisibility(View.GONE);
         megaApi.fastLogin(gSession, this);
     }
 
@@ -870,12 +948,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         log("fastLogin con publicKey y privateKey");
         resumeSesion = false;
 
-        int ret = megaChatApi.init(null);
-        if ((ret == MegaChatApi.INIT_ERROR) || (ret !=MegaChatApi.INIT_WAITING_NEW_SESSION)){
-            //disable chat, logut, etc..
-        }
 
-        megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+        int ret = megaChatApi.init(null);
+        if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
+            megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+        }
+        else{
+            log("ERROR INIT CHAT: " + ret);
+            megaChatApi.logout(this);
+        }
+//        if ((ret == MegaChatApi.INIT_ERROR) || (ret !=MegaChatApi.INIT_WAITING_NEW_SESSION)){
+//            log("RET CHAT INIT: " + ret);
+//            //disable chat, logut, etc..
+//        }
+//        log("RET CHAT INIT: " + ret);
+//
+//        megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
     }
 
     /*
@@ -1155,6 +1243,154 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    public void readyToManager(){
+        if(confirmLink==null){
+            log("confirmLink==null");
+
+            log("OK fetch nodes");
+            log("value of resumeSession: "+resumeSesion);
+
+            if((action!=null)&&(url!=null)) {
+                if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
+                    log("Action change mail after fetch nodes");
+                    Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
+                    changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+                    changeMailIntent.setData(Uri.parse(url));
+                    startActivity(changeMailIntent);
+                    ((LoginActivityLollipop) context).finish();
+                }
+                else if(action.equals(Constants.ACTION_RESET_PASS)) {
+                    log("Action reset pass after fetch nodes");
+                    Intent resetPassIntent = new Intent(context, ManagerActivityLollipop.class);
+                    resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+                    resetPassIntent.setData(Uri.parse(url));
+                    startActivity(resetPassIntent);
+                    ((LoginActivityLollipop) context).finish();
+                }
+                else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)) {
+                    log("Action cancel Account after fetch nodes");
+                    Intent cancelAccountIntent = new Intent(context, ManagerActivityLollipop.class);
+                    cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+                    cancelAccountIntent.setData(Uri.parse(url));
+                    startActivity(cancelAccountIntent);
+                    ((LoginActivityLollipop) context).finish();
+                }
+            }
+
+            if (!backWhileLogin){
+                log("NOT backWhileLogin");
+                if (parentHandle != -1){
+                    Intent intent = new Intent();
+                    intent.putExtra("PARENT_HANDLE", parentHandle);
+                    ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
+                    ((LoginActivityLollipop) context).finish();
+                }
+                else{
+                    Intent intent = null;
+                    if (firstTime){
+                        log("First time");
+                        intent = new Intent(context,ManagerActivityLollipop.class);
+                        intent.putExtra("firstTimeCam", true);
+                        if (action != null){
+                            log("Action not NULL");
+                            if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
+                                log("ACTION_EXPORT_MK");
+                                intent.setAction(action);
+                            }
+                        }
+                    }
+                    else{
+                        boolean initialCam = false;
+//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+                        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                        MegaPreferences prefs = dbH.getPreferences();
+                        prefs = dbH.getPreferences();
+                        if (prefs != null){
+                            if (prefs.getCamSyncEnabled() != null){
+                                if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                }
+                            }
+                            else{
+                                ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                initialCam = true;
+                            }
+                        }
+                        else{
+                            intent = new Intent(context,ManagerActivityLollipop.class);
+                            intent.putExtra("firstTimeCam", true);
+                            initialCam = true;
+                        }
+
+                        if (!initialCam){
+                            log("NOT initialCam");
+                            intent = new Intent(context,ManagerActivityLollipop.class);
+                            if (action != null){
+                                log("The action is: "+action);
+//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//											intent = new Intent(this, FileExplorerActivityLollipop.class);
+//											if(extras != null)
+//											{
+//												intent.putExtras(extras);
+//											}
+//											intent.setData(uriData);
+//										}
+                                if (action.equals(Constants.ACTION_FILE_PROVIDER)){
+                                    intent = new Intent(context, FileProviderActivity.class);
+                                    if(extras != null)
+                                    {
+                                        intent.putExtras(extras);
+                                    }
+                                    if(uriData != null)
+                                    {
+                                        intent.setData(uriData);
+                                    }
+                                }
+                                intent.setAction(action);
+                                if (url != null){
+                                    intent.setData(Uri.parse(url));
+                                }
+                            }
+                        }
+                        else{
+                            log("initialCam YESSSS");
+                            intent = new Intent(context,ManagerActivityLollipop.class);
+                            if (action != null){
+                                log("The action is: "+action);
+                                intent.setAction(action);
+                            }
+                        }
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    }
+
+                    startActivity(intent);
+                    ((LoginActivityLollipop)context).finish();
+                }
+            }
+
+//                    loginLogin.setVisibility(View.GONE);
+//                    loginDelimiter.setVisibility(View.GONE);
+//                    loginCreateAccount.setVisibility(View.GONE);
+//                    queryingSignupLinkText.setVisibility(View.GONE);
+//                    confirmingAccountText.setVisibility(View.GONE);
+//                    loginLoggingIn.setVisibility(View.VISIBLE);
+//                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+////				generatingKeysText.setVisibility(View.VISIBLE);
+//                    loginProgressBar.setVisibility(View.VISIBLE);
+//                    loginFetchNodesProgressBar.setVisibility(View.GONE);
+//                    loggingInText.setVisibility(View.VISIBLE);
+//                    fetchingNodesText.setVisibility(View.GONE);
+//                    prepareNodesText.setVisibility(View.GONE);
+//                    initizalizingChatText.setVisibility(View.VISIBLE);
+//                    serversBusyText.setVisibility(View.GONE);
+        }
+
+        else{
+            log("Go to ChooseAccountFragment");
+            ((LoginActivityLollipop)context).showFragment(Constants.CHOOSE_ACCOUNT_FRAGMENT);
+        }
+    }
+
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request)
     {
@@ -1203,28 +1439,31 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     errorMessage = error.getErrorString();
                 }
                 log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
-                loginLoggingIn.setVisibility(View.GONE);
-                loginLogin.setVisibility(View.VISIBLE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                loginDelimiter.setVisibility(View.VISIBLE);
-                loginCreateAccount.setVisibility(View.VISIBLE);
-                queryingSignupLinkText.setVisibility(View.GONE);
-                confirmingAccountText.setVisibility(View.GONE);
-                generatingKeysText.setVisibility(View.GONE);
-                loggingInText.setVisibility(View.GONE);
-                fetchingNodesText.setVisibility(View.GONE);
-                prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.GONE);
-                serversBusyText.setVisibility(View.GONE);
 
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                megaChatApi.logout(this);
 
-//				DatabaseHandler dbH = new DatabaseHandler(this);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                dbH.clearCredentials();
-                if (dbH.getPreferences() != null){
-                    ((LoginActivityLollipop)context).stopCameraSyncService();
-                }
+//                loginLoggingIn.setVisibility(View.GONE);
+//                loginLogin.setVisibility(View.VISIBLE);
+//                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+//                loginDelimiter.setVisibility(View.VISIBLE);
+//                loginCreateAccount.setVisibility(View.VISIBLE);
+//                queryingSignupLinkText.setVisibility(View.GONE);
+//                confirmingAccountText.setVisibility(View.GONE);
+//                generatingKeysText.setVisibility(View.GONE);
+//                loggingInText.setVisibility(View.GONE);
+//                fetchingNodesText.setVisibility(View.GONE);
+//                prepareNodesText.setVisibility(View.GONE);
+//                initizalizingChatText.setVisibility(View.GONE);
+//                serversBusyText.setVisibility(View.GONE);
+//
+//                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+//
+////				DatabaseHandler dbH = new DatabaseHandler(this);
+//                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+//                dbH.clearCredentials();
+//                if (dbH.getPreferences() != null){
+//                    ((LoginActivityLollipop)context).stopCameraSyncService();
+//                }
             }
             else{
 
@@ -1237,7 +1476,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 serversBusyText.setVisibility(View.GONE);
 
                 gSession = megaApi.dumpSession();
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession);
+                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "");
 
 //				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -1288,190 +1527,64 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
                 lastEmail = megaApi.getMyUser().getEmail();
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession);
+                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "");
 
                 dbH.saveCredentials(credentials);
-            }
-            if(confirmLink==null){
-                log("confirmLink==null");
-                if (error.getErrorCode() != MegaError.API_OK) {
-                    log("Error fetch nodes");
-                    String errorMessage;
-                    if (error.getErrorCode() == MegaError.API_ESID){
-                        errorMessage = getString(R.string.error_server_expired_session);
-                    }
-                    else if (error.getErrorCode() == MegaError.API_ETOOMANY){
-                        errorMessage = getString(R.string.too_many_attempts_login);
-                    }
-                    else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
-                        errorMessage = getString(R.string.account_not_validated_login);
-                    }
-                    else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                        errorMessage = getString(R.string.error_account_suspended);
+
+                chatSettings = dbH.getChatSettings();
+                if(chatSettings!=null) {
+                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+                    if(chatEnabled){
+                        log("Chat enabled-->connect");
+                        initizalizingChatText.setVisibility(View.VISIBLE);
+                        megaChatApi.connect(this);
                     }
                     else{
-                        errorMessage = error.getErrorString();
+                        log("Chat NOT enabled");
+                        readyToManager();
                     }
-                    loginLoggingIn.setVisibility(View.GONE);
-                    loginLogin.setVisibility(View.VISIBLE);
-                    scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                    loginDelimiter.setVisibility(View.VISIBLE);
-                    loginCreateAccount.setVisibility(View.VISIBLE);
-                    generatingKeysText.setVisibility(View.GONE);
-                    loggingInText.setVisibility(View.GONE);
-                    fetchingNodesText.setVisibility(View.GONE);
-                    prepareNodesText.setVisibility(View.GONE);
-                    initizalizingChatText.setVisibility(View.GONE);
-                    serversBusyText.setVisibility(View.GONE);
-                    queryingSignupLinkText.setVisibility(View.GONE);
-                    confirmingAccountText.setVisibility(View.GONE);
-
-                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
                 }
                 else{
-                    log("OK fetch nodes");
-                    log("value of resumeSession: "+resumeSesion);
+                    log("chatSettings NULL!! - Remove connect from here later!");
+                    initizalizingChatText.setVisibility(View.VISIBLE);
+                    megaChatApi.connect(this);
 
-                    if((action!=null)&&(url!=null)) {
-                        if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
-                            log("Action change mail after fetch nodes");
-                            Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
-                            changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
-                            changeMailIntent.setData(Uri.parse(url));
-                            startActivity(changeMailIntent);
-                            ((LoginActivityLollipop) context).finish();
-                        }
-                        else if(action.equals(Constants.ACTION_RESET_PASS)) {
-                            log("Action reset pass after fetch nodes");
-                            Intent resetPassIntent = new Intent(context, ManagerActivityLollipop.class);
-                            resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
-                            resetPassIntent.setData(Uri.parse(url));
-                            startActivity(resetPassIntent);
-                            ((LoginActivityLollipop) context).finish();
-                        }
-                        else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)) {
-                            log("Action cancel Account after fetch nodes");
-                            Intent cancelAccountIntent = new Intent(context, ManagerActivityLollipop.class);
-                            cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
-                            cancelAccountIntent.setData(Uri.parse(url));
-                            startActivity(cancelAccountIntent);
-                            ((LoginActivityLollipop) context).finish();
-                        }
-                    }
-
-                    if (!backWhileLogin){
-                        log("NOT backWhileLogin");
-                        if (parentHandle != -1){
-                            Intent intent = new Intent();
-                            intent.putExtra("PARENT_HANDLE", parentHandle);
-                            ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
-                            ((LoginActivityLollipop) context).finish();
-                        }
-                        else{
-                            Intent intent = null;
-                            if (firstTime){
-                                log("First time");
-                                intent = new Intent(context,ManagerActivityLollipop.class);
-                                intent.putExtra("firstTimeCam", true);
-                                if (action != null){
-                                    log("Action not NULL");
-                                    if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
-                                        log("ACTION_EXPORT_MK");
-                                        intent.setAction(action);
-                                    }
-                                }
-                            }
-                            else{
-                                boolean initialCam = false;
-//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-                                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                                MegaPreferences prefs = dbH.getPreferences();
-                                prefs = dbH.getPreferences();
-                                if (prefs != null){
-                                    if (prefs.getCamSyncEnabled() != null){
-                                        if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                            ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
-                                        }
-                                    }
-                                    else{
-                                        ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
-                                        initialCam = true;
-                                    }
-                                }
-                                else{
-                                    intent = new Intent(context,ManagerActivityLollipop.class);
-                                    intent.putExtra("firstTimeCam", true);
-                                    initialCam = true;
-                                }
-
-                                if (!initialCam){
-                                    log("NOT initialCam");
-                                    intent = new Intent(context,ManagerActivityLollipop.class);
-                                    if (action != null){
-                                        log("The action is: "+action);
-//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//											intent = new Intent(this, FileExplorerActivityLollipop.class);
-//											if(extras != null)
-//											{
-//												intent.putExtras(extras);
-//											}
-//											intent.setData(uriData);
-//										}
-                                        if (action.equals(Constants.ACTION_FILE_PROVIDER)){
-                                            intent = new Intent(context, FileProviderActivity.class);
-                                            if(extras != null)
-                                            {
-                                                intent.putExtras(extras);
-                                            }
-                                            if(uriData != null)
-                                            {
-                                                intent.setData(uriData);
-                                            }
-                                        }
-                                        intent.setAction(action);
-                                        if (url != null){
-                                            intent.setData(Uri.parse(url));
-                                        }
-                                    }
-                                }
-                                else{
-                                    log("initialCam YESSSS");
-                                    intent = new Intent(context,ManagerActivityLollipop.class);
-                                    if (action != null){
-                                        log("The action is: "+action);
-                                        intent.setAction(action);
-                                    }
-                                }
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            }
-
-                            startActivity(intent);
-                            ((LoginActivityLollipop)context).finish();
-                        }
-                    }
-
-//                    loginLogin.setVisibility(View.GONE);
-//                    loginDelimiter.setVisibility(View.GONE);
-//                    loginCreateAccount.setVisibility(View.GONE);
-//                    queryingSignupLinkText.setVisibility(View.GONE);
-//                    confirmingAccountText.setVisibility(View.GONE);
-//                    loginLoggingIn.setVisibility(View.VISIBLE);
-//                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-////				generatingKeysText.setVisibility(View.VISIBLE);
-//                    loginProgressBar.setVisibility(View.VISIBLE);
-//                    loginFetchNodesProgressBar.setVisibility(View.GONE);
-//                    loggingInText.setVisibility(View.VISIBLE);
-//                    fetchingNodesText.setVisibility(View.GONE);
-//                    prepareNodesText.setVisibility(View.GONE);
-//                    initizalizingChatText.setVisibility(View.VISIBLE);
-//                    serversBusyText.setVisibility(View.GONE);
                 }
-            }
-            else{
-                log("Go to ChooseAccountFragment");
-                ((LoginActivityLollipop)context).showFragment(Constants.CHOOSE_ACCOUNT_FRAGMENT);
-            }
+            }else{
+                log("Error fetch nodes");
+                String errorMessage;
+                if (error.getErrorCode() == MegaError.API_ESID){
+                    errorMessage = getString(R.string.error_server_expired_session);
+                }
+                else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+                    errorMessage = getString(R.string.too_many_attempts_login);
+                }
+                else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+                    errorMessage = getString(R.string.account_not_validated_login);
+                }
+                else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+                    errorMessage = getString(R.string.error_account_suspended);
+                }
+                else{
+                    errorMessage = error.getErrorString();
+                }
+                loginLoggingIn.setVisibility(View.GONE);
+                loginLogin.setVisibility(View.VISIBLE);
+                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                loginDelimiter.setVisibility(View.VISIBLE);
+                loginCreateAccount.setVisibility(View.VISIBLE);
+                generatingKeysText.setVisibility(View.GONE);
+                loggingInText.setVisibility(View.GONE);
+                fetchingNodesText.setVisibility(View.GONE);
+                prepareNodesText.setVisibility(View.GONE);
+                initizalizingChatText.setVisibility(View.GONE);
+                serversBusyText.setVisibility(View.GONE);
+                queryingSignupLinkText.setVisibility(View.GONE);
+                confirmingAccountText.setVisibility(View.GONE);
 
+                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+
+            }
         }
         else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
             log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
@@ -1556,6 +1669,59 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log(exception.getMessage());
             log("EXCEPTION when starting count");
         }
+    }
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish(CHAT)");
+
+        if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Connected to chat!");
+                readyToManager();
+            }
+            else{
+                log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+//				showSnackbar(getString(R.string.chat_connection_error));
+                readyToManager();
+            }
+        }
+        else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
+            loginLoggingIn.setVisibility(View.GONE);
+            loginLogin.setVisibility(View.VISIBLE);
+            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            loginDelimiter.setVisibility(View.VISIBLE);
+            loginCreateAccount.setVisibility(View.VISIBLE);
+            queryingSignupLinkText.setVisibility(View.GONE);
+            confirmingAccountText.setVisibility(View.GONE);
+            generatingKeysText.setVisibility(View.GONE);
+            loggingInText.setVisibility(View.GONE);
+            fetchingNodesText.setVisibility(View.GONE);
+            prepareNodesText.setVisibility(View.GONE);
+            initizalizingChatText.setVisibility(View.GONE);
+            serversBusyText.setVisibility(View.GONE);
+
+            DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+            dbH.clearCredentials();
+            if (dbH.getPreferences() != null){
+                ((LoginActivityLollipop)context).stopCameraSyncService();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
     }
 
 
