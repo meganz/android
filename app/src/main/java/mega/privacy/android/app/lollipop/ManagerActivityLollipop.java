@@ -11017,11 +11017,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOGOUT){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				showSnackbar("Chat disabled");
+				log("Logout from chat");
 			}
 			else{
-				log("EEEERRRRROR logout CHAT " + e.getErrorString());
+				log("ERROR logout CHAT " + e.getErrorString());
 			}
+
+			Intent intentTour = new Intent(this, LoginActivityLollipop.class);
+			startActivity(intentTour);
+			finish();
 		}
 	}
 
@@ -11058,6 +11062,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
+
+			megaChatApi.logout(this);
 
 //			if (recentChatsFragmentLollipopListener != null){
 //				log("remove chatlistener");
