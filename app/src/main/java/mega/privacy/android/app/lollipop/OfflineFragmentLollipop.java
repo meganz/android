@@ -426,26 +426,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
 
 		}
-		else{
-			prefs = dbH.getPreferences();		
-			if (prefs != null){
-				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-				if(prefs.getPreferredSortOthers()!=null){
-					orderGetChildren = Integer.parseInt(prefs.getPreferredSortOthers());
-					log("The orderOthers preference is: "+orderGetChildren);
-				}
-				else{
-					orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
-					log("Preference orderOthers is NULL -> ORDER_DEFAULT_ASC");
-				}
-			}
-			else{
-				isList = true;
-				orderGetChildren = megaApi.ORDER_DEFAULT_ASC;
-			}
-			((OfflineActivityLollipop)context).setListOffline(isList);
-		}	
-		
+
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -935,9 +916,6 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				}
-				else if (context instanceof OfflineActivityLollipop){
-					((OfflineActivityLollipop)context).setPathNavigationOffline(pathNavigation);
-				}
 
 				mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
 				if (adapter.getItemCount() == 0){
@@ -1185,24 +1163,6 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					}
-				}
-				else if (context instanceof OfflineActivityLollipop){
-					((OfflineActivityLollipop)context).setPathNavigationOffline(pathNavigation);
-					
-					if (pathNavigation.equals("/")){
-						aB.setTitle(getString(R.string.section_saved_for_offline));
-						((OfflineActivityLollipop)context).supportInvalidateOptionsMenu();
-					}
-					else{
-						
-						String title = pathNavigation;
-						index=title.lastIndexOf("/");				
-						title=title.substring(0,index);
-						index=title.lastIndexOf("/");				
-						title=title.substring(index+1,title.length());			
-						aB.setTitle(title);	
-						((OfflineActivityLollipop)context).supportInvalidateOptionsMenu();
 					}
 				}
 				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				

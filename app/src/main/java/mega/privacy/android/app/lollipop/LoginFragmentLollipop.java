@@ -1465,7 +1465,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 serversBusyText.setVisibility(View.GONE);
 
                 gSession = megaApi.dumpSession();
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession);
+                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "");
 
 //				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -1516,7 +1516,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
                 lastEmail = megaApi.getMyUser().getEmail();
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession);
+                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "");
 
                 dbH.saveCredentials(credentials);
 

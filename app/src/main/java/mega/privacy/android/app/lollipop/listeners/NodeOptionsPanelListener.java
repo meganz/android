@@ -15,7 +15,6 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.OfflineActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -262,20 +261,6 @@ public class NodeOptionsPanelListener implements View.OnClickListener {
                 nC.deleteOffline(mOff, pathNavigation);
                 break;
 
-            }
-            case R.id.offline_list_option_remove_layout:{
-                log("OFFLINE_list_out_options option");
-                ((OfflineActivityLollipop) context).hideOptionsPanel();
-                String pathNavigation = ((OfflineActivityLollipop) context).getPathNavigation();
-                MegaOffline mOff = ((OfflineActivityLollipop) context).getSelectedNode();
-                nC.deleteOffline(mOff, pathNavigation);
-                break;
-            }
-
-            case R.id.offline_list_out_options:{
-                log("OFFLINE_list_out_options option");
-                ((OfflineActivityLollipop) context).hideOptionsPanel();
-                break;
             }
         }
 
