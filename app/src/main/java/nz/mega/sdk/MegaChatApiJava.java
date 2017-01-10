@@ -378,8 +378,8 @@ public class MegaChatApiJava {
      * @param userhandle Handle of the user whose name is requested.
      * @return The email address of the contact, or NULL if not found.
      */
-    public String getUserEmail(long userhandle){
-        return megaChatApi.getUserEmail(userhandle);
+    public String getContactEmail(long userhandle){
+        return megaChatApi.getContactEmail(userhandle);
     }
 
     /**
