@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -25,18 +27,22 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,6 +54,7 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.Constants;
@@ -61,8 +68,10 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
@@ -70,6 +79,8 @@ import nz.mega.sdk.MegaUser;
 public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
 
 	RelativeLayout imageLayout;
+	android.app.AlertDialog permissionsDialog;
+	ProgressDialog statusDialog;
 
 	ContactChatInfoActivityLollipop contactChatInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
@@ -88,6 +99,12 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	RelativeLayout ringtoneLayout;
 	TextView ringtoneText;
 	View dividerRingtoneLayout;
+
+	RelativeLayout sharedFoldersLayout;
+	ImageView sharedFoldersIcon;
+	TextView sharedFoldersText;
+	Button sharedFoldersButton;
+	View dividerSharedFoldersLayout;
 
 	RelativeLayout shareContactLayout;
 	TextView shareContactText;
@@ -115,6 +132,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	DatabaseHandler dbH = null;
 	ChatItemPreferences chatPrefs = null;
+
+	MenuItem shareMenuItem;
+	MenuItem viewFoldersMenuItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -236,9 +256,32 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			ringtoneText = (TextView) findViewById(R.id.chat_contact_properties_ringtone);
 
 			dividerRingtoneLayout = (View) findViewById(R.id.divider_ringtone_layout);
-			LinearLayout.LayoutParams paramsRingtoneDivider = (LinearLayout.LayoutParams) dividerRingtoneLayout.getLayoutParams();
-			paramsRingtoneDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			dividerRingtoneLayout.setLayoutParams(paramsRingtoneDivider);
+
+			//Shared folders layout
+			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
+			sharedFoldersLayout.setOnClickListener(this);
+			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
+			RelativeLayout.LayoutParams paramsSharedFoldersIcon = (RelativeLayout.LayoutParams) sharedFoldersIcon.getLayoutParams();
+			paramsSharedFoldersIcon.leftMargin = Util.scaleWidthPx(16, outMetrics);
+			sharedFoldersIcon.setLayoutParams(paramsSharedFoldersIcon);
+
+			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
+			RelativeLayout.LayoutParams paramsSharedFoldersText = (RelativeLayout.LayoutParams) sharedFoldersText.getLayoutParams();
+			paramsSharedFoldersText.leftMargin = Util.scaleWidthPx(32, outMetrics);
+			sharedFoldersText.setLayoutParams(paramsSharedFoldersText);
+
+			sharedFoldersButton = (Button) findViewById(R.id.chat_contact_properties_shared_folders_button);
+			sharedFoldersButton.setOnClickListener(this);
+			RelativeLayout.LayoutParams paramsSharedFoldersButton = (RelativeLayout.LayoutParams) sharedFoldersButton.getLayoutParams();
+			paramsSharedFoldersButton.rightMargin = Util.scaleWidthPx(16, outMetrics);
+			sharedFoldersButton.setLayoutParams(paramsSharedFoldersButton);
+
+			sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
+
+			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
+			LinearLayout.LayoutParams paramsSharedFoldersDivider = (LinearLayout.LayoutParams) dividerSharedFoldersLayout.getLayoutParams();
+			paramsSharedFoldersDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
+			dividerSharedFoldersLayout.setLayoutParams(paramsSharedFoldersDivider);
 
 			//Share Contact Layout
 
@@ -303,6 +346,107 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		} else {
 			log("Extras is NULL");
 		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.contact_properties_action, menu);
+
+		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
+		viewFoldersMenuItem = menu.findItem(R.id.cab_menu_view_shares);
+
+		ArrayList<MegaNode> shares = megaApi.getInShares(user);
+		if(shares!=null){
+			if(shares.size()>0){
+				viewFoldersMenuItem.setVisible(true);
+			}
+			else{
+				viewFoldersMenuItem.setVisible(false);
+			}
+		}
+		else{
+			viewFoldersMenuItem.setVisible(false);
+		}
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		int id = item.getItemId();
+		switch(id){
+			case android.R.id.home:{
+				finish();
+				break;
+			}
+			case R.id.cab_menu_share_folder:{
+				pickFolderToShare(user.getEmail());
+				break;
+			}
+			case R.id.cab_menu_view_shares:{
+//				showNewFolderDialog();
+				break;
+			}
+		}
+		return true;
+	}
+
+	public void pickFolderToShare(String email){
+		log("pickFolderToShare");
+//		MegaUser user = megaApi.getContact(email);
+		if (email != null){
+			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
+			ArrayList<String> contacts = new ArrayList<String>();
+//			String[] longArray = new String[1];
+//			longArray[0] = email;
+			contacts.add(email);
+			intent.putExtra("SELECTED_CONTACTS", contacts);
+			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
+		}
+		else{
+			showSnackbar(getString(R.string.error_sharing_folder));
+			log("Error sharing folder");
+		}
+	}
+
+
+	public String getDescription(ArrayList<MegaNode> nodes){
+		int numFolders = 0;
+		int numFiles = 0;
+
+		for (int i=0;i<nodes.size();i++){
+			MegaNode c = nodes.get(i);
+			if (c.isFolder()){
+				numFolders++;
+			}
+			else{
+				numFiles++;
+			}
+		}
+
+		String info = "";
+		if (numFolders > 0){
+			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders).toUpperCase(Locale.getDefault());
+			if (numFiles > 0){
+				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFiles).toUpperCase(Locale.getDefault());
+			}
+		}
+		else {
+			if (numFiles == 0){
+				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders).toUpperCase(Locale.getDefault());
+			}
+			else{
+				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFiles).toUpperCase(Locale.getDefault());
+			}
+		}
+
+		return info;
 	}
 
 	public void setAvatar() {
@@ -530,6 +674,10 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
 				break;
 			}
+			case R.id.chat_contact_properties_shared_folders_button:
+			case R.id.chat_contact_properties_shared_folders_layout:{
+				break;
+			}
 		}
 	}
 
@@ -602,21 +750,80 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				log("Error not chosen notification sound");
 			}
 		}
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+
+			if (!Util.isOnline(this)) {
+				showSnackbar(getString(R.string.error_server_connection_problem));
+				return;
+			}
+
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final long folderHandle = intent.getLongExtra("SELECT", 0);
+
+			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
+
+			if (parent.isFolder()){
+				android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(contactChatInfoActivityLollipop);
+							temp.setMessage(getString(R.string.context_sharing_folder));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+						permissionsDialog.dismiss();
+
+						log("item "+item);
+
+						switch(item) {
+							case 0:{
+								for (int i=0;i<selectedContacts.size();i++){
+									MegaUser user= megaApi.getContact(selectedContacts.get(i));
+									log("user: "+user);
+									log("parentNode: "+parent.getName()+"_"+parent.getHandle());
+									megaApi.share(parent, user, MegaShare.ACCESS_READ, contactChatInfoActivityLollipop);
+								}
+								break;
+							}
+							case 1:{
+								for (int i=0;i<selectedContacts.size();i++){
+									MegaUser user= megaApi.getContact(selectedContacts.get(i));
+									megaApi.share(parent, user, MegaShare.ACCESS_READWRITE, contactChatInfoActivityLollipop);
+								}
+								break;
+							}
+							case 2:{
+								for (int i=0;i<selectedContacts.size();i++){
+									MegaUser user= megaApi.getContact(selectedContacts.get(i));
+									megaApi.share(parent, user, MegaShare.ACCESS_FULL, contactChatInfoActivityLollipop);
+								}
+								break;
+							}
+						}
+					}
+				});
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+				Resources resources = permissionsDialog.getContext().getResources();
+				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+				alertTitle.setTextColor(resources.getColor(R.color.mega));
+				/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
+			}
+		}
 
 		super.onActivityResult(requestCode, resultCode, intent);
 
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		log("onOptionsItemSelectedLollipop");
-		int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home: {
-				finish();
-			}
-		}
-		return true;
 	}
 
 	@Override
@@ -705,6 +912,20 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 						}
 					}
 				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_SHARE){
+			try {
+				statusDialog.dismiss();
+			}
+			catch (Exception ex) {}
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Shared folder correctly: "+request.getNodeHandle());
+				showSnackbar(getString(R.string.context_correctly_shared));
+			}
+			else{
+				showSnackbar(getString(R.string.context_no_shared));
 			}
 		}
 	}

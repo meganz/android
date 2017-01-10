@@ -119,6 +119,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionMuteChatIcon = (ImageView) contentView.findViewById(R.id.chat_list_mute_chat_image);
         optionMuteChatText = (TextView) contentView.findViewById(R.id.chat_list_mute_chat_text);
 
+        titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+
         optionInfoChat.setOnClickListener(this);
         optionMuteChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
