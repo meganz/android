@@ -231,17 +231,18 @@
         android:layout_gravity="start"
         android:background="#ffffff"
         android:clipToPadding="false"
-        android:paddingBottom="96dp"
+        android:paddingBottom="80dp"
         app:itemBackground="@drawable/navigation_view_item_background"
         app:itemIconTint="@color/drawer_item_text"
         app:itemTextColor="@color/drawer_item_text"
         app:menu="@menu/navigation_drawer_items" >
 
         <RelativeLayout
+            android:id="@+id/nv_used_space_layout"
             android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_height="80dp"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="-96dp"
+            android:layout_marginBottom="-80dp"
             android:background="#ffffff" >
 
             <TextView

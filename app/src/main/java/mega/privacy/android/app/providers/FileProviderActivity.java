@@ -1022,7 +1022,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				
 				gSession = megaApi.dumpSession();
 				if (lastEmail != null){
-					credentials = new UserCredentials(lastEmail, gSession);
+					credentials = new UserCredentials(lastEmail, gSession, "", "");
 				}
 				
 //				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());

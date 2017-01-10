@@ -326,6 +326,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	static DrawerItem lastDrawerItem = null;
 	static MenuItem drawerMenuItem = null;
 	NavigationView nV;
+	RelativeLayout usedSpaceLayout;
 	FrameLayout accountInfoFrame;
 	TextView nVDisplayName;
 	TextView nVEmail;
@@ -1262,6 +1263,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
+
+		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
@@ -2373,6 +2376,87 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		nVPictureProfileTextView.setVisibility(View.VISIBLE);
 	}
 
+	public void setOfflineAvatar(String email, String firstLetter){
+		log("setOfflineAvatar");
+
+		File avatar = null;
+		if (getExternalCacheDir() != null){
+			avatar = new File(getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+		}
+		else{
+			avatar = new File(getCacheDir().getAbsolutePath(), email + ".jpg");
+		}
+		Bitmap imBitmap = null;
+		if (avatar.exists()) {
+			if (avatar.length() > 0) {
+				BitmapFactory.Options options = new BitmapFactory.Options();
+				options.inJustDecodeBounds = true;
+				BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+
+				// Calculate inSampleSize
+				options.inSampleSize = Util.calculateInSampleSize(options, 250, 250);
+
+				// Decode bitmap with inSampleSize set
+				options.inJustDecodeBounds = false;
+
+				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+				if (imBitmap != null) {
+					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+					BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
+					Paint paint = new Paint();
+					paint.setShader(shader);
+
+					Canvas c = new Canvas(circleBitmap);
+					int radius;
+					if (imBitmap.getWidth() < imBitmap.getHeight())
+						radius = imBitmap.getWidth() / 2;
+					else
+						radius = imBitmap.getHeight() / 2;
+
+					c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
+					nVPictureProfile.setImageBitmap(circleBitmap);
+					nVPictureProfileTextView.setVisibility(View.GONE);
+					return;
+				}
+			}
+		}
+
+		log("setDefaultAvatar");
+		float density  = getResources().getDisplayMetrics().density;
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		String color = megaApi.getUserAvatarColor(myAccountInfo.getMyUser());
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		}
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		nVPictureProfile.setImageBitmap(defaultAvatar);
+
+		int avatarTextSize = Util.getAvatarTextSize(density);
+		log("DENSITY: " + density + ":::: " + avatarTextSize);
+
+		nVPictureProfileTextView.setText(firstLetter);
+		nVPictureProfileTextView.setTextSize(32);
+		nVPictureProfileTextView.setTextColor(Color.WHITE);
+		nVPictureProfileTextView.setVisibility(View.VISIBLE);
+
+	}
+
 //	@Override
 //	protected void onPostResume() {
 //		log("onPostResume");
@@ -2824,7 +2908,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showOfflineMode(){
+		log("showOfflineMode");
 
+		usedSpaceLayout.setVisibility(View.GONE);
 
 		Menu nVMenu = nV.getMenu();
 		drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
@@ -2834,9 +2920,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_red));
 		}
 
+		UserCredentials credentials = dbH.getCredentials();
+		if(credentials!=null){
+			String emailCredentials = credentials.getEmail();
+			if(emailCredentials!=null){
+				nVEmail.setText(emailCredentials);
+			}
+
+			String firstNameText = credentials.getFirstName();
+			String lastNameText = credentials.getLastName();
+			String fullName = "";
+			if(firstNameText==null){
+				firstNameText="";
+			}
+			if(lastNameText==null){
+				lastNameText="";
+			}
+			if (firstNameText.trim().length() <= 0){
+				fullName = lastNameText;
+			}
+			else{
+				fullName = firstNameText + " " + lastNameText;
+			}
+
+			if (fullName.trim().length() <= 0){
+				log("Put email as fullname");
+				String[] splitEmail = emailCredentials.split("[@._]");
+				fullName = splitEmail[0];
+			}
+
+			if (fullName.trim().length() <= 0){
+				fullName = getString(R.string.name_text)+" "+getString(R.string.lastname_text);
+				log("Full name set by default: "+fullName);
+			}
+
+			nVDisplayName.setText(fullName);
+
+			String firstLetter = fullName.charAt(0) + "";
+			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+			setOfflineAvatar(emailCredentials, firstLetter);
+		}
+
 		drawerItem=DrawerItem.SAVED_FOR_OFFLINE;
 		selectDrawerItemLollipop(drawerItem);
-
 	}
 
 	public void selectDrawerItemSharedItems(){
@@ -6574,15 +6701,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.SETTINGS){
-			drawerItem = DrawerItem.CLOUD_DRIVE;
-			if (nV != null){
-				Menu nVMenu = nV.getMenu();
-				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-				resetNavigationViewMenu(nVMenu);
-				cloudDrive.setChecked(true);
-				cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+
+			if (!Util.isOnline(this)){
+				showOfflineMode();
 			}
-			selectDrawerItemLollipop(drawerItem);
+			else{
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+					resetNavigationViewMenu(nVMenu);
+					cloudDrive.setChecked(true);
+					cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+				}
+				selectDrawerItemLollipop(drawerItem);
+			}
+
 			return;
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
@@ -6660,15 +6794,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.CHAT){
-			drawerItem = DrawerItem.CLOUD_DRIVE;
-			if (nV != null){
-				Menu nVMenu = nV.getMenu();
-				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-				resetNavigationViewMenu(nVMenu);
-				cloudDrive.setChecked(true);
-				cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+
+			if (!Util.isOnline(this)){
+				showOfflineMode();
 			}
-			selectDrawerItemLollipop(drawerItem);
+			else{
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+					resetNavigationViewMenu(nVMenu);
+					cloudDrive.setChecked(true);
+					cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+				}
+				selectDrawerItemLollipop(drawerItem);
+			}
 		}
 		else if (drawerItem == DrawerItem.CONTACTS){
 			int index = viewPagerContacts.getCurrentItem();

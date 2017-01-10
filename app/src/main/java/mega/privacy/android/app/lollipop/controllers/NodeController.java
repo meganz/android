@@ -38,7 +38,6 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.OfflineActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
@@ -1377,9 +1376,6 @@ public class NodeController {
                 if(context instanceof ManagerActivityLollipop){
                     ((ManagerActivityLollipop)context).updateOfflineView(null);
                 }
-                else{
-                    ((OfflineActivityLollipop)context).updateOfflineView(null);
-                }
             }
         }
         else {
@@ -1435,8 +1431,6 @@ public class NodeController {
 
                     if (context instanceof ManagerActivityLollipop) {
                         ((ManagerActivityLollipop) context).updateOfflineView(null);
-                    } else {
-                        ((OfflineActivityLollipop) context).updateOfflineView(null);
                     }
                 }
             } else {
@@ -1495,8 +1489,6 @@ public class NodeController {
 
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).updateOfflineView(null);
-                } else {
-                    ((OfflineActivityLollipop) context).updateOfflineView(null);
                 }
             }
         }

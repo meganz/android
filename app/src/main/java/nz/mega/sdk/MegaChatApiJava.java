@@ -382,6 +382,74 @@ public class MegaChatApiJava {
         return megaChatApi.getUserEmail(userhandle);
     }
 
+    /**
+     * @brief Returns the handle of the logged in user.
+     *
+     * This function works even in offline mode (MegaChatApi::INIT_OFFLINE_SESSION),
+     * since the value is retrieved from cache.
+     *
+     * @return Own user handle
+     */
+    public long getMyUserHandle(){
+        return megaChatApi.getMyUserHandle();
+    }
+
+    /**
+     * @brief Returns the firstname of the logged in user.
+     *
+     * This function works even in offline mode (MegaChatApi::INIT_OFFLINE_SESSION),
+     * since the value is retrieved from cache.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return Own user firstname
+     */
+    public String getMyFirstname(){
+        return megaChatApi.getMyFirstname();
+    }
+
+    /**
+     * @brief Returns the lastname of the logged in user.
+     *
+     * This function works even in offline mode (MegaChatApi::INIT_OFFLINE_SESSION),
+     * since the value is retrieved from cache.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return Own user lastname
+     */
+    public String getMyLastname(){
+        return megaChatApi.getMyLastname();
+    }
+
+    /**
+     * @brief Returns the fullname of the logged in user.
+     *
+     * This function works even in offline mode (MegaChatApi::INIT_OFFLINE_SESSION),
+     * since the value is retrieved from cache.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return Own user fullname
+     */
+    public String getMyFullname(){
+        return megaChatApi.getMyFullname();
+    }
+
+    /**
+     * @brief Returns the email of the logged in user.
+     *
+     * This function works even in offline mode (MegaChatApi::INIT_OFFLINE_SESSION),
+     * since the value is retrieved from cache.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return Own user email
+     */
+    public String getMyEmail(){
+        return megaChatApi.getMyEmail();
+    }
+
     public ArrayList<MegaChatRoom> getChatRooms()
     {
         return chatRoomListToArray(megaChatApi.getChatRooms());
