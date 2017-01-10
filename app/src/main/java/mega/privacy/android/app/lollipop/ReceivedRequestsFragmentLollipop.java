@@ -140,6 +140,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.received_request_action, menu);
+			((ManagerActivityLollipop)context).hideFabButton();
 			return true;
 		}
 
@@ -147,6 +148,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapterList.setMultipleSelect(false);
 			clearSelections();
+			((ManagerActivityLollipop)context).showFabButton();
 		}
 
 		@Override

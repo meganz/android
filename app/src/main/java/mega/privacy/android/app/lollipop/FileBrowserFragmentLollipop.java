@@ -231,6 +231,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			((ManagerActivityLollipop)context).hideFabButton();
 			return true;
 		}
 
@@ -238,6 +239,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapter.setMultipleSelect(false);
 			clearSelections();
+			((ManagerActivityLollipop)context).showFabButton();
 		}
 
 		@Override
