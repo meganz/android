@@ -5212,7 +5212,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 			case R.id.action_menu_new_chat:{
 				if (drawerItem == DrawerItem.CHAT){
-					Snackbar.make(fragmentContainer, "NEW CHAT!", Snackbar.LENGTH_LONG).show();
+					log("Create new chat");
+					chooseAddContactDialog(true);
 				}
 
 				return true;
