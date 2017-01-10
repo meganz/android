@@ -22,6 +22,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
@@ -1159,6 +1160,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
 			log("Changing the secondary uploads");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
 			dbH.setSecSyncTimeStamp(0);			
 			secondaryUpload = !secondaryUpload;
 			if (secondaryUpload){
@@ -1249,12 +1256,23 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
 			log("Changing the MEGA folder for secondary uploads");
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
 			log("Changing camera upload");
+			if(!cameraUpload){
+				if (!Util.isOnline(context)){
+					((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+					return false;
+				}
+			}
+
 			dbH.setCamSyncTimeStamp(0);			
 			cameraUpload = !cameraUpload;			
 			
@@ -1429,19 +1447,27 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_CHAT_ENABLE) == 0){
 			log("KEY_CHAT_ENABLE");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				chatEnableSwitch.setChecked(chatEnabled);
+				return false;
+			}
+
 			chatEnabled = !chatEnabled;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				if (chatEnabled){
-					//Intent to set the PIN
 					log("CONNECT CHAT!!!");
 					dbH.setEnabledChat(true+"");
 					preferenceScreen.addPreference(chatNotificationsCategory);
 					preferenceScreen.addPreference(chatStatusCategory);
+					((ManagerActivityLollipop)context).enableChat();
 				}
 				else{
 					dbH.setEnabledChat(false+"");
 					preferenceScreen.removePreference(chatNotificationsCategory);
 					preferenceScreen.removePreference(chatStatusCategory);
+					((ManagerActivityLollipop)context).disableChat();
 				}
 			}
 			else{
@@ -1460,18 +1486,30 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_ONLINE_STATUS) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
 			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
 			chatStatusOnlineCheck.setChecked(true);
 			chatStatusInvisibleCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(false);
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_INVISIBLE_STATUS) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
 			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
 			chatStatusOnlineCheck.setChecked(false);
 			chatStatusInvisibleCheck.setChecked(true);
 			chatStatusOfflineCheck.setChecked(false);
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_OFFLINE_STATUS) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
 			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, (ManagerActivityLollipop) context);
 			chatStatusOnlineCheck.setChecked(false);
 			chatStatusInvisibleCheck.setChecked(false);
@@ -1586,6 +1624,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
 			log("Changing the MEGA folder for camera uploads");
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);

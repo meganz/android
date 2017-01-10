@@ -299,6 +299,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
+			fab.setVisibility(View.GONE);
 			return true;
 		}
 		
@@ -307,6 +308,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			log("onDestroyActionMode");
 			adapter.setMultipleSelect(false);
 			adapter.clearSelections();
+			fab.setVisibility(View.VISIBLE);
 		}
 
 		@Override

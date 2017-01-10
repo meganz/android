@@ -233,6 +233,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			fab.setVisibility(View.GONE);
 			return true;
 		}
 
@@ -240,6 +241,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapter.setMultipleSelect(false);
 			clearSelections();
+			fab.setVisibility(View.VISIBLE);
 		}
 
 		@Override

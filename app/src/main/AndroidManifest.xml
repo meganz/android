@@ -84,13 +84,6 @@
                 android:resource="@xml/searchable" />
         </activity>
 
-        <activity
-            android:name="mega.privacy.android.app.lollipop.OfflineActivityLollipop"
-            android:label="@string/section_saved_for_offline"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize">
-        </activity>
-
         <activity android:name="OpenLinkActivity" android:launchMode="singleTask" android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" ></action>

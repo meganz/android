@@ -36,6 +36,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_SESSION= "session";
+	private static final String KEY_FIRST_NAME= "firstname";
+	private static final String KEY_LAST_NAME= "lastname";
+
     private static final String KEY_FIRST_LOGIN = "firstlogin";
     private static final String KEY_CAM_SYNC_ENABLED = "camsyncenabled";
     private static final String KEY_SEC_FOLDER_ENABLED = "secondarymediafolderenabled";
@@ -131,7 +134,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EMAIL + " TEXT, " 
-                + KEY_SESSION + " TEXT" + ")";        
+                + KEY_SESSION + " TEXT, " + KEY_FIRST_NAME + " TEXT, " +  KEY_LAST_NAME + " TEXT" + ")";
         db.execSQL(CREATE_CREDENTIALS_TABLE);
         
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
@@ -381,6 +384,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
 					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
 			db.execSQL(CREATE_CHAT_TABLE);
+
+			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_FIRST_NAME + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_FIRST_NAME + " = '" + encrypt("") + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_LAST_NAME + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_LAST_NAME + " = '" + encrypt("") + "';");
 		}
 	} 
 	
@@ -427,6 +436,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         db.insert(TABLE_CREDENTIALS, null, values);
     }
+
+	public void saveMyFirstName(String firstName) {
+
+		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_CREDENTIALS_TABLE = "UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_FIRST_NAME + "= '" + encrypt(firstName) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_CREDENTIALS_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_ENABLED, encrypt(firstName));
+			db.insert(TABLE_CREDENTIALS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void saveMyLastName(String lastName) {
+		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_CREDENTIALS_TABLE = "UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_LAST_NAME + "= '" + encrypt(lastName) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_CREDENTIALS_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_ENABLED, encrypt(lastName));
+			db.insert(TABLE_CREDENTIALS, null, values);
+		}
+		cursor.close();
+	}
 	
 	public static String decrypt(String encodedString) {
 		if (encodedString == null) {
@@ -453,7 +493,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				int id = Integer.parseInt(cursor.getString(0));
 				String email = decrypt(cursor.getString(1));
 				String session = decrypt(cursor.getString(2));
-				userCredentials = new UserCredentials(email, session);
+				String firstName = decrypt(cursor.getString(3));
+				String lastName = decrypt(cursor.getString(4));
+				userCredentials = new UserCredentials(email, session, firstName, lastName);
 			}
 			cursor.close();
 		}
