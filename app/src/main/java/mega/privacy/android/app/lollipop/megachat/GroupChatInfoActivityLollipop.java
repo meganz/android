@@ -462,7 +462,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             String userHandleEncoded = megaApi.userHandleToBase64(peerHandle);
             MegaUser participantContact = megaApi.getContact(userHandleEncoded);
             if(participantContact!=null){
-                String participantEmail = megaChatApi.getUserEmail(peerHandle);
+                String participantEmail = megaChatApi.getContactEmail(peerHandle);
                 if (participantContact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     log("Email of the participant: "+participantEmail);
                     participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
@@ -473,6 +473,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
             else{
+                //TODO: megaChatApi.getUseremail(userhandle, listener) for non-contacts - Task #5982
                 log("Email of the participant: NON CONTACT");
                 participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
             }
