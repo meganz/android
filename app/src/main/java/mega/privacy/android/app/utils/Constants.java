@@ -26,10 +26,9 @@ public class Constants {
 	public static int TAKE_PICTURE_PROFILE_CODE = 1015;
 	public static int CHOOSE_PICTURE_PROFILE_CODE = 1016;
 	public static int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
-	public static int ENABLE_CHAT = 1018;
-
 	public static int REQUEST_CREATE_CHAT = 1018;
 	public static int REQUEST_ADD_PARTICIPANTS = 1019;
+	public static int ENABLE_CHAT = 1020;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
