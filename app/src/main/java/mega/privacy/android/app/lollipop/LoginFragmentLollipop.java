@@ -948,14 +948,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         log("fastLogin con publicKey y privateKey");
         resumeSesion = false;
 
-        int ret = megaChatApi.init(null);
-        if ((ret == MegaChatApi.INIT_ERROR) || (ret !=MegaChatApi.INIT_WAITING_NEW_SESSION)){
-            log("RET CHAT INIT: " + ret);
-            //disable chat, logut, etc..
-        }
-        log("RET CHAT INIT: " + ret);
 
-        megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+        int ret = megaChatApi.init(null);
+        if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
+            megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+        }
+        else{
+            log("ERROR INIT CHAT: " + ret);
+            megaChatApi.logout(this);
+        }
+//        if ((ret == MegaChatApi.INIT_ERROR) || (ret !=MegaChatApi.INIT_WAITING_NEW_SESSION)){
+//            log("RET CHAT INIT: " + ret);
+//            //disable chat, logut, etc..
+//        }
+//        log("RET CHAT INIT: " + ret);
+//
+//        megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
     }
 
     /*
@@ -1431,28 +1439,31 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     errorMessage = error.getErrorString();
                 }
                 log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
-                loginLoggingIn.setVisibility(View.GONE);
-                loginLogin.setVisibility(View.VISIBLE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                loginDelimiter.setVisibility(View.VISIBLE);
-                loginCreateAccount.setVisibility(View.VISIBLE);
-                queryingSignupLinkText.setVisibility(View.GONE);
-                confirmingAccountText.setVisibility(View.GONE);
-                generatingKeysText.setVisibility(View.GONE);
-                loggingInText.setVisibility(View.GONE);
-                fetchingNodesText.setVisibility(View.GONE);
-                prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.GONE);
-                serversBusyText.setVisibility(View.GONE);
 
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                megaChatApi.logout(this);
 
-//				DatabaseHandler dbH = new DatabaseHandler(this);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                dbH.clearCredentials();
-                if (dbH.getPreferences() != null){
-                    ((LoginActivityLollipop)context).stopCameraSyncService();
-                }
+//                loginLoggingIn.setVisibility(View.GONE);
+//                loginLogin.setVisibility(View.VISIBLE);
+//                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+//                loginDelimiter.setVisibility(View.VISIBLE);
+//                loginCreateAccount.setVisibility(View.VISIBLE);
+//                queryingSignupLinkText.setVisibility(View.GONE);
+//                confirmingAccountText.setVisibility(View.GONE);
+//                generatingKeysText.setVisibility(View.GONE);
+//                loggingInText.setVisibility(View.GONE);
+//                fetchingNodesText.setVisibility(View.GONE);
+//                prepareNodesText.setVisibility(View.GONE);
+//                initizalizingChatText.setVisibility(View.GONE);
+//                serversBusyText.setVisibility(View.GONE);
+//
+//                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+//
+////				DatabaseHandler dbH = new DatabaseHandler(this);
+//                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+//                dbH.clearCredentials();
+//                if (dbH.getPreferences() != null){
+//                    ((LoginActivityLollipop)context).stopCameraSyncService();
+//                }
             }
             else{
 
@@ -1683,6 +1694,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
 //				showSnackbar(getString(R.string.chat_connection_error));
                 readyToManager();
+            }
+        }
+        else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
+            loginLoggingIn.setVisibility(View.GONE);
+            loginLogin.setVisibility(View.VISIBLE);
+            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            loginDelimiter.setVisibility(View.VISIBLE);
+            loginCreateAccount.setVisibility(View.VISIBLE);
+            queryingSignupLinkText.setVisibility(View.GONE);
+            confirmingAccountText.setVisibility(View.GONE);
+            generatingKeysText.setVisibility(View.GONE);
+            loggingInText.setVisibility(View.GONE);
+            fetchingNodesText.setVisibility(View.GONE);
+            prepareNodesText.setVisibility(View.GONE);
+            initizalizingChatText.setVisibility(View.GONE);
+            serversBusyText.setVisibility(View.GONE);
+
+            DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+            dbH.clearCredentials();
+            if (dbH.getPreferences() != null){
+                ((LoginActivityLollipop)context).stopCameraSyncService();
             }
         }
     }
