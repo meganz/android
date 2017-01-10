@@ -479,6 +479,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.recent_chat_action, menu);
+            ((ManagerActivityLollipop)context).hideFabButton();
             return true;
         }
 
@@ -486,6 +487,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         public void onDestroyActionMode(ActionMode arg0) {
             adapterList.setMultipleSelect(false);
             clearSelections();
+            ((ManagerActivityLollipop)context).showFabButton();
         }
 
         @Override
