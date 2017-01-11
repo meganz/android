@@ -151,27 +151,6 @@ public class ChatController {
         dbH.setEnabledChat(true+"");
     }
 
-    public boolean isChatEnabled(){
-
-        ChatSettings chatSettings = dbH.getChatSettings();
-        boolean chatEnabled;
-
-        if(chatSettings!=null){
-            if(chatSettings.getEnabled()!=null){
-                chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                return chatEnabled;
-            }
-            else{
-                chatEnabled=true;
-                return chatEnabled;
-            }
-        }
-        else{
-            chatEnabled=true;
-            return chatEnabled;
-        }
-    }
-
     public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
         log("createManagementString");
 

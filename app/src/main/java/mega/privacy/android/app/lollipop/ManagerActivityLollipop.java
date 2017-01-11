@@ -1104,7 +1104,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		managerActivity = this;
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		megaChatApi = app.getMegaChatApi();
+		if(Util.isChatEnabled()){
+			megaChatApi = app.getMegaChatApi();
+		}
+		else{
+			megaChatApi=null;
+		}
 
 		log("retryPendingConnections()");
 		if (megaApi != null){
@@ -4857,7 +4862,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (drawerItem == DrawerItem.CHAT){
 			log("in Chat Section");
 			ChatController chatController = new ChatController(this);
-			if(chatController.isChatEnabled()){
+			if(Util.isChatEnabled()){
 
 				if (rChatFL != null){
 					newChatMenuItem.setVisible(true);
@@ -11159,14 +11164,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if(request.getType() == MegaChatRequest.TYPE_LOGOUT){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Logout from chat");
+				megaChatApi = null;
+				((MegaApplication) getApplication()).disableMegaChatApi();
+				Util.resetAndroidLogger();
 			}
 			else{
 				log("ERROR logout CHAT " + e.getErrorString());
 			}
-
-			Intent intentTour = new Intent(this, LoginActivityLollipop.class);
-			startActivity(intentTour);
-			finish();
 		}
 	}
 
@@ -11204,7 +11208,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
 
-			megaChatApi.logout(this);
+			if(megaChatApi!=null){
+				megaChatApi.logout(null);
+			}
+
+			Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+			startActivity(tourIntent);
+			finish();
 
 //			if (recentChatsFragmentLollipopListener != null){
 //				log("remove chatlistener");
@@ -13047,10 +13057,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case CHAT:{
-				if(megaChatApi.getChatRooms().size()==0){
-					fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
+				if(megaChatApi!=null){
+					if(megaChatApi.getChatRooms().size()==0){
+						fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
+					}
+					fabButton.setVisibility(View.VISIBLE);
 				}
-				fabButton.setVisibility(View.VISIBLE);
+				else{
+					fabButton.setVisibility(View.GONE);
+				}
+
 				break;
 			}
 			default:{
@@ -13257,33 +13273,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void disableChat(){
 		log("disableChat");
-//		if(rChatFL!=null){
-//			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag("rChat");
-//			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//			ft.remove(rChatFL);
-//			ft.commit();
-//		}
-//
+
 		if(rChatFL!=null){
-			log("REcent Chat still there");
 			megaChatApi.removeChatListener(rChatFL);
 		}
 
-//		if (recentChatsFragmentLollipopListener != null){
-//			log("remove recentChatsFragmentLollipopListener");
-//			megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
-//			recentChatsFragmentLollipopListener=null;
-//		}
-//		rChatFL = null;
-
 		megaChatApi.logout(this);
+		app.disableMegaChatApi();
+		megaChatApi=null;
 	}
-
-//	public String getFullNameChat() {
-//		return fullNameChat;
-//	}
-//
-//	public void setFullNameChat(String fullNameChat) {
-//		this.fullNameChat = fullNameChat;
-//	}
 }

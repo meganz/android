@@ -141,7 +141,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         ChatController chatController = new ChatController(context);
 
-        if(chatController.isChatEnabled()){
+        if(Util.isChatEnabled()){
             chatEnabled=true;
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
@@ -422,7 +422,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
                     chatController.enableChat();
                     getActivity().supportInvalidateOptionsMenu();
                     chatEnabled=!chatEnabled;
-                    setChats();
+                    ((ManagerActivityLollipop)context).enableChat();
+//                    setChats();
                 }
 
                 break;
