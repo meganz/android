@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.megachat;
+package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -54,10 +54,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -358,6 +356,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			LinearLayout.LayoutParams paramsClearChat = (LinearLayout.LayoutParams) clearChatLayout.getLayoutParams();
 			paramsClearChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
 			clearChatLayout.setLayoutParams(paramsClearChat);
+
+			if(chat!=null){
+				clearChatLayout.setVisibility(View.VISIBLE);
+				dividerShareContactLayout.setVisibility(View.VISIBLE);
+			}
+			else{
+				clearChatLayout.setVisibility(View.GONE);
+				dividerShareContactLayout.setVisibility(View.GONE);
+			}
 
 			//SET Preferences (if exist)
 			if(chatPrefs!=null){
