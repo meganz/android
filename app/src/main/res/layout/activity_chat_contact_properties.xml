@@ -7,7 +7,7 @@
     android:id="@+id/fragment_container"
     android:fitsSystemWindows="true"
     android:background="@color/white"
-    tools:context=".lollipop.megachat.ContactInfoActivityLollipop">
+    tools:context=".lollipop.ContactInfoActivityLollipop">
         <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
@@ -19,7 +19,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
-                app:expandedTitleMarginEnd="20dp"
                 app:contentScrim="?attr/colorPrimary"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
