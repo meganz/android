@@ -142,4 +142,16 @@ public class Constants {
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
+
+	public static int DEVICE_ANDROID = 1;
+	public static int DEVICE_IOS = 2;
+
+	public static int NOTIFICATION_UPLOAD = 1;
+	public static int NOTIFICATION_DOWNLOAD = 2;
+	public static int NOTIFICATION_CAMERA_UPLOADS = 3;
+	public static int NOTIFICATION_DOWNLOAD_FINAL = 4;
+	public static int NOTIFICATION_UPLOAD_FINAL = 5;
+	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
+	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
+	public static int NOTIFICATION_PUSH_CHAT = 8;
 }
