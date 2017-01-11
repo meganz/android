@@ -2062,6 +2062,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Ok. Clear history done");
                 showSnackbar(getString(R.string.clear_history_success));
+                int lastIndex = messages.size()-1;
+                AndroidMegaChatMessage lastMessage = messages.get(lastIndex);
+                lastMessage.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                messages.clear();
+                messages.add(lastMessage);
+                adapter.setMessages(messages);
             }
             else{
                 log("Error clearing history: "+e.getErrorString());
