@@ -916,7 +916,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			MegaChatListItem chat = chats.get(position);
 			MegaChatMessage lastMessage =chat.getLastMessage();
 			if(lastMessage!=null){
-				String date = TimeChatUtils.formatDate(lastMessage, TimeChatUtils.DATE_LONG_FORMAT);
+				String date = TimeChatUtils.formatDateAndTime(lastMessage, TimeChatUtils.DATE_LONG_FORMAT);
 				holder.textViewDate.setText(date);
 				holder.textViewDate.setVisibility(View.VISIBLE);
 

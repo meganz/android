@@ -329,7 +329,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
-                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                             holder.titleOwnMessage.setVisibility(View.VISIBLE);
                             holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
@@ -443,7 +443,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
-                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                             holder.titleContactMessage.setVisibility(View.VISIBLE);
                             holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
@@ -625,7 +625,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
-                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                             holder.titleOwnMessage.setVisibility(View.VISIBLE);
                             holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
@@ -744,7 +744,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
-                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                             holder.titleContactMessage.setVisibility(View.VISIBLE);
                             holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
@@ -900,7 +900,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
-                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                             holder.titleOwnMessage.setVisibility(View.VISIBLE);
                             holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
@@ -1241,7 +1241,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     switch (messages.get(position).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             holder.dateLayout.setVisibility(View.VISIBLE);
-                            holder.dateText.setText(TimeChatUtils.formatDate(message, TimeChatUtils.DATE_SHORT_FORMAT));
+                            holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                             holder.titleContactMessage.setVisibility(View.VISIBLE);
                             holder.timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;

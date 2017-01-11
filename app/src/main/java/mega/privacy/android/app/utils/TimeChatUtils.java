@@ -57,7 +57,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String formatDate(MegaChatMessage lastMessage, int format){
+    public static String formatDateAndTime(MegaChatMessage lastMessage, int format){
 
         java.text.DateFormat df;
         if(format == DATE_LONG_FORMAT){
