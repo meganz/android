@@ -2,17 +2,6 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.view.View;
-import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
@@ -20,17 +9,13 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -92,8 +77,8 @@ public class ChatController {
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.clearChatHistory(chat.getChatId(), (ChatActivityLollipop) context);
         }
-        else if(context instanceof ContactChatInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ContactChatInfoActivityLollipop) context);
+        else if(context instanceof ContactInfoActivityLollipop){
+            megaChatApi.clearChatHistory(chat.getChatId(), (ContactInfoActivityLollipop) context);
         }
         else if(context instanceof GroupChatInfoActivityLollipop){
             megaChatApi.clearChatHistory(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
@@ -108,8 +93,8 @@ public class ChatController {
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.clearChatHistory(chatId, (ChatActivityLollipop) context);
         }
-        else if(context instanceof ContactChatInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ContactChatInfoActivityLollipop) context);
+        else if(context instanceof ContactInfoActivityLollipop){
+            megaChatApi.clearChatHistory(chatId, (ContactInfoActivityLollipop) context);
         }
         else if(context instanceof GroupChatInfoActivityLollipop){
             megaChatApi.clearChatHistory(chatId, (GroupChatInfoActivityLollipop) context);

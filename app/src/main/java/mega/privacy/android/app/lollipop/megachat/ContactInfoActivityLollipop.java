@@ -42,7 +42,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,7 +52,9 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -76,13 +77,13 @@ import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi")
-public class ContactChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
+public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
 
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
 	ProgressDialog statusDialog;
 
-	ContactChatInfoActivityLollipop contactChatInfoActivityLollipop;
+	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
 	TextView initialLetter;
@@ -107,7 +108,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 	View dividerSharedFoldersLayout;
 
 	RelativeLayout shareContactLayout;
+	RelativeLayout shareContactContentLayout;
 	TextView shareContactText;
+	ImageView shareContactIcon;
 	View dividerShareContactLayout;
 
 	RelativeLayout clearChatLayout;
@@ -117,10 +120,13 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	MegaUser user;
 	long chatHandle;
+	String userEmailExtra;
 	MegaChatRoom chat;
 
 	private MegaApiAndroid megaApi = null;
 	MegaChatApiAndroid megaChatApi = null;
+
+	boolean fromContacts = true;
 
 	private Handler handler;
 
@@ -135,13 +141,14 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 	MenuItem shareMenuItem;
 	MenuItem viewFoldersMenuItem;
+	MenuItem startConversationMenuItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
-		contactChatInfoActivityLollipop = this;
+		contactInfoActivityLollipop = this;
 		if (megaApi == null) {
 			MegaApplication app = (MegaApplication) getApplication();
 			megaApi = app.getMegaApi();
@@ -165,22 +172,6 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 
-			chatHandle = extras.getLong("handle",-1);
-			if (chatHandle == -1) {
-				finish();
-				return;
-			}
-
-			chat = megaChatApi.getChatRoom(chatHandle);
-
-			long userHandle = chat.getPeerHandle(0);
-
-			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-			user = megaApi.getContact(userHandleEncoded);
-
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-
 			setContentView(R.layout.activity_chat_contact_properties);
 			fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container);
 			toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -188,7 +179,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			aB = getSupportActionBar();
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
-			collapsingToolbar.setTitle(chat.getTitle());
+
 			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
 			collapsingToolbar.setExpandedTitleMarginStart(Util.scaleWidthPx(72, outMetrics));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -203,14 +194,68 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			contactPropertiesImage = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_image);
 			initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
-			float scaleText;
-			if (scaleH < scaleW) {
-				scaleText = scaleH;
-			} else {
-				scaleText = scaleW;
-			}
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
-			setDefaultAvatar();
+			chatHandle = extras.getLong("handle",-1);
+			if (chatHandle != -1) {
+				fromContacts = false;
+				chat = megaChatApi.getChatRoom(chatHandle);
+
+				long userHandle = chat.getPeerHandle(0);
+
+				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+				user = megaApi.getContact(userHandleEncoded);
+
+				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+
+				collapsingToolbar.setTitle(chat.getTitle());
+				setDefaultAvatar(chat.getTitle());
+			}
+			else{
+				fromContacts = true;
+				userEmailExtra = extras.getString("name");
+				user = megaApi.getContact(userEmailExtra);
+
+				String fullName = "";
+				if(user!=null){
+					MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+					if(contactDB!=null){
+
+						String firstNameText = "";
+						String lastNameText = "";
+
+						firstNameText = contactDB.getName();
+						lastNameText = contactDB.getLastName();
+
+						if (firstNameText.trim().length() <= 0){
+							fullName = lastNameText;
+						}
+						else{
+							fullName = firstNameText + " " + lastNameText;
+						}
+
+						if (fullName.trim().length() <= 0){
+							log("Put email as fullname");
+							String email = user.getEmail();
+							String[] splitEmail = email.split("[@._]");
+							fullName = splitEmail[0];
+						}
+
+						collapsingToolbar.setTitle(fullName);
+					}
+					else{
+						log("The contactDB is null: ");
+					}
+				}
+
+				//Find chat with this contact
+				chat = megaChatApi.getChatRoomByUser(user.getHandle());
+				if(chat!=null){
+					chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+				}
+
+				setDefaultAvatar(fullName);
+			}
 
 			setAvatar();
 
@@ -260,6 +305,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			//Shared folders layout
 			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
 			sharedFoldersLayout.setOnClickListener(this);
+
 			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
 			RelativeLayout.LayoutParams paramsSharedFoldersIcon = (RelativeLayout.LayoutParams) sharedFoldersIcon.getLayoutParams();
 			paramsSharedFoldersIcon.leftMargin = Util.scaleWidthPx(16, outMetrics);
@@ -287,9 +333,16 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 			shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
 			shareContactLayout.setOnClickListener(this);
-			LinearLayout.LayoutParams paramsShareContact = (LinearLayout.LayoutParams) shareContactLayout.getLayoutParams();
-			paramsShareContact.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			shareContactLayout.setLayoutParams(paramsShareContact);
+
+			shareContactIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
+			RelativeLayout.LayoutParams paramsShareContactIcon = (RelativeLayout.LayoutParams) shareContactIcon.getLayoutParams();
+			paramsShareContactIcon.leftMargin = Util.scaleWidthPx(16, outMetrics);
+			shareContactIcon.setLayoutParams(paramsShareContactIcon);
+
+			shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
+			RelativeLayout.LayoutParams paramsShareContact = (RelativeLayout.LayoutParams) shareContactContentLayout.getLayoutParams();
+			paramsShareContact.leftMargin = Util.scaleWidthPx(32, outMetrics);
+			shareContactContentLayout.setLayoutParams(paramsShareContact);
 
 			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
 			shareContactText.setText(user.getEmail());
@@ -358,6 +411,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		viewFoldersMenuItem = menu.findItem(R.id.cab_menu_view_shares);
+		startConversationMenuItem = menu.findItem(R.id.cab_menu_start_conversation);
 
 		ArrayList<MegaNode> shares = megaApi.getInShares(user);
 		if(shares!=null){
@@ -370,6 +424,13 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		}
 		else{
 			viewFoldersMenuItem.setVisible(false);
+		}
+
+		if(fromContacts){
+			startConversationMenuItem.setVisible(true);
+		}
+		else{
+			startConversationMenuItem.setVisible(false);
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -389,7 +450,13 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 				break;
 			}
 			case R.id.cab_menu_view_shares:{
-//				showNewFolderDialog();
+				Intent i = new Intent(this, ContactFileListActivityLollipop.class);
+				i.putExtra("name", user.getEmail());
+				this.startActivity(i);
+				break;
+			}
+			case R.id.cab_menu_start_conversation:{
+				showSnackbar("Not yet implemented");
 				break;
 			}
 		}
@@ -564,7 +631,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 		return dominantColor;
 	}
 
-	public void setDefaultAvatar() {
+	public void setDefaultAvatar(String title) {
 		log("setDefaultAvatar");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
@@ -590,9 +657,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 		boolean setInitialByMail = false;
 
-		if (chat.getTitle() != null) {
-			if (chat.getTitle().trim().length() > 0) {
-				String firstLetter = chat.getTitle().charAt(0) + "";
+		if (title != null) {
+			if (title.trim().length() > 0) {
+				String firstLetter = title.charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 				initialLetter.setText(firstLetter);
 				initialLetter.setTextSize(100);
@@ -651,6 +718,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
 				log("Share contact option");
+				showSnackbar("Not yet implemented!");
 				break;
 			}
 			case R.id.chat_contact_properties_ringtone_layout: {
@@ -676,6 +744,9 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
 			case R.id.chat_contact_properties_shared_folders_layout:{
+				Intent i = new Intent(this, ContactFileListActivityLollipop.class);
+				i.putExtra("name", user.getEmail());
+				this.startActivity(i);
 				break;
 			}
 		}
@@ -771,7 +842,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 
 						ProgressDialog temp = null;
 						try{
-							temp = new ProgressDialog(contactChatInfoActivityLollipop);
+							temp = new ProgressDialog(contactInfoActivityLollipop);
 							temp.setMessage(getString(R.string.context_sharing_folder));
 							temp.show();
 						}
@@ -789,21 +860,21 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 									MegaUser user= megaApi.getContact(selectedContacts.get(i));
 									log("user: "+user);
 									log("parentNode: "+parent.getName()+"_"+parent.getHandle());
-									megaApi.share(parent, user, MegaShare.ACCESS_READ, contactChatInfoActivityLollipop);
+									megaApi.share(parent, user, MegaShare.ACCESS_READ, contactInfoActivityLollipop);
 								}
 								break;
 							}
 							case 1:{
 								for (int i=0;i<selectedContacts.size();i++){
 									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									megaApi.share(parent, user, MegaShare.ACCESS_READWRITE, contactChatInfoActivityLollipop);
+									megaApi.share(parent, user, MegaShare.ACCESS_READWRITE, contactInfoActivityLollipop);
 								}
 								break;
 							}
 							case 2:{
 								for (int i=0;i<selectedContacts.size();i++){
 									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									megaApi.share(parent, user, MegaShare.ACCESS_FULL, contactChatInfoActivityLollipop);
+									megaApi.share(parent, user, MegaShare.ACCESS_FULL, contactInfoActivityLollipop);
 								}
 								break;
 							}
@@ -973,7 +1044,7 @@ public class ContactChatInfoActivityLollipop extends PinActivityLollipop impleme
 						log("Clear chat!");
 //						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
 						log("Clear history selected!");
-						ChatController chatC = new ChatController(contactChatInfoActivityLollipop);
+						ChatController chatC = new ChatController(contactInfoActivityLollipop);
 						chatC.clearHistory(chat);
 						break;
 

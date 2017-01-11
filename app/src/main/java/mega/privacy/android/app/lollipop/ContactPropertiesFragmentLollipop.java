@@ -497,18 +497,18 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 				}
 				break;
 			}
-			case R.id.contact_properties_toolbar_back:{
-				((ContactPropertiesActivityLollipop)context).finish();
-				break;
-			}
-			case R.id.contact_properties_toolbar_overflow:{
-				overflowMenuLayout.setVisibility(View.VISIBLE);
-				break;
-			}
-			case R.id.contact_properties_shared_folders_layout:{
-				((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
-				break;
-			}
+//			case R.id.contact_properties_toolbar_back:{
+//				((ContactPropertiesActivityLollipop)context).finish();
+//				break;
+//			}
+//			case R.id.contact_properties_toolbar_overflow:{
+//				overflowMenuLayout.setVisibility(View.VISIBLE);
+//				break;
+//			}
+//			case R.id.contact_properties_shared_folders_layout:{
+//				((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
+//				break;
+//			}
 		}
 	}
 
@@ -629,12 +629,12 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		log("onItemClick");
 		overflowMenuLayout.setVisibility(View.GONE);
 		String itemText = (String) parent.getItemAtPosition(position);
-		if (itemText.compareTo(getString(R.string.context_share_folder)) == 0){
-			log("User email to share: "+userEmail);
-			((ContactPropertiesActivityLollipop)context).pickFolderToShare(userEmail);
-		}
-		else if (itemText.compareTo(getString(R.string.context_view_shared_folders)) == 0){
-			((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
-		}
+//		if (itemText.compareTo(getString(R.string.context_share_folder)) == 0){
+//			log("User email to share: "+userEmail);
+//			((ContactPropertiesActivityLollipop)context).pickFolderToShare(userEmail);
+//		}
+//		else if (itemText.compareTo(getString(R.string.context_view_shared_folders)) == 0){
+//			((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
+//		}
 	}
 }

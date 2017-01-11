@@ -13,4 +13,10 @@
         android:title="@string/context_view_shared_folders"
         MEGA:showAsAction="never" />
 
+    <item
+        android:id="@+id/cab_menu_start_conversation"
+        android:orderInCategory="110"
+        android:title="@string/group_chat_start_conversation_label"
+        MEGA:showAsAction="never" />
+
 </menu>

@@ -10,8 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -34,7 +32,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -315,7 +313,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     context.startActivity(i);
                 }
                 else{
-                    Intent i = new Intent(context, ContactChatInfoActivityLollipop.class);
+                    Intent i = new Intent(context, ContactInfoActivityLollipop.class);
 //                i.putExtra("userEmail", selectedChatItem.getContacts().get(0).getMail());
 //                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
                     i.putExtra("handle", chat.getChatId());

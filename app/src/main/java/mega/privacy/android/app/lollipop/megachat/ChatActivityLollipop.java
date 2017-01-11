@@ -812,7 +812,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     this.startActivity(i);
                 }
                 else{
-                    Intent i = new Intent(this, ContactChatInfoActivityLollipop.class);
+                    Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                     i.putExtra("handle", chatRoom.getChatId());
                     this.startActivity(i);
                 }

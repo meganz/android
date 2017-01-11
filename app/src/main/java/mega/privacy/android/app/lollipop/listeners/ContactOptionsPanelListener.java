@@ -10,9 +10,10 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.ContactInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -68,7 +69,7 @@ public class ContactOptionsPanelListener implements View.OnClickListener {
                     return;
                 }
                 ((ManagerActivityLollipop) context).hideContactOptionsPanel();
-                Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
+                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra("name", selectedUser.getEmail());
                 context.startActivity(i);
                 break;

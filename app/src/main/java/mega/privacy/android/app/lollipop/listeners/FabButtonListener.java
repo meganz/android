@@ -5,7 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
@@ -46,8 +46,8 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                         }
                     }
                 }
-                else if(context instanceof ContactPropertiesActivityLollipop){
-                    ((ContactPropertiesActivityLollipop)context).showUploadPanel();
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop)context).showUploadPanel();
                 }
                 break;
             }

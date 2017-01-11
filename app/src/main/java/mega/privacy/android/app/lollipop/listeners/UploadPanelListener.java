@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -39,9 +39,9 @@ public class UploadPanelListener implements View.OnClickListener {
                     ((ManagerActivityLollipop)context).hideUploadPanel();
                     ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
-                else if(context instanceof ContactPropertiesActivityLollipop){
-                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
-                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop)context).hideUploadPanel();
+                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
                 break;
             }
@@ -59,9 +59,9 @@ public class UploadPanelListener implements View.OnClickListener {
                     ((ManagerActivityLollipop)context).hideUploadPanel();
                     ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
-                else if(context instanceof ContactPropertiesActivityLollipop){
-                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
-                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop)context).hideUploadPanel();
+                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
 
                 break;
@@ -80,9 +80,9 @@ public class UploadPanelListener implements View.OnClickListener {
                     ((ManagerActivityLollipop)context).hideUploadPanel();
                     ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
-                else if(context instanceof ContactPropertiesActivityLollipop){
-                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
-                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop)context).hideUploadPanel();
+                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
 
                 break;
@@ -100,9 +100,9 @@ public class UploadPanelListener implements View.OnClickListener {
                     ((ManagerActivityLollipop)context).hideUploadPanel();
                     ((ManagerActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
                 }
-                else if(context instanceof ContactPropertiesActivityLollipop){
-                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
-                    ((ContactPropertiesActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop)context).hideUploadPanel();
+                    ((ContactFileListActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
                 }
 
                 break;
@@ -113,8 +113,8 @@ public class UploadPanelListener implements View.OnClickListener {
                 if(context instanceof ManagerActivityLollipop){
                     ((ManagerActivityLollipop)context).hideUploadPanel();
                 }
-                else if(context instanceof ContactPropertiesActivityLollipop){
-                    ((ContactPropertiesActivityLollipop)context).hideUploadPanel();
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop)context).hideUploadPanel();
                 }
                 break;
             }

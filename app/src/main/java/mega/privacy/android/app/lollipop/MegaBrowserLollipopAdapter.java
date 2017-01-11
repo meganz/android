@@ -190,7 +190,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				break;
 			}
 			case Constants.CONTACT_FILE_ADAPTER: {
-				((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
+				((ContactFileListActivityLollipop) context).setParentHandle(parentHandle);
 				break;
 			}
 			case Constants.RUBBISH_BIN_ADAPTER: {
@@ -1155,7 +1155,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			break;
 		}
 		case Constants.CONTACT_FILE_ADAPTER: {
-			((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
+			((ContactFileListActivityLollipop) context).setParentHandle(parentHandle);
 			break;
 		}
 		case Constants.RUBBISH_BIN_ADAPTER: {

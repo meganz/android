@@ -88,7 +88,6 @@
 
                 <ImageView
                     android:id="@+id/contact_properties_email_icon"
-                    style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_email_grey" />
