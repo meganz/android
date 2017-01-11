@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="mega.privacy.android.app.lollipop.megachat.ContactChatInfoActivityLollipop"
+    tools:context="mega.privacy.android.app.lollipop.megachat.ContactInfoActivityLollipop"
     tools:showIn="@layout/activity_chat_contact_properties">
 
     <LinearLayout
@@ -183,13 +183,29 @@
             android:id="@+id/chat_contact_properties_share_contact_layout"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_gravity="left|center_vertical"
-            android:orientation="vertical">
+            android:layout_gravity="left|center_vertical">
 
             <RelativeLayout
-                android:layout_width="match_parent"
+                android:id="@+id/chat_contact_properties_share_contact_icon_layout"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true">
+
+                <ImageView
+                    android:id="@+id/chat_contact_properties_email_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:src="@drawable/ic_email_grey" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/chat_contact_properties_share_contact_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/chat_contact_properties_share_contact_icon_layout"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/chat_contact_properties_share_contact_label"
@@ -204,7 +220,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/chat_contact_properties_share_contact_label"
-                    android:text="Probando"
                     android:textColor="@color/accentColor"
                     android:textSize="14dp" />
 

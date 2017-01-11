@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -18,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,13 +25,12 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.Locale;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Constants;
@@ -282,7 +279,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             case R.id.contact_info_group_participants_chat_layout: {
                 log("contact info participants panel");
-                Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
+                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra("name", selectedParticipant.getEmail());
                 context.startActivity(i);
                 dismissAllowingStateLoss();

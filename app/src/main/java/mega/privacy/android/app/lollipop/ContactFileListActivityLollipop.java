@@ -76,7 +76,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	FrameLayout fragmentContainer;
     
@@ -85,7 +85,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	MegaApiAndroid megaApi;
 	AlertDialog permissionsDialog;
 
-	ContactPropertiesFragmentLollipop cpF;
 	ContactFileListFragmentLollipop cflF;
 
 	CoordinatorLayout coordinatorLayout;
@@ -97,9 +96,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	boolean sendToInbox=false;
 	boolean moveToRubbish=false;
 
-	public static final int CONTACT_PROPERTIES = 1000;
-	public static final int CONTACT_FILE_LIST = 1001;
-
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -107,7 +103,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 
-	static ContactPropertiesActivityLollipop contactPropertiesMainActivity;
+	static ContactFileListActivityLollipop contactPropertiesMainActivity;
 
 	long parentHandle = -1;
 
@@ -414,8 +410,17 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 			//////
 			
-			int currentFragment = CONTACT_PROPERTIES;
-			selectContactFragment(currentFragment);
+			log("Shared Folders are:");
+			coordinatorLayout.setFitsSystemWindows(true);
+			aB.show();
+
+			if (cflF == null){
+				cflF = new ContactFileListFragmentLollipop();
+			}
+			cflF.setUserEmail(userEmail);
+
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
+			coordinatorLayout.invalidate();
 		}
 		
 	}
@@ -488,35 +493,25 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		setIntent(intent); 
 	}
 
-	public void selectContactFragment(int currentFragment){
-		log("selectContactFragment: "+currentFragment);
-		switch(currentFragment){
-			case CONTACT_PROPERTIES:{
-				if (cpF == null){
-					cpF = new ContactPropertiesFragmentLollipop();
-				}
-				cpF.setUserEmail(userEmail);
-				coordinatorLayout.setFitsSystemWindows(false);
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
-	
-				break;
-			}
-			case CONTACT_FILE_LIST:{
-				log("Shared Folders are:");
-				coordinatorLayout.setFitsSystemWindows(true);
-				aB.show();
-
-				if (cflF == null){
-					cflF = new ContactFileListFragmentLollipop();
-				}
-				cflF.setUserEmail(userEmail);
-	
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
-				coordinatorLayout.invalidate();
-				break;
-			}
-		}
-	}
+//	public void selectContactFragment(int currentFragment){
+//		log("selectContactFragment: "+currentFragment);
+//		switch(currentFragment){
+//			case CONTACT_PROPERTIES:{
+//				if (cpF == null){
+//					cpF = new ContactPropertiesFragmentLollipop();
+//				}
+//				cpF.setUserEmail(userEmail);
+//				coordinatorLayout.setFitsSystemWindows(false);
+//				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
+//
+//				break;
+//			}
+//			case CONTACT_FILE_LIST:{
+//
+//				break;
+//			}
+//		}
+//	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		log("showConfirmationLeaveIncomingShare");
@@ -611,12 +606,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 		return info;
 	}
 
-	public void onContentClick(String userEmail){
-		if (userEmail.compareTo(this.userEmail) == 0){
-			selectContactFragment(CONTACT_FILE_LIST);
-		}
-	}
-
 	@Override
 	protected void onDestroy(){
 		log("onDestroy()");
@@ -643,16 +632,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 					viewSharedItem.setVisible(false);
 				}
 			}
-		}		
-		if(cpF!=null){
-			if(cpF.isVisible()){
-				log("visible ContactProperties");
-				if(shareMenuItem!=null){
-					shareMenuItem.setVisible(true);
-					viewSharedItem.setVisible(true);
-				}
-			}
-		}	
+		}
 
 		super.onPrepareOptionsMenu(menu);
 		return true;
@@ -1555,16 +1535,9 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			if (cflF.isVisible()){
 				if (cflF.onBackPressed() == 0){
 					log("onBackPressed == 0");
-					selectContactFragment(CONTACT_PROPERTIES);
+					finish();
 					return;
 				}
-			}
-		}
-
-		if (cpF != null){
-			if (cpF.isVisible()){
-				super.onBackPressed();
-				return;
 			}
 		}
 	}

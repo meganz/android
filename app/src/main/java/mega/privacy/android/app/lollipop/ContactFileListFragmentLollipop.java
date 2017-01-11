@@ -194,7 +194,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ContactPropertiesActivityLollipop)context).onFileClick(handleList);
+					((ContactFileListActivityLollipop)context).onFileClick(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy: {
@@ -205,7 +205,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					clearSelections();
 					hideMultipleSelect();
 	
-					((ContactPropertiesActivityLollipop)context).showCopyLollipop(handleList);
+					((ContactFileListActivityLollipop)context).showCopyLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -223,7 +223,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ContactPropertiesActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
+					((ContactFileListActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
 				}
 			}
 			return false;
@@ -658,7 +658,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		if (megaApi.getNodeByHandle(parentHandle) == null){
 			parentHandle = -1;
 			this.parentHandle = -1;
-			((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
+			((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 			adapter.setParentHandle(parentHandle);
 			if (aB != null){
 				aB.setTitle(R.string.contact_shared_files);
@@ -667,7 +667,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		}
 		else{
 			this.parentHandle = parentHandle;
-			((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
+			((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 			adapter.setParentHandle(parentHandle);
 			setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren));
 		}
@@ -881,12 +881,12 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				if (aB != null){
 					aB.setTitle(n.getName());
 				}
-				((ContactPropertiesActivityLollipop)context).supportInvalidateOptionsMenu();
+				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				parentHandleStack.push(parentHandle);
 				parentHandle = contactNodes.get(position).getHandle();
 				adapter.setParentHandle(parentHandle);
-				((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
+				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 
 				contactNodes = megaApi.getChildren(contactNodes.get(position));
 				adapter.setNodes(contactNodes);
@@ -916,12 +916,12 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					} else {
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
-					((ContactPropertiesActivityLollipop)context).startActivity(intent);
+					((ContactFileListActivityLollipop)context).startActivity(intent);
 				} 
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideo()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
 					Intent service = new Intent(context, MegaStreamingService.class);
-					((ContactPropertiesActivityLollipop)context).startService(service);
+					((ContactFileListActivityLollipop)context).startService(service);
 					String fileName = file.getName();
 					try {
 						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
@@ -944,14 +944,14 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(contactNodes.get(position).getHandle());
-						((ContactPropertiesActivityLollipop)context).onFileClick(handleList);
+						((ContactFileListActivityLollipop)context).onFileClick(handleList);
 			  		}
 				} else {
 					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(contactNodes.get(position).getHandle());
-					((ContactPropertiesActivityLollipop)context).onFileClick(handleList);
+					((ContactFileListActivityLollipop)context).onFileClick(handleList);
 				}
 			}
 		}
@@ -972,7 +972,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		log("Sliding not shown");
 
 		parentHandle = adapter.getParentHandle();
-		((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
+		((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 
 		if (adapter.getPositionClicked() != -1) {
 			adapter.setPositionClicked(-1);
@@ -995,10 +995,10 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					if (aB != null){
 						aB.setTitle(R.string.contact_shared_files);
 					}
-					((ContactPropertiesActivityLollipop)context).supportInvalidateOptionsMenu();
+					((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);
 					listView.scrollToPosition(0);
-					((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
+					((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 					adapter.setParentHandle(parentHandle);
 					log("return 2");
 					return 2;
@@ -1007,10 +1007,10 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					if (aB != null){
 						aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
 					}
-					((ContactPropertiesActivityLollipop)context).supportInvalidateOptionsMenu();
+					((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);
 					listView.scrollToPosition(0);
-					((ContactPropertiesActivityLollipop)context).setParentHandle(parentHandle);
+					((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 					adapter.setParentHandle(parentHandle);
 					showFabButton(megaApi.getNodeByHandle(parentHandle));
 					log("return 3");
@@ -1133,7 +1133,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		else{
 			fab.setVisibility(View.VISIBLE);
 		}
-		((ContactPropertiesActivityLollipop) context).invalidateOptionsMenu();
+		((ContactFileListActivityLollipop) context).invalidateOptionsMenu();
 	}
 
 	public int getFabVisibility(){
@@ -1151,7 +1151,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
-				((ContactPropertiesActivityLollipop) context).onFileClick(handleList);
+				((ContactFileListActivityLollipop) context).onFileClick(handleList);
 				break;
 			}
 			case R.id.contact_file_list_option_leave_share_layout: {
@@ -1159,7 +1159,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				((ContactPropertiesActivityLollipop) context).showConfirmationLeaveIncomingShare(selectedNode);
+				((ContactFileListActivityLollipop) context).showConfirmationLeaveIncomingShare(selectedNode);
 				break;
 			}
 			case R.id.contact_file_list_option_send_inbox_layout:{
@@ -1176,7 +1176,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				intent.putExtra("MULTISELECT", 0);
 				intent.putExtra("SEND_FILE",1);
 				intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, selectedNode.getHandle());
-				((ContactPropertiesActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+				((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 				break;
 			}
 			case R.id.contact_file_list_option_move_layout:{
@@ -1186,7 +1186,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
-				((ContactPropertiesActivityLollipop) context).showMoveLollipop(handleList);
+				((ContactFileListActivityLollipop) context).showMoveLollipop(handleList);
 	
 				break;
 			}
@@ -1219,7 +1219,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				hideOptionsPanel();
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				((ContactPropertiesActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
+				((ContactFileListActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
 				break;
 			}	
 			case R.id.contact_file_list_option_copy_layout: {
@@ -1229,7 +1229,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
-				((ContactPropertiesActivityLollipop) context).showCopyLollipop(handleList);
+				((ContactFileListActivityLollipop) context).showCopyLollipop(handleList);
 				break;
 			}
 			case R.id.contact_file_list_option_delete_layout:{
@@ -1241,7 +1241,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				}
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
-				((ContactPropertiesActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+				((ContactFileListActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 				break;
 			}
 		}
