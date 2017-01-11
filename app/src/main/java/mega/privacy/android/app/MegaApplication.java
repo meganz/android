@@ -256,6 +256,32 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		
 		return megaApi;
 	}
+
+	public static boolean isActivityVisible() {
+		log("isActivityVisible() => " + activityVisible);
+		return activityVisible;
+	}
+
+	public static void activityResumed() {
+		log("activityResumed()");
+		activityVisible = true;
+	}
+
+	public static void activityPaused() {
+		log("activityPaused()");
+		activityVisible = false;
+	}
+
+	private static boolean activityVisible = false;
+	private static boolean isLoggingIn = false;
+
+	public static boolean isLoggingIn() {
+		return isLoggingIn;
+	}
+
+	public static void setLoggingIn(boolean loggingIn) {
+		isLoggingIn = loggingIn;
+	}
 	
 	
 //	synchronized Tracker getTracker(TrackerName trackerId) {

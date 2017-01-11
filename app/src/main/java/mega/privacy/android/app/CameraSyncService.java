@@ -99,8 +99,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 	private boolean isForeground;
 
-	private int notificationId = 3;
-	private int notificationIdFinal = 6;
+	private int notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS;
+	private int notificationIdFinal = Constants.NOTIFICATION_CAMERA_UPLOADS_FINAL;
 
 	private static long lastRun = 0;
 
@@ -141,7 +141,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 	static CameraSyncService cameraSyncService;
 
-	boolean isLogging = false;
+	boolean isLoggingIn = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -286,8 +286,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					if (megaApi.getRootNode() == null){
 						log("RootNode = null");
 						running = true;
-						if (!isLogging){
-							isLogging = true;
+						isLoggingIn = MegaApplication.isLoggingIn();
+						if (!isLoggingIn){
+							isLoggingIn  = true;
+							MegaApplication.setLoggingIn(isLoggingIn);
 							megaApi.fastLogin(gSession, this);
 						}
 						return START_NOT_STICKY;
@@ -1967,18 +1969,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				log("ERROR: " + e.getErrorString());
-				isLogging = false;
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
 				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				isLogging = false;
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
 				retryLaterShortTime();
 			}
 			else{
 				log("ERROR: " + e.getErrorString());
-				isLogging = false;
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
 				finish();
 			}
 		}
