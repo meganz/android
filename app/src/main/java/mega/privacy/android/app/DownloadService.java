@@ -106,8 +106,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
 
-	private int notificationId = 2;
-	private int notificationIdFinal = 4;
+	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
+	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
 	private NotificationCompat.Builder mBuilderCompat;
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
