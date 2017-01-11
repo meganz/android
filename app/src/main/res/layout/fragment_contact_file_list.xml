@@ -35,11 +35,11 @@
 
                 <TextView
                     android:id="@+id/contact_file_list_initial_letter"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center_horizontal|center_vertical"
-                    android:paddingBottom="3dp"  />
+                    android:paddingBottom="3dp" />
             </RelativeLayout>
 
             <TextView

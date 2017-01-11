@@ -116,6 +116,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
+		DatabaseHandler dbH;
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 
@@ -123,8 +126,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		Util.setContext(getApplicationContext());
-		DatabaseHandler dbH;
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		boolean fileLogger = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
@@ -194,10 +195,19 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public MegaChatApiAndroid getMegaChatApi(){
 		if (megaChatApi == null){
-			getMegaApi();
+			if (megaApi == null){
+				getMegaApi();
+			}
+			else{
+				megaChatApi = new MegaChatApiAndroid(megaApi);
+			}
 		}
 
 		return megaChatApi;
+	}
+
+	public void disableMegaChatApi(){
+		megaChatApi = null;
 	}
 	
 	public MegaApiAndroid getMegaApi()
@@ -239,7 +249,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //				megaChatApi = new MegaChatApiAndroid(megaApi, false);
 //			}
 
-			megaChatApi = new MegaChatApiAndroid(megaApi);
+			if(Util.isChatEnabled()){
+				megaChatApi = new MegaChatApiAndroid(megaApi);
+			}
 		}
 		
 		return megaApi;

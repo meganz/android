@@ -599,7 +599,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 		imageView.setImageBitmap(defaultAvatar);
 		
-		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -834,7 +833,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 					firstName = true;
 				}
 				if(name&&firstName){
-					nameView.setText(nameText+" "+firstNameText);
+					String fullName = nameText+" "+firstNameText;
+					nameView.setText(fullName);
+					String firstLetter = fullName.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					contactInitialLetter.setText(firstLetter);
 					name= false;
 					firstName = false;
 				}				

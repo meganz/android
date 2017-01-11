@@ -71,9 +71,12 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -1641,6 +1644,71 @@ public class Util {
 		cal.setTimeInMillis(timestamp*1000);
 		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
 		return cal;
+	}
+
+	public static boolean isChatEnabled (){
+		log("isChatEnabled");
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(context);
+		}
+		ChatSettings chatSettings = dbH.getChatSettings();
+		boolean chatEnabled;
+
+		if(chatSettings!=null){
+			if(chatSettings.getEnabled()!=null){
+				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+				return chatEnabled;
+			}
+			else{
+				chatEnabled=true;
+				return chatEnabled;
+			}
+		}
+		else{
+			chatEnabled=true;
+			return chatEnabled;
+		}
+	}
+
+	public static void resetAndroidLogger(){
+
+		MegaApiAndroid.setLoggerObject(new AndroidLogger());
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		boolean fileLogger = false;
+
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(context);
+		}
+
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null) {
+				if (attrs.getFileLogger() != null) {
+					try {
+						fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
+					} catch (Exception e) {
+						fileLogger = false;
+					}
+				} else {
+					fileLogger = false;
+				}
+			} else {
+				fileLogger = false;
+			}
+		}
+
+		if (Util.DEBUG){
+			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		}
+		else {
+			setFileLogger(fileLogger);
+			if (fileLogger) {
+				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+			} else {
+				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+			}
+		}
 	}
 
 	private static void log(String message) {
