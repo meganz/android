@@ -30,18 +30,37 @@ import android.widget.Toast;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class MegaFirebaseMessagingService extends FirebaseMessagingService {
+public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface {
+
+    MegaApplication app;
+    MegaApiAndroid megaApi;
+    DatabaseHandler dbH;
+
+    boolean isLoggingIn = false;
+
+    String remoteMessageType = "";
 
     @Override
     public void onCreate() {
         super.onCreate();
         log("onCreateFCM");
+
+        app = (MegaApplication) getApplication();
+        megaApi = app.getMegaApi();
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     }
 
     @Override
@@ -76,25 +95,41 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             log("Message data payload: " + remoteMessage.getData());
-            sendNotification(remoteMessage.getData().get("message"));
+            UserCredentials credentials = dbH.getCredentials();
+            if (credentials == null) {
+                log("There are not user credentials");
+                return;
+            }
+            else{
+                remoteMessageType = remoteMessage.getData().get("type");
+                String gSession = credentials.getSession();
+                if (megaApi.getRootNode() == null){
+                    log("RootNode = null");
+                    isLoggingIn = MegaApplication.isLoggingIn();
+                    if (!isLoggingIn){
+                        isLoggingIn  = true;
+                        MegaApplication.setLoggingIn(isLoggingIn);
+                        megaApi.fastLogin(gSession, this);
+                    }
+                }
+                else{
+                    sendNotification(remoteMessage.getData().get("type"));
+                }
+            }
         }
-
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            log("Message Notification Body: " + remoteMessage.getNotification().getBody());
-            sendNotification(remoteMessage.getNotification().getBody());
-        }
-
-        MegaApplication app = (MegaApplication) getApplication();
-
-        MegaApiAndroid megaApi = app.getMegaApi();
-
-        if (megaApi.getRootNode() != null) {
-            log("nullll!!!!!!!");
-        }
-        else{
-            log("Tengo root node!!!!!");
-        }
+//
+//        // Check if message contains a notification payload.
+//        if (remoteMessage.getNotification() != null) {
+//            log("Message Notification Body: " + remoteMessage.getNotification().getBody());
+//            sendNotification(remoteMessage.getNotification().getBody());
+//        }
+//
+//        if (megaApi.getRootNode() != null) {
+//            log("nullll!!!!!!!");
+//        }
+//        else{
+//            log("Tengo root node!!!!!");
+//        }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
@@ -104,46 +139,113 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService {
     /**
      * Create and show a simple notification containing the received FCM message.
      *
-     * @param messageBody FCM message body received.
+     * @param type type received
      */
-    private void sendNotification(String messageBody) {
-        log("sendNotification: " + messageBody);
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+    private void sendNotification(String type) {
+        log("sendNotification: " + type);
+        if (!MegaApplication.isActivityVisible()) {
+            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
 
-        MegaApplication app = (MegaApplication) getApplication();
-        MegaApiAndroid megaApi = app.getMegaApi();
+            String notificationContent = "";
+            String notificationTitle = "";
+            int notificationId = 0;
 
-        String email = "MegaApi not logged in";
-
-        if (megaApi != null){
-            if (megaApi.getMyUser() != null){
-                if (megaApi.getMyUser().getEmail() != null){
-                    email = megaApi.getMyUser().getEmail();
+            try{
+                String email = "";
+                if (megaApi != null) {
+                    if (megaApi.getMyUser() != null) {
+                        if (megaApi.getMyUser().getEmail() != null) {
+                            email = megaApi.getMyUser().getEmail();
+                        }
+                    }
                 }
+
+
+                int typeInt = Integer.parseInt(type);
+                switch (typeInt){
+                    case 1:{
+                        notificationTitle = "Cloud activity (" + email + ")";
+                        notificationContent = "A folder has been shared with you";
+                        notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+                        break;
+                    }
+                    case 2:{
+                        notificationTitle = "Chat activity (" + email + ")";
+                        notificationContent = "You have received a message";
+                        notificationId = Constants.NOTIFICATION_PUSH_CHAT;
+                        break;
+                    }
+                }
+
+                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_notify_download)
+                        .setContentTitle(notificationTitle)
+                        .setContentText(notificationContent)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
+
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                notificationManager.notify(notificationId, notificationBuilder.build());
+
+
             }
+            catch(Exception e){}
         }
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle("FCM Message")
-                .setContentText(email + ": " + messageBody)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-
-
-
     }
 
     public static void log(String message) {
-        Util.log("MegaFirebaseMessagingService", message);
+        Util.log("MegaFirebaseMessagingService", "FCM " + message);
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        log("onRequestStart: " + request.getRequestString());
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+        log("onRequestUpdate: " + request.getRequestString());
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish: " + request.getRequestString());
+
+        if (request.getType() == MegaRequest.TYPE_LOGIN){
+            if (e.getErrorCode() == MegaError.API_OK) {
+                log("Fast login OK");
+                log("Calling fetchNodes from MegaFireBaseMessagingService");
+                megaApi.fetchNodes(this);
+            }
+            else{
+                log("ERROR: " + e.getErrorString());
+                isLoggingIn = false;
+                MegaApplication.setLoggingIn(isLoggingIn);
+                return;
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            isLoggingIn = false;
+            MegaApplication.setLoggingIn(isLoggingIn);
+            if (e.getErrorCode() == MegaError.API_OK){
+                log("OK fetch nodes");
+                sendNotification(remoteMessageType);
+            }
+            else {
+                log("ERROR: " + e.getErrorString());
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestTemporary: " + request.getRequestString());
     }
 }

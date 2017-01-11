@@ -1595,7 +1595,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			String token = FirebaseInstanceId.getInstance().getToken();
 			if (token != null) {
-				Log.d("TOKEN___", token);
+				log("FCM TOKEN: " + token);
+				megaApi.registerPushNotifications(Constants.DEVICE_ANDROID, token, this);
+//				Log.d("TOKEN___", token);
+
 //				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
 			}
 
@@ -1935,6 +1938,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("My AccountInfo is Null");
 		}
 		super.onResume();
+
+		MegaApplication.activityResumed();
 	}
 
 	@Override
@@ -2646,6 +2651,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	log("onPause");
     	managerActivity = null;
     	super.onPause();
+
+		MegaApplication.activityPaused();
     }
 
 	@Override
@@ -11960,6 +11967,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				showSnackbar(getString(R.string.rubbish_bin_no_emptied));
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION");
+			}
+			else{
+				log("FCM ERROR TOKEN TYPE_REGISTER_PUSH_NOTIFICATION: " + e.getErrorCode() + "__" + e.getErrorString());
 			}
 		}
 	}

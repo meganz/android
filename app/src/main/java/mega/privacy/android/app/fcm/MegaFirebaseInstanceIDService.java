@@ -21,10 +21,15 @@ import android.util.Log;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 
 
 public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
+
+    MegaApiAndroid megaApi;
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -36,7 +41,7 @@ public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        log("Refreshed token: " + refreshedToken);
+        log("Refreshed TOKEN: " + refreshedToken);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
@@ -55,7 +60,13 @@ public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
      */
     private void sendRegistrationToServer(String token) {
         log("sendRegistration: " + token);
-        // TODO: Implement this method to send token to your app server.
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication)getApplication()).getMegaApi();
+        }
+
+        log("TOKEN: " + token);
+        megaApi.registerPushNotifications(Constants.DEVICE_ANDROID, token);
     }
 
     public static void log(String message) {

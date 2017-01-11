@@ -81,8 +81,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	MegaRequestListenerInterface megaRequestListener;
 	MegaTransferListenerInterface megaTransferListener;
 	
-	private int notificationId = 1;
-	private int notificationIdFinal = 5;
+	private int notificationId = Constants.NOTIFICATION_UPLOAD;
+	private int notificationIdFinal = Constants.NOTIFICATION_UPLOAD_FINAL;
 	
 	private SparseArray<MegaTransfer> currentTransfers;
 	private SparseArray<MegaTransfer> transfersOK;
