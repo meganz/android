@@ -64,6 +64,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -489,7 +490,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 			case R.id.cab_menu_start_conversation:{
-				showSnackbar("Coming soon...");
+				showSnackbar("Star conversation");
+				if(user!=null){
+					MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+					if(chat==null){
+						log("No chat, create it!");
+						MegaChatPeerList peers = MegaChatPeerList.createInstance();
+						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+						megaChatApi.createChat(false, peers, this);
+					}
+					else{
+						log("There is already a chat, open it!");
+						Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+						intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+						intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+						this.startActivity(intentOpenChat);
+					}
+				}
 				break;
 			}
 		}
@@ -1144,6 +1161,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			else{
 				log("Error clearing history: "+e.getErrorString());
 				showSnackbar(getString(R.string.clear_history_error));
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+			log("Create chat request finish!!!");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Chat CREATEDD!!!---> open it!");
+				Intent intent = new Intent(this, ChatActivityLollipop.class);
+				intent.setAction(Constants.ACTION_CHAT_NEW);
+				intent.putExtra("CHAT_ID", request.getChatHandle());
+				this.startActivity(intent);
+				finish();
+			}
+			else{
+				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+				showSnackbar(getString(R.string.create_chat_error));
 			}
 		}
 	}
