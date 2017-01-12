@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -50,10 +52,12 @@ import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -791,15 +795,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
-
+                showSnackbar("Coming soon...");
                 break;
             }
             case R.id.cab_menu_video_chat:{
-                log("onClick cab_menu_video_chat");
-
-                ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
-                bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-
+                showSnackbar("Coming soon...");
                 break;
             }
             case R.id.cab_menu_invite_chat:{
@@ -2134,4 +2134,48 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         super.onDestroy();
     }
+
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        log("onNewIntent");
+
+        if (intent != null){
+            if (intent.getAction() != null){
+                log("Intent is here!: "+intent.getAction());
+                if (intent.getAction().equals(Constants.ACTION_CLEAR_CHAT)){
+                    log("Intent to Clear history");
+                    showConfirmationClearChat(chatRoom);
+                }
+                else{
+                    log("Other intent");
+                }
+            }
+        }
+        super.onNewIntent(intent);
+        setIntent(intent);
+        return;
+    }
+
+//    @Override
+//    protected void onResume() {
+//        log("onResume");
+//        super.onResume();
+//
+//        Intent newIntent = getIntent();
+//
+//        if (newIntent != null){
+//            if (newIntent.getAction() != null){
+//                log("Intent is here!: "+newIntent.getAction());
+//                if (newIntent.getAction().equals(Constants.ACTION_CLEAR_CHAT)){
+//                    log("Intent to Clear history");
+//                    showConfirmationClearChat(chatRoom);
+//                }
+//                else{
+//                    log("Other intent");
+//                }
+//            }
+//        }
+//
+//    }
 }
