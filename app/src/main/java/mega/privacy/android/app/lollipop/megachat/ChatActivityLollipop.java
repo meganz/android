@@ -81,11 +81,12 @@ import nz.mega.sdk.MegaUser;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
-    public static int NUMBER_MESSAGES_TO_LOAD = 16;
+    public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_TO_UPDATE_UI = 7;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
 
     boolean firstMessageReceived = true;
+    boolean getMoreHistory=true;
 
     private AlertDialog errorOpenChatDialog;
 
@@ -434,8 +435,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    showSnackbar("loadMoreMessages!!!");
 //                }
 
-                        if(pos==NUMBER_MESSAGES_BEFORE_LOAD){
+                        if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
                             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                            getMoreHistory = false;
                             log("Get more history------------------------");
                         }
                     }
@@ -1629,6 +1631,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
             }
+            getMoreHistory = true;
         }
     }
 
