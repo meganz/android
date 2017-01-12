@@ -114,6 +114,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
 	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
+	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
 	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 	
@@ -159,6 +160,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference aboutPrivacy;
 	Preference aboutTOS;
 	Preference aboutSDK;
+	Preference aboutKarere;
 	Preference aboutApp;
 	Preference codeLink;
 	Preference secondaryMediaFolderOn;
@@ -352,6 +354,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		aboutApp.setOnPreferenceClickListener(this);
 		aboutSDK = findPreference(KEY_ABOUT_SDK_VERSION);
 		aboutSDK.setOnPreferenceClickListener(this);
+		aboutKarere = findPreference(KEY_ABOUT_KARERE_VERSION);
 
 		codeLink = findPreference(KEY_ABOUT_CODE_LINK);
 		codeLink.setOnPreferenceClickListener(this);

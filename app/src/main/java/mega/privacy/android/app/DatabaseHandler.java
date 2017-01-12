@@ -22,7 +22,7 @@ import nz.mega.sdk.MegaApiJava;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 23;
+	private static final int DATABASE_VERSION = 24;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -384,7 +384,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
 					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
 			db.execSQL(CREATE_CHAT_TABLE);
+		}
 
+		if (oldVersion <= 23){
 			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_FIRST_NAME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_FIRST_NAME + " = '" + encrypt("") + "';");
 
