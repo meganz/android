@@ -832,7 +832,9 @@
     <string name="archive_chat_empty" context="the user has not sent any contact request to other users">No hay conversaciones archivadas</string>
     <string name="get_started_button" context="Button to start using the chat">Comenzar</string>
 
-    <string name="recent_chat_empty" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
+    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">No hay conversaciones</string>
+
+    <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Videollamada</string>
 
