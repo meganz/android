@@ -45,6 +45,7 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/divider_notifications_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:background="@color/separator_grey" />
