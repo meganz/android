@@ -176,6 +176,11 @@
             android:key="settings_about_sdk_version"
         	android:title="@string/settings_about_sdk_version"
         	android:summary="@string/sdk_version" />
+
+		<Preference
+			android:key="settings_about_karere_version"
+			android:title="@string/settings_about_karere_version"
+			android:summary="@string/karere_version" />
 		
         <Preference
             android:key="settings_about_app_version"

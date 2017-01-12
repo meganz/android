@@ -1703,19 +1703,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
-            loginLoggingIn.setVisibility(View.GONE);
-            loginLogin.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-            loginDelimiter.setVisibility(View.VISIBLE);
-            loginCreateAccount.setVisibility(View.VISIBLE);
-            queryingSignupLinkText.setVisibility(View.GONE);
-            confirmingAccountText.setVisibility(View.GONE);
-            generatingKeysText.setVisibility(View.GONE);
-            loggingInText.setVisibility(View.GONE);
-            fetchingNodesText.setVisibility(View.GONE);
-            prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
-            serversBusyText.setVisibility(View.GONE);
+//            loginLoggingIn.setVisibility(View.GONE);
+//            loginLogin.setVisibility(View.VISIBLE);
+//            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+//            loginDelimiter.setVisibility(View.VISIBLE);
+//            loginCreateAccount.setVisibility(View.VISIBLE);
+//            queryingSignupLinkText.setVisibility(View.GONE);
+//            confirmingAccountText.setVisibility(View.GONE);
+//            generatingKeysText.setVisibility(View.GONE);
+//            loggingInText.setVisibility(View.GONE);
+//            fetchingNodesText.setVisibility(View.GONE);
+//            prepareNodesText.setVisibility(View.GONE);
+//            initizalizingChatText.setVisibility(View.GONE);
+//            serversBusyText.setVisibility(View.GONE);
 
             megaChatApi = null;
             ((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();
