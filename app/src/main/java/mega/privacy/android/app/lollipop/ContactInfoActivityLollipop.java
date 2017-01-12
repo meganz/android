@@ -55,6 +55,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -720,7 +721,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		switch (v.getId()) {
 			case R.id.chat_contact_properties_clear_layout: {
 				log("Clear chat option");
-				showConfirmationClearChat();
+				if(fromContacts){
+					showConfirmationClearChat();
+				}
+				else{
+					intentToClearChat();
+					finish();
+				}
+
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -1067,6 +1075,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void intentToClearChat(){
+		Intent clearChat = new Intent(this, ChatActivityLollipop.class);
+		clearChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+		clearChat.setAction(Constants.ACTION_CLEAR_CHAT);
+		startActivity(clearChat);
 	}
 
 	@Override
