@@ -1203,10 +1203,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                         }
                     }
-
                 }
                 else{
                     log("Type message: "+message.getType());
+                    holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+
+                    holder.contentOwnMessageText.setText("Message unrecognizable");
+                    holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+                    holder.ownManagementMessageLayout.setVisibility(View.GONE);
+
+                    //Margins
+                    RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                    ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                    holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+                    holder.ownMultiselectionLayout.setVisibility(View.GONE);
+                    holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+
 //                log("Content: "+message.getContent());
                 }
             }
