@@ -295,7 +295,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if(serversBusyText!=null){
 					serversBusyText.setVisibility(View.GONE);
 				}
-				megaApi.fastLogin(gSession, this);
+				if (!MegaApplication.isLoggingIn()){
+					MegaApplication.setLoggingIn(true);
+					megaApi.fastLogin(gSession, this);
+				}
 
 			}
 			else{
@@ -900,7 +903,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			serversBusyText.setVisibility(View.GONE);
 		}
 		log("fastLogin con publicKey y privateKey");
-		megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+		if (!MegaApplication.isLoggingIn()){
+			MegaApplication.setLoggingIn(true);
+			megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+		}
 	}
 	
 	public void setParentHandle (long parentHandle){
@@ -967,6 +973,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() != MegaError.API_OK) {
+				MegaApplication.setLoggingIn(false);
+
 				String errorMessage;
 				if (e.getErrorCode() == MegaError.API_ENOENT) {
 					errorMessage = getString(R.string.error_incorrect_email_or_password);
@@ -1035,6 +1043,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			MegaApplication.setLoggingIn(false);
 			if (e.getErrorCode() != MegaError.API_OK) {
 				String errorMessage;
 				errorMessage = e.getErrorString();

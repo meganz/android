@@ -751,7 +751,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaChatApi.logout(this);
             }
             else{
-                initizalizingChatText.setText("Chat correclty initialized");
+                initizalizingChatText.setText("Chat correctly initialized");
             }
         }
 
@@ -837,7 +837,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         initizalizingChatText.setVisibility(View.GONE);
-        megaApi.fastLogin(gSession, this);
+        if (!MegaApplication.isLoggingIn()){
+            MegaApplication.setLoggingIn(true);
+            megaApi.fastLogin(gSession, this);
+        }
     }
 
     private void submitForm() {
@@ -957,7 +960,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if(Util.isChatEnabled()){
             int ret = megaChatApi.init(null);
             if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
-                megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                if (!MegaApplication.isLoggingIn()){
+                    MegaApplication.setLoggingIn(true);
+                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                }
             }
             else{
                 log("ERROR INIT CHAT: " + ret);
@@ -965,7 +971,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else{
-            megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+            if (!MegaApplication.isLoggingIn()){
+                MegaApplication.setLoggingIn(true);
+                megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+            }
         }
     }
 
@@ -1422,6 +1431,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         log("onRequestFinish: " + request.getRequestString());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
             if (error.getErrorCode() != MegaError.API_OK) {
+                MegaApplication.setLoggingIn(false);
+
                 String errorMessage;
                 if (error.getErrorCode() == MegaError.API_ENOENT) {
                     errorMessage = getString(R.string.error_incorrect_email_or_password);
@@ -1527,6 +1538,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            MegaApplication.setLoggingIn(false);
             if (error.getErrorCode() == MegaError.API_OK){
                 log("ok fetch nodes");
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
