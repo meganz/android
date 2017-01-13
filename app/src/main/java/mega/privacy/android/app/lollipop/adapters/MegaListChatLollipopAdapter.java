@@ -591,12 +591,23 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		display.getMetrics(outMetrics);
 		float density  = context.getResources().getDisplayMetrics().density;
 
-		int avatarTextSize = getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
+		String firstLetter = holder.contactInitialLetter.getText().toString();
 
-		holder.contactInitialLetter.setTextColor(Color.WHITE);
-		holder.contactInitialLetter.setVisibility(View.VISIBLE);
-		holder.contactInitialLetter.setTextSize(24);
+		if(firstLetter.trim().isEmpty()){
+			holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+		}
+		else{
+			log("Group chat initial letter is: "+firstLetter);
+			if(firstLetter.equals("(")){
+				holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+			}
+			else{
+				holder.contactInitialLetter.setText(firstLetter);
+				holder.contactInitialLetter.setTextColor(Color.WHITE);
+				holder.contactInitialLetter.setVisibility(View.VISIBLE);
+				holder.contactInitialLetter.setTextSize(24);
+			}
+		}
 	}
 	
 	public void createDefaultAvatar(ViewHolderChatList holder){
