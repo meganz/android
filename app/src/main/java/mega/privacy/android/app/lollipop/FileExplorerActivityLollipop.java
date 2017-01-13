@@ -326,7 +326,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			prepareNodesText.setVisibility(View.GONE);
 			gSession = credentials.getSession();
 			log("SESSION: " + gSession);
-			megaApi.fastLogin(gSession, this);
+			if (!MegaApplication.isLoggingIn()){
+				MegaApplication.setLoggingIn(true);
+				megaApi.fastLogin(gSession, this);
+			}
 		}
 		else{
 			afterLoginAndFetch();
@@ -1225,6 +1228,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (error.getErrorCode() != MegaError.API_OK) {
+				MegaApplication.setLoggingIn(false);
+
 				//ERROR LOGIN
 				String errorMessage;
 				if (error.getErrorCode() == MegaError.API_ENOENT) {
@@ -1283,6 +1288,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			MegaApplication.setLoggingIn(false);
 			if (error.getErrorCode() == MegaError.API_OK){
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
