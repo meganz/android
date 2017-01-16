@@ -99,7 +99,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
-//    Handler handler;
+    Handler handlerReceive;
+    Handler handlerSend;
 
     MegaChatRoom chatRoom;
     long idChat;
@@ -126,6 +127,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
     RelativeLayout chatRelativeLayout;
+    RelativeLayout userTypingLayout;
+    boolean sendIsTyping=true;
 //    TextView inviteText;
     ImageButton keyboardButton;
     EmojiconEditText textChat;
@@ -364,6 +367,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     sendIcon.setVisibility(View.GONE);
                 }
+
+                if(sendIsTyping){
+                    sendIsTyping=false;
+                    megaChatApi.sendTypingNotification(chatRoom.getChatId());
+
+                    int interval = 4000;
+                    Runnable runnable = new Runnable(){
+                        public void run() {
+                            sendIsTyping=true;
+                        }
+                    };
+                    handlerSend = new Handler();
+                    handlerSend.postDelayed(runnable, interval);
+                }
             }
         });
 
@@ -447,6 +464,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         adapter = null;
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
+
+        userTypingLayout = (RelativeLayout) findViewById(R.id.user_typing_layout);
+        userTypingLayout.setVisibility(View.GONE);
 
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
         fab.setOnClickListener(this);
@@ -1553,6 +1573,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_TYPING)){
             log("CHANGE_TYPE_USER_TYPING for the chat: "+chat.getChatId());
+            userTypingLayout.setVisibility(View.VISIBLE);
+
+            int interval = 5000;
+            Runnable runnable = new Runnable(){
+                public void run() {
+                    userTypingLayout.setVisibility(View.GONE);
+                }
+            };
+
+            handlerReceive = new Handler();
+            handlerReceive.postDelayed(runnable, interval);
         }
     }
 
