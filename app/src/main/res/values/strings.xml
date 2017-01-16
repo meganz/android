@@ -1042,4 +1042,6 @@
 
     <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message not sent</string>
 
+    <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
+
 </resources>
