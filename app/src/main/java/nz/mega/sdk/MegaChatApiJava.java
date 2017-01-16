@@ -803,6 +803,32 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Removes the unsent message from the queue
+     *
+     * Messages with status MegaChatMessage::STATUS_SENDING_MANUAL should be
+     * removed from the manual send queue after user discards them or resends them.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param tempId Temporal id of the message, as returned by MegaChatMessage::getTempId.
+     */
+    public void removeUnsentMessage(long chatid, long tempId){
+        megaChatApi.removeUnsentMessage(chatid, tempId);
+    }
+
+    /**
+     * Send a notification to the chatroom that the user is typing
+     *
+     * Other peers in the chatroom will receive a notification via
+     * \c MegaChatRoomListener::onChatRoomUpdate with the change type
+     * \c MegaChatRoom::CHANGE_TYPE_USER_TYPING. \see MegaChatRoom::getUserTyping.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     */
+    public void sendTypingNotification(long chatid){
+        megaChatApi.sendTypingNotification(chatid);
+    }
+
+    /**
      * Set the active log level.
      * <p>
      * This function sets the log level of the logging system. If you set a log listener using

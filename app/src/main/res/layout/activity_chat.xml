@@ -366,6 +366,18 @@
                 android:layout_margin="16dp"
                 android:src="@drawable/ic_add_white" />
 
+            <RelativeLayout
+                android:id="@+id/user_typing_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="is typing"/>
+            </RelativeLayout>
+
         </RelativeLayout>
 
     </RelativeLayout>
