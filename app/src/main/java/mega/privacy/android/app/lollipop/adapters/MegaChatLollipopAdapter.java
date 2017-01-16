@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollipopAdapter.ViewHolderMessageChatList> implements View.OnClickListener {
 
@@ -1048,7 +1049,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                             holder.triangleIcon.setVisibility(View.VISIBLE);
                             holder.retryAlert.setVisibility(View.VISIBLE);
-                            holder.retryAlert.setOnClickListener(this);
                         }
                         else if((status==MegaChatMessage.STATUS_SENDING)){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
@@ -1205,7 +1205,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
                 else{
-                    log("Type message: "+message.getType());
+                    log("Type message ERROR: "+message.getType());
                     holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
                     holder.contentOwnMessageText.setText("Message unrecognizable");
@@ -1221,6 +1221,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
 //                log("Content: "+message.getContent());
                 }
+//                holder.retryAlert.setVisibility(View.VISIBLE);
             }
             else{
                 log("Contact message!!");
@@ -1246,7 +1247,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
                 else{
-                    holder.fullNameTitle = getContactFullName(holder.userHandle);
+//                    holder.fullNameTitle = getContactFullName(holder.userHandle);
+                    holder.fullNameTitle = chatRoom.getTitle();
                 }
 
                 if(messages.get(position).getInfoToShow()!=-1){
@@ -1607,8 +1609,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     holder.contactManagementMessageText.setText(result);
                 }
                 else{
-                    log("Type message: "+message.getType());
-                    log("Content: "+message.getContent());
+                    log("Type message ERROR: "+message.getType());
+
+                    holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+                    holder.contactManagementMessageLayout.setVisibility(View.GONE);
+                    holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+                    holder.contentContactMessageText.setText("Message unrecognizable");
+
+                    //Margins
+                    RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
+                    timeContactTextParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                    holder.timeContactText.setLayoutParams(timeContactTextParams);
+
+                    holder.contactMultiselectionLayout.setVisibility(View.GONE);
+                    holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                 }
             }
         }
@@ -1653,10 +1667,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
             return fullName;
         }
         else{
-            String email = contactDB.getMail();
-            String[] splitEmail = email.split("[@._]");
-            String fullName = splitEmail[0];
-            return fullName;
+            //Ask for name of the user, for any reason is not in the database
+            return "Unknow name";
+//            String email = contactDB.getMail();
+//            String[] splitEmail = email.split("[@._]");
+//            String fullName = splitEmail[0];
+//            return fullName;
         }
     }
 
@@ -1837,20 +1853,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.not_sent_own_message_text:{
-                log("not_sent_own_message_text");
-                MegaChatLollipopAdapter.ViewHolderMessageChatList holder = (MegaChatLollipopAdapter.ViewHolderMessageChatList) v.getTag();
-                int currentPosition = holder.currentPosition;
-                AndroidMegaChatMessage m = (AndroidMegaChatMessage) getItem(currentPosition);
-                if(m==null){
-                    log("Message is null");
-                    break;
-                }
-                ((ChatActivityLollipop) context).showMessagePanel(m);
-                break;
-            }
-        }
+        log("onCLick");
+//        ViewHolderMessageChatList holder = (ViewHolderMessageChatList) v.getTag();
+//        if(holder==null){
+//            log("Holder is null!");
+//            return;
+//        }
+//        int currentPosition = holder.currentPosition;
+//        switch (v.getId()){
+//            case R.id.not_sent_own_message_text:{
+//                log("not_sent_own_message_text, message_chat_item_layout");
+//
+//                AndroidMegaChatMessage m = (AndroidMegaChatMessage) getItem(currentPosition);
+//                ((ChatActivityLollipop) context).showMsgNotSentPanel(m);
+//                break;
+//            }
+//            case R.id.message_chat_item_layout:{
+//                ((ChatActivityLollipop) context).itemClick(currentPosition);
+//                break;
+//            }
+//
+//        }
     }
 
     private static void log(String log) {

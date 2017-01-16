@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/msg_not_sent_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="0dp">
+
+        <!-- Title -->
+        <LinearLayout
+            android:id="@+id/msg_not_sent_title_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/msg_not_sent_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="18dp"
+                android:text="@string/title_message_not_sent_options"
+                android:textColor="@color/transparent_black"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <!--Retry-->
+        <LinearLayout
+            android:id="@+id/msg_not_sent_retry_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/msg_not_sent_retry_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.54"
+                android:paddingBottom="2dp"
+                android:layout_marginLeft="16dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_replay_black_24dp"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/msg_not_sent_retry_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="32dp"
+                android:text="@string/message_option_retry"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+
+        <!--Delete-->
+        <LinearLayout
+            android:id="@+id/msg_not_sent_delete_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/msg_not_sent_delete_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.54"
+                android:layout_marginLeft="16dp"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_remove"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/msg_not_sent_delete_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="32dp"
+                android:text="@string/context_delete"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

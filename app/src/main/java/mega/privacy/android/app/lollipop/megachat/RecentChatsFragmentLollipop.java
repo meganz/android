@@ -851,11 +851,50 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
 
+        //Add check ERROR newState - same proccess of login
     }
 
     @Override
     public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
+        log("onChatOnlineStatusUpdate");
 
+        if (isAdded()) {
+            chatStatus = megaChatApi.getOnlineStatus();
+            log("chatStatus: "+chatStatus);
+            if(chatStatus== MegaChatApi.STATUS_ONLINE){
+                chatStatusLayout.setVisibility(View.GONE);
+
+                Resources res = getResources();
+                int valuePaddingTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, res.getDisplayMetrics());
+                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
+
+                listView.setClipToPadding(false);
+                listView.setPadding(0, valuePaddingTop, 0, valuePaddingBottom);
+            }
+            else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+                chatStatusLayout.setVisibility(View.VISIBLE);
+                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
+                chatStatusText.setText(getString(R.string.settings_chat_status_offline));
+
+                Resources res = getResources();
+                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
+
+                listView.setClipToPadding(false);
+                listView.setPadding(0, 0, 0, valuePaddingBottom);
+            }
+            else{
+                chatStatusLayout.setVisibility(View.VISIBLE);
+                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_invisible_layout));
+                chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
+
+                Resources res = getResources();
+                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
+
+                listView.setClipToPadding(false);
+                listView.setPadding(0, 0, 0, valuePaddingBottom);
+            }
+
+        }
     }
 
     public void onStatusChange(int position){

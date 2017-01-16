@@ -956,8 +956,8 @@
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">If you leave, you will no longer have access to read or send messages.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Leave group chat?</string>
 
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">After cleared, you won\'t be able to see messages of this chat.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear all messages?</string>
+    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">All messages and media in this conversation will be cleared.</string>
+    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear history?</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">The participant has been correctly invited</string>
     <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. The participant has not been invited correctly</string>
@@ -1037,5 +1037,9 @@
     </plurals>
 
     <string name="chat_connection_error" context="error shown when the connection to the chat fails">Chat connection error</string>
+
+    <string name="message_option_retry" context="option shown when a message could not be sent">Retry</string>
+
+    <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message not sent</string>
 
 </resources>

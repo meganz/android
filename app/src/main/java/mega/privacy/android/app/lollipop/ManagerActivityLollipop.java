@@ -12935,10 +12935,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(chat!=null){
 			this.selectedChatItem = chat;
+			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
-
-		ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void updateUserNameNavigationView(String fullName, String firstLetter){

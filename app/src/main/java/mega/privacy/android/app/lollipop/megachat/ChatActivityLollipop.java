@@ -63,6 +63,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -227,11 +228,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public boolean onSingleTapUp(MotionEvent e) {
             log("onSingleTapUp");
 
-            if (adapter.isMultipleSelect()){
-                View view = listView.findChildViewUnder(e.getX(), e.getY());
-                int position = listView.getChildLayoutPosition(view);
-                itemClick(position);
-            }
+            View view = listView.findChildViewUnder(e.getX(), e.getY());
+            int position = listView.getChildLayoutPosition(view);
+            itemClick(position);
             return true;
         }
     }
@@ -1453,15 +1452,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 hideMultipleSelect();
             }
         }
-//        else{
-//            log("open chat one to one");
-//            Intent intent = new Intent(this, ChatActivityLollipop.class);
-//            intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-//            String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
-//            intent.putExtra("CHAT_ID", position);
-//            intent.putExtra("MY_MAIL", myMail);
-//            this.startActivity(intent);
-//        }
+        else{
+            log("show not sent message panel");
+            AndroidMegaChatMessage m = messages.get(position);
+//            showMsgNotSentPanel(m);
+            if(m!=null){
+                if(m.getMessage().getUserHandle()==megaApi.getMyUser().getHandle()) {
+                    if(!(m.getMessage().isManagementMessage())){
+                        log("selected message: "+m.getMessage().getContent());
+                        if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                            showMsgNotSentPanel(m);
+                        }
+                    }
+                }
+            }
+
+        }
     }
     /////END Multiselect/////
 
@@ -2013,8 +2019,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return chatRoom.isGroup();
     }
 
-    public void showMessagePanel(AndroidMegaChatMessage message){
-        showSnackbar("Not yet implemented!");
+    public void showMsgNotSentPanel(AndroidMegaChatMessage message){
+//        showSnackbar("Not yet implemented!");
+
+        log("showMessagePanel");
+
+        if(message!=null){
+//            this.selectedChatItem = chat;
+            MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }
     }
 
     public void showSnackbar(String s){
