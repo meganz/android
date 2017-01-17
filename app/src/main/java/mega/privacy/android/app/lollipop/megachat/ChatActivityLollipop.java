@@ -128,7 +128,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout disabledWritingLayout;
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
+    TextView userTypingtext;
     boolean sendIsTyping=true;
+    long userTypingTimeStamp = -1;
 //    TextView inviteText;
     ImageButton keyboardButton;
     EmojiconEditText textChat;
@@ -369,6 +371,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 if(sendIsTyping){
+                    log("Send is typing notification");
                     sendIsTyping=false;
                     megaChatApi.sendTypingNotification(chatRoom.getChatId());
 
@@ -467,6 +470,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         userTypingLayout = (RelativeLayout) findViewById(R.id.user_typing_layout);
         userTypingLayout.setVisibility(View.GONE);
+        userTypingtext = (TextView) findViewById(R.id.user_typing_text);
 
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
         fab.setOnClickListener(this);
@@ -1573,12 +1577,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_TYPING)){
             log("CHANGE_TYPE_USER_TYPING for the chat: "+chat.getChatId());
+            long userHandleTyping;
+            if(chat!=null){
+                userHandleTyping = chat.getUserTyping();
+                String nameTyping = chat.getPeerFirstnameByHandle(userHandleTyping);
+                if(nameTyping==null){
+                    nameTyping = "";
+                }
+                if(nameTyping.trim().isEmpty()){
+                    nameTyping = chat.getPeerFullnameByHandle(userHandleTyping);
+                    userTypingtext.setText(getString(R.string.one_user_typing, nameTyping));
+                }
+                else{
+                    userTypingtext.setText(getString(R.string.one_user_typing, nameTyping));
+                }
+            }
             userTypingLayout.setVisibility(View.VISIBLE);
+            userTypingTimeStamp = System.currentTimeMillis()/1000;
 
             int interval = 5000;
             Runnable runnable = new Runnable(){
                 public void run() {
-                    userTypingLayout.setVisibility(View.GONE);
+                    long timeNow = System.currentTimeMillis()/1000;
+                    if ((timeNow - userTypingTimeStamp) > 4){
+                        userTypingLayout.setVisibility(View.GONE);
+                    }
                 }
             };
 

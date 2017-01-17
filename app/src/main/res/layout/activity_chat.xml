@@ -349,7 +349,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="multipleChoice"
-                    android:paddingBottom="12dp"/>
+                    android:paddingBottom="32dp"/>
 
             </RelativeLayout>
 
@@ -370,12 +370,15 @@
                 android:id="@+id/user_typing_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="36dp"
+                android:layout_marginBottom="5dp"
                 android:layout_alignParentBottom="true">
 
                 <TextView
+                    android:id="@+id/user_typing_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="is typing"/>
+                    android:textSize="12sp"/>
             </RelativeLayout>
 
         </RelativeLayout>
