@@ -1557,7 +1557,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
-            log("chat online state: "+chat.getOnlineState());
             log("chat online status: "+chat.getOnlineStatus());
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
@@ -1571,9 +1570,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)){
             log("CHANGE_TYPE_TITLE for the chat: "+chat.getChatId());
-        }
-        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CHAT_STATE)){
-            log("CHANGE_TYPE_CHAT_STATE for the chat: "+chat.getChatId());
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_TYPING)){
             log("CHANGE_TYPE_USER_TYPING for the chat: "+chat.getChatId());
