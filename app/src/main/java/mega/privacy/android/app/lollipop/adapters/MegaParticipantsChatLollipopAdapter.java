@@ -321,9 +321,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			if (status == MegaChatApi.STATUS_ONLINE) {
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.online_status));
 			}
-			else if (status == MegaChatApi.STATUS_AWAY) {
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.settings_chat_status_invisible));
-			}
 			else {
 				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.offline_status));
 			}
