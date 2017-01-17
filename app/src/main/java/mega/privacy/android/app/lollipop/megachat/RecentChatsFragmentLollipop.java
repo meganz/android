@@ -302,7 +302,24 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
         if(isAdded()){
             if(chatEnabled){
-                chats = megaChatApi.getChatListItems();
+                if(chats!=null){
+                    chats.clear();
+                }
+                else{
+                    chats = new ArrayList<MegaChatListItem>();
+                }
+
+                ArrayList<MegaChatListItem> allChats = megaChatApi.getChatListItems();
+                for (int i=0; i<allChats.size();i++){
+                    MegaChatListItem chat = allChats.get(i);
+                    if(chat.isActive()){
+                        chats.add(chat);
+                    }
+                    else{
+                        log("Remove chat: "+chat.getTitle());
+                    }
+                }
+//                chats = megaChatApi.getChatListItems();
                 log("chats no: "+chats.size());
 
                 //Order by last interaction
