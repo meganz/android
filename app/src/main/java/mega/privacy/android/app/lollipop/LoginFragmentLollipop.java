@@ -1459,28 +1459,28 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     megaChatApi.logout(this);
                 }
 
-//                loginLoggingIn.setVisibility(View.GONE);
-//                loginLogin.setVisibility(View.VISIBLE);
-//                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-//                loginDelimiter.setVisibility(View.VISIBLE);
-//                loginCreateAccount.setVisibility(View.VISIBLE);
-//                queryingSignupLinkText.setVisibility(View.GONE);
-//                confirmingAccountText.setVisibility(View.GONE);
-//                generatingKeysText.setVisibility(View.GONE);
-//                loggingInText.setVisibility(View.GONE);
-//                fetchingNodesText.setVisibility(View.GONE);
-//                prepareNodesText.setVisibility(View.GONE);
-//                initizalizingChatText.setVisibility(View.GONE);
-//                serversBusyText.setVisibility(View.GONE);
-//
-//                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
-//
-////				DatabaseHandler dbH = new DatabaseHandler(this);
-//                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-//                dbH.clearCredentials();
-//                if (dbH.getPreferences() != null){
-//                    ((LoginActivityLollipop)context).stopCameraSyncService();
-//                }
+                loginLoggingIn.setVisibility(View.GONE);
+                loginLogin.setVisibility(View.VISIBLE);
+                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                loginDelimiter.setVisibility(View.VISIBLE);
+                loginCreateAccount.setVisibility(View.VISIBLE);
+                queryingSignupLinkText.setVisibility(View.GONE);
+                confirmingAccountText.setVisibility(View.GONE);
+                generatingKeysText.setVisibility(View.GONE);
+                loggingInText.setVisibility(View.GONE);
+                fetchingNodesText.setVisibility(View.GONE);
+                prepareNodesText.setVisibility(View.GONE);
+                initizalizingChatText.setVisibility(View.GONE);
+                serversBusyText.setVisibility(View.GONE);
+
+                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+
+//				DatabaseHandler dbH = new DatabaseHandler(this);
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                dbH.clearCredentials();
+                if (dbH.getPreferences() != null){
+                    ((LoginActivityLollipop)context).stopCameraSyncService();
+                }
             }
             else{
 

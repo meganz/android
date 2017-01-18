@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -210,6 +211,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onEmojiconBackspaceClicked(View v) {
         EmojiconsFragment.backspace(textChat);
     }
+
+    private class UserTyping {
+        MegaChatParticipant participantTyping;
+        long timeStampTyping;
+
+        public UserTyping(MegaChatParticipant participantTyping) {
+            this.participantTyping = participantTyping;
+        }
+
+        public MegaChatParticipant getParticipantTyping() {
+            return participantTyping;
+        }
+
+        public void setParticipantTyping(MegaChatParticipant participantTyping) {
+            this.participantTyping = participantTyping;
+        }
+
+        public long getTimeStampTyping() {
+            return timeStampTyping;
+        }
+
+        public void setTimeStampTyping(long timeStampTyping) {
+            this.timeStampTyping = timeStampTyping;
+        }
+    }
+
+    ArrayList<UserTyping> usersTyping;
+    List<UserTyping> usersTypingSync;
 
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -1564,6 +1593,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
             log("chat online status: "+chat.getOnlineStatus());
+            if(!(chatRoom.isGroup())){
+                int state = chat.getOnlineStatus();
+                if(state == MegaChatApi.STATUS_ONLINE){
+                    log("This user is connected: "+chatRoom.getTitle());
+                    aB.setSubtitle(getString(R.string.online_status));
+                }
+                else{
+                    log("This user status is: "+state+  " " + chatRoom.getTitle());
+                    aB.setSubtitle(getString(R.string.offline_status));
+                }
+            }
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
             log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+chat.getChatId());
@@ -1579,36 +1619,167 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_TYPING)){
             log("CHANGE_TYPE_USER_TYPING for the chat: "+chat.getChatId());
-            long userHandleTyping;
             if(chat!=null){
-                userHandleTyping = chat.getUserTyping();
-                String nameTyping = chat.getPeerFirstnameByHandle(userHandleTyping);
-                if(nameTyping==null){
-                    nameTyping = "";
+
+                long userHandleTyping = chat.getUserTyping();
+
+                if(userHandleTyping==megaApi.getMyUser().getHandle()){
+                    return;
                 }
-                if(nameTyping.trim().isEmpty()){
-                    nameTyping = chat.getPeerFullnameByHandle(userHandleTyping);
-                    userTypingtext.setText(getString(R.string.one_user_typing, nameTyping));
+
+                if(usersTyping==null){
+                    usersTyping = new ArrayList<UserTyping>();
+                    usersTypingSync = Collections.synchronizedList(usersTyping);
+                }
+
+                //Find if any notification arrives previously
+                if(usersTypingSync.size()<=0){
+                    log("No more users writing");
+                    MegaChatParticipant participantTyping = new MegaChatParticipant(userHandleTyping);
+                    UserTyping currentUserTyping = new UserTyping(participantTyping);
+
+                    String nameTyping = chat.getPeerFirstnameByHandle(userHandleTyping);
+                    log("userHandleTyping: "+userHandleTyping);
+                    if(nameTyping==null){
+                        log("NULL name");
+                        nameTyping = "";
+                    }
+                    if(nameTyping.trim().isEmpty()){
+                        log("EMPTY name");
+                        nameTyping = chat.getPeerFullnameByHandle(userHandleTyping);
+                        participantTyping.setFirstName(nameTyping);
+                        userTypingtext.setText(getString(R.string.one_user_typing, nameTyping));
+                    }
+                    else{
+                        participantTyping.setFirstName(nameTyping);
+                        userTypingtext.setText(getString(R.string.one_user_typing, nameTyping));
+                    }
+
+                    userTypingTimeStamp = System.currentTimeMillis()/1000;
+                    currentUserTyping.setTimeStampTyping(userTypingTimeStamp);
+
+                    usersTypingSync.add(currentUserTyping);
+                    userTypingLayout.setVisibility(View.VISIBLE);
+
                 }
                 else{
-                    userTypingtext.setText(getString(R.string.one_user_typing, nameTyping));
-                }
-            }
-            userTypingLayout.setVisibility(View.VISIBLE);
-            userTypingTimeStamp = System.currentTimeMillis()/1000;
+                    log("More users writing or the same in different timestamp");
 
-            int interval = 5000;
-            Runnable runnable = new Runnable(){
-                public void run() {
-                    long timeNow = System.currentTimeMillis()/1000;
-                    if ((timeNow - userTypingTimeStamp) > 4){
-                        userTypingLayout.setVisibility(View.GONE);
+                    //Find the item
+                    boolean found = false;
+                    for(UserTyping user : usersTypingSync) {
+                        if(user.getParticipantTyping().getHandle() == userHandleTyping) {
+                            log("Found user typing!");
+                            userTypingTimeStamp = System.currentTimeMillis()/1000;
+                            user.setTimeStampTyping(userTypingTimeStamp);
+                            found=true;
+                            break;
+                        }
+                    }
+
+                    if(!found){
+                        log("It's a new user typing");
+                        MegaChatParticipant participantTyping = new MegaChatParticipant(userHandleTyping);
+                        UserTyping currentUserTyping = new UserTyping(participantTyping);
+
+                        String nameTyping = chat.getPeerFirstnameByHandle(userHandleTyping);
+                        if(nameTyping==null){
+                            nameTyping = "";
+                        }
+                        if(nameTyping.trim().isEmpty()){
+                            nameTyping = chat.getPeerFullnameByHandle(userHandleTyping);
+                            participantTyping.setFirstName(nameTyping);
+                        }
+                        else{
+                            participantTyping.setFirstName(nameTyping);
+                        }
+                        userTypingTimeStamp = System.currentTimeMillis()/1000;
+                        currentUserTyping.setTimeStampTyping(userTypingTimeStamp);
+
+                        usersTypingSync.add(currentUserTyping);
+
+                        //Show the notification
+                        int size = usersTypingSync.size();
+                        switch (size){
+                            case 1:{
+                                userTypingtext.setText(getString(R.string.one_user_typing, usersTypingSync.get(0).getParticipantTyping().getFirstName()));
+                                break;
+                            }
+                            case 2:{
+                                userTypingtext.setText(getString(R.string.two_users_typing, usersTypingSync.get(0).getParticipantTyping().getFirstName(), usersTypingSync.get(1).getParticipantTyping().getFirstName()));
+                                break;
+                            }
+                            default:{
+                                userTypingtext.setText(getString(R.string.three_users_typing, usersTypingSync.get(0).getParticipantTyping().getFirstName(), usersTypingSync.get(1).getParticipantTyping().getFirstName()));
+                                break;
+                            }
+                        }
+                        userTypingLayout.setVisibility(View.VISIBLE);
                     }
                 }
-            };
 
-            handlerReceive = new Handler();
-            handlerReceive.postDelayed(runnable, interval);
+                int interval = 5000;
+                IsTypingRunnable runnable = new IsTypingRunnable(userTypingTimeStamp);
+                handlerReceive = new Handler();
+                handlerReceive.postDelayed(runnable, interval);
+            }
+        }
+    }
+
+    private class IsTypingRunnable implements Runnable{
+
+        long timeStamp;
+
+        public IsTypingRunnable(long timeStamp) {
+            this.timeStamp = timeStamp;
+        }
+
+        @Override
+        public void run() {
+            log("Run off notification typing");
+            long timeNow = System.currentTimeMillis()/1000;
+            if ((timeNow - timeStamp) > 4){
+                log("Remove user from the list");
+
+                boolean found = false;
+                for(UserTyping user : usersTypingSync) {
+                    if(user.getTimeStampTyping() == timeStamp) {
+                        log("Found user typing in runnable!");
+                        usersTypingSync.remove(user);
+                        found=true;
+                        break;
+                    }
+                }
+
+                if(!found){
+                    log("Error when removing an user typing");
+                }
+
+                //Update notification
+                int size = usersTypingSync.size();
+                log("Size of typing: "+size);
+                switch (size){
+                    case 0:{
+                        userTypingLayout.setVisibility(View.GONE);
+                        break;
+                    }
+                    case 1:{
+                        userTypingtext.setText(getString(R.string.one_user_typing, usersTypingSync.get(0).getParticipantTyping().getFirstName()));
+                        userTypingLayout.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case 2:{
+                        userTypingtext.setText(getString(R.string.two_users_typing, usersTypingSync.get(0).getParticipantTyping().getFirstName(), usersTypingSync.get(1).getParticipantTyping().getFirstName()));
+                        userTypingLayout.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    default:{
+                        userTypingtext.setText(getString(R.string.three_users_typing, usersTypingSync.get(0).getParticipantTyping().getFirstName(), usersTypingSync.get(1).getParticipantTyping().getFirstName()));
+                        userTypingLayout.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                }
+            }
         }
     }
 
