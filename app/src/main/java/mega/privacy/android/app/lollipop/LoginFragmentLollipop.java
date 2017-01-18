@@ -808,6 +808,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         resumeSesion = true;
 
         if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
             int ret = megaChatApi.init(gSession);
             initizalizingChatText.setVisibility(View.VISIBLE);
             initizalizingChatText.setText("Chat getting session...");
@@ -958,6 +961,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         resumeSesion = false;
 
         if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
             int ret = megaChatApi.init(null);
             if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
                 if (!MegaApplication.isLoggingIn()){
