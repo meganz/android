@@ -2365,7 +2365,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showSnackbar(getString(R.string.add_participant_success));
             }
             else{
-                showSnackbar(getString(R.string.add_participant_error));
+                if(e.getErrorCode() == MegaChatError.ERROR_EXIST){
+                    showSnackbar(getString(R.string.add_participant_error_already_exists));
+                }
+                else{
+                    showSnackbar(getString(R.string.add_participant_error));
+                }
             }
         }
     }
