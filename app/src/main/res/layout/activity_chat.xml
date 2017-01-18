@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:focusableInTouchMode="true"
                 android:background="@color/white"
-                android:layout_height="48dp">
+                android:layout_height="wrap_content">
 
                 <ImageButton
                     android:id="@+id/keyboard_icon_chat"
@@ -64,7 +64,7 @@
                 <io.github.rockerhieu.emojicon.EmojiconEditText
                     android:id="@+id/edit_text_chat"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:layout_toRightOf="@+id/keyboard_icon_chat"
                     android:layout_marginTop="10dp"
@@ -76,7 +76,9 @@
                     android:hint="@string/type_message_hint"
                     android:layout_toLeftOf="@+id/send_message_icon_chat"
                     android:inputType="textMultiLine|textShortMessage"
-                    emojicon:emojiconSize="16sp"/>
+                    emojicon:emojiconSize="16sp"
+                    android:minLines="2"
+                    android:lines="6"/>
 
                 <RelativeLayout
                     android:id="@+id/writing_disabled_linear_layout_chat"
