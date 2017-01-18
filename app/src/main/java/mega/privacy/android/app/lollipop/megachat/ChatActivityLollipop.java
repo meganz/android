@@ -363,8 +363,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
-                if(count>0){
-                    sendIcon.setVisibility(View.VISIBLE);
+                log("onTextChanged: " + s + ", " + start + ", " + before + ", " + count);
+
+                if (s != null) {
+                    if (s.length() > 0) {
+                        sendIcon.setVisibility(View.VISIBLE);
+                    } else {
+                        sendIcon.setVisibility(View.GONE);
+                    }
                 }
                 else{
                     sendIcon.setVisibility(View.GONE);
