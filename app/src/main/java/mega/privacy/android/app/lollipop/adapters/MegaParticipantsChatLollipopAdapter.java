@@ -375,13 +375,19 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		float density  = context.getResources().getDisplayMetrics().density;
 
 //		String fullName;
-		String firstLetter = holder.fullName.charAt(0) + "";
-		firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		holder.contactInitialLetter.setText(firstLetter);
-		holder.contactInitialLetter.setTextColor(Color.WHITE);
-		holder.contactInitialLetter.setVisibility(View.VISIBLE);
+		if(holder.fullName!=null&&(!(holder.fullName.trim().isEmpty()))){
+			String firstLetter = holder.fullName.charAt(0) + "";
+			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			holder.contactInitialLetter.setText(firstLetter);
+			holder.contactInitialLetter.setTextColor(Color.WHITE);
+			holder.contactInitialLetter.setVisibility(View.VISIBLE);
 
-		holder.contactInitialLetter.setTextSize(24);
+			holder.contactInitialLetter.setTextSize(24);
+		}
+		else{
+			holder.contactInitialLetter.setVisibility(View.GONE);
+		}
+
 	}
 		
 	private int getAvatarTextSize (float density){

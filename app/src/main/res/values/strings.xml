@@ -1044,6 +1044,9 @@
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
-    <string name="one_user_typing" context="message shown when a chat has no messages">%1s is typing...</string>
+    <string name="one_user_typing" formatted="false" context="message shown when a chat has no messages">%1s is typing...</string>
 
+    <string name="two_users_typing" formatted="false" context="message shown when a chat has no messages">%1s, %2s are typing...</string>
+
+    <string name="three_users_typing" formatted="false" context="message shown when a chat has no messages">%1s, %2s and more are typing...</string>
 </resources>

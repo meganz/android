@@ -20,6 +20,10 @@ public class MegaChatParticipant {
         this.status = status;
     }
 
+    public MegaChatParticipant(long handle) {
+        this.handle = handle;
+    }
+
     public long getHandle() {
         return handle;
     }

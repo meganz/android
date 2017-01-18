@@ -1381,11 +1381,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
+        log("onChatInitStateUpdate");
     }
 
     @Override
     public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
-
+        log("onChatOnlineStatusUpdate");
     }
 }
