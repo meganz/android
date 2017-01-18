@@ -247,4 +247,8 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="CollapsingToolbarContactInfo" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
 </resources>
