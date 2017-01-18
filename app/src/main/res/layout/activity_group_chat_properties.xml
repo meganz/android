@@ -90,7 +90,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
-                            android:textColor="@color/accentColor"
+                            android:textColor="@color/name_my_account"
                             android:maxLines="1"
                             android:ellipsize="end"
                             android:textSize="16dp" />
@@ -100,7 +100,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toRightOf="@+id/chat_group_contact_properties_info_title"
-                            android:src="@drawable/ic_shared_read_write" />
+                            android:src="@drawable/ic_rename_title" />
 
                         <TextView
                             android:id="@+id/chat_group_contact_properties_info_participants"
@@ -108,7 +108,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
                             android:layout_below="@+id/chat_group_contact_properties_info_title"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="@color/mail_my_account"
                             android:textSize="14dp" />
 
                     </RelativeLayout>
@@ -194,7 +194,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/chat_group_contact_properties_messages_sound_label"
-                            android:textColor="@color/accentColor"
+                            android:textColor="@color/mail_my_account"
                             android:textSize="14dp" />
 
                     </RelativeLayout>
@@ -234,7 +234,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/chat_group_contact_properties_ringtone_label"
-                            android:textColor="@color/accentColor"
+                            android:textColor="@color/mail_my_account"
                             android:textSize="14dp" />
 
                     </RelativeLayout>
