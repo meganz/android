@@ -20,8 +20,7 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:theme="@style/CollapsingToolbarContactInfo"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <RelativeLayout
