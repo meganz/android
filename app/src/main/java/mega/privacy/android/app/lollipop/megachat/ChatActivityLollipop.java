@@ -568,7 +568,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             });
         }
-
         Intent newIntent = getIntent();
 
         if (newIntent != null){
@@ -624,6 +623,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
 
                         log("Result of open chat: " + result);
+
+                        int permission = chatRoom.getOwnPrivilege();
+
+                        if(permission==MegaChatRoom.PRIV_RO) {
+                            writingContainerLayout.setVisibility(View.GONE);
+                        }
 
                         if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
                             log("ACTION_CHAT_NEW");
