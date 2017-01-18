@@ -355,8 +355,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 notificationsSwitch.setChecked(notificationsEnabled);
 
                 if(!notificationsEnabled){
-                    ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
-                    messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+//                    ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+//                    messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+                    ringtoneLayout.setVisibility(View.GONE);
+                    dividerRingtoneLayout.setVisibility(View.GONE);
+                    messageSoundLayout.setVisibility(View.GONE);
+                    dividerMessageSoundLayout.setVisibility(View.GONE);
                 }
 
                 String ringtoneString = chatPrefs.getRingtone();
@@ -1117,12 +1121,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         notificationsSwitch.setChecked(isChecked);
 
         if(!isChecked){
-            ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
-            messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+//            ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+//            messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+            ringtoneLayout.setVisibility(View.GONE);
+            dividerRingtoneLayout.setVisibility(View.GONE);
+            messageSoundLayout.setVisibility(View.GONE);
+            dividerMessageSoundLayout.setVisibility(View.GONE);
         }
         else{
-            ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
-            messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+//            ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+//            messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            ringtoneLayout.setVisibility(View.VISIBLE);
+            dividerRingtoneLayout.setVisibility(View.VISIBLE);
+            messageSoundLayout.setVisibility(View.VISIBLE);
+            dividerMessageSoundLayout.setVisibility(View.VISIBLE);
         }
 
         if(chatPrefs==null){

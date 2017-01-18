@@ -6,21 +6,17 @@
 
     <RelativeLayout
         android:id="@+id/add_participant_list_relative_layout"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="18dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
         android:layout_centerVertical="true">
 
         <ImageView
             android:id="@+id/add_participant_list_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerInParent="true"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_add_contact"
-            android:tint="@color/black"
-            android:gravity="center_horizontal|center_vertical"
-            android:paddingBottom="3dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_contact_chat_item"
+            android:gravity="center_horizontal|center_vertical"/>
     </RelativeLayout>
 
     <TextView
@@ -28,8 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/add_participant_list_relative_layout"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="13dp"
+        android:layout_marginLeft="24dp"
         android:layout_centerVertical="true"
         android:textAllCaps="true"
         android:text="@string/add_participants_menu_item"
