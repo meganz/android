@@ -59,7 +59,7 @@
                     android:layout_marginRight="16dp"
                     android:background="@null"
                     android:layout_centerVertical="true"
-                    android:tint="@color/transparency_white"
+                    android:tint="@color/accentColor"
                     android:src="@drawable/ic_send_black" />
 
                 <io.github.rockerhieu.emojicon.EmojiconEditText
