@@ -419,7 +419,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 			cflF.setUserEmail(userEmail);
 
-			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
 		}
 		
