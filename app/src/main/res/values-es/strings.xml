@@ -37,8 +37,8 @@
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Suscribir</string>
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continuar</string> 
     <string name="error_no_selection" context="when any file or folder is selected">Ningún fichero o carpeta ha sido seleccionada.</string>
-    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Descargado anteriormente</string>
-    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">Subido anteriormente</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">descargado anteriormente</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">subido anteriormente</string>
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
