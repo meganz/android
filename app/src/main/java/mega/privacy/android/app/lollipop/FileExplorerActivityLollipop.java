@@ -367,7 +367,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
+				ft.commitNow();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 

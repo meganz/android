@@ -1938,7 +1938,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
     					fbFLol.setNodes(nodes);
     					if (!fbFLol.isVisible()){
-    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbFLol, "fbFLol").commit();
+    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbFLol, "fbFLol").commitNow();
     					}
     				}
     				else{
@@ -1949,7 +1949,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
     					fbFLol.setNodes(nodes);
     					if (!fbFLol.isVisible()){
-    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbFLol, "fbFLol").commit();
+    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbFLol, "fbFLol").commitNow();
     					}
     				}
     			}
@@ -2055,7 +2055,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									.beginTransaction()
 									.detach(fbFLol)
 									.attach(fbFLol)
-									.commit();
+									.commitNowAllowingStateLoss();
 						}
 					}
 					else{
@@ -2082,7 +2082,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 									.beginTransaction()
 									.detach(rbFLol)
 									.attach(rbFLol)
-									.commit();
+									.commitNowAllowingStateLoss();
 						}
 					}
 	    			break;
@@ -2466,7 +2466,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 											.beginTransaction()
 											.detach(fbFLol)
 											.attach(fbFLol)
-											.commit();
+											.commitNowAllowingStateLoss();
 								}
 								viewPagerCDrive.setCurrentItem(0);
 							}
@@ -2481,7 +2481,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 											.beginTransaction()
 											.detach(rbFLol)
 											.attach(rbFLol)
-											.commit();
+											.commitNowAllowingStateLoss();
 								}
 								viewPagerCDrive.setCurrentItem(1);
 							}
@@ -2717,7 +2717,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			sharesSectionLayout.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, oFLol, "oFLol");
-    			ft.commit();
+    			ft.commitNow();
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -2753,15 +2753,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 				if (currentFragment != null) {
 					fragTransaction.detach(currentFragment);
-					fragTransaction.commit();
+					fragTransaction.commitNowAllowingStateLoss();
 
 					fragTransaction = getSupportFragmentManager().beginTransaction();
 					fragTransaction.attach(currentFragment);
-					fragTransaction.commit();
+					fragTransaction.commitNowAllowingStateLoss();
 				}
 				else{
 					fragTransaction.replace(R.id.fragment_container, cuFL, "cuFLol");
-					fragTransaction.commit();
+					fragTransaction.commitNowAllowingStateLoss();
 				}
 
     			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2817,7 +2817,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, muFLol, "muFLol");
-    			ft.commit();
+    			ft.commitNowAllowingStateLoss();
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -2878,7 +2878,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, iFLol, "iFLol");
-    			ft.commit();
+    			ft.commitNowAllowingStateLoss();
 
     			viewPagerContacts.setVisibility(View.GONE);
     			drawerLayout.closeDrawer(Gravity.LEFT);
@@ -2930,7 +2930,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 											.beginTransaction()
 											.detach(inSFLol)
 											.attach(inSFLol)
-											.commit();
+											.commitNowAllowingStateLoss();
 								}
 								viewPagerShares.setCurrentItem(0);
 							}
@@ -2945,7 +2945,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 											.beginTransaction()
 											.detach(outSFLol)
 											.attach(outSFLol)
-											.commit();
+											.commitNowAllowingStateLoss();
 								}
 								viewPagerShares.setCurrentItem(1);
 							}
@@ -3139,7 +3139,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
     			}
 				contactsSectionLayout.setVisibility(View.VISIBLE);
     			viewPagerContacts.setVisibility(View.VISIBLE);
@@ -3257,7 +3257,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
     			}
 
     			if(sttFLol==null){
@@ -3266,7 +3266,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
-    			ft.commit();
+    			ft.commitNowAllowingStateLoss();
 
 				supportInvalidateOptionsMenu();
 				showFabButton();
@@ -3325,7 +3325,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			viewPagerShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
-    			ft.commit();
+    			ft.commitNowAllowingStateLoss();
 
 				supportInvalidateOptionsMenu();
 				showFabButton();
@@ -3390,15 +3390,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
 						if (currentFragment != null) {
 							fragTransaction.detach(currentFragment);
-							fragTransaction.commit();
+							fragTransaction.commitNowAllowingStateLoss();
 
 							fragTransaction = getSupportFragmentManager().beginTransaction();
 							fragTransaction.attach(currentFragment);
-							fragTransaction.commit();
+							fragTransaction.commitNowAllowingStateLoss();
 						}
 						else{
 							fragTransaction.replace(R.id.fragment_container, maFLol, "maF");
-							fragTransaction.commit();
+							fragTransaction.commitNowAllowingStateLoss();
 						}
 
 //				getSupportFragmentManager().executePendingTransactions();
@@ -3449,7 +3449,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, tFLol, "tFLol");
-    			ft.commit();
+    			ft.commitNowAllowingStateLoss();
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -3496,12 +3496,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ccFL = new CreditCardFragmentLollipop();
 				ccFL.setInfo(type, myAccountInfo, payMonth);
 				ft.replace(R.id.fragment_container, ccFL, "ccF");
-				ft.commit();
+				ft.commitNowAllowingStateLoss();
 			}
 			else{
 				ccFL.setInfo(type, myAccountInfo, payMonth);
 				ft.replace(R.id.fragment_container, ccFL, "ccF");
-				ft.commit();
+				ft.commitNowAllowingStateLoss();
 			}
 		}
 		else{
@@ -3509,19 +3509,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (tempF != null){
 				ft.detach(tempF);
 				ft.attach(tempF);
-				ft.commit();
+				ft.commitNowAllowingStateLoss();
 			}
 			else{
 				if (ccFL == null){
 					ccFL = new CreditCardFragmentLollipop();
 					ccFL.setInfo(type, myAccountInfo, payMonth);
 					ft.replace(R.id.fragment_container, ccFL, "ccF");
-					ft.commit();
+					ft.commitNowAllowingStateLoss();
 				}
 				else{
 					ccFL.setInfo(type, myAccountInfo, payMonth);
 					ft.replace(R.id.fragment_container, ccFL, "ccF");
-					ft.commit();
+					ft.commitNowAllowingStateLoss();
 				}
 			}
 		}
@@ -3553,12 +3553,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			fFL = new FortumoFragmentLollipop();
 			fFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container,  fFL, "fF");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 		else{
 			fFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, fFL, "fF");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 	}
 
@@ -3573,12 +3573,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ctFL = new CentiliFragmentLollipop();
 			ctFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container,  ctFL, "ctF");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 		else{
 			ctFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, ctFL, "ctF");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 	}
 
@@ -3599,12 +3599,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			myFL = new MonthlyAnnualyFragmentLollipop();
 			myFL.setInfo(paymentMethod, type, myAccountInfo);
 			ft.replace(R.id.fragment_container, myFL, "myF");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 		else{
 			myFL.setInfo(paymentMethod, type, myAccountInfo);
 			ft.replace(R.id.fragment_container, myFL, "myF");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 	}
 
@@ -3625,12 +3625,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			upAFL = new UpgradeAccountFragmentLollipop();
 			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 		else{
 			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
-			ft.commit();
+			ft.commitNowAllowingStateLoss();
 		}
 
 		invalidateOptionsMenu();
@@ -5049,7 +5049,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
+	        			fragTransaction.commitNowAllowingStateLoss();
 
 	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
 	        			if (isLargeGridCameraUploads){
@@ -5062,7 +5062,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();
+	        			fragTransaction.commitNowAllowingStateLoss();
 	        		}
 	        	}
 	        	if (drawerItem == DrawerItem.MEDIA_UPLOADS){
@@ -5070,7 +5070,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
+	        			fragTransaction.commitNowAllowingStateLoss();
 
 	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
 	        			if (isLargeGridCameraUploads){
@@ -5083,7 +5083,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();
+	        			fragTransaction.commitNowAllowingStateLoss();
 	        		}
 	        	}
 	        	return true;
@@ -5106,7 +5106,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
         				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.detach(currentFragment);
-        				fragTransaction.commit();
+        				fragTransaction.commitNowAllowingStateLoss();
 
         				if (isListCameraUploads){
     	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -5123,7 +5123,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         				fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.attach(currentFragment);
-        				fragTransaction.commit();
+        				fragTransaction.commitNowAllowingStateLoss();
 
         			}
 	        	}
@@ -5142,7 +5142,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
         				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.detach(currentFragment);
-        				fragTransaction.commit();
+        				fragTransaction.commitNowAllowingStateLoss();
 
         				if (isListCameraUploads){
     	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -5159,7 +5159,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         				fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.attach(currentFragment);
-        				fragTransaction.commit();
+        				fragTransaction.commitNowAllowingStateLoss();
         			}
         		}
 	        	else{
@@ -5181,14 +5181,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (rbFLol != null){
 		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.detach(rbFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        			rbFLol.setIsList(isList);
 		        			rbFLol.setParentHandle(parentHandleRubbish);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.attach(rbFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 	    				}
 	    				//Cloud Drive
 	    				String cFTagCD = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
@@ -5196,14 +5196,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (fbFLol != null){
 		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.detach(fbFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        			fbFLol.setIsList(isList);
 		        			fbFLol.setParentHandle(parentHandleBrowser);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.attach(fbFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 	    				}
 	    			}
 	    			else if(drawerItem == DrawerItem.INBOX){
@@ -5211,13 +5211,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("iFLol");
 	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commit();
+	        				fragTransaction.commitNowAllowingStateLoss();
 
 	        				iFLol.setIsList(isList);
 
 	        				fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commit();
+	        				fragTransaction.commitNowAllowingStateLoss();
 
 		        		}
 	    			}
@@ -5228,13 +5228,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.detach(cFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        			cFLol.setIsList(isList);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.attach(cFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        		}
 	    			}
@@ -5245,14 +5245,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (inSFLol != null){
 		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.detach(inSFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        			inSFLol.setIsList(isList);
 		        			inSFLol.setParentHandle(parentHandleIncoming);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.attach(inSFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 	    				}
 
 	    				//Outgoing
@@ -5261,14 +5261,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (outSFLol != null){
 		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.detach(outSFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        			outSFLol.setIsList(isList);
 		        			outSFLol.setParentHandle(parentHandleOutgoing);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
 		        			fragTransaction.attach(outSFLol);
-		        			fragTransaction.commit();
+		        			fragTransaction.commitNowAllowingStateLoss();
 	    				}
 	    			}
 	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -5276,7 +5276,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
 	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commit();
+	        				fragTransaction.commitNowAllowingStateLoss();
 
 	        				oFLol.setIsList(isList);
 	        				oFLol.setPathNavigation(pathNavigationOffline);
@@ -5285,7 +5285,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	        				fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commit();
+	        				fragTransaction.commitNowAllowingStateLoss();
 
 		        		}
 	    			}
@@ -5294,14 +5294,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    					Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("sFLol");
 	    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commit();
+	        				fragTransaction.commitNowAllowingStateLoss();
 
 	        				sFLol.setIsList(isList);
 	        				sFLol.setParentHandle(parentHandleSearch);
 
 	        				fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commit();
+	        				fragTransaction.commitNowAllowingStateLoss();
 	    				}
 	    			}
 
@@ -6057,11 +6057,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.detach(fbFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 
 			fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.attach(fbFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 		}
 
 		cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
@@ -6072,11 +6072,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.detach(rbFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 
 			fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.attach(rbFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 		}
 
 		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
@@ -6087,11 +6087,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.detach(inSFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 
 			fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.attach(inSFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 		}
 
 		sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
@@ -6102,11 +6102,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.detach(outSFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 
 			fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.attach(outSFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 		}
 
 		String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
@@ -6117,11 +6117,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.detach(cFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 
 			fragTransaction = getSupportFragmentManager().beginTransaction();
 			fragTransaction.attach(cFLol);
-			fragTransaction.commit();
+			fragTransaction.commitNowAllowingStateLoss();
 		}
 	}
 
@@ -8240,11 +8240,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		fragTransaction.detach(currentFragment);
-		fragTransaction.commit();
+		fragTransaction.commitNowAllowingStateLoss();
 
 		fragTransaction = getSupportFragmentManager().beginTransaction();
 		fragTransaction.attach(currentFragment);
-		fragTransaction.commit();
+		fragTransaction.commitNowAllowingStateLoss();
 	}
 
 	public void hideOptionsPanel(){
@@ -8879,13 +8879,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ft.replace(R.id.fragment_container, upAFL, "upAFL");
 						drawerItem = DrawerItem.ACCOUNT;
 						accountFragment=Constants.OVERQUOTA_ALERT;
-						ft.commit();
+						ft.commitNowAllowingStateLoss();
 					}
 					else{
 						ft.replace(R.id.fragment_container, upAFL, "upAFL");
 						drawerItem = DrawerItem.ACCOUNT;
 						accountFragment=Constants.OVERQUOTA_ALERT;
-						ft.commit();
+						ft.commitNowAllowingStateLoss();
 					}
 				}
 			});
@@ -8967,7 +8967,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.detach(fbFLol);
 				ft.attach(fbFLol);
-				ft.commitAllowingStateLoss();
+				ft.commitNowAllowingStateLoss();
 			}
 		}
 	}

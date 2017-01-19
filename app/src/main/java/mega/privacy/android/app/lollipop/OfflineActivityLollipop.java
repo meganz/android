@@ -91,7 +91,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 //		isListOffline = oFLol.getIsList();
 //		log("IsListOffline: "+isListOffline);
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commit();
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commitNow();
 	}
 
 	public void showOptionsPanel(MegaOffline sNode){
@@ -166,7 +166,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 					Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
 					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 					fragTransaction.detach(currentFragment);
-					fragTransaction.commit();
+					fragTransaction.commitNow();
 
 					oFLol.setIsList(isListOffline);						
 					oFLol.setPathNavigation(pathNavigation);
@@ -175,7 +175,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 
 					fragTransaction = getSupportFragmentManager().beginTransaction();
 					fragTransaction.attach(currentFragment);
-					fragTransaction.commit();
+					fragTransaction.commitNow();
 					
 				}
 				break;
