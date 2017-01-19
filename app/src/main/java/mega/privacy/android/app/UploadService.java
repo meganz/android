@@ -15,10 +15,12 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.util.SparseArray;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -255,8 +257,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				}
 				case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER:{
 					log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-					String sShow=file.getName() + " " + getString(R.string.general_already_uploaded);					
-					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
+					String sShow=file.getName() + " " + getString(R.string.general_already_uploaded);
+//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
+
+					Intent i = new Intent(this, ManagerActivityLollipop.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					i.setAction(Constants.SHOW_REPEATED_UPLOAD);
+					i.putExtra("MESSAGE", sShow);
+					startActivity(i);
 					
 					if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0)){
 						successCount = transfersOK.size();
@@ -269,7 +277,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 	}
-	
+
 	int checkFileToUpload(File file, long parentHandle){
 		
 		MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));

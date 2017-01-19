@@ -2028,6 +2028,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						megaApi.setAvatar(path, maFLol);
 					}
 				}
+				else if (intent.getAction().equals(Constants.SHOW_REPEATED_UPLOAD)){
+					log("Intent SHOW_REPEATED_UPLOAD");
+					String message = intent.getStringExtra("MESSAGE");
+					showSnackbar(message);
+				}
+
     			intent.setAction(null);
 				setIntent(null);
     		}
