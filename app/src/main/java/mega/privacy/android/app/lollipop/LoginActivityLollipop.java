@@ -3,13 +3,13 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -108,7 +108,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				if(loginFragment==null){
 					loginFragment = new LoginFragmentLollipop();
 				}
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, loginFragment);
 				ft.commitNow();
 
@@ -125,7 +125,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 					chooseAccountFragment = new ChooseAccountFragmentLollipop();
 				}
 
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, chooseAccountFragment);
 				ft.commitNow();
 				break;
@@ -136,7 +136,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 					createAccountFragment = new CreateAccountFragmentLollipop();
 				}
 
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, createAccountFragment);
 				ft.commitNow();
 				break;
@@ -147,7 +147,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 					tourFragment = new TourFragmentLollipop();
 				}
 
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, tourFragment);
 				ft.commitNow();
 				break;
@@ -158,10 +158,10 @@ public class LoginActivityLollipop extends AppCompatActivity {
 					confirmEmailFragment = new ConfirmEmailFragmentLollipop();
 				}
 
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, confirmEmailFragment);
 				ft.commitNow();
-				FragmentManager fragmentManager = getFragmentManager();
+				FragmentManager fragmentManager = getSupportFragmentManager();
 				fragmentManager.executePendingTransactions();
 				break;
 			}
