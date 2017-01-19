@@ -283,7 +283,9 @@ public class NodeController {
             hashes[i] = handleList.get(i);
             MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
             if (nodeTemp != null){
-                size += nodeTemp.getSize();
+                if (nodeTemp.isFile()){
+                    size += nodeTemp.getSize();
+                }
             }
         }
         log("Number of files: "+hashes.length);
@@ -513,7 +515,8 @@ public class NodeController {
         }
         catch(Exception ex){}
 
-        if(availableFreeSpace < size) {
+        log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
+        if(availableFreeSpace < sizeC) {
             ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
             log("Not enough space");
             return;
