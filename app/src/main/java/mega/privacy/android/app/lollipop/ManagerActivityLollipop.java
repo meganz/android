@@ -1594,7 +1594,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;
 							log("Show success mesage");
-							Util.showAlert(this, getString(R.string.pass_changed_alert), null);
+							showSnackbar(getString(R.string.pass_changed_alert));
 						}
 						else if(result==MegaError.API_EARGS){
 							drawerItem=DrawerItem.ACCOUNT;
