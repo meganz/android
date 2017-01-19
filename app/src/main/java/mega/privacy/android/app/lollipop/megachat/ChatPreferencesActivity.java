@@ -69,7 +69,7 @@ public class ChatPreferencesActivity extends AppCompatActivity {
         android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
         sttChat = new SettingsChatFragment();
         ft.replace(R.id.fragment_container, sttChat);
-        ft.commit();
+        ft.commitNow();
     }
 
     public void changeSound(){
