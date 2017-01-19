@@ -280,7 +280,12 @@ public class AccountController {
         }
 
         if (!logoutBadSession){
-            megaApi.logout((ManagerActivityLollipop)context);
+            if (context instanceof ManagerActivityLollipop){
+                megaApi.logout((ManagerActivityLollipop)context);
+            }
+            else{
+                megaApi.logout();
+            }
         }
 
         File offlineDirectory = null;
