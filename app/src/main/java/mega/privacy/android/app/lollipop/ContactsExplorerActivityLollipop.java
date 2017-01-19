@@ -119,7 +119,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			megaApi = app.getMegaApi();
 		}			
 		
-		megaApi.addGlobalListener(this);		
+		megaApi.addGlobalListener(this);
 		
 		setContentView(R.layout.activity_contactsexplorer);
 		
