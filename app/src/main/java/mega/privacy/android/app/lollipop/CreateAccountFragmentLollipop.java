@@ -2,12 +2,12 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
