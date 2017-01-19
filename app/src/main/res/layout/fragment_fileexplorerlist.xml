@@ -74,35 +74,36 @@
         android:stateListAnimator="@anim/button_elevation"/>--> 
       
     <LinearLayout
-         android:id="@+id/options_explorer_layout"
-         android:layout_width="fill_parent"
-         android:layout_height="48dp"
-         android:gravity="right|center_vertical"
-         android:layout_alignParentBottom="true"
-         android:orientation="horizontal" >
+        android:id="@+id/options_explorer_layout"
+		android:layout_width="fill_parent"
+		android:layout_height="48dp"
+		android:background="@color/preference_category_title"
+		android:gravity="right|center_vertical"
+		android:layout_alignParentBottom="true"
+		android:orientation="horizontal" >
 
-         <TextView
+         <Button
              android:id="@+id/cancel_text"
-             android:fontFamily="sans-serif-medium"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:textColor="@color/accentColor"
-             android:gravity="center_vertical|center_horizontal"
-             android:textSize="14sp"/>
+			 android:stateListAnimator="@null"
+			 android:background="@color/preference_category_title"
+             android:gravity="center_vertical|center_horizontal"/>
 
-         <TextView
+         <Button
              android:id="@+id/action_text"
-             android:fontFamily="sans-serif-medium"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:textColor="@color/accentColor"
-             android:gravity="center_vertical|center_horizontal"
-             android:textSize="14sp"/>
+			 android:stateListAnimator="@null"
+			 android:background="@color/preference_category_title"
+             android:gravity="center_vertical|center_horizontal"/>
      </LinearLayout>
      
     <View 
      android:id="@+id/separator" 
-	 android:background="@color/separator_grey"
+	 android:background="@color/tour_bar_grey"
 	 android:layout_width = "fill_parent"
 	 android:layout_height="1dip"
 	 android:layout_above="@id/options_explorer_layout"/>
