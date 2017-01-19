@@ -2257,6 +2257,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					break;
 				}
 				case CHAT:{
+					if (nV != null){
+						Menu nVMenu = nV.getMenu();
+						resetNavigationViewMenu(nVMenu);
+						MenuItem menuItem = nVMenu.findItem(R.id.navigation_item_chat);
+						menuItem.setChecked(true);
+						menuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat_red));
+					}
+
 					if (rChatFL != null){
 						if(rChatFL.isAdded()){
 							rChatFL.setChats();
