@@ -497,7 +497,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				}
 				cpF.setUserEmail(userEmail);
 				coordinatorLayout.setFitsSystemWindows(false);
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commitNow();
 	
 				break;
 			}
@@ -511,7 +511,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				}
 				cflF.setUserEmail(userEmail);
 	
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 				coordinatorLayout.invalidate();
 				break;
 			}
