@@ -1,0 +1,194 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/my_storage_complete_relative_layout"
+	android:layout_width="match_parent"
+	android:background="@color/white"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/white"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:id="@+id/my_storage_parent_linear_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@color/white"
+			android:orientation="vertical">
+
+			<RelativeLayout
+				android:id="@+id/my_storage_account_type_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white">
+
+				<LinearLayout
+					android:id="@+id/my_storage_account_type_account_type_layout"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="left"
+					android:orientation="vertical">
+
+					<TextView
+						android:id="@+id/my_storage_account_type_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_storage_used_space"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account"/>
+
+				</LinearLayout>
+
+			</RelativeLayout>
+
+			<LinearLayout
+				android:id="@+id/my_storage_expiration_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_storage_expiration_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_storage_expiration_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/expires_on"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account" />
+
+					<TextView
+						android:id="@+id/my_storage_expiration"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_storage_last_session_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="vertical" >
+
+				<TextView
+					android:id="@+id/my_storage_last_session_label"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/my_account_last_session"
+					android:textSize="16sp"
+					android:textColor="@color/name_my_account"/>
+
+				<TextView
+					android:id="@+id/my_storage_last_session"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="14sp"
+					android:textColor="@color/mail_my_account"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_storage_connections_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_storage_connections_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_storage_connections_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/my_account_connections"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_storage_connections"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<ImageView
+					android:id="@+id/my_storage_connections_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="gone" />
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/my_storage_fingerprint_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:gravity="left"
+				android:orientation="horizontal" >
+
+				<LinearLayout
+					android:id="@+id/my_storage_fingerprint_text_layout"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:background="@color/white"
+					android:gravity="left"
+					android:orientation="vertical" >
+
+					<TextView
+						android:id="@+id/my_storage_fingerprint_label"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/my_account_my_credentials"
+						android:textSize="16sp"
+						android:textColor="@color/name_my_account"/>
+
+					<TextView
+						android:id="@+id/my_storage_fingerprint"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+				</LinearLayout>
+
+				<ImageView
+					android:id="@+id/my_storage_fingerprint_icon"
+					style="@style/dialogActionButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_email_grey"
+					android:visibility="invisible" />
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</ScrollView>
