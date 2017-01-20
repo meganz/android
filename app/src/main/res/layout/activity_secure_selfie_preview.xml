@@ -11,7 +11,7 @@
         android:id="@+id/secure_selfie_viewer_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:scaleType="fitXY" />
+        android:scaleType="center" />
     
      <RelativeLayout 
         android:layout_width="fill_parent"
@@ -24,7 +24,8 @@
             android:id="@+id/secure_selfie_viewer_discard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
+            android:src="@drawable/ic_close_grey"
+			android:tint="@color/white"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
@@ -34,7 +35,7 @@
 		    android:id="@+id/secure_selfie_viewer_upload"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:src="@drawable/ic_menu_upload_here"
+		    android:src="@drawable/ic_upload_white"
 		    android:layout_centerVertical="true"
 		    android:layout_toLeftOf="@id/secure_selfie_viewer_discard"
 		    android:layout_marginRight="5dp"
