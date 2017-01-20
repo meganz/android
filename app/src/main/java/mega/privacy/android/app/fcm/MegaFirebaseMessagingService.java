@@ -178,6 +178,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         notificationId = Constants.NOTIFICATION_PUSH_CHAT;
                         break;
                     }
+                    case 3:{
+                        notificationTitle = "Contact activity (" + email + ")";
+                        notificationContent = "You have a new contact request";
+                        notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
+                        break;
+                    }
                 }
 
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
