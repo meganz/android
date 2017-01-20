@@ -65,7 +65,7 @@
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Cancelar tu cuenta</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
     <string name="action_add" context="Menu item">Subir</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
@@ -850,4 +850,7 @@
         <item context="Singular" quantity="one">Eliminar contacto?</item>
         <item context="Plural" quantity="other">Eliminar contactos?</item>
     </plurals>
+
+    <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
+    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
 </resources>
