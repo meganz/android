@@ -155,4 +155,5 @@ public class Constants {
 	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
 	public static int NOTIFICATION_PUSH_CHAT = 8;
+	public static int NOTIFICATION_PUSH_CONTACT = 9;
 }
