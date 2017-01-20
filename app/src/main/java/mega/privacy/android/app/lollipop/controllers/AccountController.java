@@ -271,19 +271,27 @@ public class AccountController {
     static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount, boolean logoutBadSession) {
         log("logout");
 
+        boolean isManagerActivityLollipop = false;
+
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            if (context instanceof Activity){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
         }
 
         if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            if (context instanceof Activity){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
         }
 
         if (!logoutBadSession){
             if (context instanceof ManagerActivityLollipop){
+                isManagerActivityLollipop = true;
                 megaApi.logout((ManagerActivityLollipop)context);
             }
             else{
+                isManagerActivityLollipop = false;
                 megaApi.logout();
             }
         }
@@ -373,6 +381,12 @@ public class AccountController {
         dbH.clearOffline();
 
         dbH.clearContacts();
+
+        if (!isManagerActivityLollipop){
+            Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
+            tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            context.startActivity(tourIntent);
+        }
     }
 
     public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
