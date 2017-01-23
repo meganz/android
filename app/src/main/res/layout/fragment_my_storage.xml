@@ -2,6 +2,8 @@
 	android:id="@+id/my_storage_complete_relative_layout"
 	android:layout_width="match_parent"
 	android:background="@color/white"
+	android:paddingTop="25dp"
+	android:paddingBottom="6dp"
 	android:layout_height="match_parent">
 
 	<LinearLayout
@@ -11,7 +13,6 @@
 		android:background="@color/white"
 		android:layout_marginLeft="16dp"
 		android:layout_marginRight="16dp"
-		android:layout_marginTop="27dp"
 		android:orientation="vertical">
 
 		<TextView
@@ -26,6 +27,7 @@
 			android:id="@+id/my_storage_account_plan_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:layout_marginBottom="10dp"
 			android:background="@color/white">
 
 			<TextView
@@ -51,6 +53,7 @@
 			android:id="@+id/my_storage_account_space_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:layout_marginBottom="10dp"
 			android:background="@color/white">
 
 			<TextView
@@ -77,6 +80,7 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
+			android:layout_marginBottom="28dp"
 			android:gravity="left"
 			android:orientation="horizontal" >
 
@@ -105,6 +109,7 @@
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:gravity="left"
+			android:layout_marginBottom="26dp"
 			android:orientation="horizontal" >
 
 			<TextView
@@ -113,8 +118,8 @@
 				android:layout_height="wrap_content"
 				android:layout_alignParentLeft="true"
 				android:text="@string/transfer_quota"
-				android:textSize="14sp"
-				android:textColor="@color/mail_my_account" />
+				android:textSize="16sp"
+				android:textColor="@color/name_my_account" />
 
 			<TextView
 				android:id="@+id/my_storage_account_transfer_text"
@@ -123,7 +128,7 @@
 				android:layout_alignParentRight="true"
 				android:textSize="14sp"
 				android:textColor="@color/name_my_account"
-				android:text="FEcha"/>
+				android:text="@string/not_available"/>
 
 		</RelativeLayout>
 
@@ -132,7 +137,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="16sp"
-			android:layout_marginTop="37dp"
+			android:layout_marginBottom="10dp"
 			android:textColor="@color/name_my_account"
 			android:text="@string/my_account_used_space"/>
 
@@ -141,8 +146,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="14sp"
-			android:layout_marginTop="10dp"
-			android:layout_marginBottom="22dp"
+			android:layout_marginBottom="20dp"
 			android:textColor="@color/name_my_account"/>
 
 		<RelativeLayout
@@ -263,7 +267,7 @@
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:gravity="left"
-			android:layout_marginBottom="12dp"
+			android:layout_marginBottom="16dp"
 			android:orientation="horizontal" >
 
 			<TextView
@@ -288,7 +292,7 @@
 		<RelativeLayout
 			android:id="@+id/my_storage_account_progress_bar_layout"
 			android:layout_width="match_parent"
-			android:layout_height="10dp"
+			android:layout_height="8dp"
 			android:background="@color/white"
 			android:gravity="left"
 			android:orientation="horizontal" >

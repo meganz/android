@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -113,6 +116,7 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 		availableSpaceText = (TextView) v.findViewById(R.id.my_storage_account_available_storage_text);
 
 		progressBar = (ProgressBar) v.findViewById(R.id.my_storage_progress_bar);
+		progressBar.setProgress(0);
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
@@ -230,8 +234,15 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 			totalUsedSpace.setText(getString(R.string.recovering_info));
 		}
 		else{
-			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
-			totalUsedSpace.setText(usedSpaceString);
+			String usedSpaceString = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(usedSpaceString,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(usedSpaceString);
+			}
+
+			totalUsedSpace.setText(result);
 		}
 
 		if(myAccountInfo.getAccountInfo()==null){
@@ -246,13 +257,28 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 		incomingUsedText.setText(myAccountInfo.getFormattedUsedIncoming());
 		availableSpaceText.setText(myAccountInfo.getFormattedAvailableSpace());
 
-		if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
-			transferQuotaUsedText.setText(getString(R.string.recovering_info));
+		if(myAccountInfo.getAccountType()==0){
+			transferQuotaUsedText.setText(context.getString(R.string.not_available));
+			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
 		}
 		else{
-			long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
-//			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
-			transferQuotaUsedText.setText(transferQuotaUsed+"");
+			if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
+				transferQuotaUsedText.setText(getString(R.string.recovering_info));
+			}
+			else{
+				long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
+				long transferQuotaMax = myAccountInfo.getAccountInfo().getTransferMax();
+
+				String textToShow = String.format(context.getString(R.string.my_account_of_string), Util.getSizeString(transferQuotaUsed), Util.getSizeString(transferQuotaMax));
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				transferQuotaUsedText.setText(result);
+			}
 		}
 
 		int usedPerc = myAccountInfo.getUsedPerc();
