@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 	TextView rubbishUsedText;
 	TextView availableSpaceText;
 
+	ProgressBar progressBar;
 
 	
 	DisplayMetrics outMetrics;
@@ -104,9 +106,13 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 
 		totalUsedSpace = (TextView) v.findViewById(R.id.my_storage_used_space_result_text);
 
+		cloudDriveUsedText = (TextView) v.findViewById(R.id.my_storage_account_cloud_storage_text);
+		inboxUsedText = (TextView) v.findViewById(R.id.my_storage_account_inbox_storage_text);
+		incomingUsedText = (TextView) v.findViewById(R.id.my_storage_account_incoming_storage_text);
+		rubbishUsedText = (TextView) v.findViewById(R.id.my_storage_account_rubbish_storage_text);
+		availableSpaceText = (TextView) v.findViewById(R.id.my_storage_account_available_storage_text);
 
-
-
+		progressBar = (ProgressBar) v.findViewById(R.id.my_storage_progress_bar);
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
@@ -166,31 +172,31 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 			switch(myAccountInfo.getAccountType()){
 
 				case 0:{
-					typeAccountText.setText(R.string.my_account_free);
-					expirationAccountText.setText("No billing cycle");
+					typeAccountText.setText(R.string.free_account);
+					expirationAccountText.setText(getString(R.string.no_bylling_cycle));
 					break;
 				}
 
 				case 1:{
-					typeAccountText.setText(getString(R.string.my_account_pro1));
+					typeAccountText.setText(getString(R.string.pro1_account));
 					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 2:{
-					typeAccountText.setText(getString(R.string.my_account_pro2));
+					typeAccountText.setText(getString(R.string.pro2_account));
 					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 3:{
-					typeAccountText.setText(getString(R.string.my_account_pro3));
+					typeAccountText.setText(getString(R.string.pro3_account));
 					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 4:{
-					typeAccountText.setText(getString(R.string.my_account_prolite));
+					typeAccountText.setText(getString(R.string.prolite_account));
 					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
@@ -228,15 +234,41 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 			totalUsedSpace.setText(usedSpaceString);
 		}
 
-//		if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
-//			transferQuotaUsedText.setText(getString(R.string.recovering_info));
-//		}
-//		else{
-//			long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
-////			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
-//			transferQuotaUsedText.setText(transferQuotaUsed+"");
-//		}
+		if(myAccountInfo.getAccountInfo()==null){
+			log("Account info NULL");
+			return;
+		}
 
+		//Check size of the different nodes
+		cloudDriveUsedText.setText(myAccountInfo.getFormattedUsedCloud());
+		inboxUsedText.setText(myAccountInfo.getFormattedUsedInbox());
+		rubbishUsedText.setText(myAccountInfo.getFormattedUsedRubbish());
+		incomingUsedText.setText(myAccountInfo.getFormattedUsedIncoming());
+		availableSpaceText.setText(myAccountInfo.getFormattedAvailableSpace());
+
+		if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
+			transferQuotaUsedText.setText(getString(R.string.recovering_info));
+		}
+		else{
+			long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
+//			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
+			transferQuotaUsedText.setText(transferQuotaUsed+"");
+		}
+
+		int usedPerc = myAccountInfo.getUsedPerc();
+		if (usedPerc < 90){
+			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
+		}
+		else if ((usedPerc >= 90) && (usedPerc <= 95)){
+			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
+		}
+		else{
+			if (usedPerc > 100){
+				myAccountInfo.setUsedPerc(100);
+			}
+			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
+		}
+		progressBar.setProgress(usedPerc);
 	}
 
 	@Override

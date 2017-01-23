@@ -598,7 +598,7 @@
     <string name="new_account" context="in login screen to create a new account">Create account now!</string>
     
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
-    <string name="expires_on" context="title of the Expiration Date">Expires on </string>
+    <string name="expires_on" context="title of the Expiration Date">Renews on </string>
     <string name="free_account">FREE</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">Pro I</string>
@@ -855,4 +855,12 @@
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
+
+    <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
+    <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Storage Space</string>
+    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer Quota</string>
+
+    <string name="available_space" context="Label in section the storage tab in My Account Section">Available</string>
+
+    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">No billing cycle</string>
 </resources>
