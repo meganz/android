@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,20 +35,22 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 
 	MegaUser myUser;
 
-	TextView typeAccount;
-	TextView expirationAccount;
-	TextView usedSpace;
-	TextView lastSession;
-	TextView connections;
-	TextView fingerprint;
-
-	RelativeLayout typeLayout;
-	LinearLayout expirationLayout;
-	LinearLayout lastSessionLayout;
-	LinearLayout connectionsLayout;
-	LinearLayout fingerprintLayout;
-
 	LinearLayout parentLinearLayout;
+
+	TextView typeAccountText;
+	TextView expirationAccountText;
+	TextView storageAvailableText;
+	TextView transferQuotaUsedText;
+
+	TextView totalUsedSpace;
+
+	TextView cloudDriveUsedText;
+	TextView inboxUsedText;
+	TextView incomingUsedText;
+	TextView rubbishUsedText;
+	TextView availableSpaceText;
+
+
 	
 	DisplayMetrics outMetrics;
 	float density;
@@ -93,94 +94,28 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 			return null;
 		}
 
-		typeLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_type_layout);
-		LinearLayout.LayoutParams typeLayoutParams = (LinearLayout.LayoutParams)typeLayout.getLayoutParams();
-		typeLayoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(27, outMetrics), 0, 0);
-		typeLayout.setLayoutParams(typeLayoutParams);
-
-		typeAccount = (TextView) v.findViewById(R.id.my_storage_account_type_text);
-		LinearLayout.LayoutParams typeAccountParams = (LinearLayout.LayoutParams)typeAccount.getLayoutParams();
-		typeAccountParams.setMargins(0, Util.scaleHeightPx(5, outMetrics), 0, 0);
-		typeAccount.setLayoutParams(typeAccountParams);
-
-		usedSpace = (TextView) v.findViewById(R.id.my_storage_used_space);
-
-		expirationLayout = (LinearLayout) v.findViewById(R.id.my_storage_expiration_layout);
-		LinearLayout.LayoutParams expirationParams = (LinearLayout.LayoutParams)expirationLayout.getLayoutParams();
-		expirationParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		expirationLayout.setLayoutParams(expirationParams);
-		expirationAccount = (TextView) v.findViewById(R.id.my_storage_expiration);
-
-		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_storage_last_session_layout);
-		LinearLayout.LayoutParams lastSessionParams = (LinearLayout.LayoutParams)lastSessionLayout.getLayoutParams();
-		lastSessionParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		lastSessionLayout.setLayoutParams(lastSessionParams);
-
-		lastSession = (TextView) v.findViewById(R.id.my_storage_last_session);
-
-		fingerprintLayout = (LinearLayout) v.findViewById(R.id.my_storage_fingerprint_layout);
-		LinearLayout.LayoutParams fingerprintParams = (LinearLayout.LayoutParams)fingerprintLayout.getLayoutParams();
-		fingerprintParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		fingerprintLayout.setLayoutParams(fingerprintParams);
-
-		fingerprint = (TextView) v.findViewById(R.id.my_storage_fingerprint);
-
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_storage_connections_layout);
-		LinearLayout.LayoutParams connectionsParams = (LinearLayout.LayoutParams)connectionsLayout.getLayoutParams();
-		connectionsParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		connectionsLayout.setLayoutParams(connectionsParams);
-
-		connections = (TextView) v.findViewById(R.id.my_storage_connections);
-
-		expirationLayout.setVisibility(View.GONE);
-
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.my_storage_parent_linear_layout);
+
+		typeAccountText = (TextView) v.findViewById(R.id.my_storage_account_plan_text);
+		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
+		expirationAccountText = (TextView) v.findViewById(R.id.my_storage_account_expiration_text);
+		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
+
+
+		totalUsedSpace = (TextView) v.findViewById(R.id.my_storage_used_space_result_text);
+
+
+
+
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
 
-		fingerprintLayout.setVisibility(View.GONE);
-		if (megaApi.getMyFingerprint() != null){
-			if (megaApi.getMyFingerprint().compareTo("") != 0){
-				fingerprintLayout.setVisibility(View.VISIBLE);
-				String fingerprintString = megaApi.getMyFingerprint();
-				String fingerprintUIString = "";
-				for (int i=0;i<fingerprintString.length();i++){
-					if (i != 0){
-						if ((i % 20) == 0){
-							fingerprintUIString = fingerprintUIString + "\n" + fingerprintString.charAt(i);
-						}
-						else if ((i % 4) == 0){
-							fingerprintUIString = fingerprintUIString + " " + fingerprintString.charAt(i);
-						}
-						else{
-							fingerprintUIString = fingerprintUIString + fingerprintString.charAt(i);
-						}
-					}
-					else{
-						fingerprintUIString = fingerprintUIString + fingerprintString.charAt(i);
-					}
-				}
-
-				fingerprint.setText(fingerprintUIString);
-			}
-		}
-		
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
-
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}		
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 
 		setAccountDetails();
-
+//
 		refreshAccountInfo();
 
 		return v;
@@ -222,42 +157,41 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 		}
 		//Set account details
 		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
-//			typeAccount.setText(getString(R.string.recovering_info));
+			typeAccountText.setText(getString(R.string.recovering_info));
+			expirationAccountText.setText(getString(R.string.recovering_info));
+			storageAvailableText.setText(getString(R.string.recovering_info));
 		}
 		else{
+			storageAvailableText.setText(myAccountInfo.getTotalFormatted());
 			switch(myAccountInfo.getAccountType()){
 
 				case 0:{
-//					typeAccount.setText(R.string.my_account_free);
-					expirationLayout.setVisibility(View.GONE);
+					typeAccountText.setText(R.string.my_account_free);
+					expirationAccountText.setText("No billing cycle");
 					break;
 				}
 
 				case 1:{
-//					typeAccount.setText(getString(R.string.my_account_pro1));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					typeAccountText.setText(getString(R.string.my_account_pro1));
+					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 2:{
-//					typeAccount.setText(getString(R.string.my_account_pro2));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					typeAccountText.setText(getString(R.string.my_account_pro2));
+					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 3:{
-//					typeAccount.setText(getString(R.string.my_account_pro3));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					typeAccountText.setText(getString(R.string.my_account_pro3));
+					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 4:{
-//					typeAccount.setText(getString(R.string.my_account_prolite));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					typeAccountText.setText(getString(R.string.my_account_prolite));
+					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
@@ -285,25 +219,24 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 //				}
 //			}
 //		}
+
 		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
-			usedSpace.setText(getString(R.string.recovering_info));
+			totalUsedSpace.setText(getString(R.string.recovering_info));
 		}
 		else{
 			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
-			usedSpace.setText(usedSpaceString);
+			totalUsedSpace.setText(usedSpaceString);
 		}
 
-		if(myAccountInfo.getLastSessionFormattedDate()!=null) {
-			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
-				lastSession.setText(getString(R.string.recovering_info));
-			} else {
-				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
-			}
-		}
-		else{
-			lastSession.setText(getString(R.string.recovering_info));
-		}
-		///////////
+//		if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
+//			transferQuotaUsedText.setText(getString(R.string.recovering_info));
+//		}
+//		else{
+//			long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
+////			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
+//			transferQuotaUsedText.setText(transferQuotaUsed+"");
+//		}
+
 	}
 
 	@Override
