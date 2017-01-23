@@ -532,6 +532,12 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                                 mAF.setAccountDetails();
                             }
                         }
+                        MyStorageFragmentLollipop mStorageF = ((ManagerActivityLollipop) context).getMyStorageFragment();
+                        if(mStorageF!=null){
+                            if(mStorageF.isAdded()){
+                                mStorageF.setAccountDetails();
+                            }
+                        }
                     }
                     else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
                         UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();

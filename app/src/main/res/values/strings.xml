@@ -857,10 +857,13 @@
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
-    <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Storage Space</string>
-    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer Quota</string>
+    <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Storage space</string>
+    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer quota</string>
 
     <string name="available_space" context="Label in section the storage tab in My Account Section">Available</string>
+    <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">not available</string>
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">No billing cycle</string>
+
+    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>of %2$s</font>]]></string>
 </resources>
