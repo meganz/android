@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Activity;
 import android.content.Context;
 
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
@@ -18,8 +20,10 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAccountSession;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -35,12 +39,19 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     long usedGbStorage = -1;
     String usedFormatted = "";
     String totalFormatted = "";
+    String formattedUsedCloud = "";
+    String formattedUsedInbox = "";
+    String formattedUsedIncoming = "";
+    String formattedUsedRubbish = "";
+    String formattedAvailableSpace = "";
     int levelInventory = -1;
     int levelAccountDetails = -1;
 
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
+
+    MegaApiAndroid megaApi;
 
     String firstNameText = "";
     String lastNameText = "";
@@ -70,52 +81,100 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
         log("MyAccountInfo created");
 
         this.context = context;
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
     public void setAccountDetails(){
+
+        if(accountInfo==null){
+            log("Error because accoun info is NUll in setAccountDetails");
+        }
+
         long totalStorage = accountInfo.getStorageMax();
-        long usedStorage = accountInfo.getStorageUsed();;
+        long usedStorage = 0;
+        long usedCloudDrive = 0;
+        long usedInbox = 0;
+        long usedRubbish = 0;
+        long usedIncoming = 0;
         boolean totalGb = false;
+
+        //Check size of the different nodes
+        if(megaApi.getRootNode()!=null){
+            usedCloudDrive = accountInfo.getStorageUsed(megaApi.getRootNode().getHandle());
+            formattedUsedCloud = Util.getSizeString(usedCloudDrive);
+        }
+
+        if(megaApi.getInboxNode()!=null){
+            usedInbox = accountInfo.getStorageUsed(megaApi.getInboxNode().getHandle());
+            formattedUsedInbox = Util.getSizeString(usedInbox);
+        }
+
+        if(megaApi.getRubbishNode()!=null){
+            usedRubbish = accountInfo.getStorageUsed(megaApi.getRubbishNode().getHandle());
+            formattedUsedRubbish = Util.getSizeString(usedRubbish);
+        }
+
+        ArrayList<MegaNode> nodes=megaApi.getInShares();
+        if(nodes!=null){
+            for(int i=0;i<nodes.size();i++){
+                MegaNode nodeIn = nodes.get(i);
+                usedIncoming = usedIncoming + accountInfo.getStorageUsed(nodeIn.getHandle());
+            }
+        }
+
+        formattedUsedIncoming = Util.getSizeString(usedIncoming);
+
+        totalFormatted = Util.getSizeString(totalStorage);
+
+        usedStorage = usedCloudDrive+usedInbox+usedIncoming+usedRubbish;
+        usedFormatted=Util.getSizeString(usedStorage);
 
         usedPerc = 0;
         if (totalStorage != 0){
             usedPerc = (int)((100 * usedStorage) / totalStorage);
         }
 
-        totalStorage = ((totalStorage / 1024) / 1024) / 1024;
-        totalFormatted="";
+        long availableSpace = totalStorage - usedStorage;
+        formattedAvailableSpace = Util.getSizeString(availableSpace);
 
-        if (totalStorage >= 1024){
-            totalStorage = totalStorage / 1024;
-            totalFormatted = totalFormatted + totalStorage + " TB";
-        }
-        else{
-            totalFormatted = totalFormatted + totalStorage + " GB";
-            totalGb = true;
-        }
-
-        usedStorage = ((usedStorage / 1024) / 1024) / 1024;
-        usedFormatted="";
-
-        if(totalGb){
-            usedGbStorage = usedStorage;
-            usedFormatted = usedFormatted + usedStorage + " GB";
-        }
-        else{
-            if (usedStorage >= 1024){
-                usedGbStorage = usedStorage;
-                usedStorage = usedStorage / 1024;
-
-                usedFormatted = usedFormatted + usedStorage + " TB";
-            }
-            else{
-                usedGbStorage = usedStorage;
-                usedFormatted = usedFormatted + usedStorage + " GB";
-            }
-        }
+//        totalStorage = ((totalStorage / 1024) / 1024) / 1024;
+//        totalFormatted="";
+//
+//        if (totalStorage >= 1024){
+//            totalStorage = totalStorage / 1024;
+//            totalFormatted = totalFormatted + totalStorage + " TB";
+//        }
+//        else{
+//            totalFormatted = totalFormatted + totalStorage + " GB";
+//            totalGb = true;
+//        }
+//
+//        usedStorage = ((usedStorage / 1024) / 1024) / 1024;
+//        usedFormatted="";
+//
+//        if(totalGb){
+//            usedGbStorage = usedStorage;
+//            usedFormatted = usedFormatted + usedStorage + " GB";
+//        }
+//        else{
+//            if (usedStorage >= 1024){
+//                usedGbStorage = usedStorage;
+//                usedStorage = usedStorage / 1024;
+//
+//                usedFormatted = usedFormatted + usedStorage + " TB";
+//            }
+//            else{
+//                usedGbStorage = usedStorage;
+//                usedFormatted = usedFormatted + usedStorage + " GB";
+//            }
+//        }
 
         accountDetailsFinished = true;
 
@@ -620,6 +679,46 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     public String getFirstLetter() {
         return firstLetter;
+    }
+
+    public String getFormattedUsedCloud() {
+        return formattedUsedCloud;
+    }
+
+    public void setFormattedUsedCloud(String formattedUsedCloud) {
+        this.formattedUsedCloud = formattedUsedCloud;
+    }
+
+    public String getFormattedUsedInbox() {
+        return formattedUsedInbox;
+    }
+
+    public void setFormattedUsedInbox(String formattedUsedInbox) {
+        this.formattedUsedInbox = formattedUsedInbox;
+    }
+
+    public String getFormattedUsedIncoming() {
+        return formattedUsedIncoming;
+    }
+
+    public void setFormattedUsedIncoming(String formattedUsedIncoming) {
+        this.formattedUsedIncoming = formattedUsedIncoming;
+    }
+
+    public String getFormattedUsedRubbish() {
+        return formattedUsedRubbish;
+    }
+
+    public void setFormattedUsedRubbish(String formattedUsedRubbish) {
+        this.formattedUsedRubbish = formattedUsedRubbish;
+    }
+
+    public String getFormattedAvailableSpace() {
+        return formattedAvailableSpace;
+    }
+
+    public void setFormattedAvailableSpace(String formattedAvailableSpace) {
+        this.formattedAvailableSpace = formattedAvailableSpace;
     }
 
     public void setFirstLetter(String firstLetter) {
