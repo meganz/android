@@ -37,8 +37,8 @@
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Suscribir</string>
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continuar</string> 
     <string name="error_no_selection" context="when any file or folder is selected">Ningún fichero o carpeta ha sido seleccionada.</string>
-    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Descargado anteriormente</string>
-    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">Subido anteriormente</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">descargado anteriormente</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">subido anteriormente</string>
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
@@ -65,7 +65,7 @@
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Cancelar tu cuenta</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
     <string name="action_add" context="Menu item">Subir</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
@@ -886,4 +886,7 @@
         <item context="Singular" quantity="one">Eliminar contacto?</item>
         <item context="Plural" quantity="other">Eliminar contactos?</item>
     </plurals>
+
+    <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
+    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
 </resources>

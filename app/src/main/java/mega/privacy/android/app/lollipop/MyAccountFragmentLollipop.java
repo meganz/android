@@ -142,17 +142,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-
-		if(aB!=null){
-			aB.setTitle(getString(R.string.section_account));
-			log("indicator_menu_white_559");
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-		}
-
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -195,6 +184,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		nameView.setOnClickListener(this);
 
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
+		myEmail = megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
 		LinearLayout.LayoutParams infoEmailParams = (LinearLayout.LayoutParams)infoEmail.getLayoutParams();
 		infoEmailParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, Util.scaleHeightPx(26, outMetrics));
@@ -371,6 +361,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
 
+		mKLayoutVisible = ((ManagerActivityLollipop)context).isMkLayoutVisible();
+
 		if(myAccountInfo!=null){
 			log("myAccountInfo!=NULL");
 			if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
@@ -398,6 +390,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		if(mKLayoutVisible){
 			log("on Create MK visible");
+			((ManagerActivityLollipop)context).showMKLayout(true);
 			showMKLayout();
 		}
 
@@ -444,6 +437,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		refreshAccountInfo();
 
 		return v;
+	}
+
+	public static MyAccountFragmentLollipop newInstance() {
+		log("newInstance");
+		MyAccountFragmentLollipop fragment = new MyAccountFragmentLollipop();
+		return fragment;
 	}
 
 	public void refreshAccountInfo(){
@@ -584,10 +583,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		
 		return (int)textSize;
 	}
-	
-	public void setMyEmail(String myEmail){
-		this.myEmail = myEmail;
-	}
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -636,6 +631,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}
 				else{
+					((ManagerActivityLollipop)context).showMKLayout(true);
 					showMKLayout();
 				}
 
@@ -935,18 +931,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	}
 
-	public void setMKLayoutVisible(boolean show){
-		log("setMKLayoutVisible");
-		mKLayoutVisible = show;
-//		showMKLayout();
-	}
-
 	public void showMKLayout(){
 		log("showMKLayout");
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		aB.hide();
 		parentLinearLayout.setVisibility(View.GONE);
 		exportMKLayout.setVisibility(View.VISIBLE);
 		mKLayoutVisible=false;
@@ -958,13 +944,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void hideMKLayout(){
 		log("hideMKLayout");
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		aB.show();
 		exportMKLayout.setVisibility(View.GONE);
 		parentLinearLayout.setVisibility(View.VISIBLE);
 		mKLayoutVisible=false;
+		((ManagerActivityLollipop)context).hideMKLayout();
 	}
 
 	public void updateAvatar(String contactEmail, boolean retry){

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,8 +54,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
-	TextView optionText;
-	TextView cancelText;
+	Button optionButton;
+	Button cancelButton;
 	View separator;
 
 	public static CloudDriveExplorerFragmentLollipop newInstance() {
@@ -104,21 +105,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		separator = (View) v.findViewById(R.id.separator);
 		
 		optionsBar = (LinearLayout) v.findViewById(R.id.options_explorer_layout);
-		optionText = (TextView) v.findViewById(R.id.action_text);
-		optionText.setOnClickListener(this);
-		//Left and Right margin
-		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(10, metrics), 0);
-		optionText.setLayoutParams(optionTextParams);
-		
-		cancelText = (TextView) v.findViewById(R.id.cancel_text);
-		cancelText.setOnClickListener(this);		
-		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(10, metrics), 0);
-		cancelText.setLayoutParams(cancelTextParams);				
-				
+		optionButton = (Button) v.findViewById(R.id.action_text);
+		optionButton.setOnClickListener(this);
+
+		cancelButton = (Button) v.findViewById(R.id.cancel_text);
+		cancelButton.setOnClickListener(this);
+		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new MegaLinearLayoutManager(context);
@@ -229,25 +222,25 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-			optionText.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));			
+			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
-			optionText.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));	
+			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
-			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));	
+			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-			optionText.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
+			optionButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
-			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
+			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}	
 		else {
-			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
+			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}	
 
 		if(modeCloud==FileExplorerActivityLollipop.SELECT){

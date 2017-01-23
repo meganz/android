@@ -70,7 +70,7 @@
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Cancel your account</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
@@ -1049,4 +1049,8 @@
     <string name="two_users_typing" formatted="false" context="message shown when a chat has no messages">%1s, %2s are typing...</string>
 
     <string name="three_users_typing" formatted="false" context="message shown when a chat has no messages">%1s, %2s and more are typing...</string>
+
+    <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
+    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
+
 </resources>

@@ -105,6 +105,29 @@
                         android:layout_weight="1" />
             </LinearLayout>
 
+            <!-- MY ACCOUNT TABS -->
+            <LinearLayout
+                android:id="@+id/tabhost_my_account"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_my_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/mega"
+                    style="@style/MyCustomTabLayout"/>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/my_account_tabs_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
