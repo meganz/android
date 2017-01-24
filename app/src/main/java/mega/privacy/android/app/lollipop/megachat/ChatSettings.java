@@ -6,12 +6,14 @@ public class ChatSettings {
     String notificationsEnabled = "";
     String notificationsSound = "";
     String vibrationEnabled = "";
+    String chatStatus = "";
 
-    public ChatSettings(String enabled, String notificationsEnabled, String notificationsSound, String vibrationEnabled) {
+    public ChatSettings(String enabled, String notificationsEnabled, String notificationsSound, String vibrationEnabled, String chatStatus) {
         this.enabled = enabled;
         this.notificationsEnabled = notificationsEnabled;
         this.notificationsSound = notificationsSound;
         this.vibrationEnabled = vibrationEnabled;
+        this.chatStatus = chatStatus;
     }
 
     public String getEnabled() {
@@ -44,5 +46,13 @@ public class ChatSettings {
 
     public void setVibrationEnabled(String vibrationEnabled) {
         this.vibrationEnabled = vibrationEnabled;
+    }
+
+    public String getChatStatus() {
+        return chatStatus;
+    }
+
+    public void setChatStatus(String chatStatus) {
+        this.chatStatus = chatStatus;
     }
 }

@@ -203,6 +203,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             firstTime = true;
         }
 
+        chatSettings = dbH.getChatSettings();
+        if(chatSettings==null){
+            chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
+            dbH.setChatSettings(chatSettings);
+        }
+
         display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -742,7 +748,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 initizalizingChatText.setText("Chat error, not initialized");
                 if(chatSettings==null) {
-                    chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                    chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
                     dbH.setChatSettings(chatSettings);
                 }
                 else{
@@ -826,7 +832,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 initizalizingChatText.setText("Chat error, not initialized");
                 if(chatSettings==null) {
-                    chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                    chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
                     dbH.setChatSettings(chatSettings);
                 }
                 else{
@@ -1712,11 +1718,66 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (request.getType() == MegaChatRequest.TYPE_CONNECT){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
-                readyToManager();
+                chatSettings = dbH.getChatSettings();
+                if(chatSettings!=null){
+                    String status = chatSettings.getChatStatus();
+                    if(status!=null){
+                        try{
+                            if(!status.isEmpty()){
+                                int statusInt = Integer.parseInt(status);
+                                log("Set online status: "+statusInt);
+                                megaChatApi.setOnlineStatus(statusInt, this);
+                            }
+                            else{
+                                megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+                            }
+                        }
+                        catch(NumberFormatException nfe){
+                            megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+                            dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+                        }
+                    }
+                    else{
+                        megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+                        dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+                    }
+                }
+                else{
+                    log("Chat settings is NULL - setOnlineStatus ONLINE");
+                    megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+                }
             }
             else{
                 log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
 //				showSnackbar(getString(R.string.chat_connection_error));
+                readyToManager();
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Status changed to: "+request.getNumber());
+//                int status = (int) request.getNumber();
+//                switch(status){
+//                    case MegaChatApi.STATUS_ONLINE:{
+//                        showSnackbar(getString(R.string.changing_status_to_online_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+//                        break;
+//                    }
+//                    case MegaChatApi.STATUS_AWAY:{
+//                        showSnackbar(getString(R.string.changing_status_to_invisible_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_AWAY+"");
+//                        break;
+//                    }
+//                    case MegaChatApi.STATUS_OFFLINE:{
+//                        showSnackbar(getString(R.string.changing_status_to_offline_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_OFFLINE+"");
+//                        break;
+//                    }
+//                }
+                readyToManager();
+            }
+            else{
+                log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
                 readyToManager();
             }
         }

@@ -700,6 +700,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		if(chatEnabled){
 			//Get chat status
 			chatStatus = megaChatApi.getOnlineStatus();
+			log("SETTINGS chatStatus: "+chatStatus);
 			if(chatStatus== MegaChatApi.STATUS_ONLINE){
 				chatStatusOnlineCheck.setChecked(true);
 				chatStatusInvisibleCheck.setChecked(false);
@@ -1493,7 +1494,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
 			}
-			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
+			int status = megaChatApi.getOnlineStatus();
+			if(status==MegaChatApi.STATUS_OFFLINE){
+				//Do connect
+				((ManagerActivityLollipop)context).connectChat(MegaChatApi.STATUS_ONLINE);
+			}
+			else{
+				megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
+			}
+
 			chatStatusOnlineCheck.setChecked(true);
 			chatStatusInvisibleCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(false);
@@ -1503,7 +1512,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
 			}
-			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
+			int status = megaChatApi.getOnlineStatus();
+			if(status==MegaChatApi.STATUS_OFFLINE){
+				//Do connect()
+				((ManagerActivityLollipop)context).connectChat(MegaChatApi.STATUS_AWAY);
+			}
+			else{
+				megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
+			}
+
 			chatStatusOnlineCheck.setChecked(false);
 			chatStatusInvisibleCheck.setChecked(true);
 			chatStatusOfflineCheck.setChecked(false);
