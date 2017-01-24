@@ -2111,6 +2111,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 	    			break;
 	    		}
+				case ACCOUNT:{
+					log("onPostResume - case ACCOUNT");
+					aB.setTitle(getString(R.string.section_account));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					if (nV != null){
+						Menu nVMenu = nV.getMenu();
+						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+						resetNavigationViewMenu(nVMenu);
+						hidden.setChecked(true);
+					}
+					break;
+				}
 	    		case SHARED_ITEMS:{
 	    			log("onResume - case SHARED ITEMS");
 	    			if (viewPagerShares != null){
@@ -2515,6 +2527,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 								viewPagerCDrive.setCurrentItem(1);
 							}
+							aB.setTitle(getString(R.string.section_cloud_drive));
 						}
 						indexCloud=-1;
 					}
