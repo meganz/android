@@ -73,14 +73,37 @@ public class MegaChatApiJava {
 //        megaChatApi.init(createDelegateRequestListener(listener));
 //    }
 
-    public void connect()
-    {
-        megaChatApi.connect();
-    }
+    /**
+     * Establish the connection with chat-related servers (chatd, presenced and Gelb).
+     *
+     * This function must be called only after calling:
+     *  - MegaChatApi::init to initialize the chat engine
+     *  - MegaApi::login to login in MEGA
+     *  - MegaApi::fetchNodes to retrieve current state of the account
+     *
+     * At that point, the initialization state should be MegaChatApi::INIT_ONLINE_SESSION.
+     *
+     * The online status after connecting will be whatever was last used.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_CONNECT
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
 
     public void connect(MegaChatRequestListenerInterface listener)
     {
         megaChatApi.connect(createDelegateRequestListener(listener));
+    }
+
+    /**
+     * Disconnect from chat-related servers (chatd, presenced and Gelb).
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_DISCONNECT
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
+    public void disconnect(MegaChatRequestListenerInterface listener){
+        megaChatApi.disconnect(createDelegateRequestListener(listener));
     }
 
     /**

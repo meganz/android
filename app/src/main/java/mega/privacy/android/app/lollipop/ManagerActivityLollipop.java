@@ -165,6 +165,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.Util.context;
+
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
 
 	public int accountFragment;
@@ -192,6 +194,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	FloatingActionButton fabButton;
 
 	boolean mkLayoutVisible = false;
+
+	int statusToConnect = -1;
 
 	NodeController nC;
 	ContactController cC;
@@ -11294,6 +11298,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showSnackbar(getString(R.string.leave_chat_error));
 			}
 		}
+		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Connected to chat!: statusToConnect: "+statusToConnect);
+				megaChatApi.setOnlineStatus(statusToConnect, this);
+			}
+			else{
+				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+//				showSnackbar(getString(R.string.chat_connection_error));
+			}
+		}
+		else if (request.getType() == MegaChatRequest.TYPE_DISCONNECT){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("DISConnected from chat!");
+			}
+			else{
+				log("EEEERRRRROR WHEN DISCONNECTING " + e.getErrorString());
+			}
+		}
+		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
+//            loginLoggingIn.setVisibility(View.GONE);
+//            loginLogin.setVisibility(View.VISIBLE);
+//            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+//            loginDelimiter.setVisibility(View.VISIBLE);
+//            loginCreateAccount.setVisibility(View.VISIBLE);
+//            queryingSignupLinkText.setVisibility(View.GONE);
+//            confirmingAccountText.setVisibility(View.GONE);
+//            generatingKeysText.setVisibility(View.GONE);
+//            loggingInText.setVisibility(View.GONE);
+//            fetchingNodesText.setVisibility(View.GONE);
+//            prepareNodesText.setVisibility(View.GONE);
+//            initizalizingChatText.setVisibility(View.GONE);
+//            serversBusyText.setVisibility(View.GONE);
+
+			megaChatApi = null;
+			((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();
+			Util.resetAndroidLogger();
+		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Status changed to: "+request.getNumber());
@@ -11301,14 +11342,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch(status){
 					case MegaChatApi.STATUS_ONLINE:{
 						showSnackbar(getString(R.string.changing_status_to_online_success));
+						dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
 						break;
 					}
 					case MegaChatApi.STATUS_AWAY:{
 						showSnackbar(getString(R.string.changing_status_to_invisible_success));
+						dbH.setStatusChat(MegaChatApi.STATUS_AWAY+"");
 						break;
 					}
 					case MegaChatApi.STATUS_OFFLINE:{
 						showSnackbar(getString(R.string.changing_status_to_offline_success));
+						dbH.setStatusChat(MegaChatApi.STATUS_OFFLINE+"");
+						megaChatApi.disconnect(this);
 						break;
 					}
 				}
@@ -11319,7 +11364,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else{
-				log("EEEERRRRROR WHEN leaving CHAT " + e.getErrorString());
+				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
 				showSnackbar(getString(R.string.changing_status_error));
 			}
 		}
@@ -13442,6 +13487,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		String gSession = credentials.getSession();
 //		int ret = megaChatApi.init(gSession);
 //		megaApi.fetchNodes(this);
+	}
+
+	public void connectChat(int status){
+		log("connectChat");
+		statusToConnect = status;
+		megaChatApi.connect(this);
 	}
 
 

@@ -18,11 +18,12 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 24;
+	private static final int DATABASE_VERSION = 25;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -101,6 +102,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
+	private static final String KEY_CHAT_STATUS = "chatstatus";
 
     private static DatabaseHandler instance;
     
@@ -175,7 +177,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
-				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
+				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN, "+ KEY_CHAT_STATUS + " TEXT"+")";
 		db.execSQL(CREATE_CHAT_TABLE);
   
 	}
@@ -393,6 +395,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_LAST_NAME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_LAST_NAME + " = '" + encrypt("") + "';");
 		}
+
+		if (oldVersion <= 24){
+			db.execSQL("ALTER TABLE " + TABLE_CHAT_SETTINGS + " ADD COLUMN " + KEY_CHAT_STATUS + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_STATUS + " = '" + encrypt(MegaChatApi.STATUS_ONLINE+"") + "';");
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -600,7 +607,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String notificationsEnabled = decrypt(cursor.getString(2));
 			String notificationSound = decrypt(cursor.getString(3));
 			String vibrationEnabled = decrypt(cursor.getString(4));
-			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled);
+			String chatStatus = decrypt(cursor.getString(5));
+			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled, chatStatus);
 		}
 		cursor.close();
 
@@ -629,6 +637,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
+			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setStatusChat(String status){
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_STATUS + "= '" + encrypt(status) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_STATUS, encrypt(status));
 			db.insert(TABLE_CHAT_SETTINGS, null, values);
 		}
 		cursor.close();

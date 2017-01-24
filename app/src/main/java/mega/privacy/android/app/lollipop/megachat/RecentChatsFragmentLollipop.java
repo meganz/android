@@ -217,6 +217,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             //Get chat status
             chatStatus = megaChatApi.getOnlineStatus();
             log("chatStatus: "+chatStatus);
+
+            chatSettings = dbH.getChatSettings();
+            if(chatSettings!=null){
+                String state = chatSettings.getChatStatus();
+                log("in DB status is: "+state);
+            }
+
             if(chatStatus== MegaChatApi.STATUS_ONLINE){
                 chatStatusLayout.setVisibility(View.GONE);
 
@@ -873,7 +880,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
 
     @Override
     public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
-        log("onChatOnlineStatusUpdate");
+        log("onChatOnlineStatusUpdate: "+status);
 
         if (isAdded()) {
             chatStatus = megaChatApi.getOnlineStatus();
