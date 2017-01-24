@@ -2244,6 +2244,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 	    			break;
 	    		}
+				case ACCOUNT:{
+					log("onPostResume - case ACCOUNT");
+					aB.setTitle(getString(R.string.section_account));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					if (nV != null){
+						Menu nVMenu = nV.getMenu();
+						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+						resetNavigationViewMenu(nVMenu);
+						hidden.setChecked(true);
+					}
+					break;
+				}
 	    		case SHARED_ITEMS:{
 	    			log("onResume - case SHARED ITEMS");
 	    			if (viewPagerShares != null){
@@ -2751,6 +2763,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						viewPagerCDrive.setCurrentItem(1);
 					}
+					aB.setTitle(getString(R.string.section_cloud_drive));
 				}
 				indexCloud=-1;
 			}
@@ -3459,24 +3472,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 
-//				viewPagerMyAccount.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//
-//					@Override
-//					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//					}
-//
-//					@Override
-//					public void onPageSelected(int position) {
-//						supportInvalidateOptionsMenu();
-//						showFabButton();
-//					}
-//
-//					@Override
-//					public void onPageScrollStateChanged(int state) {
-//
-//					}
-//				});
+				viewPagerMyAccount.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+					@Override
+					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+					}
+
+					@Override
+					public void onPageSelected(int position) {
+						supportInvalidateOptionsMenu();
+					}
+
+					@Override
+					public void onPageScrollStateChanged(int state) {
+					}
+				});
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -4845,17 +4854,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					logoutMenuItem.setVisible(true);
 					forgotPassMenuItem.setVisible(true);
 
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-					log("Exists MK in: "+path);
-					File file= new File(path);
-					if(file.exists()){
-						removeMK.setVisible(true);
-						exportMK.setVisible(false);
+					int index = viewPagerMyAccount.getCurrentItem();
+					if(index==0){
+						String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+						log("Exists MK in: "+path);
+						File file= new File(path);
+						if(file.exists()){
+							removeMK.setVisible(true);
+							exportMK.setVisible(false);
+						}
+						else{
+							removeMK.setVisible(false);
+							exportMK.setVisible(true);
+						}
 					}
 					else{
 						removeMK.setVisible(false);
-						exportMK.setVisible(true);
+						exportMK.setVisible(false);
 					}
+
 					if (myAccountInfo.getNumberOfSubscriptions() > 0) {
 						cancelSubscription.setVisible(true);
 					}
@@ -13355,6 +13372,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
 		if(maFLol!=null){
 			return maFLol;
+		}
+		return null;
+	}
+
+	public MyStorageFragmentLollipop getMyStorageFragment() {
+		String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
+		mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+		if(mStorageFLol!=null){
+			return mStorageFLol;
 		}
 		return null;
 	}
