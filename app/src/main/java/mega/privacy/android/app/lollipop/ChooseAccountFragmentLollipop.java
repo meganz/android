@@ -248,6 +248,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         rightFreeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout_right_side);
         RelativeLayout.LayoutParams rightLayoutParams = (RelativeLayout.LayoutParams) rightFreeLayout.getLayoutParams();
         rightLayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
+        rightLayoutParams.setMargins(Util.scaleWidthPx(12, outMetrics),0,0,0);
         rightFreeLayout.setLayoutParams(rightLayoutParams);
 
         tableRowFree = (TableRow) v.findViewById(R.id.table_row_free);
