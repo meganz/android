@@ -76,7 +76,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	
 	TextView typeAccount;
 	TextView infoEmail;
-	TextView expirationAccount;
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
@@ -88,7 +87,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button deleteAccountButton;
 	
 	RelativeLayout typeLayout;
-	LinearLayout expirationLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
 	LinearLayout fingerprintLayout;
@@ -247,12 +245,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButtonParams.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
 		upgradeButton.setLayoutParams(upgradeButtonParams);
 
-		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
-		LinearLayout.LayoutParams expirationParams = (LinearLayout.LayoutParams)expirationLayout.getLayoutParams();
-		expirationParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		expirationLayout.setLayoutParams(expirationParams);
-		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
-
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
 		LinearLayout.LayoutParams lastSessionParams = (LinearLayout.LayoutParams)lastSessionLayout.getLayoutParams();
 		lastSessionParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
@@ -297,8 +289,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
 		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
-
-		expirationLayout.setVisibility(View.GONE);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
@@ -482,35 +472,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 				case 0:{
 					typeAccount.setText(R.string.my_account_free);
-					expirationLayout.setVisibility(View.GONE);
 					break;
 				}
 
 				case 1:{
 					typeAccount.setText(getString(R.string.my_account_pro1));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 2:{
 					typeAccount.setText(getString(R.string.my_account_pro2));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 3:{
 					typeAccount.setText(getString(R.string.my_account_pro3));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
 				case 4:{
 					typeAccount.setText(getString(R.string.my_account_prolite));
-					expirationLayout.setVisibility(View.VISIBLE);
-					expirationAccount.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 					break;
 				}
 
