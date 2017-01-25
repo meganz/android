@@ -552,8 +552,8 @@ public class MegaChatApiJava {
      *
      * @return MegaChatListItemList including all the active chatrooms
      */
-    public MegaChatListItemList getActiveChatListItems(){
-        return megaChatApi.getActiveChatListItems();
+    public ArrayList<MegaChatListItem> getActiveChatListItems(){
+        return chatRoomListItemToArray(megaChatApi.getActiveChatListItems());
     }
 
     /**
@@ -567,8 +567,8 @@ public class MegaChatApiJava {
      *
      * @return MegaChatListItemList including all the active chatrooms
      */
-    public MegaChatListItemList getInactiveChatListItems(){
-        return megaChatApi.getInactiveChatListItems();
+    public ArrayList<MegaChatListItem> getInactiveChatListItems(){
+        return chatRoomListItemToArray(megaChatApi.getInactiveChatListItems());
     }
 
     /**

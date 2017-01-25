@@ -295,17 +295,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                     chats = new ArrayList<MegaChatListItem>();
                 }
 
-                ArrayList<MegaChatListItem> allChats = megaChatApi.getChatListItems();
-                for (int i=0; i<allChats.size();i++){
-                    MegaChatListItem chat = allChats.get(i);
-                    if(chat.isActive()){
-                        chats.add(chat);
-                    }
-                    else{
-                        log("Remove chat: "+chat.getTitle());
-                    }
-                }
-//                chats = megaChatApi.getChatListItems();
+                chats = megaChatApi.getActiveChatListItems();
                 log("chats no: "+chats.size());
 
                 //Order by last interaction
