@@ -627,6 +627,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         int permission = chatRoom.getOwnPrivilege();
 
                         if(permission==MegaChatRoom.PRIV_RO) {
+                            log("Permission RO");
                             writingContainerLayout.setVisibility(View.GONE);
                         }
 
