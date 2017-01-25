@@ -254,13 +254,23 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         float density  = getResources().getDisplayMetrics().density;
 
 //		String fullName;
-        String firstLetter = participant.getFullName().charAt(0) + "";
-        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-        contactInitialLetter.setText(firstLetter);
-        contactInitialLetter.setTextColor(Color.WHITE);
-        contactInitialLetter.setVisibility(View.VISIBLE);
+        if(participant.getFullName()!=null){
+            if(!(participant.getFullName().trim().isEmpty())){
+                String firstLetter = participant.getFullName().charAt(0) + "";
+                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                contactInitialLetter.setText(firstLetter);
+                contactInitialLetter.setTextColor(Color.WHITE);
+                contactInitialLetter.setVisibility(View.VISIBLE);
+                contactInitialLetter.setTextSize(24);
+            }
+            else{
+                contactInitialLetter.setVisibility(View.GONE);
+            }
+        }
+        else{
+            contactInitialLetter.setVisibility(View.GONE);
+        }
 
-        contactInitialLetter.setTextSize(24);
         ////
     }
 
