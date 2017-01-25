@@ -247,9 +247,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTitleChatText.setText(chat.getTitle());
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
 
+            infoTitleChatText.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
-            paramsEditIcon.leftMargin = Util.scaleWidthPx(15, outMetrics);
+            paramsEditIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
             editImageView.setLayoutParams(paramsEditIcon);
             editImageView.setOnClickListener(this);
 
