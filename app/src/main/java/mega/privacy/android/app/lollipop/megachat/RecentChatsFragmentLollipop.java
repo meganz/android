@@ -68,13 +68,12 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
 
-public class RecentChatsFragmentLollipop extends Fragment implements MegaChatListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
+public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
     DatabaseHandler dbH;
-    ChatItemPreferences chatPrefs = null;
     ChatSettings chatSettings;
 
     Context context;
@@ -101,7 +100,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
     int chatStatus;
 
     boolean chatEnabled = true;
-    float scaleH, scaleW;
     float density;
     DisplayMetrics outMetrics;
     Display display;
@@ -145,14 +143,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
             chatEnabled=true;
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-            }
-
-            megaChatApi.addChatListener(this);
-            log("addChatListener");
-
-            if (context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop)context).setChatListenerRecentChatsFragmentLollipop(this);
-                log("setChatListenerRecentChatsFragmentLollipop");
             }
         }
         else{
@@ -268,17 +258,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
 
         return v;
-    }
-
-    @Override
-    public void onDestroy(){
-        log("onDestroy");
-
-        if (megaChatApi != null){
-            megaChatApi.removeChatListener(this);
-        }
-
-        super.onDestroy();
     }
 
     public static RecentChatsFragmentLollipop newInstance() {
@@ -657,9 +636,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
     }
 
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-        log("onChatListItemUpdate: "+item.getTitle());
+    public void listItemUpdate(MegaChatListItem item) {
+        log("listItemUpdate: "+item.getTitle());
 
         if(!isAdded()){
             log("return!");
@@ -872,15 +850,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements MegaChatLis
         }
     }
 
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-        //Add check ERROR newState - same proccess of login
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
-        log("onChatOnlineStatusUpdate: "+status);
+    public void onlineStatusUpdate(int status) {
+        log("onlineStatusUpdate: "+status);
 
         if (isAdded()) {
             chatStatus = megaChatApi.getOnlineStatus();

@@ -538,6 +538,40 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Return the number of chatrooms with unread messages
+     * @return The number of chatrooms with unread messages
+     */
+    public int getUnreadChats(){
+        return megaChatApi.getUnreadChats();
+    }
+
+    /**
+     * Return the chatrooms that are currently active
+     *
+     * You take the onwership of the returned value.
+     *
+     * @return MegaChatListItemList including all the active chatrooms
+     */
+    public MegaChatListItemList getActiveChatListItems(){
+        return megaChatApi.getActiveChatListItems();
+    }
+
+    /**
+     * Return the chatrooms that are currently inactive
+     *
+     * Chatrooms became inactive when you left a groupchat or, for 1on1 chats,
+     * when the contact-relationship is broken (you remove the contact or you are
+     * removed by the other contact).
+     *
+     * You take the onwership of the returned value.
+     *
+     * @return MegaChatListItemList including all the active chatrooms
+     */
+    public MegaChatListItemList getInactiveChatListItems(){
+        return megaChatApi.getInactiveChatListItems();
+    }
+
+    /**
      * Get the chat id for the 1on1 chat with the specified user
      *
      * If the 1on1 chat with the user specified doesn't exist, this function will

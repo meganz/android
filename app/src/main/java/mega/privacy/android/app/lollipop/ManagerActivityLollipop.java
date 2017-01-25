@@ -44,7 +44,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -167,7 +169,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.Util.context;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
+public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
 
 	public int accountFragment;
 
@@ -304,7 +306,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
-    public enum DrawerItem {
+
+	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
 		public String getTitle(Context context) {
@@ -490,8 +493,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem newChatMenuItem;
 
 	boolean fromTakePicture = false;
-
-	MegaChatListenerInterface recentChatsFragmentLollipopListener = null;
 
 	//Billing
 
@@ -1119,6 +1120,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		megaApi = app.getMegaApi();
 		if(Util.isChatEnabled()){
 			megaChatApi = app.getMegaChatApi();
+			log("addChatListener");
+			megaChatApi.addChatListener(this);
 		}
 		else{
 			megaChatApi=null;
@@ -1778,7 +1781,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 	        }
 
-	        if (drawerItem == null) {
+			log("onCreate - Check if there any unread chat");
+			if(Util.isChatEnabled()){
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+					int numberUnread = megaChatApi.getUnreadChats();
+					if(numberUnread==0){
+						chat.setTitle(getString(R.string.section_chat));
+					}
+					else{
+						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						chat.setTitle(result);
+					}
+				}
+			}
+
+
+			if (drawerItem == null) {
 	        	log("DRAWERITEM NULL");
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	Intent intent = getIntent();
@@ -2707,6 +2733,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		megaApi.removeTransferListener(this);
     		megaApi.removeRequestListener(this);
     	}
+
+		if (megaChatApi != null){
+			megaChatApi.removeChatListener(this);
+		}
 
     	super.onDestroy();
 	}
@@ -13498,11 +13528,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.selectedChatItem = selectedChatItem;
 	}
 
-	public void setChatListenerRecentChatsFragmentLollipop(MegaChatListenerInterface recentChatsFragmentLollipopListener){
-		log("setChatListenerRecentChatsFragmentLollipop");
-		this.recentChatsFragmentLollipopListener = recentChatsFragmentLollipopListener;
-	}
-
 	public void enableChat(){
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -13525,13 +13550,60 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void disableChat(){
 		log("disableChat");
 
-		if(rChatFL!=null){
-			megaChatApi.removeChatListener(rChatFL);
+		if (megaChatApi != null){
+			megaChatApi.removeChatListener(this);
 		}
 
 		megaChatApi.logout(this);
 		app.disableMegaChatApi();
 		megaChatApi=null;
+	}
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+		if(rChatFL!=null){
+			if(rChatFL.isAdded()){
+				rChatFL.listItemUpdate(item);
+			}
+		}
+
+		if(Util.isChatEnabled()){
+			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+				log("Change unread count: " + item.getTitle());
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+					int numberUnread = megaChatApi.getUnreadChats();
+					if(numberUnread==0){
+						chat.setTitle(getString(R.string.section_chat));
+					}
+					else{
+						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						chat.setTitle(result);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
+		if(rChatFL!=null){
+			if(rChatFL.isAdded()){
+				rChatFL.onlineStatusUpdate(status);
+			}
+		}
 	}
 
 	public boolean isMkLayoutVisible() {
