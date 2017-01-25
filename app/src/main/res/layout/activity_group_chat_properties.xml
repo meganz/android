@@ -91,6 +91,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
                             android:textColor="@color/name_my_account"
+                            android:singleLine="true"
                             android:maxLines="1"
                             android:ellipsize="end"
                             android:textSize="16dp" />
