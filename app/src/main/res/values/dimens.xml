@@ -23,4 +23,9 @@
     <dimen name="left_margin_back_arrow">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="recycler_view_separator">72dp</dimen>
+
+    <dimen name="width_image_pending_message_one_digit">20dp</dimen>
+    <dimen name="width_image_pending_message_two_digits">28dp</dimen>
+    <dimen name="width_image_pending_message_three_digits">36dp</dimen>
+    <dimen name="width_image_pending_message_four_digits">44dp</dimen>
 </resources>

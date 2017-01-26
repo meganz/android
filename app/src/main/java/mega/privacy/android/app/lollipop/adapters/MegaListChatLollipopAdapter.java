@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -15,6 +17,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,7 +116,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-		RoundedImageView circlePendingMessages;
+		ImageView circlePendingMessages;
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
@@ -504,7 +507,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
-		holder.circlePendingMessages = (RoundedImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
+		holder.circlePendingMessages = (ImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
@@ -519,31 +522,142 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void setUnreadCount(int unreadMessages, ViewHolderChatList holder){
 		log("setPendingMessages: "+unreadMessages);
 
-		Bitmap circle = Bitmap.createBitmap(150,150, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(circle);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.accentColor));
+		Bitmap image=null;
+		String numberString = "";
 
-		int radius;
-		if (circle.getWidth() < circle.getHeight())
-			radius = circle.getWidth()/2;
-		else
-			radius = circle.getHeight()/2;
-
-		c.drawCircle(circle.getWidth()/2, circle.getHeight()/2, radius, p);
-		holder.circlePendingMessages.setImageBitmap(circle);
-
-		holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+		int heightPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_one_digit);
 
 		if(unreadMessages<0){
 			unreadMessages = Math.abs(unreadMessages);
 			log("unread number: "+unreadMessages);
-			holder.numberPendingMessages.setText("+"+unreadMessages);
+			numberString = "+"+unreadMessages;
 		}
 		else{
-			holder.numberPendingMessages.setText(unreadMessages+"");
+			numberString = unreadMessages+"";
 		}
+
+//		numberString="20";
+		int size = numberString.length();
+
+		switch(size){
+			case 0:{
+				log("0 digits - error!");
+				holder.layoutPendingMessages.setVisibility(View.GONE);
+				break;
+			}
+			case 1:{
+				log("drawing circle for one digit");
+
+				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
+				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
+
+				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
+
+				Canvas c = new Canvas(image);
+				Paint p = new Paint();
+				p.setAntiAlias(true);
+				p.setColor(context.getResources().getColor(R.color.accentColor));
+
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				params.width=heightPendingMessageIcon;
+				holder.layoutPendingMessages.setLayoutParams(params);
+
+				int radius;
+				if (image.getWidth() < image.getHeight())
+					radius = image.getWidth()/2;
+				else
+					radius = image.getHeight()/2;
+
+				c.drawCircle(image.getWidth()/2, image.getHeight()/2, radius, p);
+				break;
+			}
+			case 2:{
+				log("drawing oval for two digits");
+				int widthPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_two_digits);
+
+				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthPendingMessageIcon, outMetrics);
+				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
+
+				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
+
+				Canvas c = new Canvas(image);
+				Paint p = new Paint();
+				p.setAntiAlias(true);
+				p.setColor(context.getResources().getColor(R.color.accentColor));
+
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				params.width=widthPendingMessageIcon;
+				holder.layoutPendingMessages.setLayoutParams(params);
+
+				final RectF rect = new RectF(0, 0, image.getWidth(), image.getHeight());
+
+				c.drawOval(rect, p);
+
+				break;
+			}
+			case 3:{
+				log("drawing oval for three digits");
+				int widthPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_three_digits);
+
+				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthPendingMessageIcon, outMetrics);
+				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
+
+				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
+
+				Canvas c = new Canvas(image);
+				Paint p = new Paint();
+				p.setAntiAlias(true);
+				p.setColor(context.getResources().getColor(R.color.accentColor));
+
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				params.width=widthPendingMessageIcon;
+				holder.layoutPendingMessages.setLayoutParams(params);
+
+				final RectF rect = new RectF(0, 0, image.getWidth(), image.getHeight());
+
+				c.drawOval(rect, p);
+				break;
+			}
+			default:{
+				log("drawing oval for DEFAULT");
+				int widthPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_four_digits);
+
+				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthPendingMessageIcon, outMetrics);
+				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
+
+				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
+
+				Canvas c = new Canvas(image);
+				Paint p = new Paint();
+				p.setAntiAlias(true);
+				p.setColor(context.getResources().getColor(R.color.accentColor));
+
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				params.width=widthPendingMessageIcon;
+				holder.layoutPendingMessages.setLayoutParams(params);
+
+				final RectF rect = new RectF(0, 0, image.getWidth(), image.getHeight());
+
+				c.drawOval(rect, p);
+				break;
+			}
+		}
+
+		if(image!=null){
+			holder.circlePendingMessages.setImageBitmap(image);
+
+			holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
+			holder.numberPendingMessages.setText(numberString);
+		}
+		else{
+			log("image is NULL -- hide layout for pending messages");
+			holder.layoutPendingMessages.setVisibility(View.GONE);
+		}
+	}
+
+	public void drawOval(){
+
 	}
 
 	public void createMultiselectTick (ViewHolderChatList holder){

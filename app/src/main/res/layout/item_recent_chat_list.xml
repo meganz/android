@@ -70,21 +70,18 @@
 
     <RelativeLayout
         android:id="@+id/recent_chat_list_unread_layout"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_alignParentRight="true"
         android:layout_marginRight="36dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="14dp">
 
-        <mega.privacy.android.app.components.RoundedImageView
+        <ImageView
             android:id="@+id/recent_chat_list_unread_circle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_centerInParent="true"
-            android:scaleType="fitCenter"
-            rounded:border_color="@color/accentColor"
-            rounded:border_width="0dp"
-            rounded:corner_radius="12dp" />
+            android:scaleType="fitCenter"/>
 
         <TextView
             android:id="@+id/recent_chat_list_unread_number"
