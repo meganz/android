@@ -160,6 +160,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
 		if(chat.isGroup()){
 			infoChatText.setText(getString(R.string.group_chat_info_label));
+            int visibility = chat.getVisibility();
+            log("visibility: "+visibility);
+
 			optionLeaveChat.setVisibility(View.VISIBLE);
 			optionClearHistory.setVisibility(View.VISIBLE);
 		}

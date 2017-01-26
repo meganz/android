@@ -45,7 +45,6 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 
 import mega.privacy.android.app.utils.TimeChatUtils;
