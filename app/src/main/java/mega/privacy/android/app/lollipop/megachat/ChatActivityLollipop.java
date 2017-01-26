@@ -588,13 +588,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(idChat!=-1) {
                     //REcover chat
                     log("Recover chat with id: " + idChat);
-
                     chatRoom = megaChatApi.getChatRoom(idChat);
-                    aB.setTitle(chatRoom.getTitle());
-
-                    if (!chatRoom.isGroup()) {
-                        log("One to one chat");
-                        setStatus();
+                    if(chatRoom==null){
+                        log("Chatroom is NULL - finisg activity!!");
+                        finish();
                     }
 
                     log("Call to open chat");
@@ -625,10 +622,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Result of open chat: " + result);
 
                         int permission = chatRoom.getOwnPrivilege();
+                        aB.setTitle(chatRoom.getTitle());
 
-                        if(permission==MegaChatRoom.PRIV_RO) {
-                            log("Permission RO");
-                            writingContainerLayout.setVisibility(View.GONE);
+                        if (chatRoom.isGroup()) {
+                            log("Check permissions group chat");
+                            if(permission==MegaChatRoom.PRIV_RO) {
+                                log("Permission RO");
+                                writingContainerLayout.setVisibility(View.GONE);
+                                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                            }
+                        }
+                        else{
+                            log("Check permissions one to one chat");
+                            if(permission==MegaChatRoom.PRIV_RO) {
+                                log("Permission RO");
+                                writingContainerLayout.setVisibility(View.GONE);
+                                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                            }
+                            else{
+                                int state = chatRoom.getOnlineStatus();
+                                if(state == MegaChatApi.STATUS_ONLINE){
+                                    log("This user is connected: "+chatRoom.getTitle());
+                                    aB.setSubtitle(getString(R.string.online_status));
+                                }
+                                else{
+                                    log("This user status is: "+state+  " " + chatRoom.getTitle());
+                                    aB.setSubtitle(getString(R.string.offline_status));
+                                }
+                            }
                         }
 
                         if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
@@ -695,18 +716,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void setStatus(){
-
-        int state = chatRoom.getOnlineStatus();
-        if(state == MegaChatApi.STATUS_ONLINE){
-            log("This user is connected: "+chatRoom.getTitle());
-            aB.setSubtitle(getString(R.string.online_status));
-        }
-        else{
-            log("This user status is: "+state+  " " + chatRoom.getTitle());
-            aB.setSubtitle(getString(R.string.offline_status));
-        }
-    }
+//    public void setStatus(){
+//
+//        int state = chatRoom.getOnlineStatus();
+//        if(state == MegaChatApi.STATUS_ONLINE){
+//            log("This user is connected: "+chatRoom.getTitle());
+//            aB.setSubtitle(getString(R.string.online_status));
+//        }
+//        else{
+//            log("This user status is: "+state+  " " + chatRoom.getTitle());
+//            aB.setSubtitle(getString(R.string.offline_status));
+//        }
+//    }
 
     public int compareTime(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
 
@@ -814,9 +835,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         leaveMenuItem = menu.findItem(R.id.cab_menu_leave_chat);
 
         if(chatRoom!=null){
+            int permission = chatRoom.getOwnPrivilege();
             if(chatRoom.isGroup()){
-
-                int permission = chatRoom.getOwnPrivilege();
 
                 if(permission==MegaChatRoom.PRIV_MODERATOR) {
                     inviteMenuItem.setVisible(true);
@@ -829,13 +849,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                 contactInfoMenuItem.setVisible(true);
-                leaveMenuItem.setVisible(true);
+
+                if(permission==MegaChatRoom.PRIV_RM) {
+                    log("Group chat PRIV_RM");
+                    leaveMenuItem.setVisible(false);
+                }
+                else{
+                    log("Permission: "+permission);
+                    leaveMenuItem.setVisible(true);
+                }
             }
             else{
                 inviteMenuItem.setVisible(false);
-                contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
-                contactInfoMenuItem.setVisible(true);
-                clearHistoryMenuItem.setVisible(true);
+                if(permission==MegaChatRoom.PRIV_RO) {
+                    clearHistoryMenuItem.setVisible(false);
+                    contactInfoMenuItem.setVisible(false);
+                    callMenuItem.setVisible(false);
+                    videoMenuItem.setVisible(false);
+                }
+                else{
+                    clearHistoryMenuItem.setVisible(true);
+                    contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                    contactInfoMenuItem.setVisible(true);
+                }
                 leaveMenuItem.setVisible(false);
             }
         }
@@ -1101,22 +1137,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.upload_from_gallery_chat:{
                 hideUploadPanel();
+                showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
             case R.id.upload_from_cloud_chat:{
                 hideUploadPanel();
+                showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
             case R.id.upload_audio_chat:{
                 hideUploadPanel();
+                showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
             case R.id.upload_contact_chat:{
                 hideUploadPanel();
+                showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
             case R.id.upload_from_filesystem_chat:{
                 hideUploadPanel();
+                showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
 		}
@@ -2328,32 +2369,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Remove participant: "+request.getUserHandle()+" my user: "+megaApi.getMyUser().getHandle());
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                if(megaApi.getMyUser().getHandle()==request.getUserHandle()){
-                    log("I left the chatroom");
-                    finish();
-                }
-                else{
-                    log("Removed from chat");
-                    //
-
-//                    for(int i=0;i<participantsCount;i++){
-//
-//                        if(request.getUserHandle()==participants.get(i).getHandle()){
-//                            participantToUpdate = participants.get(i);
-//
-//                            participantToUpdate.setPrivilege(request.getPrivilege());
-//                            index=i;
-//                            break;
-//                        }
-//                    }
-//
-//                    if(index!=-1&&participantToUpdate!=null){
-//                        participants.remove(index);
-//                        adapter.removeParticipant(index, participants);
-//                    }
-
-                    showSnackbar(getString(R.string.remove_participant_success));
-                }
+                log("Participant removed OK");
+                invalidateOptionsMenu();
             }
             else{
                 log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
