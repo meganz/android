@@ -2345,6 +2345,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void showMuteIcon(MegaChatListItem item){
+		log("showMuteIcon");
+		if (rChatFL != null) {
+			if (rChatFL.isAdded()) {
+				rChatFL.showMuteIcon(item);
+			}
+		}
+	}
+
 	public void setProfileAvatar(){
 		log("setProfileAvatar");
 		File avatar = null;

@@ -450,7 +450,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                     hideMultipleSelect();
                     ChatController chatC = new ChatController(context);
                     chatC.muteChats(chats);
-                    setChats();
+//                    setChats();
                     break;
                 }
                 case R.id.cab_menu_archive:{
@@ -915,6 +915,32 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         if(updateOrder){
             interactionUpdate(position);
+        }
+    }
+
+    public void showMuteIcon(MegaChatListItem item){
+        log("showMuteIcon");
+
+        long chatHandleToUpdate = item.getChatId();
+        int indexToReplace = -1;
+        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+        while (itrReplace.hasNext()) {
+            MegaChatListItem chat = itrReplace.next();
+            if(chat!=null){
+                if(chat.getChatId()==chatHandleToUpdate){
+                    indexToReplace = itrReplace.nextIndex()-1;
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        if(indexToReplace!=-1){
+            log("Index to replace: "+indexToReplace);
+            if(adapterList!=null){
+                adapterList.showMuteIcon(indexToReplace);
+            }
         }
     }
 

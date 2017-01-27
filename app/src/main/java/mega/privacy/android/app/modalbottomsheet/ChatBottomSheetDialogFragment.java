@@ -368,7 +368,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     }
                 }
 
-                ((ManagerActivityLollipop)context).setChats();
+                ((ManagerActivityLollipop)context).showMuteIcon(chat);
                 break;
             }
         }
