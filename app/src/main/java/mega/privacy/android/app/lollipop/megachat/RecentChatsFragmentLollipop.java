@@ -922,6 +922,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         MegaChatListItem chat = chats.remove(position);
         chats.add(0, chat);
         adapterList.notifyItemMoved(position, 0);
+        if(lastFirstVisiblePosition==position){
+            log("Interaction - change lastFirstVisiblePosition");
+            lastFirstVisiblePosition=0;
+        }
     }
 
     public String getParticipantFullName(MegaChatRoom chat, long i){
@@ -1065,6 +1069,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         }else{
             (listView.getLayoutManager()).scrollToPosition(0);
         }
+        lastFirstVisiblePosition=0;
         super.onResume();
     }
 
