@@ -1,14 +1,11 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -16,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.util.DisplayMetrics;
@@ -70,6 +68,8 @@ import nz.mega.sdk.MegaChatRoom;
 
 public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
 
+    private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
@@ -90,6 +90,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     RecyclerView.LayoutManager mLayoutManager;
 
     ArrayList<MegaChatListItem> chats;
+
+    int lastFirstVisiblePosition;
 
     //Empty screen
     TextView emptyTextView;
@@ -1028,6 +1030,54 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 //            }
 //        }
 //    }
+
+//    @Override
+//    public void onViewStateRestored(Bundle savedInstanceState) {
+//        log("onViewStateRestored");
+//        super.onViewStateRestored(savedInstanceState);
+//
+//        if(savedInstanceState != null)
+//        {
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+//            listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+//        }
+//    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+    }
+
+    @Override
+    public void onPause() {
+        log("onPause");
+        lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        log("onResume: lastFirstVisiblePosition " +lastFirstVisiblePosition);
+        if(lastFirstVisiblePosition>0){
+            (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
+        }else{
+            (listView.getLayoutManager()).scrollToPosition(0);
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        log("onActivityCreated");
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+        }
+    }
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);
