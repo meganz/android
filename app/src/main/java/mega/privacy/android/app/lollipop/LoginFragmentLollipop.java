@@ -1210,8 +1210,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        if (Util.isChatEnabled()) {
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            }
         }
     }
 
@@ -1223,12 +1225,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         dbH = DatabaseHandler.getDbHandler(context);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        if (Util.isChatEnabled()){
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            }
         }
     }
 
@@ -1466,9 +1470,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
 
-                if(megaChatApi!=null){
-
-                    megaChatApi.logout(this);
+                if (Util.isChatEnabled()) {
+                    if (megaChatApi != null) {
+                        megaChatApi.logout(this);
+                    }
                 }
 
                 loginLoggingIn.setVisibility(View.GONE);
@@ -1570,14 +1575,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         megaChatApi.connect(this);
                     }
                     else{
-                        log("Chat NOT enabled");
+                        log("Chat NOT enabled - readyToManager");
                         readyToManager();
                     }
                 }
                 else{
-                    log("chatSettings NULL!! - Remove connect from here later!");
-                    initizalizingChatText.setVisibility(View.VISIBLE);
-                    megaChatApi.connect(this);
+                    log("chatSettings NULL - readyToManager");
+                    readyToManager();
 
                 }
             }else{
