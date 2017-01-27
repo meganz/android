@@ -1139,16 +1139,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             dividerMessageSoundLayout.setVisibility(View.VISIBLE);
         }
 
-        if(chatPrefs==null){
-            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(isChecked), defaultRingtoneUri.toString(), defaultSoundUri.toString());
-            dbH.setChatItemPreferences(chatPrefs);
+        ChatController chatC = new ChatController(this);
+        if(isChecked){
+            chatC.unmuteChat(chatHandle);
         }
         else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(isChecked));
-            dbH.setNotificationEnabledChatItem(Boolean.toString(isChecked), Long.toString(chatHandle));
+            chatC.muteChat(chatHandle);
         }
     }
 

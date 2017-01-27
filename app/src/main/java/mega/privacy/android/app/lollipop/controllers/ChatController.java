@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import java.util.ArrayList;
 
@@ -12,6 +14,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -134,17 +137,50 @@ public class ChatController {
     public void muteChats(ArrayList<MegaChatListItem> chats){
         for(int i=0; i<chats.size();i++){
             muteChat(chats.get(i));
+            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
+        }
+    }
+
+    public void muteChat(long chatHandle){
+        log("muteChat");
+        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
+        if(chatPrefs==null){
+            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+            dbH.setChatItemPreferences(chatPrefs);
+        }
+        else{
+            chatPrefs.setNotificationsEnabled(Boolean.toString(false));
+            dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chatHandle));
         }
     }
 
     public void muteChat(MegaChatListItem chat){
-        log("muteChat");
-        dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chat.getChatId()));
+        log("muteChatITEM");
+        muteChat(chat.getChatId());
     }
 
     public void unmuteChat(MegaChatListItem chat){
+        log("UNmuteChatITEM");
+        unmuteChat(chat.getChatId());
+    }
+
+    public void unmuteChat(long chatHandle){
         log("UNmuteChat");
-        dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chat.getChatId()));
+        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
+        if(chatPrefs==null){
+            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+            dbH.setChatItemPreferences(chatPrefs);
+        }
+        else{
+            chatPrefs.setNotificationsEnabled(Boolean.toString(true));
+            dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chatHandle));
+        }
     }
 
     public void enableChat(){

@@ -655,10 +655,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
-	public void drawOval(){
-
-	}
-
 	public void createMultiselectTick (ViewHolderChatList holder){
 		log("createMultiselectTick");
 
@@ -1027,6 +1023,40 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				holder.layoutPendingMessages.setVisibility(View.INVISIBLE);
 			}
+		}
+	}
+
+	public void showMuteIcon(int position){
+		log("showMuteIcon");
+		if(holder == null){
+			holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
+		}
+
+		if(holder!=null){
+			MegaChatListItem chatToShow = chats.get(position);
+
+			chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatToShow.getChatId()));
+			if(chatPrefs!=null) {
+				log("Chat prefs exists!!!");
+				boolean notificationsEnabled = true;
+				if (chatPrefs.getNotificationsEnabled() != null) {
+					notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
+				}
+
+				if (!notificationsEnabled) {
+					log("Chat is MUTE");
+					holder.muteIcon.setVisibility(View.VISIBLE);
+				}
+				else{
+					log("Chat with notifications enabled!!");
+					holder.muteIcon.setVisibility(View.GONE);
+				}
+			}
+			else{
+				log("Chat prefs is NULL");
+				holder.muteIcon.setVisibility(View.GONE);
+			}
+			notifyItemChanged(position);
 		}
 	}
 
