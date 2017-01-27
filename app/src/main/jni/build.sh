@@ -147,7 +147,7 @@ if [ "$1" == "bindings" ]; then
     createMEGABindings
     echo "* Bindings ready!"
     echo "* Running ndk-build"
-    ${NDK_BUILD} NDK_DEBUG=1-j8
+    ${NDK_BUILD} -j8
     echo "* ndk-build finished"
     echo "* Task finished OK"
     exit 0
@@ -300,7 +300,7 @@ echo "* cURL with c-ares is ready"
 
 echo "* All dependencies are prepared!"
 echo "* Running ndk-build"
-${NDK_BUILD} NDK_DEBUG=1 -j8
+${NDK_BUILD} -j8
 echo "* ndk-build finished"
 echo "* Task finished OK"
 
