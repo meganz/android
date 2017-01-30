@@ -205,12 +205,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
 		if (adapter == null){
+			if(selectFile){
+				log("Mode SELECT FILE ON");
+			}
+
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
-			
+			log("SetOnItemClickListener");
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-				
+
 				@Override
 				public void onItemClick(View view, int position) {
+					log("item click listener trigger!!");
 					itemClick(view, position);
 				}
 			});
@@ -411,6 +416,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				
 			}
+			else{
+				log("Not select file enabled!");
+			}
 		}
 	}	
 
@@ -475,7 +483,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 * Disable nodes from the list
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
-
+		log("setDisableNodes");
 		if (adapter == null){
 			log("Adapter is NULL");
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
@@ -494,6 +502,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //			adapter.setSelectFile(selectFile);
 //		}
 		adapter.setDisableNodes(disabledNodes);
+		adapter.setSelectFile(selectFile);
 	}
 
 	private static void log(String log) {
