@@ -28,7 +28,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
@@ -248,7 +248,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     return;
                 }
 
-                Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
+                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra("name", contact.getEmail());
                 context.startActivity(i);
 
