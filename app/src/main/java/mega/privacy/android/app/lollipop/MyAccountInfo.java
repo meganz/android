@@ -385,7 +385,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                         if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
                             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
                             if(mAF!=null){
-                                mAF.updateAvatar(myUser.getEmail(), false);
+                                mAF.updateAvatar(false);
                             }
                         }
                     }
@@ -461,7 +461,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                         if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
                             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
                             if(mAF!=null){
-                                mAF.updateAvatar(myUser.getEmail(), false);
+                                mAF.updateAvatar(false);
                             }
                         }
                     }
