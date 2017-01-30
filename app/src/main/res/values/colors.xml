@@ -80,4 +80,6 @@
     <color name="small_letter_upgrade_account">#8a333333</color>
 
     <color name="preference_category_title">#f2f2f2</color>
+
+    <color name="sliding_panel_separator">#dcdcdcdc</color>
 </resources>

@@ -113,13 +113,15 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
-import mega.privacy.android.app.lollipop.listeners.ContactOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -214,22 +216,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public TextView propertiesText;
 	public TextView optionPublicLinkText;
 	private NodeOptionsPanelListener nodeOptionsPanelListener;
-	////
-
-	//Sliding CONTACT OPTIONS PANEL
-	private SlidingUpPanelLayout slidingContactOptionsPanel;
-	public FrameLayout optionsContactOutLayout;
-	public LinearLayout optionsContactLayout;
-	public LinearLayout optionContactProperties;
-	public LinearLayout optionContactSendFile;
-	public LinearLayout optionContactShare;
-	public LinearLayout optionContactRemove;
-	private ContactOptionsPanelListener contactOptionsPanelListener;
-	public LinearLayout optionReinvite;
-	public LinearLayout optionDeleteSentRequest;
-	public LinearLayout optionAccept;
-	public LinearLayout optionDecline;
-	public LinearLayout optionIgnore;
 	////
 
 	//Sliding AVATAR OPTIONS PANEL
@@ -1303,37 +1289,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		////
-
-		//Sliding CONTACTS OPTIONS panel
-		slidingContactOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_contacts_list);
-		optionsContactLayout = (LinearLayout) findViewById(R.id.contact_list_options);
-		optionsContactOutLayout = (FrameLayout) findViewById(R.id.contact_list_out_options);
-		optionContactProperties = (LinearLayout) findViewById(R.id.contact_list_option_properties_layout);
-		optionContactShare = (LinearLayout) findViewById(R.id.contact_list_option_share_layout);
-		optionContactSendFile = (LinearLayout) findViewById(R.id.contact_list_option_send_file_layout);
-		optionContactRemove = (LinearLayout) findViewById(R.id.contact_list_option_remove_layout);
-		optionReinvite = (LinearLayout) findViewById(R.id.contact_list_option_reinvite_layout);
-		optionDeleteSentRequest = (LinearLayout) findViewById(R.id.contact_list_option_delete_request_layout);
-		optionAccept = (LinearLayout) findViewById(R.id.contact_list_option_accept_layout);
-		optionDecline = (LinearLayout) findViewById(R.id.contact_list_option_decline_layout);
-		optionIgnore = (LinearLayout) findViewById(R.id.contact_list_option_ignore_layout);
-
-		contactOptionsPanelListener = new ContactOptionsPanelListener(this);
-
-		optionContactRemove.setOnClickListener(contactOptionsPanelListener);
-		optionContactShare.setOnClickListener(contactOptionsPanelListener);
-		optionContactProperties.setOnClickListener(contactOptionsPanelListener);
-		optionContactSendFile.setOnClickListener(contactOptionsPanelListener);
-		optionsContactOutLayout.setOnClickListener(contactOptionsPanelListener);
-		optionReinvite.setOnClickListener(contactOptionsPanelListener);
-		optionDeleteSentRequest.setOnClickListener(contactOptionsPanelListener);
-		optionAccept.setOnClickListener(contactOptionsPanelListener);
-		optionDecline.setOnClickListener(contactOptionsPanelListener);
-		optionIgnore.setOnClickListener(contactOptionsPanelListener);
-
-		slidingContactOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		////
 
 		//Sliding AVATAR OPTIONS panel
@@ -6302,14 +6257,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		log("Sliding Node OPTIONs not shown");
 
-		if(slidingContactOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingContactOptionsPanel.getVisibility()==View.VISIBLE){
-			log("slidingContactOptionsPanel()!=PanelState.HIDDEN");
-			hideContactOptionsPanel();
-			return;
-		}
-
-		log("Sliding CONTACT options not shown");
-
 		if(slidingAvatarOptionsPanel.getVisibility()==View.VISIBLE||slidingAvatarOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
 			hideAvatarOptionsPanel();
 			return;
@@ -8869,125 +8816,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("Show the slidingPanel offline");
 	}
 
-	public void showContactOptionsCF(){
-		log("showContactOptionsCF---ContactsFragment");
-		optionContactProperties.setVisibility(View.VISIBLE);
-		optionContactShare.setVisibility(View.VISIBLE);
-		optionContactSendFile.setVisibility(View.VISIBLE);
-		optionContactRemove.setVisibility(View.VISIBLE);
-		optionReinvite.setVisibility(View.GONE);
-		optionDeleteSentRequest.setVisibility(View.GONE);
-		optionAccept.setVisibility(View.GONE);
-		optionDecline.setVisibility(View.GONE);
-		optionIgnore.setVisibility(View.GONE);
-
-		slidingContactOptionsPanel.setVisibility(View.VISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void showContactOptionsSrF(){
-		log("showContactOptionsSRF---SentRequestFragment");
-		optionContactProperties.setVisibility(View.GONE);
-		optionContactShare.setVisibility(View.GONE);
-		optionContactSendFile.setVisibility(View.GONE);
-		optionContactRemove.setVisibility(View.GONE);
-		optionReinvite.setVisibility(View.VISIBLE);
-		optionDeleteSentRequest.setVisibility(View.VISIBLE);
-		optionAccept.setVisibility(View.INVISIBLE);
-		optionDecline.setVisibility(View.GONE);
-		optionIgnore.setVisibility(View.GONE);
-
-		slidingContactOptionsPanel.setVisibility(View.VISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void showContactOptionsRrF(){
-		log("showContactOptionsSRF---SentRequestFragment");
-		optionContactProperties.setVisibility(View.GONE);
-		optionContactShare.setVisibility(View.GONE);
-		optionContactSendFile.setVisibility(View.GONE);
-		optionContactRemove.setVisibility(View.GONE);
-		optionReinvite.setVisibility(View.GONE);
-		optionDeleteSentRequest.setVisibility(View.GONE);
-		optionAccept.setVisibility(View.VISIBLE);
-		optionDecline.setVisibility(View.VISIBLE);
-		optionIgnore.setVisibility(View.VISIBLE);
-
-		slidingContactOptionsPanel.setVisibility(View.VISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void showContactOptionsPanel(MegaUser user, MegaContactRequest request){
-		log("showNodeOptionsPanel");
-
+	public void showContactOptionsPanel(MegaUser user){
+		log("showContactOptionsPanel");
 		if(user!=null){
 			this.selectedUser = user;
-		}
-		if(request!=null){
-			this.selectedRequest = request;
-		}
-		int index = viewPagerContacts.getCurrentItem();
-		switch (index){
-			case 0:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					showContactOptionsCF();
-				}
-				break;
-			}
-			case 1:{
-				String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);
-				log("Tag: "+ sRFTag1);
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-				if (sRFLol != null){
-					showContactOptionsSrF();
-				}
-				break;
-			}
-			case 2:{
-				String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 2);
-				log("Tag: "+ sRFTag1);
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-				if (rRFLol != null){
-					showContactOptionsRrF();
-				}
-				break;
-			}
+			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
-	public void hideContactOptionsPanel(){
-		log("hideContactOptionsPanel");
+	public void showSentRequestOptionsPanel(MegaContactRequest request){
+		log("showSentRequestOptionsPanel");
+		if(request!=null){
+			this.selectedRequest = request;
+			SentRequestBottomSheetDialogFragment bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		}
+	}
 
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingContactOptionsPanel.setVisibility(View.GONE);
-		int index = viewPagerContacts.getCurrentItem();
-		switch (index){
-			case 0:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					cFLol.resetAdapter();
-				}
-				break;
-			}
-			case 1:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (sRFLol != null){
-					sRFLol.resetAdapter();
-				}
-				break;
-			}
-			case 2:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (rRFLol != null){
-					rRFLol.resetAdapter();
-				}
-				break;
-			}
+	public void showReceivedRequestOptionsPanel(MegaContactRequest request){
+		log("showReceivedRequestOptionsPanel");
+		if(request!=null){
+			this.selectedRequest = request;
+			ReceivedRequestBottomSheetDialogFragment bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
