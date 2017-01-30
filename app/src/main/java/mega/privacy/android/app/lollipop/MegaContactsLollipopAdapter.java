@@ -952,22 +952,22 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			
 			switch (v.getId()){			
 				case R.id.contact_list_three_dots:{
-					log("contact_list_three_dots");
-					if (positionClicked == -1){
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
-					else{
-						if (positionClicked == currentPosition){
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-						else{
-							positionClicked = currentPosition;
-							notifyDataSetChanged();
-						}
-					}
-					((ManagerActivityLollipop) context).showContactOptionsPanel(c, null);
+					log("click contact three dots!");
+//					if (positionClicked == -1){
+//						positionClicked = currentPosition;
+//						notifyDataSetChanged();
+//					}
+//					else{
+//						if (positionClicked == currentPosition){
+//							positionClicked = -1;
+//							notifyDataSetChanged();
+//						}
+//						else{
+//							positionClicked = currentPosition;
+//							notifyDataSetChanged();
+//						}
+//					}
+					((ManagerActivityLollipop) context).showContactOptionsPanel(c);
 					break;
 				}			
 				case R.id.contact_list_item_layout:{
@@ -1000,7 +1000,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 							notifyDataSetChanged();
 						}
 					}
-					((ManagerActivityLollipop) context).showContactOptionsPanel(c,null);
+					((ManagerActivityLollipop) context).showContactOptionsPanel(c);
 					break;
 				}			
 				case R.id.contact_grid_item_layout:{

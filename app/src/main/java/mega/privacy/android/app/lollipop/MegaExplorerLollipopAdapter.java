@@ -221,11 +221,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			if(selectFile)
 			{
 				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));	
+				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.itemView.setOnClickListener(holder);
 			}
 			else{
 				holder.imageView.setAlpha(.4f);
 				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.itemView.setOnClickListener(null);
 			}			
 			
 			long nodeSize = node.getSize();

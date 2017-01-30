@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.controllers;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -65,19 +64,23 @@ public class AccountController {
         this.megaApi = megaApi;
     }
 
-    public void deleteAccount(MyAccountFragmentLollipop mAF){
+    public void resetPass(String myEmail){
+        megaApi.resetPassword(myEmail, true, (ManagerActivityLollipop)context);
+    }
+
+    public void deleteAccount(){
         log("deleteAccount");
-        megaApi.cancelAccount(mAF);
+        megaApi.cancelAccount((ManagerActivityLollipop)context);
     }
 
-    public void confirmDeleteAccount(String link, String pass, MyAccountFragmentLollipop mAF){
+    public void confirmDeleteAccount(String link, String pass){
         log("confirmDeleteAccount");
-        megaApi.confirmCancelAccount(link, pass, mAF);
+        megaApi.confirmCancelAccount(link, pass, (ManagerActivityLollipop)context);
     }
 
-    public void confirmChangeMail(String link, String pass, MyAccountFragmentLollipop mAF){
+    public void confirmChangeMail(String link, String pass){
         log("confirmChangeMail");
-        megaApi.confirmChangeEmail(link, pass, mAF);
+        megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
     }
 
     public void takeProfilePicture(){
@@ -141,13 +144,7 @@ public class AccountController {
             }
         }
 
-        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-        if(mAF!=null){
-            megaApi.setAvatar(null, mAF);
-        }
-        else{
-            megaApi.setAvatar(null);
-        }
+        megaApi.setAvatar(null, (ManagerActivityLollipop)context);
     }
 
     public void exportMK(){
@@ -396,19 +393,19 @@ public class AccountController {
             log("Changes in first name");
             if(myAccountFragmentLollipop!=null){
                 count++;
-                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, myAccountFragmentLollipop);
+                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, (ManagerActivityLollipop)context);
             }
         }
         if(!oldLastName.equals(newLastName)){
             log("Changes in last name");
             if(myAccountFragmentLollipop!=null){
                 count++;
-                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, myAccountFragmentLollipop);
+                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, (ManagerActivityLollipop)context);
             }
         }
         if(!oldMail.equals(newMail)){
             log("Changes in mail, new mail: "+newMail);
-            megaApi.changeEmail(newMail, myAccountFragmentLollipop);
+            megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
         }
         log("The number of attributes to change is: "+count);
         return count;

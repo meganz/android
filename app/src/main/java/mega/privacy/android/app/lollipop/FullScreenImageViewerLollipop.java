@@ -26,7 +26,6 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +43,6 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -728,7 +726,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				menuOptions[0] = getString(R.string.context_rename);
 				menuOptions[1] = getString(R.string.context_move);
 				menuOptions[2] = getString(R.string.context_copy);
-				menuOptions[3] = getString(R.string.context_remove);
+				menuOptions[3] = getString(R.string.confirmation_move_to_rubbish);
 				overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 				arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
 				overflowMenuList.setAdapter(arrayAdapter);
@@ -1560,14 +1558,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
 			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();

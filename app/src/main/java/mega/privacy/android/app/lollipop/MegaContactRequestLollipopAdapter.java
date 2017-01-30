@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -434,21 +434,27 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		
 		switch (v.getId()){	
 			case R.id.contact_request_list_three_dots:{
-				if (positionClicked == -1){
-					positionClicked = currentPosition;
-					notifyDataSetChanged();
+//				if (positionClicked == -1){
+//					positionClicked = currentPosition;
+//					notifyDataSetChanged();
+//				}
+//				else{
+//					if (positionClicked == currentPosition){
+//						positionClicked = -1;
+//						notifyDataSetChanged();
+//					}
+//					else{
+//						positionClicked = currentPosition;
+//						notifyDataSetChanged();
+//					}
+//				}
+				if(type==Constants.OUTGOING_REQUEST_ADAPTER)
+				{
+					((ManagerActivityLollipop) context).showSentRequestOptionsPanel(c);
 				}
 				else{
-					if (positionClicked == currentPosition){
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-					else{
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
+					((ManagerActivityLollipop) context).showReceivedRequestOptionsPanel(c);
 				}
-				((ManagerActivityLollipop) context).showContactOptionsPanel(null, c);
 				break;
 			}
 			case R.id.contact_request_list_item_layout:{

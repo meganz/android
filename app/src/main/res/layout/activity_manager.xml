@@ -237,13 +237,6 @@
     <include
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        layout="@layout/sliding_contact_options_panel"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true"/>
-
-    <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         layout="@layout/sliding_avatar_options_panel"
         android:visibility="gone"
         android:layout_alignParentBottom="true"/>
