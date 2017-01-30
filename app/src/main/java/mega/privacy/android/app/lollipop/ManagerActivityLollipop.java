@@ -249,6 +249,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int selectedAccountType;
 	int displayedAccountType;
 
+	int countUserAttributes=0;
+	int errorUserAttibutes=0;
+
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
     public enum DrawerItem {
@@ -1927,6 +1930,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_ALERT)){
 	    			showOverquotaAlert();
 	    		}
+				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
+					log("Intent CHANGE AVATAR");
+					String path = intent.getStringExtra("IMAGE_PATH");
+					log("Path of the avatar: "+path);
+					megaApi.setAvatar(path, this);
+				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
@@ -1986,16 +1995,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				log("Intent take selfie");
     				takePicture();
     			}
-				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
-					log("Intent CHANGE AVATAR");
-					String path = intent.getStringExtra("IMAGE_PATH");
-					log("Path of the avatar: "+path);
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-					if(maFLol!=null){
-						megaApi.setAvatar(path, maFLol);
-					}
-				}
 				else if (intent.getAction().equals(Constants.SHOW_REPEATED_UPLOAD)){
 					log("Intent SHOW_REPEATED_UPLOAD");
 					String message = intent.getStringExtra("MESSAGE");
@@ -2328,12 +2327,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						int countAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
-						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-						if(maFLol!=null){
-							maFLol.setCountUserAttributes(countAttributes);
-						}
+						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
 						changeUserAttributeDialog.dismiss();
 					}
 				}
@@ -2383,12 +2377,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else {
 					log("positive button pressed - change user attribute");
-					int countAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-					if(maFLol!=null){
-						maFLol.setCountUserAttributes(countAttributes);
-					}
+					countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
 					changeUserAttributeDialog.dismiss();
 				}
 			}
@@ -7287,7 +7276,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else {
 							log("action DONE ime - cancel account");
-							aC.confirmDeleteAccount(confirmationLink, pass, maFLol);
+							aC.confirmDeleteAccount(confirmationLink, pass);
 							insertPassDialog.dismiss();
 						}
 					}
@@ -7321,7 +7310,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else {
 							log("action DONE ime - change mail");
-							aC.confirmChangeMail(confirmationLink, pass, maFLol);
+							aC.confirmChangeMail(confirmationLink, pass);
 							insertPassDialog.dismiss();
 						}
 					}
@@ -7369,7 +7358,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - cancel account");
-						aC.confirmDeleteAccount(confirmationLink, pass, maFLol);
+						aC.confirmDeleteAccount(confirmationLink, pass);
 						insertPassDialog.dismiss();
 					}
 				}
@@ -7388,7 +7377,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - change mail");
-						aC.confirmChangeMail(confirmationLink, pass, maFLol);
+						aC.confirmChangeMail(confirmationLink, pass);
 						insertPassDialog.dismiss();
 					}
 				}
@@ -7405,7 +7394,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						aC.deleteAccount(maFLol);
+						aC.deleteAccount();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -10233,7 +10222,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
 								maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
 								if(maFLol!=null){
-									megaApi.setAvatar(newFile.getAbsolutePath(), maFLol);
+									megaApi.setAvatar(newFile.getAbsolutePath(), this);
 								}
 
 							}
@@ -10320,6 +10309,174 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					ManagerActivityLollipop.logout(managerActivity, app, megaApi, false);
 //				}
 //			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
+			log("TYPE_SET_ATTR_USER");
+			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+				log("(1)request.getText(): "+request.getText());
+				countUserAttributes--;
+				myAccountInfo.setFirstNameText(request.getText());
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("The first name has changed");
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null){
+						if(maFLol.isAdded()){
+							maFLol.updateNameView(myAccountInfo.getFullName());
+						}
+					}
+					updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+				}
+				else{
+					log("Error with first name");
+					errorUserAttibutes++;
+				}
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+				log("(2)request.getText(): "+request.getText());
+				countUserAttributes--;
+				myAccountInfo.setLastNameText(request.getText());
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("The last name has changed");
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null){
+						if(maFLol.isAdded()){
+							maFLol.updateNameView(myAccountInfo.getFullName());
+						}
+					}
+					updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+				}
+				else{
+					log("Error with last name");
+					errorUserAttibutes++;
+				}
+			}
+			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
+
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("Avatar changed!!");
+					if(request.getFile()!=null){
+						log("old path: "+request.getFile());
+						File oldFile = new File(request.getFile());
+						if(oldFile!=null){
+							if(oldFile.exists()){
+								String newPath = null;
+								if (getExternalCacheDir() != null){
+									newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								}
+								else{
+									log("getExternalCacheDir() is NULL");
+									newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								}
+								File newFile = new File(newPath);
+								oldFile.renameTo(newFile);
+							}
+						}
+					}
+					setProfileAvatar();
+
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null){
+						if(maFLol.isAdded()){
+							maFLol.updateAvatar(false);
+						}
+					}
+				}
+				else{
+					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
+				}
+			}
+
+			if(countUserAttributes==0){
+				if(errorUserAttibutes==0){
+					log("All user attributes changed!");
+					showSnackbar(getString(R.string.success_changing_user_attributes));
+				}
+				else{
+					log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
+					showSnackbar(getString(R.string.error_changing_user_attributes));
+				}
+				AccountController aC = new AccountController(this);
+				errorUserAttibutes=0;
+				aC.setCount(0);
+			}
+		}
+		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
+			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The change link has been sent");
+				Util.showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				log("The new mail already exists");
+				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else{
+				log("Error when asking for change mail link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
+			log("TYPE_GET_RECOVERY_LINK");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The recovery link has been sent");
+				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else if (e.getErrorCode() == MegaError.API_ENOENT){
+				log("No account with this mail");
+				Util.showAlert(this, getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
+			}
+			else{
+				log("Error when asking for recovery pass link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
+			log("TYPE_GET_CANCEL_LINK request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The cancel link has been sent");
+				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else{
+				log("ERROR when asking for link to cancel account");
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
+			log("TYPE_CONFIRM_CANCEL_LINK request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The account has been canceled");
+				AccountController aC = new AccountController(this);
+				aC.logout(this, megaApi, false);
+			}
+			else{
+				log("ERROR when cancelling account: "+e.getErrorString());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
+			log("TYPE_CONFIRM_CHANGE_EMAIL_LINK request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The mail has been changed");
+				myAccountInfo.setMyUser(megaApi.getMyUser());
+				String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+				if(maFLol!=null){
+					if(maFLol.isAdded()){
+						maFLol.updateMailView(request.getEmail());
+					}
+				}
+				updateMailNavigationView(request.getEmail());
+				Util.showAlert(this, getString(R.string.success_changing_user_mail), getString(R.string.change_mail_title_last_step));
+			}
+			else{
+				log("ERROR when changing email: "+e.getErrorString()+ " "+e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
 			log("TYPE_GET_RECOVERY_LINK");

@@ -40,20 +40,13 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface{
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener{
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
-
-	public static int MY_ACCOUNT_FRAGMENT = 5000;
-	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
-	public static int PAYMENT_FRAGMENT = 5002;
 
 	Context context;
 	ActionBar aB;
@@ -70,9 +63,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	String myEmail;
 	MegaUser myUser;
 
-	int countUserAttributes=0;
-	int errorUserAttibutes=0;
-	
 	TextView typeAccount;
 	TextView infoEmail;
 	TextView usedSpace;
@@ -118,14 +108,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		super.onCreate(savedInstanceState);
 	}
 	
-	public void onDestroy()
-	{
-		if(megaApi != null)
-		{	
-			megaApi.removeRequestListener(this);
-		}
-		super.onDestroy();
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -368,7 +350,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi.getUserAttribute(myUser, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
 		}
 
-		this.updateAvatar(myUser.getEmail(), true);
+		this.updateAvatar(true);
 
 		if(mKLayoutVisible){
 			log("on Create MK visible");
@@ -703,7 +685,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			nameView.setText(fullName);
 		}
 
-		updateAvatar(myEmail, false);
+		updateAvatar(false);
 	}
 
 	public void updateMailView(String newMail){
@@ -729,179 +711,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
-
-		if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-			log("TYPE_SET_ATTR_USER");
-			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-				log("(1)request.getText(): "+request.getText());
-                countUserAttributes--;
-				myAccountInfo.setFirstNameText(request.getText());
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("The first name has changed");
-					updateNameView(myAccountInfo.getFullName());
-					((ManagerActivityLollipop) context).updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
-				}
-				else{
-					log("Error with first name");
-					errorUserAttibutes++;
-				}
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-				log("(2)request.getText(): "+request.getText());
-                countUserAttributes--;
-				myAccountInfo.setLastNameText(request.getText());
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("The last name has changed");
-					updateNameView(myAccountInfo.getFullName());
-					((ManagerActivityLollipop) context).updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
-				}
-				else{
-					log("Error with last name");
-					errorUserAttibutes++;
-				}
-			}
-			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
-				if(context==null){
-					log("Context is NULL");
-					return;
-				}
-
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("Avatar changed!!");
-					if(request.getFile()!=null){
-						log("old path: "+request.getFile());
-						File oldFile = new File(request.getFile());
-						if(oldFile!=null){
-							if(oldFile.exists()){
-								String newPath = null;
-								if (context.getExternalCacheDir() != null){
-									newPath = context.getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
-								}
-								else{
-									log("getExternalCacheDir() is NULL");
-									newPath = context.getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
-								}
-								File newFile = new File(newPath);
-								oldFile.renameTo(newFile);
-							}
-						}
-					}
-					((ManagerActivityLollipop) context).setProfileAvatar();
-
-					updateAvatar(myUser.getEmail(), false);
-				}
-				else{
-					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
-				}
-			}
-
-			if(countUserAttributes==0){
-				if(errorUserAttibutes==0){
-					log("All user attributes changed!");
-					((ManagerActivityLollipop) context).showSnackbar(getString(R.string.success_changing_user_attributes));
-				}
-				else{
-					log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
-					((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_changing_user_attributes));
-				}
-				AccountController aC = new AccountController(context);
-				errorUserAttibutes=0;
-				aC.setCount(0);
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
-			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("The change link has been sent");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
-			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST){
-				log("The new mail already exists");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.mail_already_used), getString(R.string.email_verification_title));
-			}
-			else{
-				log("Error when asking for change mail link");
-				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
-			log("TYPE_GET_RECOVERY_LINK");
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("The recovery link has been sent");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text), getString(R.string.email_verification_title));
-			}
-			else if (e.getErrorCode() == MegaError.API_ENOENT){
-				log("No account with this mail");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.invalid_email_text), getString(R.string.invalid_email_title));
-			}
-			else{
-				log("Error when asking for recovery pass link");
-				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
-			log("TYPE_GET_CANCEL_LINK request");
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("The cancel link has been sent");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text), getString(R.string.email_verification_title));
-			}
-			else{
-				log("ERROR when asking for link to cancel account");
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
-			log("TYPE_CONFIRM_CANCEL_LINK request");
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("The account has been canceled");
-				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, false);
-			}
-			else{
-				log("ERROR when cancelling account: "+e.getErrorString());
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
-			log("TYPE_CONFIRM_CHANGE_EMAIL_LINK request");
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("The mail has been changed");
-				myAccountInfo.setMyUser(megaApi.getMyUser());
-				updateMailView(request.getEmail());
-				((ManagerActivityLollipop) context).updateMailNavigationView(request.getEmail());
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.success_changing_user_mail), getString(R.string.change_mail_title_last_step));
-			}
-			else{
-				log("ERROR when changing email: "+e.getErrorString()+ " "+e.getErrorCode());
-				Util.showAlert(((ManagerActivityLollipop) context), getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestTemporaryError");
-	}
-
 	public static void log(String log) {
 		Util.log("MyAccountFragmentLollipop", log);
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void showMKLayout(){
@@ -912,7 +723,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public void resetPass(){
-		megaApi.resetPassword(myEmail, true, this);
+		AccountController aC = new AccountController(context);
+		aC.resetPass(myEmail);
 	}
 
 	public void hideMKLayout(){
@@ -923,10 +735,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		((ManagerActivityLollipop)context).hideMKLayout();
 	}
 
-	public void updateAvatar(String contactEmail, boolean retry){
-		log("updateAvatar: "+contactEmail);
+	public void updateAvatar(boolean retry){
+		log("updateAvatar");
 		File avatar = null;
-
+		String contactEmail = myUser.getEmail();
 		if(context!=null){
 			log("context is not null");
 
@@ -1050,16 +862,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 	}
-
-	public int getCountUserAttributes() {
-		return countUserAttributes;
-	}
-
-	public void setCountUserAttributes(int countUserAttributes) {
-		log("setCountUserAttributes: "+countUserAttributes);
-		this.countUserAttributes = countUserAttributes;
-	}
-
 
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
