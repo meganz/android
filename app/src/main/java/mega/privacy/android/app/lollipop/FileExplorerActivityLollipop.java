@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -36,24 +34,19 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
@@ -396,7 +389,38 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				tabShown=NO_TABS;
 
-			}else{
+			}
+			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
+				log("action = ACTION_SELECT_FILE");
+				//Just show Cloud Drive, no need of tabhost
+
+				mode = SELECT;
+				selectFile = true;
+				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
+
+				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+
+				if(cDriveExplorer==null){
+					cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
+				}
+
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
+				ft.commitNow();
+
+				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+
+				if(fileExplorerSectionLayout!=null){
+					fileExplorerSectionLayout.setVisibility(View.GONE);
+				}
+				else{
+					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
+					fileExplorerSectionLayout.setVisibility(View.GONE);
+				}
+
+				tabShown=NO_TABS;
+			}
+			else{
 
 				if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
 					log("ACTION_PICK_MOVE_FOLDER");
@@ -489,21 +513,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					}
 
-				}
-				else if (intent.getAction().equals(ACTION_SELECT_FILE)){
-					log("action = ACTION_SELECT_FILE");
-					mode = SELECT;
-					selectFile = true;
-					selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
-
-					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
-						viewPagerExplorer.setVisibility(View.VISIBLE);
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
-						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
-						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
-					}
 				}
 				else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
 					log("action = ACTION_UPLOAD_SELFIE");

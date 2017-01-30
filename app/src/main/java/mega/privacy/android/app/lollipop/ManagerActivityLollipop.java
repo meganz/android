@@ -124,7 +124,6 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
-import mega.privacy.android.app.lollipop.listeners.ContactOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
@@ -135,6 +134,9 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -247,22 +249,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private NodeOptionsPanelListener nodeOptionsPanelListener;
 	////
 
-	//Sliding CONTACT OPTIONS PANEL
-	private SlidingUpPanelLayout slidingContactOptionsPanel;
-	public FrameLayout optionsContactOutLayout;
-	public LinearLayout optionsContactLayout;
-	public LinearLayout optionContactProperties;
-	public LinearLayout optionContactSendFile;
-	public LinearLayout optionContactShare;
-	public LinearLayout optionContactRemove;
-	private ContactOptionsPanelListener contactOptionsPanelListener;
-	public LinearLayout optionReinvite;
-	public LinearLayout optionDeleteSentRequest;
-	public LinearLayout optionAccept;
-	public LinearLayout optionDecline;
-	public LinearLayout optionIgnore;
-	////
-
 	//Sliding AVATAR OPTIONS PANEL
 	private SlidingUpPanelLayout slidingAvatarOptionsPanel;
 	public FrameLayout optionsAvatarOutLayout;
@@ -303,6 +289,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int selectedPaymentMethod;
 	int selectedAccountType;
 	int displayedAccountType;
+
+	int countUserAttributes=0;
+	int errorUserAttibutes=0;
 
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
@@ -1427,37 +1416,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		////
 
-		//Sliding CONTACTS OPTIONS panel
-		slidingContactOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_contacts_list);
-		optionsContactLayout = (LinearLayout) findViewById(R.id.contact_list_options);
-		optionsContactOutLayout = (FrameLayout) findViewById(R.id.contact_list_out_options);
-		optionContactProperties = (LinearLayout) findViewById(R.id.contact_list_option_properties_layout);
-		optionContactShare = (LinearLayout) findViewById(R.id.contact_list_option_share_layout);
-		optionContactSendFile = (LinearLayout) findViewById(R.id.contact_list_option_send_file_layout);
-		optionContactRemove = (LinearLayout) findViewById(R.id.contact_list_option_remove_layout);
-		optionReinvite = (LinearLayout) findViewById(R.id.contact_list_option_reinvite_layout);
-		optionDeleteSentRequest = (LinearLayout) findViewById(R.id.contact_list_option_delete_request_layout);
-		optionAccept = (LinearLayout) findViewById(R.id.contact_list_option_accept_layout);
-		optionDecline = (LinearLayout) findViewById(R.id.contact_list_option_decline_layout);
-		optionIgnore = (LinearLayout) findViewById(R.id.contact_list_option_ignore_layout);
-
-		contactOptionsPanelListener = new ContactOptionsPanelListener(this);
-
-		optionContactRemove.setOnClickListener(contactOptionsPanelListener);
-		optionContactShare.setOnClickListener(contactOptionsPanelListener);
-		optionContactProperties.setOnClickListener(contactOptionsPanelListener);
-		optionContactSendFile.setOnClickListener(contactOptionsPanelListener);
-		optionsContactOutLayout.setOnClickListener(contactOptionsPanelListener);
-		optionReinvite.setOnClickListener(contactOptionsPanelListener);
-		optionDeleteSentRequest.setOnClickListener(contactOptionsPanelListener);
-		optionAccept.setOnClickListener(contactOptionsPanelListener);
-		optionDecline.setOnClickListener(contactOptionsPanelListener);
-		optionIgnore.setOnClickListener(contactOptionsPanelListener);
-
-		slidingContactOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		////
-
 		//Sliding AVATAR OPTIONS panel
 		slidingAvatarOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_avatar_list);
 		optionsAvatarLayout = (LinearLayout) findViewById(R.id.avatar_list_options);
@@ -2137,6 +2095,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_ALERT)){
 	    			showOverquotaAlert();
 	    		}
+				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
+					log("Intent CHANGE AVATAR");
+					String path = intent.getStringExtra("IMAGE_PATH");
+					log("Path of the avatar: "+path);
+					megaApi.setAvatar(path, this);
+				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
@@ -2196,16 +2160,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				log("Intent take selfie");
     				takePicture();
     			}
-				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
-					log("Intent CHANGE AVATAR");
-					String path = intent.getStringExtra("IMAGE_PATH");
-					log("Path of the avatar: "+path);
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-					if(maFLol!=null){
-						megaApi.setAvatar(path, maFLol);
-					}
+				else if (intent.getAction().equals(Constants.SHOW_REPEATED_UPLOAD)){
+					log("Intent SHOW_REPEATED_UPLOAD");
+					String message = intent.getStringExtra("MESSAGE");
+					showSnackbar(message);
 				}
+
     			intent.setAction(null);
 				setIntent(null);
     		}
@@ -2650,12 +2610,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						int countAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
-						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-						if(maFLol!=null){
-							maFLol.setCountUserAttributes(countAttributes);
-						}
+						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
 						changeUserAttributeDialog.dismiss();
 					}
 				}
@@ -2705,12 +2660,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else {
 					log("positive button pressed - change user attribute");
-					int countAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-					if(maFLol!=null){
-						maFLol.setCountUserAttributes(countAttributes);
-					}
+					countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
 					changeUserAttributeDialog.dismiss();
 				}
 			}
@@ -6835,14 +6785,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		log("Sliding Node OPTIONs not shown");
 
-		if(slidingContactOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingContactOptionsPanel.getVisibility()==View.VISIBLE){
-			log("slidingContactOptionsPanel()!=PanelState.HIDDEN");
-			hideContactOptionsPanel();
-			return;
-		}
-
-		log("Sliding CONTACT options not shown");
-
 		if(slidingAvatarOptionsPanel.getVisibility()==View.VISIBLE||slidingAvatarOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
 			hideAvatarOptionsPanel();
 			return;
@@ -7909,7 +7851,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else {
 							log("action DONE ime - cancel account");
-							aC.confirmDeleteAccount(confirmationLink, pass, maFLol);
+							aC.confirmDeleteAccount(confirmationLink, pass);
 							insertPassDialog.dismiss();
 						}
 					}
@@ -7943,7 +7885,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else {
 							log("action DONE ime - change mail");
-							aC.confirmChangeMail(confirmationLink, pass, maFLol);
+							aC.confirmChangeMail(confirmationLink, pass);
 							insertPassDialog.dismiss();
 						}
 					}
@@ -7991,7 +7933,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - cancel account");
-						aC.confirmDeleteAccount(confirmationLink, pass, maFLol);
+						aC.confirmDeleteAccount(confirmationLink, pass);
 						insertPassDialog.dismiss();
 					}
 				}
@@ -8010,7 +7952,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else {
 						log("positive button pressed - change mail");
-						aC.confirmChangeMail(confirmationLink, pass, maFLol);
+						aC.confirmChangeMail(confirmationLink, pass);
 						insertPassDialog.dismiss();
 					}
 				}
@@ -8027,7 +7969,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						aC.deleteAccount(maFLol);
+						aC.deleteAccount();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -9588,125 +9530,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("Show the slidingPanel offline");
 	}
 
-	public void showContactOptionsCF(){
-		log("showContactOptionsCF---ContactsFragment");
-		optionContactProperties.setVisibility(View.VISIBLE);
-		optionContactShare.setVisibility(View.VISIBLE);
-		optionContactSendFile.setVisibility(View.VISIBLE);
-		optionContactRemove.setVisibility(View.VISIBLE);
-		optionReinvite.setVisibility(View.GONE);
-		optionDeleteSentRequest.setVisibility(View.GONE);
-		optionAccept.setVisibility(View.GONE);
-		optionDecline.setVisibility(View.GONE);
-		optionIgnore.setVisibility(View.GONE);
-
-		slidingContactOptionsPanel.setVisibility(View.VISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void showContactOptionsSrF(){
-		log("showContactOptionsSRF---SentRequestFragment");
-		optionContactProperties.setVisibility(View.GONE);
-		optionContactShare.setVisibility(View.GONE);
-		optionContactSendFile.setVisibility(View.GONE);
-		optionContactRemove.setVisibility(View.GONE);
-		optionReinvite.setVisibility(View.VISIBLE);
-		optionDeleteSentRequest.setVisibility(View.VISIBLE);
-		optionAccept.setVisibility(View.INVISIBLE);
-		optionDecline.setVisibility(View.GONE);
-		optionIgnore.setVisibility(View.GONE);
-
-		slidingContactOptionsPanel.setVisibility(View.VISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void showContactOptionsRrF(){
-		log("showContactOptionsSRF---SentRequestFragment");
-		optionContactProperties.setVisibility(View.GONE);
-		optionContactShare.setVisibility(View.GONE);
-		optionContactSendFile.setVisibility(View.GONE);
-		optionContactRemove.setVisibility(View.GONE);
-		optionReinvite.setVisibility(View.GONE);
-		optionDeleteSentRequest.setVisibility(View.GONE);
-		optionAccept.setVisibility(View.VISIBLE);
-		optionDecline.setVisibility(View.VISIBLE);
-		optionIgnore.setVisibility(View.VISIBLE);
-
-		slidingContactOptionsPanel.setVisibility(View.VISIBLE);
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void showContactOptionsPanel(MegaUser user, MegaContactRequest request){
-		log("showNodeOptionsPanel");
-
+	public void showContactOptionsPanel(MegaUser user){
+		log("showContactOptionsPanel");
 		if(user!=null){
 			this.selectedUser = user;
-		}
-		if(request!=null){
-			this.selectedRequest = request;
-		}
-		int index = viewPagerContacts.getCurrentItem();
-		switch (index){
-			case 0:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					showContactOptionsCF();
-				}
-				break;
-			}
-			case 1:{
-				String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);
-				log("Tag: "+ sRFTag1);
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-				if (sRFLol != null){
-					showContactOptionsSrF();
-				}
-				break;
-			}
-			case 2:{
-				String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 2);
-				log("Tag: "+ sRFTag1);
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-				if (rRFLol != null){
-					showContactOptionsRrF();
-				}
-				break;
-			}
+			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
-	public void hideContactOptionsPanel(){
-		log("hideContactOptionsPanel");
+	public void showSentRequestOptionsPanel(MegaContactRequest request){
+		log("showSentRequestOptionsPanel");
+		if(request!=null){
+			this.selectedRequest = request;
+			SentRequestBottomSheetDialogFragment bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		}
+	}
 
-		slidingContactOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingContactOptionsPanel.setVisibility(View.GONE);
-		int index = viewPagerContacts.getCurrentItem();
-		switch (index){
-			case 0:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					cFLol.resetAdapter();
-				}
-				break;
-			}
-			case 1:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (sRFLol != null){
-					sRFLol.resetAdapter();
-				}
-				break;
-			}
-			case 2:{
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (rRFLol != null){
-					rRFLol.resetAdapter();
-				}
-				break;
-			}
+	public void showReceivedRequestOptionsPanel(MegaContactRequest request){
+		log("showReceivedRequestOptionsPanel");
+		if(request!=null){
+			this.selectedRequest = request;
+			ReceivedRequestBottomSheetDialogFragment bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
@@ -11221,7 +11068,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
 								maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
 								if(maFLol!=null){
-									megaApi.setAvatar(newFile.getAbsolutePath(), maFLol);
+									megaApi.setAvatar(newFile.getAbsolutePath(), this);
 								}
 
 							}
@@ -11494,6 +11341,115 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					ManagerActivityLollipop.logout(managerActivity, app, megaApi, false);
 //				}
 //			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
+			log("TYPE_SET_ATTR_USER");
+			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+				log("(1)request.getText(): "+request.getText());
+				countUserAttributes--;
+				myAccountInfo.setFirstNameText(request.getText());
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("The first name has changed");
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null){
+						if(maFLol.isAdded()){
+							maFLol.updateNameView(myAccountInfo.getFullName());
+						}
+					}
+					updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+				}
+				else{
+					log("Error with first name");
+					errorUserAttibutes++;
+				}
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+				log("(2)request.getText(): "+request.getText());
+				countUserAttributes--;
+				myAccountInfo.setLastNameText(request.getText());
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("The last name has changed");
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null){
+						if(maFLol.isAdded()){
+							maFLol.updateNameView(myAccountInfo.getFullName());
+						}
+					}
+					updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+				}
+				else{
+					log("Error with last name");
+					errorUserAttibutes++;
+				}
+			}
+			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
+
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("Avatar changed!!");
+					if(request.getFile()!=null){
+						log("old path: "+request.getFile());
+						File oldFile = new File(request.getFile());
+						if(oldFile!=null){
+							if(oldFile.exists()){
+								String newPath = null;
+								if (getExternalCacheDir() != null){
+									newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								}
+								else{
+									log("getExternalCacheDir() is NULL");
+									newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+								}
+								File newFile = new File(newPath);
+								oldFile.renameTo(newFile);
+							}
+						}
+					}
+					setProfileAvatar();
+
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null){
+						if(maFLol.isAdded()){
+							maFLol.updateAvatar(false);
+						}
+					}
+				}
+				else{
+					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
+				}
+			}
+
+			if(countUserAttributes==0){
+				if(errorUserAttibutes==0){
+					log("All user attributes changed!");
+					showSnackbar(getString(R.string.success_changing_user_attributes));
+				}
+				else{
+					log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
+					showSnackbar(getString(R.string.error_changing_user_attributes));
+				}
+				AccountController aC = new AccountController(this);
+				errorUserAttibutes=0;
+				aC.setCount(0);
+			}
+		}
+		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
+			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("The change link has been sent");
+				Util.showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				log("The new mail already exists");
+				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else{
+				log("Error when asking for change mail link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
 			log("TYPE_GET_RECOVERY_LINK");
