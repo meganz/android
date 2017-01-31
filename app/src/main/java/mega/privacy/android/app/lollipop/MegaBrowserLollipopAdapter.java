@@ -1073,19 +1073,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			case R.id.file_grid_three_dots:{	
 				
 				log("onClick: file_list_three_dots: "+currentPosition);			
-	
-				if (positionClicked == -1) {
-					positionClicked = currentPosition;
-					notifyDataSetChanged();
-				} else {
-					if (positionClicked == currentPosition) {
-						positionClicked = -1;
-						notifyDataSetChanged();
-					} else {
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
-				}
+
 				if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
 				}

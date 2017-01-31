@@ -75,7 +75,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         display.getMetrics(outMetrics);
 
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.sent_request_bottom_sheet, null);
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_sent_request, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.sent_request_item_bottom_sheet);
 
