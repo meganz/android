@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -25,6 +26,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.provider.DocumentFile;
 import android.text.format.Formatter;
 import android.text.format.Time;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import java.io.File;
@@ -41,6 +43,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -48,6 +51,12 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -59,7 +68,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface{
+public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static String PHOTO_SYNC = "PhotoSync";
 	public static String CAMERA_UPLOADS = "Camera Uploads";
@@ -79,8 +88,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private NotificationManager mNotificationManager;
 
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	MegaApplication app;
 	DatabaseHandler dbH;
+	ChatSettings chatSettings;
 
 	static public boolean running = false;
 	private boolean canceled;
@@ -120,6 +131,91 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	boolean stopped = false;
 
 	MediaObserver mediaObserver;
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Connected to chat!");
+				chatSettings = dbH.getChatSettings();
+				if(chatSettings!=null){
+					String status = chatSettings.getChatStatus();
+					if(status!=null){
+						try{
+							if(!status.isEmpty()){
+								int statusInt = Integer.parseInt(status);
+								log("Set online status: "+statusInt);
+								megaChatApi.setOnlineStatus(statusInt, this);
+							}
+							else{
+								megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+							}
+						}
+						catch(NumberFormatException nfe){
+							megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+							dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+						}
+					}
+					else{
+						megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+						dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+					}
+				}
+				else{
+					log("Chat settings is NULL - setOnlineStatus ONLINE");
+					megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+				}
+			}
+			else{
+				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+//				showSnackbar(getString(R.string.chat_connection_error));
+				retryLaterShortTime();
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Status changed to: "+request.getNumber());
+//                int status = (int) request.getNumber();
+//                switch(status){
+//                    case MegaChatApi.STATUS_ONLINE:{
+//                        showSnackbar(getString(R.string.changing_status_to_online_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+//                        break;
+//                    }
+//                    case MegaChatApi.STATUS_AWAY:{
+//                        showSnackbar(getString(R.string.changing_status_to_invisible_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_AWAY+"");
+//                        break;
+//                    }
+//                    case MegaChatApi.STATUS_OFFLINE:{
+//                        showSnackbar(getString(R.string.changing_status_to_offline_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_OFFLINE+"");
+//                        break;
+//                    }
+//                }
+				retryLaterShortTime();
+			}
+			else{
+				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
+				retryLaterShortTime();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+	}
 
 	private class Media {
 		public String filePath;
@@ -286,6 +382,35 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					if (megaApi.getRootNode() == null){
 						log("RootNode = null");
 						running = true;
+
+						if(Util.isChatEnabled()){
+							if (megaChatApi == null){
+								megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+							}
+							int ret = megaChatApi.init(gSession);
+							chatSettings = dbH.getChatSettings();
+							if (ret == MegaChatApi.INIT_NO_CACHE)
+							{
+								megaApi.invalidateCache();
+
+							}
+							else if (ret == MegaChatApi.INIT_ERROR)
+							{
+								// chat cannot initialize, disable chat completely
+								if(chatSettings==null) {
+									chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
+									dbH.setChatSettings(chatSettings);
+								}
+								else{
+									dbH.setEnabledChat(false + "");
+								}
+								megaChatApi.logout(this);
+							}
+							else{
+								log("Chat correctly initialized");
+							}
+						}
+
 						isLoggingIn = MegaApplication.isLoggingIn();
 						if (!isLoggingIn){
 							isLoggingIn  = true;
@@ -1978,7 +2103,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			if (e.getErrorCode() == MegaError.API_OK){
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
-				retryLaterShortTime();
+
+				chatSettings = dbH.getChatSettings();
+				if(chatSettings!=null) {
+					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+					if(chatEnabled){
+						log("Chat enabled-->connect");
+						megaChatApi.connect(this);
+					}
+					else{
+						log("Chat NOT enabled - readyToManager");
+						retryLaterShortTime();
+					}
+				}
+				else{
+					log("chatSettings NULL - readyToManager");
+					retryLaterShortTime();
+				}
 			}
 			else{
 				log("ERROR: " + e.getErrorString());
