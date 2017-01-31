@@ -72,6 +72,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.MySwitch;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -79,6 +80,12 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -91,7 +98,7 @@ import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi") 
-public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
+public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface {
 	
 //	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 //	
@@ -167,8 +174,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	String SD_CACHE_PATH = "/Android/data/mega.privacy.android.app/cache/files";
 
 	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
 	MegaApplication app;
 //	private int mode;
+
+	ChatSettings chatSettings;
 
 	private boolean folderSelected = false;
 
@@ -295,6 +305,36 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if(serversBusyText!=null){
 					serversBusyText.setVisibility(View.GONE);
 				}
+
+				if(Util.isChatEnabled()){
+					if (megaChatApi == null){
+						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+					}
+					int ret = megaChatApi.init(gSession);
+					chatSettings = dbH.getChatSettings();
+					if (ret == MegaChatApi.INIT_NO_CACHE)
+					{
+						megaApi.invalidateCache();
+
+					}
+					else if (ret == MegaChatApi.INIT_ERROR)
+					{
+						// chat cannot initialize, disable chat completely
+						if(chatSettings==null) {
+							chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
+							dbH.setChatSettings(chatSettings);
+						}
+						else{
+							dbH.setEnabledChat(false + "");
+						}
+						megaChatApi.logout(this);
+					}
+					else{
+						log("Chat correctly initialized");
+					}
+				}
+
+
 				if (!MegaApplication.isLoggingIn()){
 					MegaApplication.setLoggingIn(true);
 					megaApi.fastLogin(gSession, this);
@@ -842,7 +882,93 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 		new HashTask().execute(lastEmail, lastPassword);
 	}
-	
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Connected to chat!");
+				chatSettings = dbH.getChatSettings();
+				if(chatSettings!=null){
+					String status = chatSettings.getChatStatus();
+					if(status!=null){
+						try{
+							if(!status.isEmpty()){
+								int statusInt = Integer.parseInt(status);
+								log("Set online status: "+statusInt);
+								megaChatApi.setOnlineStatus(statusInt, this);
+							}
+							else{
+								megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+							}
+						}
+						catch(NumberFormatException nfe){
+							megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+							dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+						}
+					}
+					else{
+						megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+						dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+					}
+				}
+				else{
+					log("Chat settings is NULL - setOnlineStatus ONLINE");
+					megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this);
+				}
+			}
+			else{
+				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+//				showSnackbar(getString(R.string.chat_connection_error));
+				afterFetchNodes();
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Status changed to: "+request.getNumber());
+//                int status = (int) request.getNumber();
+//                switch(status){
+//                    case MegaChatApi.STATUS_ONLINE:{
+//                        showSnackbar(getString(R.string.changing_status_to_online_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
+//                        break;
+//                    }
+//                    case MegaChatApi.STATUS_AWAY:{
+//                        showSnackbar(getString(R.string.changing_status_to_invisible_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_AWAY+"");
+//                        break;
+//                    }
+//                    case MegaChatApi.STATUS_OFFLINE:{
+//                        showSnackbar(getString(R.string.changing_status_to_offline_success));
+//                        dbH.setStatusChat(MegaChatApi.STATUS_OFFLINE+"");
+//                        break;
+//                    }
+//                }
+				afterFetchNodes();
+			}
+			else{
+				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
+				afterFetchNodes();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+	}
+
 	/*
 	 * Task to process email and password
 	 */
@@ -1078,89 +1204,109 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
-				//Set toolbar
-				tB = (Toolbar) findViewById(R.id.toolbar_provider);
-
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
-				params.setMargins(0, getStatusBarHeight(), 0, 0);
-
-				setSupportActionBar(tB);
-				aB = getSupportActionBar();
-				aB.setDisplayHomeAsUpEnabled(true);
-				aB.setDisplayShowHomeEnabled(true);
-
-				Display display = getWindowManager().getDefaultDisplay();
-
-				DisplayMetrics metrics = new DisplayMetrics();
-				display.getMetrics(metrics);
-
-				optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
-
-				cancelText = (TextView) findViewById(R.id.cancel_text);
-				cancelText.setOnClickListener(this);
-				cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-				//Left and Right margin
-				LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-				cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
-				cancelText.setLayoutParams(cancelTextParams);
-				//TABS section
-				providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
-				tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
-				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);
-
-				//Create tabs
-				providerSectionLayout.setVisibility(View.VISIBLE);
-
-				if (mTabsAdapterProvider == null){
-					mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
-					viewPagerProvider.setAdapter(mTabsAdapterProvider);
-					tabLayoutProvider.setupWithViewPager(viewPagerProvider);
-				}
-
-				viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-					public void onPageScrollStateChanged(int state) {}
-					public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-
-					public void onPageSelected(int position) {
-						log("onTabChanged TabId :"+ position);
-						if(position == 0){
-							tabShown=CLOUD_TAB;
-							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-							gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
-							cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(cDriveProviderLol!=null){
-								if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
-									aB.setTitle(getString(R.string.section_cloud_drive));
-								}
-								else{
-									aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
-								}
-							}
-						}
-						else if(position == 1){
-							tabShown=INCOMING_TAB;
-
-							String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-							gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
-							iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(iSharesProviderLol!=null){
-								if(iSharesProviderLol.getDeepBrowserTree()==0){
-									aB.setTitle(getString(R.string.title_incoming_shares_explorer));
-								}
-								else{
-									aB.setTitle(iSharesProviderLol.name);
-								}
-							}
-						}
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				chatSettings = dbH.getChatSettings();
+				if(chatSettings!=null) {
+					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+					if(chatEnabled){
+						log("Chat enabled-->connect");
+						megaChatApi.connect(this);
 					}
-				});
-
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+					else{
+						log("Chat NOT enabled - readyToManager");
+						afterFetchNodes();
+					}
+				}
+				else{
+					log("chatSettings NULL - readyToManager");
+					afterFetchNodes();
+				}
 			}
 		}
+	}
+
+	public void afterFetchNodes(){
+		//Set toolbar
+		tB = (Toolbar) findViewById(R.id.toolbar_provider);
+
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
+		params.setMargins(0, getStatusBarHeight(), 0, 0);
+
+		setSupportActionBar(tB);
+		aB = getSupportActionBar();
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setDisplayShowHomeEnabled(true);
+
+		Display display = getWindowManager().getDefaultDisplay();
+
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics(metrics);
+
+		optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
+
+		cancelText = (TextView) findViewById(R.id.cancel_text);
+		cancelText.setOnClickListener(this);
+		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+		cancelText.setLayoutParams(cancelTextParams);
+		//TABS section
+		providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
+		tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
+		viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);
+
+		//Create tabs
+		providerSectionLayout.setVisibility(View.VISIBLE);
+
+		if (mTabsAdapterProvider == null){
+			mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
+			viewPagerProvider.setAdapter(mTabsAdapterProvider);
+			tabLayoutProvider.setupWithViewPager(viewPagerProvider);
+		}
+
+		viewPagerProvider.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			public void onPageScrollStateChanged(int state) {}
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+			public void onPageSelected(int position) {
+				log("onTabChanged TabId :"+ position);
+				if(position == 0){
+					tabShown=CLOUD_TAB;
+					String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+					gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+					cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+					if(cDriveProviderLol!=null){
+						if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
+							aB.setTitle(getString(R.string.section_cloud_drive));
+						}
+						else{
+							aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
+						}
+					}
+				}
+				else if(position == 1){
+					tabShown=INCOMING_TAB;
+
+					String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+					gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+					iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+					if(iSharesProviderLol!=null){
+						if(iSharesProviderLol.getDeepBrowserTree()==0){
+							aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+						}
+						else{
+							aB.setTitle(iSharesProviderLol.name);
+						}
+					}
+				}
+			}
+		});
+
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 	}
 
 	@Override
