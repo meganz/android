@@ -17,7 +17,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -26,6 +28,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements OnClickListener{
@@ -40,7 +43,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
 	ArrayList<MegaNode> nodes;
-	
+
+	DatabaseHandler dbH = null;
 	private ArrayList<Long> disabledNodes;
 	
 	long parentHandle = -1;
@@ -96,6 +100,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
 	}
 	
 	@Override
@@ -167,7 +173,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		Bitmap thumb = null;
 		
 		holder.textViewFileName.setText(node.getName());
-
 			
 		if (node.isFolder()){
 
@@ -212,8 +217,39 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				holder.permissionsIcon.setVisibility(View.GONE);
 			}
 
-			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
-			holder.imageView.setImageResource(R.drawable.ic_folder_list);
+			if(node.isInShare()){
+				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+				for(int j=0; j<sharesIncoming.size();j++){
+					MegaShare mS = sharesIncoming.get(j);
+					if(mS.getNodeHandle()==node.getHandle()){
+						MegaUser user= megaApi.getContact(mS.getUser());
+						if(user!=null){
+							MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+							if(contactDB!=null){
+								if(!contactDB.getName().equals("")){
+									holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
+								}
+								else{
+									holder.textViewFileSize.setText(user.getEmail());
+								}
+							}
+							else{
+								log("The contactDB is null: ");
+								holder.textViewFileSize.setText(user.getEmail());
+							}
+						}
+						else{
+							holder.textViewFileSize.setText(mS.getUser());
+						}
+					}
+				}
+
+			}
+			else{
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			}
 		}
 		else{
 			holder.permissionsIcon.setVisibility(View.GONE);
