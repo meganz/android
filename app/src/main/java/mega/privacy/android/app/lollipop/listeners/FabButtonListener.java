@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import mega.privacy.android.app.R;
@@ -46,7 +47,10 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                         }
                     }
                 }
-                else if(context instanceof ContactFileListActivityLollipop){
+                break;
+            }
+            case R.id.floating_button_contact_file_list:{
+                if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop)context).showUploadPanel();
                 }
                 break;

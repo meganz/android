@@ -122,11 +122,9 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.AvatarOptionsPanelListener;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
-import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -135,8 +133,11 @@ import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -213,17 +214,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaChatListItem selectedChatItem;
 //	String fullNameChat;
 
-	//UPLOAD PANEL
-	private SlidingUpPanelLayout slidingUploadPanel;
-	public FrameLayout uploadOutLayout;
-	public LinearLayout uploadLayout;
-	public LinearLayout uploadImage;
-	public LinearLayout uploadAudio;
-	public LinearLayout uploadVideo;
-	public LinearLayout uploadFromSystem;
-	private UploadPanelListener uploadPanelListener;
-	////
-
 	//Sliding NODES OPTIONS panel
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
@@ -247,16 +237,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public TextView propertiesText;
 	public TextView optionPublicLinkText;
 	private NodeOptionsPanelListener nodeOptionsPanelListener;
-	////
-
-	//Sliding AVATAR OPTIONS PANEL
-	private SlidingUpPanelLayout slidingAvatarOptionsPanel;
-	public FrameLayout optionsAvatarOutLayout;
-	public LinearLayout optionsAvatarLayout;
-	public LinearLayout optionAvatarChoosePhoto;
-	public LinearLayout optionAvatarTakePhoto;
-	public LinearLayout optionAvatarDelete;
-	private AvatarOptionsPanelListener avatarOptionsPanelListener;
 	////
 
 	//COLLECTION FAB BUTTONS
@@ -1338,28 +1318,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
 		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
 
-		//Sliding UPLOAD panel
-		slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
-		uploadLayout = (LinearLayout) findViewById(R.id.file_list_upload);
-		uploadOutLayout = (FrameLayout) findViewById(R.id.file_list_out_upload);
-		uploadImage = (LinearLayout) findViewById(R.id.file_list_upload_image_layout);
-		uploadAudio= (LinearLayout) findViewById(R.id.file_list_upload_audio_layout);
-		uploadVideo = (LinearLayout) findViewById(R.id.file_list_upload_video_layout);
-		uploadFromSystem = (LinearLayout) findViewById(R.id.file_list_upload_from_system_layout);
-
-		uploadPanelListener = new UploadPanelListener(this);
-
-		uploadImage.setOnClickListener(uploadPanelListener);
-		uploadAudio.setOnClickListener(uploadPanelListener);
-		uploadVideo.setOnClickListener(uploadPanelListener);
-		uploadFromSystem.setOnClickListener(uploadPanelListener);
-
-		uploadOutLayout.setOnClickListener(uploadPanelListener);
-
-		slidingUploadPanel.setVisibility(View.INVISIBLE);
-		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		/////
-
 		//Sliding OPTIONS panel
 		slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 		optionsLayout = (LinearLayout) findViewById(R.id.file_list_options);
@@ -1415,26 +1373,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
 		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 		////
-
-		//Sliding AVATAR OPTIONS panel
-		slidingAvatarOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_avatar_list);
-		optionsAvatarLayout = (LinearLayout) findViewById(R.id.avatar_list_options);
-		optionsAvatarOutLayout = (FrameLayout) findViewById(R.id.avatar_list_out_options);
-		optionAvatarChoosePhoto = (LinearLayout) findViewById(R.id.avatar_list_choose_photo_layout);
-		optionAvatarTakePhoto = (LinearLayout) findViewById(R.id.avatar_list_take_photo_layout);
-		optionAvatarDelete = (LinearLayout) findViewById(R.id.avatar_list_delete_layout);
-
-		avatarOptionsPanelListener = new AvatarOptionsPanelListener(this);
-
-		optionAvatarDelete.setOnClickListener(avatarOptionsPanelListener);
-		optionAvatarTakePhoto.setOnClickListener(avatarOptionsPanelListener);
-		optionAvatarChoosePhoto.setOnClickListener(avatarOptionsPanelListener);
-		optionsAvatarOutLayout.setOnClickListener(avatarOptionsPanelListener);
-
-
-		slidingAvatarOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		//slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
 
 		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
@@ -6769,14 +6707,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
-		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
-			log("slidingUploadPanel()!=PanelState.HIDDEN");
-			hideUploadPanel();
-			return;
-		}
-
-		log("Sliding UPLOAD options not shown");
-
 		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
 			log("slidingOptionsPanel()!=PanelState.HIDDEN");
 			hideOptionsPanel();
@@ -6784,13 +6714,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		log("Sliding Node OPTIONs not shown");
-
-		if(slidingAvatarOptionsPanel.getVisibility()==View.VISIBLE||slidingAvatarOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN){
-			hideAvatarOptionsPanel();
-			return;
-		}
-
-		log("Sliding AVATAR options not shown");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -9210,192 +9133,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("Show the slidingPanel");
 	}
 
-	public void showOptionsPanelFileBrowser(MegaNode sNode){
-		log("showOptionsPanelFileBrowser");
-
-		if (sNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-			optionShare.setVisibility(View.VISIBLE);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-			optionShare.setVisibility(View.GONE);
-		}
-
-		optionSendToInbox.setVisibility(View.VISIBLE);
-		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);
-		optionDelete.setVisibility(View.VISIBLE);
-		optionPublicLink.setVisibility(View.VISIBLE);
-		if(sNode.isExported()){
-			optionPublicLinkText.setText(R.string.edit_link_option);
-			optionRemoveLink.setVisibility(View.VISIBLE);
-		}
-		else{
-			optionPublicLinkText.setText(R.string.context_get_link_menu);
-			optionRemoveLink.setVisibility(View.GONE);
-		}
-		optionDelete.setVisibility(View.VISIBLE);
-		optionRename.setVisibility(View.VISIBLE);
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionCopyTo.setVisibility(View.VISIBLE);
-
-		//Hide
-		optionClearShares.setVisibility(View.GONE);
-		optionRemoveTotal.setVisibility(View.GONE);
-		optionPermissions.setVisibility(View.GONE);
-		optionLeaveShare.setVisibility(View.GONE);
-		optionOpenFolder.setVisibility(View.GONE);
-		optionDeleteOffline.setVisibility(View.GONE);
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-
-	public void showOptionsPanelInbox(MegaNode sNode){
-		log("showOptionsPanelInbox");
-
-		if (sNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-			optionShare.setVisibility(View.VISIBLE);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-			optionShare.setVisibility(View.GONE);
-		}
-
-		optionPublicLink.setVisibility(View.VISIBLE);
-		if(sNode.isExported()){
-			optionPublicLinkText.setText(R.string.edit_link_option);
-			optionRemoveLink.setVisibility(View.VISIBLE);
-		}
-		else{
-			optionPublicLinkText.setText(R.string.context_get_link_menu);
-			optionRemoveLink.setVisibility(View.GONE);
-		}
-
-		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);
-		optionDelete.setVisibility(View.VISIBLE);
-		optionRename.setVisibility(View.VISIBLE);
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionCopyTo.setVisibility(View.VISIBLE);
-
-		optionClearShares.setVisibility(View.GONE);
-		optionRemoveTotal.setVisibility(View.GONE);
-		optionPermissions.setVisibility(View.GONE);
-		optionSendToInbox.setVisibility(View.GONE);
-		optionLeaveShare.setVisibility(View.GONE);
-		optionOpenFolder.setVisibility(View.GONE);
-		optionDeleteOffline.setVisibility(View.GONE);
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-
-	public void showOptionsPanelSearch(MegaNode sNode){
-		log("showOptionsPanelSearch");
-
-		if (sNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-		}
-
-		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);
-		optionPublicLink.setVisibility(View.VISIBLE);
-		if(sNode.isExported()){
-			optionPublicLinkText.setText(R.string.edit_link_option);
-			optionRemoveLink.setVisibility(View.VISIBLE);
-		}
-		else{
-			optionPublicLinkText.setText(R.string.context_get_link_menu);
-			optionRemoveLink.setVisibility(View.GONE);
-		}
-		optionOpenFolder.setVisibility(View.VISIBLE);
-
-		//Hide
-		optionClearShares.setVisibility(View.GONE);
-		optionRemoveTotal.setVisibility(View.GONE);
-		optionPermissions.setVisibility(View.GONE);
-		optionLeaveShare.setVisibility(View.GONE);
-		optionDelete.setVisibility(View.GONE);
-		optionDelete.setVisibility(View.GONE);
-		optionRename.setVisibility(View.GONE);
-		optionMoveTo.setVisibility(View.GONE);
-		optionCopyTo.setVisibility(View.GONE);
-		optionSendToInbox.setVisibility(View.GONE);
-		optionShare.setVisibility(View.GONE);
-		optionDeleteOffline.setVisibility(View.GONE);
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-
-	public void showOptionsPanelRubbish(MegaNode sNode){
-		log("showOptionsPanelRubbish");
-
-		this.selectedNode = sNode;
-
-		if (selectedNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-		}
-
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionRemoveTotal.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);
-
-		//Hide
-		optionClearShares.setVisibility(View.GONE);
-		optionPermissions.setVisibility(View.GONE);
-		optionLeaveShare.setVisibility(View.GONE);
-		optionDelete.setVisibility(View.GONE);
-		optionRename.setVisibility(View.GONE);
-		optionCopyTo.setVisibility(View.GONE);
-		optionSendToInbox.setVisibility(View.GONE);
-		optionShare.setVisibility(View.GONE);
-		optionDownload.setVisibility(View.GONE);
-		optionPublicLink.setVisibility(View.GONE);
-		optionOpenFolder.setVisibility(View.GONE);
-		optionDeleteOffline.setVisibility(View.GONE);
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-
 	public void showNodeOptionsPanel(MegaNode node){
 		log("showNodeOptionsPanel");
 		selectedNode=node;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			int index = viewPagerCDrive.getCurrentItem();
-			if (index == 0){
-				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (fbFLol != null){
-					showOptionsPanelFileBrowser(node);
-				}
-			}
-			else{
-				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (rbFLol != null){
-					showOptionsPanelRubbish(node);
-				}
+			if(node!=null){
+				this.selectedNode = node;
+				NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 			}
 		}
 		else if(drawerItem == DrawerItem.SEARCH){
-			if (sFLol != null){
-				showOptionsPanelSearch(node);
+			if(node!=null){
+				this.selectedNode = node;
+				NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX){
-			if (iFLol != null){
-				showOptionsPanelInbox(node);
+			if(node!=null){
+				this.selectedNode = node;
+				NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
@@ -9419,115 +9178,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showOptionsPanel(MegaOffline sNode){
 		log("showNodeOptionsPanel-Offline");
-
-		//Check if the node is the Master Key file
-		if(sNode.getHandle().equals("0")){
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				optionMoveTo.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionProperties.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionPermissions.setVisibility(View.GONE);
-				optionLeaveShare.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionCopyTo.setVisibility(View.GONE);
-				optionSendToInbox.setVisibility(View.GONE);
-				optionShare.setVisibility(View.GONE);
-				optionDownload.setVisibility(View.GONE);
-				optionPublicLink.setVisibility(View.GONE);
-				optionRemoveLink.setVisibility(View.GONE);
-				optionOpenFolder.setVisibility(View.GONE);
-				optionDeleteOffline.setVisibility(View.VISIBLE);
-
-				slidingOptionsPanel.setVisibility(View.VISIBLE);
-				slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-				log("Show the slidingPanel");
-				return;
-			}
-		}
-
-		if (Util.isOnline(this)){
-			//With connection
-			log("Connection!");
-			long handle = Long.parseLong(sNode.getHandle());
-			this.selectedNode = megaApi.getNodeByHandle(handle);
+		if(sNode!=null){
 			this.selectedOfflineNode = sNode;
-
-			if(selectedNode!=null){
-				if (selectedNode.isFolder()) {
-					propertiesText.setText(R.string.general_folder_info);
-				}else{
-					propertiesText.setText(R.string.general_file_info);
-				}
-
-				optionDownload.setVisibility(View.VISIBLE);
-				optionProperties.setVisibility(View.VISIBLE);
-				optionDeleteOffline.setVisibility(View.VISIBLE);
-				optionRemoveLink.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionPermissions.setVisibility(View.GONE);
-				optionLeaveShare.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionCopyTo.setVisibility(View.GONE);
-				optionSendToInbox.setVisibility(View.GONE);
-				optionShare.setVisibility(View.GONE);
-				optionPublicLink.setVisibility(View.GONE);
-				optionRemoveLink.setVisibility(View.GONE);
-				optionOpenFolder.setVisibility(View.GONE);
-			}
-			else{
-				//No node handle
-				log("node not found with handle");
-				optionMoveTo.setVisibility(View.GONE);
-				optionRemoveTotal.setVisibility(View.GONE);
-				optionProperties.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionPermissions.setVisibility(View.GONE);
-				optionLeaveShare.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionCopyTo.setVisibility(View.GONE);
-				optionSendToInbox.setVisibility(View.GONE);
-				optionShare.setVisibility(View.GONE);
-				optionDownload.setVisibility(View.GONE);
-				optionPublicLink.setVisibility(View.GONE);
-				optionRemoveLink.setVisibility(View.GONE);
-				optionOpenFolder.setVisibility(View.GONE);
-				optionDeleteOffline.setVisibility(View.VISIBLE);
-
-			}
+			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
-		else{
-			//No connection
-			log("No connection!");
-			optionMoveTo.setVisibility(View.GONE);
-			optionRemoveTotal.setVisibility(View.GONE);
-			optionProperties.setVisibility(View.GONE);
-			optionClearShares.setVisibility(View.GONE);
-			optionPermissions.setVisibility(View.GONE);
-			optionLeaveShare.setVisibility(View.GONE);
-			optionDelete.setVisibility(View.GONE);
-			optionRename.setVisibility(View.GONE);
-			optionCopyTo.setVisibility(View.GONE);
-			optionSendToInbox.setVisibility(View.GONE);
-			optionShare.setVisibility(View.GONE);
-			optionDownload.setVisibility(View.GONE);
-			optionPublicLink.setVisibility(View.GONE);
-			optionRemoveLink.setVisibility(View.GONE);
-			optionOpenFolder.setVisibility(View.GONE);
-			optionDeleteOffline.setVisibility(View.VISIBLE);
-		}
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-
-		log("Show the slidingPanel offline");
 	}
 
 	public void showContactOptionsPanel(MegaUser user){
@@ -9557,23 +9212,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showAvatarOptionsPanel() {
-		log("showAvatarOptionsPanel");
-		if(aC.existsAvatar()){
-			optionAvatarDelete.setVisibility(View.VISIBLE);
-		}
-		else{
-			optionAvatarDelete.setVisibility(View.GONE);
-		}
-		slidingAvatarOptionsPanel.setVisibility(View.VISIBLE);
-		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+	public void showMyAccountOptionsPanel() {
+		log("showMyAccountOptionsPanel");
+		MyAccountBottomSheetDialogFragment bottomSheetDialogFragment = new MyAccountBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
-	public void hideAvatarOptionsPanel() {
-		log("hideAvatarOptionsPanel");
-		slidingAvatarOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingAvatarOptionsPanel.setVisibility(View.GONE);
-		fabButton.setVisibility(View.GONE);
+	public void showUploadPanel(){
+		log("showUploadPanel");
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
+		}
+
+		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	private void showOverquotaAlert(){
@@ -13095,30 +12753,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerContacts.setCurrentItem(index);
 	}
 
-	public void showUploadPanel(){
-		log("showUploadPanel");
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
-		}
-
-		fabButton.setVisibility(View.GONE);
-		slidingUploadPanel.setVisibility(View.VISIBLE);
-		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-	}
-
-	public void hideUploadPanel(){
-		log("hideUploadPanel");
-		fabButton.setVisibility(View.VISIBLE);
-		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingUploadPanel.setVisibility(View.GONE);
-	}
-
 	public void showChatPanel(MegaChatListItem chat){
 		log("showChatPanel");
 
@@ -13179,6 +12813,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showFabButton(){
 		log("showFabButton");
+		if(drawerItem==null){
+			return;
+		}
 		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
