@@ -54,11 +54,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.listeners.UploadPanelListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -126,17 +125,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	Toolbar tB;
 	ActionBar aB;
-
-	//UPLOAD PANEL
-	private SlidingUpPanelLayout slidingUploadPanel;
-	public FrameLayout uploadOutLayout;
-	public LinearLayout uploadLayout;
-	public LinearLayout uploadImage;
-	public LinearLayout uploadAudio;
-	public LinearLayout uploadVideo;
-	public LinearLayout uploadFromSystem;
-	private UploadPanelListener uploadPanelListener;
-	////
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -388,28 +376,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_contact_properties);
 
-			//Sliding UPLOAD panel
-			slidingUploadPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_upload);
-			uploadLayout = (LinearLayout) findViewById(R.id.file_list_upload);
-			uploadOutLayout = (FrameLayout) findViewById(R.id.file_list_out_upload);
-			uploadImage = (LinearLayout) findViewById(R.id.file_list_upload_image_layout);
-			uploadAudio= (LinearLayout) findViewById(R.id.file_list_upload_audio_layout);
-			uploadVideo = (LinearLayout) findViewById(R.id.file_list_upload_video_layout);
-			uploadFromSystem = (LinearLayout) findViewById(R.id.file_list_upload_from_system_layout);
-
-			uploadPanelListener = new UploadPanelListener(this);
-
-			uploadImage.setOnClickListener(uploadPanelListener);
-			uploadAudio.setOnClickListener(uploadPanelListener);
-			uploadVideo.setOnClickListener(uploadPanelListener);
-			uploadFromSystem.setOnClickListener(uploadPanelListener);
-
-			uploadOutLayout.setOnClickListener(uploadPanelListener);
-
-			slidingUploadPanel.setVisibility(View.INVISIBLE);
-			slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-			//////
-			
 			log("Shared Folders are:");
 			coordinatorLayout.setFitsSystemWindows(true);
 			aB.show();
@@ -425,7 +391,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		
 	}
 
-	public void showUploadPanel(){
+	public void showUploadPanel() {
 		log("showUploadPanel");
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -436,14 +402,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		}
 
-		slidingUploadPanel.setVisibility(View.VISIBLE);
-		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-	}
-
-	public void hideUploadPanel(){
-		log("hideUploadPanel");
-		slidingUploadPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingUploadPanel.setVisibility(View.GONE);
+		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	@Override
@@ -1523,13 +1483,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onBackPressed() {
-		if(slidingUploadPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingUploadPanel.getVisibility()==View.VISIBLE){
-			log("slidingUploadPanel()!=PanelState.HIDDEN");
-			hideUploadPanel();
-			return;
-		}
-
-		log("Sliding UPLOAD options not shown");
 
 		if (cflF != null){
 			if (cflF.isVisible()){
@@ -1664,7 +1617,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public static void log(String log) {
-		Util.log("ContactPropertiesActivityLollipop", log);
+		Util.log("ContactFileListActivityLollipop", log);
 	}
 
 	@Override

@@ -707,10 +707,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		context = activity;
+		this.context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
 		if (aB != null){
 			aB.show();
+			((AppCompatActivity) context).invalidateOptionsMenu();
 		}
 	}
 

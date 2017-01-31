@@ -86,7 +86,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         display.getMetrics(outMetrics);
 
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.contact_item_bottom_sheet, null);
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_item_bottom_sheet);
 
