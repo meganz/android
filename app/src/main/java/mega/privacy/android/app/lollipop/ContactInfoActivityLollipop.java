@@ -155,9 +155,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			megaApi = app.getMegaApi();
 		}
 
-		if (megaChatApi == null) {
-			MegaApplication app = (MegaApplication) getApplication();
-			megaChatApi = app.getMegaChatApi();
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null) {
+				MegaApplication app = (MegaApplication) getApplication();
+				megaChatApi = app.getMegaChatApi();
+			}
 		}
 
 		handler = new Handler();
@@ -199,6 +201,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			if (chatHandle != -1) {
+				log("From chat!!");
 				fromContacts = false;
 				chat = megaChatApi.getChatRoom(chatHandle);
 
@@ -213,6 +216,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				setDefaultAvatar(chat.getTitle());
 			}
 			else{
+				log("From contacts!!");
 				fromContacts = true;
 				userEmailExtra = extras.getString("name");
 				user = megaApi.getContact(userEmailExtra);
@@ -250,9 +254,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 
 				//Find chat with this contact
-				chat = megaChatApi.getChatRoomByUser(user.getHandle());
-				if(chat!=null){
-					chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+				if(Util.isChatEnabled()){
+					chat = megaChatApi.getChatRoomByUser(user.getHandle());
+					if(chat!=null){
+						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+					}
 				}
 
 				setDefaultAvatar(fullName);
@@ -490,7 +496,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 			case R.id.cab_menu_start_conversation:{
-				showSnackbar("Star conversation");
+				showSnackbar("Start conversation");
 				if(user!=null){
 					MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 					if(chat==null){
