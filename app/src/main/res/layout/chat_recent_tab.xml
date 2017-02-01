@@ -69,7 +69,7 @@
             android:paddingBottom="-3dp"
             android:textColor="@color/white"
             android:text="@string/contact_invite"
-            android:background="@drawable/ripple_upgrade"
+            android:background="@color/accentColor"
             android:elevation="@dimen/elevation_upgrade_low"
             android:stateListAnimator="@anim/button_upgrade_elevation"
             android:tint="@android:color/white" />

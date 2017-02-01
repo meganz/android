@@ -74,7 +74,6 @@
 
 	<PreferenceCategory
 		android:key="settings_chat"
-		android:layout="@layout/my_category_preference"
 		android:title="@string/section_chat">
 		<!--        android:textColor="@color/pressed_mega">  -->
 
@@ -87,7 +86,6 @@
 
 	<PreferenceCategory
 		android:key="settings_status_chat"
-		android:layout="@layout/my_category_preference"
 		android:title="@string/settings_chat_status">
 		<!--        android:textColor="@color/pressed_mega">  -->
 
@@ -102,6 +100,16 @@
 		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_status_chat_offline"
 			android:title="@string/settings_chat_status_offline" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_notifications_chat"
+		android:title="@string/title_properties_chat_contact_notifications">
+
+		<Preference
+			android:key="settings_nested_notifications_chat"
+			android:title="@string/section_chat" />
 
 	</PreferenceCategory>
 	
