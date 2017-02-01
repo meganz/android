@@ -291,9 +291,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.option_delete_offline_layout:{
                 log("Delete Offline");
                 if(context instanceof ManagerActivityLollipop){
-                    String pathNavigation = ((ManagerActivityLollipop) context).getPathNavigationOffline();
-                    MegaOffline mOff = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
-                    nC.deleteOffline(mOff, pathNavigation);
+                    ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
                 break;
             }

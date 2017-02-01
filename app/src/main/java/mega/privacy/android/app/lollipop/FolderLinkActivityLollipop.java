@@ -39,7 +39,6 @@ import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -65,9 +64,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -108,24 +106,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	MegaBrowserLollipopAdapter adapterList;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-	
-	private MenuItem downloadFolderMenuItem;
-	private MenuItem importFolderMenuItem;
-	
+
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionImport;
-	////
-	
-	
+
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	
 	private ActionMode actionMode;
@@ -392,31 +378,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     	}
     	
     	aB.setTitle("MEGA - " + getString(R.string.general_loading));
-    	
-    	slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-		optionsLayout = (LinearLayout) findViewById(R.id.folder_link_list_options);
-		optionsOutLayout = (FrameLayout) findViewById(R.id.folder_link_list_out_options);
-		optionDownload = (LinearLayout) findViewById(R.id.folder_link_list_option_download_layout);
-		optionImport = (LinearLayout) findViewById(R.id.folder_link_list_option_import_layout);
+
 		
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
-		if (dbH != null){
-			if (dbH.getCredentials() != null){
-				optionImport.setVisibility(View.VISIBLE);
-			}
-			else{
-				optionImport.setVisibility(View.INVISIBLE);
-			}
-		}
-		
-		optionDownload.setOnClickListener(this);
-		optionImport.setOnClickListener(this);
-		optionsOutLayout.setOnClickListener(this);
-		
-		slidingOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
     }
 	
 	public void askForDecryptionKeyDialog(){
@@ -513,54 +479,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}, 50);
 	}
-	
-	public void showOptionsPanel(MegaNode sNode){
-		log("showNodeOptionsPanel");
-		optionsBar.setVisibility(View.GONE);
-		separator.setVisibility(View.GONE);
-		
-		this.selectedNode = sNode;
-		
-		optionDownload.setVisibility(View.VISIBLE);
-//		if(sNode.isFolder()){
-//			optionImport.setVisibility(View.INVISIBLE);
-////			slidingOptionsPanel.setPanelHeight(optionDownload.getHeight());
-//		}
-//		else{
-			if (dbH == null){
-				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-			}
-			if (dbH != null){
-				if (dbH.getCredentials() != null){
-					optionImport.setVisibility(View.VISIBLE);
-				}
-				else{
-					optionImport.setVisibility(View.INVISIBLE);
-				}
-			}			
-//			slidingOptionsPanel.setPanelHeight(optionImport.getHeight()*2);
-//		}
-					
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-		optionsBar.setVisibility(View.VISIBLE);
-		separator.setVisibility(View.VISIBLE);
-		adapterList.setPositionClicked(-1);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-	}
-	
-	public PanelState getPanelState ()
-	{
-		log("getPanelState: "+slidingOptionsPanel.getPanelState());
-		return slidingOptionsPanel.getPanelState();
-	}
-	
+
 	@Override
 	protected void onDestroy() {
 
@@ -1453,34 +1372,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	@Override
 	public void onBackPressed() {
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			hideOptionsPanel();
-			adapterList.setPositionClicked(-1);
-			adapterList.notifyDataSetChanged();
-			return;
-		}
-		
-		log("Sliding not shown");
-		
+
 		if (adapterList != null){
 			parentHandle = adapterList.getParentHandle();
 			
@@ -1580,7 +1472,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 	}
 	
-	void importNode(){
+	public void importNode(){
 		log("importNode");
 //		if (megaApi.getRootNode() == null){
 //			log("megaApi bad fetch nodes");
@@ -1591,6 +1483,26 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
 			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 //		}		
+	}
+
+	public void downloadNode(){
+		log("Download option");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+
+				handleListM.clear();
+				handleListM.add(selectedNode.getHandle());
+				return;
+			}
+		}
+
+		ArrayList<Long> handleList = new ArrayList<Long>();
+		handleList.add(selectedNode.getHandle());
+		onFileClick(handleList);
 	}
 
 	@Override
@@ -1630,11 +1542,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	        	}
 				break;
 			}
-			case R.id.folder_link_list_out_options:{
-				log("Out Panel");
-				hideOptionsPanel();
-				break;				
-			}
 			case R.id.folder_link_import_button:{
 				if (megaApiFolder.getRootNode() != null){
 					this.selectedNode = megaApiFolder.getRootNode();
@@ -1642,66 +1549,23 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 				break;
 			}
-			case R.id.folder_link_list_option_download_layout: {
-				log("Download option");
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions(this,
-				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								Constants.REQUEST_WRITE_STORAGE);
-						
-						handleListM.clear();
-						handleListM.add(selectedNode.getHandle());
-						
-						slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-						slidingOptionsPanel.setVisibility(View.GONE);
-						adapterList.setPositionClicked(-1);
-						adapterList.notifyDataSetChanged();
-						
-						hideOptionsPanel();
-						
-						return;
-					}
-				}
-				
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(selectedNode.getHandle());
-				onFileClick(handleList);
-				hideOptionsPanel();
-				break;
-			}
-			case R.id.folder_link_list_option_import_layout: {
-				log("Import option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-//				Intent i = new Intent(this, FilePropertiesActivityLollipop.class);
-//				i.putExtra("handle", selectedNode.getHandle());
-//				log("Handle of the selected node: "+selectedNode.getHandle());
-//				if (selectedNode.isFolder()) {
-//					if (megaApi.isShared(selectedNode)){
-//						i.putExtra("imageId", R.drawable.folder_shared_mime);	
-//					}
-//					else{
-//						i.putExtra("imageId", R.drawable.folder_mime);
-//					}
-//				} 
-//				else {
-//					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
-//				}
-//				i.putExtra("name", selectedNode.getName());
-//				this.startActivity(i);
-
-				importNode();
-				hideOptionsPanel();
-				break;
-			}
 		}			
+	}
+
+	public void showOptionsPanel(MegaNode sNode){
+		log("showNodeOptionsPanel-Offline");
+		if(sNode!=null){
+			this.selectedNode = sNode;
+			FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment = new FolderLinkBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		}
+	}
+
+	public MegaNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(MegaNode selectedNode) {
+		this.selectedNode = selectedNode;
 	}
 }
