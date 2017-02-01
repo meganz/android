@@ -132,7 +132,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
                     chatVibrateSwitch.setChecked(chatVibration);
                 }
                 else{
-                    chatVibrateSwitch.setChecked(chatVibration);
+                    chatVibrateCheck.setChecked(chatVibration);
                 }
             }
             else{
@@ -141,7 +141,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
                     chatVibrateSwitch.setChecked(chatVibration);
                 }
                 else{
-                    chatVibrateSwitch.setChecked(chatVibration);
+                    chatVibrateCheck.setChecked(chatVibration);
                 }
             }
 
