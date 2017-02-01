@@ -1,22 +1,27 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -26,23 +31,19 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
     Toolbar tB;
     ActionBar aB;
 
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionRemove;
-	private NodeOptionsPanelListener nodeOptionsPanelListener;
-	////
-	
 	boolean isListOffline = true;
 	private MenuItem thumbViewMenuItem;
 	String pathNavigation = "/";
 	MegaOffline selectedNode;
+
+	static OfflineActivityLollipop offlineActivity = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
 		super.onCreate(savedInstanceState);
+
+		offlineActivity = this;
 
 		if (Util.isOnline(this)){
 			log("Network then intent to ManagerActivityLollipop");
@@ -77,41 +78,18 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 			oFLol.setIsList(isListOffline);
 		}
 
-		slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_offline_list);
-		optionsLayout = (LinearLayout) findViewById(R.id.offline_list_options);
-		optionsOutLayout = (FrameLayout) findViewById(R.id.offline_list_out_options);
-		optionRemove = (LinearLayout) findViewById(R.id.offline_list_option_remove_layout);
-
-		nodeOptionsPanelListener = new NodeOptionsPanelListener(this);
-
-		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
-		optionRemove.setOnClickListener(nodeOptionsPanelListener);
-
-		slidingOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-//		isListOffline = oFLol.getIsList();
-//		log("IsListOffline: "+isListOffline);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commitNow();
 	}
 
 	public void showOptionsPanel(MegaOffline sNode){
-		log("showOptionsPanel");
-
-		this.selectedNode = sNode;
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-	}
-
-	public void hideOptionsPanel() {
-		log("hideOptionsPanel");
-		if(oFLol!=null){
-			oFLol.resetAdapter();
+		log("showNodeOptionsPanel-Offline");
+		if(sNode!=null){
+			this.selectedNode = sNode;
+			OfflineOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
 	}
-	
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
@@ -188,13 +166,6 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 	public void onBackPressed() {
 		log("onBackPressed");
 
-		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
-			log("slidingOptionsPanel()!=PanelState.HIDDEN: "+slidingOptionsPanel.getPanelState());
-			hideOptionsPanel();
-			return;
-		}
-
-		log("Sliding Node OPTIONs not shown");
 		if (oFLol != null){
 			if (oFLol.isVisible()){
 				if (oFLol.onBackPressed() == 0){
@@ -225,6 +196,47 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 				oFLol.refreshPaths(mOff);
 			}
 		}
+	}
+
+	public void showConfirmationRemoveFromOffline(){
+		log("showConfirmationRemoveFromOffline");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
+		}
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						String pathNavigation = getPathNavigation();
+						MegaOffline mOff = getSelectedNode();
+						NodeController nC = new NodeController(offlineActivity);
+						nC.deleteOffline(mOff, pathNavigation);
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE: {
+						//No button clicked
+						break;
+					}
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	public void setPathNavigationOffline(String pathNavigation){

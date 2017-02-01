@@ -66,6 +66,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         if(context instanceof ManagerActivityLollipop){
             nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
         }
+        else if(context instanceof OfflineActivityLollipop){
+            nodeOffline = ((OfflineActivityLollipop) context).getSelectedNode();
+        }
 
         nC = new NodeController(context);
     }
@@ -292,15 +295,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.option_delete_offline_layout:{
                 log("Delete Offline");
                 if(context instanceof ManagerActivityLollipop){
-                    String pathNavigation = ((ManagerActivityLollipop) context).getPathNavigationOffline();
-                    MegaOffline mOff = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
-                    nC.deleteOffline(mOff, pathNavigation);
+                    ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
                 else if(context instanceof OfflineActivityLollipop){
                     log("OFFLINE_list_out_options option");
-                    String pathNavigation = ((OfflineActivityLollipop) context).getPathNavigation();
-                    MegaOffline mOff = ((OfflineActivityLollipop) context).getSelectedNode();
-                    nC.deleteOffline(mOff, pathNavigation);
+                    ((OfflineActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
                 break;
             }
