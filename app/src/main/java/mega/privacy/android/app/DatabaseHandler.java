@@ -2158,8 +2158,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	public void clearContacts(){		
 		db.execSQL("DELETE FROM " + TABLE_CONTACTS);   
-	}	
-	
+	}
+
+	public void clearNonContacts(){
+		db.execSQL("DELETE FROM " + TABLE_NON_CONTACTS);
+	}
+
 	public void clearOffline(SQLiteDatabase db){		
 		db.execSQL("DELETE FROM " + TABLE_OFFLINE);   
 	}

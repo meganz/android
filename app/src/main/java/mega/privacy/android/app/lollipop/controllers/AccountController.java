@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.AndroidRuntimeException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -378,6 +376,10 @@ public class AccountController {
         dbH.clearOffline();
 
         dbH.clearContacts();
+
+        dbH.clearNonContacts();
+
+        dbH.setEnabledChat(false+"");
 
         if (!isManagerActivityLollipop){
             Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
