@@ -10893,7 +10893,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //            serversBusyText.setVisibility(View.GONE);
 
 			megaChatApi = null;
-			((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();
+			if (app != null){
+				app.disableMegaChatApi();
+			}
 			Util.resetAndroidLogger();
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
