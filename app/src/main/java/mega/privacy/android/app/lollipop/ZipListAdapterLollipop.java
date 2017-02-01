@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -47,7 +46,7 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 
 		public ImageView publicLinkImage;
 		//ImageView arrowSelection;
-		LinearLayout optionsLayout;
+//		LinearLayout optionsLayout;
 		//ImageView optionDownload;
 		//ImageView optionProperties;
         ProgressBar transferProgressBar;
@@ -103,7 +102,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
-			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
 
 			convertView.setTag(holder);
 		} else {

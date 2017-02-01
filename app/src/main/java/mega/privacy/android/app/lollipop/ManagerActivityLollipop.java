@@ -113,7 +113,6 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -124,7 +123,6 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
-import mega.privacy.android.app.lollipop.listeners.NodeOptionsPanelListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -135,6 +133,7 @@ import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
@@ -213,31 +212,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaContactRequest selectedRequest;
 	MegaChatListItem selectedChatItem;
 //	String fullNameChat;
-
-	//Sliding NODES OPTIONS panel
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;
-	public LinearLayout optionRemoveLink;
-	public LinearLayout optionShare;
-	public LinearLayout optionPermissions;
-	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
-	public LinearLayout optionClearShares;
-	public LinearLayout optionLeaveShare;
-	public LinearLayout optionSendToInbox;
-	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;
-	public LinearLayout optionOpenFolder;
-	public LinearLayout optionDeleteOffline;
-	public TextView propertiesText;
-	public TextView optionPublicLinkText;
-	private NodeOptionsPanelListener nodeOptionsPanelListener;
-	////
 
 	//COLLECTION FAB BUTTONS
 	CoordinatorLayout fabButtonsLayout;
@@ -1318,62 +1292,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
 		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
 
-		//Sliding OPTIONS panel
-		slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-		optionsLayout = (LinearLayout) findViewById(R.id.file_list_options);
-		optionsOutLayout = (FrameLayout) findViewById(R.id.file_list_out_options);
-		optionRename = (LinearLayout) findViewById(R.id.file_list_option_rename_layout);
-		optionLeaveShare = (LinearLayout) findViewById(R.id.file_list_option_leave_share_layout);
-		optionDownload = (LinearLayout) findViewById(R.id.file_list_option_download_layout);
-		optionProperties = (LinearLayout) findViewById(R.id.file_list_option_properties_layout);
-		propertiesText = (TextView) findViewById(R.id.file_list_option_properties_text);
-
-		optionPublicLink = (LinearLayout) findViewById(R.id.file_list_option_public_link_layout);
-		optionPublicLinkText = (TextView) findViewById(R.id.file_list_option_public_link_text);
-//				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-		optionRemoveLink = (LinearLayout) findViewById(R.id.file_list_option_remove_link_layout);
-		optionShare = (LinearLayout) findViewById(R.id.file_list_option_share_layout);
-		optionPermissions = (LinearLayout) findViewById(R.id.file_list_option_permissions_layout);
-
-		optionDelete = (LinearLayout) findViewById(R.id.file_list_option_delete_layout);
-		optionRemoveTotal = (LinearLayout) findViewById(R.id.file_list_option_remove_layout);
-
-//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-
-		optionClearShares = (LinearLayout) findViewById(R.id.file_list_option_clear_share_layout);
-		optionMoveTo = (LinearLayout) findViewById(R.id.file_list_option_move_layout);
-		optionCopyTo = (LinearLayout) findViewById(R.id.file_list_option_copy_layout);
-		optionSendToInbox = (LinearLayout) findViewById(R.id.file_list_option_send_inbox_layout);
-		optionOpenFolder = (LinearLayout) findViewById(R.id.file_list_option_open_folder_layout);
-		optionDeleteOffline = (LinearLayout) findViewById(R.id.offline_list_option_delete_layout);
-
-		nodeOptionsPanelListener = new NodeOptionsPanelListener(this);
-
-		optionClearShares.setOnClickListener(nodeOptionsPanelListener);
-		optionPermissions.setOnClickListener(nodeOptionsPanelListener);
-		optionDownload.setOnClickListener(nodeOptionsPanelListener);
-		optionShare.setOnClickListener(nodeOptionsPanelListener);
-		optionProperties.setOnClickListener(nodeOptionsPanelListener);
-		optionRename.setOnClickListener(nodeOptionsPanelListener);
-		optionDelete.setOnClickListener(nodeOptionsPanelListener);
-		optionRemoveTotal.setOnClickListener(nodeOptionsPanelListener);
-		optionPublicLink.setOnClickListener(nodeOptionsPanelListener);
-		optionRemoveLink.setOnClickListener(nodeOptionsPanelListener);
-		optionMoveTo.setOnClickListener(nodeOptionsPanelListener);
-		optionCopyTo.setOnClickListener(nodeOptionsPanelListener);
-		optionSendToInbox.setOnClickListener(nodeOptionsPanelListener);
-		optionsOutLayout.setOnClickListener(nodeOptionsPanelListener);
-		optionLeaveShare.setOnClickListener(nodeOptionsPanelListener);
-		optionOpenFolder.setOnClickListener(nodeOptionsPanelListener);
-		optionDeleteOffline.setOnClickListener(nodeOptionsPanelListener);
-
-		slidingOptionsPanel.setVisibility(View.INVISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		////
-
 		//OVERQUOTA WARNING PANEL
 		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
 		outSpaceTextFirst =  (TextView) findViewById(R.id.overquota_alert_text_first);
@@ -1426,7 +1344,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //			startActivity(offlineIntent);
 //			finish();
 			showOfflineMode();
-
 //			selectDrawerItemPending=false;
         	return;
         }
@@ -6702,19 +6619,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		return;
     	}
 
-		if(isFabOpen){
-			animateFABCollection();
-			return;
-		}
-
-		if(slidingOptionsPanel.getPanelState()!= SlidingUpPanelLayout.PanelState.HIDDEN||slidingOptionsPanel.getVisibility()==View.VISIBLE){
-			log("slidingOptionsPanel()!=PanelState.HIDDEN");
-			hideOptionsPanel();
-			return;
-		}
-
-		log("Sliding Node OPTIONs not shown");
-
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
@@ -8960,219 +8864,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fragTransaction.commitNowAllowingStateLoss();
 	}
 
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-		switch(drawerItem){
-			case CLOUD_DRIVE:{
-				int index = viewPagerCDrive.getCurrentItem();
-				if (index == 0){
-					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (fbFLol != null){
-						fbFLol.resetAdapter();
-					}
-				}
-				else{
-					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (rbFLol != null){
-						rbFLol.resetAdapter();
-					}
-				}
-				break;
-			}
-			case SHARED_ITEMS:{
-				int index = viewPagerShares.getCurrentItem();
-				if (index == 0){
-					String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (inSFLol != null){
-						inSFLol.resetAdapter();
-					}
-				}
-				else{
-					String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-					outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (outSFLol != null){
-						outSFLol.resetAdapter();
-					}
-				}
-				break;
-			}
-			case INBOX:{
-				iFLol.resetAdapter();
-				break;
-			}
-			case SEARCH:{
-				sFLol.resetAdapter();
-				break;
-			}
-			case SAVED_FOR_OFFLINE:{
-				oFLol.resetAdapter();
-				break;
-			}
-		}
-
-	}
-
-	public void showOptionsPanelIncoming(MegaNode sNode){
-		log("showOptionsPanelIncoming");
-
-		if (sNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-		}
-
-		int accessLevel = megaApi.getAccess(selectedNode);
-		log("Node: "+sNode.getName()+" "+accessLevel);
-		optionOpenFolder.setVisibility(View.GONE);
-		optionDeleteOffline.setVisibility(View.GONE);
-		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);
-		optionPermissions.setVisibility(View.GONE);
-		optionRemoveTotal.setVisibility(View.GONE);
-		optionShare.setVisibility(View.GONE);
-		optionSendToInbox.setVisibility(View.VISIBLE);
-
-		if(inSFLol!=null){
-			int dBT=inSFLol.getDeepBrowserTree();
-			if(dBT>0){
-				optionLeaveShare.setVisibility(View.GONE);
-			}
-			else{
-				optionLeaveShare.setVisibility(View.VISIBLE);
-			}
-		}
-
-		switch (accessLevel) {
-			case MegaShare.ACCESS_FULL: {
-				log("access FULL");
-				optionPublicLink.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionRename.setVisibility(View.VISIBLE);
-				optionMoveTo.setVisibility(View.GONE);
-				if(inSFLol!=null){
-					int dBT=inSFLol.getDeepBrowserTree();
-					if(dBT>0){
-						optionDelete.setVisibility(View.VISIBLE);
-					}
-					else{
-						optionDelete.setVisibility(View.GONE);
-					}
-				}
-				break;
-			}
-			case MegaShare.ACCESS_READ: {
-				log("access read");
-				optionPublicLink.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				break;
-			}
-			case MegaShare.ACCESS_READWRITE: {
-				log("readwrite");
-				optionPublicLink.setVisibility(View.GONE);
-				optionRename.setVisibility(View.GONE);
-				optionClearShares.setVisibility(View.GONE);
-				optionMoveTo.setVisibility(View.GONE);
-				optionDelete.setVisibility(View.GONE);
-				break;
-			}
-		}
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-
-	public void showOptionsPanelOutgoing(MegaNode sNode, int deep){
-		log("showOptionsPanelOutgoing");
-
-		if (sNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-			optionShare.setVisibility(View.VISIBLE);
-			optionSendToInbox.setVisibility(View.GONE);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-			optionShare.setVisibility(View.GONE);
-			optionSendToInbox.setVisibility(View.VISIBLE);
-		}
-
-		if(deep==0){
-			optionPermissions.setVisibility(View.VISIBLE);
-			optionClearShares.setVisibility(View.VISIBLE);
-		}
-		else{
-			optionPermissions.setVisibility(View.GONE);
-			optionClearShares.setVisibility(View.GONE);
-		}
-
-		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);
-		optionRename.setVisibility(View.VISIBLE);
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionCopyTo.setVisibility(View.VISIBLE);
-
-		//Hide
-		optionDelete.setVisibility(View.GONE);
-		optionDelete.setVisibility(View.GONE);
-		optionRemoveTotal.setVisibility(View.GONE);
-		optionPublicLink.setVisibility(View.GONE);
-		optionLeaveShare.setVisibility(View.GONE);
-		optionOpenFolder.setVisibility(View.GONE);
-		optionDeleteOffline.setVisibility(View.GONE);
-
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-		log("Show the slidingPanel");
-	}
-
 	public void showNodeOptionsPanel(MegaNode node){
 		log("showNodeOptionsPanel");
 		selectedNode=node;
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if(node!=null){
-				this.selectedNode = node;
-				NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-			}
-		}
-		else if(drawerItem == DrawerItem.SEARCH){
-			if(node!=null){
-				this.selectedNode = node;
-				NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-			}
-		}
-		else if (drawerItem == DrawerItem.INBOX){
-			if(node!=null){
-				this.selectedNode = node;
-				NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-			}
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if (index == 0){
-				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (inSFLol != null){
-					showOptionsPanelIncoming(node);
-				}
-			}
-			else{
-				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (outSFLol != null){
-					showOptionsPanelOutgoing(node, outSFLol.getDeepBrowserTree());
-				}
-			}
+		if(node!=null){
+			this.selectedNode = node;
+			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
 
@@ -9180,7 +8878,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showNodeOptionsPanel-Offline");
 		if(sNode!=null){
 			this.selectedOfflineNode = sNode;
-			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+			OfflineOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
@@ -12698,7 +12396,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public int getDeepBrowserTreeIncoming() {
-		return deepBrowserTreeIncoming;
+		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
+		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+		if(inSFLol!=null) {
+			return inSFLol.getDeepBrowserTree();
+		}
+		else{
+			return -1;
+		}
 	}
 
 	public void setDeepBrowserTreeIncoming(int deepBrowserTreeIncoming) {
@@ -12707,7 +12412,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public int getDeepBrowserTreeOutgoing() {
-		return deepBrowserTreeOutgoing;
+		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+		if(outSFLol!=null) {
+			return outSFLol.getDeepBrowserTree();
+		}
+		else{
+			return -1;
+		}
 	}
 
 	public void setDeepBrowserTreeOutgoing(int deepBrowserTreeOutgoing) {
