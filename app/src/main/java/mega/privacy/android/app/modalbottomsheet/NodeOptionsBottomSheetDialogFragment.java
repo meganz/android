@@ -4,23 +4,24 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
@@ -30,16 +31,17 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
     MegaNode node = null;
-    MegaOffline nodeOffline = null;
     NodeController nC;
 
     private BottomSheetBehavior mBehavior;
@@ -67,11 +69,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     LinearLayout optionRubbishBin;
     LinearLayout optionRemove;
     LinearLayout optionOpenFolder;
-    LinearLayout optionDeleteOffline;
 
     DisplayMetrics outMetrics;
 
     static ManagerActivityLollipop.DrawerItem drawerItem = null;
+    Bitmap thumb = null;
 
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
@@ -129,7 +131,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionRubbishBin = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
         optionOpenFolder = (LinearLayout) contentView.findViewById(R.id.option_open_folder_layout);
-        optionDeleteOffline = (LinearLayout) contentView.findViewById(R.id.option_delete_offline_layout);
 
         optionDownload.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -146,7 +147,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionRubbishBin.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
-        optionDeleteOffline.setOnClickListener(this);
 
         nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
@@ -166,7 +166,29 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 else{
                     long nodeSize = node.getSize();
                     nodeInfo.setText(Util.getSizeString(nodeSize));
-                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
+                    if (node.hasThumbnail()) {
+                        log("Node has thumbnail");
+                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                        params1.setMargins(20, 0, 12, 0);
+                        nodeThumb.setLayoutParams(params1);
+
+                        thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                        if (thumb != null) {
+                            nodeThumb.setImageBitmap(thumb);
+                        } else {
+                            thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                            if (thumb != null) {
+                                nodeThumb.setImageBitmap(thumb);
+                            } else {
+                                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                            }
+                        }
+                    } else {
+                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                    }
                 }
             }
         }
@@ -211,7 +233,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionPermissions.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                     optionOpenFolder.setVisibility(View.GONE);
-                    optionDeleteOffline.setVisibility(View.GONE);
                 }
                 else if(tabSelected==1){
                     log("show Rubbish bottom sheet");
@@ -238,7 +259,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionLink.setVisibility(View.GONE);
                     optionRemoveLink.setVisibility(View.GONE);
                     optionOpenFolder.setVisibility(View.GONE);
-                    optionDeleteOffline.setVisibility(View.GONE);
                 }
                 break;
 
@@ -279,154 +299,153 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionPermissions.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
                 optionOpenFolder.setVisibility(View.GONE);
-                optionDeleteOffline.setVisibility(View.GONE);
 
                 break;
             }
             case SHARED_ITEMS:{
-                break;
 
-            }
-            case SAVED_FOR_OFFLINE:{
-                nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
+                int tabSelected = ((ManagerActivityLollipop)context).getTabItemShares();
+                if(tabSelected==0){
+                    log("showOptionsPanelIncoming");
 
-                //Check if the node is the Master Key file
-                if(nodeOffline.getHandle().equals("0")){
-                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                    File file= new File(path);
-                    if(file.exists()){
-                        optionMove.setVisibility(View.GONE);
-                        optionRemove.setVisibility(View.GONE);
-                        optionInfo.setVisibility(View.GONE);
-                        optionClearShares.setVisibility(View.GONE);
-                        optionPermissions.setVisibility(View.GONE);
-                        optionLeaveShares.setVisibility(View.GONE);
-                        optionRubbishBin.setVisibility(View.GONE);
-                        optionRename.setVisibility(View.GONE);
-                        optionCopy.setVisibility(View.GONE);
-                        optionSendInbox.setVisibility(View.GONE);
-                        optionShare.setVisibility(View.GONE);
-                        optionDownload.setVisibility(View.GONE);
-                        optionLink.setVisibility(View.GONE);
-                        optionLink.setVisibility(View.GONE);
-                        optionRemoveLink.setVisibility(View.GONE);
-                        optionOpenFolder.setVisibility(View.GONE);
-                        optionDeleteOffline.setVisibility(View.VISIBLE);
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                    }else{
+                        optionInfoText.setText(R.string.general_file_info);
                     }
-                }
-                else{
 
-                    if(Util.isOnline(context)){
-                        long handle = Long.parseLong(nodeOffline.getHandle());
-                        node = megaApi.getNodeByHandle(handle);
+                    int accessLevel = megaApi.getAccess(node);
+                    log("Node: "+node.getName()+" "+accessLevel);
+                    optionOpenFolder.setVisibility(View.GONE);
+                    optionDownload.setVisibility(View.VISIBLE);
+                    optionInfo.setVisibility(View.VISIBLE);
+                    optionPermissions.setVisibility(View.GONE);
+                    optionRemove.setVisibility(View.GONE);
+                    optionShare.setVisibility(View.GONE);
+                    optionSendInbox.setVisibility(View.VISIBLE);
 
-                        if(node!=null){
-
-                            nodeName.setText(node.getName());
-
-                            if (node.isFolder()) {
-                                nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
-                                if (node.isShared()) {
-                                    nodeThumb.setImageResource(R.drawable.ic_folder_shared_list);
-                                } else {
-                                    nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                    int dBT=((ManagerActivityLollipop)context).getDeepBrowserTreeIncoming();
+                    log("DeepTree value:"+dBT);
+                    if(dBT>0){
+                        optionLeaveShares.setVisibility(View.GONE);
+                    }
+                    else{
+                        //Show the owner of the shared folder
+                        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+                        for(int j=0; j<sharesIncoming.size();j++){
+                            MegaShare mS = sharesIncoming.get(j);
+                            if(mS.getNodeHandle()==node.getHandle()){
+                                MegaUser user= megaApi.getContact(mS.getUser());
+                                if(user!=null){
+                                    MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+                                    if(contactDB!=null){
+                                        if(!contactDB.getName().equals("")){
+                                            nodeInfo.setText(contactDB.getName()+" "+contactDB.getLastName());
+                                        }
+                                        else{
+                                            nodeInfo.setText(user.getEmail());
+                                        }
+                                    }
+                                    else{
+                                        log("The contactDB is null: ");
+                                        nodeInfo.setText(user.getEmail());
+                                    }
+                                }
+                                else{
+                                    nodeInfo.setText(mS.getUser());
                                 }
                             }
-                            else{
-                                long nodeSize = node.getSize();
-                                nodeInfo.setText(Util.getSizeString(nodeSize));
-                                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                            }
-
-                            if (node.isFolder()) {
-                                optionInfoText.setText(R.string.general_folder_info);
-                            }else{
-                                optionInfoText.setText(R.string.general_file_info);
-                            }
-
-                            optionDownload.setVisibility(View.VISIBLE);
-                            optionInfo.setVisibility(View.VISIBLE);
-                            optionDeleteOffline.setVisibility(View.VISIBLE);
-                            optionRemoveLink.setVisibility(View.GONE);
-                            optionMove.setVisibility(View.GONE);
-                            optionRemove.setVisibility(View.GONE);
-                            optionClearShares.setVisibility(View.GONE);
-                            optionPermissions.setVisibility(View.GONE);
-                            optionLeaveShares.setVisibility(View.GONE);
-                            optionRubbishBin.setVisibility(View.GONE);
-                            optionRename.setVisibility(View.GONE);
-                            optionCopy.setVisibility(View.GONE);
-                            optionSendInbox.setVisibility(View.GONE);
-                            optionShare.setVisibility(View.GONE);
-                            optionLink.setVisibility(View.GONE);
-                            optionRemoveLink.setVisibility(View.GONE);
-                            optionOpenFolder.setVisibility(View.GONE);
                         }
-                        else{
-                            //No node handle
+                        optionLeaveShares.setVisibility(View.VISIBLE);
+                    }
 
-                            nodeName.setText(nodeOffline.getName());
-
-                            if (nodeOffline.isFolder()) {
-                                optionInfoText.setText(R.string.general_folder_info);
-//                                nodeInfo.setText(MegaApiUtils.getInfoFolder);
-                                nodeThumb.setImageResource(R.drawable.ic_folder_list);
-
-                            }else{
-                                optionInfoText.setText(R.string.general_file_info);
-//                                long nodeSize = nodeOffline.get
-//                                nodeInfo.setText(Util.getSizeString(nodeSize));
-                                nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
-                            }
-
-                            log("node not found with handle");
-                            optionDownload.setVisibility(View.GONE);
-                            optionInfo.setVisibility(View.GONE);
-                            optionRemoveLink.setVisibility(View.GONE);
-                            optionMove.setVisibility(View.GONE);
-                            optionRemove.setVisibility(View.GONE);
-                            optionClearShares.setVisibility(View.GONE);
-                            optionPermissions.setVisibility(View.GONE);
-                            optionLeaveShares.setVisibility(View.GONE);
-                            optionRubbishBin.setVisibility(View.GONE);
-                            optionRename.setVisibility(View.GONE);
-                            optionCopy.setVisibility(View.GONE);
-                            optionSendInbox.setVisibility(View.GONE);
-                            optionShare.setVisibility(View.GONE);
+                    switch (accessLevel) {
+                        case MegaShare.ACCESS_FULL: {
+                            log("access FULL");
                             optionLink.setVisibility(View.GONE);
                             optionRemoveLink.setVisibility(View.GONE);
-                            optionOpenFolder.setVisibility(View.GONE);
-                            optionDeleteOffline.setVisibility(View.VISIBLE);
+                            optionClearShares.setVisibility(View.GONE);
+                            optionRename.setVisibility(View.VISIBLE);
+                            optionMove.setVisibility(View.GONE);
 
+                            if(dBT>0){
+                                optionRubbishBin.setVisibility(View.VISIBLE);
+                            }
+                            else{
+                                optionRubbishBin.setVisibility(View.GONE);
+                            }
+
+                            break;
+                        }
+                        case MegaShare.ACCESS_READ: {
+                            log("access read");
+                            optionLink.setVisibility(View.GONE);
+                            optionRemoveLink.setVisibility(View.GONE);
+                            optionRename.setVisibility(View.GONE);
+                            optionClearShares.setVisibility(View.GONE);
+                            optionMove.setVisibility(View.GONE);
+                            optionRubbishBin.setVisibility(View.GONE);
+                            break;
+                        }
+                        case MegaShare.ACCESS_READWRITE: {
+                            log("readwrite");
+                            optionLink.setVisibility(View.GONE);
+                            optionRemoveLink.setVisibility(View.GONE);
+                            optionRename.setVisibility(View.GONE);
+                            optionClearShares.setVisibility(View.GONE);
+                            optionMove.setVisibility(View.GONE);
+                            optionRubbishBin.setVisibility(View.GONE);
+                            break;
+                        }
+                    }
+                }
+                else if(tabSelected==1){
+                    log("showOptionsPanelOutgoing");
+
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                        optionShare.setVisibility(View.VISIBLE);
+                        optionSendInbox.setVisibility(View.GONE);
+                    }else{
+                        optionInfoText.setText(R.string.general_file_info);
+                        optionShare.setVisibility(View.GONE);
+                        optionSendInbox.setVisibility(View.VISIBLE);
+                    }
+
+                    if(((ManagerActivityLollipop)context).getDeepBrowserTreeOutgoing()==0){
+                        optionPermissions.setVisibility(View.VISIBLE);
+                        optionClearShares.setVisibility(View.VISIBLE);
+
+                        //Show the number of contacts who shared the folder
+                        ArrayList<MegaShare> sl = megaApi.getOutShares(node);
+                        if (sl != null) {
+                            if(sl.size()!=0){
+                                nodeInfo.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+                            }
                         }
                     }
                     else{
-                        if (nodeOffline.isFolder()) {
-                            optionInfoText.setText(R.string.general_folder_info);
-                        }else{
-                            optionInfoText.setText(R.string.general_file_info);
-                        }
-
-                        optionDownload.setVisibility(View.GONE);
-                        optionInfo.setVisibility(View.GONE);
-                        optionRemoveLink.setVisibility(View.GONE);
-                        optionMove.setVisibility(View.GONE);
-                        optionRemove.setVisibility(View.GONE);
-                        optionClearShares.setVisibility(View.GONE);
                         optionPermissions.setVisibility(View.GONE);
-                        optionLeaveShares.setVisibility(View.GONE);
-                        optionRubbishBin.setVisibility(View.GONE);
-                        optionRename.setVisibility(View.GONE);
-                        optionCopy.setVisibility(View.GONE);
-                        optionSendInbox.setVisibility(View.GONE);
-                        optionShare.setVisibility(View.GONE);
-                        optionLink.setVisibility(View.GONE);
-                        optionRemoveLink.setVisibility(View.GONE);
-                        optionOpenFolder.setVisibility(View.GONE);
-                        optionDeleteOffline.setVisibility(View.VISIBLE);
+                        optionClearShares.setVisibility(View.GONE);
                     }
+
+                    optionDownload.setVisibility(View.VISIBLE);
+                    optionInfo.setVisibility(View.VISIBLE);
+                    optionRename.setVisibility(View.VISIBLE);
+                    optionMove.setVisibility(View.VISIBLE);
+                    optionCopy.setVisibility(View.VISIBLE);
+
+                    //Hide
+                    optionRubbishBin.setVisibility(View.GONE);
+                    optionRemove.setVisibility(View.GONE);
+                    optionLink.setVisibility(View.GONE);
+                    optionRemoveLink.setVisibility(View.GONE);
+                    optionLeaveShares.setVisibility(View.GONE);
+                    optionOpenFolder.setVisibility(View.GONE);
                 }
+
                 break;
+
             }
             case SEARCH:{
                 if (node.isFolder()) {
@@ -463,7 +482,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionRemove.setVisibility(View.GONE);
                 optionPermissions.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
-                optionDeleteOffline.setVisibility(View.GONE);
                 break;
             }
         }
@@ -660,21 +678,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
                 nC.openFolderFromSearch(node.getHandle());
                 dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.option_delete_offline_layout:{
-                log("Delete Offline");
-                if(context instanceof ManagerActivityLollipop){
-                    String pathNavigation = ((ManagerActivityLollipop) context).getPathNavigationOffline();
-                    MegaOffline mOff = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
-                    nC.deleteOffline(mOff, pathNavigation);
-                }
-//                else if(context instanceof OfflineActivityLollipop){
-//                    log("OFFLINE_list_out_options option");
-//                    String pathNavigation = ((OfflineActivityLollipop) context).getPathNavigation();
-//                    MegaOffline mOff = ((OfflineActivityLollipop) context).getSelectedNode();
-//                    nC.deleteOffline(mOff, pathNavigation);
-//                }
                 break;
             }
         }

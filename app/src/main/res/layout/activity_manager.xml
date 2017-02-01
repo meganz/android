@@ -220,13 +220,6 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/sliding_options_panel"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true"/>
-
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"

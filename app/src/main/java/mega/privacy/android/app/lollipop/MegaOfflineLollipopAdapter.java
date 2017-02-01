@@ -742,25 +742,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}			
 			case R.id.offline_list_three_dots:
 			case R.id.offline_grid_three_dots:{
-				if (positionClicked == -1){
-					positionClicked = currentPosition;
-					notifyDataSetChanged();
-				}
-				else{
-					if (positionClicked == currentPosition){
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-					else{
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
-				}
 
 				if(context instanceof ManagerActivityLollipop){
+					log("Connection! - ManagerActivity instance!");
 					((ManagerActivityLollipop) context).showOptionsPanel(mOff);
 				}
-
 				break;
 			}
 		}		
