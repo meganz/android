@@ -21,7 +21,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -44,7 +43,6 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
 
     DisplayMetrics outMetrics;
 
-    static ManagerActivityLollipop.DrawerItem drawerItem = null;
     Bitmap thumb = null;
 
     MegaApiAndroid megaApi;
@@ -58,8 +56,17 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
         }
 
-        if(context instanceof FolderLinkActivityLollipop){
-            node = ((FolderLinkActivityLollipop) context).getSelectedNode();
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            long handle = savedInstanceState.getLong("handle", -1);
+            log("Handle of the node: "+handle);
+            node = megaApi.getNodeByHandle(handle);
+        }
+        else{
+            log("Bundle NULL");
+            if(context instanceof FolderLinkActivityLollipop){
+                node = ((FolderLinkActivityLollipop) context).getSelectedNode();
+            }
         }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
@@ -187,6 +194,15 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+        long handle = node.getHandle();
+        log("Handle of the node: "+handle);
+        outState.putLong("handle", handle);
     }
 
     private static void log(String log) {

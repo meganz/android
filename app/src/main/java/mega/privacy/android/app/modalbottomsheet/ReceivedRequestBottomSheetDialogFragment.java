@@ -60,8 +60,17 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if(context instanceof ManagerActivityLollipop){
-            request = ((ManagerActivityLollipop) context).getSelectedRequest();
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            long handle = savedInstanceState.getLong("handle", -1);
+            log("Handle of the request: "+handle);
+            request = megaApi.getContactRequestByHandle(handle);
+        }
+        else{
+            log("Bundle NULL");
+            if(context instanceof ManagerActivityLollipop){
+                request = ((ManagerActivityLollipop) context).getSelectedRequest();
+            }
         }
 
         cC = new ContactController(context);
@@ -95,12 +104,20 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
         optionIgnore.setOnClickListener(this);
         optionDecline.setOnClickListener(this);
 
-        titleNameContactChatPanel.setText(request.getSourceEmail());
-        titleMailContactChatPanel.setText(""+ DateUtils.getRelativeTimeSpanString(request.getCreationTime() * 1000));
+        if(request!=null){
+            titleNameContactChatPanel.setText(request.getSourceEmail());
+            titleMailContactChatPanel.setText(""+ DateUtils.getRelativeTimeSpanString(request.getCreationTime() * 1000));
 
-        addAvatarRequestPanel(request);
+            addAvatarRequestPanel(request);
 
-        dialog.setContentView(contentView);
+            dialog.setContentView(contentView);
+            mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+        else{
+            log("Request NULL");
+        }
+
     }
 
     public void addAvatarRequestPanel(MegaContactRequest request){
@@ -194,14 +211,22 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        context = activity;
+        this.context = activity;
     }
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+        long handle = request.getHandle();
+        log("Handle of the request: "+handle);
+        outState.putLong("handle", handle);
     }
 
     private static void log(String log) {

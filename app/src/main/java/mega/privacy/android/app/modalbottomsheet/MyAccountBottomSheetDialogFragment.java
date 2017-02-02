@@ -21,12 +21,10 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaUser;
 
 public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
-    MegaUser contact = null;
     AccountController aC;
 
     private BottomSheetBehavior mBehavior;
@@ -48,10 +46,6 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if(context instanceof ManagerActivityLollipop){
-            contact = ((ManagerActivityLollipop) context).getSelectedUser();
         }
 
         aC = new AccountController(context);
@@ -88,6 +82,8 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
         }
 
         dialog.setContentView(contentView);
+        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
 
@@ -131,7 +127,7 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        context = activity;
+        this.context = activity;
     }
 
 
