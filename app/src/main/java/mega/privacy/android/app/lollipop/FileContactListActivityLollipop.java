@@ -30,9 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -47,9 +45,8 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.SlidingUpPanelLayout;
-import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
+import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -69,7 +66,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	ActionBar aB;
 	Toolbar tB;
 	FileContactListActivityLollipop fileContactListActivityLollipop = this;
-	MegaShare selectedNode;
+	MegaShare selectedShare;
 	
 	TextView nameView;
 	ImageView imageView;
@@ -110,26 +107,17 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	AlertDialog permissionsDialog;
 	
 	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
-	
+
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-		
+
 	private List<ShareInfo> filePreparedInfos;
-	
+
 	MegaPreferences prefs = null;
 	
-	MenuItem permissionButton;
-	MenuItem deleteShareButton;
 	MenuItem addSharingContact;
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
-	
-	//OPTIONS PANEL
-	private SlidingUpPanelLayout slidingOptionsPanel;
-	public FrameLayout optionsOutLayout;
-	public LinearLayout optionsLayout;
-	public LinearLayout optionPermissions;
-	public LinearLayout optionRemove;
-	
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 //		@Override
@@ -369,9 +357,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);	    
 	    
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
@@ -472,22 +457,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.setMultipleSelect(false);
 			
 			listView.setAdapter(adapter);
-			
-			slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_file_contact_list);
-			optionsLayout = (LinearLayout) findViewById(R.id.file_contact_list_options);
-			optionsOutLayout = (FrameLayout) findViewById(R.id.file_contact_list_out_options);
-			optionPermissions = (LinearLayout) findViewById(R.id.file_contact_list_option_share_layout);					
-			optionRemove = (LinearLayout) findViewById(R.id.file_contact_list_option_remove_layout);
-			
-//			slidingOptionsPanel.setPanelHeight(optionPermissions.getHeight()*2);
-			
-			optionRemove.setOnClickListener(this);			
-			optionPermissions.setOnClickListener(this);
-			
-			optionsOutLayout.setOnClickListener(this);
-			
-			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		}
 	}
 	
@@ -496,37 +465,14 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		log("showNodeOptionsPanel");
 		
 //		fabButton.setVisibility(View.GONE);
-		
-		this.selectedNode = sShare;
-		slidingOptionsPanel.setPanelHeight(optionPermissions.getHeight()*2);
-		
-		if (selectedNode.getUser() != null){
-			optionPermissions.setVisibility(View.VISIBLE);
-			optionPermissions.setOnClickListener(this);
+
+		if(node!=null){
+			this.selectedShare = sShare;
+			FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
-		else{
-			optionPermissions.setVisibility(View.GONE);			
-		}		
-					
-		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
-		slidingOptionsPanel.setVisibility(View.VISIBLE);
 	}
-	
-	public void hideOptionsPanel(){
-		log("hideOptionsPanel");
-				
-		adapter.setPositionClicked(-1);
-//		fabButton.setVisibility(View.VISIBLE);
-		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-		slidingOptionsPanel.setVisibility(View.GONE);
-	}
-	
-	public PanelState getPanelState ()
-	{
-		log("getPanelState: "+slidingOptionsPanel.getPanelState());
-		return slidingOptionsPanel.getPanelState();
-	}
-	
+
 	@Override
     protected void onDestroy(){
     	super.onDestroy();
@@ -729,34 +675,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		
-		PanelState pS=slidingOptionsPanel.getPanelState();
-		
-		if(pS==null){
-			log("NULLL");
-		}
-		else{
-			if(pS==PanelState.HIDDEN){
-				log("Hidden");
-			}
-			else if(pS==PanelState.COLLAPSED){
-				log("Collapsed");
-			}
-			else{
-				log("ps: "+pS);
-			}
-		}		
-		
-		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
-			log("getPanelState()!=PanelState.HIDDEN");
-			hideOptionsPanel();
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return;
-		}
-		
-		log("Sliding not shown");
-					
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
@@ -833,11 +752,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				finish();
 				break;
 			}
-			case R.id.file_contact_list_out_options:{
-				log("Out Panel");
-				hideOptionsPanel();
-				break;				
-			}
 			case R.id.floating_button_file_contact_list:{
 				removeShare = false;
 				changeShare = false;
@@ -848,78 +762,68 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 				break;
 			}
-			case R.id.file_contact_list_option_share_layout:{
-				log("En el adapter - change");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, selectedNode.getAccess(), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						removeShare = false;
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(fileContactListActivityLollipop);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-						permissionsDialog.dismiss();
-						
-						switch(item) {
-	                        case 0:{
-	                        	MegaUser u = megaApi.getContact(selectedNode.getUser());
-	                        	megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
-	                        	break;
-	                        }
-	                        case 1:{
-	                        	MegaUser u = megaApi.getContact(selectedNode.getUser());
-	                        	megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
-                                break;
-	                        }
-	                        case 2:{
-	                        	MegaUser u = megaApi.getContact(selectedNode.getUser());
-	                        	megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
-                                break;
-	                        }
-	                    }
+		}
+	}
+
+	public void removeFileContactShare(){
+		log("removeFileContactShare");
+		notifyDataSetChanged();
+		MegaUser c = null;
+		if (selectedShare.getUser() != null){
+			c = megaApi.getContact(selectedShare.getUser());
+		}
+		showConfirmationRemoveContactFromShare(c);
+	}
+
+	public void changePermissions(){
+		log("changePermissions");
+		notifyDataSetChanged();
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+		final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+		dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+				removeShare = false;
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(fileContactListActivityLollipop);
+					temp.setMessage(getString(R.string.context_sharing_folder));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
+				permissionsDialog.dismiss();
+
+				switch(item) {
+					case 0:{
+						MegaUser u = megaApi.getContact(selectedShare.getUser());
+						megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
+						break;
 					}
-				});
-				permissionsDialog = dialogBuilder.create();
-				permissionsDialog.show();
+					case 1:{
+						MegaUser u = megaApi.getContact(selectedShare.getUser());
+						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+						break;
+					}
+					case 2:{
+						MegaUser u = megaApi.getContact(selectedShare.getUser());
+						megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
+						break;
+					}
+				}
+			}
+		});
+		permissionsDialog = dialogBuilder.create();
+		permissionsDialog.show();
 //				Resources resources = permissionsDialog.getContext().getResources();
 //				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 //				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 //		        alertTitle.setTextColor(resources.getColor(R.color.mega));
 //				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 //				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));				
-				setPositionClicked(-1);
-//				((FileContactListActivityLollipop)context).refreshView();
-				break;
-			}
-			case R.id.file_contact_list_option_remove_layout:{
-				log("En el adapter - remove");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				MegaUser c = null;
-				if (selectedNode.getUser() != null){
-					c = megaApi.getContact(selectedNode.getUser());
-				}
-				showConfirmationRemoveContactFromShare(c);
-				setPositionClicked(-1);
-//				((FileContactListActivityLollipop)context).refreshView();
-				break;
-			}
-		}
+//				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 	}
 	
 	public void setPositionClicked(int positionClicked){
@@ -1296,6 +1200,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+
+	public MegaUser getSelectedContact() {
+		String email = selectedShare.getUser();
+		return megaApi.getContact(email);
 	}
 }
 

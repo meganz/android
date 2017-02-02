@@ -21,12 +21,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaUser;
 
 public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
-    MegaUser contact = null;
 
     private BottomSheetBehavior mBehavior;
 
@@ -47,10 +45,6 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if(context instanceof ManagerActivityLollipop){
-            contact = ((ManagerActivityLollipop) context).getSelectedUser();
         }
     }
     @Override
@@ -78,6 +72,8 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         optionFromSystem.setOnClickListener(this);
 
         dialog.setContentView(contentView);
+        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     @Override
@@ -165,7 +161,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        context = activity;
+        this.context = activity;
     }
 
     @Override
