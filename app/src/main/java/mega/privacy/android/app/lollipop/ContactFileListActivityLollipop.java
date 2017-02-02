@@ -57,6 +57,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -122,6 +123,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	long lastTimeOnTransferUpdate = -1;
 
 	private List<ShareInfo> filePreparedInfos;
+
+	MegaNode selectedNode = null;
 
 	Toolbar tB;
 	ActionBar aB;
@@ -1909,6 +1912,15 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		
 	}
 
+	public void showOptionsPanel(MegaNode node){
+		log("showOptionsPanel");
+		if(node!=null){
+			this.selectedNode = node;
+			ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		}
+	}
+
 	public void showSnackbar(String s, View view){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
@@ -1917,4 +1929,27 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		snackbar.show();
 	}
 
+	public MegaNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(MegaNode selectedNode) {
+		this.selectedNode = selectedNode;
+	}
+
+	public boolean isEmptyParentHandleStack() {
+		if(cflF!=null){
+			return cflF.isEmptyParentHandleStack();
+		}
+		log("Fragment NULL");
+		return true;
+	}
+
+	public long getParentHandle() {
+
+		if(cflF!=null){
+			return cflF.getParentHandle();
+		}
+		return -1;
+	}
 }
