@@ -62,6 +62,5 @@ dependencies {
     compile 'com.android.support:design:25.1.0'
     compile 'com.google.android.gms:play-services-wallet:10.0.1'
     compile 'com.android.support:recyclerview-v7:25.1.0'
-    compile 'com.sothree.slidinguppanel:library:3.3.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
 }
