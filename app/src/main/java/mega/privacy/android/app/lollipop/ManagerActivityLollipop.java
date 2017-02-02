@@ -8170,7 +8170,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showNodeOptionsPanel(MegaNode node){
 		log("showNodeOptionsPanel");
-		selectedNode=node;
+		this.selectedNode=node;
 		if(node!=null){
 			this.selectedNode = node;
 			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
