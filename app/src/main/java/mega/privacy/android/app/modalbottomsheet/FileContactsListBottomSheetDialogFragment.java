@@ -3,7 +3,6 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,8 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -28,15 +25,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ContactPropertiesActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
-public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
+public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
     MegaUser contact = null;
@@ -49,10 +45,8 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public TextView titleMailContactPanel;
     public RoundedImageView contactImageView;
     public TextView avatarInitialLetter;
-    public LinearLayout optionInfoContact;
-    public LinearLayout optionSendFile;
-    public LinearLayout optionShareFolder;
-    public LinearLayout optionRemove;
+    public LinearLayout optionChangePermissions;
+    public LinearLayout optionDelete;
 
     String fullName="";
 
@@ -79,13 +73,10 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         }
         else{
             log("Bundle NULL");
-            if(context instanceof ManagerActivityLollipop){
-                contact = ((ManagerActivityLollipop) context).getSelectedUser();
+            if(context instanceof FileContactListActivityLollipop){
+                contact = ((FileContactListActivityLollipop) context).getSelectedContact();
             }
         }
-
-        cC = new ContactController(context);
-
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
     @Override
@@ -96,26 +87,23 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         display.getMetrics(outMetrics);
 
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_item, null);
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
 
-        mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_item_bottom_sheet);
+        mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.file_contact_list_bottom_sheet);
 
-        titleNameContactPanel = (TextView) contentView.findViewById(R.id.contact_list_contact_name_text);
-        titleMailContactPanel = (TextView) contentView.findViewById(R.id.contact_list_contact_mail_text);
-        contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_contact_list_thumbnail);
-        avatarInitialLetter = (TextView) contentView.findViewById(R.id.sliding_contact_list_initial_letter);
-        optionInfoContact = (LinearLayout) contentView.findViewById(R.id.contact_list_info_contact_layout);
-        optionSendFile= (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_file_layout);
-        optionShareFolder = (LinearLayout) contentView.findViewById(R.id.contact_list_option_share_layout);
-        optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
+        titleNameContactPanel = (TextView) contentView.findViewById(R.id.file_contact_list_contact_name_text);
+        titleMailContactPanel = (TextView) contentView.findViewById(R.id.file_contact_list_contact_mail_text);
+        contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
+        avatarInitialLetter = (TextView) contentView.findViewById(R.id.sliding_file_contact_list_initial_letter);
+
+        optionChangePermissions = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
+        optionDelete = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_delete_layout);
 
         titleNameContactPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
-        optionInfoContact.setOnClickListener(this);
-        optionRemove.setOnClickListener(this);
-        optionSendFile.setOnClickListener(this);
-        optionShareFolder.setOnClickListener(this);
+        optionChangePermissions.setOnClickListener(this);
+        optionDelete.setOnClickListener(this);
 
         if(contact!=null){
             fullName = getFullName(contact);
@@ -257,53 +245,22 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
         switch(v.getId()){
 
-            case R.id.contact_list_info_contact_layout:{
-                log("click contact info");
+            case R.id.file_contact_list_option_permissions_layout:{
+                log("permissions layout");
                 if(contact==null){
                     log("Selected contact NULL");
                     return;
                 }
-
-                Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
-                i.putExtra("name", contact.getEmail());
-                context.startActivity(i);
-
-                dismissAllowingStateLoss();
+                ((FileContactListActivityLollipop)context).changePermissions();
                 break;
             }
-            case R.id.contact_list_option_send_file_layout:{
+            case R.id.file_contact_list_option_delete_layout:{
                 log("optionSendFile");
                 if(contact==null){
                     log("Selected contact NULL");
                     return;
                 }
-                List<MegaUser> user = new ArrayList<MegaUser>();
-                user.add(contact);
-                ContactController cC = new ContactController(context);
-                cC.pickFileToSend(user);
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.contact_list_option_share_layout:{
-                log("optionShare");
-                if(contact==null){
-                    log("Selected contact NULL");
-                    return;
-                }
-                List<MegaUser> user = new ArrayList<MegaUser>();
-                user.add(contact);
-                ContactController cC = new ContactController(context);
-                cC.pickFolderToShare(user);
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.contact_list_option_remove_layout:{
-                log("optionRemove");
-                if(contact==null){
-                    log("Selected contact NULL");
-                    return;
-                }
-                ((ManagerActivityLollipop) context).showConfirmationRemoveContact(contact);
+                ((FileContactListActivityLollipop)context).removeFileContactShare();
                 break;
             }
         }
@@ -337,6 +294,6 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     }
 
     private static void log(String log) {
-        Util.log("ContactsBottomSheetDialogFragment", log);
+        Util.log("FileContactsListBottomSheetDialogFragment", log);
     }
 }
