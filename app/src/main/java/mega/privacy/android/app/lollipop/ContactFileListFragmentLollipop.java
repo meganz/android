@@ -1324,4 +1324,9 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	public long getParentHandle() {
 		return parentHandle;
 	}
+
+	public boolean isEmptyParentHandleStack() {
+		return parentHandleStack.isEmpty();
+	}
+
 }

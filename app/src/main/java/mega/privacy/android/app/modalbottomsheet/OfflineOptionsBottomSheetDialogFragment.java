@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
@@ -53,6 +54,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     DisplayMetrics outMetrics;
 
     MegaApiAndroid megaApi;
+    DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,8 +64,19 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if(context instanceof ManagerActivityLollipop){
-            nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
+        dbH = DatabaseHandler.getDbHandler(getActivity());
+
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            String handle = savedInstanceState.getString("handle");
+            log("Handle of the node offline: "+handle);
+            nodeOffline = dbH.findByHandle(handle);
+        }
+        else{
+            log("Bundle NULL");
+            if(context instanceof ManagerActivityLollipop){
+                nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
+            }
         }
 
         nC = new NodeController(context);
@@ -305,7 +318,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        context = activity;
+        this.context = activity;
     }
 
 
@@ -313,6 +326,15 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+        String handle = nodeOffline.getHandle();
+        log("Handle of the node offline: "+handle);
+        outState.putString("handle", handle);
     }
 
     private static void log(String log) {
