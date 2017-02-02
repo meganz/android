@@ -70,8 +70,19 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if(context instanceof ManagerActivityLollipop){
-            contact = ((ManagerActivityLollipop) context).getSelectedUser();
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            String email = savedInstanceState.getString("email");
+            log("Email of the contact: "+email);
+            if(email!=null){
+                contact = megaApi.getContact(email);
+            }
+        }
+        else{
+            log("Bundle NULL");
+            if(context instanceof ManagerActivityLollipop){
+                contact = ((ManagerActivityLollipop) context).getSelectedUser();
+            }
         }
 
         cC = new ContactController(context);
@@ -108,13 +119,20 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionSendFile.setOnClickListener(this);
         optionShareFolder.setOnClickListener(this);
 
-        fullName = getFullName(contact);
-        titleNameContactChatPanel.setText(fullName);
-        titleMailContactChatPanel.setText(contact.getEmail());
+        if(contact!=null){
+            fullName = getFullName(contact);
+            titleNameContactChatPanel.setText(fullName);
+            titleMailContactChatPanel.setText(contact.getEmail());
 
-        addAvatarContactPanel(contact);
+            addAvatarContactPanel(contact);
 
-        dialog.setContentView(contentView);
+            dialog.setContentView(contentView);
+            mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+        else{
+            log("Contact NULL");
+        }
     }
 
     public String getFullName(MegaUser contact){
@@ -301,7 +319,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        context = activity;
+        this.context = activity;
     }
 
 
@@ -309,6 +327,15 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+        String email = contact.getEmail();
+        log("Email of the contact: "+email);
+        outState.putString("email", email);
     }
 
     private static void log(String log) {
