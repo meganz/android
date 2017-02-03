@@ -52,28 +52,29 @@
         android:id="@+id/options_file_storage_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
+		android:background="@color/preference_category_title"
 		android:gravity="right|center_vertical"
-        android:background="@color/white"
+		android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
 
-        <TextView
+        <Button
             android:id="@+id/file_storage_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_vertical|center_horizontal"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+			android:textColor="@color/accentColor"
+			android:gravity="center_vertical|center_horizontal"
+			android:stateListAnimator="@null"
+		 	android:background="@color/preference_category_title"/>
 
-        <TextView
-            android:id="@+id/file_storage_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_vertical|center_horizontal"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+		<Button
+			android:id="@+id/file_storage_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textColor="@color/accentColor"
+			android:gravity="center_vertical|center_horizontal"
+			android:stateListAnimator="@null"
+			android:background="@color/preference_category_title"/>
+
     </LinearLayout>
 
 	<View
@@ -81,7 +82,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="1dip"
 		android:layout_above="@id/options_file_storage_layout"
-		android:background="@color/separator_grey" />
+		android:background="@color/tour_bar_grey" />
     
    <android.support.v7.widget.RecyclerView
         android:id="@+id/file_storage_list_view"

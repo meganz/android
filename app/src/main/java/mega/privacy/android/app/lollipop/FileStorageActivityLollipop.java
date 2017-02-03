@@ -33,8 +33,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -107,11 +109,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 //	DisplayMetrics outMetrics;
 	private RelativeLayout viewContainer;
 //	private TextView windowTitle;
-	private TextView button;
+	private Button button;
 	private TextView contentText;
 	private RecyclerView listView;
 	RecyclerView.LayoutManager mLayoutManager;
-	private TextView cancelButton;
+	private Button cancelButton;
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -357,7 +359,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    else{
 	    	scaleText = scaleW;
 	    }
-					    
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		}
+
 		setContentView(R.layout.activity_filestorage);
 		
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
@@ -394,52 +403,31 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
         viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
 		contentText = (TextView) findViewById(R.id.file_storage_content_text);
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
-		
-//		optionsBar = (LinearLayout) v.findViewById(R.id.options_file_storage_layout);
-		cancelButton = (TextView) findViewById(R.id.file_storage_cancel_button);
-		button = (TextView) findViewById(R.id.file_storage_button);
+
+		cancelButton = (Button) findViewById(R.id.file_storage_cancel_button);
+		button = (Button) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
-//		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
-//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		
+
 		if(fromSettings){
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-//			paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 		}
 		else{
 			if (mode == Mode.PICK_FOLDER) {
 				button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-//				paramsb2.width = Util.scaleWidthPx(95, outMetrics);
 				
 			}
 			else{
 				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-//				paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 			}
 		}		
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
 		emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 		emptyTextView.setText(R.string.file_browser_empty_folder);
-		
-//		button.setLayoutParams(paramsb2);
-		//Left and Right margin
-		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)button.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(12, outMetrics), 0); 
-		button.setLayoutParams(optionTextParams);		
-		
+
 		cancelButton.setOnClickListener(this);		
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));		
-		
-		android.view.ViewGroup.LayoutParams paramsb1 = cancelButton.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb1.width = Util.scaleWidthPx(145, outMetrics);
-		cancelButton.setLayoutParams(paramsb1);
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		cancelButton.setLayoutParams(cancelTextParams);		
-		
+
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(this);
@@ -936,7 +924,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	
 	public void showNewFolderDialog(){
-		log("showNewFolderDialogKitLollipop");
+		log("showNewFolderDialog");
 		
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
@@ -946,7 +934,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);		
 		
-		input.setId(1);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
