@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -49,7 +48,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -168,8 +166,6 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
-
-import static mega.privacy.android.app.utils.Util.context;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
 
@@ -1782,17 +1778,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	public void onPostCreate(Bundle savedInstanceState){
-		log("onPostCreate");
-		super.onPostCreate(savedInstanceState);
-	}
-
-	@Override
 	protected void onResume(){
 		log("onResume");
-		if(myAccountInfo==null){
-			log("My AccountInfo is Null");
-		}
 		super.onResume();
 
 		MegaApplication.activityResumed();
@@ -1800,7 +1787,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	protected void onPostResume() {
-		log("onPostResume ");
+		log("onPostResume");
     	super.onPostResume();
 
 		if (isSearching){
@@ -1823,11 +1810,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			return;
     		}
     		else{
-    			log("not credentials");
+    			log("onPostResume: not credentials");
     			if (intent != null) {
-    				log("not credentials -> INTENT");
+    				log("onPostResume: not credentials -> INTENT");
     				if (intent.getAction() != null){
-    					log("intent with ACTION: "+intent.getAction());
+    					log("onPostResume: intent with ACTION: "+intent.getAction());
     					if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
     						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -1843,20 +1830,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
     	if (intent != null) {
-    		log("intent not null! "+intent.getAction());
+    		log("onPostResume: intent not null! "+intent.getAction());
     		// Open folder from the intent
 			if (intent.hasExtra(Constants.EXTRA_OPEN_FOLDER)) {
-				log("INTENT: EXTRA_OPEN_FOLDER");
+				log("onPostResume: INTENT: EXTRA_OPEN_FOLDER");
 				parentHandleBrowser = intent.getLongExtra(Constants.EXTRA_OPEN_FOLDER, -1);
 				intent.removeExtra(Constants.EXTRA_OPEN_FOLDER);
 				setIntent(null);
 			}
 
     		if (intent.getAction() != null){
-    			log("intent action");
+    			log("onPostResume: intent action");
 
     			if(getIntent().getAction().equals(Constants.ACTION_EXPLORE_ZIP)){
-					log("open zip browser");
+					log("onPostResume: open zip browser");
     				String pathZip=intent.getExtras().getString(Constants.EXTRA_PATH_ZIP);
 
     				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
@@ -1877,7 +1864,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //
 //    			}
     			if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
-					log("ACTION_IMPORT_LINK_FETCH_NODES");
+					log("onPostResume: ACTION_IMPORT_LINK_FETCH_NODES");
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1888,7 +1875,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_OPEN_MEGA_LINK)){
-					log("ACTION_OPEN_MEGA_LINK");
+					log("onPostResume: ACTION_OPEN_MEGA_LINK");
 					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					fileLinkIntent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
@@ -1898,13 +1885,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						startActivity(fileLinkIntent);
 					}
 					else{
-						log("getDataString is NULL");
+						log("onPostResume: getDataString is NULL");
 					}
 					finish();
 					return;
 				}
     			else if (intent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
-					log("ACTION_OPEN_MEGA_FOLDER_LINK");
+					log("onPostResume: ACTION_OPEN_MEGA_FOLDER_LINK");
     				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivityLollipop.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     				intentFolderLink.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
@@ -1915,7 +1902,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						startActivity(intentFolderLink);
 					}
 					else{
-						log("getDataString is NULL");
+						log("onPostResume: getDataString is NULL");
 					}
 					finish();
     			}
@@ -1951,13 +1938,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			showOverquotaAlert();
 	    		}
 				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
-					log("Intent CHANGE AVATAR");
+					log("onPostResume: Intent CHANGE AVATAR");
 					String path = intent.getStringExtra("IMAGE_PATH");
-					log("Path of the avatar: "+path);
+					log("onPostResume: Path of the avatar: "+path);
 					megaApi.setAvatar(path, this);
 				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-    				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+    				log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
 					String title = null;
 					String text = null;
@@ -2007,16 +1994,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
-    				log("intent show transfers");
+    				log("onPostResume: intent show transfers");
     				drawerItem = DrawerItem.TRANSFERS;
     				selectDrawerItemLollipop(drawerItem);
     			}
     			else if (intent.getAction().equals(Constants.ACTION_TAKE_SELFIE)){
-    				log("Intent take selfie");
+    				log("onPostResume: Intent take selfie");
     				takePicture();
     			}
 				else if (intent.getAction().equals(Constants.SHOW_REPEATED_UPLOAD)){
-					log("Intent SHOW_REPEATED_UPLOAD");
+					log("onPostResume: Intent SHOW_REPEATED_UPLOAD");
 					String message = intent.getStringExtra("MESSAGE");
 					showSnackbar(message);
 				}
@@ -2029,13 +2016,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	if (nV != null){
     		switch(drawerItem){
 	    		case CLOUD_DRIVE:{
-	    			log("onResume - case CLOUD DRIVE");
+	    			log("onPostResume: case CLOUD DRIVE");
 					//Check the tab to shown and the title of the actionBar
 					int index = viewPagerCDrive.getCurrentItem();
 					if(index==0) {
-						log("onResume - TAB CLOUD DRIVE");
+						log("onPostResume: TAB CLOUD DRIVE");
 						if (parentHandleBrowser == -1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
-							log("Parent -1 or ROOTNODE");
+							log("onPostResume: Parent -1 or ROOTNODE");
 							parentHandleBrowser = megaApi.getRootNode().getHandle();
 							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -2043,7 +2030,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						else{
 							MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 							aB.setTitle(parentNode.getName());
-							log("indicator_arrow_back_135");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						}
 						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
@@ -2057,9 +2043,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						log("onResume - TAB RUBBISH NODE");
+						log("onPostResume: TAB RUBBISH NODE");
 						if (parentHandleRubbish == -1||parentHandleRubbish==megaApi.getRubbishNode().getHandle()){
-							log("Parent -1 or RUBBISHNODE");
+							log("onPostResume: Parent -1 or RUBBISHNODE");
 							aB.setTitle(getString(R.string.section_rubbish_bin));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						}
@@ -2069,7 +2055,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								parentNode = megaApi.getRubbishNode();
 							}
 							aB.setTitle(parentNode.getName());
-							log("indicator_arrow_back_137");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						}
 						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
@@ -2086,7 +2071,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			break;
 	    		}
 				case ACCOUNT:{
-					log("onPostResume - case ACCOUNT");
+					log("onPostResume: case ACCOUNT");
 					aB.setTitle(getString(R.string.section_account));
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					if (nV != null){
@@ -2098,7 +2083,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					break;
 				}
 	    		case SHARED_ITEMS:{
-	    			log("onResume - case SHARED ITEMS");
+	    			log("onPostResume: case SHARED ITEMS");
 	    			if (viewPagerShares != null){
 	    				int index = viewPagerShares.getCurrentItem();
 	        			if(index==0){
@@ -2116,6 +2101,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				}
 	        			}
 		    		}
+					log("onPostResume: shared tabs visible");
+					sharesSectionLayout.setVisibility(View.VISIBLE);
+					tabLayoutShares.setVisibility(View.VISIBLE);
+					viewPagerShares.setVisibility(View.VISIBLE);
 		    		break;
 	    		}
 				case SETTINGS:{
@@ -2141,7 +2130,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if(rChatFL.isAdded()){
 							rChatFL.setChats();
 						}
-
 					}
 					break;
 				}
@@ -2880,11 +2868,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerContacts.setVisibility(View.GONE);
 		cloudSectionLayout.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
+		myAccountSectionLayout.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
 
 		if (mTabsAdapterShares == null){
-			log("mTabsAdapterShares is NULL");
-			sharesSectionLayout.setVisibility(View.VISIBLE);
-			viewPagerShares.setVisibility(View.VISIBLE);
+			log("selectDrawerItemSharedItems: mTabsAdapterShares is NULL");
 
 			mTabsAdapterShares = new SharesPageAdapter(getSupportFragmentManager(),this);
 			viewPagerShares.setAdapter(mTabsAdapterShares);
@@ -2892,11 +2880,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			//Force on CreateView, addTab do not execute onCreateView
 			if(indexShares!=-1){
-				log("The index of the TAB Shares is: "+indexShares);
+				log("selectDrawerItemSharedItems: The index of the TAB Shares is: "+indexShares);
 				if (viewPagerShares != null){
 					if(indexShares==0){
-						log("after creating tab in INCOMING TAB: "+parentHandleIncoming);
-						log("deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+						log("selectDrawerItemSharedItems: after creating tab in INCOMING TAB: "+parentHandleIncoming);
+						log("selectDrawerItemSharedItems: deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
 
 						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 						inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
@@ -2911,7 +2899,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						viewPagerShares.setCurrentItem(0);
 					}
 					else{
-						log("after creating tab in OUTGOING TAB: "+parentHandleOutgoing);
+						log("selectDrawerItemSharedItems: after creating tab in OUTGOING TAB: "+parentHandleOutgoing);
 
 						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
 						outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
@@ -2930,11 +2918,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else {
 				//No bundle, no change of orientation
-				log("indexShares is NOT -1");
+				log("selectDrawerItemSharedItems: indexShares is NOT -1");
 			}
+			sharesSectionLayout.setVisibility(View.VISIBLE);
+			viewPagerShares.setVisibility(View.VISIBLE);
 		}
 		else{
-			log("mTabsAdapterShares NOT null");
+			log("selectDrawerItemSharedItems: mTabsAdapterShares NOT null");
 			sharesSectionLayout.setVisibility(View.VISIBLE);
 			viewPagerShares.setVisibility(View.VISIBLE);
 
@@ -2971,29 +2961,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //    				}
 
 			int index = viewPagerShares.getCurrentItem();
-			log("Fragment Index Shared Items: " + index);
+			log("selectDrawerItemSharedItems: Fragment Index Shared Items: " + index);
 			if(index==0){
 				//INCOMING TAB
 //        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 //        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 				if (inSFLol != null){
 					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-					log("Selected Incoming with parent: "+parentHandleIncoming);
-					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+					log("selectDrawerItemSharedItems: Selected Incoming with parent: "+parentHandleIncoming);
+					log("selectDrawerItemSharedItems: inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
 					if (node != null){
 						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
 						inSFLol.setParentHandle(parentHandleIncoming);
 						inSFLol.setDeepBrowserTree(deepBrowserTreeIncoming);
 						aB.setTitle(node.getName());
-						log("indicator_arrow_back_893");
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						firstNavigationLevel = false;
 					}
 					else{
-						log("The Node is NULL");
+						log("selectDrawerItemSharedItems: The Node is NULL");
 						inSFLol.findNodes();
 						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_16");
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						firstNavigationLevel = true;
 					}
@@ -3008,14 +2996,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (node != null){
 						outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
 						aB.setTitle(node.getName());
-						log("indicator_arrow_back_894");
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						firstNavigationLevel = false;
 					}
 					else{
 						outSFLol.refresh();
 						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_18");
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						firstNavigationLevel = true;
 					}
@@ -3034,7 +3020,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void onPageSelected(int position) {
-				log("TabId :"+ position);
+				log("selectDrawerItemSharedItems: TabId :"+ position);
 				supportInvalidateOptionsMenu();
 				if(position == 1){
 					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
@@ -3057,7 +3043,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						log("outSFLol == null");
+						log("selectDrawerItemSharedItems: outSFLol == null");
 					}
 				}
 				else if(position == 0){
@@ -3081,7 +3067,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						log("inSFLol == null");
+						log("selectDrawerItemSharedItems: inSFLol == null");
 					}
 				}
 				showFabButton();
@@ -9172,7 +9158,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void setFirstNavigationLevel(boolean firstNavigationLevel){
-		log("setFirstNavigationLevel: "+firstNavigationLevel);
+		log("setFirstNavigationLevel: set value to "+firstNavigationLevel);
 		this.firstNavigationLevel = firstNavigationLevel;
 	}
 
@@ -9212,7 +9198,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void setParentHandleBrowser(long parentHandleBrowser){
-		log("setParentHandleBrowser: "+parentHandleBrowser);
+		log("setParentHandleBrowser: set value to:"+parentHandleBrowser);
 
 		this.parentHandleBrowser = parentHandleBrowser;
 
@@ -12574,16 +12560,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
-				log("Cloud Drive SECTION");
+				log("showFabButton: Cloud Drive SECTION");
 				int indexCloud = getTabItemCloud();
 				switch(indexCloud){
 					case 0:{
-						log("cloud TAB");
+						log("showFabButton: cloud TAB");
 						fabButton.setVisibility(View.VISIBLE);
 						break;
 					}
 					case 1:{
-						log("rubbish TAB");
+						log("showFabButton: rubbish TAB");
 						fabButton.setVisibility(View.GONE);
 						break;
 					}
@@ -12595,27 +12581,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case SHARED_ITEMS:{
-				log("Shared Items SECTION");
+				log("showFabButton: Shared Items SECTION");
 				int indexShares = getTabItemShares();
 				switch(indexShares){
 					case 0:{
-						log("INCOMING TAB");
+						log("showFabButton: INCOMING TAB");
 						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 						inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 						if(inSFLol!=null){
 							int deepBrowserTreeIn = inSFLol.getDeepBrowserTree();
 							if(deepBrowserTreeIn<=0){
-								log("fabButton GONE");
+								log("showFabButton: fabButton GONE");
 								fabButton.setVisibility(View.GONE);
 							}
 							else {
 								//Check the folder's permissions
 								long handle = inSFLol.getParentHandle();
-								log("handle from incoming: "+handle);
+								log("showFabButton: handle from incoming: "+handle);
 								MegaNode parentNodeInSF = megaApi.getNodeByHandle(handle);
 								if(parentNodeInSF!=null){
 									int accessLevel= megaApi.getAccess(parentNodeInSF);
-									log("Node: "+parentNodeInSF.getName());
+									log("showFabButton: Node: "+parentNodeInSF.getName());
 
 									switch(accessLevel) {
 										case MegaShare.ACCESS_OWNER:
@@ -12638,7 +12624,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 					case 1:{
-						log("OUTGOING TAB");
+						log("showFabButton: OUTGOING TAB");
 						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
 						outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 						if(outSFLol!=null){
@@ -12688,7 +12674,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			default:{
-				log("default GONE fabButton");
+				log("showFabButton: default GONE fabButton");
 				fabButton.setVisibility(View.GONE);
 				break;
 			}
