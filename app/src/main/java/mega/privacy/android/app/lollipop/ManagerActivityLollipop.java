@@ -12900,6 +12900,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void disableChat(){
 		log("disableChat");
 
+		drawerItem = DrawerItem.SETTINGS;
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+			chat.setTitle(getString(R.string.section_chat));
+			MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
+			settings.setChecked(true);
+			settings.setIcon(getResources().getDrawable(R.drawable.settings_red));
+		}
+
 		if (megaChatApi != null){
 			megaChatApi.removeChatListener(this);
 		}
