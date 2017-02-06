@@ -3,28 +3,18 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import java.io.File;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class ChatNonContactNameListener implements MegaChatRequestListenerInterface {
 
@@ -86,14 +76,12 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                 if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
                     log("ManagerActivityLollipop->First name received");
                     firstName = request.getText();
-                    receivedFirstName = true;
-                    addToDB(request.getUserHandle());
+                    dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
                 }
                 else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
                     log("ManagerActivityLollipop->Last name received");
                     lastName = request.getText();
-                    receivedLastName = true;
-                    addToDB(request.getUserHandle());
+                    dbH.setNonContactLastName(lastName, request.getUserHandle()+"");
                 }
             }
             else{
@@ -108,7 +96,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                         log("Match!");
                         firstName = request.getText();
                         receivedFirstName = true;
-                        addToDB(request.getUserHandle());
+                        dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
                         log("Update holder: "+holder.getUserHandle());
                         updateAdapter(holder.getCurrentPosition());
                     }
@@ -120,7 +108,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                         log("MEgaChatAdapter->Match!");
                         lastName = request.getText();
                         receivedLastName = true;
-                        addToDB(request.getUserHandle());
+                        dbH.setNonContactLastName(lastName, request.getUserHandle()+"");
                         log("Update holder: "+holder.getUserHandle());
                         updateAdapter(holder.getCurrentPosition());
                     }
@@ -135,43 +123,17 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     public void addToDB(long userHandle){
         log("addTODB: "+userHandle);
-        if(receivedFirstName&&receivedLastName){
 
-            if(lastName==null){
-                lastName="";
-            }
-            if(lastName == null){
-                lastName="";
-            }
-
-            if (firstName.trim().length() <= 0){
-                fullName = lastName;
-            }
-            else{
-                fullName = firstName + " " + lastName;
-            }
-
-//            String userHandleString = megaApi.userHandleToBase64(userHandle);
-            NonContactInfo check = dbH.findNonContactByHandle(userHandle+"");
-
-            if(check==null){
-                NonContactInfo nonContact = new NonContactInfo(userHandle+"", fullName);
-                log("Insert into NON contant table: "+fullName);
-                dbH.setNonContact(nonContact);
-            }
-            else{
-                log("The non contact already exists");
-//                dbH.setNonContactFullName(fullName, userHandle+"");
-            }
-
-            receivedFirstName = false;
-            receivedLastName = false;
-        }
     }
 
     public void updateAdapter(int position) {
         log("updateAdapter: "+position);
-        adapter.notifyItemChanged(position);
+        if(receivedFirstName&&receivedLastName){
+
+            adapter.notifyItemChanged(position);
+            receivedFirstName = false;
+            receivedLastName = false;
+        }
     }
 
     @Override

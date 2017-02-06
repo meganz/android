@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -53,17 +51,14 @@ import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
-import mega.privacy.android.app.modalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -579,7 +574,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 idChat = newIntent.getLongExtra("CHAT_ID", -1);
 //                    idChat=8179160514871859886L;
                 myMail = megaApi.getMyEmail();
-                myUserHandle = megaApi.getMyUser().getHandle();
+                myUserHandle = megaChatApi.getMyUserHandle();
 
                 log("Show empty screen");
                 chatRelativeLayout.setVisibility(View.GONE);
@@ -1563,7 +1558,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             AndroidMegaChatMessage m = messages.get(position);
 //            showMsgNotSentPanel(m);
             if(m!=null){
-                if(m.getMessage().getUserHandle()==megaApi.getMyUser().getHandle()) {
+                if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                     if(!(m.getMessage().isManagementMessage())){
                         log("selected message: "+m.getMessage().getContent());
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
@@ -1670,7 +1665,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 long userHandleTyping = chat.getUserTyping();
 
-                if(userHandleTyping==megaApi.getMyUser().getHandle()){
+                if(userHandleTyping==megaChatApi.getMyUserHandle()){
                     return;
                 }
 
@@ -2366,7 +2361,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
-            log("Remove participant: "+request.getUserHandle()+" my user: "+megaApi.getMyUser().getHandle());
+            log("Remove participant: "+request.getUserHandle()+" my user: "+megaChatApi.getMyUserHandle());
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Participant removed OK");
@@ -2427,6 +2422,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onNewIntent(intent);
         setIntent(intent);
         return;
+    }
+
+    public String getPeerFullName(long userHandle){
+        return chatRoom.getPeerFullnameByHandle(userHandle);
     }
 
 //    @Override

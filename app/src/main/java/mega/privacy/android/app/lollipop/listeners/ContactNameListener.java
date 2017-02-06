@@ -32,7 +32,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
 
         if (e.getErrorCode() == MegaError.API_OK){
 
-            if(request.getParamType()==1){
+            if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
                 log("(ManagerActivityLollipop(1)request.getText(): "+request.getText()+" -- "+request.getEmail());
                 int rows = dbH.setContactName(request.getText(), request.getEmail());
                 log("Rows affected: "+rows);
@@ -43,7 +43,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                         cFLol.updateView();
                 }
             }
-            else if(request.getParamType()==2){
+            else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
                 log("ManagerActivityLollipop(2)request.getText(): "+request.getText()+" -- "+request.getEmail());
                 int rows = dbH.setContactLastName(request.getText(), request.getEmail());
                 log("Rows affected: "+rows);

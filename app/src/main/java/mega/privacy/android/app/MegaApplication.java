@@ -16,14 +16,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaChatRoomList;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
@@ -38,7 +31,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	final String TAG = "MegaApplication";
 	static final String USER_AGENT = "MEGAAndroid/3.1.alpha.1";
 
-
+	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -72,18 +65,18 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		@Override
 		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			log("onRequestStart: " + request.getRequestString());
+			log("BackgroundRequestListener:onRequestStart: " + request.getRequestString());
 		}
 
 		@Override
 		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			log("onRequestUpdate: " + request.getRequestString());
+			log("BackgroundRequestListener:onRequestUpdate: " + request.getRequestString());
 		}
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
-			log("onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
+			log("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 			if (e.getErrorCode() == MegaError.API_ESID){
 				if (request.getType() == MegaRequest.TYPE_LOGOUT){
 					log("type_logout");
@@ -93,9 +86,39 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 				if (e.getErrorCode() == MegaError.API_OK){
 					if (megaApi != null){
-						log("enableTransferResumption ");
-						log("enableTransferResumption - Session: " + megaApi.dumpSession());
+						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption ");
+						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption - Session: " + megaApi.dumpSession());
 //						megaApi.enableTransferResumption();
+					}
+				}
+			}
+			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("BackgroundRequestListener:onRequestFinish: Email: "+request.getEmail());
+					log("BackgroundRequestListener:onRequestFinish: Name: "+request.getText());
+
+					if (megaApi != null){
+						if(request.getEmail()!=null){
+							MegaUser user = megaApi.getContact(request.getEmail());
+							if (user != null) {
+								log("BackgroundRequestListener:onRequestFinish: User handle: "+user.getHandle());
+								if(user.getEmail()!=null){
+									log("BackgroundRequestListener:onRequestFinish: The user is CONTACT");
+								}
+								else{
+									log("BackgroundRequestListener:onRequestFinish: Non-contact");
+									if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+										dbH.setNonContactFirstName(request.getName(), request.getEmail());
+									}
+									else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+										dbH.setNonContactLastName(request.getName(), request.getEmail());
+									}
+								}
+							}
+							else{
+								log("BackgroundRequestListener:onRequestFinish: User is NULL");
+							}
+						}
 					}
 				}
 			}
@@ -104,7 +127,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		@Override
 		public void onRequestTemporaryError(MegaApiJava api,
 				MegaRequest request, MegaError e) {
-			log("onRequestTemporaryError: " + request.getRequestString());
+			log("BackgroundRequestListener: onRequestTemporaryError: " + request.getRequestString());
 		}
 		
 	}
@@ -116,7 +139,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
-		DatabaseHandler dbH;
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		megaApi = getMegaApi();

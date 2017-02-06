@@ -5,15 +5,34 @@ public class NonContactInfo {
 
     String handle;
     String fullName;
+    String firstName;
+    String lastName;
 //    boolean requestDone = false;
 
-    public NonContactInfo(String handle, String fullName) {
+    public NonContactInfo(String handle, String fullName, String firstName, String lastName) {
         this.fullName = fullName;
         this.handle = handle;
+        this.firstName = firstName;
+        this.lastName = lastName;
 //        this.requestDone = requestDone;
     }
 
     public String getFullName() {
+
+        if(lastName==null){
+            lastName="";
+        }
+        if(lastName == null){
+            lastName="";
+        }
+
+        if (firstName.trim().length() <= 0){
+            fullName = lastName;
+        }
+        else{
+            fullName = firstName + " " + lastName;
+        }
+
         return fullName;
     }
 
@@ -27,5 +46,21 @@ public class NonContactInfo {
 
     public void setHandle(String handle) {
         this.handle = handle;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }
