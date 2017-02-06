@@ -94,29 +94,32 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (e.getErrorCode() == MegaError.API_OK){
-					log("BackgroundRequestListener:onRequestFinish: Email: "+request.getEmail());
-					log("BackgroundRequestListener:onRequestFinish: Name: "+request.getText());
 
-					if (megaApi != null){
-						if(request.getEmail()!=null){
-							MegaUser user = megaApi.getContact(request.getEmail());
-							if (user != null) {
-								log("BackgroundRequestListener:onRequestFinish: User handle: "+user.getHandle());
-								if(user.getEmail()!=null){
-									log("BackgroundRequestListener:onRequestFinish: The user is CONTACT");
+					if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME||request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+						log("BackgroundRequestListener:onRequestFinish: Email: "+request.getEmail());
+						log("BackgroundRequestListener:onRequestFinish: Name: "+request.getText());
+						if (megaApi != null){
+							if(request.getEmail()!=null){
+								MegaUser user = megaApi.getContact(request.getEmail());
+								if (user != null) {
+									log("BackgroundRequestListener:onRequestFinish: User handle: "+user.getHandle());
+									log("Visibility: "+user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
+									if(user.getVisibility()==MegaUser.VISIBILITY_UNKNOWN){
+										log("BackgroundRequestListener:onRequestFinish: Non-contact");
+										if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+											dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
+										}
+										else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+											dbH.setNonContactLastName(request.getText(), user.getHandle()+"");
+										}
+									}
+									else{
+										log("BackgroundRequestListener:onRequestFinish: The user is or was CONTACT: "+user.getEmail());
+									}
 								}
 								else{
-									log("BackgroundRequestListener:onRequestFinish: Non-contact");
-									if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-										dbH.setNonContactFirstName(request.getName(), request.getEmail());
-									}
-									else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-										dbH.setNonContactLastName(request.getName(), request.getEmail());
-									}
+									log("BackgroundRequestListener:onRequestFinish: User is NULL");
 								}
-							}
-							else{
-								log("BackgroundRequestListener:onRequestFinish: User is NULL");
 							}
 						}
 					}
