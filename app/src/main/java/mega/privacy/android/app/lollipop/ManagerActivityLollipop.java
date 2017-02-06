@@ -1340,7 +1340,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //			startActivity(offlineIntent);
 //			finish();
 			showOfflineMode();
-//			selectDrawerItemPending=false;
+			if(Util.isChatEnabled()){
+				UserCredentials credentials = dbH.getCredentials();
+				if(credentials!=null){
+					String gSession = credentials.getSession();
+					int ret = megaChatApi.init(gSession);
+					log("In Offline mode: init chat is: "+ret);
+				}
+			}
         	return;
         }
 
