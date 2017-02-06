@@ -130,8 +130,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
-        ChatController chatController = new ChatController(context);
-
         if(Util.isChatEnabled()){
             chatEnabled=true;
             if (megaChatApi == null){
