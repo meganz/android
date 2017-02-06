@@ -15,7 +15,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -27,11 +26,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -50,7 +45,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -59,11 +53,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
 
 public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
@@ -192,7 +183,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
-        emptyTextViewParams2.setMargins(0, Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
+        emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
@@ -256,7 +247,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         }
         else{
             log("Chat DISABLED");
-            showDisableChatScreen();
+            if(Util.isOnline(context)){
+                showDisableChatScreen();
+            }
+            else{
+                showNoConnectionScreen();
+            }
         }
 
         return v;
@@ -297,7 +293,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                     chats = new ArrayList<MegaChatListItem>();
                 }
 
+                int initState = megaChatApi.getInitState();
+                log("Init state is: "+initState);
                 chats = megaChatApi.getActiveChatListItems();
+
                 log("chats no: "+chats.size());
 
                 //Order by last interaction
@@ -342,7 +341,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 }
             }
             else{
-                showDisableChatScreen();
+                if(Util.isOnline(context)){
+                    showDisableChatScreen();
+                }
+                else{
+                    showNoConnectionScreen();
+                }
             }
         }
     }
@@ -355,6 +359,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_enable_chat));
         inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
         emptyTextView.setText(R.string.recent_chat_enable_chat);
+        emptyLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void showNoConnectionScreen(){
+
+        listView.setVisibility(View.GONE);
+        chatStatusLayout.setVisibility(View.GONE);
+        ((ManagerActivityLollipop)context).hideFabButton();
+        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_no_connection_title));
+        inviteButton.setVisibility(View.GONE);
+        emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
         emptyLayout.setVisibility(View.VISIBLE);
     }
 

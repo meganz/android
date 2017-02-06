@@ -848,7 +848,6 @@
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
     <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat\nand enjoy our encrypted platform with privacy and security.</string>
 
-
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
 
     <plurals name="general_minutes">
@@ -1066,4 +1065,7 @@
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>of %2$s</font>]]></string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for Offline section">Remove from Save for Offline?</string>
+
+    <string name="recent_chat_empty_no_connection_title" context="Title of chat section when the app has no connection">No Internet connection</string>
+    <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without connection.</string>
 </resources>
