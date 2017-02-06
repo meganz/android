@@ -22,7 +22,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
@@ -917,6 +916,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			ListView lv = (ListView) v.findViewById(android.R.id.list);
 			lv.setPadding(0, 0, 0, 0);
 		}
+
+		if(!Util.isOnline(context)){
+			chatEnabledCategory.setEnabled(false);
+			chatStatusCategory.setEnabled(false);
+			cameraUploadCategory.setEnabled(false);
+		}
+
 		return v;
 	}
 
@@ -1897,6 +1903,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		taskGetSizeCache();
 		taskGetSizeOffline();
+
+		if(!Util.isOnline(context)){
+			chatEnabledCategory.setEnabled(false);
+			chatStatusCategory.setEnabled(false);
+			cameraUploadCategory.setEnabled(false);
+		}
+
 	}
 	
 	public void afterSetPinLock(){
