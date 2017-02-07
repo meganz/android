@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -104,25 +103,13 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		MegaContactRequest contact = (MegaContactRequest) getItem(position);
 		
 		if (!multipleSelect) {
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			if (positionClicked != -1){
-				if (positionClicked == position){
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					listFragment.smoothScrollToPosition(positionClicked);
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			}
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		} else {
 			log("Multiselect ON");
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 			}
 			else{
 				log("NOT selected");

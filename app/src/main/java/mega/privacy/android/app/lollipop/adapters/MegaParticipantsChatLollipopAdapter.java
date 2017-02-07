@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -29,30 +28,18 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.R.string.offline_status;
 
 
 public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<MegaParticipantsChatLollipopAdapter.ViewHolderParticipants> implements OnClickListener {
@@ -193,27 +180,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
 
 			if (!multipleSelect) {
-				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
-
-				if (positionClicked != -1) {
-					if (positionClicked == position) {
-						//				holder.arrowSelection.setVisibility(View.VISIBLE);
-						//					holder.optionsLayout.setVisibility(View.GONE);
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-						listFragment.smoothScrollToPosition(positionClicked);
-					} else {
-						//				holder.arrowSelection.setVisibility(View.GONE);
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-					}
-				} else {
-					//			holder.arrowSelection.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			} else {
-				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setVisibility(View.GONE);
 
 				if (this.isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 				} else {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 				}

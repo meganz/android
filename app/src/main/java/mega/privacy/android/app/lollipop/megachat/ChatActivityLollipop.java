@@ -311,6 +311,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
 
+        tB.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                log("Click on Toolbar!");
+            }
+        });
+
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -880,6 +887,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        log("onOptionsItemSelected");
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {

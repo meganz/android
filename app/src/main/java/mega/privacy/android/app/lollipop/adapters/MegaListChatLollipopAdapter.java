@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -41,12 +40,11 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
-
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -168,18 +166,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if (!multipleSelect) {
 				//Multiselect OFF
 				holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-				if (positionClicked != -1){
-					if (positionClicked == position){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-						listFragment.smoothScrollToPosition(positionClicked);
-					}
-					else{
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-					}
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.multiselectIcon.setVisibility(View.GONE);
 				setUserAvatar(holder, user);
 			} else {
@@ -188,7 +175,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 					createMultiselectTick(holder);
 				}
 				else{
@@ -212,19 +199,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			if (!multipleSelect) {
 				//Multiselect OFF
-				holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-				if (positionClicked != -1){
-					if (positionClicked == position){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-						listFragment.smoothScrollToPosition(positionClicked);
-					}
-					else{
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-					}
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.multiselectIcon.setVisibility(View.GONE);
 
 				if (chat.getTitle().length() > 0){
@@ -240,13 +215,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
-					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 					createMultiselectTick(holder);
 				}
 				else{
 					log("NOT selected");
-					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					holder.multiselectIcon.setVisibility(View.GONE);
 
