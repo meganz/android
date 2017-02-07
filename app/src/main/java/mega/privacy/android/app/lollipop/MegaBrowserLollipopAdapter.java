@@ -677,32 +677,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.textViewFileName.setText(node.getName());	
 		
 		if (!multipleSelect) {
-
-			if (positionClicked != -1) {
-				if (positionClicked == position) {
-					//				holder.arrowSelection.setVisibility(View.VISIBLE);
-//					holder.optionsLayout.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-//					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-					listFragment.smoothScrollToPosition(positionClicked);
-				}
-				else {
-					//				holder.arrowSelection.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-//					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-				}
-			} 
-			else {
-				//			holder.arrowSelection.setVisibility(View.GONE);
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-//				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-			}
-	
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		} 
 		else {
 
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);

@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -35,10 +34,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 /*
@@ -261,7 +256,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		if (selectedContacts != null) {
 			for (int i = 0; i < selectedContacts.size(); i++) {
 				if (selectedContacts.get(position) == true) {
-					holder.contactLayout.setBackgroundColor(mContext.getResources().getColor(R.color.file_list_selected_row));
+					holder.contactLayout.setBackgroundColor(mContext.getResources().getColor(R.color.new_file_list_selected_row));
 				}
 				else{
 					holder.contactLayout.setBackgroundColor(Color.WHITE);

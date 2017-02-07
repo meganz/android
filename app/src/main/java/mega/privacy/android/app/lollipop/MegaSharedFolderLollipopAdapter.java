@@ -242,27 +242,11 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		log("onBindViewHolder");
 		
 		if (!multipleSelect) {
-			log("positionClicked: "+positionClicked+" position: "+position);
-			if (positionClicked != -1) {
-				if (positionClicked == position) {
-					//				holder.arrowSelection.setVisibility(View.VISIBLE);
-//					holder.optionsLayout.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));					
-					listFragment.smoothScrollToPosition(positionClicked);
-				}
-				else {
-					//				holder.arrowSelection.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(Color.WHITE);					
-				}
-			} 
-			else {
-				//			holder.arrowSelection.setVisibility(View.GONE);
-				holder.itemLayout.setBackgroundColor(Color.WHITE);				
-			}
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		} else {
 
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);

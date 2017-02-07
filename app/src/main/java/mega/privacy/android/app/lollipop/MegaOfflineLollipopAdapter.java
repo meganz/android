@@ -531,21 +531,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		if (!multipleSelect){
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			
-			if (positionClicked != -1){
-				if (positionClicked == position){
-					
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					listFragment.smoothScrollToPosition(positionClicked);				
-				}
-				else{
-					//				
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			}			
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 		}
 		else{
 			log("multiselect enabled");
@@ -553,7 +539,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 			if(this.isItemChecked(position)){
 				log("checked");
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
 			}
 			else{
 				log("NO checked");
