@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,9 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +40,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
@@ -129,15 +127,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
-		
-		float scaleText;
-		if (scaleH < scaleW){
-			scaleText = scaleH;
-		}
-		else{
-			scaleText = scaleW;
-		}
-
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
 		
@@ -154,13 +143,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		mailIcon.setLayoutParams(mailIconParams);
 
 		nameView = (TextView) v.findViewById(R.id.my_account_name);
-		nameView.setEllipsize(TextUtils.TruncateAt.END);
-		nameView.setSingleLine();
 		LinearLayout.LayoutParams nameViewParams = (LinearLayout.LayoutParams)nameView.getLayoutParams();
 		nameViewParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(26, outMetrics), 0, 0);
 		nameView.setLayoutParams(nameViewParams);
-
-		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
 		nameView.setOnClickListener(this);
 
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
@@ -170,6 +155,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmailParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, Util.scaleHeightPx(26, outMetrics));
 		infoEmail.setLayoutParams(infoEmailParams);
 		infoEmail.setOnClickListener(this);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("onCreate: Landscape configuration");
+			nameView.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+			infoEmail.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+		}
+		else{
+			nameView.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+			infoEmail.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+		}
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 

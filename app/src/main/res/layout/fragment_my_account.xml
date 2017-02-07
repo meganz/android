@@ -45,6 +45,9 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textColor="@color/name_my_account"
+						android:singleLine="true"
+						android:maxLines="1"
+						android:ellipsize="end"
 						android:textSize="16sp" />
 
 					<TextView
@@ -52,6 +55,9 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textSize="14sp"
+						android:singleLine="true"
+						android:maxLines="1"
+						android:ellipsize="end"
 						android:textColor="@color/mail_my_account" />
 				</LinearLayout>
 

@@ -272,6 +272,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         dialog.show();
     }
 
+    public void showGroupInfoActivity(){
+        log("showGroupInfoActivity");
+        if(chatRoom.isGroup()){
+            Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
+            i.putExtra("handle", chatRoom.getChatId());
+            this.startActivity(i);
+        }
+        else{
+            Intent i = new Intent(this, ContactInfoActivityLollipop.class);
+            i.putExtra("handle", chatRoom.getChatId());
+            this.startActivity(i);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
@@ -314,7 +328,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         tB.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                log("Click on Toolbar!");
+                showGroupInfoActivity();
             }
         });
 

@@ -8,7 +8,7 @@
         android:title="@string/general_mute"
         MEGA:showAsAction="always"
         android:icon="@drawable/ic_phone_white"
-        android:enabled="false"/>
+        android:enabled="true"/>
 
     <item
         android:id="@+id/cab_menu_video_chat"
