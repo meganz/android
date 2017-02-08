@@ -414,7 +414,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     protected void onDestroy(){
         log("onDestroy()");
 
-        megaChatApi.removeChatListener(this);
+        megaChatApi.removeChatListener(groupChatInfoActivity);
 
         super.onDestroy();
     }

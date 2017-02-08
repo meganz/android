@@ -977,6 +977,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(!chat.isGroup()){
 				holder.fullName = chat.getTitle();
 			}
+			else{
+				if (chat.getTitle().length() > 0){
+					String chatTitle = chat.getTitle().trim();
+					String firstLetter = chatTitle.charAt(0) + "";
+					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+					holder.contactInitialLetter.setText(firstLetter);
+				}
+
+				createGroupChatAvatar(holder);
+			}
 		}
 	}
 
