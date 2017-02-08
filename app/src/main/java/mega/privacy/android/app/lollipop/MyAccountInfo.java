@@ -142,7 +142,13 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
         }
 
         long availableSpace = totalStorage - usedStorage;
-        formattedAvailableSpace = Util.getSizeString(availableSpace);
+        if (availableSpace < 0) {
+            formattedAvailableSpace = Util.getSizeString(0);
+        }
+        else{
+            formattedAvailableSpace = Util.getSizeString(availableSpace);
+        }
+
 
 //        totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 //        totalFormatted="";

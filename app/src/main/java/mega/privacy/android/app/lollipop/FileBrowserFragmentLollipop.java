@@ -487,12 +487,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				if(infoNode==null){
+					infoNode = megaApi.getRootNode();
+				}
 				log("Node shown: "+infoNode.getName());
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
 					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
-				else{					
+				else{
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}						
