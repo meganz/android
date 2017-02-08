@@ -414,7 +414,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     protected void onDestroy(){
         log("onDestroy()");
 
-        megaChatApi.removeChatListener(groupChatInfoActivity);
+        megaChatApi.removeChatListener(this);
 
         super.onDestroy();
     }
@@ -1370,6 +1370,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 log("NEW title: "+chat.getTitle());
                 infoTitleChatText.setText(chat.getTitle());
                 aB.setTitle(chat.getTitle());
+
+                if (chat.getTitle().length() > 0){
+                    String chatTitle = chat.getTitle().trim();
+                    String firstLetter = chatTitle.charAt(0) + "";
+                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    initialLetter.setText(firstLetter);
+                }
+
+                createGroupChatAvatar();
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {

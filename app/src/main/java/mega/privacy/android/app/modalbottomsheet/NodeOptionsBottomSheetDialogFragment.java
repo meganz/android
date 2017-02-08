@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.CoordinatorLayout;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -47,6 +48,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private BottomSheetBehavior mBehavior;
 
     LinearLayout mainLinearLayout;
+    CoordinatorLayout coordinatorLayout;
+
     ImageView nodeThumb;
     TextView nodeName;
     TextView nodeInfo;
@@ -488,13 +491,34 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
             }
             dialog.setContentView(contentView);
-            mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+
+            mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
         else{
             log("Node NULL");
         }
     }
+
+//    private int getBottomSheetMaximumHeight() {
+//        // get toolbar height
+//        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+//        int toolbarHeight = toolbar.getHeight();
+//
+//        //get status bar height
+//        Rect rectangle = new Rect();
+//        Window window = getActivity().getWindow();
+//        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+//        int windowHeight = rectangle.bottom;
+//
+//        // material design recommended bottomsheet padding from actionbar
+//        final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, getContext().getResources().getDisplayMetrics());
+//
+//        // maximum height of the bottomsheet
+////        return windowHeight - toolbarHeight - rectangle.top - padding;
+//        return toolbarHeight + rectangle.top + padding;
+//
+//    }
 
     @Override
     public void onClick(View v) {
