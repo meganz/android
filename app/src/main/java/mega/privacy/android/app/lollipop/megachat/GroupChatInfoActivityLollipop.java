@@ -1366,9 +1366,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
             chat = megaChatApi.getChatRoom(chatHandle);
-            log("NEW title: "+chat.getTitle());
-            infoTitleChatText.setText(chat.getTitle());
-            aB.setTitle(chat.getTitle());
+            if(chat!=null){
+                log("NEW title: "+chat.getTitle());
+                infoTitleChatText.setText(chat.getTitle());
+                aB.setTitle(chat.getTitle());
+            }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {
             log("CHANGE_TYPE_VISIBILITY");
