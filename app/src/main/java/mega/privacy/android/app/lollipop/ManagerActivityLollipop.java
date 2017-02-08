@@ -228,6 +228,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	Handler handler;
+	Handler outSpaceHandler;
+	Runnable outSpaceRunnable;
     ArrayList<MegaTransfer> tL;
 	DisplayMetrics outMetrics;
     float scaleText;
@@ -9297,17 +9299,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
+				outSpaceLayout.setVisibility(View.GONE);
 				break;
 			}
 			case R.id.overquota_alert_btnLeft_cancel:{
 				log("outSpace Layout gone!");
+				if(outSpaceHandler!=null){
+					outSpaceHandler.removeCallbacks(outSpaceRunnable);
+				}
 				outSpaceLayout.setVisibility(View.GONE);
+				outSpaceLayout.clearAnimation();
 				break;
 			}
 			case R.id.btnRight_upgrade:
 			case R.id.overquota_alert_btnRight_upgrade:{
 				//Add navigation to Upgrade Account
-				log("layout PRO gone!");
+				log("click on Upgrade in overquota or pro panel!");
 				drawerItem = DrawerItem.ACCOUNT;
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -10302,28 +10309,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outSpaceLayout.setVisibility(View.VISIBLE);
 		outSpaceLayout.bringToFront();
 
-		Runnable r = new Runnable() {
+		outSpaceRunnable = new Runnable() {
 
 			@Override
 			public void run() {
 				log("BUTTON DISAPPEAR");
-				log("altura: "+outSpaceLayout.getHeight());
 
 				TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
 				animTop.setDuration(4000);
-				animTop.setFillAfter(true);
 				outSpaceLayout.setAnimation(animTop);
 
 				outSpaceLayout.setVisibility(View.GONE);
-				outSpaceLayout.invalidate();
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//				listView.setLayoutParams(p);
 			}
 		};
 
-		Handler handler = new Handler();
-		handler.postDelayed(r,10000);
+		outSpaceHandler = new Handler();
+		outSpaceHandler.postDelayed(outSpaceRunnable,3000);
 	}
 
 	public void updateCancelSubscriptions(){
