@@ -50,15 +50,40 @@ public class MegaChatApiJava {
     }
 
     public void removeChatRequestListener(MegaChatRequestListenerInterface listener) {
-        megaChatApi.removeChatRequestListener(createDelegateRequestListener(listener, false));
-    }
 
-    public void removeChatRoomListener(MegaChatRoomListenerInterface listener) {
-        megaChatApi.removeChatRoomListener(createDelegateChatRoomListener(listener));
+        ArrayList<DelegateMegaChatRequestListener> listenersToRemove = new ArrayList<DelegateMegaChatRequestListener>();
+        synchronized (activeRequestListeners) {
+            Iterator<DelegateMegaChatRequestListener> it = activeRequestListeners.iterator();
+            while (it.hasNext()) {
+                DelegateMegaChatRequestListener delegate = it.next();
+                if (delegate.getUserListener() == listener) {
+                    listenersToRemove.add(delegate);
+                    it.remove();
+                }
+            }
+        }
+
+        for (int i=0;i<listenersToRemove.size();i++){
+            megaChatApi.removeChatRequestListener(listenersToRemove.get(i));
+        }
     }
 
     public void removeChatListener(MegaChatListenerInterface listener) {
-        megaChatApi.removeChatListener(createDelegateChatListener(listener));
+        ArrayList<DelegateMegaChatListener> listenersToRemove = new ArrayList<DelegateMegaChatListener>();
+        synchronized (activeChatListeners) {
+            Iterator<DelegateMegaChatListener> it = activeChatListeners.iterator();
+            while (it.hasNext()) {
+                DelegateMegaChatListener delegate = it.next();
+                if (delegate.getUserListener() == listener) {
+                    listenersToRemove.add(delegate);
+                    it.remove();
+                }
+            }
+        }
+
+        for (int i=0;i<listenersToRemove.size();i++){
+            megaChatApi.removeChatListener(listenersToRemove.get(i));
+        }
     }
 
     public int init(String sid)
