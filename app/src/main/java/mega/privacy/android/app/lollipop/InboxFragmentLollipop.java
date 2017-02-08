@@ -325,9 +325,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 		if (parentHandle == -1||parentHandle==megaApi.getInboxNode().getHandle()) {
 			log("parentHandle -1");
+
 			if (megaApi.getInboxNode() != null){
-				parentHandle = megaApi.getInboxNode().getHandle();
 				inboxNode = megaApi.getInboxNode();
+				parentHandle = inboxNode.getHandle();
 				//		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(inboxNode, orderGetChildren);
 			}
@@ -397,7 +398,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			else{					
 				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 			}			
-			
+
+			log("call to setNodes");
 			setNodes(nodes);
 
 			if (adapter.getItemCount() == 0){
