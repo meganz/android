@@ -1694,9 +1694,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		getOfflineSizeTask.execute();
 	}
 
-	public void intentToPinLock(){
+	public void intentToPinLock(boolean setFingerprint){
 		log("intentToPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
+		if(setFingerprint)
+			intent.putExtra(Constants.FINGERPRINT_OR_ALPHANUMERIC,Constants.FINGERPRINT_OR_ALPHANUMERIC);
 		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
 		this.startActivityForResult(intent, Constants.SET_PIN);
 	}

@@ -5,6 +5,7 @@ public class Constants {
 	public static String PIN_4 = "4";
 	public static String PIN_6 = "6";
 	public static String PIN_ALPHANUMERIC = "alphanumeric";
+	public static String FINGERPRINT_OR_ALPHANUMERIC = "fingerprint_or_alphanumeric";
 
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 
