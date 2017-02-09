@@ -295,6 +295,7 @@
 			android:layout_height="8dp"
 			android:background="@color/white"
 			android:gravity="left"
+			android:layout_marginBottom="32dp"
 			android:orientation="horizontal" >
 
 			<ProgressBar

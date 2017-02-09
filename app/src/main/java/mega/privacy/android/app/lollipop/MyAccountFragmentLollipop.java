@@ -264,7 +264,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		deleteAccountButton.setOnClickListener(this);
 
 		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(32, outMetrics));
 		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
