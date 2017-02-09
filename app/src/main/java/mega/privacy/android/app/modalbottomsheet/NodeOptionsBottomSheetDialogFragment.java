@@ -53,6 +53,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     ImageView nodeThumb;
     TextView nodeName;
     TextView nodeInfo;
+    RelativeLayout nodePublicLink;
     LinearLayout optionDownload;
     LinearLayout optionInfo;
     TextView optionInfoText;
@@ -128,6 +129,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_name_text);
         nodeInfo  = (TextView) contentView.findViewById(R.id.node_info_text);
+        nodePublicLink = (RelativeLayout) contentView.findViewById(R.id.node_relative_layout_public_link);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
         optionInfo = (LinearLayout) contentView.findViewById(R.id.option_properties_layout);
         optionInfoText = (TextView) contentView.findViewById(R.id.option_properties_text);
@@ -224,18 +226,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionShare.setVisibility(View.GONE);
                         }
 
+                        if(node.isExported()){
+                            //Node has public link
+                            nodePublicLink.setVisibility(View.VISIBLE);
+                            optionLinkText.setText(R.string.edit_link_option);
+                            optionRemoveLink.setVisibility(View.VISIBLE);
+                            if(node.isExpired()){
+                                log("Node exported but expired!!");
+                                nodePublicLink.setVisibility(View.GONE);
+                            }
+                        }
+                        else{
+                            nodePublicLink.setVisibility(View.GONE);
+                            optionLinkText.setText(R.string.context_get_link_menu);
+                            optionRemoveLink.setVisibility(View.GONE);
+                        }
+
                         optionSendInbox.setVisibility(View.VISIBLE);
                         optionDownload.setVisibility(View.VISIBLE);
                         optionInfo.setVisibility(View.VISIBLE);
                         optionRubbishBin.setVisibility(View.VISIBLE);
                         optionLink.setVisibility(View.VISIBLE);
-                        if (node.isExported()) {
-                            optionLinkText.setText(R.string.edit_link_option);
-                            optionRemoveLink.setVisibility(View.VISIBLE);
-                        } else {
-                            optionLinkText.setText(R.string.context_get_link_menu);
-                            optionRemoveLink.setVisibility(View.GONE);
-                        }
 
                         optionRubbishBin.setVisibility(View.VISIBLE);
                         optionRename.setVisibility(View.VISIBLE);
@@ -255,6 +266,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
                         }
+
+                        nodePublicLink.setVisibility(View.GONE);
 
                         optionMove.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.VISIBLE);
@@ -288,18 +301,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionShare.setVisibility(View.GONE);
                     }
 
+                    if(node.isExported()){
+                        //Node has public link
+                        nodePublicLink.setVisibility(View.VISIBLE);
+                        optionLinkText.setText(R.string.edit_link_option);
+                        optionRemoveLink.setVisibility(View.VISIBLE);
+                        if(node.isExpired()){
+                            log("Node exported but expired!!");
+                            nodePublicLink.setVisibility(View.GONE);
+                        }
+                    }
+                    else{
+                        nodePublicLink.setVisibility(View.GONE);
+                        optionLinkText.setText(R.string.context_get_link_menu);
+                        optionRemoveLink.setVisibility(View.GONE);
+                    }
+
                     optionSendInbox.setVisibility(View.VISIBLE);
                     optionDownload.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
-                    if (node.isExported()) {
-                        optionLinkText.setText(R.string.edit_link_option);
-                        optionRemoveLink.setVisibility(View.VISIBLE);
-                    } else {
-                        optionLinkText.setText(R.string.context_get_link_menu);
-                        optionRemoveLink.setVisibility(View.GONE);
-                    }
 
                     optionRubbishBin.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
@@ -326,6 +348,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
                         }
+
+                        nodePublicLink.setVisibility(View.GONE);
 
                         int accessLevel = megaApi.getAccess(node);
                         log("Node: " + node.getName() + " " + accessLevel);
@@ -419,6 +443,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionSendInbox.setVisibility(View.VISIBLE);
                         }
 
+                        if(node.isExported()){
+                            //Node has public link
+                            nodePublicLink.setVisibility(View.VISIBLE);
+                            if(node.isExpired()){
+                                log("Node exported but expired!!");
+                                nodePublicLink.setVisibility(View.GONE);
+                            }
+                        }
+                        else{
+                            nodePublicLink.setVisibility(View.GONE);
+                        }
+
                         if (((ManagerActivityLollipop) context).getDeepBrowserTreeOutgoing() == 0) {
                             optionPermissions.setVisibility(View.VISIBLE);
                             optionClearShares.setVisibility(View.VISIBLE);
@@ -463,18 +499,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionShare.setVisibility(View.GONE);
                     }
 
+                    if(node.isExported()){
+                        //Node has public link
+                        nodePublicLink.setVisibility(View.VISIBLE);
+                        optionLinkText.setText(R.string.edit_link_option);
+                        optionRemoveLink.setVisibility(View.VISIBLE);
+                        if(node.isExpired()){
+                            log("Node exported but expired!!");
+                            nodePublicLink.setVisibility(View.GONE);
+                        }
+                    }
+                    else{
+                        nodePublicLink.setVisibility(View.GONE);
+                        optionLinkText.setText(R.string.context_get_link_menu);
+                        optionRemoveLink.setVisibility(View.GONE);
+                    }
+
                     optionSendInbox.setVisibility(View.VISIBLE);
                     optionDownload.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
-                    if (node.isExported()) {
-                        optionLinkText.setText(R.string.edit_link_option);
-                        optionRemoveLink.setVisibility(View.VISIBLE);
-                    } else {
-                        optionLinkText.setText(R.string.context_get_link_menu);
-                        optionRemoveLink.setVisibility(View.GONE);
-                    }
 
                     optionRubbishBin.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
