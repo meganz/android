@@ -58,7 +58,6 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 	TextView availableSpaceText;
 
 	ProgressBar progressBar;
-
 	
 	DisplayMetrics outMetrics;
 	float density;
@@ -119,7 +118,6 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 		expirationAccountText = (TextView) v.findViewById(R.id.my_storage_account_expiration_text);
 		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
 
-
 		totalUsedSpace = (TextView) v.findViewById(R.id.my_storage_used_space_result_text);
 
 		cloudDriveUsedText = (TextView) v.findViewById(R.id.my_storage_account_cloud_storage_text);
@@ -131,11 +129,14 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 		progressBar = (ProgressBar) v.findViewById(R.id.my_storage_progress_bar);
 		progressBar.setProgress(0);
 
+//		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();
+//		bottomParams.setMargins(0, 0, 0, Util.scaleHeightPx(32, outMetrics));
+//		progressBar.setLayoutParams(bottomParams);
+
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
-
 
 		setAccountDetails();
 //

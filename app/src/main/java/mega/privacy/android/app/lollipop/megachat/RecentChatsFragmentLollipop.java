@@ -958,6 +958,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     }
 
     public void interactionUpdate(int position){
+        log("interactionUpdate");
         MegaChatListItem chat = chats.remove(position);
         chats.add(0, chat);
         adapterList.notifyItemMoved(position, 0);
