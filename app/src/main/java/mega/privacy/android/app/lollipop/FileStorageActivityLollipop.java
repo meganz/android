@@ -352,13 +352,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
-	    float scaleText;
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = this.getWindow();
@@ -405,28 +398,28 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 
 		cancelButton = (Button) findViewById(R.id.file_storage_cancel_button);
+		cancelButton.setOnClickListener(this);
+		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+
 		button = (Button) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
 		if(fromSettings){
-			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+			button.setText(getString(R.string.general_select));
 		}
 		else{
 			if (mode == Mode.PICK_FOLDER) {
-				button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+				button.setText(getString(R.string.general_download));
 				
 			}
 			else{
-				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+				button.setText(getString(R.string.context_upload));
 			}
 		}		
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
 		emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 		emptyTextView.setText(R.string.file_browser_empty_folder);
-
-		cancelButton.setOnClickListener(this);		
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));		
 
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
