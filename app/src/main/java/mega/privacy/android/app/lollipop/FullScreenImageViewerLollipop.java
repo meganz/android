@@ -726,7 +726,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				menuOptions[0] = getString(R.string.context_rename);
 				menuOptions[1] = getString(R.string.context_move);
 				menuOptions[2] = getString(R.string.context_copy);
-				menuOptions[3] = getString(R.string.confirmation_move_to_rubbish);
+				menuOptions[3] = getString(R.string.context_move_to_trash);
 				overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 				arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
 				overflowMenuList.setAdapter(arrayAdapter);
