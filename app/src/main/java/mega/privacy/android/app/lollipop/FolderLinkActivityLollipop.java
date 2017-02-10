@@ -1372,18 +1372,23 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	@Override
 	public void onBackPressed() {
+		log("onBackPressed");
 
 		if (adapterList != null){
+			log("onBackPressed: adapter !=null");
 			parentHandle = adapterList.getParentHandle();
 			
 			if (adapterList.getPositionClicked() != -1){
+				log("onBackPressed: PositionClicked() != -1");
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();
 				return;
 			}
 			else{
+				log("onBackPressed: PositionClicked() == -1");
 				MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
 				if (parentNode != null){
+					log("onBackPressed: parentNode != NULL");
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
@@ -1409,6 +1414,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				    });
 					adapterList.setParentHandle(parentHandle);
 					return;
+				}
+				else{
+					log("onBackPressed: parentNode == NULL");
+					finish();
 				}
 			}
 		}
