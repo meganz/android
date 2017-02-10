@@ -36,8 +36,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,7 +54,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -96,9 +97,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	TextView emptyTextView;
 	TextView contentText;
     RelativeLayout fragmentContainer;
-	TextView downloadButton;
+	Button downloadButton;
 	View separator;
-	private TextView importButton;
+	Button importButton;
 	LinearLayout optionsBar;
 	DisplayMetrics outMetrics;
 	long parentHandle = -1;
@@ -274,15 +275,19 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-		
+
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
 		
 		folderLinkActivity = this;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		}
 		
 		setContentView(R.layout.activity_folder_link);	
 		
@@ -310,30 +315,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
 		separator = (View) findViewById(R.id.separator_3);
-		downloadButton = (TextView) findViewById(R.id.folder_link_button_download);
-		downloadButton.setOnClickListener(this);
-		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
-		downloadButton.setLayoutParams(paramsb1);
-		//Left and Right margin
-		LinearLayout.LayoutParams donwlTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
-		donwlTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		downloadButton.setLayoutParams(donwlTextParams);
 
-		importButton = (TextView) findViewById(R.id.folder_link_import_button);
+		downloadButton = (Button) findViewById(R.id.folder_link_button_download);
+		downloadButton.setOnClickListener(this);
+
+		importButton = (Button) findViewById(R.id.folder_link_import_button);
 		importButton.setOnClickListener(this);
-		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
-		
-		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb1.width = Util.scaleWidthPx(145, metrics);
-		importButton.setLayoutParams(paramsb1);
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)importButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
-		importButton.setLayoutParams(cancelTextParams);
 
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
