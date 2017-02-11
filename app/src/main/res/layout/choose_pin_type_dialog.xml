@@ -35,7 +35,17 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>    
-	    
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+		<CheckedTextView
+			android:visibility="gone"
+			android:id="@+id/choose_pin_alphaN_fingerprint_check"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+			android:ellipsize="marquee"
+			android:gravity="center_vertical"
+			android:textAppearance="?android:attr/textAppearanceMedium"/>
+
 	</LinearLayout>
 </ScrollView>

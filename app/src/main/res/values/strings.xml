@@ -658,6 +658,13 @@
     <string name="four_pin_lock" context="PIN with 4 digits">4 digits PIN</string>
     <string name="six_pin_lock" context="PIN with 6 digits">6 digits PIN</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">Alphanumeric PIN</string>
+    <string name="fingerprint_or_AN_pin_lock" context="Fingerprint or PIN alphanumeric option">Fingerprint | Alphanumeric code</string>
+    <string name="fingerprint_not_recognized" context="Fingerprint not recognized">Fingerprint not recognized. Try again</string>
+    <string name="fingerprint_success" context="Fingerprint recognized">Fingerprint recognized</string>
+    <string name="fingerprint_description" context="Confirm fingerprint to continue">Confirm fingerprint to continue</string>
+    <string name="fingerprint_hint" context="Hint touch sensor">Touch sensor</string>
+    <string name="fingerprint_dialog_title">Fingerprint authentication</string>
+
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
