@@ -1028,6 +1028,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         aC = new AccountController(this);
         myAccountInfo = new MyAccountInfo(this);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         megaFingerprintManager = new MegaFingerprintManager(this);
 
         File thumbDir;

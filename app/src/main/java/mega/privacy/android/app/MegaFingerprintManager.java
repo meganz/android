@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
@@ -28,7 +27,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import static android.content.Context.FINGERPRINT_SERVICE;
-import static android.content.Context.KEYGUARD_SERVICE;
 
 /**
  * Created by Loza on 08/02/2017.
@@ -37,21 +35,12 @@ import static android.content.Context.KEYGUARD_SERVICE;
 @TargetApi(Build.VERSION_CODES.M)
 public class MegaFingerprintManager {
 
-
     private FingerprintManager fingerprintManager;
-    private KeyguardManager keyguardManager;
     private KeyStore keyStore;
-    private KeyGenerator keyGenerator;
-    private static final String KEY_NAME = "example_key";
-    private Cipher cipher;
-    private FingerprintManager.CryptoObject cryptoObject;
-
+    private static final String KEY_NAME = "MEGA_KEY";
 
     public MegaFingerprintManager(Context context) {
-
-        keyguardManager = (KeyguardManager) context.getSystemService(KEYGUARD_SERVICE);
         fingerprintManager = (FingerprintManager) context.getSystemService(FINGERPRINT_SERVICE);
-
     }
 
     public boolean hasFingerprintHardware(Context context) {
@@ -68,8 +57,7 @@ public class MegaFingerprintManager {
         try {
 
             keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
-
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
             keyStore.load(null);
             keyGenerator.init(new
                     KeyGenParameterSpec.Builder(KEY_NAME,
@@ -98,6 +86,7 @@ public class MegaFingerprintManager {
 
 
     public Cipher getCipher() {
+        Cipher cipher;
         try {
             cipher = Cipher.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES + "/"
@@ -125,7 +114,6 @@ public class MegaFingerprintManager {
 
 
     public class FingerprintException extends Exception {
-
         public FingerprintException(Exception e) {
             super(e);
         }

@@ -6,9 +6,9 @@ package mega.privacy.android.app.lollipop;
 
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +25,16 @@ import mega.privacy.android.app.R;
 public class FingerprintAuthenticationDialogFragmentLollipop extends DialogFragment
         implements FingerprintUiHelper.Callback {
 
-    private Button mCancelButton;
-    private View mFingerprintContent;
-
     private FingerprintManager.CryptoObject mCryptoObject;
     private FingerprintUiHelper mFingerprintUiHelper;
     private PinLockActivityLollipop mActivity;
 
+
+    public static FingerprintAuthenticationDialogFragmentLollipop newInstance(FingerprintManager.CryptoObject cryptoObject) {
+        FingerprintAuthenticationDialogFragmentLollipop myDialogFragment = new FingerprintAuthenticationDialogFragmentLollipop();
+        myDialogFragment.setCryptoObject(cryptoObject);
+        return myDialogFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,7 @@ public class FingerprintAuthenticationDialogFragmentLollipop extends DialogFragm
 
         getDialog().setCanceledOnTouchOutside(false);
 
-        mCancelButton = (Button) v.findViewById(R.id.cancel_button);
+        Button mCancelButton = (Button) v.findViewById(R.id.cancel_button);
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,7 +61,7 @@ public class FingerprintAuthenticationDialogFragmentLollipop extends DialogFragm
             }
         });
 
-        mFingerprintContent = v.findViewById(R.id.fingerprint_container);
+        View mFingerprintContent = v.findViewById(R.id.fingerprint_container);
 
         mFingerprintUiHelper = new FingerprintUiHelper(
                 mActivity.getSystemService(FingerprintManager.class),
@@ -113,6 +116,14 @@ public class FingerprintAuthenticationDialogFragmentLollipop extends DialogFragm
         // successful.
         mFingerprintUiHelper.stopListening();
         ((FingerprintAuthenticationListerner)getActivity()).onSuccess();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance())
+            getDialog().setDismissMessage(null);
+        super.onDestroyView();
+
     }
 
     @Override
