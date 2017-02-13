@@ -242,6 +242,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionRemoveLink.setVisibility(View.GONE);
                         }
 
+                        if(node.isShared()){
+                            if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
+                                log("Visible clear shares - firstNavigationLevel true!");
+                                optionClearShares.setVisibility(View.VISIBLE);
+
+                            } else {
+                                optionClearShares.setVisibility(View.GONE);
+                            }
+                        }
+                        else{
+                            optionClearShares.setVisibility(View.GONE);
+                        }
+
                         optionSendInbox.setVisibility(View.VISIBLE);
                         optionDownload.setVisibility(View.VISIBLE);
                         optionInfo.setVisibility(View.VISIBLE);
@@ -254,7 +267,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionCopy.setVisibility(View.VISIBLE);
 
                         //Hide
-                        optionClearShares.setVisibility(View.GONE);
                         optionRemove.setVisibility(View.GONE);
                         optionPermissions.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
