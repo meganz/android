@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -37,6 +38,8 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -57,6 +60,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	TextView emptyTextViewFragment;
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	boolean multipleSelect;
 	DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
@@ -161,6 +165,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+			}
 		}
 		
 		emptyImageViewFragment = _emptyImageView;
@@ -551,19 +561,28 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
-
-		if(Util.isChatEnabled()){
-			holder.contactStateIcon.setVisibility(View.VISIBLE);
-			//TODO: insert the right status of the user, getStatusByHandle
-
-		}
-		else{
-			holder.contactStateIcon.setVisibility(View.GONE);
-		}
 		
 		MegaUser contact = (MegaUser) getItem(position);
 		holder.contactMail = contact.getEmail();
 		log("contact: "+contact.getEmail()+" handle: "+contact.getHandle());
+
+		if(Util.isChatEnabled()){
+			holder.contactStateIcon.setVisibility(View.VISIBLE);
+			if (megaChatApi != null){
+				int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
+				if(userStatus == MegaChatApi.STATUS_ONLINE){
+					log("This user is connected");
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+				}
+				else{
+					log("This user status is: "+userStatus);
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+				}
+			}
+		}
+		else{
+			holder.contactStateIcon.setVisibility(View.GONE);
+		}
 	
 		if (!multipleSelect) {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
