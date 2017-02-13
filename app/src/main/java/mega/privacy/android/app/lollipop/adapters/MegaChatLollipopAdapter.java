@@ -64,6 +64,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     int type;
     private SparseBooleanArray selectedItems;
 
+    long myUserHandle = -1;
+
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
     MegaChatRoom chatRoom;
@@ -92,6 +94,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         else{
             log("Number of messages: NULL");
         }
+
+        myUserHandle = megaChatApi.getMyUserHandle();
+        log("MegaChatLollipopAdapter: MyUserHandle: "+myUserHandle);
     }
 
     /*private view holder class*/
@@ -319,7 +324,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
             log("ALTER PARTICIPANT MESSAGE!!");
 
-            if(message.getUserHandleOfAction()==megaChatApi.getMyUserHandle()){
+            if(message.getUserHandleOfAction()==myUserHandle){
                 log("me alter participant");
 
                 if(messages.get(position).getInfoToShow()!=-1){
@@ -536,7 +541,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 String textToShow = "";
                 if(privilege!=MegaChatRoom.PRIV_RM){
                     log("Participant was added");
-                    if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                    if(message.getUserHandle()==myUserHandle){
                         log("By me");
                         textToShow = String.format(context.getString(R.string.message_add_participant), holder.fullNameTitle, context.getString(R.string.chat_me_text));
                     }
@@ -565,7 +570,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }//END participant was added
                 else{
                     log("Participant was removed or left");
-                    if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                    if(message.getUserHandle()==myUserHandle){
                         textToShow = String.format(context.getString(R.string.message_remove_participant), holder.fullNameTitle, context.getString(R.string.chat_me_text));
                     }
                     else{
@@ -613,7 +618,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
             log("PRIVILEGE CHANGE message");
-            if(message.getUserHandleOfAction()==megaChatApi.getMyUserHandle()){
+            if(message.getUserHandleOfAction()==myUserHandle){
                 log("a moderator change my privilege");
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
@@ -661,7 +666,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 String textToShow = "";
 
-                if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                if(message.getUserHandle()==myUserHandle){
                     log("I changed my Own permission");
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, context.getString(R.string.chat_me_text));
                 }
@@ -824,6 +829,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
                     if(nonContact!=null){
                         holder.fullNameTitle = nonContact.getFullName();
+                        log("The fullName: "+holder.fullNameTitle);
+                        if((holder.fullNameTitle.trim()).isEmpty()){
+                            holder.fullNameTitle = "No name";
+                        }
                     }
                     else{
                         holder.fullNameTitle = "Unknown name";
@@ -852,7 +861,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
 
                 String textToShow = "";
-                if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                if(message.getUserHandle()==myUserHandle){
                     log("The privilege was change by me");
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, context.getString(R.string.chat_me_text));
 
@@ -889,7 +898,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         }
         else{
             //OTHER TYPE OF MESSAGES
-            if(message.getUserHandle()==megaChatApi.getMyUserHandle()) {
+            if(message.getUserHandle()==myUserHandle) {
                 log("MY message!!:");
                 log("MY message handle!!: "+message.getMsgId());
 
@@ -1220,8 +1229,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 //                holder.retryAlert.setVisibility(View.VISIBLE);
             }
             else{
-                log("Contact message!!");
                 long userHandle = message.getUserHandle();
+                log("Contact message!!: "+userHandle);
 
                 if(((ChatActivityLollipop) context).isGroup()){
 
@@ -1707,7 +1716,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
                 MegaChatMessage message = messages.get(pos).getMessage();
 //                String myMail = ((ChatActivityLollipop) context).getMyMail();
-                if(message.getUserHandle()==megaChatApi.getMyUserHandle()) {
+                if(message.getUserHandle()==myUserHandle) {
                     view.ownMultiselectionTickIcon.setVisibility(View.GONE);
                     view.contactMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_empty));
                     view.ownMultiselectionLayout.startAnimation(flipAnimation);
@@ -1727,7 +1736,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
                 MegaChatMessage message = messages.get(pos).getMessage();
                 String myMail = ((ChatActivityLollipop) context).getMyMail();
-                if(message.getUserHandle()==megaChatApi.getMyUserHandle()) {
+                if(message.getUserHandle()==myUserHandle) {
                     view.ownMultiselectionLayout.startAnimation(flipAnimation);
                 }
                 else{

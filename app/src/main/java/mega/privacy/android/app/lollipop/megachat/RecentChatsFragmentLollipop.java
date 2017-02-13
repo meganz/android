@@ -899,14 +899,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     }
 
     public void onStatusChange(int position){
-        log("onStatusChange");
+        log("onStatusChange: "+position);
 
         adapterList.setStatus(position, null);
     }
 
     public void onLastMessageChange(int position){
 
-        log("onLastMessageChange");
+        log("onLastMessageChange: "+position);
 
         adapterList.setLastMessage(position, null);
 

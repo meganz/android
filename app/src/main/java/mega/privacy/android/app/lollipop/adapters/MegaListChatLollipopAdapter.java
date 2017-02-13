@@ -1007,6 +1007,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.layoutPendingMessages.setVisibility(View.INVISIBLE);
 			}
 		}
+		else{
+			log("Holder is NULL");
+		}
 	}
 
 	public void showMuteIcon(int position){
@@ -1170,6 +1173,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 				holder.textViewDate.setVisibility(View.GONE);
 			}
+		}
+		else{
+			log("Holder is NULL");
 		}
 	}
 	
