@@ -8602,7 +8602,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.confirmation_remove_outgoing_shares);
+		int size = shareList.size();
+		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}

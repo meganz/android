@@ -796,7 +796,10 @@
         <item quantity="other" context="referring to a invitation request in the Contacts section">invitaciones</item>
     </plurals>
 
-    <string name="confirmation_remove_outgoing_shares" context="Confirmation before removing the outgoing shares of a folder">¿Dejar de compartir la carpeta?</string>
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item context="Confirmation before removing the outgoing shares of a folder" quantity="one">La carpeta está compartida con %1$d contacto. Eliminar la compartición?</item>
+        <item context="Confirmation before removing the outgoing shares of a folder" quantity="other">La carpeta está compartida con %1$d contactos. Eliminar las comparticiones?</item>
+    </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">El correo electrónico o la contraseña introducidas no son correctas. Por favor, pruebe otra vez.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.co.nz</string>
