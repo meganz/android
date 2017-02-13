@@ -47,7 +47,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/contact_list_relative_layout_avatar"
-        android:layout_toLeftOf="@id/contact_list_three_dots"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
         android:textColor="@color/file_list_first_row"
@@ -55,6 +54,17 @@
         android:singleLine="true"
         android:ellipsize="middle"
         android:textSize="16sp"/>
+
+    <ImageView
+        android:id="@+id/contact_list_drawable_state"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:layout_alignTop="@id/contact_list_name"
+        android:layout_toRightOf="@id/contact_list_name"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="6dp"
+        android:background="@null"
+        android:src="@drawable/circle_status_contact_not_connected" />
 
     <TextView
         android:id="@+id/contact_list_content"
