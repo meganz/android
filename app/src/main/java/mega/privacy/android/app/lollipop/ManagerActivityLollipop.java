@@ -12901,6 +12901,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void disableChat(){
 		log("disableChat");
 
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cFLol != null){
+			if(cFLol.isAdded()){
+				cFLol.notifyDataSetChanged();
+			}
+		}
+
 		drawerItem = DrawerItem.SETTINGS;
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();

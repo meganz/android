@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -191,6 +192,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			super(v);
 		}
     	RoundedImageView imageView;
+		ImageView contactStateIcon;
     }
     
     public class ViewHolderContactsGrid extends ViewHolderContacts{
@@ -224,6 +226,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 		    holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
+			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				log("onCreate: Landscape configuration");
+				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+			}
+			else{
+				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+			}
 
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);	    
@@ -540,6 +551,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
+
+		if(Util.isChatEnabled()){
+			holder.contactStateIcon.setVisibility(View.VISIBLE);
+			//TODO: insert the right status of the user, getStatusByHandle
+
+		}
+		else{
+			holder.contactStateIcon.setVisibility(View.GONE);
+		}
 		
 		MegaUser contact = (MegaUser) getItem(position);
 		holder.contactMail = contact.getEmail();
