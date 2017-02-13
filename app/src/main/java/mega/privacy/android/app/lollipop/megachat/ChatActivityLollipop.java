@@ -647,6 +647,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 writingContainerLayout.setVisibility(View.GONE);
                                 aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                             }
+                            else{
+                                log("permission: "+permission);
+                            }
                         }
                         else{
                             log("Check permissions one to one chat");
@@ -1855,6 +1858,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                 log("Obtengo mensajes sin enviar!!!-------------------------------------------------: "+msg.getStatus());
+                AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
+                modifyMessageReceived(androidMsg, false);
             }
 
             log("Temporal id: "+msg.getTempId());
@@ -1876,7 +1881,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 //
             if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                log("No rise position to scroll");
+                log("No rise position to scroll: "+msg.getStatus());
             }
             else{
                 if(positionToScroll>=0){
@@ -1983,6 +1988,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void addAlertMessageNotSent(MegaChatMessage msg){
+        log("addAlertMessageNotSent");
+
+        AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
+        modifyMessageReceived(androidMsg, false);
+
+
+
+    }
+
     public void modifyMessageReceived(AndroidMegaChatMessage msg, boolean markAsSent){
         log("modifyMessageReceived");
         int indexToChange = -1;
@@ -1992,14 +2007,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             AndroidMegaChatMessage messageToCheck = itr.next();
             if(markAsSent){
                 if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
-                    log("Mark as sent: " + messageToCheck.getMessage().getContent());
+                    log("modifyMessageReceived: Mark as sent: " + messageToCheck.getMessage().getContent());
                     indexToChange = itr.nextIndex()-1;
                     break;
                 }
             }
             else{
                 if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                    log("Found message status !!: " + messageToCheck.getMessage().getContent());
+                    log("modifyMessageReceived: Found message status !!: " + messageToCheck.getMessage().getContent());
                     indexToChange = itr.nextIndex()-1;
                     break;
                 }
@@ -2009,7 +2024,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(indexToChange!=-1){
             AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
             if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
-                log("The internal index not change");
+                log("modifyMessageReceived: The internal index not change");
 
                 messages.set(indexToChange, msg);
 
@@ -2020,7 +2035,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     //Not first element
                     AndroidMegaChatMessage previousMessage = messages.get(indexToChange - 1);
-                    log("previous message: " + previousMessage.getMessage().getContent());
+                    log("modifyMessageReceived: previous message: " + previousMessage.getMessage().getContent());
                     if (previousMessage.getMessage().getUserHandle() == myUserHandle) {
                         //The last two messages are mine
                         if (compareDate(msg, previousMessage) == 0) {
@@ -2058,10 +2073,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
-                log("INDEX change, need to reorder");
+                log("modifyMessageReceived: INDEX change, need to reorder");
                 messages.remove(indexToChange);
+                log("modifyMessageReceived: messages size: "+messages.size());
                 adapter.notifyItemRemoved(indexToChange);
                 appendMessage(msg);
+                log("modifyMessageReceived: messages size 2: "+messages.size());
             }
 
         }
@@ -2197,6 +2214,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void appendMessage(AndroidMegaChatMessage msg){
+        log("appendMessage: "+messages.size()+" messages");
 
         if(messages.size()==0){
             msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -2205,9 +2223,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             int lastIndex = messages.size()-1;
             AndroidMegaChatMessage previousMessage = messages.get(lastIndex);
-            log("Previous message: "+previousMessage.getMessage().getContent());
+//            log("Previous message: "+previousMessage.getMessage().getContent());
 
             messages.add(msg);
+            log("appendMessage size: "+messages.size());
 
             long userHandleToCompare = -1;
             if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {

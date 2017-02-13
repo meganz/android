@@ -19,8 +19,8 @@ public class NonContactInfo {
 
     public String getFullName() {
 
-        if(lastName==null){
-            lastName="";
+        if(firstName==null){
+            firstName="";
         }
         if(lastName == null){
             lastName="";
