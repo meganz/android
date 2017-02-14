@@ -128,7 +128,7 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_menu_chat"
+            android:src="@drawable/ic_chat_black_24dp"
             android:visibility="visible" />
 
         <TextView
