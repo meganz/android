@@ -1432,6 +1432,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("rootNode != null");
 
+			attr = dbH.getAttributes();
+			if (attr != null){
+				if (attr.getInvalidateSdkCache() != null){
+					if (attr.getInvalidateSdkCache().compareTo("") != 0) {
+						try {
+							if (Boolean.parseBoolean(attr.getInvalidateSdkCache())){
+								log("megaApi.invalidateCache();");
+								megaApi.invalidateCache();
+							}
+						}
+						catch(Exception e){}
+					}
+				}
+			}
+
+			dbH.setInvalidateSdkCache(false);
+
 			String token = FirebaseInstanceId.getInstance().getToken();
 			if (token != null) {
 				log("FCM TOKEN: " + token);
@@ -10528,7 +10545,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onRequestFinish(CHAT)");
 
 		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-			log("Truncate history request finisf!!!");
+			log("Truncate history request finish.");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				showSnackbar(getString(R.string.clear_history_success));
 			}
@@ -10538,16 +10555,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			log("Create chat request finish!!!");
+			log("Create chat request finish.");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Chat CREATEDD!!!");
+				log("Chat CREATED.");
 
 				//Update chat view
 				if(rChatFL!=null){
 //					rChatFL.setChats();
 				}
 
-				log("open new chat");
+				log("open new chat: " + request.getChatHandle());
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
 				intent.setAction(Constants.ACTION_CHAT_NEW);
 				intent.putExtra("CHAT_ID", request.getChatHandle());
@@ -12929,6 +12946,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+		if (item != null){
+			log("onChatListItemUpdate:" + item.getTitle());
+		}
+		else{
+			log("onChatListItemUpdate");
+		}
+
 		if(rChatFL!=null){
 			if(rChatFL.isAdded()){
 				rChatFL.listItemUpdate(item);

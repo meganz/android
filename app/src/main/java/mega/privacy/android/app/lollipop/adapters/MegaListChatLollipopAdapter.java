@@ -156,7 +156,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
 			MegaUser user = megaApi.getContact(userHandleEncoded);
 			if(user!=null){
-				log("El email del user es: "+user.getEmail());
+				log("User email: _"+user.getEmail() + "_");
 			}
 			else{
 				log("El user es NULL");
