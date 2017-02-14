@@ -1857,7 +1857,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(msg!=null){
 
             if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                log("Obtengo mensajes sin enviar!!!-------------------------------------------------: "+msg.getStatus());
+                log("Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
                 modifyMessageReceived(androidMsg, false);
             }
@@ -1875,6 +1875,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 //
             if(firstMessageReceived){
+                //TODO Only do this if the message is not ours and it's not already seen
                 megaChatApi.setMessageSeen(idChat, msg.getMsgId());
                 log("set Message Seen: "+msg.getMsgIndex());
                 firstMessageReceived = false;
