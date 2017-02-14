@@ -11,8 +11,9 @@ public class MegaAttributes {
 	String paymentMethodsTimeStamp="";
 	String pricingTimeStamp ="";
 	String extendedAccountDetailsTimeStamp="";
+	String invalidateSdkCache = "false";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -22,6 +23,7 @@ public class MegaAttributes {
 		this.paymentMethodsTimeStamp = paymentMethodsTimeStamp;
 		this.pricingTimeStamp = pricingTimeStamp;
 		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
+		this.invalidateSdkCache = invalidateSdkCache;
 	}
 	
 	public String getOnline(){
@@ -96,4 +98,11 @@ public class MegaAttributes {
 		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
 	}
 
+	public String getInvalidateSdkCache(){
+		return invalidateSdkCache;
+	}
+
+	public void setInvalidateSdkCache(String invalidateSdkCache){
+		this.invalidateSdkCache = invalidateSdkCache;
+	}
 }
