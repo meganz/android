@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -420,12 +421,14 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		else{
 			log("NOT Image");
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
+			viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
+			viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 				startActivity(viewIntent);
 			else{
 				Intent intentShare = new Intent(Intent.ACTION_SEND);
-				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
+				intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
+				intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 				if (MegaApiUtils.isIntentAvailable(this, intentShare))
 					startActivity(intentShare);
 				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;

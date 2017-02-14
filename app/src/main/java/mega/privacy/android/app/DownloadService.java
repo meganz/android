@@ -18,6 +18,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.text.format.Formatter;
 import android.util.SparseArray;
 import android.widget.RemoteViews;
@@ -574,15 +575,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Download is document");
 
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 					if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 						startActivity(viewIntent);
 					else{
 						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(intentShare);
 					}
 				}
@@ -590,15 +593,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Download is IMAGE");
 
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 					if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 						startActivity(viewIntent);
 					else{
 						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(intentShare);
 					}
 				}
@@ -606,13 +612,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					log("Download is OTHER FILE");
 					intent = new Intent(Intent.ACTION_VIEW);
-					intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
+					intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName())
 							.getType());
+					intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 					if (!MegaApiUtils.isIntentAvailable(DownloadService.this, intent)){
 						intent.setAction(Intent.ACTION_SEND);
-						intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
+						intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName())
 								.getType());
+						intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 
 					log("Show notification");
@@ -837,8 +845,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 				File f = new File(filePath);
-			    Uri contentUri = Uri.fromFile(f);
-			    mediaScanIntent.setData(contentUri);
+			    Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
+				mediaScanIntent.setData(contentUri);
+				mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			    this.sendBroadcast(mediaScanIntent);
 
 			    if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
