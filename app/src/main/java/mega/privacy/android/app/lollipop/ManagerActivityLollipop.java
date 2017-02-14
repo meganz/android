@@ -5115,7 +5115,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(title);
 	            builder.setMessage(text);
-				builder.setPositiveButton(getString(R.string.general_yes),
+				builder.setPositiveButton(getString(R.string.general_cancel),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								if (tFLol != null){
@@ -5127,7 +5127,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								startService(cancelIntentUpload);
 							}
 						});
-				builder.setNegativeButton(getString(R.string.general_no), null);
+				builder.setNegativeButton(getString(R.string.general_dissmiss), null);
 				final AlertDialog dialog = builder.create();
 				try {
 					dialog.show();
@@ -7559,8 +7559,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
         builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-        builder.setPositiveButton(R.string.general_yes, dialogClickListener);
-        builder.setNegativeButton(R.string.general_no, dialogClickListener);
+        builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+        builder.setNegativeButton(R.string.general_dissmiss, dialogClickListener);
         builder.show();
 
 	}
@@ -7604,12 +7604,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setMoveToRubbish(true);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
-					if (handleList.size() > 1){
-						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
-					}
-					else{
-						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
-					}
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+
 					builder.setPositiveButton(R.string.general_move, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
@@ -7618,12 +7614,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setMoveToRubbish(false);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
-					if (handleList.size() > 1){
-						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega_plural));
-					}
-					else{
-						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
-					}
+
+					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+
 					builder.setPositiveButton(R.string.context_delete, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();

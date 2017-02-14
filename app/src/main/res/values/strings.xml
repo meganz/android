@@ -12,6 +12,7 @@
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> of </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
+    <string name="general_dissmiss" context="Answer for confirmation dialog.">Dissmis</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Cancel</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Move to</string>
@@ -60,12 +61,9 @@
 
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these %d contacts?</string>
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Remove these %d contacts?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
-    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Are you sure you want to move these items to the Rubbish Bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">Are you sure you want to delete these items permanently?</string>
-    <string name="title_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
@@ -135,7 +133,7 @@
     </plurals>
 
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
-    <string name="alert_larger_file" context="Alert text before download"> %s will be downloaded. Are you sure?</string>
+    <string name="alert_larger_file" context="Alert text before download"> %s will be downloaded.</string>
     <string name="alert_no_app" context="Alert text before download"> There is no app to open the file %s. Do you want to continue with the download?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show again</string>
 
@@ -188,8 +186,8 @@
     <string name="create_account_creating_account">Connecting to the server: Creating account</string>
 
     <string name="cancel_transfer_title">Cancel Transfer</string>
-    <string name="cancel_transfer_confirmation">The transfer will be cancelled, are you sure you want to continue?</string>
-    <string name="cancel_all_transfer_confirmation">All transfers will be cancelled, are you sure you want to continue?</string>
+    <string name="cancel_transfer_confirmation">Cancel this transfer?</string>
+    <string name="cancel_all_transfer_confirmation">Cancel all transfers?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
