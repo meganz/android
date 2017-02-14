@@ -42,3 +42,4 @@ captures
 /app/src/main/java/nz/mega/sdk/MegaChatLogger.java
 /app/src/main/java/nz/mega/sdk/MegaChatListItemList.java
 /app/src/main/java/nz/mega/sdk/MegaTransferData.java
+/app/src/main/java/nz/mega/sdk/MegaEvent.java
