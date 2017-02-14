@@ -83,8 +83,8 @@
     <string name="action_help" context="Menu item">Help</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade your account</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrading account</string>
-    <string name="action_select_all" context="Menu item to select all the elements of a list">Select All</string>
-    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Select all</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect all</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup recovery key</string>
