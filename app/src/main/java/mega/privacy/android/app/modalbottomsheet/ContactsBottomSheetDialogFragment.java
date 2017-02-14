@@ -51,6 +51,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public RoundedImageView contactImageView;
     public TextView avatarInitialLetter;
     public LinearLayout optionInfoContact;
+    public LinearLayout optionStartConversation;
     public LinearLayout optionSendFile;
     public LinearLayout optionShareFolder;
     public LinearLayout optionRemove;
@@ -106,6 +107,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_contact_list_thumbnail);
         avatarInitialLetter = (TextView) contentView.findViewById(R.id.sliding_contact_list_initial_letter);
         optionInfoContact = (LinearLayout) contentView.findViewById(R.id.contact_list_info_contact_layout);
+        optionStartConversation = (LinearLayout) contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
         optionSendFile= (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_file_layout);
         optionShareFolder = (LinearLayout) contentView.findViewById(R.id.contact_list_option_share_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
@@ -127,6 +129,14 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             titleMailContactPanel.setText(sharedNodesDescription);
 
             addAvatarContactPanel(contact);
+
+            if(Util.isChatEnabled()){
+                optionStartConversation.setVisibility(View.VISIBLE);
+                optionStartConversation.setOnClickListener(this);
+            }
+            else{
+                optionStartConversation.setVisibility(View.GONE);
+            }
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
@@ -272,6 +282,14 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                 context.startActivity(i);
 
                 dismissAllowingStateLoss();
+                break;
+            }
+            case R.id.contact_list_option_start_conversation_layout:{
+                if(contact==null){
+                    log("Selected contact NULL");
+                    return;
+                }
+                ((ManagerActivityLollipop) context).startOneToOneChat(contact);
                 break;
             }
             case R.id.contact_list_option_send_file_layout:{
