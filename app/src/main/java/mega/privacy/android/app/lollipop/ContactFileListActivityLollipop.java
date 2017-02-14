@@ -19,6 +19,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
@@ -827,14 +828,16 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 //						else{
 
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)),
+							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)),
 									MimeTypeList.typeForName(tempNode.getName()).getType());
+							viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								intentShare.setDataAndType(Uri.fromFile(new File(localPath)),
+								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)),
 										MimeTypeList.typeForName(tempNode.getName()).getType());
+								intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;

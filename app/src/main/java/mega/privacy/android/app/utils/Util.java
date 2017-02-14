@@ -27,6 +27,7 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
@@ -922,12 +923,15 @@ public class Util {
 				throw new FileNotFoundException("Failed to delete file: " + f);
 			}
 			else{
-				
-				Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-				File fileToDelete = new File(f.getAbsolutePath());
-			    Uri contentUri = Uri.fromFile(fileToDelete);
-			    mediaScanIntent.setData(contentUri);
-			    context.sendBroadcast(mediaScanIntent);
+				try {
+					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+					File fileToDelete = new File(f.getAbsolutePath());
+					Uri contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
+					mediaScanIntent.setData(contentUri);
+					mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					context.sendBroadcast(mediaScanIntent);
+				}
+				catch (Exception e){ log ("Exception while deleting media scanner file: " + e.getMessage()); }
 		    
 			}
 		}

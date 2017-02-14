@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -94,11 +95,11 @@ public class AccountController {
             newFile.createNewFile();
         } catch (IOException e) {}
 
-        Uri outputFileUri = Uri.fromFile(newFile);
+        Uri outputFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
+        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         ((ManagerActivityLollipop)context).startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
     }
 

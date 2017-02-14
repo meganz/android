@@ -22,6 +22,7 @@ import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -962,7 +963,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						supportInvalidateOptionsMenu();
 					}
 		    		Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
+					intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
+					intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					if (MegaApiUtils.isIntentAvailable(this, intent)){
 						startActivity(intent);
 					}
@@ -2530,12 +2532,14 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+						viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+						viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+							intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+							intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
@@ -2651,7 +2655,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					supportInvalidateOptionsMenu();
 				}
 	    		Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
+				intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
+				intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 				if (MegaApiUtils.isIntentAvailable(this, intent)){
 					startActivity(intent);
 				}

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -1016,13 +1017,15 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
     
     public void openFile (File currentFile){
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-		viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+		viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+		viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){
 			context.startActivity(viewIntent);
 		}
 		else{
 			Intent intentShare = new Intent(Intent.ACTION_SEND);
-			intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+			intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+			intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			if (MegaApiUtils.isIntentAvailable(context, intentShare)){
 				context.startActivity(intentShare);
 			}

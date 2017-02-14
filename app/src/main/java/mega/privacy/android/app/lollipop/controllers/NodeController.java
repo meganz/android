@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
@@ -698,14 +699,16 @@ public class NodeController {
                         else {
                             log("MimeTypeList other file");
                             Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                            viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             if (MegaApiUtils.isIntentAvailable(context, viewIntent)) {
                                 log("if isIntentAvailable");
                                 context.startActivity(viewIntent);
                             } else {
                                 log("ELSE isIntentAvailable");
                                 Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
                                     log("call to startActivity(intentShare)");
                                     context.startActivity(intentShare);
