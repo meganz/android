@@ -34,6 +34,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -120,7 +121,10 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         if(contact!=null){
             fullName = getFullName(contact);
             titleNameContactPanel.setText(fullName);
-            titleMailContactPanel.setText(contact.getEmail());
+
+            ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact);
+            String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
+            titleMailContactPanel.setText(sharedNodesDescription);
 
             addAvatarContactPanel(contact);
 
@@ -248,7 +252,6 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         } else {
             avatarInitialLetter.setVisibility(View.INVISIBLE);
         }
-
         ////
     }
 
