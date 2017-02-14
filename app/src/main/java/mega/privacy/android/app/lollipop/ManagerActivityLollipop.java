@@ -5132,7 +5132,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(title);
 	            builder.setMessage(text);
-				builder.setPositiveButton(getString(R.string.general_yes),
+				builder.setPositiveButton(getString(R.string.general_cancel),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								if (tFLol != null){
@@ -5144,7 +5144,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								startService(cancelIntentUpload);
 							}
 						});
-				builder.setNegativeButton(getString(R.string.general_no), null);
+				builder.setNegativeButton(getString(R.string.general_dissmiss), null);
 				final AlertDialog dialog = builder.create();
 				try {
 					dialog.show();
@@ -7576,8 +7576,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
         builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-        builder.setPositiveButton(R.string.general_yes, dialogClickListener);
-        builder.setNegativeButton(R.string.general_no, dialogClickListener);
+        builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+        builder.setNegativeButton(R.string.general_dissmiss, dialogClickListener);
         builder.show();
 
 	}
@@ -7621,12 +7621,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setMoveToRubbish(true);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
-					if (handleList.size() > 1){
-						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
-					}
-					else{
-						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
-					}
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+
 					builder.setPositiveButton(R.string.general_move, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
@@ -7635,12 +7631,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setMoveToRubbish(false);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
-					if (handleList.size() > 1){
-						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega_plural));
-					}
-					else{
-						builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
-					}
+
+					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+
 					builder.setPositiveButton(R.string.context_delete, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
@@ -10033,28 +10026,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
 			if (contactsData != null){
-
-				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				if(contactsData.size()==1){
 					MegaUser user = megaApi.getContact(contactsData.get(0));
 					if(user!=null){
 						log("Chat with contact: "+contactsData.size());
-						MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
-						if(chat==null){
-							log("No chat, create it!");
-							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-							megaChatApi.createChat(false, peers, this);
-						}
-						else{
-							log("There is already a chat, open it!");
-							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-							this.startActivity(intentOpenChat);
-						}
+						startOneToOneChat(user);
 					}
 				}
 				else{
+					MegaChatPeerList peers = MegaChatPeerList.createInstance();
 					for (int i=0; i<contactsData.size(); i++){
 						MegaUser user = megaApi.getContact(contactsData.get(i));
 						if(user!=null){
@@ -10100,6 +10080,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
+		}
+	}
+
+	public void startOneToOneChat(MegaUser user){
+		log("startOneToOneChat");
+		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+		if(chat==null){
+			log("No chat, create it!");
+			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, this);
+		}
+		else{
+			log("There is already a chat, open it!");
+			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+			intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			this.startActivity(intentOpenChat);
 		}
 	}
 
