@@ -356,6 +356,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
 			shareContactText.setText(user.getEmail());
 
+			RelativeLayout.LayoutParams paramsContactText = (RelativeLayout.LayoutParams) shareContactText.getLayoutParams();
+			paramsContactText.rightMargin = Util.scaleWidthPx(16, outMetrics);
+			shareContactText.setLayoutParams(paramsContactText);
+
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 			LinearLayout.LayoutParams paramsShareContactDivider = (LinearLayout.LayoutParams) dividerShareContactLayout.getLayoutParams();
 			paramsShareContactDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);

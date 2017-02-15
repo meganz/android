@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -112,8 +113,13 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionShareFolder = (LinearLayout) contentView.findViewById(R.id.contact_list_option_share_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
 
-        titleNameContactPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-        titleMailContactPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            log("onCreate: Landscape configuration");
+            titleNameContactPanel.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+        }
+        else{
+            titleNameContactPanel.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+        }
 
         optionInfoContact.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
