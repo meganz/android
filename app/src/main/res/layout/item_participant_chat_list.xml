@@ -62,7 +62,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
         android:textColor="@color/file_list_first_row"
-        android:ellipsize="middle"
+        android:ellipsize="end"
         android:textSize="16sp"
         android:maxLines="1"
         android:singleLine="true"/>

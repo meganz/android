@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -28,8 +29,8 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Constants;
@@ -128,6 +129,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionLeaveChat.setOnClickListener(this);
         //////
 
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            log("onCreate: Landscape configuration");
+            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+        }
+        else{
+            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+        }
 
         titleNameContactChatPanel.setText(selectedParticipant.getFullName());
         int permission = selectedChat.getPeerPrivilegeByHandle(selectedParticipant.getHandle());
