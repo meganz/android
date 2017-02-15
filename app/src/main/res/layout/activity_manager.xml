@@ -6,44 +6,37 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <RelativeLayout
+
+    <android.support.design.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:background="@color/white"
         android:layout_width="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_below="@id/toolbar"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextAppearance="@style/ToolbarTitle"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            tools:context=".ManagerActivityLollipop" />
+            android:layout_height="match_parent">
 
-        <android.support.design.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:background="@color/white"
-            android:layout_width="match_parent"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_height="match_parent"
-            android:layout_below="@id/toolbar"
-            xmlns:app="http://schemas.android.com/apk/res-auto">
-
-            <FrameLayout
-                android:id="@+id/fragment_container"
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/toolbar" />
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <!-- THE Cloud Drive TABS -->
-            <LinearLayout
-                android:id="@+id/tabhost_cloud_drive"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:gravity="center"
-                android:orientation="vertical">
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:titleTextAppearance="@style/ToolbarTitle"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    tools:context=".ManagerActivityLollipop" />
+
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_cloud_drive"
@@ -52,22 +45,6 @@
                         android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
-                    <android.support.v4.view.ViewPager
-                        android:id="@+id/cloud_drive_tabs_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"/>
-            </LinearLayout>
-
-            <!-- THE CONTACTS TABS -->
-            <LinearLayout
-                android:id="@+id/tabhost_contacts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:gravity="center"
-                android:orientation="vertical">
-
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_contacts"
                         android:layout_width="match_parent"
@@ -75,59 +52,58 @@
                         android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
-                    <android.support.v4.view.ViewPager
-                        android:id="@+id/contact_tabs_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-            </LinearLayout>
 
-            <!-- THE SHARES TABS -->
-            <LinearLayout
-                android:id="@+id/tabhost_shares"
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/sliding_tabs_shares"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/mega"
+                        style="@style/MyCustomTabLayout"/>
+
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/sliding_tabs_my_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/mega"
+                        style="@style/MyCustomTabLayout"/>
+
+
+            </android.support.design.widget.AppBarLayout>
+
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/cloud_drive_tabs_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/contact_tabs_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/shares_tabs_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/my_account_tabs_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:gravity="center"
-                android:orientation="vertical" >
+                android:layout_below="@id/app_bar_layout"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-                <android.support.design.widget.TabLayout
-                    android:id="@+id/sliding_tabs_shares"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/mega"
-                    style="@style/MyCustomTabLayout"/>
-
-                    <android.support.v4.view.ViewPager
-                        android:id="@+id/shares_tabs_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-            </LinearLayout>
-
-            <!-- MY ACCOUNT TABS -->
-            <LinearLayout
-                android:id="@+id/tabhost_my_account"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:gravity="center"
-                android:orientation="vertical" >
-
-                <android.support.design.widget.TabLayout
-                    android:id="@+id/sliding_tabs_my_account"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/mega"
-                    android:elevation="6dp"
-                    style="@style/MyCustomTabLayout"/>
-
-                <android.support.v4.view.ViewPager
-                    android:id="@+id/my_account_tabs_pager"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-            </LinearLayout>
+        </LinearLayout>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/floating_button"
@@ -139,8 +115,6 @@
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white"
                 android:layout_gravity="bottom|right|end"/>
-
-        </android.support.design.widget.CoordinatorLayout>
 
         <include
             android:layout_width="fill_parent"
@@ -157,7 +131,7 @@
             android:layout_alignParentBottom="true"
             layout="@layout/layout_get_pro_account"
             android:visibility="gone" />
-    </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
