@@ -9,6 +9,7 @@ public class MegaChatParticipant {
     private long handle;
     private int privilege;
     private int status;
+    private boolean isContact;
 
     public MegaChatParticipant(long handle, String firstName, String lastName, String fullName, String email, int privilege, int status) {
         this.fullName = fullName;
@@ -78,5 +79,13 @@ public class MegaChatParticipant {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public boolean isContact() {
+        return isContact;
+    }
+
+    public void setContact(boolean contact) {
+        isContact = contact;
     }
 }

@@ -444,9 +444,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //            String participantFirstName = "Pepe";
             String participantLastName = chat.getPeerLastname(i);
 
+            String participantEmailPrueba = chat.getPeerEmail(i);
+
 //                chat.getOnlineStatus()
             log("First of the peer: "+participantFirstName);
             log("Last of the peer: "+participantLastName);
+            log("Email of the peer:"+participantEmailPrueba);
 
             String fullName;
 
