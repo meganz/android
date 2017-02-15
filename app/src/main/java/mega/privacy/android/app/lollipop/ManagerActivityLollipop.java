@@ -8966,6 +8966,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 //		showOverquotaPanel();
+//		showProPanel();
 
 		if (getUsedPerc() < 90){
 			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
@@ -10276,7 +10277,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
 				animTop.setDuration(4000);
 				outSpaceLayout.setAnimation(animTop);
-
 				outSpaceLayout.setVisibility(View.GONE);
 			}
 		};
