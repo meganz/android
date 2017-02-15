@@ -301,17 +301,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 Collections.sort(chats, new Comparator<MegaChatListItem> (){
 
                     public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                        MegaChatMessage message1 = c1.getLastMessage();
-                        long timestamp1 = -1;
-                        if(message1!=null){
-                            timestamp1 = message1.getTimestamp();
-                        }
-
-                        MegaChatMessage message2 = c2.getLastMessage();
-                        long timestamp2 = -1;
-                        if(message2!=null){
-                            timestamp2 = message2.getTimestamp();
-                        }
+                        long timestamp1 = c1.getLastTimestamp();
+                        long timestamp2 = c2.getLastTimestamp();
 
                         long result = timestamp2 - timestamp1;
                         return (int)result;
@@ -730,6 +721,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 }
             }
         }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)){
+
+        }
         else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
             log("Change title: "+item.getTitle());
 
@@ -907,6 +901,15 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     public void onLastMessageChange(int position){
 
         log("onLastMessageChange: "+position);
+
+        adapterList.setLastMessage(position, null);
+
+        interactionUpdate(position);
+    }
+
+    public void onLastTsChange(int position){
+
+        log("onLastTsChange: "+position);
 
         adapterList.setLastMessage(position, null);
 
