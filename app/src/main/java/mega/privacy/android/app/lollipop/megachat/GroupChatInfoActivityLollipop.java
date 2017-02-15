@@ -444,12 +444,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //            String participantFirstName = "Pepe";
             String participantLastName = chat.getPeerLastname(i);
 
-            String participantEmailPrueba = chat.getPeerEmail(i);
+            String participantEmail = chat.getPeerEmail(i);
 
 //                chat.getOnlineStatus()
             log("First of the peer: "+participantFirstName);
             log("Last of the peer: "+participantLastName);
-            log("Email of the peer:"+participantEmailPrueba);
+            log("Email of the peer:"+participantEmail);
 
             String fullName;
 
@@ -463,29 +463,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             int status = megaChatApi.getUserOnlineStatus(peerHandle);
 
-//                String tempFullName = "";
-//                tempFullName = fullName.substring(1);
-//                fullName = tempFullName;
-
-            MegaChatParticipant participant = null;
-            String userHandleEncoded = megaApi.userHandleToBase64(peerHandle);
-            MegaUser participantContact = megaApi.getContact(userHandleEncoded);
-            if(participantContact!=null){
-                String participantEmail = megaChatApi.getContactEmail(peerHandle);
-                if (participantContact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                    log("Email of the participant: "+participantEmail);
-                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
-                }
-                else{
-                    log("Email of the participant: NOT VISIBLE any more: "+participantEmail);
-                    participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
-                }
-            }
-            else{
-                //TODO: megaChatApi.getUseremail(userhandle, listener) for non-contacts - Task #5982
-                log("Email of the participant: NON CONTACT");
-                participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, null, peerPrivilege, status);
-            }
+            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
 
             participants.add(participant);
         }
@@ -515,6 +493,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         changeTitleItem =menu.findItem(R.id.action_rename);
 
         int permission = chat.getOwnPrivilege();
+        log("Permision: "+permission);
 
         if(permission==MegaChatRoom.PRIV_MODERATOR) {
             addParticipantItem.setVisible(true);
