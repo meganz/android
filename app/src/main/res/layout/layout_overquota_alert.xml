@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_centerHorizontal="true"
+    android:elevation="@dimen/elevation_high"
     android:background="@color/white"
     android:layout_gravity="center|fill_horizontal"
     android:orientation="vertical" >
