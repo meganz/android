@@ -11,9 +11,6 @@ import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -42,7 +39,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -993,6 +989,26 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
+	public void setTs(int position, ViewHolderChatList holder) {
+		log("setTs");
+		if (holder == null) {
+			holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
+		}
+
+		if(holder!=null){
+			MegaChatListItem chat = chats.get(position);
+			log("ChatRoom title: "+chat.getTitle());
+			log("chat timestamp: "+chat.getLastTimestamp());
+			String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+			log("date timestamp: "+date);
+			holder.textViewDate.setText(date);
+			holder.textViewDate.setVisibility(View.VISIBLE);
+		}
+		else{
+			log("holder is NULL");
+		}
+	}
+
 	public void setPendingMessages(int position, ViewHolderChatList holder){
 		log("setPendingMessages");
 		if(holder == null){
@@ -1009,6 +1025,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				holder.layoutPendingMessages.setVisibility(View.INVISIBLE);
 			}
+			setLastMessage(position, holder);
 		}
 		else{
 			log("Holder is NULL");
