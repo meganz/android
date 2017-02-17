@@ -28,7 +28,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
-import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -607,18 +607,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
+                Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
 
                 drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
                 if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
-                        i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
+                        i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                     }
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
-                        i.putExtra("from", FilePropertiesActivityLollipop.FROM_INBOX);
+                        i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
                     }
                 }
 
