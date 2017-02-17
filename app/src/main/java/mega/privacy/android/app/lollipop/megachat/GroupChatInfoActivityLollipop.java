@@ -56,13 +56,13 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.modalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -72,6 +72,7 @@ import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -427,7 +428,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         long participantsLabel = participantsCount+1; //Add one to include me
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
-        MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), MegaChatApi.STATUS_ONLINE);
+        MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
 
         participants.add(me);
 
@@ -1086,6 +1087,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
+    public void inviteContact (String email){
+        log("inviteContact");
+
+        ContactController cC = new ContactController(this);
+        cC.inviteContact(email);
+    }
+
 //    @Override
 //    public void onBackPressed() {
 //        log("onBackPressed");
@@ -1314,7 +1322,35 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish "+request.getRequestString());
 
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
+            log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+
+            if(request.getNumber()== MegaContactRequest.INVITE_ACTION_REMIND){
+                showSnackbar(getString(R.string.context_contact_invitation_resent));
+            }
+            else{
+                if (e.getErrorCode() == MegaError.API_OK){
+                    log("OK INVITE CONTACT: "+request.getEmail());
+                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+                    {
+                        showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+                    }
+                }
+                else{
+                    log("Code: "+e.getErrorString());
+                    if(e.getErrorCode()==MegaError.API_EEXIST)
+                    {
+                        showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+                    }
+                    else{
+                        showSnackbar(getString(R.string.general_error));
+                    }
+                    log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                }
+            }
+        }
     }
 
     @Override

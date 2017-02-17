@@ -12,7 +12,6 @@
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> of </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
-    <string name="general_dissmiss" context="Answer for confirmation dialog.">Dissmis</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Cancel</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Move to</string>
@@ -387,7 +386,6 @@
 
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here</string>
-    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Dismiss</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Send</string>
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancel Subscription</string>
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
@@ -1069,4 +1067,7 @@
 
     <string name="recent_chat_empty_no_connection_title" context="Title of chat section when the app has no connection">No Internet connection</string>
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without connection.</string>
+
+
+    <string name="general_dissmiss" context="Answer for confirmation dialog.">Dismiss</string>
 </resources>

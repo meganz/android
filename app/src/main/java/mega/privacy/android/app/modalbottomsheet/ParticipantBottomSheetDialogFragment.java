@@ -20,7 +20,6 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -38,6 +37,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -50,7 +50,8 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     public LinearLayout mainLinearLayout;
     public TextView titleNameContactChatPanel;
-    ImageView stateIcon;
+    public ImageView stateIcon;
+    public ImageView permissionsIcon;
     public TextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
     public TextView contactInitialLetter;
@@ -61,6 +62,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public LinearLayout optionLeaveChat;
     public LinearLayout optionChangePermissionsChat;
     public LinearLayout optionRemoveParticipantChat;
+    public LinearLayout optionInvite;
     ////
 
     DisplayMetrics outMetrics;
@@ -105,9 +107,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         stateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
         stateIcon.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
 
-        RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)stateIcon.getLayoutParams();
-        stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
-        stateIcon.setLayoutParams(stateIconParams);
+        permissionsIcon = (ImageView) contentView.findViewById(R.id.group_participant_list_permissions);
 
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.group_participants_chat_mail_text);
         contactLayout = (LinearLayout) contentView.findViewById(R.id.group_participants_chat);
@@ -120,6 +120,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionLeaveChat = (LinearLayout) contentView.findViewById(R.id.leave_group_participants_chat_layout);
         optionChangePermissionsChat = (LinearLayout) contentView.findViewById(R.id.change_permissions_group_participants_chat_layout);
         optionRemoveParticipantChat= (LinearLayout) contentView.findViewById(R.id.remove_group_participants_chat_layout);
+        optionInvite = (LinearLayout) contentView.findViewById(R.id.invite_group_participants_chat_layout);
 
         optionChangePermissionsChat.setOnClickListener(this);
         optionRemoveParticipantChat.setOnClickListener(this);
@@ -127,27 +128,31 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionStartConversationChat.setOnClickListener(this);
         optionEditProfileChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
+        optionInvite.setOnClickListener(this);
         //////
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             log("onCreate: Landscape configuration");
-            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
         }
         else{
-            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+            titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         }
 
         titleNameContactChatPanel.setText(selectedParticipant.getFullName());
-        int permission = selectedChat.getPeerPrivilegeByHandle(selectedParticipant.getHandle());
+        titleMailContactChatPanel.setText(selectedParticipant.getEmail());
+        int permission = selectedParticipant.getPrivilege();
 
         if(permission== MegaChatRoom.PRIV_STANDARD) {
-            titleMailContactChatPanel.setText(getString(R.string.member_permission_label_participants_panel));
+            permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
         }
         else if(permission==MegaChatRoom.PRIV_MODERATOR){
-            titleMailContactChatPanel.setText(getString(R.string.administrator_permission_label_participants_panel));
+            permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
         }
         else{
-            titleMailContactChatPanel.setText(getString(R.string.observer_permission_label_participants_panel));
+            permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
         }
 
         int state = selectedParticipant.getStatus();
@@ -170,17 +175,30 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             optionRemoveParticipantChat.setVisibility(View.GONE);
         }
         else{
-            optionEditProfileChat.setVisibility(View.GONE);
-            optionLeaveChat.setVisibility(View.GONE);
+            MegaUser contact = megaApi.getContact(selectedParticipant.getEmail());
 
-            if(selectedParticipant.getEmail()!=null){
-                optionContactInfoChat.setVisibility(View.VISIBLE);
-                optionStartConversationChat.setVisibility(View.VISIBLE);
+            if(contact!=null) {
+                if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                    optionContactInfoChat.setVisibility(View.VISIBLE);
+                    optionStartConversationChat.setVisibility(View.VISIBLE);
+                    optionInvite.setVisibility(View.GONE);
+                }
+                else{
+                    log("Non contact");
+                    optionContactInfoChat.setVisibility(View.GONE);
+                    optionStartConversationChat.setVisibility(View.GONE);
+                    optionInvite.setVisibility(View.VISIBLE);
+                }
             }
             else{
+                log("Non contact");
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
+                optionInvite.setVisibility(View.VISIBLE);
             }
+
+            optionEditProfileChat.setVisibility(View.GONE);
+            optionLeaveChat.setVisibility(View.GONE);
 
             log("Other participant selected its me");
             if(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
@@ -335,6 +353,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                 ((GroupChatInfoActivityLollipop) context).showConfirmationLeaveChat(selectedChat);
                 break;
             }
+
+            case R.id.invite_group_participants_chat_layout: {
+                log("invite contact participants panel");
+                ((GroupChatInfoActivityLollipop) context).inviteContact(selectedParticipant.getEmail());
+                break;
+            }
+
         }
 //        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());

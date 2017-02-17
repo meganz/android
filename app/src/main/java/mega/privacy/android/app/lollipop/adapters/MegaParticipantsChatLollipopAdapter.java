@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -87,6 +88,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		TextView contactInitialLetter;
 		TextView textViewContent;
 		ImageButton imageButtonThreeDots;
+		ImageView statusImage;
 
 		ImageView permissionsIcon;
 		int currentPosition;
@@ -136,6 +138,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.textViewContent = (TextView) v.findViewById(R.id.participant_list_content);
 			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.participant_list_three_dots);
 			holderList.permissionsIcon = (ImageView) v.findViewById(R.id.participant_list_permissions);
+			holderList.statusImage = (ImageView) v.findViewById(R.id.group_participants_state_circle);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				log("onCreate: Landscape configuration");
+				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
+				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
+			}
+			else{
+				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+			}
 
 			holderList.itemLayout.setTag(holderList);
 			v.setTag(holderList);
@@ -179,6 +192,16 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			log("participant: " + participant.getEmail() + " handle: " + participant.getHandle());
 			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
 
+			int userStatus = participant.getStatus();
+			if(userStatus == MegaChatApi.STATUS_ONLINE){
+				log("This user is connected");
+				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+			}
+			else{
+				log("This user status is: "+userStatus);
+				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+			}
+
 			if (!multipleSelect) {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			} else {
@@ -191,6 +214,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 
 			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);
+			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
 
 			createDefaultAvatar(((ViewHolderParticipantsList)holder));
 
@@ -221,6 +245,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 			else{
 				log("NOOOT me!!!");
+
 				if (((ViewHolderParticipantsList)holder).contactMail != null) {
 					log("The participant is contact!!");
 
@@ -269,22 +294,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 								}
 							}
 							((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
-							((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
+
 						}
 						else{
 							log("Participant is NOT contact");
-							if(position!=0){
-								((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
-								((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
-							}
 						}
 					}
 					else{
 						log("Participant is NOT contact");
-						if(position!=0){
-							((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
-							((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
-						}
 					}
 
 				} else {
@@ -294,15 +311,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 						((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
 					}
 				}
-			}
-
-			int status = participant.getStatus();
-
-			if (status == MegaChatApi.STATUS_ONLINE) {
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.online_status));
-			}
-			else {
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getResources().getString(R.string.offline_status));
 			}
 
 			((ViewHolderParticipantsList)holder).textViewContent.setText(((ViewHolderParticipantsList)holder).contactMail);

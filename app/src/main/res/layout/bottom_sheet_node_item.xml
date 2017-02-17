@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:ellipsize="end"
+                android:ellipsize="middle"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp"/>
 
@@ -64,7 +64,7 @@
             android:id="@+id/node_relative_layout_public_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="45dp"
+            android:layout_marginRight="47dp"
             android:gravity="right"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"

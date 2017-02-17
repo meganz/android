@@ -56,11 +56,11 @@
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">¿Quieres enviar una invitación a %s?</string>
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borrar estos %d contactos?</string>
-    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
-    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Está seguro de que desea enviar estos elementos a la Papelera?</string>
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Enviar este elemento a la Papelera?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Ennviar estos elementos a la Papelera?</string>
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Borrar de MEGA</string>
-    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Está seguro de que desear eliminar completamente este elemento de MEGA?</string>
-    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">¿Está seguro de que desear eliminar completamente estos elementos de MEGA?</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Eliminar completamente este elemento de MEGA?</string>
+    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">¿Eliminar completamente estos elementos de MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
@@ -176,15 +176,15 @@
 	<string name="error_enter_username" context="Warning dialog">Por favor, escribe tu nombre.</string>
     <string name="error_short_password" context="when creating the account">La contraseña es muy corta</string>
     <string name="error_passwords_dont_match" context="when creating the account">Las contraseñas no coinciden</string>
-    <string name="error_email_registered" contect="when creating the account">Está dirección de correo electrónico ya fue utilizada para el registro de una cuenta con MEGA.</string>
+    <string name="error_email_registered" contect="when creating the account">Esta dirección de correo electrónico ya fue utilizada para el registro de una cuenta con MEGA.</string>
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Se requiere confirmación</string>
     <string name="create_account_confirm" context="">Por favor, comprueba tu correo electrónico y haz clic en el enlace para iniciar sesión y confirmar tu cuenta</string>
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta.</string>
     
     <string name="cancel_transfer_title">Cancelar Transferencia</string>
-    <string name="cancel_transfer_confirmation">La transferencia será cancelada, ¿está seguro?</string>
-        <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias, ¿está seguro?</string>
+    <string name="cancel_transfer_confirmation">La transferencia será cancelada.</string>
+        <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias.</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
@@ -892,4 +892,6 @@
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
+
+    <string name="general_dissmiss" context="Answer for confirmation dialog.">Descartar</string>
 </resources>
