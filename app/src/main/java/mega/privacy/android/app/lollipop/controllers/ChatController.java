@@ -11,12 +11,11 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Util;
@@ -577,32 +576,31 @@ public class ChatController {
     }
 
     public static String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
-        String participantFirstName = getParticipantFirstName(userHandle, chatRoom);
-        String participantLastName = getParticipantLastName(userHandle, chatRoom);
 
-        if(participantFirstName==null){
-            participantFirstName="";
-        }
-        if(participantLastName == null){
-            participantLastName="";
-        }
+        String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
-        if (participantFirstName.trim().length() <= 0){
-            log("Participant1: "+participantFirstName);
-            return participantLastName;
+        if(fullName!=null){
+            if(fullName.isEmpty()){
+                log("1-Put email as fullname");
+                String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
+                return participantEmail;
+            }
+            else{
+                if (fullName.trim().length() <= 0){
+                    log("2-Put email as fullname");
+                    String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
+                    return participantEmail;
+                }
+                else{
+                    return fullName;
+                }
+            }
         }
         else{
-            log("Participant2: "+participantLastName);
-            return participantFirstName + " " + participantLastName;
+            log("3-Put email as fullname");
+            String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
+            return participantEmail;
         }
-    }
-
-    public static String getParticipantFirstName(long handle, MegaChatRoom chatRoom) {
-        return chatRoom.getPeerFirstnameByHandle(handle);
-    }
-
-    public static String getParticipantLastName(long handle, MegaChatRoom chatRoom) {
-        return chatRoom.getPeerLastnameByHandle(handle);
     }
 
     public static void log(String message) {

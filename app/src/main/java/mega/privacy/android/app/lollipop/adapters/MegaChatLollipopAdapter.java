@@ -33,10 +33,8 @@ import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -358,21 +356,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 String textToShow = "";
                 String fullNameAction = ChatController.getParticipantFullName(message.getUserHandle(), chatRoom);
 
-                if(fullNameAction.trim().length()<=0){
-                    log("No name!");
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-                    if(nonContact!=null){
-                        fullNameAction = nonContact.getFullName();
-                    }
-                    else{
-                        log("Ask for name non-contact");
-                        fullNameAction = "Participant left";
-                        log("1-Call for nonContactName: "+ message.getUserHandle());
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                    }
-                }
+//                if(fullNameAction.trim().length()<=0){
+//                    log("No name!");
+//                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+//                    if(nonContact!=null){
+//                        fullNameAction = nonContact.getFullName();
+//                    }
+//                    else{
+//                        log("Ask for name non-contact");
+//                        fullNameAction = "Participant left";
+//                        log("1-Call for nonContactName: "+ message.getUserHandle());
+//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+//                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+//                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
+//                    }
+//                }
 
                 if(privilege!=MegaChatRoom.PRIV_RM){
                     log("I was added");
@@ -524,19 +522,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 holder.fullNameTitle = ChatController.getParticipantFullName(message.getUserHandleOfAction(), chatRoom);
 
-                if(holder.fullNameTitle.trim().length()<=0){
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
-                    if(nonContact!=null){
-                        holder.fullNameTitle = nonContact.getFullName();
-                    }
-                    else{
-                        holder.fullNameTitle = "Unknown name";
-                        log("3-Call for nonContactName: "+ message.getUserHandle());
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
-                    }
-                }
+//                if(holder.fullNameTitle.trim().length()<=0){
+//                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
+//                    if(nonContact!=null){
+//                        holder.fullNameTitle = nonContact.getFullName();
+//                    }
+//                    else{
+//                        holder.fullNameTitle = "Unknown name";
+//                        log("3-Call for nonContactName: "+ message.getUserHandle());
+//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
+//                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
+//                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+//                    }
+//                }
 
                 String textToShow = "";
                 if(privilege!=MegaChatRoom.PRIV_RM){
@@ -550,20 +548,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         log("By other");
                         String fullNameAction = ChatController.getParticipantFullName(message.getUserHandle(), chatRoom);
 
-                        if(fullNameAction.trim().length()<=0){
-                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-                            if(nonContact!=null){
-                                fullNameAction = nonContact.getFullName();
-                            }
-                            else{
-                                fullNameAction = "Unknown name";
-                                log("2-Call for nonContactName: "+ message.getUserHandle());
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                            }
-
-                        }
+//                        if(fullNameAction.trim().length()<=0){
+//                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+//                            if(nonContact!=null){
+//                                fullNameAction = nonContact.getFullName();
+//                            }
+//                            else{
+//                                fullNameAction = "Unknown name";
+//                                log("2-Call for nonContactName: "+ message.getUserHandle());
+//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+//                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+//                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
+//                            }
+//
+//                        }
                         textToShow = String.format(context.getString(R.string.message_add_participant), holder.fullNameTitle, fullNameAction);
 
                     }
@@ -585,20 +583,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             log("The participant was removed");
                             String fullNameAction = ChatController.getParticipantFullName(message.getUserHandle(), chatRoom);
 
-                            if(fullNameAction.trim().length()<=0){
-                                NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-                                if(nonContact!=null){
-                                    fullNameAction = nonContact.getFullName();
-                                }
-                                else{
-                                    fullNameAction = "Unknown name";
-                                    log("4-Call for nonContactName: "+ message.getUserHandle());
-                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                                }
-
-                            }
+//                            if(fullNameAction.trim().length()<=0){
+//                                NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+//                                if(nonContact!=null){
+//                                    fullNameAction = nonContact.getFullName();
+//                                }
+//                                else{
+//                                    fullNameAction = "Unknown name";
+//                                    log("4-Call for nonContactName: "+ message.getUserHandle());
+//                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+//                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+//                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
+//                                }
+//
+//                            }
 
                             textToShow = String.format(context.getString(R.string.message_remove_participant), holder.fullNameTitle, fullNameAction);
                         }
@@ -674,20 +672,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("I was change by someone");
                     String fullNameAction = ChatController.getParticipantFullName(message.getUserHandle(), chatRoom);
 
-                    if(fullNameAction.trim().length()<=0){
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-                        if(nonContact!=null){
-                            fullNameAction = nonContact.getFullName();
-                        }
-                        else{
-                            fullNameAction = "Unknown name";
-                            log("5-Call for nonContactName: "+ message.getUserHandle());
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        }
-
-                    }
+//                    if(fullNameAction.trim().length()<=0){
+//                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+//                        if(nonContact!=null){
+//                            fullNameAction = nonContact.getFullName();
+//                        }
+//                        else{
+//                            fullNameAction = "Unknown name";
+//                            log("5-Call for nonContactName: "+ message.getUserHandle());
+//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+//                        }
+//
+//                    }
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, fullNameAction);
                 }
 
@@ -825,24 +823,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 holder.fullNameTitle = ChatController.getParticipantFullName(message.getUserHandleOfAction(), chatRoom);
 
-                if(holder.fullNameTitle.trim().length()<=0){
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
-                    if(nonContact!=null){
-                        holder.fullNameTitle = nonContact.getFullName();
-                        log("The fullName: "+holder.fullNameTitle);
-                        if((holder.fullNameTitle.trim()).isEmpty()){
-                            holder.fullNameTitle = "No name";
-                        }
-                    }
-                    else{
-                        holder.fullNameTitle = "Unknown name";
-                        log("6-Call for nonContactName: "+ message.getUserHandle());
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
-                    }
-
-                }
+//                if(holder.fullNameTitle.trim().length()<=0){
+//                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
+//                    if(nonContact!=null){
+//                        holder.fullNameTitle = nonContact.getFullName();
+//                        log("The fullName: "+holder.fullNameTitle);
+//                        if((holder.fullNameTitle.trim()).isEmpty()){
+//                            holder.fullNameTitle = "No name";
+//                        }
+//                    }
+//                    else{
+//                        holder.fullNameTitle = "Unknown name";
+//                        log("6-Call for nonContactName: "+ message.getUserHandle());
+//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
+//                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
+//                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+//                    }
+//
+//                }
 
                 int privilege = message.getPrivilege();
                 String privilegeString = "";
@@ -870,19 +868,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("By other");
                     String fullNameAction = ChatController.getParticipantFullName(message.getUserHandle(), chatRoom);
 
-                    if(fullNameAction.trim().length()<=0){
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-                        if(nonContact!=null){
-                            fullNameAction = nonContact.getFullName();
-                        }
-                        else{
-                            fullNameAction = "Unknown name";
-                            log("8-Call for nonContactName: "+ message.getUserHandle());
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        }
-                    }
+//                    if(fullNameAction.trim().length()<=0){
+//                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+//                        if(nonContact!=null){
+//                            fullNameAction = nonContact.getFullName();
+//                        }
+//                        else{
+//                            fullNameAction = "Unknown name";
+//                            log("8-Call for nonContactName: "+ message.getUserHandle());
+//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+//                        }
+//                    }
 
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, fullNameAction);
                 }
@@ -1236,20 +1234,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     holder.fullNameTitle = ChatController.getParticipantFullName(userHandle, chatRoom);
 
-                    if(holder.fullNameTitle.trim().length()<=0){
-//                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-                        if(nonContact!=null){
-                            holder.fullNameTitle = nonContact.getFullName();
-                        }
-                        else{
-                            holder.fullNameTitle = "Unknown name";
-//
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        }
-                    }
+//                    if(holder.fullNameTitle.trim().length()<=0){
+////                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
+//                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
+//                        if(nonContact!=null){
+//                            holder.fullNameTitle = nonContact.getFullName();
+//                        }
+//                        else{
+//                            holder.fullNameTitle = "Unknown name";
+////
+//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+//                        }
+//                    }
                 }
                 else{
 //                    holder.fullNameTitle = getContactFullName(holder.userHandle);
