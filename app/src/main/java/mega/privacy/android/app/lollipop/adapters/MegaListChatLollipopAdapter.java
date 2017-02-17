@@ -1025,7 +1025,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				holder.layoutPendingMessages.setVisibility(View.INVISIBLE);
 			}
-			setLastMessage(position, holder);
+//			setLastMessage(position, holder);
 		}
 		else{
 			log("Holder is NULL");
@@ -1074,7 +1074,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-
 
 			int messageType = chat.getLastMessageType();
 			String lastMessageString = chat.getLastMessage();
