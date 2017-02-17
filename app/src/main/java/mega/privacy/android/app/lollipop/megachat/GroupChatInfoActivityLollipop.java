@@ -428,7 +428,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         long participantsLabel = participantsCount+1; //Add one to include me
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
-        MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text), megaApi.getMyUser().getEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
+        String myFullName = getMyFullName();
+
+        MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
 
         participants.add(me);
 
@@ -440,31 +442,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             long peerHandle = chat.getPeerHandle(i);
 
-//                String participantFirstName = chat.getPeerFirstname(i);
-            String participantFirstName = chat.getPeerFirstname(i);
-//            String participantFirstName = "Pepe";
-            String participantLastName = chat.getPeerLastname(i);
-
+            String fullName = getParticipantFullName(i);
             String participantEmail = chat.getPeerEmail(i);
 
-//                chat.getOnlineStatus()
-            log("First of the peer: "+participantFirstName);
-            log("Last of the peer: "+participantLastName);
-            log("Email of the peer:"+participantEmail);
-
-            String fullName;
-
-            if (participantFirstName.trim().length() <= 0){
-                fullName = participantLastName;
-            }
-            else{
-                fullName = participantFirstName + " " + participantLastName;
-            }
             log("FullName of the peer: "+fullName);
 
             int status = megaChatApi.getUserOnlineStatus(peerHandle);
 
-            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, participantFirstName, participantLastName, fullName, participantEmail, peerPrivilege, status);
+            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege, status);
 
             participants.add(participant);
         }
@@ -479,6 +464,74 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             adapter.setParticipants(participants);
+        }
+    }
+
+    public String getMyFullName(){
+
+        String fullName = megaChatApi.getMyFullname();
+
+        if(fullName!=null){
+            if(fullName.isEmpty()){
+                log("1-Put MY email as fullname");
+                String myEmail = megaChatApi.getMyEmail();
+                String[] splitEmail = myEmail.split("[@._]");
+                fullName = splitEmail[0];
+                return fullName;
+            }
+            else{
+                if (fullName.trim().length() <= 0){
+                    log("2-Put MY email as fullname");
+                    String myEmail = megaChatApi.getMyEmail();
+                    String[] splitEmail = myEmail.split("[@._]");
+                    fullName = splitEmail[0];
+                    return fullName;
+                }
+                else{
+                    return fullName;
+                }
+            }
+        }
+        else{
+            log("3-Put MY  email as fullname");
+            String myEmail = megaChatApi.getMyEmail();
+            String[] splitEmail = myEmail.split("[@._]");
+            fullName = splitEmail[0];
+            return fullName;
+        }
+    }
+
+    public String getParticipantFullName(long i){
+
+        String fullName = chat.getPeerFullname(i);
+
+        if(fullName!=null){
+            if(fullName.isEmpty()){
+                log("1-Put email as fullname");
+                String participantEmail = chat.getPeerEmail(i);
+                String[] splitEmail = participantEmail.split("[@._]");
+                fullName = splitEmail[0];
+                return fullName;
+            }
+            else{
+                if (fullName.trim().length() <= 0){
+                    log("2-Put email as fullname");
+                    String participantEmail = chat.getPeerEmail(i);
+                    String[] splitEmail = participantEmail.split("[@._]");
+                    fullName = splitEmail[0];
+                    return fullName;
+                }
+                else{
+                    return fullName;
+                }
+            }
+        }
+        else{
+            log("3-Put email as fullname");
+            String participantEmail = chat.getPeerEmail(i);
+            String[] splitEmail = participantEmail.split("[@._]");
+            fullName = splitEmail[0];
+            return fullName;
         }
     }
 
