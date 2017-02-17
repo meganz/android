@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -166,8 +167,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
 
-        nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            log("onCreate: Landscape configuration");
+            nodeName.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
+            nodeInfo.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
+        }
+        else{
+            nodeName.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+            nodeInfo.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+        }
 
         if(node!=null) {
             log("node is NOT null");

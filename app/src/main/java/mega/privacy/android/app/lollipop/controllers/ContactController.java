@@ -16,6 +16,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -232,16 +233,20 @@ public class ContactController {
     public void inviteContact(String contactEmail){
         log("inviteContact");
 
-        if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            return;
-        }
+        if(context instanceof ManagerActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
 
-        if(((ManagerActivityLollipop) context).isFinishing()){
-            return;
+            if(((ManagerActivityLollipop) context).isFinishing()){
+                return;
+            }
+            megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivityLollipop) context);
         }
-
-        megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivityLollipop) context);
+        else if(context instanceof GroupChatInfoActivityLollipop){
+            megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (GroupChatInfoActivityLollipop) context);
+        }
     }
 
     public void inviteMultipleContacts(ArrayList<String> contactEmails){
