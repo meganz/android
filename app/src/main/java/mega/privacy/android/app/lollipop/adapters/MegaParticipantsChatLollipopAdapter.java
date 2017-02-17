@@ -228,18 +228,27 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
 				}
 				Bitmap bitmap = null;
-				if (avatar.exists()) {
-					if (avatar.length() > 0) {
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-						if (bitmap != null) {
-							((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
-							((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
+				if(avatar!=null){
+					if (avatar.exists()) {
+						if (avatar.length() > 0) {
+							BitmapFactory.Options bOpts = new BitmapFactory.Options();
+							bOpts.inPurgeable = true;
+							bOpts.inInputShareable = true;
+							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+							if (bitmap != null) {
+								((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
+								((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
+							}
 						}
 					}
+					else{
+						log("My avatar Not exists");
+					}
 				}
+				else{
+					log("My avatar NULL");
+				}
+
 				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
 				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
 			}
