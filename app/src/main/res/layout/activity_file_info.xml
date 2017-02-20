@@ -19,21 +19,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
+                android:background="@color/white"
+                app:contentScrim="@color/white"
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <RelativeLayout
                     android:id="@+id/file_info_image_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:background="@color/white"
                     app:layout_collapseMode="parallax"
-                    android:fitsSystemWindows="true" >
+                    android:fitsSystemWindows="true">
 
                     <ImageView
                         android:id="@+id/file_info_toolbar_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="144dp"
+                        android:layout_height="144dp"
+                        android:layout_gravity="center"
                         android:adjustViewBounds="true"
                         android:scaleType="fitCenter" />
                 </RelativeLayout>

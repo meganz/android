@@ -202,7 +202,7 @@
                             style="@style/dialogActionButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_information_grey"
+                            android:src="@drawable/info_ic"
                             android:visibility="invisible" />
 
                         <RelativeLayout
@@ -241,7 +241,7 @@
                             style="@style/dialogActionButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_information_grey" />
+                            android:src="@drawable/info_ic" />
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -280,7 +280,7 @@
                             style="@style/dialogActionButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_information_grey"
+                            android:src="@drawable/info_ic"
                             android:visibility="invisible" />
 
                         <RelativeLayout
@@ -319,7 +319,7 @@
                             style="@style/dialogActionButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_information_grey"
+                            android:src="@drawable/info_ic"
                             android:visibility="invisible" />
 
                         <RelativeLayout
@@ -358,7 +358,7 @@
                             style="@style/dialogActionButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_information_grey"
+                            android:src="@drawable/info_ic"
                             android:visibility="invisible" />
 
                         <RelativeLayout

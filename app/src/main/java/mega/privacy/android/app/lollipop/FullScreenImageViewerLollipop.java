@@ -1048,7 +1048,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					break;
 				}
 				case R.id.full_image_viewer_properties:{
-					Intent i = new Intent(this, FilePropertiesActivityLollipop.class);
+					Intent i = new Intent(this, FileInfoActivityLollipop.class);
 					i.putExtra("handle", node.getHandle());
 					i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
 					i.putExtra("name", node.getName());
