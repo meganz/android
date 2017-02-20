@@ -30,7 +30,8 @@
             android:fontFamily="sans-serif-medium"
             android:textColor="@color/accentColor"
             android:textSize="14sp"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:visibility="invisible"/>
 
         <TextView
             android:id="@+id/file_link_button_download"
@@ -39,7 +40,8 @@
             android:fontFamily="sans-serif-medium"
             android:textColor="@color/accentColor"
             android:textSize="14sp"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:visibility="invisible"/>
     </LinearLayout>
 
     <View
