@@ -1,0 +1,70 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/cab_menu_file_info_download"
+        android:orderInCategory="100"
+        android:title="@string/general_download"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_share_folder"
+        android:orderInCategory="100"
+        android:title="@string/context_share_folder"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_get_link"
+        android:orderInCategory="100"
+        android:title="@string/context_get_link_menu"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_edit_link"
+        android:orderInCategory="100"
+        android:title="@string/edit_link_option"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_remove_link"
+        android:orderInCategory="100"
+        android:title="@string/context_remove_link_menu"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_rename"
+        android:orderInCategory="105"
+        android:title="@string/context_rename"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_move"
+        android:orderInCategory="110"
+        android:title="@string/general_move"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_copy"
+        android:orderInCategory="110"
+        android:title="@string/context_copy"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_rubbish"
+        android:orderInCategory="110"
+        android:title="@string/context_move_to_trash"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_leave"
+        android:orderInCategory="110"
+        android:title="@string/general_leave"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_file_info_delete"
+        android:orderInCategory="110"
+        android:title="@string/context_delete"
+        MEGA:showAsAction="never" />
+
+</menu>

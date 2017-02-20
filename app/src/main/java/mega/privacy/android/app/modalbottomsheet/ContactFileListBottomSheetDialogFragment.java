@@ -26,7 +26,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -272,9 +272,9 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                     log("The selected node is NULL");
                     return;
                 }
-                Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
+                Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
-                i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
+                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 if (node.isFolder()) {
                     if (megaApi.isShared(node)){
                         i.putExtra("imageId", R.drawable.folder_shared_mime);

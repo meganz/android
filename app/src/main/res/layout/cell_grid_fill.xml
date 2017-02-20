@@ -126,7 +126,7 @@
 			android:id="@+id/cell_public_link"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:src="@drawable/ic_public_link_list"
+			android:src="@drawable/link_ic"
 			android:layout_marginTop="5dp"
 			android:layout_centerHorizontal="true"
 			android:layout_above="@id/cell_separator"/>

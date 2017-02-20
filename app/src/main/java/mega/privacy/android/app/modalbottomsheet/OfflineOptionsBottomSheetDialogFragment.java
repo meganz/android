@@ -25,7 +25,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -272,7 +272,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                         return;
                     }
 
-                    Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
+                    Intent i = new Intent(context, FileInfoActivityLollipop.class);
                     i.putExtra("handle", node.getHandle());
 
                     if (node.isFolder()) {

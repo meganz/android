@@ -223,17 +223,17 @@
 	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Disponible sin conexión</string>
 	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
 	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
-	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Tamaño:</string>
-	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Contenido:</string>
-	<string name="file_properties_info_added" context="when was the file added in MEGA">Añadido:</string>
-	<string name="file_properties_info_modified" context="when was the file modified">Modificado:</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Tamaño</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Contenido</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">Añadido</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Modificado</string>
 	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Enlace no público</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Enlace público</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Acceso Total</string>
 	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lectura y Escritura</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Solo Lectura</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Compartido con:</string>
-	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permisos:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permisos</string>
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Permisos</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Cambiar permisos</string>
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida con</string>
