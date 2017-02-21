@@ -33,8 +33,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FilePropertiesActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -871,13 +871,13 @@ public class NodeController {
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((FullScreenImageViewerLollipop) context));
         }
-        else  if(context instanceof FilePropertiesActivityLollipop){
+        else  if(context instanceof FileInfoActivityLollipop){
             if (!Util.isOnline(context)){
-                ((FilePropertiesActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
-            ((FilePropertiesActivityLollipop) context).setIsGetLink(true);
-            megaApi.exportNode(document, ((FilePropertiesActivityLollipop) context));
+            ((FileInfoActivityLollipop) context).setIsGetLink(true);
+            megaApi.exportNode(document, ((FileInfoActivityLollipop) context));
         }
     }
 
@@ -901,14 +901,14 @@ public class NodeController {
             ((FullScreenImageViewerLollipop) context).setExpiredDateLink(true);
             megaApi.exportNode(document, timestamp, ((FullScreenImageViewerLollipop) context));
         }
-        else if (context instanceof FilePropertiesActivityLollipop){
+        else if (context instanceof FileInfoActivityLollipop){
             if (!Util.isOnline(context)){
-                ((FilePropertiesActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
-            ((FilePropertiesActivityLollipop) context).setIsGetLink(true);
-            ((FilePropertiesActivityLollipop) context).setExpiredDateLink(true);
-            megaApi.exportNode(document, timestamp, ((FilePropertiesActivityLollipop) context));
+            ((FileInfoActivityLollipop) context).setIsGetLink(true);
+            ((FileInfoActivityLollipop) context).setExpiredDateLink(true);
+            megaApi.exportNode(document, timestamp, ((FileInfoActivityLollipop) context));
         }
     }
 

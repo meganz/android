@@ -1705,23 +1705,23 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			return;
 		}
 
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_creating_link));
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
-
 		if(node.isExported()){
 			log("node is already exported: "+node.getName());
 			log("node link: "+node.getPublicLink());
 			showGetLinkPanel(node.getPublicLink(), node.getExpirationTime());
 		}
 		else{
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_creating_link));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+
 			NodeController nC = new NodeController(filePropertiesActivity);
 			log("Export link for Node: "+node.getName());
 			nC.exportLink(node);
@@ -2527,7 +2527,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	protected void onResume() {
-		log("onResume-FilePropertiesActivityLollipop");
+		log("onResume-FileInfoActivityLollipop");
 		super.onResume();
 
 		refreshProperties();
