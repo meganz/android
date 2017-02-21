@@ -25,7 +25,7 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <RelativeLayout
-                    android:id="@+id/file_info_image_layout"
+                    android:id="@+id/file_info_icon_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -34,12 +34,40 @@
                     android:fitsSystemWindows="true">
 
                     <ImageView
-                        android:id="@+id/file_info_toolbar_image"
+                        android:id="@+id/file_info_toolbar_icon"
                         android:layout_width="144dp"
                         android:layout_height="144dp"
                         android:layout_gravity="center"
                         android:adjustViewBounds="true"
                         android:scaleType="fitCenter" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/file_info_image_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_collapseMode="parallax"
+                    android:fitsSystemWindows="true">
+
+                    <ImageView
+                        android:id="@+id/file_info_toolbar_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:fitsSystemWindows="true"
+                        android:scaleType="centerCrop" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="112dp"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/gradient_shape" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@drawable/actionbar_gradient_dark" />
                 </RelativeLayout>
 
                 <android.support.v7.widget.Toolbar
