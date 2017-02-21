@@ -786,6 +786,37 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
             log("Change last message: "+item.getChanges());
+            if(item!=null){
+
+                if (adapterList == null || adapterList.getItemCount()==0){
+                    setChats();
+                }
+                else{
+                    long chatHandleToUpdate = item.getChatId();
+                    int indexToReplace = -1;
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatListItem chat = itrReplace.next();
+                        if(chat!=null){
+                            if(chat.getChatId()==chatHandleToUpdate){
+                                indexToReplace = itrReplace.nextIndex()-1;
+                                break;
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if(indexToReplace!=-1){
+                        log("Index to replace: "+indexToReplace);
+                        log("New title: "+item.getTitle());
+
+                        chats.set(indexToReplace, item);
+                        onLastMessageChange(indexToReplace);
+                    }
+                }
+            }
+
 
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
@@ -920,6 +951,16 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         if(updateOrder){
             interactionUpdate(position);
         }
+    }
+
+    public void onLastMessageChange(int position){
+        log("onLastMessageChange");
+
+        adapterList.setLastMessage(position, null);
+
+//        if(updateOrder){
+//            interactionUpdate(position);
+//        }
     }
 
     public void showMuteIcon(MegaChatListItem item){
