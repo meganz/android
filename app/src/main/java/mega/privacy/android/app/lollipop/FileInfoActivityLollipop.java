@@ -707,6 +707,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			thumb = ThumbnailUtils.getThumbnailFromCache(node);
 			if (thumb != null){
 				imageToolbarView.setImageBitmap(thumb);
+				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 				imageToolbarLayout.setVisibility(View.VISIBLE);
 				iconToolbarLayout.setVisibility(View.GONE);
 //				iconToolbarView.setImageBitmap(thumb);
@@ -716,6 +717,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if (thumb != null){
 //					iconToolbarView.setImageBitmap(thumb);
 					imageToolbarView.setImageBitmap(thumb);
+					collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 					imageToolbarLayout.setVisibility(View.VISIBLE);
 					iconToolbarLayout.setVisibility(View.GONE);
 				}
@@ -724,6 +726,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if (preview != null){
 				PreviewUtils.previewCache.put(node.getHandle(), preview);
 //				iconToolbarView.setImageBitmap(preview);
+				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 				imageToolbarView.setImageBitmap(preview);
 				imageToolbarLayout.setVisibility(View.VISIBLE);
 				iconToolbarLayout.setVisibility(View.GONE);
@@ -732,6 +735,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				preview = PreviewUtils.getPreviewFromFolder(node, this);
 				if (preview != null){
 					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 					imageToolbarView.setImageBitmap(preview);
 					imageToolbarLayout.setVisibility(View.VISIBLE);
 					iconToolbarLayout.setVisibility(View.GONE);
@@ -1988,6 +1992,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						PreviewUtils.previewCache.put(handle, bitmap);
 						if (iconToolbarView != null){
 //							iconToolbarView.setImageBitmap(bitmap);
+							collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 							imageToolbarView.setImageBitmap(bitmap);
 							imageToolbarLayout.setVisibility(View.VISIBLE);
 							iconToolbarLayout.setVisibility(View.GONE);
