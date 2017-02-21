@@ -94,6 +94,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
+
+	boolean importClicked = false;
+	MegaNode target = null;
 	
 	@Override
 	public void onDestroy(){
@@ -428,6 +431,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				sizeTextView.setText(Formatter.formatFileSize(this, document.getSize()));
 
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+
+				downloadButton.setVisibility(View.VISIBLE);
+				importButton.setVisibility(View.VISIBLE);
+
+				if (importClicked){
+					if ((document != null) && (target != null)){
+						megaApi.copyNode(document, target, this);
+					}
+				}
 			}
 			else{
 				log("ERROR: " + e.getErrorCode());
@@ -550,7 +562,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 	
 	void importNode(){
-		
+
 		if (megaApi.getRootNode() == null){
 			Intent intent = new Intent(this, ManagerActivityLollipop.class);
 			intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
@@ -865,12 +877,29 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
-			MegaNode target = megaApi.getNodeByHandle(toHandle);
+
+			target = null;
+			target = megaApi.getNodeByHandle(toHandle);
 			if(target == null){
 				target = megaApi.getRootNode();
 			}
-			megaApi.copyNode(document, target, this);
+
+			if (document != null){
+				log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+				if (target != null){
+					log("TARGET: " + target.getName() + "_" + target.getHandle());
+					megaApi.copyNode(document, target, this);
+				}
+				else{
+					log("TARGET: null");
+				}
+			}
+			else{
+				log("DOCUMENT: null");
+				if (target != null){
+					importClicked = true;
+				}
+			}
 		}
 	}
 	
