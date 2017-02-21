@@ -106,7 +106,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	static int FROM_OFFLINE= 15;
 	static public int FROM_INBOX= 16;
 
-	RelativeLayout imageLayout;
+	RelativeLayout iconToolbarLayout;
+	ImageView iconToolbarView;
+
+	RelativeLayout imageToolbarLayout;
+	ImageView imageToolbarView;
 
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
@@ -125,7 +129,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	float scaleText;
 
 	RelativeLayout container;
-	ImageView imageView;
+
 	LinearLayout optionsLayout;
 	LinearLayout availableOfflineLayout;
 
@@ -306,12 +310,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 			}
 
-			imageLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
+			iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
+			iconToolbarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 
-			imageLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
+			iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
+			iconToolbarView.setImageResource(imageId);
 
-			imageView = (ImageView) findViewById(R.id.file_info_toolbar_image);
-			imageView.setImageResource(imageId);
+			imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
+			imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
+			imageToolbarLayout.setVisibility(View.GONE);
 
 			//Available Offline Layout
 
@@ -699,24 +706,35 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			Bitmap preview = null;
 			thumb = ThumbnailUtils.getThumbnailFromCache(node);
 			if (thumb != null){
-				imageView.setImageBitmap(thumb);
+				imageToolbarView.setImageBitmap(thumb);
+				imageToolbarLayout.setVisibility(View.VISIBLE);
+				iconToolbarLayout.setVisibility(View.GONE);
+//				iconToolbarView.setImageBitmap(thumb);
 			}
 			else{
 				thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
 				if (thumb != null){
-					imageView.setImageBitmap(thumb);
+//					iconToolbarView.setImageBitmap(thumb);
+					imageToolbarView.setImageBitmap(thumb);
+					imageToolbarLayout.setVisibility(View.VISIBLE);
+					iconToolbarLayout.setVisibility(View.GONE);
 				}
 			}
 			preview = PreviewUtils.getPreviewFromCache(node);
 			if (preview != null){
 				PreviewUtils.previewCache.put(node.getHandle(), preview);
-				imageView.setImageBitmap(preview);
+//				iconToolbarView.setImageBitmap(preview);
+				imageToolbarView.setImageBitmap(preview);
+				imageToolbarLayout.setVisibility(View.VISIBLE);
+				iconToolbarLayout.setVisibility(View.GONE);
 			}
 			else{
 				preview = PreviewUtils.getPreviewFromFolder(node, this);
 				if (preview != null){
 					PreviewUtils.previewCache.put(node.getHandle(), preview);
-					imageView.setImageBitmap(preview);
+					imageToolbarView.setImageBitmap(preview);
+					imageToolbarLayout.setVisibility(View.VISIBLE);
+					iconToolbarLayout.setVisibility(View.GONE);
 				}
 				else{
 					if (node.hasPreview()){
@@ -764,7 +782,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 //				offlineSwitch.setChecked(false);
 //			}
 
-			imageView.setImageResource(imageId);
+			iconToolbarView.setImageResource(imageId);
 
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
@@ -851,14 +869,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						if(sl.size()>1){
 							//It is public and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
+							iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);
 							usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
 						else{
 							//It is just public
-							imageView.setImageResource(R.drawable.folder_mime);
+							iconToolbarView.setImageResource(R.drawable.folder_mime);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);
 //							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
@@ -868,7 +886,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					else{
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 						//It is private and shared
-						imageView.setImageResource(R.drawable.folder_shared_mime);
+						iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 						sharedLayout.setVisibility(View.VISIBLE);
 						dividerSharedLayout.setVisibility(View.VISIBLE);
 						usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
@@ -1968,8 +1986,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					if (preview.length() > 0) {
 						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
 						PreviewUtils.previewCache.put(handle, bitmap);
-						if (imageView != null){
-							imageView.setImageBitmap(bitmap);
+						if (iconToolbarView != null){
+//							iconToolbarView.setImageBitmap(bitmap);
+							imageToolbarView.setImageBitmap(bitmap);
+							imageToolbarLayout.setVisibility(View.VISIBLE);
+							iconToolbarLayout.setVisibility(View.GONE);
 						}
 					}
 				}
@@ -2376,7 +2397,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}
 
 		if (node.isFolder()){
-			imageView.setImageResource(imageId);
+			iconToolbarView.setImageResource(imageId);
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
 
@@ -2384,7 +2405,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					log("sl.size==0");
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
-					imageView.setImageResource(R.drawable.folder_mime);
+					iconToolbarView.setImageResource(R.drawable.folder_mime);
 
 //					If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
@@ -2432,14 +2453,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						if(sl.size()>1){
 							//It is public and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
+							iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);
 							usersSharedWithTextButton.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
 							//It is just public
-							imageView.setImageResource(R.drawable.folder_mime);
+							iconToolbarView.setImageResource(R.drawable.folder_mime);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);
 							usersSharedWithTextButton.setText(R.string.file_properties_shared_folder_public_link);
@@ -2449,7 +2470,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					else{
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 						//It is private and shared
-						imageView.setImageResource(R.drawable.folder_shared_mime);
+						iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 						sharedLayout.setVisibility(View.VISIBLE);
 						dividerSharedLayout.setVisibility(View.VISIBLE);
 						usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
