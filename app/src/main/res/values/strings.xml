@@ -1068,5 +1068,7 @@
     <string name="recent_chat_empty_no_connection_title" context="Title of chat section when the app has no connection">No Internet connection</string>
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without connection.</string>
 
+    <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
+
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
 </resources>
