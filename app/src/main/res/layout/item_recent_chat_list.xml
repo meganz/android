@@ -68,13 +68,24 @@
         android:background="@null"
         android:src="@drawable/circle_status_contact_not_connected" />
 
+
+    <ImageView
+        android:id="@+id/recent_chat_list_mute_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/mute_ic"
+        android:background="@null"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/recent_chat_list_contact_state"
+        android:layout_marginLeft="6dp"/>
+
     <RelativeLayout
         android:id="@+id/recent_chat_list_unread_layout"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="36dp"
-        android:layout_marginTop="14dp">
+        android:layout_marginRight="32dp"
+        android:layout_centerVertical="true">
 
         <ImageView
             android:id="@+id/recent_chat_list_unread_circle"
@@ -129,17 +140,5 @@
         android:background="@null"
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
-
-    <ImageView
-        android:id="@+id/recent_chat_list_call_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_notifications_off"
-        android:background="@null"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="36dp"
-        android:layout_marginBottom="16dp"
-        android:layout_toLeftOf="@id/recent_chat_list_three_dots"/>
 
 </RelativeLayout>

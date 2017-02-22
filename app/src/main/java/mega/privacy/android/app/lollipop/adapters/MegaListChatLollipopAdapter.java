@@ -465,7 +465,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 		holder = new ViewHolderChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
-		holder.muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_icon);
+		holder.muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_mute_icon);
 		holder.multiselectIcon = (ImageView) v.findViewById(R.id.recent_chat_list_multiselect_icon);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
