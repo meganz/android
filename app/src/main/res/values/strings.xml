@@ -837,7 +837,6 @@
 
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     <string name="recent_chat_empty" context="Message shown when the user has no archived chats">No conversations</string>
-    <string name="action_new_chat" context="Menu item">New chat</string>
 
     <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Chat is disabled</string>
     <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Enable chat</string>
@@ -1068,4 +1067,6 @@
 
     <string name="recent_chat_empty_no_connection_title" context="Title of chat section when the app has no connection">No Internet connection</string>
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without connection.</string>
+
+    <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
 </resources>

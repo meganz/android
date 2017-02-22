@@ -5085,7 +5085,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								startService(cancelIntentUpload);
 							}
 						});
-				builder.setNegativeButton(getString(R.string.general_dissmiss), null);
+				builder.setNegativeButton(getString(R.string.general_dismiss), null);
 				final AlertDialog dialog = builder.create();
 				try {
 					dialog.show();
@@ -7518,9 +7518,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
         builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
         builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-        builder.setNegativeButton(R.string.general_dissmiss, dialogClickListener);
+        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
         builder.show();
-
 	}
 
 	public void setIsClearRubbishBin(boolean value){
@@ -7880,7 +7879,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		});
 
-		builder.setNegativeButton(getString(R.string.dismiss_cancel_subscriptions), new android.content.DialogInterface.OnClickListener() {
+		builder.setNegativeButton(getString(R.string.general_dismiss), new android.content.DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
