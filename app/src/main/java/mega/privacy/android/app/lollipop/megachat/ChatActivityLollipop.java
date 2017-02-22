@@ -412,8 +412,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if (s != null) {
                     if (s.length() > 0) {
-                        sendIcon.setVisibility(View.VISIBLE);
-                    } else {
+                        String temp = s.toString();
+                        if(temp.trim().length()>0){
+                            sendIcon.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            sendIcon.setVisibility(View.GONE);
+                        }
+                    }
+                    else {
                         sendIcon.setVisibility(View.GONE);
                     }
                 }
