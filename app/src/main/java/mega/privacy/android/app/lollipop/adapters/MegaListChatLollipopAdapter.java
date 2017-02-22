@@ -51,7 +51,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
@@ -240,87 +239,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		setLastMessage(position, holder);
 
-		/*
-
-		if(messages!=null){
-			Message lastMessage = messages.get(messages.size()-1);
-
-			if(lastMessage.getType()==Message.TEXT){
-				log("The last message is text!");
-
-				//Set margin contentTextView - more margin bottom duration
-				RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-				contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
-				holder.textViewContent.setLayoutParams(contentTextViewParams);
-
-				String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
-				if(lastMessage.getUser().getMail().equals(myMail)){
-					log("The last message is mine");
-					Spannable me = new SpannableString("Me: ");
-					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.setText(me);
-					Spannable myMessage = new SpannableString(lastMessage.getMessage());
-					myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.append(myMessage);
-				}
-				else{
-					log("The last message NOT mine");
-					if(lastMessage.isRead()){
-						log("Message READ");
-						holder.textViewContent.setTextColor(context.getResources().getColor(R.color.file_list_second_row));
-					}
-					else{
-						log("Message NOt read");
-						holder.textViewContent.setTextColor(context.getResources().getColor(R.color.accentColor));
-					}
-					holder.textViewContent.setText(lastMessage.getMessage());
-				}
-			}
-			else if(lastMessage.getType()==Message.VIDEO){
-
-				//The last message is a call
-				log("The last message is a call!");
-
-				//Set margin contentTextView - more margin bottom duration
-				RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-				contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(2, outMetrics));
-				holder.textViewContent.setLayoutParams(contentTextViewParams);
-
-//				String videoCallString = context.getResources().getString(R.string.videocall_item);
-				Spannable videoCall = new SpannableString("Video call");
-				videoCall.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context,R.color.file_list_first_row)), 0, videoCall.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-				holder.textViewContent.setText(videoCall);
-				int duration = (int) lastMessage.getDuration();
-				String s = formatStringDuration(duration);
-				Spannable durationString = new SpannableString(s);
-				durationString.setSpan(new RelativeSizeSpan(0.85f), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-				durationString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context,R.color.file_list_second_row)), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-				holder.textViewContent.append(durationString);
-			}
-
-
-			if(chat.isMute()){
-				holder.muteIcon.setVisibility(View.VISIBLE);
-				RelativeLayout.LayoutParams muteIconParams = (RelativeLayout.LayoutParams)holder.muteIcon.getLayoutParams();
-				muteIconParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(14, outMetrics), 0, 0);
-				holder.muteIcon.setLayoutParams(muteIconParams);
-
-				//Set margin
-				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(0, Util.scaleHeightPx(12, outMetrics), 0, 0);
-				holder.textViewContactName.setLayoutParams(nameTextViewParams);
-			}
-			else{
-				holder.muteIcon.setVisibility(View.GONE);
-				//Set margin
-				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
-				holder.textViewContactName.setLayoutParams(nameTextViewParams);
-			}
-
-			holder.textViewDate.setText(TimeChatUtils.formatDate(lastMessage, TimeChatUtils.DATE_LONG_FORMAT));
-		}*/
-
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
 			log("Chat prefs exists!!!");
@@ -347,56 +265,77 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageButtonThreeDots.setOnClickListener(this);		
 	}
 
-	public String getParticipantFullName(long userHandle) {
+	public String getParticipantShortName(long userHandle){
+
 		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
 		if (contactDB != null) {
 
-			holder.firstNameText = contactDB.getName();
-			holder.lastNameText = contactDB.getLastName();
+			String participantFirstName = contactDB.getName();
 
-			String fullName;
-
-			if (holder.firstNameText.trim().length() <= 0) {
-				fullName = holder.lastNameText;
-			} else {
-				fullName = holder.firstNameText + " " + holder.lastNameText;
+			if(participantFirstName==null){
+				participantFirstName="";
 			}
 
-			if (fullName.trim().length() <= 0) {
-				log("Full name empty");
-				return "";
-			}
+			if (participantFirstName.trim().length() <= 0){
+				String participantLastName = contactDB.getLastName();
 
-			return fullName;
+				if(participantLastName == null){
+					participantLastName="";
+				}
+
+				if (participantLastName.trim().length() <= 0){
+					String stringHandle = megaApi.handleToBase64(userHandle);
+					MegaUser megaContact = megaApi.getContact(stringHandle);
+					if(megaContact!=null){
+						return megaContact.getEmail();
+					}
+					else{
+						return "No name";
+					}
+				}
+				else{
+					return participantLastName;
+				}
+			}
+			else{
+				return participantFirstName;
+			}
 		} else {
+			log("Find non contact!");
+
+			NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
+
+			if(nonContact!=null){
+				String nonContactFirstName = nonContact.getFirstName();
+
+				if(nonContactFirstName==null){
+					nonContactFirstName="";
+				}
+
+				if (nonContactFirstName.trim().length() <= 0){
+					String nonContactLastName = nonContact.getLastName();
+
+					if(nonContactLastName == null){
+						nonContactLastName="";
+					}
+
+					if (nonContactLastName.trim().length() <= 0){
+						log("Ask for email of a non contact");
+					}
+					else{
+						return nonContactLastName;
+					}
+				}
+				else{
+					return nonContactFirstName;
+				}
+			}
+			else{
+				log("Ask for non contact info");
+			}
+
 			return "";
 		}
-	}
-
-	public String getParticipantShortName(long userHandle, MegaChatRoom chatRoom){
-//		String participantFirstName = getParticipantFirstName(userHandle, chatRoom);
-//
-//		if(participantFirstName==null){
-//			participantFirstName="";
-//		}
-//
-//		if (participantFirstName.trim().length() <= 0){
-//			String participantLastName = getParticipantLastName(userHandle, chatRoom);
-//
-//			if(participantLastName == null){
-//				participantLastName="";
-//			}
-//
-//			if (participantLastName.trim().length() <= 0){
-//			}
-//			else{
-//				return participantLastName;
-//			}
-//		}
-//		else{
-//			return participantFirstName;
-//		}
-		return "Short name";
 	}
 
 	public void setUserAvatar(ViewHolderChatList holder, MegaUser contact){
@@ -1146,23 +1085,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 					else{
 						log("The last message NOT mine");
-						String fullNameAction = getParticipantFullName(chat.getLastMessageSender());
-
-						if(fullNameAction.trim().length()<=0){
-							log("No name!");
-							NonContactInfo nonContact = dbH.findNonContactByHandle(chat.getLastMessageSender()+"");
-							if(nonContact!=null){
-								fullNameAction = nonContact.getFullName();
-							}
-							else{
-								log("Ask for name non-contact");
-								fullNameAction = "Non-contact";
-//							log("1-Call for nonContactName: "+ lastMessage.getUserHandle());
-//							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMessage.getUserHandle());
-//							megaChatApi.getUserFirstname(lastMessage.getUserHandle(), listener);
-//							megaChatApi.getUserLastname(lastMessage.getUserHandle(), listener);
-							}
-						}
+						String fullNameAction = getParticipantShortName(chat.getLastMessageSender());
 
 						if(chat.isGroup()){
 							Spannable name = new SpannableString(fullNameAction+": ");
@@ -1217,39 +1140,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 
 			}
-
-
-//			MegaChatMessage lastMessage =chat.getLastMessage();
-//
-//			if(lastMessage!=null){
-//				String date = TimeChatUtils.formatDateAndTime(lastMessage, TimeChatUtils.DATE_LONG_FORMAT);
-//				holder.textViewDate.setText(date);
-//				holder.textViewDate.setVisibility(View.VISIBLE);
-//
-//				if(lastMessage.isManagementMessage()){
-//					if(lastMessage.getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
-//						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-//					}
-//					else{
-//						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-//					}
-//					holder.textViewContent.setText("Management message");
-//				}
-//				else{
-//					log("The last message is text!");
-//
-//					//Set margin contentTextView - more margin bottom duration
-////					RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-////					contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
-////					holder.textViewContent.setLayoutParams(contentTextViewParams);/
-//
-//				}
-//			}
-//			else{
-//				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
-//				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-//				holder.textViewDate.setVisibility(View.GONE);
-//			}
 		}
 		else{
 			log("Holder is NULL");
