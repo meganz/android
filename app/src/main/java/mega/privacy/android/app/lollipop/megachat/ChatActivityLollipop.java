@@ -1951,6 +1951,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         megaChatApi.setMessageSeen(idChat, msg.getMsgId());
 
+        if(msg.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
+            log("Change of chat title");
+            String newTitle = msg.getContent();
+            if(newTitle!=null){
+                aB.setTitle(newTitle);
+            }
+        }
+
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
         appendMessage(androidMsg);
 
