@@ -376,9 +376,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
 
-			//OPTIONS LAYOUT
-			optionsLayout = (LinearLayout) findViewById(R.id.file_properties_options);
-
 			//Permissions Layout
 			permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
 			permissionsLayout.setVisibility(View.GONE);
