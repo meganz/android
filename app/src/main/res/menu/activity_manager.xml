@@ -87,10 +87,9 @@
 	<item
 		android:id="@+id/action_menu_new_chat"
 		android:orderInCategory="100"
-		android:showAsAction="never"
-		android:title="@string/action_new_chat"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
+		MEGA:showAsAction="never"
+		android:title="@string/group_chat_start_conversation_label"
+		android:icon="@drawable/ic_action_bar_null" />
 
 	<item
 		android:id="@+id/action_add_contact"

@@ -184,7 +184,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 
 			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
-			collapsingToolbar.setExpandedTitleMarginStart(Util.scaleWidthPx(72, outMetrics));
+			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));

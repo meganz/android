@@ -12,17 +12,21 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -197,7 +201,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	private MegaApiAndroid megaApi = null;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	public FileInfoActivityLollipop filePropertiesActivity;
+	public FileInfoActivityLollipop fileInfoActivity;
 
 	ProgressDialog statusDialog;
 	boolean publicLink=false;
@@ -243,7 +247,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		megaApi.addGlobalListener(this);
 
-		filePropertiesActivity = this;
+		fileInfoActivity = this;
 		handler = new Handler();
 
 //		dbH = new DatabaseHandler(getApplicationContext());
@@ -284,22 +288,52 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			setContentView(R.layout.activity_file_info);
 
 			fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_info_fragment_container);
+
 			toolbar = (Toolbar) findViewById(R.id.toolbar);
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
 
-			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
-			collapsingToolbar.setExpandedTitleMarginStart(Util.scaleWidthPx(72, outMetrics));
-			getSupportActionBar().setDisplayShowTitleEnabled(false);
+			if(node.hasPreview()||node.hasThumbnail()){
+				AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+				appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+					@Override
+					public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+						Drawable upArrow = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_back_white, null);
+						if (offset < -200) {
+							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.name_my_account), PorterDuff.Mode.SRC_ATOP);
+							getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
-			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
+							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.name_my_account), PorterDuff.Mode.SRC_ATOP);
+							toolbar.setOverflowIcon(drawable);
+						} else {
+
+							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+							getSupportActionBar().setHomeAsUpIndicator(upArrow);
+							getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+							toolbar.setOverflowIcon(drawable);
+						}
+					}
+				});
+				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+			}
+			else{
+				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
+			}
+
+			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
+			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 			collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
 			collapsingToolbar.setTitle(name);
 
-//			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_);
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
 
@@ -621,7 +655,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						typeExport=TYPE_EXPORT_REMOVE;
-						megaApi.disableExport(node, filePropertiesActivity);
+						megaApi.disableExport(node, fileInfoActivity);
 					}
 				});
 
@@ -707,17 +741,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			thumb = ThumbnailUtils.getThumbnailFromCache(node);
 			if (thumb != null){
 				imageToolbarView.setImageBitmap(thumb);
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 				imageToolbarLayout.setVisibility(View.VISIBLE);
 				iconToolbarLayout.setVisibility(View.GONE);
-//				iconToolbarView.setImageBitmap(thumb);
 			}
 			else{
 				thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
 				if (thumb != null){
-//					iconToolbarView.setImageBitmap(thumb);
 					imageToolbarView.setImageBitmap(thumb);
-					collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 					imageToolbarLayout.setVisibility(View.VISIBLE);
 					iconToolbarLayout.setVisibility(View.GONE);
 				}
@@ -725,8 +755,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			preview = PreviewUtils.getPreviewFromCache(node);
 			if (preview != null){
 				PreviewUtils.previewCache.put(node.getHandle(), preview);
-//				iconToolbarView.setImageBitmap(preview);
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 				imageToolbarView.setImageBitmap(preview);
 				imageToolbarLayout.setVisibility(View.VISIBLE);
 				iconToolbarLayout.setVisibility(View.GONE);
@@ -735,7 +763,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				preview = PreviewUtils.getPreviewFromFolder(node, this);
 				if (preview != null){
 					PreviewUtils.previewCache.put(node.getHandle(), preview);
-					collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 					imageToolbarView.setImageBitmap(preview);
 					imageToolbarLayout.setVisibility(View.VISIBLE);
 					iconToolbarLayout.setVisibility(View.GONE);
@@ -1344,7 +1371,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
 		        	//TODO remove the incoming shares
-		    		megaApi.remove(node,filePropertiesActivity);
+		    		megaApi.remove(node,fileInfoActivity);
 		            break;
 
 		        case DialogInterface.BUTTON_NEGATIVE:
@@ -1544,10 +1571,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    		//Check if the node is not yet in the rubbish bin (if so, remove it)
 
 		    		if (moveToRubbish){
-		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, filePropertiesActivity);
+		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivity);
 		    			ProgressDialog temp = null;
 		    			try{
-		    				temp = new ProgressDialog(filePropertiesActivity);
+		    				temp = new ProgressDialog(fileInfoActivity);
 		    				temp.setMessage(getString(R.string.context_move_to_trash));
 		    				temp.show();
 		    			}
@@ -1557,10 +1584,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    			statusDialog = temp;
 		    		}
 		    		else{
-		    			megaApi.remove(megaApi.getNodeByHandle(handle), filePropertiesActivity);
+		    			megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivity);
 		    			ProgressDialog temp = null;
 		    			try{
-		    				temp = new ProgressDialog(filePropertiesActivity);
+		    				temp = new ProgressDialog(fileInfoActivity);
 		    				temp.setMessage(getString(R.string.context_delete_from_mega));
 		    				temp.show();
 		    			}
@@ -1726,7 +1753,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 			statusDialog = temp;
 
-			NodeController nC = new NodeController(filePropertiesActivity);
+			NodeController nC = new NodeController(fileInfoActivity);
 			log("Export link for Node: "+node.getName());
 			nC.exportLink(node);
 		}
@@ -1740,7 +1767,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		int month = c.get(Calendar.MONTH);
 		int day = c.get(Calendar.DAY_OF_MONTH);
 
-		final DatePickerDialog datePickerDialog = new DatePickerDialog(filePropertiesActivity, this, year, month, day);
+		final DatePickerDialog datePickerDialog = new DatePickerDialog(fileInfoActivity, this, year, month, day);
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 		builder.setTitle(getString(R.string.context_get_link_menu));
@@ -1920,7 +1947,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					}
 					else{
 						isExpiredDateLink=true;
-						NodeController nC = new NodeController(filePropertiesActivity);
+						NodeController nC = new NodeController(fileInfoActivity);
 						nC.exportLink(node);
 					}
 				}
@@ -1991,8 +2018,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
 						PreviewUtils.previewCache.put(handle, bitmap);
 						if (iconToolbarView != null){
-//							iconToolbarView.setImageBitmap(bitmap);
-							collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 							imageToolbarView.setImageBitmap(bitmap);
 							imageToolbarLayout.setVisibility(View.VISIBLE);
 							iconToolbarLayout.setVisibility(View.GONE);
@@ -2245,7 +2270,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						public void onClick(DialogInterface dialog, int item) {
 							ProgressDialog temp = null;
 							try{
-								temp = new ProgressDialog(filePropertiesActivity);
+								temp = new ProgressDialog(fileInfoActivity);
 								temp.setMessage(getString(R.string.context_sharing_folder));
 								temp.show();
 							}
@@ -2259,21 +2284,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			                    case 0:{
 			                    	for (int i=0;i<contactsData.size();i++){
 			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, filePropertiesActivity);
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileInfoActivity);
 			                    	}
 			                    	break;
 			                    }
 			                    case 1:{
 			                    	for (int i=0;i<contactsData.size();i++){
 			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, filePropertiesActivity);
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileInfoActivity);
 			                    	}
 			                        break;
 			                    }
 			                    case 2:{
 			                    	for (int i=0;i<contactsData.size();i++){
 			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, filePropertiesActivity);
+			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileInfoActivity);
 			                    	}
 			                        break;
 			                    }
@@ -2293,7 +2318,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					for (int i=0;i<contactsData.size();i++){
 						MegaUser u = megaApi.getContact(contactsData.get(i));
-						megaApi.sendFileToUser(node, u, filePropertiesActivity);
+						megaApi.sendFileToUser(node, u, fileInfoActivity);
 					}
 				}
 			}
@@ -2648,13 +2673,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}
 	}
 
-
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		// TODO Auto-generated method stub
 
 	}
-
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {

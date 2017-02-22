@@ -58,7 +58,6 @@
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borrar estos %d contactos?</string>
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Enviar este elemento a la Papelera?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Ennviar estos elementos a la Papelera?</string>
-    <string name="title_delete_from_mega" context="confirmation message before removing a file">Borrar de MEGA</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Eliminar completamente este elemento de MEGA?</string>
     <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">¿Eliminar completamente estos elementos de MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
@@ -385,7 +384,6 @@
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí las posibles mejoras...</string>
-    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Atrás</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Enviar</string>
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancelar Subscripción</string>
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Gracias por tu mensaje! ¿Estás seguro de que quieres cancelar la subscripción?</string>
@@ -893,5 +891,5 @@
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
 
-    <string name="general_dissmiss" context="Answer for confirmation dialog.">Descartar</string>
+    <string name="general_dismiss" context="Answer for confirmation dialog.">Descartar</string>
 </resources>
