@@ -278,9 +278,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_contact_properties_switch);
 			notificationsSwitch.setOnCheckedChangeListener(this);
-			LinearLayout.LayoutParams paramsSwitch = (LinearLayout.LayoutParams) notificationsSwitch.getLayoutParams();
-			paramsSwitch.rightMargin = Util.scaleWidthPx(16, outMetrics);
-			notificationsSwitch.setLayoutParams(paramsSwitch);
 
 			dividerNotificationsLayout = (View) findViewById(R.id.divider_notifications_layout);
 
@@ -288,24 +285,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			messageSoundLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_messages_sound_layout);
 			messageSoundLayout.setOnClickListener(this);
-			LinearLayout.LayoutParams paramsSound = (LinearLayout.LayoutParams) messageSoundLayout.getLayoutParams();
-			paramsSound.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			messageSoundLayout.setLayoutParams(paramsSound);
 
 			messageSoundText = (TextView) findViewById(R.id.chat_contact_properties_messages_sound);
 
 			dividerMessageSoundLayout = (View) findViewById(R.id.divider_message_sound_layout);
-			LinearLayout.LayoutParams paramsDividerSound = (LinearLayout.LayoutParams) dividerMessageSoundLayout.getLayoutParams();
-			paramsDividerSound.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			dividerMessageSoundLayout.setLayoutParams(paramsDividerSound);
 
 			//Call ringtone Layout
 
 			ringtoneLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_ringtone_layout);
 			ringtoneLayout.setOnClickListener(this);
-			LinearLayout.LayoutParams paramsRingtone = (LinearLayout.LayoutParams) ringtoneLayout.getLayoutParams();
-			paramsRingtone.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			ringtoneLayout.setLayoutParams(paramsRingtone);
 
 			ringtoneText = (TextView) findViewById(R.id.chat_contact_properties_ringtone);
 
@@ -316,27 +304,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			sharedFoldersLayout.setOnClickListener(this);
 
 			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
-			RelativeLayout.LayoutParams paramsSharedFoldersIcon = (RelativeLayout.LayoutParams) sharedFoldersIcon.getLayoutParams();
-			paramsSharedFoldersIcon.leftMargin = Util.scaleWidthPx(16, outMetrics);
-			sharedFoldersIcon.setLayoutParams(paramsSharedFoldersIcon);
 
 			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
-			RelativeLayout.LayoutParams paramsSharedFoldersText = (RelativeLayout.LayoutParams) sharedFoldersText.getLayoutParams();
-			paramsSharedFoldersText.leftMargin = Util.scaleWidthPx(32, outMetrics);
-			sharedFoldersText.setLayoutParams(paramsSharedFoldersText);
 
 			sharedFoldersButton = (Button) findViewById(R.id.chat_contact_properties_shared_folders_button);
 			sharedFoldersButton.setOnClickListener(this);
-			RelativeLayout.LayoutParams paramsSharedFoldersButton = (RelativeLayout.LayoutParams) sharedFoldersButton.getLayoutParams();
-			paramsSharedFoldersButton.rightMargin = Util.scaleWidthPx(16, outMetrics);
-			sharedFoldersButton.setLayoutParams(paramsSharedFoldersButton);
 
 			sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
 
 			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
-			LinearLayout.LayoutParams paramsSharedFoldersDivider = (LinearLayout.LayoutParams) dividerSharedFoldersLayout.getLayoutParams();
-			paramsSharedFoldersDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			dividerSharedFoldersLayout.setLayoutParams(paramsSharedFoldersDivider);
 
 			//Share Contact Layout
 
@@ -344,33 +320,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			shareContactLayout.setOnClickListener(this);
 
 			shareContactIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
-			RelativeLayout.LayoutParams paramsShareContactIcon = (RelativeLayout.LayoutParams) shareContactIcon.getLayoutParams();
-			paramsShareContactIcon.leftMargin = Util.scaleWidthPx(16, outMetrics);
-			shareContactIcon.setLayoutParams(paramsShareContactIcon);
 
 			shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
-			RelativeLayout.LayoutParams paramsShareContact = (RelativeLayout.LayoutParams) shareContactContentLayout.getLayoutParams();
-			paramsShareContact.leftMargin = Util.scaleWidthPx(32, outMetrics);
-			shareContactContentLayout.setLayoutParams(paramsShareContact);
 
 			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
 			shareContactText.setText(user.getEmail());
 
-			RelativeLayout.LayoutParams paramsContactText = (RelativeLayout.LayoutParams) shareContactText.getLayoutParams();
-			paramsContactText.rightMargin = Util.scaleWidthPx(16, outMetrics);
-			shareContactText.setLayoutParams(paramsContactText);
-
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
-			LinearLayout.LayoutParams paramsShareContactDivider = (LinearLayout.LayoutParams) dividerShareContactLayout.getLayoutParams();
-			paramsShareContactDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			dividerShareContactLayout.setLayoutParams(paramsShareContactDivider);
 
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
-			LinearLayout.LayoutParams paramsClearChat = (LinearLayout.LayoutParams) clearChatLayout.getLayoutParams();
-			paramsClearChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
-			clearChatLayout.setLayoutParams(paramsClearChat);
 
 			if(chat!=null){
 				clearChatLayout.setVisibility(View.VISIBLE);
