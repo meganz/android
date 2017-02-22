@@ -173,7 +173,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:minWidth="0dp"
-                android:layout_marginRight="12dp"
+                android:layout_marginRight="16dp"
                 android:background="@android:color/transparent"
                 android:textColor="@color/accentColor"/>
         </RelativeLayout>

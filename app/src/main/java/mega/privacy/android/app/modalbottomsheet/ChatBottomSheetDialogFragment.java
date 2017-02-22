@@ -29,10 +29,10 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -182,19 +182,19 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
 			if (!notificationsEnabled) {
 				log("Chat is MUTE");
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_notifications_black));
+				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
 				optionMuteChatText.setText(getString(R.string.general_unmute));
 			}
 			else{
 				log("Chat with notifications enabled!!");
 				optionMuteChatText.setText(getString(R.string.general_mute));
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_notifications_off_black));
+				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.mute_ic));
 			}
 		}
 		else{
 			log("Chat prefs is NULL");
 			optionMuteChatText.setText(getString(R.string.general_mute));
-			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_notifications_off_black));
+			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.mute_ic));
 		}
 
         dialog.setContentView(contentView);
