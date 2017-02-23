@@ -119,7 +119,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
         ImageView muteIcon;
 		ImageView multiselectIcon;
 		ImageView contactStateIcon;
-        int currentPosition;
         String contactMail;
 		String lastNameText="";
 		String firstNameText="";
@@ -140,7 +139,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void onBindViewHolder(ViewHolderChatList holder, int position) {
 		log("onBindViewHolder");
 
-		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
 
@@ -917,12 +915,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	@Override
 	public void onClick(View v) {
 		ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
-		int currentPosition = holder.currentPosition;
+		int currentPosition = holder.getAdapterPosition();
+		log("Current position: "+currentPosition);
 		MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
 
 		switch (v.getId()){	
 			case R.id.recent_chat_list_three_dots:{
-				log("click three dots!");
+				log("click three dots!: "+c.getTitle());
 				((ManagerActivityLollipop) context).showChatPanel(c);
 				break;
 			}
