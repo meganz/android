@@ -239,6 +239,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     Toolbar tB;
     ActionBar aB;
 
+	boolean scrollToChat = false;
+
 	int selectedPaymentMethod;
 	int selectedAccountType;
 	int displayedAccountType;
@@ -5189,6 +5191,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						settings.setChecked(true);
 						settings.setIcon(getResources().getDrawable(R.drawable.settings_red));
 					}
+					scrollToChat = true;
 					selectDrawerItemLollipop(drawerItem);
 				}
 
@@ -12974,6 +12977,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				rChatFL.onlineStatusUpdate(status);
 			}
 		}
+	}
+
+	public boolean isScrollToChat() {
+		return scrollToChat;
+	}
+
+	public void setScrollToChat(boolean scrollToChat) {
+		this.scrollToChat = scrollToChat;
 	}
 
 	public boolean isMkLayoutVisible() {
