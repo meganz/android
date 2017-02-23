@@ -16,6 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -485,6 +486,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);;
         listView.setNestedScrollingEnabled(false);
+        ((SimpleItemAnimator) listView.getItemAnimator()).setSupportsChangeAnimations(false);
 
         mLayoutManager = new MegaLinearLayoutManager(this);
         mLayoutManager.setStackFromEnd(true);

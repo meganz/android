@@ -359,6 +359,13 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holder.firstNameText = contactDB.getName();
 			holder.lastNameText = contactDB.getLastName();
 
+			if(holder.firstNameText==null){
+				holder.firstNameText="";
+			}
+			if(holder.lastNameText==null){
+				holder.lastNameText="";
+			}
+
 			String fullName;
 
 			if (holder.firstNameText.trim().length() <= 0){

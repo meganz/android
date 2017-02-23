@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -24,6 +25,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
 public class ChatController {
 
@@ -575,8 +577,97 @@ public class ChatController {
         }
     }
 
-    public static String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
+    public String getFullName(long userHandle, MegaChatRoom chatRoom){
+        log("getFullName: "+userHandle);
+        int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
+        log("privilege is: "+privilege);
+        if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
+            log("Not participant any more!");
+            String handleString = megaApi.handleToBase64(userHandle);
+            MegaUser contact = megaApi.getContact(handleString);
+            if(contact!=null){
+                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                    log("Is contact!");
+                    return getContactFullName(userHandle);
+                }
+                else{
+                    log("Old contact");
+                    return getNonContactFullName(userHandle);
+                }
+            }
+            else{
+                log("Non contact");
+                return getNonContactFullName(userHandle);
+            }
+        }
+        else{
+            log("Is participant");
+            return getParticipantFullName(userHandle, chatRoom);
+        }
+    }
 
+    public String getContactFullName(long userHandle){
+        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        if(contactDB!=null){
+
+            String name = contactDB.getName();
+            String lastName = contactDB.getLastName();
+
+            if(name==null){
+                name="";
+            }
+            if(lastName==null){
+                lastName="";
+            }
+            String fullName = "";
+
+            if (name.trim().length() <= 0){
+                fullName = lastName;
+            }
+            else{
+                fullName = name + " " + lastName;
+            }
+
+            if (fullName.trim().length() <= 0){
+                log("Full name empty");
+                return "";
+            }
+
+            return fullName;
+        }
+        return "";
+    }
+
+    public String getNonContactFullName(long userHandle){
+        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
+        if(nonContact!=null){
+            String fullName = nonContact.getFullName();
+
+            if(fullName!=null){
+                if(fullName.isEmpty()){
+                    log("1-Put email as fullname");
+                    return "email";
+                }
+                else{
+                    if (fullName.trim().length() <= 0){
+                        log("2-Put email as fullname");
+                        return "email";
+                    }
+                    else{
+                        return fullName;
+                    }
+                }
+            }
+            else{
+                log("3-Put email as fullname");
+
+                return "email";
+            }
+        }
+        return "";
+    }
+    public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
+        log("getParticipantFullName: "+userHandle);
         String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
         if(fullName!=null){
