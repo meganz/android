@@ -912,8 +912,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		if(v != null) {
-			ListView lv = (ListView) v.findViewById(android.R.id.list);
+		final ListView lv = (ListView) v.findViewById(android.R.id.list);
+		if(lv != null) {
 			lv.setPadding(0, 0, 0, 0);
 		}
 
@@ -921,6 +921,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatEnabledCategory.setEnabled(false);
 			chatStatusCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
+		}
+
+		if(((ManagerActivityLollipop)context).isScrollToChat()){
+			Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				public void run() {
+					try {
+						log("Running!");
+						if(lv==null){
+							log("lv is NULL");
+						}
+						lv.setSelection(4);
+					} catch (Exception e) {}
+				}
+			}, 100);
+			((ManagerActivityLollipop)context).setScrollToChat(false);
 		}
 
 		return v;
@@ -1910,6 +1926,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.setEnabled(false);
 		}
 
+		if(!Util.isOnline(context)){
+			chatEnabledCategory.setEnabled(false);
+			chatStatusCategory.setEnabled(false);
+			cameraUploadCategory.setEnabled(false);
+		}
 	}
 	
 	public void afterSetPinLock(){
