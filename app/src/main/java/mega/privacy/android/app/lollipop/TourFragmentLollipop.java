@@ -4,19 +4,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
@@ -27,14 +26,15 @@ import mega.privacy.android.app.utils.Util;
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
     Context context;
+    LinearLayout mainLinearLayout;
     private TourImageAdapter adapter;
     private LoopViewPager viewPager;
     private LinearLayout bar1;
     private LinearLayout bar2;
     private LinearLayout bar3;
     private LinearLayout bar4;
-    private TextView bRegister;
-    private TextView bLogin;
+    private Button bRegister;
+    private Button bLogin;
     TextView tourText1;
     TextView tourText2;
     private LinearLayout tourLoginCreate;
@@ -61,6 +61,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         display.getMetrics(metrics);
 
         View v = inflater.inflate(R.layout.fragment_tour, container, false);
+        mainLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_tour);
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_tour);
         viewPager = (LoopViewPager) v.findViewById(R.id.pager);
         bar1 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_1);
@@ -69,65 +70,17 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         bar4 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_4);
         tourLoginCreate = (LinearLayout) v.findViewById(R.id.tour_login_create);
 
+        mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         tourText1 = (TextView) v.findViewById(R.id.tour_text_1);
-        tourText1.setPadding(Util.scaleWidthPx(16, metrics), 0, 0, 0);
         tourText1.setGravity(Gravity.CENTER_VERTICAL);
-        android.view.ViewGroup.LayoutParams params = tourText1.getLayoutParams();
-
-        params.height = Util.scaleHeightPx(56, metrics);
-        tourText1.setLayoutParams(params);
 
         tourText2 = (TextView) v.findViewById(R.id.tour_text_2);
-        tourText2.setPadding(Util.scaleWidthPx(16, metrics), 0, 0, 0);
         tourText2.setGravity(Gravity.CENTER_VERTICAL);
-        params = tourText2.getLayoutParams();
-        params.height = Util.scaleHeightPx(68, metrics);
-        tourText2.setLayoutParams(params);
-        //Bottom margin
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)tourText2.getLayoutParams();
-        textParams.setMargins(0, 0, 0, Util.scaleHeightPx(10, metrics));
-        tourText2.setLayoutParams(textParams);
-
-        float density  = getResources().getDisplayMetrics().density;
-
-        float scaleW = Util.getScaleW(metrics, density);
-        float scaleH = Util.getScaleH(metrics, density);
-        float scaleText;
-        if (scaleH < scaleW){
-            scaleText = scaleH;
-        }
-        else{
-            scaleText = scaleW;
-        }
-        tourText1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
-        tourText2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 
         optionsLayout = (LinearLayout) v.findViewById(R.id.options_layout);
-        LinearLayout.LayoutParams linearLayoutParams = (android.widget.LinearLayout.LayoutParams) optionsLayout.getLayoutParams();
-        linearLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(8, metrics));
-        optionsLayout.setLayoutParams(linearLayoutParams);
 
-        bLogin = (TextView) v.findViewById(R.id.button_login_tour);
-        bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-        android.view.ViewGroup.LayoutParams paramsb2 = bLogin.getLayoutParams();
-        paramsb2.height = Util.scaleHeightPx(48, metrics);
-		/*paramsb2.width = Util.scaleWidthPx(63, metrics);*/
-        bLogin.setLayoutParams(paramsb2);
-        //Left and Right margin
-        LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-        textParamsLogin.setMargins(Util.scaleWidthPx(16, metrics), 0, Util.scaleWidthPx(15, metrics), 0);
-        bLogin.setLayoutParams(textParamsLogin);
-
-        bRegister = (TextView) v.findViewById(R.id.button_register_tour);
-        bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-        android.view.ViewGroup.LayoutParams paramsb1 = bRegister.getLayoutParams();
-        paramsb1.height = Util.scaleHeightPx(48, metrics);
-		/*paramsb1.width = Util.scaleWidthPx(144, metrics);*/
-//		bRegister.setGravity(Gravity.CENTER);
-        bRegister.setLayoutParams(paramsb1);
-
-        bLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-        bRegister.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+        bLogin = (Button) v.findViewById(R.id.button_login_tour);
+        bRegister = (Button) v.findViewById(R.id.button_register_tour);
 
         bLogin.setOnClickListener(this);
         bRegister.setOnClickListener(this);
@@ -236,6 +189,6 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     }
 
     public static void log(String message) {
-        Util.log("ChooseAccountFragmentLollipop", message);
+        Util.log("TourFragmentLollipop", message);
     }
 }

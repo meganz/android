@@ -124,6 +124,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp" />
+
             </LinearLayout>
         </LinearLayout>
 
