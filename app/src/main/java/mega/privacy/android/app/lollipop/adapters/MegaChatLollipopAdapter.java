@@ -535,12 +535,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     log("NOT found in DB - holder.fullNameTitle");
                     holder.fullNameTitle = "Unknown name";
-                    log("3-Call for nonContactName: "+ message.getUserHandle());
                     if(!(holder.nameRequested)){
+                        log("3-Call for nonContactName: "+ message.getUserHandle());
                         holder.nameRequested=true;
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
                         megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
                         megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                    }
+                    else{
+
                     }
                 }
 

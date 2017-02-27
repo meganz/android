@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 27;
+	private static final int DATABASE_VERSION = 28;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -99,6 +99,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_NONCONTACT_FULLNAME = "noncontactfullname";
 	private static final String KEY_NONCONTACT_FIRSTNAME = "noncontactfirstname";
 	private static final String KEY_NONCONTACT_LASTNAME = "noncontactlastname";
+	private static final String KEY_NONCONTACT_EMAIL = "noncontactemail";
 
 	private static final String KEY_CHAT_ENABLED = "chatenabled";
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
@@ -177,7 +178,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NONCONTACT_HANDLE + " TEXT, " + KEY_NONCONTACT_FULLNAME + " TEXT, " +
-				KEY_NONCONTACT_FIRSTNAME+ " TEXT, "+KEY_NONCONTACT_LASTNAME+ " TEXT"+")";
+				KEY_NONCONTACT_FIRSTNAME+ " TEXT, "+KEY_NONCONTACT_LASTNAME+ " TEXT, "+ KEY_NONCONTACT_EMAIL + " TEXT"+")";
 		db.execSQL(CREATE_NONCONTACT_TABLE);
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
@@ -418,6 +419,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 26){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_INVALIDATE_SDK_CACHE + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_INVALIDATE_SDK_CACHE + " = '" + encrypt("true") + "';");
+		}
+
+		if (oldVersion <= 27){
+			db.execSQL("ALTER TABLE " + TABLE_NON_CONTACTS + " ADD COLUMN " + KEY_NONCONTACT_EMAIL + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_NON_CONTACTS + " SET " + KEY_NONCONTACT_EMAIL + " = '" + encrypt("") + "';");
 		}
 	} 
 	
@@ -860,31 +866,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return attr;
 	}
 
-	public void setNonContact (NonContactInfo nonContact){
-		log("setNonContact: "+nonContact.getHandle());
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_NONCONTACT_HANDLE,  encrypt(nonContact.getHandle()));
-		values.put(KEY_NONCONTACT_FULLNAME, encrypt(nonContact.getFullName()));
-		values.put(KEY_NONCONTACT_FIRSTNAME, encrypt(nonContact.getFirstName()));
-		values.put(KEY_NONCONTACT_LASTNAME, encrypt(nonContact.getLastName()));
-
-		NonContactInfo check = findNonContactByHandle(nonContact.getHandle()+"");
-
-		if(check==null){
-			db.insert(TABLE_NON_CONTACTS, null, values);
-		}
-		else{
-			int id = (int) db.insertWithOnConflict(TABLE_NON_CONTACTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-			log("setNonContact: Final value: "+id);
-		}
-	}
+//	public void setNonContact (NonContactInfo nonContact){
+//		log("setNonContact: "+nonContact.getHandle());
+//
+//		ContentValues values = new ContentValues();
+//		values.put(KEY_NONCONTACT_HANDLE,  encrypt(nonContact.getHandle()));
+//		values.put(KEY_NONCONTACT_FULLNAME, encrypt(nonContact.getFullName()));
+//		values.put(KEY_NONCONTACT_FIRSTNAME, encrypt(nonContact.getFirstName()));
+//		values.put(KEY_NONCONTACT_LASTNAME, encrypt(nonContact.getLastName()));
+//
+//		NonContactInfo check = findNonContactByHandle(nonContact.getHandle()+"");
+//
+//		if(check==null){
+//			db.insert(TABLE_NON_CONTACTS, null, values);
+//		}
+//		else{
+//			int id = (int) db.insertWithOnConflict(TABLE_NON_CONTACTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+//			log("setNonContact: Final value: "+id);
+//		}
+//	}
 
 	public int setNonContactFirstName (String name, String handle){
 		log("setContactName: "+name+" "+handle);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_NONCONTACT_FIRSTNAME, encrypt(name));
+		values.put(KEY_NONCONTACT_FIRSTNAME, name);
 		int rows = db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle) + "'", null);
 		if(rows==0){
 			values.put(KEY_NONCONTACT_HANDLE, encrypt(handle));
@@ -896,7 +902,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public int setNonContactLastName (String lastName, String handle){
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_NONCONTACT_LASTNAME, encrypt(lastName));
+		values.put(KEY_NONCONTACT_LASTNAME, lastName);
+		int rows = db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle) + "'", null);
+		if(rows==0){
+			values.put(KEY_NONCONTACT_HANDLE, encrypt(handle));
+			db.insert(TABLE_NON_CONTACTS, null, values);
+		}
+		return rows;
+	}
+
+	public int setNonContactEmail (String email, String handle){
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_NONCONTACT_EMAIL, email);
 		int rows = db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle) + "'", null);
 		if(rows==0){
 			values.put(KEY_NONCONTACT_HANDLE, encrypt(handle));
@@ -929,8 +947,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _fullName = decrypt(cursor.getString(2));
 				String _firstName = decrypt(cursor.getString(3));
 				String _lastName = decrypt(cursor.getString(4));
+				String _email = decrypt(cursor.getString(5));
 
-				noncontact = new NonContactInfo(handle, _fullName, _firstName, _lastName);
+				noncontact = new NonContactInfo(handle, _fullName, _firstName, _lastName, _email);
 				cursor.close();
 				return noncontact;
 			}

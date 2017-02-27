@@ -104,9 +104,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								if (user != null) {
 									log("BackgroundRequestListener:onRequestFinish: User handle: "+user.getHandle());
 									log("Visibility: "+user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-									if(user.getVisibility()==MegaUser.VISIBILITY_UNKNOWN){
+									if(user.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
 										log("BackgroundRequestListener:onRequestFinish: Non-contact");
 										if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+											dbH.setNonContactEmail(request.getEmail(), user.getHandle()+"");
 											dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
 										}
 										else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){

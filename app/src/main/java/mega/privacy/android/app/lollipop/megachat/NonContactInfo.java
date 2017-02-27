@@ -7,13 +7,15 @@ public class NonContactInfo {
     String fullName;
     String firstName;
     String lastName;
+    String email;
 //    boolean requestDone = false;
 
-    public NonContactInfo(String handle, String fullName, String firstName, String lastName) {
+    public NonContactInfo(String handle, String fullName, String firstName, String lastName, String email) {
         this.fullName = fullName;
         this.handle = handle;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
 //        this.requestDone = requestDone;
     }
 
@@ -62,5 +64,13 @@ public class NonContactInfo {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -629,8 +629,18 @@ public class ChatController {
             }
 
             if (fullName.trim().length() <= 0){
-                log("Full name empty");
-                return "";
+                log("1- Full name empty");
+                log("2-Put email as fullname");
+                String mail = contactDB.getMail();
+                if(mail==null){
+                    mail="";
+                }
+                if (mail.trim().length() <= 0){
+                    return "";
+                }
+                else{
+                    return mail;
+                }
             }
 
             return fullName;
@@ -651,7 +661,23 @@ public class ChatController {
                 else{
                     if (fullName.trim().length() <= 0){
                         log("2-Put email as fullname");
-                        return "email";
+                        String email = nonContact.getEmail();
+                        if(email!=null){
+                            if(email.isEmpty()){
+                                return "";
+                            }
+                            else{
+                                if (email.trim().length() <= 0){
+                                    return "";
+                                }
+                                else{
+                                    return email;
+                                }
+                            }
+                        }
+                        else{
+                            return "";
+                        }
                     }
                     else{
                         return fullName;
@@ -660,8 +686,23 @@ public class ChatController {
             }
             else{
                 log("3-Put email as fullname");
-
-                return "email";
+                String email = nonContact.getEmail();
+                if(email!=null){
+                    if(email.isEmpty()){
+                        return "";
+                    }
+                    else{
+                        if (email.trim().length() <= 0){
+                            return "";
+                        }
+                        else{
+                            return email;
+                        }
+                    }
+                }
+                else{
+                    return "";
+                }
             }
         }
         return "";
