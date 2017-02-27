@@ -1,96 +1,113 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_view_tour"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_secondary"
-    tools:context=".LoginActivityLollipop">
+    android:orientation="vertical"
+    android:id="@+id/main_linear_layout_tour"
+    android:background="@color/white">
 
-    <LinearLayout
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scroll_view_tour"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:context=".LoginActivityLollipop">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingBottom="0dp"
+                android:paddingTop="0dp" >
+
+                <mega.privacy.android.app.components.LoopViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:id="@+id/bar_tour_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/bar_tour_layout_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tour_bar_grey"
+                        android:orientation="horizontal" />
+                    <LinearLayout
+                        android:id="@+id/bar_tour_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tour_bar_grey"
+                        android:orientation="horizontal" />
+                    <LinearLayout
+                        android:id="@+id/bar_tour_layout_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tour_bar_grey"
+                        android:orientation="horizontal" />
+                    <LinearLayout
+                        android:id="@+id/bar_tour_layout_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/tour_bar_grey"
+                        android:orientation="horizontal" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <include layout="@layout/delimiter" />
+
+            <LinearLayout
+                android:id="@+id/tour_login_create"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tour_text_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tour_space_title"
+                    android:layout_margin="24dp"
+                    android:textColor="@color/lollipop_primary_color"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tour_text_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="24dp"
+                    android:text="@string/tour_space_text"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="vertical"
-            android:paddingBottom="0dp"
-            android:paddingTop="0dp" >
-
-            <mega.privacy.android.app.components.LoopViewPager
-                android:id="@+id/pager"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
-
-            <LinearLayout 
-                android:id="@+id/bar_tour_layout"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:orientation="horizontal">
-                
-                <LinearLayout 
-                    android:id="@+id/bar_tour_layout_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/tour_bar_grey"
-                    android:orientation="horizontal" />
-                <LinearLayout 
-                    android:id="@+id/bar_tour_layout_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/tour_bar_grey"
-                    android:orientation="horizontal" />
-                <LinearLayout 
-                    android:id="@+id/bar_tour_layout_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/tour_bar_grey"
-                    android:orientation="horizontal" />
-                <LinearLayout 
-                    android:id="@+id/bar_tour_layout_4"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/tour_bar_grey"
-                    android:orientation="horizontal" />
-            </LinearLayout>            
-        </LinearLayout>
-
-        <include layout="@layout/delimiter" />
-
-        <LinearLayout
-            android:id="@+id/tour_login_create"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="left|center_vertical"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tour_text_1"
-               	android:fontFamily="sans-serif-medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tour_space_title"
-                android:textColor="@color/lollipop_primary_color"
-                android:textSize="22sp" />
-
-            <TextView
-                android:id="@+id/tour_text_2"
-                android:fontFamily="sans-serif"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tour_space_text"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-        </LinearLayout>
-
+        android:layout_alignParentBottom="true">
         <View
             android:id="@+id/separator"
             android:layout_width="match_parent"
@@ -100,27 +117,35 @@
         <LinearLayout
             android:id="@+id/options_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
+            android:layout_height="48dp"
+            android:layout_below="@+id/separator"
+            android:layout_gravity="left|bottom"
             android:orientation="horizontal" >
 
-            <TextView
+            <Button
                 android:id="@+id/button_login_tour"
-                android:fontFamily="sans-serif-medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:gravity="center"
-                android:textSize="14sp"/>
+                android:layout_marginLeft="24dp"
+                android:layout_centerVertical="true"
+                android:minWidth="0dp"
+                android:text="@string/login_text"
+                android:background="@android:color/transparent"
+                android:textColor="@color/accentColor" />
 
-            <TextView
+            <Button
                 android:id="@+id/button_register_tour"
-                android:fontFamily="sans-serif-medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp"/>
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="24dp"
+                android:minWidth="0dp"
+                android:background="@android:color/transparent"
+                android:text="@string/create_account"
+                android:textColor="@color/accentColor" />
         </LinearLayout>
-    </LinearLayout>
 
-</ScrollView>
+    </RelativeLayout>
+
+
+</LinearLayout>

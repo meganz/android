@@ -134,7 +134,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	RelativeLayout container;
 
-	LinearLayout optionsLayout;
 	LinearLayout availableOfflineLayout;
 
 	RelativeLayout sizeLayout;

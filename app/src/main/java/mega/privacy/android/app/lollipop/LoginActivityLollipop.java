@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -100,7 +99,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 	}
 
 	public void showFragment(int visibleFragment){
-		log("showFragment");
+		log("showFragment: "+visibleFragment);
 		this.visibleFragment = visibleFragment;
 		switch (visibleFragment){
 			case Constants.LOGIN_FRAGMENT:{
@@ -120,6 +119,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				break;
 			}
 			case Constants.CHOOSE_ACCOUNT_FRAGMENT:{
+				log("Show CHOOSE_ACCOUNT_FRAGMENT");
 
 				if(chooseAccountFragment==null){
 					chooseAccountFragment = new ChooseAccountFragmentLollipop();
@@ -142,6 +142,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				break;
 			}
 			case Constants.TOUR_FRAGMENT:{
+				log("Show TOUR_FRAGMENT");
 
 				if(tourFragment==null){
 					tourFragment = new TourFragmentLollipop();
