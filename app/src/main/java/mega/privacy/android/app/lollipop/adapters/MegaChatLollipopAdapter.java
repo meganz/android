@@ -59,7 +59,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
-    int type;
     private SparseBooleanArray selectedItems;
 
     ChatController cC;
@@ -109,6 +108,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         long userHandle;
         String fullNameTitle;
         boolean nameRequested = false;
+        boolean nameRequestedAction = false;
 
         RelativeLayout itemLayout;
 
@@ -361,21 +361,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 String textToShow = "";
                 String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
 
-//                if(fullNameAction.trim().length()<=0){
-//                    log("No name!");
-//                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-//                    if(nonContact!=null){
-//                        fullNameAction = nonContact.getFullName();
-//                    }
-//                    else{
-//                        log("Ask for name non-contact");
-//                        fullNameAction = "Participant left";
-//                        log("1-Call for nonContactName: "+ message.getUserHandle());
-//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
-//                    }
-//                }
+                if(fullNameAction==null){
+                    fullNameAction = "";
+                }
+
+                if(fullNameAction.trim().length()<=0){
+
+                    log("NOT found in DB - holder.fullNameTitle");
+                    fullNameAction = "Unknown name";
+                    if(!(holder.nameRequestedAction)){
+                        log("3-Call for nonContactName: "+ message.getUserHandle());
+                        holder.nameRequestedAction=true;
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                    }
+                    else{
+                        log("4-Name already asked and no name received: "+ message.getUserHandle());
+                    }
+                }
 
                 if(privilege!=MegaChatRoom.PRIV_RM){
                     log("I was added");
@@ -543,7 +547,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
                     }
                     else{
-
+                        log("4-Name already asked and no name received: "+ message.getUserHandle());
                     }
                 }
 
@@ -559,20 +563,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         log("By other");
                         String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
 
-//                        if(fullNameAction.trim().length()<=0){
-//                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-//                            if(nonContact!=null){
-//                                fullNameAction = nonContact.getFullName();
-//                            }
-//                            else{
-//                                fullNameAction = "Unknown name";
-//                                log("2-Call for nonContactName: "+ message.getUserHandle());
-//                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-//                            }
-//
-//                        }
+                        if(fullNameAction==null){
+                            fullNameAction = "";
+                        }
+
+                        if(fullNameAction.trim().length()<=0){
+
+                            log("NOT found in DB - holder.fullNameTitle");
+                            fullNameAction = "Unknown name";
+                            if(!(holder.nameRequestedAction)){
+                                log("3-Call for nonContactName: "+ message.getUserHandle());
+                                holder.nameRequestedAction=true;
+                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            }
+                            else{
+                                log("4-Name already asked and no name received: "+ message.getUserHandle());
+                            }
+                        }
+
                         textToShow = String.format(context.getString(R.string.message_add_participant), holder.fullNameTitle, fullNameAction);
 
                     }
@@ -594,21 +604,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             log("The participant was removed");
                             String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
 
-//                            if(fullNameAction.trim().length()<=0){
-//                                log("Ask non-contact in DB");
-//                                NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-//                                if(nonContact!=null){
-//                                    fullNameAction = nonContact.getFullName();
-//                                }
-//                                else{
-//                                    log("NOT found in DB");
-//                                    fullNameAction = "Unknown name";
-//                                    log("4-Call for nonContactName: "+ message.getUserHandle());
-//                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
-//                                }
-//                            }
+                            if(fullNameAction==null){
+                                fullNameAction = "";
+                            }
+
+                            if(fullNameAction.trim().length()<=0){
+
+                                log("NOT found in DB - holder.fullNameTitle");
+                                fullNameAction = "Unknown name";
+                                if(!(holder.nameRequestedAction)){
+                                    log("3-Call for nonContactName: "+ message.getUserHandle());
+                                    holder.nameRequestedAction=true;
+                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                                }
+                                else{
+                                    log("4-Name already asked and no name received: "+ message.getUserHandle());
+                                }
+                            }
 
                             textToShow = String.format(context.getString(R.string.message_remove_participant), holder.fullNameTitle, fullNameAction);
                         }
@@ -684,20 +698,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("I was change by someone");
                     String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
 
-//                    if(fullNameAction.trim().length()<=0){
-//                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-//                        if(nonContact!=null){
-//                            fullNameAction = nonContact.getFullName();
-//                        }
-//                        else{
-//                            fullNameAction = "Unknown name";
-//                            log("5-Call for nonContactName: "+ message.getUserHandle());
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-//                        }
-//
-//                    }
+                    if(fullNameAction==null){
+                        fullNameAction = "";
+                    }
+
+                    if(fullNameAction.trim().length()<=0){
+
+                        log("NOT found in DB - holder.fullNameTitle");
+                        fullNameAction = "Unknown name";
+                        if(!(holder.nameRequestedAction)){
+                            log("3-Call for nonContactName: "+ message.getUserHandle());
+                            holder.nameRequestedAction=true;
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        }
+                        else{
+                            log("4-Name already asked and no name received: "+ message.getUserHandle());
+                        }
+                    }
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, fullNameAction);
                 }
 
@@ -835,24 +854,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                 holder.fullNameTitle = cC.getFullName(message.getUserHandleOfAction(), chatRoom);
 
-//                if(holder.fullNameTitle.trim().length()<=0){
-//                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction()+"");
-//                    if(nonContact!=null){
-//                        holder.fullNameTitle = nonContact.getFullName();
-//                        log("The fullName: "+holder.fullNameTitle);
-//                        if((holder.fullNameTitle.trim()).isEmpty()){
-//                            holder.fullNameTitle = "No name";
-//                        }
-//                    }
-//                    else{
-//                        holder.fullNameTitle = "Unknown name";
-//                        log("6-Call for nonContactName: "+ message.getUserHandle());
-//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-//                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-//                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
-//                    }
-//
-//                }
+                if(holder.fullNameTitle==null){
+                    holder.fullNameTitle = "";
+                }
+
+                if(holder.fullNameTitle.trim().length()<=0){
+
+                    log("NOT found in DB - holder.fullNameTitle");
+                    holder.fullNameTitle = "Unknown name";
+                    if(!(holder.nameRequested)){
+                        log("3-Call for nonContactName: "+ message.getUserHandle());
+                        holder.nameRequested=true;
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
+                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
+                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                    }
+                    else{
+                        log("4-Name already asked and no name received: "+ message.getUserHandle());
+                    }
+                }
 
                 int privilege = message.getPrivilege();
                 String privilegeString = "";
@@ -880,19 +900,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("By other");
                     String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
 
-//                    if(fullNameAction.trim().length()<=0){
-//                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-//                        if(nonContact!=null){
-//                            fullNameAction = nonContact.getFullName();
-//                        }
-//                        else{
-//                            fullNameAction = "Unknown name";
-//                            log("8-Call for nonContactName: "+ message.getUserHandle());
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-//                        }
-//                    }
+                    if(fullNameAction==null){
+                        fullNameAction = "";
+                    }
+
+                    if(fullNameAction.trim().length()<=0){
+
+                        log("NOT found in DB - holder.fullNameTitle");
+                        fullNameAction = "Unknown name";
+                        if(!(holder.nameRequestedAction)){
+                            log("3-Call for nonContactName: "+ message.getUserHandle());
+                            holder.nameRequestedAction=true;
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
+                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
+                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        }
+                        else{
+                            log("4-Name already asked and no name received: "+ message.getUserHandle());
+                        }
+                    }
 
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), holder.fullNameTitle, privilegeString, fullNameAction);
                 }
@@ -1246,20 +1272,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                     holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
 
-//                    if(holder.fullNameTitle.trim().length()<=0){
-////                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
-//                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle()+"");
-//                        if(nonContact!=null){
-//                            holder.fullNameTitle = nonContact.getFullName();
-//                        }
-//                        else{
-//                            holder.fullNameTitle = "Unknown name";
-////
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
-//                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-//                        }
-//                    }
+                    if(holder.fullNameTitle==null){
+                        holder.fullNameTitle = "";
+                    }
+
+                    if(holder.fullNameTitle.trim().length()<=0){
+
+                        log("NOT found in DB - holder.fullNameTitle");
+                        holder.fullNameTitle = "Unknown name";
+                        if(!(holder.nameRequested)){
+                            log("3-Call for nonContactName: "+ message.getUserHandle());
+                            holder.nameRequested=true;
+                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle);
+                            megaChatApi.getUserFirstname(userHandle, listener);
+                            megaChatApi.getUserLastname(userHandle, listener);
+                        }
+                        else{
+                            log("4-Name already asked and no name received: "+ message.getUserHandle());
+                        }
+                    }
                 }
                 else{
 //                    holder.fullNameTitle = getContactFullName(holder.userHandle);

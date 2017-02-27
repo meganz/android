@@ -656,7 +656,23 @@ public class ChatController {
             if(fullName!=null){
                 if(fullName.isEmpty()){
                     log("1-Put email as fullname");
-                    return "email";
+                    String email = nonContact.getEmail();
+                    if(email!=null){
+                        if(email.isEmpty()){
+                            return "";
+                        }
+                        else{
+                            if (email.trim().length() <= 0){
+                                return "";
+                            }
+                            else{
+                                return email;
+                            }
+                        }
+                    }
+                    else{
+                        return "";
+                    }
                 }
                 else{
                     if (fullName.trim().length() <= 0){

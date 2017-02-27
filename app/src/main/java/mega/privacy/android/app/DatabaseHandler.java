@@ -890,7 +890,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("setContactName: "+name+" "+handle);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_NONCONTACT_FIRSTNAME, name);
+		values.put(KEY_NONCONTACT_FIRSTNAME, encrypt(name));
 		int rows = db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle) + "'", null);
 		if(rows==0){
 			values.put(KEY_NONCONTACT_HANDLE, encrypt(handle));
@@ -902,7 +902,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public int setNonContactLastName (String lastName, String handle){
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_NONCONTACT_LASTNAME, lastName);
+		values.put(KEY_NONCONTACT_LASTNAME, encrypt(lastName));
 		int rows = db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle) + "'", null);
 		if(rows==0){
 			values.put(KEY_NONCONTACT_HANDLE, encrypt(handle));
@@ -914,7 +914,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public int setNonContactEmail (String email, String handle){
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_NONCONTACT_EMAIL, email);
+		values.put(KEY_NONCONTACT_EMAIL, encrypt(email));
 		int rows = db.update(TABLE_NON_CONTACTS, values, KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle) + "'", null);
 		if(rows==0){
 			values.put(KEY_NONCONTACT_HANDLE, encrypt(handle));
