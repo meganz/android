@@ -322,6 +322,48 @@ public class ContactController {
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivityLollipop) context);
     }
 
+    public String getContactFullName(long userHandle){
+        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        if(contactDB!=null){
+
+            String name = contactDB.getName();
+            String lastName = contactDB.getLastName();
+
+            if(name==null){
+                name="";
+            }
+            if(lastName==null){
+                lastName="";
+            }
+            String fullName = "";
+
+            if (name.trim().length() <= 0){
+                fullName = lastName;
+            }
+            else{
+                fullName = name + " " + lastName;
+            }
+
+            if (fullName.trim().length() <= 0){
+                log("1- Full name empty");
+                log("2-Put email as fullname");
+                String mail = contactDB.getMail();
+                if(mail==null){
+                    mail="";
+                }
+                if (mail.trim().length() <= 0){
+                    return "";
+                }
+                else{
+                    return mail;
+                }
+            }
+
+            return fullName;
+        }
+        return "";
+    }
+
     public static void log(String message) {
         Util.log("ContactController", message);
     }

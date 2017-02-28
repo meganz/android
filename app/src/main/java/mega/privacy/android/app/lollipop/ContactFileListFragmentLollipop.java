@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -54,6 +55,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -62,14 +64,12 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class ContactFileListFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface {
+public class ContactFileListFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
@@ -103,11 +103,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 	Stack<Long> parentHandleStack = new Stack<Long>();
 
 	private ActionMode actionMode;
-	
-	private boolean name = false;
-	private boolean firstName = false;
-	String nameText;
-	String firstNameText;
 
 	ProgressDialog statusDialog;
 
@@ -344,18 +339,17 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 			fab.setOnClickListener(new FabButtonListener(context));
 			fab.setVisibility(View.GONE);
 
-			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
 			if(contact == null)
 			{
 				return null;
 			}
-			name=false;
-			firstName=false;
-			megaApi.getUserAttribute(contact, 1, this);
-			megaApi.getUserAttribute(contact, 2, this);
-			
-			createDefaultAvatar();
+
+			ContactController cC = new ContactController(context);
+			String fullName =  cC.getContactFullName(contact.getHandle());
+			nameView.setText(fullName);
+
+			createDefaultAvatar(fullName);
 
 			File avatar = null;
 			if (context.getExternalCacheDir() != null) {
@@ -373,18 +367,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 					bOpts.inInputShareable = true;
 					imBitmap = BitmapFactory.decodeFile(
 							avatar.getAbsolutePath(), bOpts);
-					if (imBitmap == null) {
-						avatar.delete();
-						if (context.getExternalCacheDir() != null) {
-							megaApi.getUserAvatar(contact,
-									context.getExternalCacheDir().getAbsolutePath()
-									+ "/" + contact.getEmail(), this);
-						} else {
-							megaApi.getUserAvatar(contact,
-									context.getCacheDir().getAbsolutePath() + "/"
-											+ contact.getEmail(), this);
-						}
-					} else {
+					if (imBitmap != null) {
 						imageView.setImageBitmap(imBitmap);
 						contactInitialLetter.setVisibility(View.GONE);
 					}
@@ -441,15 +424,23 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 		((ContactFileListActivityLollipop)context).showOptionsPanel(sNode);
 	}
 
-	public void createDefaultAvatar(){
+	public void createDefaultAvatar(String fullname){
 		log("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
-		
+		String color = megaApi.getUserAvatarColor(contact);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+		}
+
 		int radius; 
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
         	radius = defaultAvatar.getWidth()/2;
@@ -466,15 +457,14 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 	    
 	    int avatarTextSize = getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
-	    if (userEmail != null){
-		    if (userEmail.length() > 0){
-		    	String firstLetter = userEmail.charAt(0) + "";
-		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		    	contactInitialLetter.setVisibility(View.VISIBLE);
-		    	contactInitialLetter.setText(firstLetter);
-		    	contactInitialLetter.setTextSize(32);
-		    	contactInitialLetter.setTextColor(Color.WHITE);
-		    }
+	    if (!(fullname.isEmpty())){
+			String firstLetter = fullname.charAt(0) + "";
+			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			contactInitialLetter.setVisibility(View.VISIBLE);
+			contactInitialLetter.setText(firstLetter);
+			contactInitialLetter.setTextSize(24);
+			contactInitialLetter.setTextColor(Color.WHITE);
+
 	    }
 	}
 		
@@ -637,97 +627,13 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 		}
 	}
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		if (request.getType() == MegaRequest.TYPE_MOVE) {
-			log("move request start");
-		} else if (request.getType() == MegaRequest.TYPE_REMOVE) {
-			log("remove request start");
-		} else if (request.getType() == MegaRequest.TYPE_EXPORT) {
-			log("export request start");
-		} else if (request.getType() == MegaRequest.TYPE_RENAME) {
-			log("rename request start");
-		} else if (request.getType() == MegaRequest.TYPE_COPY) {
-			log("copy request start");
-		}
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestFinish: "+request.getType());
-		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-			if (e.getErrorCode() == MegaError.API_OK) {
-				File avatar = null;				
-				if (context.getExternalCacheDir() != null) {
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(),
-							request.getEmail() + ".jpg");
-				} else {
-					avatar = new File(context.getCacheDir().getAbsolutePath(),
-							request.getEmail() + ".jpg");
-				}
-				Bitmap imBitmap = null;
-				if (avatar.exists()) {
-					if (avatar.length() > 0) {
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						imBitmap = BitmapFactory.decodeFile(
-								avatar.getAbsolutePath(), bOpts);
-						if (imBitmap == null) {
-							avatar.delete();
-						} else {
-							imageView.setImageBitmap(imBitmap);
-							contactInitialLetter.setVisibility(View.GONE);
-						}
-					}
-				}
-				if(request.getParamType()==1){
-					log("(1)request.getText(): "+request.getText());
-					nameText=request.getText();
-					name=true;
-				}
-				else if(request.getParamType()==2){
-					log("(2)request.getText(): "+request.getText());
-					firstNameText = request.getText();
-					firstName = true;
-				}
-				if(name&&firstName){
-					String fullName = nameText+" "+firstNameText;
-					nameView.setText(fullName);
-					String firstLetter = fullName.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					contactInitialLetter.setText(firstLetter);
-					name= false;
-					firstName = false;
-				}				
-			}
-		} 
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestTemporaryError");
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate");
-	}
-
 	public static void log(String log) {
 		Util.log("ContactFileListFragmentLollipop", log);
 	}
 
 	@Override
 	public void onDestroy(){
-		if(megaApi != null)
-		{	
-			megaApi.removeRequestListener(this);
-		}
-		
+
 		super.onDestroy();
 	}
 	
