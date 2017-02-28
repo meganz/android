@@ -239,6 +239,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		setLastMessage(position, holder);
 
+		setTs(position, holder);
+
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
 			log("Chat prefs exists!!!");
@@ -995,7 +997,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				holder.layoutPendingMessages.setVisibility(View.INVISIBLE);
 			}
-//			setLastMessage(position, holder);
 		}
 		else{
 			log("Holder is NULL");
@@ -1057,15 +1058,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				case MegaChatMessage.TYPE_NORMAL:{
 
-					long ts = chat.getLastTimestamp();
-					log("timestamp: "+chat.getLastTimestamp());
-
-					String date = TimeChatUtils.formatDateAndTime(ts, TimeChatUtils.DATE_LONG_FORMAT);
-					holder.textViewDate.setText(date);
-					holder.textViewDate.setVisibility(View.VISIBLE);
-
 					if(lastMessageString==null){
-
 						lastMessageString = "Mensaje irreconocible";
 					}
 
