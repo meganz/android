@@ -7,9 +7,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -31,7 +29,6 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,10 +47,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.Switch;
-import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -69,7 +62,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.MySwitch;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -288,58 +280,62 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				lastEmail = credentials.getEmail();
 				String gSession = credentials.getSession();
 
-				loginLogin.setVisibility(View.GONE);
-				loginDelimiter.setVisibility(View.GONE);
-				loginCreateAccount.setVisibility(View.GONE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				loginLoggingIn.setVisibility(View.VISIBLE);
-				if(scrollView!=null){
-					scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-				}
-				loginProgressBar.setVisibility(View.VISIBLE);
-				loginFetchNodesProgressBar.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.VISIBLE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);
-				if(serversBusyText!=null){
-					serversBusyText.setVisibility(View.GONE);
-				}
-
-				if(Util.isChatEnabled()){
-					if (megaChatApi == null){
-						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-					}
-					int ret = megaChatApi.init(gSession);
-					chatSettings = dbH.getChatSettings();
-					if (ret == MegaChatApi.INIT_NO_CACHE)
-					{
-						megaApi.invalidateCache();
-
-					}
-					else if (ret == MegaChatApi.INIT_ERROR)
-					{
-						// chat cannot initialize, disable chat completely
-						if(chatSettings==null) {
-							chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
-							dbH.setChatSettings(chatSettings);
-						}
-						else{
-							dbH.setEnabledChat(false + "");
-						}
-						megaChatApi.logout(this);
-					}
-					else{
-						log("Chat correctly initialized");
-					}
-				}
-
-
 				if (!MegaApplication.isLoggingIn()){
 					MegaApplication.setLoggingIn(true);
+
+					loginLogin.setVisibility(View.GONE);
+					loginDelimiter.setVisibility(View.GONE);
+					loginCreateAccount.setVisibility(View.GONE);
+					queryingSignupLinkText.setVisibility(View.GONE);
+					confirmingAccountText.setVisibility(View.GONE);
+					loginLoggingIn.setVisibility(View.VISIBLE);
+					if(scrollView!=null){
+						scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+					}
+					loginProgressBar.setVisibility(View.VISIBLE);
+					loginFetchNodesProgressBar.setVisibility(View.GONE);
+					loggingInText.setVisibility(View.VISIBLE);
+					fetchingNodesText.setVisibility(View.GONE);
+					prepareNodesText.setVisibility(View.GONE);
+					if(serversBusyText!=null){
+						serversBusyText.setVisibility(View.GONE);
+					}
+
+					if(Util.isChatEnabled()){
+						log("onCreate: Chat is ENABLED");
+						if (megaChatApi == null){
+							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+						}
+						int ret = megaChatApi.init(gSession);
+						log("onCreate: result of init ---> "+ret);
+						chatSettings = dbH.getChatSettings();
+						if (ret == MegaChatApi.INIT_NO_CACHE)
+						{
+							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+							megaApi.invalidateCache();
+
+						}
+						else if (ret == MegaChatApi.INIT_ERROR)
+						{
+							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+							if(chatSettings==null) {
+								log("1 - onCreate: ERROR----> Switch OFF chat");
+								chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
+								dbH.setChatSettings(chatSettings);
+							}
+							else{
+								log("2 - onCreate: ERROR----> Switch OFF chat");
+								dbH.setEnabledChat(false + "");
+							}
+							megaChatApi.logout(this);
+						}
+						else{
+							log("onCreate: Chat correctly initialized");
+						}
+					}
+
 					megaApi.fastLogin(gSession, this);
 				}
-
 			}
 			else{
 				setContentView(R.layout.activity_file_provider);
@@ -897,6 +893,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			MegaApplication.setLoggingIn(false);
+
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
 				chatSettings = dbH.getChatSettings();
@@ -1169,7 +1167,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			MegaApplication.setLoggingIn(false);
+
 			if (e.getErrorCode() != MegaError.API_OK) {
 				String errorMessage;
 				errorMessage = e.getErrorString();
@@ -1214,11 +1212,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
+						MegaApplication.setLoggingIn(false);
 						afterFetchNodes();
 					}
 				}
 				else{
 					log("chatSettings NULL - readyToManager");
+					MegaApplication.setLoggingIn(false);
 					afterFetchNodes();
 				}
 			}

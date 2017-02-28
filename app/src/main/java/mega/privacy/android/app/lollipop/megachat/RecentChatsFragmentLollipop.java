@@ -427,6 +427,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 }
                 else{
                     ChatController chatController = new ChatController(context);
+                    log("onCLick: enableChat");
                     chatController.enableChat();
                     getActivity().supportInvalidateOptionsMenu();
                     chatEnabled=!chatEnabled;
@@ -655,7 +656,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         }
 
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
-            log("Change status");
+            log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
 
             if(item!=null) {
 
@@ -684,15 +685,15 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
-            log("Change participants");
+            log("listItemUpdate: Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
             updateCacheForNonContacts(chatToCheck);
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)){
-            log("Change visibility");
+            log("listItemUpdate: Change visibility");
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
-            log("Change unread count: "+item.getTitle());
+            log("listItemUpdate: Change unread count: "+item.getTitle());
             if(item!=null){
 
                 if (adapterList == null || adapterList.getItemCount()==0){
@@ -731,7 +732,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             }
         }
         else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
-            log("Change title: "+item.getTitle());
+            log("listItemUpdate: Change title: "+item.getTitle());
 
             if(item!=null){
 
@@ -766,7 +767,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
-            log("Change last message: "+item.getChanges());
+            log("listItemUpdate: Change last message: "+item.getChanges());
 
             if(item!=null){
 
@@ -799,7 +800,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
-            log("Change closed");
+            log("listItemUpdate: Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
 
             //Keep in the list of chats by now - then remove
 //            if(item!=null){
@@ -843,7 +844,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 //            }
         }
         else{
-            log("Other change: "+item.getChanges());
+            log("listItemUpdate: Other change: "+item.getChanges());
             if(item!=null){
                 log("New chat: "+item.getTitle());
                 setChats();
