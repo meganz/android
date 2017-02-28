@@ -13,9 +13,11 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,6 +37,8 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
@@ -56,12 +60,14 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public LinearLayout optionSendFile;
     public LinearLayout optionShareFolder;
     public LinearLayout optionRemove;
+    ImageView contactStateIcon;
 
     String fullName="";
 
     DisplayMetrics outMetrics;
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
 
     @Override
@@ -112,6 +118,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionSendFile= (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_file_layout);
         optionShareFolder = (LinearLayout) contentView.findViewById(R.id.contact_list_option_share_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
+        contactStateIcon = (ImageView) contentView.findViewById(R.id.contact_list_drawable_state);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             log("onCreate: Landscape configuration");
@@ -137,11 +144,30 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             addAvatarContactPanel(contact);
 
             if(Util.isChatEnabled()){
+
+                if (megaChatApi == null){
+                    megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                }
+
                 optionStartConversation.setVisibility(View.VISIBLE);
                 optionStartConversation.setOnClickListener(this);
+
+                contactStateIcon.setVisibility(View.VISIBLE);
+                if (megaChatApi != null){
+                    int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
+                    if(userStatus == MegaChatApi.STATUS_ONLINE){
+                        log("This user is connected");
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+                    }
+                    else{
+                        log("This user status is: "+userStatus);
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+                    }
+                }
             }
             else{
                 optionStartConversation.setVisibility(View.GONE);
+                contactStateIcon.setVisibility(View.GONE);
             }
 
             dialog.setContentView(contentView);
