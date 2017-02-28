@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,13 +104,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         float scaleW = Util.getScaleW(outMetrics, density);
         float scaleH = Util.getScaleH(outMetrics, density);
-        float scaleText;
-        if (scaleH < scaleW){
-            scaleText = scaleH;
-        }
-        else{
-            scaleText = scaleW;
-        }
 
         megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 
@@ -124,7 +115,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)createAccountTitle.getLayoutParams();
         textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
         createAccountTitle.setLayoutParams(textParams);
-        createAccountTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 
         userName = (EditText) v.findViewById(R.id.create_account_name_text);
         android.view.ViewGroup.LayoutParams paramsb1 = userName.getLayoutParams();
@@ -165,7 +155,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         chkTOS = (CheckBox) v.findViewById(R.id.create_account_chkTOS);
         tos = (TextView) v.findViewById(R.id.tos);
-        tos.setTextSize(TypedValue.COMPLEX_UNIT_SP, (8*scaleText));
 
         bRegister = (TextView) v.findViewById(R.id.button_create_account_create);
         bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
@@ -184,7 +173,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         LinearLayout.LayoutParams textAAccount = (LinearLayout.LayoutParams)textAlreadyAccount.getLayoutParams();
         textAAccount.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(25, outMetrics));
         textAlreadyAccount.setLayoutParams(textAAccount);
-        textAlreadyAccount.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 
         bLogin = (TextView) v.findViewById(R.id.button_login_create);
         bLogin.setOnClickListener(this);
