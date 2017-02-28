@@ -380,6 +380,7 @@ public class AccountController {
 
         dbH.clearNonContacts();
 
+        log("logout: switch OFF chat");
         dbH.setEnabledChat(false+"");
 
         if (!isManagerActivityLollipop){

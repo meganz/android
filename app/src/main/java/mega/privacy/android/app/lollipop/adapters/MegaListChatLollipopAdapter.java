@@ -137,7 +137,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     
 	@Override
 	public void onBindViewHolder(ViewHolderChatList holder, int position) {
-		log("onBindViewHolder");
+		log("---------------onBindViewHolder----------------");
 
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
@@ -971,14 +971,32 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			log("ChatRoom title: "+chat.getTitle());
-			holder.textViewContactName.setText(chat.getTitle());
-			if(!chat.isGroup()){
-				holder.fullName = chat.getTitle();
+
+			String title = chat.getTitle();
+			if(title!=null){
+				if(title.isEmpty()){
+					log("Chat title is empty");
+				}
+				else{
+					if(title.trim().length()<=0){
+						log("Chat title is length < 0");
+					}
+					else{
+						log("Chat TITLE: "+title);
+					}
+				}
 			}
 			else{
-				if (chat.getTitle().length() > 0){
-					String chatTitle = chat.getTitle().trim();
+				log("Chat title is NULL");
+			}
+
+			holder.textViewContactName.setText(title);
+			if(!chat.isGroup()){
+				holder.fullName = title;
+			}
+			else{
+				if (title.length() > 0){
+					String chatTitle = title.trim();
 					String firstLetter = chatTitle.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					holder.contactInitialLetter.setText(firstLetter);

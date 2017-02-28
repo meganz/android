@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -49,7 +48,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -182,6 +180,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			MegaApplication.setLoggingIn(false);
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
 				chatSettings = dbH.getChatSettings();
@@ -415,58 +414,65 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
 			log("hide action bar");
-			getSupportActionBar().hide();
-			fileExplorerSectionLayout.setVisibility(View.GONE);
-			queryingSignupLinkText.setVisibility(View.GONE);
-			confirmingAccountText.setVisibility(View.GONE);
-			loginLoggingIn.setVisibility(View.VISIBLE);
+			if (!MegaApplication.isLoggingIn()) {
+				MegaApplication.setLoggingIn(true);
+
+				getSupportActionBar().hide();
+				fileExplorerSectionLayout.setVisibility(View.GONE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
+				loginLoggingIn.setVisibility(View.VISIBLE);
 //			generatingKeysText.setVisibility(View.VISIBLE);
-			loginProgressBar.setVisibility(View.VISIBLE);
-			loginFetchNodesProgressBar.setVisibility(View.GONE);
-			loggingInText.setVisibility(View.VISIBLE);
-			initizalizingChatText.setVisibility(View.GONE);
-			fetchingNodesText.setVisibility(View.GONE);
-			prepareNodesText.setVisibility(View.GONE);
-			gSession = credentials.getSession();
+				loginProgressBar.setVisibility(View.VISIBLE);
+				loginFetchNodesProgressBar.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.VISIBLE);
+				initizalizingChatText.setVisibility(View.GONE);
+				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
+				gSession = credentials.getSession();
 
-			if(Util.isChatEnabled()){
-				if (megaChatApi == null){
-					megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-				}
-				int ret = megaChatApi.init(gSession);
-				initizalizingChatText.setVisibility(View.VISIBLE);
-				initizalizingChatText.setText("Chat getting session...");
-				chatSettings = dbH.getChatSettings();
-				if (ret == MegaChatApi.INIT_NO_CACHE)
-				{
-					megaApi.invalidateCache();
+				if(Util.isChatEnabled()){
+					log("onCreate: Chat is ENABLED");
+					if (megaChatApi == null){
+						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+					}
+					int ret = megaChatApi.init(gSession);
+					log("onCreate: result of init ---> "+ret);
+					initizalizingChatText.setVisibility(View.VISIBLE);
+					initizalizingChatText.setText("Chat getting session...");
+					chatSettings = dbH.getChatSettings();
+					if (ret == MegaChatApi.INIT_NO_CACHE)
+					{
+						log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+						megaApi.invalidateCache();
 
-				}
-				else if (ret == MegaChatApi.INIT_ERROR)
-				{
-					// chat cannot initialize, disable chat completely
-
-					initizalizingChatText.setText("Chat error, not initialized");
-					if(chatSettings==null) {
-						chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
-						dbH.setChatSettings(chatSettings);
+					}
+					else if (ret == MegaChatApi.INIT_ERROR)
+					{
+						log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+						initizalizingChatText.setText("Chat error, not initialized");
+						if(chatSettings==null) {
+							log("1 - onCreate: ERROR----> Switch OFF chat");
+							chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
+							dbH.setChatSettings(chatSettings);
+						}
+						else{
+							log("2 - onCreate: ERROR----> Switch OFF chat");
+							dbH.setEnabledChat(false + "");
+						}
+						megaChatApi.logout(this);
 					}
 					else{
-						dbH.setEnabledChat(false + "");
+						log("onCreate: Chat correctly initialized");
+						initizalizingChatText.setText("Chat correctly initialized");
 					}
-					megaChatApi.logout(this);
 				}
-				else{
-					initizalizingChatText.setText("Chat correctly initialized");
-				}
-			}
 
-			log("SESSION: " + gSession);
-			initizalizingChatText.setVisibility(View.GONE);
-			if (!MegaApplication.isLoggingIn()){
-				MegaApplication.setLoggingIn(true);
+				log("SESSION: " + gSession);
 				megaApi.fastLogin(gSession, this);
 			}
+
+			initizalizingChatText.setVisibility(View.GONE);
 		}
 		else{
 			afterLoginAndFetch();
@@ -1441,7 +1447,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			MegaApplication.setLoggingIn(false);
+
 			if (error.getErrorCode() == MegaError.API_OK){
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
@@ -1463,11 +1469,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
+						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
 					}
 				}
 				else{
 					log("chatSettings NULL - readyToManager");
+					MegaApplication.setLoggingIn(false);
 					afterLoginAndFetch();
 
 				}

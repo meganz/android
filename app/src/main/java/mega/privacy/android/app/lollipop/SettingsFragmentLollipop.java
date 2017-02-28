@@ -1490,6 +1490,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					((ManagerActivityLollipop)context).enableChat();
 				}
 				else{
+					log("DISCONNECT CHAT!!!");
 					dbH.setEnabledChat(false+"");
 					preferenceScreen.removePreference(chatNotificationsCategory);
 					preferenceScreen.removePreference(chatStatusCategory);

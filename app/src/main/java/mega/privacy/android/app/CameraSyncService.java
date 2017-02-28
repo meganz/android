@@ -1,7 +1,6 @@
 package mega.privacy.android.app;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -26,7 +25,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.provider.DocumentFile;
 import android.text.format.Formatter;
 import android.text.format.Time;
-import android.view.View;
 import android.widget.RemoteViews;
 
 import java.io.File;
@@ -145,6 +143,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+
+			isLoggingIn = false;
+			MegaApplication.setLoggingIn(isLoggingIn);
+
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
 				chatSettings = dbH.getChatSettings();
@@ -383,38 +385,45 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						log("RootNode = null");
 						running = true;
 
-						if(Util.isChatEnabled()){
-							if (megaChatApi == null){
-								megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-							}
-							int ret = megaChatApi.init(gSession);
-							chatSettings = dbH.getChatSettings();
-							if (ret == MegaChatApi.INIT_NO_CACHE)
-							{
-								megaApi.invalidateCache();
-
-							}
-							else if (ret == MegaChatApi.INIT_ERROR)
-							{
-								// chat cannot initialize, disable chat completely
-								if(chatSettings==null) {
-									chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
-									dbH.setChatSettings(chatSettings);
-								}
-								else{
-									dbH.setEnabledChat(false + "");
-								}
-								megaChatApi.logout(this);
-							}
-							else{
-								log("Chat correctly initialized");
-							}
-						}
-
 						isLoggingIn = MegaApplication.isLoggingIn();
 						if (!isLoggingIn){
+
 							isLoggingIn  = true;
 							MegaApplication.setLoggingIn(isLoggingIn);
+
+							if(Util.isChatEnabled()){
+								log("shouldRun: Chat is ENABLED");
+								if (megaChatApi == null){
+									megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+								}
+								int ret = megaChatApi.init(gSession);
+								log("shouldRun: result of init ---> "+ret);
+								chatSettings = dbH.getChatSettings();
+								if (ret == MegaChatApi.INIT_NO_CACHE)
+								{
+									log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+									megaApi.invalidateCache();
+
+								}
+								else if (ret == MegaChatApi.INIT_ERROR)
+								{
+									log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+									if(chatSettings==null) {
+										log("1 - shouldRun: ERROR----> Switch OFF chat");
+										chatSettings = new ChatSettings(false+"", true + "", true + "",true + "", MegaChatApi.STATUS_ONLINE+"");
+										dbH.setChatSettings(chatSettings);
+									}
+									else{
+										log("2 - shouldRun: ERROR----> Switch OFF chat");
+										dbH.setEnabledChat(false + "");
+									}
+									megaChatApi.logout(this);
+								}
+								else{
+									log("shouldRun: Chat correctly initialized");
+								}
+							}
+
 							megaApi.fastLogin(gSession, this);
 						}
 						return START_NOT_STICKY;
@@ -2101,9 +2110,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				isLoggingIn = false;
-				MegaApplication.setLoggingIn(isLoggingIn);
-
 				chatSettings = dbH.getChatSettings();
 				if(chatSettings!=null) {
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
@@ -2113,11 +2119,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
+						isLoggingIn = false;
+						MegaApplication.setLoggingIn(isLoggingIn);
 						retryLaterShortTime();
 					}
 				}
 				else{
 					log("chatSettings NULL - readyToManager");
+					isLoggingIn = false;
+					MegaApplication.setLoggingIn(isLoggingIn);
 					retryLaterShortTime();
 				}
 			}

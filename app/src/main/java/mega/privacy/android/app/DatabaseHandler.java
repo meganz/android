@@ -641,6 +641,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setChatSettings(ChatSettings chatSettings){
+		log("setChatSettings");
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ENABLED, encrypt(chatSettings.getEnabled()));
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
@@ -651,6 +652,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setEnabledChat(String enabled){
+		log("setEnabledChat");
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
