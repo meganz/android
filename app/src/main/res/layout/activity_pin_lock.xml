@@ -154,6 +154,8 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center_horizontal"
             android:imeOptions="actionDone"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif"
             android:inputType="textPassword" />
         
     </LinearLayout>

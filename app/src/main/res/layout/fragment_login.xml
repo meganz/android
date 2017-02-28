@@ -37,6 +37,7 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:hint="@string/email_text"
+                android:textSize="16sp"
                 android:imeOptions="actionNext"
                 android:inputType="textEmailAddress" />
 
@@ -47,6 +48,8 @@
                 android:layout_gravity="left"
                 android:hint="@string/password_text"
                 android:imeOptions="actionDone"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"
                 android:inputType="textPassword" />
 
             <LinearLayout

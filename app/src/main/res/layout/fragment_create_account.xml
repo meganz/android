@@ -27,7 +27,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/create_account_text"
                 android:textColor="@color/lollipop_primary_color"
-                android:textSize="14sp" />
+                android:textSize="22sp" />
 
             <EditText
                 android:id="@+id/create_account_name_text"
@@ -35,6 +35,7 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:hint="@string/name_text"
+                android:textSize="16sp"
                 android:imeOptions="actionNext"
                 android:inputType="text" />
             
@@ -44,6 +45,7 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:hint="@string/lastname_text"
+                 android:textSize="16sp"
                 android:imeOptions="actionNext"
                 android:inputType="text" />
 
@@ -53,6 +55,7 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:hint="@string/email_text"
+                android:textSize="16sp"
                 android:imeOptions="actionNext"
                 android:inputType="textEmailAddress" />
 
@@ -63,6 +66,8 @@
                 android:layout_gravity="left"
                 android:hint="@string/password_text"
                 android:imeOptions="actionNext"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"
                 android:inputType="textPassword" />
 
             <EditText
@@ -72,6 +77,8 @@
                 android:layout_gravity="left"
                 android:hint="@string/confirm_password_text"
                 android:imeOptions="actionDone"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"
                 android:inputType="textPassword" />
 
             <LinearLayout
@@ -88,13 +95,13 @@
                     android:linksClickable="true"
                     android:singleLine="false"
                     android:text="@string/tos"
-                    android:textSize="8sp" />
+                    android:textSize="10sp" />
 
                 <CheckBox
                     android:id="@+id/create_account_chkTOS"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"/>
             </LinearLayout>
 
             <TextView
@@ -123,7 +130,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/already_account"
                 android:textColor="@color/text_login"
-                android:textSize="14sp" />
+                android:textSize="22sp" />
 
             <TextView
                 android:id="@+id/button_login_create"
