@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -38,6 +39,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -45,7 +47,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -77,6 +78,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	boolean downloadInProgress = false;
 	ProgressBar progressBar;
 
+	Stack<Integer> lastPositionStack;
+
 	MegaApiAndroid megaApi;
 
 	long parentHandle = -1;
@@ -97,7 +100,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	private ActionMode actionMode;
 
 //    FloatingActionButton fabButton;
-	private RecyclerView.LayoutManager mLayoutManager;
+	private LinearLayoutManager mLayoutManager;
 	MegaNode selectedNode = null;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -330,6 +333,27 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	}
 
+//	private class ScrollToPositionRunnable implements Runnable{
+//
+//		int position;
+//
+//		public ScrollToPositionRunnable(int position) {
+//			this.position = position;
+//		}
+//
+//		@Override
+//		public void run()
+//		{
+//			log("ScrollToPositionRunnable: run ->scroll to position: "+position);
+//			recyclerView.scrollToPosition(position);
+//			View v = recyclerView.getChildAt(position);
+//			if (v != null)
+//			{
+//				v.requestFocus();
+//			}
+//		}
+//	}
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
@@ -351,6 +375,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
+		lastPositionStack = new Stack<>();
 
 		super.onCreate(savedInstanceState);
 		log("after onCreate called super");
@@ -440,8 +465,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
+			recyclerView.setHasFixedSize(true);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
@@ -843,78 +869,70 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
     public void itemClick(int position) {
 		log("item click position: " + position);
-		
-		/*if (isList){*/
-			if (adapter.isMultipleSelect()){
-				adapter.toggleSelection(position);
-				List<MegaNode> selectedNodes = adapter.getSelectedNodes();
-				if (selectedNodes.size() > 0){
-					updateActionModeTitle();
-					adapter.notifyDataSetChanged();
-				}
-				else{
-					hideMultipleSelect();
-				}
-//				adapterList.notifyDataSetChanged();
+
+		if (adapter.isMultipleSelect()){
+			adapter.toggleSelection(position);
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+				adapter.notifyDataSetChanged();
 			}
 			else{
-				if (nodes.get(position).isFolder()){
-					MegaNode n = nodes.get(position);
-					setFolderInfoNavigation(n);
-				}
-				else{
-					//Is file
-					if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-						intent.putExtra("position", position);
-						intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
-						intent.putExtra("isFolderLink", false);
-						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-						}
-						MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-						if(accountInfo!=null){
-							intent.putExtra("typeAccount", accountInfo.getAccountType());
-						}
-						intent.putExtra("orderGetChildren", orderGetChildren);
-						startActivity(intent);
-								
-					}
-					else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
-						MegaNode file = nodes.get(position);
-						Intent service = new Intent(context, MegaStreamingService.class);
-				  		context.startService(service);
-				  		String fileName = file.getName();
-						try {
-							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-						} 
-						catch (UnsupportedEncodingException e) {
-							e.printStackTrace();
-						}
-						
-				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-				  		System.out.println("FILENAME: " + fileName);
-				  		
-				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-				  			startActivity(mediaIntent);
-				  		}
-				  		else{
-				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-				  			adapter.setPositionClicked(-1);
-							adapter.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(nodes.get(position).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList);
-						}
+				hideMultipleSelect();
+			}
+		}
+		else{
+			if (nodes.get(position).isFolder()){
+				MegaNode n = nodes.get(position);
+				int lastFirstVisiblePosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
+				setFolderInfoNavigation(n);
+			}
+			else{
+				//Is file
+				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+					intent.putExtra("position", position);
+					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					intent.putExtra("isFolderLink", false);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						intent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
+						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						intent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					intent.putExtra("orderGetChildren", orderGetChildren);
+					startActivity(intent);
+
+				}
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+					MegaNode file = nodes.get(position);
+					Intent service = new Intent(context, MegaStreamingService.class);
+					context.startService(service);
+					String fileName = file.getName();
+					try {
+						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+					}
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+
+					String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					System.out.println("FILENAME: " + fileName);
+
+					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+						startActivity(mediaIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 						adapter.setPositionClicked(-1);
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
@@ -923,28 +941,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						nC.prepareForDownload(handleList);
 					}
 				}
+				else{
+					adapter.setPositionClicked(-1);
+					adapter.notifyDataSetChanged();
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(nodes.get(position).getHandle());
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList);
+				}
 			}
-		/*}
-		else{
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			contentText.setText(getInfoFolder(infoNode));
-			
-			if (adapter.getItemCount() == 0){				
-
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
-			}			
-		}*/
+		}
 	}
 
 	public void setFolderInfoNavigation(MegaNode n){
@@ -1186,143 +1192,74 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		
 		log("onBackPressed");
 
-		if (isList){
-			if (adapter != null){
-				parentHandle = adapter.getParentHandle();
-				((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
-				
-				if (adapter.isMultipleSelect()){
-					hideMultipleSelect();
-					return 3;
-				}
-				
-				if (adapter.getPositionClicked() != -1){
-					adapter.setPositionClicked(-1);
-					adapter.notifyDataSetChanged();
-					return 1;
-				}
-				else{
-					log("parentHandle is: "+parentHandle);
-					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-					if (parentNode != null){
-						recyclerView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
+		if (adapter != null){
+			parentHandle = adapter.getParentHandle();
+			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 
-						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-							log("Parent is ROOT");
-							aB.setTitle(getString(R.string.section_cloud_drive));
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-						}
-						else{
-							aB.setTitle(parentNode.getName());
-							log("indicator_arrow_back_033");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-						}
-						
-						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-						
-						parentHandle = parentNode.getHandle();
-						((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
-						nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						adapter.setNodes(nodes);
-						recyclerView.post(new Runnable() 
-					    {
-					        @Override
-					        public void run() 
-					        {
-					        	recyclerView.scrollToPosition(0);
-					            View v = recyclerView.getChildAt(0);
-					            if (v != null) 
-					            {
-					                v.requestFocus();
-					            }
-					        }
-					    });
-						adapter.setParentHandle(parentHandle);
-						if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-							showProgressBar();
-						}
-						else{					
-							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-						}
-						log("return 2");
-						return 2;
-					}
-					else{
-						log("ParentNode is NULL");
-						return 0;
-					}
-				}
+			if (adapter.isMultipleSelect()){
+				hideMultipleSelect();
+				return 3;
 			}
-		}
-		else{
-			if (adapter != null){
-				parentHandle = adapter.getParentHandle();
-				((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
-				
-				if (adapter.isMultipleSelect()){
-					hideMultipleSelect();
-					return 3;
-				}
-				
-				if (adapter.getPositionClicked() != -1){
-					adapter.setPositionClicked(-1);
-					adapter.notifyDataSetChanged();
-					return 1;
-				}
-				else{
-					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-					if (parentNode != null){
-						recyclerView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
 
-						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-							aB.setTitle(getString(R.string.section_cloud_drive));
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-						}
-						else{
-							aB.setTitle(parentNode.getName());
-							log("indicator_arrow_back_034");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-						}
-						
-						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-						
-						parentHandle = parentNode.getHandle();
-						((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
-						nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						adapter.setNodes(nodes);
-						recyclerView.post(new Runnable() 
-					    {
-					        @Override
-					        public void run() 
-					        {
-					        	recyclerView.scrollToPosition(0);
-					            View v = recyclerView.getChildAt(0);
-					            if (v != null) 
-					            {
-					                v.requestFocus();
-					            }
-					        }
-					    });
-						adapter.setParentHandle(parentHandle);
-						if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-							showProgressBar();
-						}
-						else{					
-							contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-						}						
-						return 2;
+			if (adapter.getPositionClicked() != -1){
+				adapter.setPositionClicked(-1);
+				adapter.notifyDataSetChanged();
+				return 1;
+			}
+			else{
+				log("parentHandle is: "+parentHandle);
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+				if (parentNode != null){
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+
+					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+						log("Parent is ROOT");
+						aB.setTitle(getString(R.string.section_cloud_drive));
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 					}
 					else{
-						return 0;
+						aB.setTitle(parentNode.getName());
+						log("indicator_arrow_back_033");
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					}
+
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+					parentHandle = parentNode.getHandle();
+					((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
+					nodes = megaApi.getChildren(parentNode, orderGetChildren);
+					adapter.setNodes(nodes);
+
+					int lastVisiblePosition = 0;
+					if(!lastPositionStack.empty()){
+						lastVisiblePosition = lastPositionStack.pop();
+						log("Pop of the stack "+lastVisiblePosition+" position");
+					}
+					log("Scroll to "+lastVisiblePosition+" position");
+
+					if(lastVisiblePosition>0){
+						final int positionToScroll = lastVisiblePosition;
+
+						mLayoutManager.scrollToPositionWithOffset(positionToScroll, 0);
+					}
+
+					adapter.setParentHandle(parentHandle);
+					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+						showProgressBar();
+					}
+					else{
+						contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+					}
+					log("return 2");
+					return 2;
+				}
+				else{
+					log("ParentNode is NULL");
+					return 0;
 				}
 			}
 		}
