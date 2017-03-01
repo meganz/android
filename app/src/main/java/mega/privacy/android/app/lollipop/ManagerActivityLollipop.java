@@ -10925,10 +10925,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: "+request.getType());
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(getString(R.string.context_invitacion_reply));
+
 				if(request.getNumber()==MegaContactRequest.REPLY_ACTION_ACCEPT){
 					log("I've accepted the invitation");
-
+					showSnackbar(getString(R.string.context_invitacion_reply_accepted));
 					MegaContactRequest contactRequest = megaApi.getContactRequestByHandle(request.getNodeHandle());
 					log("Handle of the rquest: "+request.getNodeHandle());
 					if(contactRequest!=null){
@@ -10949,6 +10949,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else{
 						log("ContactRequest is NULL");
 					}
+				}
+				else if(request.getNumber()==MegaContactRequest.REPLY_ACTION_DENY){
+					showSnackbar(getString(R.string.context_invitacion_reply_declined));
+				}
+				else if(request.getNumber()==MegaContactRequest.REPLY_ACTION_IGNORE){
+					showSnackbar(getString(R.string.context_invitacion_reply_ignored));
 				}
 			}
 			else{
