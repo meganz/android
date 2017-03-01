@@ -323,7 +323,7 @@
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Invitación eliminada</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Invitación reenviada</string>
     <string name="context_contact_request_sent" context="success message when sending a contact request">Invitación correctamente enviada a %s. El estado puede consultarse en la pestaña de Solicitudes enviadas.</string>
-    <string name="context_invitacion_reply" context="success message when adding a contact">Contestación a la invitación enviada</string>
+
     <string name="context_contact_removed" context="success message when removing a contact">Contacto borrado</string>
     <string name="context_contact_not_removed" context="error message">Error. No se pudo borrar el contacto</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permisos modificados</string>
@@ -892,4 +892,8 @@
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
 
     <string name="general_dismiss" context="Answer for confirmation dialog.">Descartar</string>
+
+    <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitación aceptada</string>
+    <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitación rechazada</string>
+    <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">Invitación ignorada</string>
 </resources>

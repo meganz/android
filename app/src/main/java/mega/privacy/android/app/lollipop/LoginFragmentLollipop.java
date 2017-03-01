@@ -749,13 +749,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 chatSettings = dbH.getChatSettings();
                 if (ret == MegaChatApi.INIT_NO_CACHE)
                 {
-                    log("enableChat: condition ret != MegaChatApi.INIT_NO_CACHE");
+                    log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
                     megaApi.invalidateCache();
 
                 }
-                else if (ret != MegaChatApi.INIT_ERROR)
+                else if (ret == MegaChatApi.INIT_ERROR)
                 {
-                    log("enableChat: condition ret != MegaChatApi.INIT_NO_CACHE");
+                    log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
                     // chat cannot initialize, disable chat completely
                     initizalizingChatText.setText("Chat error, not initialized");
                     if(chatSettings==null) {
@@ -770,7 +770,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     megaChatApi.logout(this);
                 }
                 else{
-                    log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                    log("enableChat: condition ret == OK -- chat correctly initialized");
                     initizalizingChatText.setText("Chat correctly initialized");
                 }
             }
@@ -778,6 +778,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("enableChat: Chat is NOT ENABLED");
             }
             fetchingNodesText.setVisibility(View.VISIBLE);
+            log("enableChat: Call to fechtNodes");
             megaApi.fetchNodes(this);
 
         }
