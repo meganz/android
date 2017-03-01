@@ -2866,6 +2866,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			aB = getSupportActionBar();
 		}
 
+		aB.setTitle(getString(R.string.section_shared_items));
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutCloud.setVisibility(View.GONE);
