@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -32,13 +33,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -57,7 +58,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	GestureDetectorCompat detector;
 	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
@@ -84,6 +85,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
+
+	Stack<Integer> lastPositionStack;
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
@@ -260,6 +263,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
+
+		lastPositionStack = new Stack<>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -342,7 +347,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
@@ -582,6 +587,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		else{
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
+
+				int lastFirstVisiblePosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
 				
 				aB.setTitle(n.getName());
 				log("indicator_arrow_back_190");
@@ -754,19 +763,19 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				adapter.setNodes(nodes);
-				recyclerView.post(new Runnable() 
-			    {
-			        @Override
-			        public void run() 
-			        {
-			        	recyclerView.scrollToPosition(0);
-			            View v = recyclerView.getChildAt(0);
-			            if (v != null) 
-			            {
-			                v.requestFocus();
-			            }
-			        }
-			    });
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+
 				adapter.setParentHandle(parentHandle);
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				return 2;

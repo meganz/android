@@ -100,7 +100,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	private ActionMode actionMode;
 
 //    FloatingActionButton fabButton;
-	private LinearLayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	GridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -560,7 +561,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+			gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 				@Override
 			      public int getSpanSize(int position) {
@@ -884,7 +885,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		else{
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
-				int lastFirstVisiblePosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
+				int lastFirstVisiblePosition = 0;
+				if(isList){
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+				else{
+					lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 				setFolderInfoNavigation(n);
@@ -1241,10 +1250,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					log("Scroll to "+lastVisiblePosition+" position");
 
-					if(lastVisiblePosition>0){
-						final int positionToScroll = lastVisiblePosition;
+					if(lastVisiblePosition>=0){
 
-						mLayoutManager.scrollToPositionWithOffset(positionToScroll, 0);
+						if(isList){
+							mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+						}
+						else{
+							gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+						}
+
 					}
 
 					adapter.setParentHandle(parentHandle);
