@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -40,6 +39,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.AutofitRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -59,6 +59,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	ActionBar aB;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
+	AutofitRecyclerView.AutoFitGridLayoutManager gridLayoutManager;
 	GestureDetectorCompat detector;
 	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
@@ -433,13 +434,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
 			recyclerView.setHasFixedSize(true);
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-				@Override
-			      public int getSpanSize(int position) {
-					return 1;
-				}
-			});
+			gridLayoutManager = (AutofitRecyclerView.AutoFitGridLayoutManager) recyclerView.getLayoutManager();
+//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//				@Override
+//			      public int getSpanSize(int position) {
+//					return 1;
+//				}
+//			});
 			
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
@@ -588,7 +589,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
 
-				int lastFirstVisiblePosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+				int lastFirstVisiblePosition = 0;
+				if(isList){
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+				else{
+					lastFirstVisiblePosition = ((AutofitRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+				}
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 				
@@ -772,8 +779,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				log("Scroll to "+lastVisiblePosition+" position");
 
 				if(lastVisiblePosition>=0){
-
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					if(isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
 				}
 
 				adapter.setParentHandle(parentHandle);

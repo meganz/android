@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -47,6 +46,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.AutofitRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -101,7 +101,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 //    FloatingActionButton fabButton;
 	LinearLayoutManager mLayoutManager;
-	GridLayoutManager gridLayoutManager;
+	AutofitRecyclerView.AutoFitGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -556,19 +556,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = (AutofitRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
-			gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-				@Override
-			      public int getSpanSize(int position) {
-					return 1;
-				}
-			});
-			
+			gridLayoutManager = (AutofitRecyclerView.AutoFitGridLayoutManager) recyclerView.getLayoutManager();
+//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//				@Override
+//			      public int getSpanSize(int position) {
+//					return 1;
+//				}
+//			});
+
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
@@ -891,7 +891,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((AutofitRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 				}
 
 				log("Push to stack "+lastFirstVisiblePosition+" position");
@@ -1258,7 +1258,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						else{
 							gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 						}
-
 					}
 
 					adapter.setParentHandle(parentHandle);
