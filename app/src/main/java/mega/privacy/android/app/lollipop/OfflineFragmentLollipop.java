@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -14,7 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -35,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -42,7 +42,8 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -62,8 +63,10 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 	ActionBar aB;
 	RecyclerView recyclerView;
 	GestureDetectorCompat detector;
-	RecyclerView.LayoutManager mLayoutManager;
-	MegaOffline selectedNode = null;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
+
+	Stack<Integer> lastPositionStack;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -376,6 +379,8 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 		}			
 		
 //		dbH = new DatabaseHandler(context);
+		lastPositionStack = new Stack<>();
+
 		dbH = DatabaseHandler.getDbHandler(context);
 		
 		mOffList = new ArrayList<MegaOffline>();		
@@ -442,7 +447,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
@@ -494,15 +499,15 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser_grid);
+			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
 			recyclerView.setHasFixedSize(true);
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-				@Override
-			      public int getSpanSize(int position) {
-					return 1;
-				}
-			});
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//				@Override
+//			      public int getSpanSize(int position) {
+//					return 1;
+//				}
+//			});
 			
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -907,6 +912,18 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			}
 			
 			if(currentFile.exists() && currentFile.isDirectory()){
+
+				int lastFirstVisiblePosition = 0;
+				if(isList){
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+				else{
+					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+				}
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
+
 				aB.setTitle(currentNode.getName());
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				
@@ -981,7 +998,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 				}
 				
 				adapter.setPositionClicked(-1);
-				
+				recyclerView.scrollToPosition(0);
 				notifyDataSetChanged();
 
 			}
@@ -1180,6 +1197,24 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 				else{
 					sortByNameAscending();
 				}
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					if(isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
+
 				//adapterList.setNodes(mOffList);
 				
 				return 2;
