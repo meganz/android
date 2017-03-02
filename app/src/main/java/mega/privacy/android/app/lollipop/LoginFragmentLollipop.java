@@ -1557,10 +1557,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
 
-//				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                dbH.clearCredentials();
-
                 log("Logged in: " + gSession);
 
 //				String session = megaApi.dumpSession();
