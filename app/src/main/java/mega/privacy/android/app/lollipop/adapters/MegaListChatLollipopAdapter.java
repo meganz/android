@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
@@ -65,6 +66,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	ArrayList<MegaChatListItem> chats;
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	boolean multipleSelect;
 	private SparseBooleanArray selectedItems;
 	Object fragment;
@@ -86,6 +88,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		if (megaChatApi == null){
+			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 
 		listFragment = _listView;
@@ -152,14 +158,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			log("Chat one to one");
 			long contactHandle = chat.getPeerHandle();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
+			if(megaApi==null){
+				log("onBindViewHolder: megaApi is Null in Offline mode");
+			}
 			MegaUser user = megaApi.getContact(userHandleEncoded);
 			if(user!=null){
-				log("User email: _"+user.getEmail() + "_");
+				log("User email: _"+user.getEmail() + "_"+ contactHandle+ " userHandleEncoded: "+userHandleEncoded);
 			}
 			else{
-				log("El user es NULL");
+				log("El user es NULL: "+contactHandle+ " userHandleEncoded: "+userHandleEncoded);
 			}
-			holder.contactMail = user.getEmail();
+			holder.contactMail = megaChatApi.getContactEmail(contactHandle);
 
 			if (!multipleSelect) {
 				//Multiselect OFF
@@ -393,12 +402,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (bitmap == null) {
 					avatar.delete();
+					if(contact!=null){
 						if (context.getExternalCacheDir() != null){
 							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 						}
 						else{
 							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 						}
+					}
 				}
 				else{
 					holder.contactInitialLetter.setVisibility(View.GONE);
@@ -406,21 +417,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 			else{
+				if(contact!=null){
 					if (context.getExternalCacheDir() != null){
 						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
 					else{
 						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
+				}
 			}
 		}
 		else{
+			if(contact!=null){
 				if (context.getExternalCacheDir() != null){
 					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 				}
 				else{
 					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 				}
+			}
 		}
 	}
 
@@ -1094,7 +1109,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //					contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
 //					holder.textViewContent.setLayoutParams(contentTextViewParams);
 
-					if(lastMessage.getUserHandle()==megaApi.getMyUser().getHandle()){
+					if(lastMessage.getUserHandle()==megaChatApi.getMyUserHandle()){
 						log("The last message is mine");
 						Spannable me = new SpannableString("Me: ");
 						me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
