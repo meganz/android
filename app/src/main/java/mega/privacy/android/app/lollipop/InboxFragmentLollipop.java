@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -37,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -44,7 +44,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -64,7 +65,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	GestureDetectorCompat detector;
 	MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
@@ -83,6 +85,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	boolean downloadInProgress = false;
 	ProgressBar progressBar;
 	ImageView transferArrow;
+
+	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
 	
@@ -293,6 +297,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
+
+		lastPositionStack = new Stack<>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -360,7 +366,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());      
@@ -426,33 +432,18 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
-    
-		    int totalWidth = outMetrics.widthPixels;
-		    int totalHeight = outMetrics.heightPixels;
-		    
-		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-		    	if (numberOfCells < 3){
-					numberOfCells = 3;
-				}	
-		    }
-		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-		    	if (numberOfCells < 2){
-					numberOfCells = 2;
-				}	
-		    }		    
 		    
 		    detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_grid_view);
+			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
 			recyclerView.setHasFixedSize(true);
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-				@Override
-			      public int getSpanSize(int position) {
-					return 1;
-				}
-			});
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//				@Override
+//			      public int getSpanSize(int position) {
+//					return 1;
+//				}
+//			});
 			
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -594,6 +585,17 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
+
+				int lastFirstVisiblePosition = 0;
+				if(isList){
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+				else{
+					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+				}
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
 
 				aB.setTitle(n.getName());
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -781,19 +783,24 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				adapter.setNodes(nodes);
-				recyclerView.post(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						recyclerView.scrollToPosition(0);
-						View v = recyclerView.getChildAt(0);
-						if (v != null)
-						{
-							v.requestFocus();
-						}
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					if(isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
-				});
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
+
 				adapter.setParentHandle(parentHandle);
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
