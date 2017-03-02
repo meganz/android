@@ -213,7 +213,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
             switch (accessLevel) {
                 case MegaShare.ACCESS_FULL: {
-                    optionMove.setVisibility(View.VISIBLE);
+                    optionMove.setVisibility(View.GONE);
                     optionRename.setVisibility(View.VISIBLE);
 
                     if(firstLevel||parentHandle == -1){
@@ -275,6 +275,10 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                boolean firstLevel = ((ContactFileListActivityLollipop) context).isEmptyParentHandleStack();
+                log("onClick File Info: First LEVEL is: "+firstLevel);
+                i.putExtra("firstLevel", firstLevel);
+
                 if (node.isFolder()) {
                     if (megaApi.isShared(node)){
                         i.putExtra("imageId", R.drawable.folder_shared_mime);

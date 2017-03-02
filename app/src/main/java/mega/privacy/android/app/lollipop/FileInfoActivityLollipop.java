@@ -110,6 +110,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	static int FROM_OFFLINE= 15;
 	static public int FROM_INBOX= 16;
 
+	boolean firstIncomingLevel=true;
+
 	RelativeLayout iconToolbarLayout;
 	ImageView iconToolbarView;
 
@@ -271,6 +273,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		if (extras != null){
 			imageId = extras.getInt("imageId");
 			from = extras.getInt("from");
+			if(from==FROM_INCOMING_SHARES){
+				firstIncomingLevel = extras.getBoolean("firstLevel");
+			}
 //			String name = extras.getString("name");
 			accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 			handle = extras.getLong("handle", -1);
@@ -483,9 +488,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 				downloadMenuItem.setVisible(true);
 				shareMenuItem.setVisible(false);
-				rubbishMenuItem.setVisible(false);
 				deleteMenuItem.setVisible(false);
-				leaveMenuItem.setVisible(true);
+
+				if(firstIncomingLevel){
+					leaveMenuItem.setVisible(true);
+				}
+				else{
+					leaveMenuItem.setVisible(false);
+				}
 
 		    	int accessLevel= megaApi.getAccess(node);
 				log("Node: "+node.getName());
@@ -494,8 +504,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 					case MegaShare.ACCESS_OWNER:
 					case MegaShare.ACCESS_FULL:{
+						if(firstIncomingLevel){
+							rubbishMenuItem.setVisible(false);
+						}
+						else{
+							rubbishMenuItem.setVisible(true);
+						}
 						renameMenuItem.setVisible(true);
-						moveMenuItem.setVisible(true);
+						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
 						break;
 					}
@@ -503,12 +519,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(false);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						rubbishMenuItem.setVisible(false);
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE:{
 						renameMenuItem.setVisible(false);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						rubbishMenuItem.setVisible(false);
 						break;
 					}
 				}

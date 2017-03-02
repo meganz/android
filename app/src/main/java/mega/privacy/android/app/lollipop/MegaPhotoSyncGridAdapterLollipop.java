@@ -57,11 +57,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	
 	ViewHolderPhotoSyncGrid holder = null;
-	
-	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
-	static int FROM_OFFLINE= 15;
-	
+
 	Context context;
 	MegaApplication app;
 	MegaApiAndroid megaApi;

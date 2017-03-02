@@ -42,11 +42,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	private SparseBooleanArray selectedItems = new SparseBooleanArray();;
 	
 	ViewHolderPhotoSyncList holder = null;
-	
-	static int FROM_FILE_BROWSER = 13;
-	static int FROM_INCOMING_SHARES= 14;
-	static int FROM_OFFLINE= 15;
-	
+
 	Context context;
 	MegaApplication app;
 	MegaApiAndroid megaApi;

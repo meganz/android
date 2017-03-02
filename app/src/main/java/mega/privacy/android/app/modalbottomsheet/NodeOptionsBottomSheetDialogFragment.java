@@ -614,6 +614,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
                         i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                        int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
+                        if(dBT<=0){
+                            log("First LEVEL is true: "+dBT);
+                            i.putExtra("firstLevel", true);
+                        }
+                        else{
+                            log("First LEVEL is false: "+dBT);
+                            i.putExtra("firstLevel", false);
+                        }
                     }
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
