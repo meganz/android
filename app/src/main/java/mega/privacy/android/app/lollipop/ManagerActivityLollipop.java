@@ -2285,7 +2285,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		nVPictureProfileTextView.setVisibility(View.VISIBLE);
 	}
 
-	public void setOfflineAvatar(String email, String firstLetter){
+	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
 		log("setOfflineAvatar");
 
 		File avatar = null;
@@ -2331,13 +2331,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		log("setDefaultAvatar");
 		float density  = getResources().getDisplayMetrics().density;
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(myAccountInfo.getMyUser());
+
+		String myHandleEncoded = "";
+		if(myAccountInfo.getMyUser()!=null){
+			myHandle = myAccountInfo.getMyUser().getHandle();
+			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
+		}
+		else{
+			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
+		}
+
+		String color = megaApi.getUserAvatarColor(myHandleEncoded);
 		if(color!=null){
 			log("The color to set the avatar is "+color);
 			p.setColor(Color.parseColor(color));
@@ -2802,6 +2811,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showOfflineMode(){
 		log("showOfflineMode");
 
+		if(megaApi==null){
+			log("megaApi is Null in Offline mode");
+		}
+
 		usedSpaceLayout.setVisibility(View.GONE);
 
 		Menu nVMenu = nV.getMenu();
@@ -2817,6 +2830,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			String emailCredentials = credentials.getEmail();
 			if(emailCredentials!=null){
 				nVEmail.setText(emailCredentials);
+			}
+
+			String myHandleCredentials = credentials.getMyHandle();
+			long myHandle = -1;
+			if(myHandleCredentials!=null){
+				if(!myHandleCredentials.isEmpty()){
+					myHandle = Long.parseLong(myHandleCredentials);
+				}
 			}
 
 			String firstNameText = credentials.getFirstName();
@@ -2851,7 +2872,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			String firstLetter = fullName.charAt(0) + "";
 			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 
-			setOfflineAvatar(emailCredentials, firstLetter);
+			setOfflineAvatar(emailCredentials, myHandle, firstLetter);
 		}
 
 		drawerItem=DrawerItem.SAVED_FOR_OFFLINE;

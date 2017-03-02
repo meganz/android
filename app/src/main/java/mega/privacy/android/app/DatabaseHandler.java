@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 28;
+	private static final int DATABASE_VERSION = 29;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -39,6 +39,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SESSION= "session";
 	private static final String KEY_FIRST_NAME= "firstname";
 	private static final String KEY_LAST_NAME= "lastname";
+	private static final String KEY_MY_HANDLE= "myhandle";
 
     private static final String KEY_FIRST_LOGIN = "firstlogin";
     private static final String KEY_CAM_SYNC_ENABLED = "camsyncenabled";
@@ -141,7 +142,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EMAIL + " TEXT, " 
-                + KEY_SESSION + " TEXT, " + KEY_FIRST_NAME + " TEXT, " +  KEY_LAST_NAME + " TEXT" + ")";
+                + KEY_SESSION + " TEXT, " + KEY_FIRST_NAME + " TEXT, " +  KEY_LAST_NAME + " TEXT, " + KEY_MY_HANDLE + " TEXT" + ")";
         db.execSQL(CREATE_CREDENTIALS_TABLE);
         
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
@@ -425,6 +426,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_NON_CONTACTS + " ADD COLUMN " + KEY_NONCONTACT_EMAIL + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_NON_CONTACTS + " SET " + KEY_NONCONTACT_EMAIL + " = '" + encrypt("") + "';");
 		}
+
+		if (oldVersion <= 28){
+			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_MY_HANDLE + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_MY_HANDLE + " = '" + encrypt("") + "';");
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -468,6 +474,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (userCredentials.getSession() != null){
            	values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
         }
+		if (userCredentials.getMyHandle() != null){
+			values.put(KEY_MY_HANDLE, encrypt(userCredentials.getMyHandle()+""));
+		}
         db.insert(TABLE_CREDENTIALS, null, values);
     }
 
@@ -529,7 +538,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String session = decrypt(cursor.getString(2));
 				String firstName = decrypt(cursor.getString(3));
 				String lastName = decrypt(cursor.getString(4));
-				userCredentials = new UserCredentials(email, session, firstName, lastName);
+				String myHandle = decrypt(cursor.getString(5));
+				userCredentials = new UserCredentials(email, session, firstName, lastName, myHandle);
 			}
 			cursor.close();
 		}

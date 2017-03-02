@@ -1436,7 +1436,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				prepareNodesText.setVisibility(View.GONE);
 				
 				gSession = megaApi.dumpSession();
-				credentials = new UserCredentials(lastEmail, gSession, "", "");
+				credentials = new UserCredentials(lastEmail, gSession, "", "", "");
 
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
@@ -1452,8 +1452,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
-				lastEmail = megaApi.getMyUser().getEmail();
-				credentials = new UserCredentials(lastEmail, gSession, "", "");
+				MegaUser myUser = megaApi.getMyUser();
+				String myUserHandle = "";
+				if(myUser!=null){
+					lastEmail = megaApi.getMyUser().getEmail();
+					myUserHandle = megaApi.getMyUser().getHandle()+"";
+				}
+
+				credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
 				
 				dbH.saveCredentials(credentials);
 				

@@ -60,6 +60,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
@@ -1555,7 +1556,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 serversBusyText.setVisibility(View.GONE);
 
                 gSession = megaApi.dumpSession();
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "");
 
 //				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
@@ -1606,8 +1606,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
 
                 gSession = megaApi.dumpSession();
-                lastEmail = megaApi.getMyUser().getEmail();
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "");
+                MegaUser myUser = megaApi.getMyUser();
+                String myUserHandle = "";
+                if(myUser!=null){
+                    lastEmail = megaApi.getMyUser().getEmail();
+                    myUserHandle = megaApi.getMyUser().getHandle()+"";
+                }
+
+                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
 
                 dbH.saveCredentials(credentials);
 
