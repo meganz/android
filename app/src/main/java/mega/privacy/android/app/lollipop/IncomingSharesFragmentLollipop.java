@@ -12,7 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -38,12 +38,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -62,12 +64,15 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
+
+	Stack<Integer> lastPositionStack;
 
 	MegaApiAndroid megaApi;
 	
@@ -293,6 +298,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 		nodes = new ArrayList<MegaNode>();
 		parentHandle=-1;
+		lastPositionStack = new Stack<>();
+
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -343,7 +350,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 	        
@@ -444,17 +451,17 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-				@Override
-			      public int getSpanSize(int position) {
-					return 1;
-				}
-			});
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//				@Override
+//			      public int getSpanSize(int position) {
+//					return 1;
+//				}
+//			});
 			
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());         
@@ -707,6 +714,17 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				deepBrowserTree = deepBrowserTree+1;
 				
 				MegaNode n = nodes.get(position);
+
+				int lastFirstVisiblePosition = 0;
+				if(isList){
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+				else{
+					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+				}
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
 				
 				aB.setTitle(n.getName());
 				log("aB.setHomeAsUpIndicator_61");
@@ -727,6 +745,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 				adapter.setNodes(nodes);
+				recyclerView.scrollToPosition(0);
 				setPositionClicked(-1);
 				
 				//If folder has no files
@@ -974,6 +993,23 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			findNodes();
 //				adapterList.setNodes(nodes);
 			recyclerView.setVisibility(View.VISIBLE);
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+
+				if(isList){
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else{
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+			}
+
 			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 				showProgressBar();
 			}
@@ -1016,6 +1052,22 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				//TODO
 				adapter.setNodes(nodes);
 				setPositionClicked(-1);
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					if(isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
 				adapter.setParentHandle(parentHandle);
 			}
 
