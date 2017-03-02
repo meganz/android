@@ -362,7 +362,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_ignore"
+                    android:src="@drawable/leave_share_ic"
                     android:visibility="visible" />
 
                 <TextView
