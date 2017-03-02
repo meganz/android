@@ -44,7 +44,7 @@
 	        android:visibility="gone"/>  
     </RelativeLayout>
 
-    <mega.privacy.android.app.components.AutofitRecyclerView
+    <mega.privacy.android.app.components.CustomizedGridRecyclerView
         android:id="@+id/rubbishbin_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

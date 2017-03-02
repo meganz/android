@@ -63,7 +63,7 @@
         android:textColor="@color/text_secondary"
         android:textSize="16sp" />    
 
-    <mega.privacy.android.app.components.AutofitRecyclerView
+    <mega.privacy.android.app.components.CustomizedGridRecyclerView
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

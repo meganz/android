@@ -39,7 +39,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.AutofitRecyclerView;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -50,7 +51,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
-
 public class RubbishBinFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 
 	public static int GRID_WIDTH =400;
@@ -59,7 +59,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	ActionBar aB;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
-	AutofitRecyclerView.AutoFitGridLayoutManager gridLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	GestureDetectorCompat detector;
 	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
@@ -434,7 +434,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
 			recyclerView.setHasFixedSize(true);
-			gridLayoutManager = (AutofitRecyclerView.AutoFitGridLayoutManager) recyclerView.getLayoutManager();
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 //			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 //				@Override
 //			      public int getSpanSize(int position) {
@@ -594,7 +594,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((AutofitRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 				}
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);

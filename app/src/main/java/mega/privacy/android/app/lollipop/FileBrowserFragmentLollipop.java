@@ -46,7 +46,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.AutofitRecyclerView;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -101,7 +102,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 //    FloatingActionButton fabButton;
 	LinearLayoutManager mLayoutManager;
-	AutofitRecyclerView.AutoFitGridLayoutManager gridLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -556,12 +557,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			recyclerView = (AutofitRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
-			gridLayoutManager = (AutofitRecyclerView.AutoFitGridLayoutManager) recyclerView.getLayoutManager();
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 //			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 //				@Override
 //			      public int getSpanSize(int position) {
@@ -891,7 +892,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((AutofitRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 				}
 
 				log("Push to stack "+lastFirstVisiblePosition+" position");
