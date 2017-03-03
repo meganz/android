@@ -105,7 +105,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	}
 	}
 	
-	/*private view holder class*/
+	/*public view holder class*/
     public static class ViewHolderChatList extends ViewHolder{
     	public ViewHolderChatList(View arg0) {
 			super(arg0);
@@ -123,7 +123,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
-		ImageView multiselectIcon;
 		ImageView contactStateIcon;
         String contactMail;
 		String lastNameText="";
@@ -174,7 +173,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				//Multiselect OFF
 				holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.multiselectIcon.setVisibility(View.GONE);
+
 				setUserAvatar(holder, user);
 			} else {
 				log("Multiselect ON");
@@ -182,14 +181,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					createMultiselectTick(holder);
 				}
 				else{
 					log("NOT selected");
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.multiselectIcon.setVisibility(View.GONE);
+
 					setUserAvatar(holder, user);
 				}
 			}
@@ -207,7 +206,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if (!multipleSelect) {
 				//Multiselect OFF
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.multiselectIcon.setVisibility(View.GONE);
 
 				if (chat.getTitle().length() > 0){
 					String chatTitle = chat.getTitle().trim();
@@ -222,13 +220,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					createMultiselectTick(holder);
 				}
 				else{
 					log("NOT selected");
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.multiselectIcon.setVisibility(View.GONE);
 
 					if (chat.getTitle().length() > 0){
 						String chatTitle = chat.getTitle().trim();
@@ -468,6 +465,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public ViewHolderChatList onCreateViewHolder(ViewGroup parent, int viewType) {
+		log("onCreateViewHolder");
 
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -479,7 +477,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder = new ViewHolderChatList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
 		holder.muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_mute_icon);
-		holder.multiselectIcon = (ImageView) v.findViewById(R.id.recent_chat_list_multiselect_icon);
+
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
@@ -643,24 +641,27 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void createMultiselectTick (ViewHolderChatList holder){
 		log("createMultiselectTick");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.grey_info_menu));
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		holder.imageView.setImageBitmap(defaultAvatar);
+		holder.imageView.setImageResource(R.drawable.ic_multiselect);
 
 		holder.contactInitialLetter.setVisibility(View.GONE);
-		holder.multiselectIcon.setVisibility(View.VISIBLE);
+
+//		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+//		Canvas c = new Canvas(defaultAvatar);
+//		Paint p = new Paint();
+//		p.setAntiAlias(true);
+//		p.setColor(context.getResources().getColor(R.color.grey_info_menu));
+//
+//		int radius;
+//		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+//			radius = defaultAvatar.getWidth()/2;
+//		else
+//			radius = defaultAvatar.getHeight()/2;
+//
+//		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+//		holder.imageView.setImageBitmap(defaultAvatar);
+//
+//		holder.contactInitialLetter.setVisibility(View.GONE);
+//		holder.multiselectIcon.setVisibility(View.VISIBLE);
 	}
 
 	public void createGroupChatAvatar(ViewHolderChatList holder){
@@ -817,7 +818,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		log("setMultipleSelect");
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
@@ -827,9 +827,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
+
 		ViewHolderChatList view = (ViewHolderChatList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
-			log("Start animation: "+view.contactMail);
+			log("Start animation: "+pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			view.imageView.startAnimation(flipAnimation);
 		}
@@ -925,13 +926,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		notifyDataSetChanged();
     }
 
-
-
 	@Override
 	public void onClick(View v) {
 		ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
-		log("Current position: "+currentPosition);
+		log("onClick -> Current position: "+currentPosition);
 		MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
 
 		switch (v.getId()){	

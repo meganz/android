@@ -7983,10 +7983,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showNewFolderDialog(){
 		log("showNewFolderDialogKitLollipop");
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			fbFLol.setPositionClicked(-1);
-			fbFLol.notifyDataSetChanged();
-		}
 
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
