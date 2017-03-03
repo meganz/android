@@ -102,17 +102,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         public void onLongPress(MotionEvent e) {
-            log("onLongPress");
-            View view = listView.findChildViewUnder(e.getX(), e.getY());
-            int position = listView.getChildLayoutPosition(view);
+            log("onLongPress -- RecyclerViewOnGestureListener");
 
             // handle long press
             if (!adapterList.isMultipleSelect()){
                 adapterList.setMultipleSelect(true);
 
                 actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-
-                itemClick(position);
             }
 
             super.onLongPress(e);
@@ -393,7 +389,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
     @Override
     public void onLongPress(MotionEvent e) {
-
+        log("onLongPress");
     }
 
     @Override
@@ -497,6 +493,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         public void onDestroyActionMode(ActionMode arg0) {
             adapterList.setMultipleSelect(false);
             clearSelections();
+            adapterList.notifyDataSetChanged();
             ((ManagerActivityLollipop)context).showFabButton();
         }
 
@@ -604,7 +601,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
-//                adapterList.notifyDataSetChanged();
             }
             else{
                 hideMultipleSelect();
