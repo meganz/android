@@ -2048,21 +2048,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							parentHandleBrowser = megaApi.getRootNode().getHandle();
 							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							firstNavigationLevel = true;
 						}
 						else{
 							MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 							aB.setTitle(parentNode.getName());
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							firstNavigationLevel = false;
 						}
-						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-						if (fbFLol != null){
-							getSupportFragmentManager()
-									.beginTransaction()
-									.detach(fbFLol)
-									.attach(fbFLol)
-									.commitNowAllowingStateLoss();
-						}
+//						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+//						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+//						if (fbFLol != null){
+//							getSupportFragmentManager()
+//									.beginTransaction()
+//									.detach(fbFLol)
+//									.attach(fbFLol)
+//									.commitNowAllowingStateLoss();
+//						}
 					}
 					else{
 						log("onPostResume: TAB RUBBISH NODE");
