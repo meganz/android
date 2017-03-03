@@ -717,13 +717,15 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.transferProgressBar.setVisibility(View.GONE);		
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+
 			if(type==Constants.FOLDER_LINK_ADAPTER){
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
-			}else{
-				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			}
-			
-			if(type==Constants.INCOMING_SHARES_ADAPTER||type==Constants.CONTACT_FILE_ADAPTER){
+			else if(type==Constants.CONTACT_FILE_ADAPTER){
+				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+			}
+			else if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 				//Show the owner of the shared folder
@@ -777,15 +779,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else{
-				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-				if (sl != null) {
-					if (sl.size() > 0) {					
-						holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
-					} else {
-						holder.imageView.setImageResource(R.drawable.ic_folder_list);
-					}
-				} 
-				else {
+				if(node.isShared()||node.isInShare()){
+					holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+				}
+				else{
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				}
 			}			
