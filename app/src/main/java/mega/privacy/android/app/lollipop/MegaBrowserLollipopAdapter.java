@@ -118,19 +118,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public void toggleSelection(int pos) {
 		log("toggleSelection: "+pos);
 
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			log("adapter type is LIST");
-			MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
-			if(view!=null){
-				log("Start animation: "+pos);
-				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-				view.imageView.startAnimation(flipAnimation);
-			}
-		}
-		else{
-			log("adapter type is GRID");
-		}
-
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
 			selectedItems.delete(pos);
@@ -140,6 +127,37 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			log("adapter type is LIST");
+			MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view!=null){
+				log("Start animation: "+pos);
+				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (selectedItems.size() <= 0){
+							((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+						}
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+
+					}
+				});
+				view.imageView.startAnimation(flipAnimation);
+			}
+		}
+		else{
+			log("adapter type is GRID");
+		}
 	}
 	
 	public void selectAll(){

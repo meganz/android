@@ -872,13 +872,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
+
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
 			}
-			else{
-				hideMultipleSelect();
-			}
+//			else{
+//				hideMultipleSelect();
+//			}
 		}
 		else{
 			if (nodes.get(position).isFolder()){

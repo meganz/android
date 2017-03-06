@@ -935,7 +935,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         else{
             //OTHER TYPE OF MESSAGES
             if(message.getUserHandle()==myUserHandle) {
-                log("MY message!!:");
+                log("MY message!!");
                 log("MY message handle!!: "+message.getMsgId());
 
                 if(messages.get(position).getInfoToShow()!=-1){
