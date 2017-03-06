@@ -727,12 +727,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		if (adapter == null){
 			return 0;
 		}
-		
-		if (adapter.isMultipleSelect()){
-			hideMultipleSelect();
-			return 2;
-		}
-		
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();

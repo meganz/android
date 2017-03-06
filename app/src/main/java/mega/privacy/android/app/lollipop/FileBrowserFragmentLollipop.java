@@ -1169,7 +1169,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("oninvalidate error");
 		}
 	}
-	
 		
 	/*
 	 * Disable selection
