@@ -101,18 +101,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
-	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-	        int position = recyclerView.getChildPosition(view);
-
-	        // handle long press
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
+			super.onLongPress(e);
 	    }
 	}
 	
@@ -211,8 +207,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 		}
 
@@ -698,14 +695,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
     	log("itemClick");
     	
 		if (adapter.isMultipleSelect()){
+			log("multiselect ON");
 			adapter.toggleSelection(position);
+
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-			else{
-				hideMultipleSelect();
 			}
 		}
 		else{
@@ -912,8 +907,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-
-		updateActionModeTitle();
 	}
 		
 	private void updateActionModeTitle() {
@@ -971,11 +964,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 		if (adapter == null){
 			return 0;
-		}
-		
-		if (adapter.isMultipleSelect()){
-			hideMultipleSelect();
-			return 2;
 		}
 
 		log("deepBrowserTree-1");
