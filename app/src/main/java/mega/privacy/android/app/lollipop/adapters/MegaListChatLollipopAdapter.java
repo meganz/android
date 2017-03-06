@@ -237,9 +237,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		setPendingMessages(position, holder);
 
-		setLastMessage(position, holder);
-
 		setTs(position, holder);
+
+		setLastMessage(position, holder);
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
@@ -963,18 +963,27 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void setTs(int position, ViewHolderChatList holder) {
 		log("setTs");
+
 		if (holder == null) {
 			holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
 		}
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			log("ChatRoom title: "+chat.getTitle());
-			log("chat timestamp: "+chat.getLastTimestamp());
-			String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
-			log("date timestamp: "+date);
-			holder.textViewDate.setText(date);
-			holder.textViewDate.setVisibility(View.VISIBLE);
+
+			int messageType = chat.getLastMessageType();
+
+			if(messageType==MegaChatMessage.TYPE_INVALID) {
+				holder.textViewDate.setVisibility(View.GONE);
+			}
+			else{
+				log("ChatRoom title: "+chat.getTitle());
+				log("chat timestamp: "+chat.getLastTimestamp());
+				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				log("date timestamp: "+date);
+				holder.textViewDate.setText(date);
+				holder.textViewDate.setVisibility(View.VISIBLE);
+			}
 		}
 		else{
 			log("holder is NULL");
