@@ -1859,25 +1859,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void onLoadMessageNotSent(){
+        log("onLoadMessageNotSent");
+
+    }
+
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageLoaded!------------------------");
 
+        log("Temporal id: "+msg.getTempId());
+        log("Final id: "+msg.getMsgId());
+
         if(msg!=null){
 
             if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                log("Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
+                log("onMessageLoaded: Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
-                modifyMessageReceived(androidMsg, false);
+                int returnValue = modifyMessageReceived(androidMsg, false);
+                if(returnValue!=-1){
+                    log("onMessageLoaded: Message " + returnValue + " modified!");
+                    return;
+                }
             }
-
-            log("Temporal id: "+msg.getTempId());
-            log("Final id: "+msg.getMsgId());
 
             AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
             if (lastMessageSeen != null) {
                 if(lastMessageSeen.getMsgId()==msg.getMsgId()){
-                    log("Last message seen received!");
+                    log("onMessageLoaded: Last message seen received!");
                     lastSeenReceived=true;
                     positionToScroll = 0;
                 }
@@ -1886,38 +1895,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(firstMessageReceived){
                 //TODO Only do this if the message is not ours and it's not already seen
                 megaChatApi.setMessageSeen(idChat, msg.getMsgId());
-                log("set Message Seen: "+msg.getMsgIndex());
+                log("onMessageLoaded: set Message Seen: "+msg.getMsgIndex());
                 firstMessageReceived = false;
             }
 //
             if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                log("No rise position to scroll: "+msg.getStatus());
+                log("onMessageLoaded: No rise position to scroll: "+msg.getStatus());
             }
             else{
                 if(positionToScroll>=0){
-                    log("Position to scroll up!");
+                    log("onMessageLoaded: Position to scroll up!");
                     positionToScroll++;
                 }
             }
 
             bufferMessages.add(androidMsg);
-            log("Counter: "+bufferMessages.size());
+            log("onMessageLoaded: Counter: "+bufferMessages.size());
             if(msg.getContent()!=null){
-                log("Content: "+msg.getContent());
+                log("onMessageLoaded: Content: "+msg.getContent());
             }
             else{
-                log("content NULL");
+                log("onMessageLoaded: content NULL");
             }
-            log("Size of messages: "+messages.size());
+            log("onMessageLoaded: Get type of message: "+msg.getType());
+
+            log("onMessageLoaded: Size of messages: "+messages.size());
             if(bufferMessages.size()==NUMBER_MESSAGES_TO_UPDATE_UI){
-                log("Show messages screen");
+                log("onMessageLoaded: Show messages screen");
                 chatRelativeLayout.setVisibility(View.VISIBLE);
                 emptyScrollView.setVisibility(View.GONE);
                 loadMessages();
             }
         }
         else{
-            log("The message is null");
+            log("onMessageLoaded: The message is null");
             if(bufferMessages.size()!=0){
                 chatRelativeLayout.setVisibility(View.VISIBLE);
                 emptyScrollView.setVisibility(View.GONE);
@@ -1925,17 +1936,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 loadMessages();
 
                 if(lastSeenReceived==false){
-                    log("last message seen NOT received");
+                    log("onMessageLoaded: last message seen NOT received");
                     if(stateHistory!=MegaChatApi.SOURCE_NONE){
-                        log("ask more history!: "+messages.size());
+                        log("onMessageLoaded: ask more history!: "+messages.size());
                         stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                     }
                 }
                 else{
-                    log("last message seen received");
+                    log("onMessageLoaded: last message seen received");
                     if(positionToScroll>0){
-                        log("message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
-                        log("Scroll to position: "+positionToScroll);
+                        log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
+                        log("onMessageLoaded: Scroll to position: "+positionToScroll);
                         messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                         adapter.notifyItemChanged(positionToScroll);
                         mLayoutManager.scrollToPositionWithOffset(positionToScroll,10);
@@ -2016,7 +2027,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
-    public void modifyMessageReceived(AndroidMegaChatMessage msg, boolean markAsSent){
+    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean markAsSent){
         log("modifyMessageReceived");
         int indexToChange = -1;
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator();
@@ -2103,7 +2114,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("Error, id temp message not found!!");
         }
-
+        return indexToChange;
     }
 
     public void loadMessages(){
