@@ -102,18 +102,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
-	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-	        int position = recyclerView.getChildPosition(view);
-
-	        // handle long press
-	        if (!adapter.isMultipleSelect()){
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
+			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
+			super.onLongPress(e);
 	    }
 	}
 	
@@ -197,8 +193,9 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 		}
 
 		@Override
@@ -571,14 +568,12 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		log("itemClick");
 
 		if (adapter.isMultipleSelect()){
+			log("multiselect ON");
 			adapter.toggleSelection(position);
-			List<MegaNode> selectedDocuments = adapter.getSelectedNodes();
-			if (selectedDocuments.size() > 0){
+
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-			else{
-				hideMultipleSelect();
 			}
 		}
 		else{
@@ -703,14 +698,31 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			return;
 		}
 		List<MegaNode> documents = adapter.getSelectedNodes();
-		int files = documents.size();
-
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
 		Resources res = getActivity().getResources();
 		String format = "%d %s";
 		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));		
-		String title = filesStr;
-
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = foldersStr + ", " + filesStr;
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();
@@ -718,7 +730,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
 	}
 
 	/*
@@ -728,7 +739,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 	
 	/*
@@ -747,12 +757,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		if (adapter == null){
 			return 0;
 		}
-		
-		if (adapter.isMultipleSelect()){
-			hideMultipleSelect();
-			return 2;
-		}
-		
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();

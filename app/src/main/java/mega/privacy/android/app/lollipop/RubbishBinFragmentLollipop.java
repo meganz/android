@@ -96,17 +96,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 		public void onLongPress(MotionEvent e) {
-			View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-			int position = recyclerView.getChildPosition(view);
-
+			log("onLongPress -- RecyclerViewOnGestureListener");
 			// handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
 
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
-
-				itemClick(position);
-			}  
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
 			super.onLongPress(e);
 		}
 	}
@@ -162,8 +158,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 		}
 
 		@Override
@@ -575,14 +572,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
     public void itemClick(int position) {
 		
 		if (adapter.isMultipleSelect()){
+			log("multiselect ON");
 			adapter.toggleSelection(position);
+
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-			else{
-				hideMultipleSelect();
 			}
 		}
 		else{
@@ -712,7 +707,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 
 	/*

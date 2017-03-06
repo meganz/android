@@ -245,9 +245,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			log("onDestroyActionMode");
-			adapter.setMultipleSelect(false);
-			adapter.notifyDataSetChanged();
 			clearSelections();
+			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 		}
 
@@ -1127,7 +1126,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1170,7 +1168,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
 	}
 	
 		
@@ -1192,11 +1189,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (adapter != null){
 			parentHandle = adapter.getParentHandle();
 			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
-
-			if (adapter.isMultipleSelect()){
-				hideMultipleSelect();
-				return 3;
-			}
 
 			log("parentHandle is: "+parentHandle);
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
