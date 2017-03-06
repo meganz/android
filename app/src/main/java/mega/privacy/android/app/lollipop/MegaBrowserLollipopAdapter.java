@@ -114,7 +114,77 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public View separator;
 		
 	}
-	
+
+	public void toggleAllSelection(int pos) {
+		log("toggleSelection: "+pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+
+		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			log("adapter type is LIST");
+			MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view!=null){
+				log("Start animation: "+pos);
+				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (selectedItems.size() <= 0){
+
+							if(type==Constants.RUBBISH_BIN_ADAPTER){
+								((RubbishBinFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.INBOX_ADAPTER){
+								((InboxFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.INCOMING_SHARES_ADAPTER){
+								((IncomingSharesFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.OUTGOING_SHARES_ADAPTER){
+								((OutgoingSharesFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.CONTACT_FILE_ADAPTER){
+								((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.FOLDER_LINK_ADAPTER){
+								((FolderLinkActivityLollipop) context).hideMultipleSelect();
+							}
+							else if(type==Constants.SEARCH_ADAPTER){
+								((SearchFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else{
+								((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+							}
+						}
+						notifyItemChanged(positionToflip);
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+
+					}
+				});
+				view.imageView.startAnimation(flipAnimation);
+			}
+		}
+		else {
+			log("adapter type is GRID");
+		}
+	}
+
 	public void toggleSelection(int pos) {
 		log("toggleSelection: "+pos);
 
@@ -143,7 +213,31 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					@Override
 					public void onAnimationEnd(Animation animation) {
 						if (selectedItems.size() <= 0){
-							((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+
+							if(type==Constants.RUBBISH_BIN_ADAPTER){
+								((RubbishBinFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.INBOX_ADAPTER){
+								((InboxFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.INCOMING_SHARES_ADAPTER){
+								((IncomingSharesFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.OUTGOING_SHARES_ADAPTER){
+								((OutgoingSharesFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.CONTACT_FILE_ADAPTER){
+								((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else if(type==Constants.FOLDER_LINK_ADAPTER){
+								((FolderLinkActivityLollipop) context).hideMultipleSelect();
+							}
+							else if(type==Constants.SEARCH_ADAPTER){
+								((SearchFragmentLollipop) fragment).hideMultipleSelect();
+							}
+							else{
+								((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+							}
 						}
 					}
 
@@ -163,18 +257,32 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
-				toggleSelection(i);
+				toggleAllSelection(i);
 			}
 		}
 	}
 
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-		notifyDataSetChanged();
 	}
-	
+
+//	public void clearSelections() {
+//		if(selectedItems!=null){
+//			selectedItems.clear();
+//			for (int i= 0; i<this.getItemCount();i++) {
+//				if (isItemChecked(i)) {
+//					toggleAllSelection(i);
+//				}
+//			}
+//		}
+//		notifyDataSetChanged();
+//	}
+//
 	private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }

@@ -2081,16 +2081,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							aB.setTitle(parentNode.getName());
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						}
-						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-						rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-						if (rbFLol != null){
-//								outSFLol.refresh(parentHandleOutgoing);
-							getSupportFragmentManager()
-									.beginTransaction()
-									.detach(rbFLol)
-									.attach(rbFLol)
-									.commitNowAllowingStateLoss();
-						}
+//						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+//						rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+//						if (rbFLol != null){
+////								outSFLol.refresh(parentHandleOutgoing);
+//							getSupportFragmentManager()
+//									.beginTransaction()
+//									.detach(rbFLol)
+//									.attach(rbFLol)
+//									.commitNowAllowingStateLoss();
+//						}
 					}
 	    			break;
 	    		}
