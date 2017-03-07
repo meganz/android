@@ -1868,10 +1868,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageLoaded!------------------------");
 
-        log("Temporal id: "+msg.getTempId());
-        log("Final id: "+msg.getMsgId());
-
         if(msg!=null){
+
+            log("Temporal id: "+msg.getTempId());
+            log("Final id: "+msg.getMsgId());
 
             if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                 log("onMessageLoaded: Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
