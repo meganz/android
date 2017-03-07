@@ -88,23 +88,18 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-	    public void onLongPress(MotionEvent e) {
-	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-	        int position = recyclerView.getChildPosition(view);
+		public void onLongPress(MotionEvent e) {
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
+			if (!adapter.isMultipleSelect()){
+				adapter.setMultipleSelect(true);
 
-	        // handle long press
-	        if (!adapter.isMultipleSelect()){
-	        	adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
-
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
-	    }
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
+			super.onLongPress(e);
+		}
 	}
-	////
-	
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -193,8 +188,9 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 		}
 
 		@Override
@@ -269,9 +265,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			
 			return false;
 		}
-		
 	}
-	
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -463,9 +457,13 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
     public void itemClick(int position) {
 		
 		if (adapter.isMultipleSelect()){
+			log("multiselect ON");
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
+
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+			}
 		}
 		else{
 			if (nodes.get(position).isFolder()){
@@ -580,7 +578,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -665,12 +662,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-		
-		if (adapter.isMultipleSelect()){
-			hideMultipleSelect();
-			return 3;
-		}
-		
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();

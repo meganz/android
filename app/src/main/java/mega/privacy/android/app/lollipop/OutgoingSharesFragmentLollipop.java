@@ -89,41 +89,23 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	long parentHandle = -1;
 	int deepBrowserTree = 0;
 	boolean isList = true;
-	boolean overflowMenu = false;
 	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
-	MegaNode selectedNode;
-	
+
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
 	private ActionMode actionMode;
-	////
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//			@Override
-//		    public boolean onSingleTapConfirmed(MotionEvent e) {
-//		        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//		        int position = listView.getChildPosition(view);
-//
-//		        // handle single tap
-//		        itemClick(view, position);
-//
-//		        return super.onSingleTapConfirmed(e);
-//		    }
-
 		public void onLongPress(MotionEvent e) {
-			View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-			int position = recyclerView.getChildPosition(view);
-
+			log("onLongPress -- RecyclerViewOnGestureListener");
 			// handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
 
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-
-				itemClick(position);
 			}
 			super.onLongPress(e);
 		}
@@ -239,8 +221,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 		}
 
@@ -707,15 +690,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
     public void itemClick(int position) {
 	
     	if (adapter.isMultipleSelect()){
-    		adapter.toggleSelection(position);
-    		List<MegaNode> selectedNodes = adapter.getSelectedNodes();
-    		if (selectedNodes.size() > 0){
-    			updateActionModeTitle();
-    			adapter.notifyDataSetChanged();
-    		}
-    		else{
-    			hideMultipleSelect();
-    		}
+			log("multiselect ON");
+			adapter.toggleSelection(position);
+
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+			}
 		}
 		else{
 			if (nodes.get(position).isFolder()){
@@ -983,8 +964,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1046,12 +1025,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (adapter == null){
 			return 0;
 		}
-		
-		if (adapter.isMultipleSelect()){
-			hideMultipleSelect();
-			return 2;
-		}
-		
+
 		deepBrowserTree = deepBrowserTree-1;
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		if(deepBrowserTree==0){
