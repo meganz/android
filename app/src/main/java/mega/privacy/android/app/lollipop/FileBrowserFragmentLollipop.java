@@ -261,6 +261,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			boolean showLink = false;
 			boolean showTrash = false;
 			boolean showShare = true;
+
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
@@ -319,9 +320,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			if(showLink){
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
+			if(showShare){
+				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 
 			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
 
