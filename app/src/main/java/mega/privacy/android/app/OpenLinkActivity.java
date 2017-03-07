@@ -44,6 +44,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		
 		Intent intent = getIntent();
 		String url = intent.getDataString();
+		log("Original url: " + url);
 		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
@@ -333,7 +334,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			return;
 		}
 
-		if (url != null && (url.matches("^https://mega.co.nz/#blog.+$") || url.matches("^https://mega.nz/#blog.+$"))) {
+		if (url != null && (url.matches("^https://mega.co.nz/#blog") || url.matches("^https://mega.nz/#blog") || url.matches("^https://mega.nz/blog") || url.matches("^https://mega.co.nz/#blog.+$") || url.matches("^https://mega.nz/#blog.+$") || url.matches("^https://mega.nz/blog.+$") ) ) {
 			log("blog link url");
 
 			Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
@@ -343,8 +344,19 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			finish();
 			return;
 		}
+
+		if (url != null && (url.matches("^https://mega.co.nz/#help") || url.matches("^https://mega.nz/#help") || url.matches("^https://mega.nz/help"))) {
+			log("help link url");
+
+			Intent openHelpIntent = new Intent(this, WebViewActivityLollipop.class);
+			openHelpIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openHelpIntent.setData(Uri.parse(url));
+			startActivity(openHelpIntent);
+			finish();
+			return;
+		}
 		
-		log("wrong url");
+		log("wrong url: " + url);
 
 		Intent errorIntent = new Intent(this, ManagerActivityLollipop.class);
 		errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
