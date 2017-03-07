@@ -3979,6 +3979,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchView.setIconifiedByDefault(true);
 		}
 
+		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				searchQuery = "" + query;
+				selectDrawerItemLollipop(DrawerItem.SEARCH);
+				log("Search query: " + query);
+
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				return true;
+			}
+
+    	});
+
+
+
+
 		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
 		addContactMenuItem =menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
