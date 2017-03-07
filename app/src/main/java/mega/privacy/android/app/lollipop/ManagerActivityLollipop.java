@@ -3625,9 +3625,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
     			}
 
-    			if(sttFLol==null){
-    				sttFLol = new SettingsFragmentLollipop();
-    			}
+    			if(scrollToChat){
+					log("scrollToChat true -> create new Fragment");
+					sttFLol = new SettingsFragmentLollipop();
+				}
+				else{
+					if(sttFLol==null){
+						sttFLol = new SettingsFragmentLollipop();
+					}
+				}
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
