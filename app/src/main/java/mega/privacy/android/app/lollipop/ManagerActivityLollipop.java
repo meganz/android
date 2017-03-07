@@ -3997,9 +3997,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     	});
 
-
-
-
 		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
 		addContactMenuItem =menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
@@ -4865,10 +4862,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(Util.isChatEnabled()){
 
 				if (rChatFL != null){
-					newChatMenuItem.setVisible(true);
-					addContactMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
-					setStatusMenuItem.setVisible(true);
+					if(Util.isOnline(this)){
+						newChatMenuItem.setVisible(true);
+						addContactMenuItem.setVisible(true);
+						selectMenuItem.setVisible(true);
+						setStatusMenuItem.setVisible(true);
+					}
+					else{
+						newChatMenuItem.setVisible(false);
+						addContactMenuItem.setVisible(false);
+						selectMenuItem.setVisible(false);
+						setStatusMenuItem.setVisible(false);
+					}
 				}
 
 				//Hide
