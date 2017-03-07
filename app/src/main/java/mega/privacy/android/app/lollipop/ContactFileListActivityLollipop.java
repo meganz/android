@@ -56,6 +56,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
@@ -82,6 +83,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	FrameLayout fragmentContainer;
     
     String userEmail;
+	MegaUser contact;
+	String fullName = "";
 
 	MegaApiAndroid megaApi;
 	AlertDialog permissionsDialog;
@@ -355,8 +358,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if (extras != null){
 			userEmail = extras.getString("name");
 
-
-
 			setContentView(R.layout.activity_main_contact_properties);
 
 			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
@@ -367,14 +368,23 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if(tB==null){
 				log("Toolbar is NULL");
 			}
-//			tB.setPadding(0,getStatusBarHeight(),0,0);
-			tB.setTitle(getString(R.string.contact_shared_files));
+
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
+
+			contact = megaApi.getContact(userEmail);
+			if(contact == null)
+			{
+				finish();
+			}
+
+			ContactController cC = new ContactController(this);
+			fullName =  cC.getContactFullName(contact.getHandle());
+
 			if(aB!=null){
 				aB.setDisplayHomeAsUpEnabled(true);
 				aB.setDisplayShowHomeEnabled(true);
-				aB.hide();
+				setTitleActionBar(null);
 			}
 			else{
 				log("aB is NULL!!!!");
@@ -384,7 +394,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 			log("Shared Folders are:");
 			coordinatorLayout.setFitsSystemWindows(true);
-			aB.show();
 
 			if (cflF == null){
 				cflF = new ContactFileListFragmentLollipop();
@@ -1948,6 +1957,21 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 		log("Fragment NULL");
 		return true;
+	}
+
+	public void setTitleActionBar(String title){
+		if (aB != null){
+			if(title == null){
+				log("reset title and subtitle");
+				aB.setTitle(R.string.contact_shared_files);
+				aB.setSubtitle(fullName);
+
+			}
+			else{
+				aB.setTitle(title);
+				aB.setSubtitle(null);
+			}
+		}
 	}
 
 	public long getParentHandle() {

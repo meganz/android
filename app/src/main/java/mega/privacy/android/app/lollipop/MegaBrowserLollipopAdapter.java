@@ -868,6 +868,19 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 					}
 				}
+
+				int accessLevel = megaApi.getAccess(node);
+
+				if(accessLevel== MegaShare.ACCESS_FULL){
+					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+				}
+				else if(accessLevel== MegaShare.ACCESS_READWRITE){
+					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+				}
+				else{
+					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+				}
+				holder.permissionsIcon.setVisibility(View.VISIBLE);
 			}
 			else if(type==Constants.INCOMING_SHARES_ADAPTER){
 				holder.publicLinkImage.setVisibility(View.INVISIBLE);
