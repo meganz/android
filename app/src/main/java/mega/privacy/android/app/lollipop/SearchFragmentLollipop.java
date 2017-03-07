@@ -66,7 +66,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	ProgressBar progressBar;
-	MegaNode selectedNode = null;
 	MegaApiAndroid megaApi;	
 	ImageView transferArrow;
 		
@@ -359,8 +358,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				adapter.setNodes(nodes);
 			}
-			
-			adapter.setPositionClicked(-1);
+
 			adapter.setMultipleSelect(false);
 	
 			recyclerView.setAdapter(adapter);
@@ -422,7 +420,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			setNodes(nodes);
 			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 			
-			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
@@ -551,7 +548,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			  		}
 			  		else{
 			  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-			  			adapter.setPositionClicked(-1);
 			  			adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
@@ -560,7 +556,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			  		}						
 				}
 				else{
-					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
@@ -663,103 +658,97 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 
-		if (adapter.getPositionClicked() != -1){
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return 1;
-		}
-		else{
-			if (levels > 0){
-				log("levels > 0");
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-				if (parentNode != null){
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-					recyclerView.setVisibility(View.VISIBLE);
-					contentText.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_cloud_drive));	
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						log("aB.setHomeAsUpIndicator_52");
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());	
-						log("aB.setHomeAsUpIndicator_53");
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-					}
-					
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = parentNode.getHandle();
-					((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					if(nodes!=null){
-						log("nodes.size: "+nodes.size());
-						if(nodes.size()>0){
-							recyclerView.setVisibility(View.VISIBLE);
-							contentText.setVisibility(View.VISIBLE);
-							emptyImageView.setVisibility(View.GONE);
-							emptyTextView.setVisibility(View.GONE);
-						}
-						else{						
-							recyclerView.setVisibility(View.GONE);
-							contentText.setVisibility(View.GONE);
-							emptyImageView.setVisibility(View.VISIBLE);
-							emptyTextView.setVisibility(View.VISIBLE);
-						}
-					}
-					adapter.setNodes(nodes);
-					recyclerView.scrollToPosition(0);
-					adapter.setParentHandle(parentHandle);
-					levels--;
-					return 2;
+		if (levels > 0){
+			log("levels > 0");
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+			if (parentNode != null){
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+				recyclerView.setVisibility(View.VISIBLE);
+				contentText.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+					aB.setTitle(getString(R.string.section_cloud_drive));
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					log("aB.setHomeAsUpIndicator_52");
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				}
 				else{
-					return 0;
+					aB.setTitle(parentNode.getName());
+					log("aB.setHomeAsUpIndicator_53");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				}
-			}
-			else if (levels == -1){
-				log("levels == -1");
-				return 0;
-			}
-			else{
-				log("levels searchQuery");
-				parentHandle = -1;
+
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+				parentHandle = parentNode.getHandle();
 				((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-				nodes = megaApi.search(searchQuery);
-				adapter.setNodes(nodes);
-				setNodes(nodes);
-				contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				if(nodes!=null){
 					log("nodes.size: "+nodes.size());
 					if(nodes.size()>0){
-						contentText.setVisibility(View.VISIBLE);
 						recyclerView.setVisibility(View.VISIBLE);
+						contentText.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
 					}
 					else{
-						contentText.setVisibility(View.GONE);
 						recyclerView.setVisibility(View.GONE);
+						contentText.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
 						emptyTextView.setVisibility(View.VISIBLE);
 					}
-				}				
+				}
+				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				adapter.setParentHandle(parentHandle);
 				levels--;
-				aB.setTitle(getString(R.string.action_search)+": "+searchQuery);	
-				log("aB.setHomeAsUpIndicator_54");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				return 3;
+				return 2;
+			}
+			else{
+				return 0;
 			}
 		}
+		else if (levels == -1){
+			log("levels == -1");
+			return 0;
+		}
+		else{
+			log("levels searchQuery");
+			parentHandle = -1;
+			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
+			nodes = megaApi.search(searchQuery);
+			adapter.setNodes(nodes);
+			setNodes(nodes);
+			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
+			if(nodes!=null){
+				log("nodes.size: "+nodes.size());
+				if(nodes.size()>0){
+					contentText.setVisibility(View.VISIBLE);
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}
+				else{
+					contentText.setVisibility(View.GONE);
+					recyclerView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+				}
+			}
+			recyclerView.scrollToPosition(0);
+			adapter.setParentHandle(parentHandle);
+			levels--;
+			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
+			log("aB.setHomeAsUpIndicator_54");
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+			return 3;
+		}
 	}
+
 	
 	public long getParentHandle(){
 		return adapter.getParentHandle();
@@ -852,13 +841,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			}			
 		}
 	}
-	
-	public void setPositionClicked(int positionClicked){
-		if (adapter != null){
-			adapter.setPositionClicked(positionClicked);
-		}	
-	}
-	
+
 	public void notifyDataSetChanged(){
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
@@ -927,12 +910,5 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	public void resetAdapter(){
-		log("resetAdapter");
-		if(adapter!=null){
-			adapter.setPositionClicked(-1);
-		}
 	}
 }

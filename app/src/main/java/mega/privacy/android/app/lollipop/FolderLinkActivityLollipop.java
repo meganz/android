@@ -19,7 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -121,35 +120,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//		@Override
-//	    public boolean onSingleTapConfirmed(MotionEvent e) {
-//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//	        int position = listView.getChildPosition(view);
-//
-//	        // handle single tap
-//	        itemClick(view, position);
-//
-//	        return super.onSingleTapConfirmed(e);
-//	    }
 
 	    public void onLongPress(MotionEvent e) {
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
 
-	        // handle long press
-			if (adapterList != null) {
-				if (adapterList.getPositionClicked() == -1) {
-					adapterList.setMultipleSelect(true);
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
+			if (!adapterList.isMultipleSelect()){
+				adapterList.setMultipleSelect(true);
 
-					actionMode = startSupportActionMode(new ActionBarCallBack());
-
-					optionsBar.setVisibility(View.GONE);
-					separator.setVisibility(View.GONE);
-
-					itemClick(position);
-				}
+				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
-	        super.onLongPress(e);
+			super.onLongPress(e);
 	    }
 	}
 	
@@ -214,8 +195,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			adapterList.setMultipleSelect(false);
 			clearSelections();
+			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
 		}
@@ -1046,7 +1027,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							adapterList.setNodes(nodes);
 						}
 
-						adapterList.setPositionClicked(-1);
 						adapterList.setMultipleSelect(false);
 
 						listView.setAdapter(adapterList);
@@ -1151,7 +1131,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				adapterList.setMultipleSelect(true);
 				adapterList.selectAll();
 				
-				actionMode = ((AppCompatActivity)this).startSupportActionMode(new ActionBarCallBack());
+				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
 			
 			updateActionModeTitle();
@@ -1165,8 +1145,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		if(adapterList.isMultipleSelect()){
 			adapterList.clearSelections();
 		}
-
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1213,15 +1191,13 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 	public void itemClick(int position) {
 		if (adapterList.isMultipleSelect()){
+			log("multiselect ON");
 			adapterList.toggleSelection(position);
-			List<MegaNode> documents = adapterList.getSelectedNodes();
-			if(documents.size() > 0){
+
+			List<MegaNode> selectedNodes = adapterList.getSelectedNodes();
+			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
 			}
-			else{
-				hideMultipleSelect();
-			}			
 		}
 		else{
 			if (nodes.get(position).isFolder()){
@@ -1296,7 +1272,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			  		}
 			  		else{
 			  			Snackbar.make(fragmentContainer, getResources().getString(R.string.intent_not_available), Snackbar.LENGTH_SHORT).show();
-			  			adapterList.setPositionClicked(-1);
 						adapterList.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
@@ -1317,8 +1292,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							return;
 						}
 					}
-					
-					adapterList.setPositionClicked(-1);
 					adapterList.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
@@ -1365,47 +1338,39 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			log("onBackPressed: adapter !=null");
 			parentHandle = adapterList.getParentHandle();
 			
-			if (adapterList.getPositionClicked() != -1){
-				log("onBackPressed: PositionClicked() != -1");
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
+
+			MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
+			if (parentNode != null){
+				log("onBackPressed: parentNode != NULL");
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				aB.setTitle(parentNode.getName());
+
+				supportInvalidateOptionsMenu();
+
+				parentHandle = parentNode.getHandle();
+				nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
+				adapterList.setNodes(nodes);
+				listView.post(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						listView.scrollToPosition(0);
+						View v = listView.getChildAt(0);
+						if (v != null)
+						{
+							v.requestFocus();
+						}
+					}
+				});
+				adapterList.setParentHandle(parentHandle);
 				return;
 			}
 			else{
-				log("onBackPressed: PositionClicked() == -1");
-				MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
-				if (parentNode != null){
-					log("onBackPressed: parentNode != NULL");
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					aB.setTitle(parentNode.getName());					
-					
-					supportInvalidateOptionsMenu();
-					
-					parentHandle = parentNode.getHandle();
-					nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
-					adapterList.setNodes(nodes);
-					listView.post(new Runnable() 
-				    {
-				        @Override
-				        public void run() 
-				        {
-				        	listView.scrollToPosition(0);
-				            View v = listView.getChildAt(0);
-				            if (v != null) 
-				            {
-				                v.requestFocus();
-				            }
-				        }
-				    });
-					adapterList.setParentHandle(parentHandle);
-					return;
-				}
-				else{
-					log("onBackPressed: parentNode == NULL");
-					finish();
-				}
+				log("onBackPressed: parentNode == NULL");
+				finish();
 			}
 		}
 		

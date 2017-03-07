@@ -404,7 +404,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 			adapter.setNodes(nodes);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);		
@@ -511,9 +510,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}				
 				aB.setTitle(infoNode.getName());
-			}						
-			
-			adapter.setPositionClicked(-1);
+			}
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);		
@@ -563,7 +560,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		adapter.setParentHandle(parentHandle);
 		nodes = megaApi.getChildren(n, orderGetChildren);
 		adapter.setNodes(nodes);
-		setPositionClicked(-1);
 		
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
@@ -597,7 +593,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			log("adapter != null");
 			adapter.setParentHandle(-1);
 			adapter.setNodes(nodes);
-			adapter.setPositionClicked(-1);
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 	}
@@ -736,7 +731,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 				adapter.setNodes(nodes);
-				setPositionClicked(-1);
 				recyclerView.scrollToPosition(0);
 				
 				//If folder has no files
@@ -805,7 +799,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			  		}
 			  		else{
 						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
-			  			adapter.setPositionClicked(-1);
 			  			adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
@@ -814,7 +807,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					}
 				}
 				else{
-					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
@@ -1100,7 +1092,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				adapter.setNodes(nodes);
-				setPositionClicked(-1);
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
@@ -1192,13 +1183,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 //			}
 //		}
 //	}
-	
-	public void setPositionClicked(int positionClicked){
-		if (adapter != null){
-			adapter.setPositionClicked(positionClicked);
-		}	
-	}
-	
+
 	public void notifyDataSetChanged(){
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
@@ -1306,10 +1291,4 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		this.deepBrowserTree = deepBrowserTree;
 	}
 
-	public void resetAdapter(){
-		log("resetAdapter");
-		if(adapter!=null){
-			adapter.setPositionClicked(-1);
-		}
-	}
 }

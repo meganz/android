@@ -389,7 +389,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
 
-			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
@@ -467,8 +466,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
-			
-			adapter.setPositionClicked(-1);
+
 			recyclerView.setAdapter(adapter);
 
 			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
@@ -673,7 +671,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-						adapter.setPositionClicked(-1);
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
@@ -682,7 +679,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 				}
 				else{
-					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
@@ -758,66 +754,59 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			return 0;
 		}
 
-		if (adapter.getPositionClicked() != -1){
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return 1;
-		}
-		else{
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-			if (parentNode != null) {
-				log("ParentNode: "+parentNode.getName());
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+		if (parentNode != null) {
+			log("ParentNode: "+parentNode.getName());
+			recyclerView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
 
-				if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
-					aB.setTitle(getString(R.string.section_inbox));
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				}
-				else{
-					aB.setTitle(parentNode.getName());
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-				parentHandle = parentNode.getHandle();
-				((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-				adapter.setNodes(nodes);
-
-				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
-					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
-				}
-				log("Scroll to "+lastVisiblePosition+" position");
-
-				if(lastVisiblePosition>=0){
-
-					if(isList){
-						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-					else{
-						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-				}
-
-				adapter.setParentHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-				}
-				return 2;
+			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
+				aB.setTitle(getString(R.string.section_inbox));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else{
-				return 0;
+				aB.setTitle(parentNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			}
+
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+			parentHandle = parentNode.getHandle();
+			((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			adapter.setNodes(nodes);
+
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+
+				if(isList){
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else{
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+			}
+
+			adapter.setParentHandle(parentHandle);
+			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+				showProgressBar();
+			}
+			else{
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+			}
+			return 2;
+		}
+		else{
+			return 0;
 		}
 	}
 
@@ -869,13 +858,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			}			
 		}	
 	}
-	
-	public void setPositionClicked(int positionClicked){
-		if (adapter != null){
-			adapter.setPositionClicked(positionClicked);
-		}
-	}
-	
+
 	public void notifyDataSetChanged(){
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
@@ -952,12 +935,5 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			return adapter.getItemCount();
 		}
 		return 0;
-	}
-
-	public void resetAdapter(){
-		log("resetAdapter");
-		if(adapter!=null){
-			adapter.setPositionClicked(-1);
-		}
 	}
 }
