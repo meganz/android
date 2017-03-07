@@ -153,6 +153,61 @@ public class TimeChatUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
+    public static String formatTime(long ts){
+        java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
+        Calendar cal = Util.calculateDateFromTimestamp(ts);
+        TimeZone tz = cal.getTimeZone();
+        df.setTimeZone(tz);
+        Date date = cal.getTime();
+        String formattedDate = df.format(date);
+        return formattedDate;
+    }
+
+    public static String formatDateAndTime(long ts, int format){
+
+        java.text.DateFormat df;
+        if(format == DATE_LONG_FORMAT){
+            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+        }
+        else{
+            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+        }
+
+        Calendar cal = Util.calculateDateFromTimestamp(ts);
+
+        //Compare to yesterday
+        Calendar calToday = Calendar.getInstance();
+        Calendar calYesterday = Calendar.getInstance();
+        calYesterday.add(Calendar.DATE, -1);
+        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        if(tc.compare(cal, calToday)==0) {
+            String time = formatTime(ts);
+            String formattedDate = "Today" + " " + time;
+            return formattedDate;
+        }
+        else if(tc.compare(cal, calYesterday)==0){
+            String time = formatTime(ts);
+            String formattedDate = "Yesterday" + " " + time;
+            return formattedDate;
+        }
+        else{
+            if(tc.calculateDifferenceDays(cal, calToday)<7){
+                Date date = cal.getTime();
+                String dayWeek = new SimpleDateFormat("EEEE").format(date);
+                String time = formatTime(ts);
+                String formattedDate = dayWeek + " " + time;
+                return formattedDate;
+            }
+            else{
+                TimeZone tz = cal.getTimeZone();
+                df.setTimeZone(tz);
+                Date date = cal.getTime();
+                String formattedDate = df.format(date);
+                return formattedDate;
+            }
+        }
+    }
+
     private static void log(String message) {
         Util.log("TimeChatUtils", message);
     }

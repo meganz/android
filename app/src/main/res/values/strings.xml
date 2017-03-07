@@ -1075,4 +1075,6 @@
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitation accepted</string>
     <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitation declined</string>
     <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">Invitation ignored</string>
+
+    <string name="error_message_unrecognizable" context="Content of a normal message that cannot be recognized">Message unrecognizable</string>
 </resources>

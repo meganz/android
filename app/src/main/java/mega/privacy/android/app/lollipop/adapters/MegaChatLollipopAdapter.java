@@ -1249,7 +1249,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     log("Type message ERROR: "+message.getType());
                     holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-                    holder.contentOwnMessageText.setText("Message unrecognizable");
+                    holder.contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
                     holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
                     holder.ownManagementMessageLayout.setVisibility(View.GONE);
 
@@ -1660,7 +1660,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                     holder.contactManagementMessageLayout.setVisibility(View.GONE);
                     holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-                    holder.contentContactMessageText.setText("Message unrecognizable");
+                    holder.contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
 
                     //Margins
                     RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)holder.timeContactText.getLayoutParams();
