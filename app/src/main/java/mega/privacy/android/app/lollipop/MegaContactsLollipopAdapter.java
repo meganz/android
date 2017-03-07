@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -329,19 +331,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.contactMail = contact.getEmail();
 		
 		if (!multipleSelect) {
-			
-			if (positionClicked != -1) {
-				if (positionClicked == position) {
-					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-					listFragment.smoothScrollToPosition(positionClicked);
-				}
-				else {
-					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-									}
-			} 
-			else {
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-			}
+
+			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 		} 
 		else {
 
@@ -590,18 +581,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		else{
 			holder.contactStateIcon.setVisibility(View.GONE);
 		}
-	
-		if (!multipleSelect) {
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-		} else {
-
-			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
-			}
-			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);				
-			}
-		}
 
 		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
 		if(contactDB!=null){
@@ -633,26 +612,42 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holder.textViewContactName.setText(fullName);
 		}
 
-		createDefaultAvatar(holder, contact);
-		
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
-		
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-		}
-		Bitmap bitmap = null;
-		if (avatar.exists()){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
+		if (!multipleSelect) {
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+			createDefaultAvatar(holder, contact);
+
+			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+			File avatar = null;
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+			}
+			else{
+				avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+			}
+			Bitmap bitmap = null;
+			if (avatar.exists()){
+				if (avatar.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (bitmap == null) {
+						avatar.delete();
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						}
+					}
+					else{
+						holder.contactInitialLetter.setVisibility(View.GONE);
+						holder.imageView.setImageBitmap(bitmap);
+					}
+				}
+				else{
 					if (context.getExternalCacheDir() != null){
 						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
@@ -660,26 +655,73 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
 				}
-				else{
-					holder.contactInitialLetter.setVisibility(View.GONE);
-					holder.imageView.setImageBitmap(bitmap);
-				}
 			}
 			else{
 				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
+					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 				}
 				else{
-					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
-				}			
+					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
 			}
-		}	
-		else{
-			if (context.getExternalCacheDir() != null){
-				megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+		} else {
+
+			if(this.isItemChecked(position)){
+				holder.imageView.setImageResource(R.drawable.ic_multiselect);
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 			}
 			else{
-				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+				createDefaultAvatar(holder, contact);
+
+				UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+				File avatar = null;
+				if (context.getExternalCacheDir() != null){
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+				}
+				else{
+					avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+				}
+				Bitmap bitmap = null;
+				if (avatar.exists()){
+					if (avatar.length() > 0){
+						BitmapFactory.Options bOpts = new BitmapFactory.Options();
+						bOpts.inPurgeable = true;
+						bOpts.inInputShareable = true;
+						bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						if (bitmap == null) {
+							avatar.delete();
+							if (context.getExternalCacheDir() != null){
+								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+							}
+							else{
+								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+							}
+						}
+						else{
+							holder.contactInitialLetter.setVisibility(View.GONE);
+							holder.imageView.setImageBitmap(bitmap);
+						}
+					}
+					else{
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						}
+					}
+				}
+				else{
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
+					else{
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
+				}
 			}
 		}
 		
@@ -890,16 +932,62 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public void setMultipleSelect(boolean multipleSelect) {
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
 			selectedItems = new SparseBooleanArray();
 		}
 	}
+
+	public void toggleAllSelection(int pos) {
+		log("toggleSelection: "+pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+
+		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			log("adapter type is LIST");
+			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view!=null){
+				log("Start animation: "+pos);
+				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (selectedItems.size() <= 0){
+							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+						}
+						notifyItemChanged(positionToflip);
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+
+					}
+				});
+				view.imageView.startAnimation(flipAnimation);
+			}
+		}
+		else {
+			log("adapter type is GRID");
+		}
+	}
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
+
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
 			selectedItems.delete(pos);
@@ -909,6 +997,37 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+			log("adapter type is LIST");
+			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view!=null){
+				log("Start animation: "+pos);
+				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						if (selectedItems.size() <= 0){
+							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+						}
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+
+					}
+				});
+				view.imageView.startAnimation(flipAnimation);
+			}
+		}
+		else{
+			log("adapter type is GRID");
+		}
 	}
 	
 	public void selectAll(){
@@ -920,10 +1039,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-		notifyDataSetChanged();
 	}
 	
 	private boolean isItemChecked(int position) {
