@@ -923,6 +923,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.setEnabled(false);
 		}
 
+
 		if(((ManagerActivityLollipop)context).isScrollToChat()){
 			Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
@@ -932,10 +933,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						if(lv==null){
 							log("lv is NULL");
 						}
-						lv.setSelection(4);
+						int scroll = 4;
+						if(pinLock){
+							scroll = scroll + 1;
+						}
+						if (secondaryUpload){
+							scroll = scroll + 9;
+						}
+						else if(cameraUpload){
+							scroll = scroll + 7;
+						}
+
+						lv.setSelection(scroll);
+
 					} catch (Exception e) {}
 				}
-			}, 100);
+			}, 50);
 			((ManagerActivityLollipop)context).setScrollToChat(false);
 		}
 
@@ -1888,7 +1901,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	@Override
 	public void onResume() {
-	    super.onResume();
 	    log("onResume");
 	    prefs=dbH.getPreferences();
 	    
@@ -1932,6 +1944,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatStatusCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
+		super.onResume();
 	}
 	
 	public void afterSetPinLock(){
