@@ -80,18 +80,14 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
-	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-	        int position = recyclerView.getChildPosition(view);
-
-	        // handle long press
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
+			super.onLongPress(e);
 	    }
 	}
 	
@@ -156,8 +152,9 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 		}
 
@@ -232,7 +229,6 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -479,14 +475,12 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 		log("itemClick");
 					
 		if (adapter.isMultipleSelect()){
+			log("multiselect ON");
 			adapter.toggleSelection(position);
+
 			List<MegaUser> users = adapter.getSelectedUsers();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-			else{
-				hideMultipleSelect();
 			}
 		}
 		else{

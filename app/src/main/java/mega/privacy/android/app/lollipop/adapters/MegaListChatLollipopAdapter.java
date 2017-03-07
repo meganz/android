@@ -182,7 +182,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					createMultiselectTick(holder);
+					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.contactInitialLetter.setVisibility(View.GONE);
 				}
 				else{
 					log("NOT selected");
@@ -221,7 +222,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					createMultiselectTick(holder);
+					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+
+					holder.contactInitialLetter.setVisibility(View.GONE);
 				}
 				else{
 					log("NOT selected");
@@ -637,31 +640,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			log("image is NULL -- hide layout for pending messages");
 			holder.layoutPendingMessages.setVisibility(View.GONE);
 		}
-	}
-
-	public void createMultiselectTick (ViewHolderChatList holder){
-		log("createMultiselectTick");
-		holder.imageView.setImageResource(R.drawable.ic_multiselect);
-
-		holder.contactInitialLetter.setVisibility(View.GONE);
-
-//		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-//		Canvas c = new Canvas(defaultAvatar);
-//		Paint p = new Paint();
-//		p.setAntiAlias(true);
-//		p.setColor(context.getResources().getColor(R.color.grey_info_menu));
-//
-//		int radius;
-//		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-//			radius = defaultAvatar.getWidth()/2;
-//		else
-//			radius = defaultAvatar.getHeight()/2;
-//
-//		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-//		holder.imageView.setImageBitmap(defaultAvatar);
-//
-//		holder.contactInitialLetter.setVisibility(View.GONE);
-//		holder.multiselectIcon.setVisibility(View.VISIBLE);
 	}
 
 	public void createGroupChatAvatar(ViewHolderChatList holder){
