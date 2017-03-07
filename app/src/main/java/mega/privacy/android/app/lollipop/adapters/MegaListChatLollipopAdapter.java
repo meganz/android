@@ -157,24 +157,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			log("Chat one to one");
 			long contactHandle = chat.getPeerHandle();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(contactHandle);
-			if(megaApi==null){
-				log("onBindViewHolder: megaApi is Null in Offline mode");
-			}
-			MegaUser user = megaApi.getContact(userHandleEncoded);
-			if(user!=null){
-				log("User email: _"+user.getEmail() + "_"+ contactHandle+ " userHandleEncoded: "+userHandleEncoded);
-			}
-			else{
-				log("El user es NULL: "+contactHandle+ " userHandleEncoded: "+userHandleEncoded);
-			}
-			holder.contactMail = megaChatApi.getContactEmail(contactHandle);
 
+			holder.contactMail = megaChatApi.getContactEmail(contactHandle);
 			if (!multipleSelect) {
 				//Multiselect OFF
 				holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-				setUserAvatar(holder, user);
+				setUserAvatar(holder, userHandleEncoded);
 			} else {
 				log("Multiselect ON");
 
@@ -190,7 +180,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-					setUserAvatar(holder, user);
+					setUserAvatar(holder, userHandleEncoded);
 				}
 			}
 			holder.contactStateIcon.setVisibility(View.VISIBLE);
@@ -244,88 +234,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		setPendingMessages(position, holder);
 
+		setTs(position, holder);
+
 		setLastMessage(position, holder);
-
-		/*
-
-		if(messages!=null){
-			Message lastMessage = messages.get(messages.size()-1);
-
-			if(lastMessage.getType()==Message.TEXT){
-				log("The last message is text!");
-
-				//Set margin contentTextView - more margin bottom duration
-				RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-				contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
-				holder.textViewContent.setLayoutParams(contentTextViewParams);
-
-				String myMail = ((ManagerActivityLollipop) context).getMyAccountInfo().getMyUser().getEmail();
-				if(lastMessage.getUser().getMail().equals(myMail)){
-					log("The last message is mine");
-					Spannable me = new SpannableString("Me: ");
-					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.setText(me);
-					Spannable myMessage = new SpannableString(lastMessage.getMessage());
-					myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.append(myMessage);
-				}
-				else{
-					log("The last message NOT mine");
-					if(lastMessage.isRead()){
-						log("Message READ");
-						holder.textViewContent.setTextColor(context.getResources().getColor(R.color.file_list_second_row));
-					}
-					else{
-						log("Message NOt read");
-						holder.textViewContent.setTextColor(context.getResources().getColor(R.color.accentColor));
-					}
-					holder.textViewContent.setText(lastMessage.getMessage());
-				}
-			}
-			else if(lastMessage.getType()==Message.VIDEO){
-
-				//The last message is a call
-				log("The last message is a call!");
-
-				//Set margin contentTextView - more margin bottom duration
-				RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-				contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(2, outMetrics));
-				holder.textViewContent.setLayoutParams(contentTextViewParams);
-
-//				String videoCallString = context.getResources().getString(R.string.videocall_item);
-				Spannable videoCall = new SpannableString("Video call");
-				videoCall.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context,R.color.file_list_first_row)), 0, videoCall.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-				holder.textViewContent.setText(videoCall);
-				int duration = (int) lastMessage.getDuration();
-				String s = formatStringDuration(duration);
-				Spannable durationString = new SpannableString(s);
-				durationString.setSpan(new RelativeSizeSpan(0.85f), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-				durationString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context,R.color.file_list_second_row)), 0, durationString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-				holder.textViewContent.append(durationString);
-			}
-
-
-			if(chat.isMute()){
-				holder.muteIcon.setVisibility(View.VISIBLE);
-				RelativeLayout.LayoutParams muteIconParams = (RelativeLayout.LayoutParams)holder.muteIcon.getLayoutParams();
-				muteIconParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(14, outMetrics), 0, 0);
-				holder.muteIcon.setLayoutParams(muteIconParams);
-
-				//Set margin
-				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(0, Util.scaleHeightPx(12, outMetrics), 0, 0);
-				holder.textViewContactName.setLayoutParams(nameTextViewParams);
-			}
-			else{
-				holder.muteIcon.setVisibility(View.GONE);
-				//Set margin
-				RelativeLayout.LayoutParams nameTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContactName.getLayoutParams();
-				nameTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), Util.scaleHeightPx(12, outMetrics), 0, 0);
-				holder.textViewContactName.setLayoutParams(nameTextViewParams);
-			}
-
-			holder.textViewDate.setText(TimeChatUtils.formatDate(lastMessage, TimeChatUtils.DATE_LONG_FORMAT));
-		}*/
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
@@ -353,36 +264,83 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageButtonThreeDots.setOnClickListener(this);		
 	}
 
-	public String getParticipantFullName(long userHandle) {
+	public String getParticipantShortName(long userHandle){
+
 		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
 		if (contactDB != null) {
 
-			holder.firstNameText = contactDB.getName();
-			holder.lastNameText = contactDB.getLastName();
+			String participantFirstName = contactDB.getName();
 
-			String fullName;
-
-			if (holder.firstNameText.trim().length() <= 0) {
-				fullName = holder.lastNameText;
-			} else {
-				fullName = holder.firstNameText + " " + holder.lastNameText;
+			if(participantFirstName==null){
+				participantFirstName="";
 			}
 
-			if (fullName.trim().length() <= 0) {
-				log("Full name empty");
-				return "";
-			}
+			if (participantFirstName.trim().length() <= 0){
+				String participantLastName = contactDB.getLastName();
 
-			return fullName;
+				if(participantLastName == null){
+					participantLastName="";
+				}
+
+				if (participantLastName.trim().length() <= 0){
+					String stringHandle = megaApi.handleToBase64(userHandle);
+					MegaUser megaContact = megaApi.getContact(stringHandle);
+					if(megaContact!=null){
+						return megaContact.getEmail();
+					}
+					else{
+						return "No name";
+					}
+				}
+				else{
+					return participantLastName;
+				}
+			}
+			else{
+				return participantFirstName;
+			}
 		} else {
+			log("Find non contact!");
+
+			NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
+
+			if(nonContact!=null){
+				String nonContactFirstName = nonContact.getFirstName();
+
+				if(nonContactFirstName==null){
+					nonContactFirstName="";
+				}
+
+				if (nonContactFirstName.trim().length() <= 0){
+					String nonContactLastName = nonContact.getLastName();
+
+					if(nonContactLastName == null){
+						nonContactLastName="";
+					}
+
+					if (nonContactLastName.trim().length() <= 0){
+						log("Ask for email of a non contact");
+					}
+					else{
+						return nonContactLastName;
+					}
+				}
+				else{
+					return nonContactFirstName;
+				}
+			}
+			else{
+				log("Ask for non contact info");
+			}
+
 			return "";
 		}
 	}
 
-	public void setUserAvatar(ViewHolderChatList holder, MegaUser contact){
+	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
 		log("setUserAvatar");
 
-		createDefaultAvatar(holder);
+		createDefaultAvatar(holder, userHandle);
 
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
 
@@ -402,6 +360,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (bitmap == null) {
 					avatar.delete();
+
+					if(megaApi==null){
+						log("setUserAvatar: megaApi is Null in Offline mode");
+						return;
+					}
+
+					MegaUser contact = megaApi.getContact(holder.contactMail);
+
 					if(contact!=null){
 						if (context.getExternalCacheDir() != null){
 							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
@@ -410,6 +376,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 						}
 					}
+					else{
+						log("Contact is NULL");
+					}
 				}
 				else{
 					holder.contactInitialLetter.setVisibility(View.GONE);
@@ -417,6 +386,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 			else{
+				if(megaApi==null){
+					log("setUserAvatar: megaApi is Null in Offline mode");
+					return;
+				}
+
+				MegaUser contact = megaApi.getContact(holder.contactMail);
 				if(contact!=null){
 					if (context.getExternalCacheDir() != null){
 						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
@@ -425,9 +400,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 					}
 				}
+				else{
+					log("Contact is NULL");
+				}
 			}
 		}
 		else{
+			if(megaApi==null){
+				log("setUserAvatar: megaApi is Null in Offline mode");
+				return;
+			}
+
+			MegaUser contact = megaApi.getContact(holder.contactMail);
 			if(contact!=null){
 				if (context.getExternalCacheDir() != null){
 					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
@@ -435,6 +419,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 				}
+			}
+			else{
+				log("Contact is NULL");
 			}
 		}
 	}
@@ -684,7 +671,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 	
-	public void createDefaultAvatar(ViewHolderChatList holder){
+	public void createDefaultAvatar(ViewHolderChatList holder, String userHandle){
 		log("createDefaultAvatar()");
 		
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -692,20 +679,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 
-		MegaUser contact = megaApi.getContact(holder.contactMail);
-		if(contact!=null){
-			String color = megaApi.getUserAvatarColor(contact);
-			if(color!=null){
-				log("The color to set the avatar is "+color);
-				p.setColor(Color.parseColor(color));
-			}
-			else{
-				log("Default color to the avatar");
-				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
-			}
+		String color = megaApi.getUserAvatarColor(userHandle);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
 		}
 		else{
-			log("Contact is NULL");
+			log("Default color to the avatar");
 			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		}
 
@@ -962,40 +942,61 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 
 		if(holder!=null){
-			MegaChatListItem chat = chats.get(position);
 
+			MegaChatListItem chat = chats.get(position);
 			String title = chat.getTitle();
+
 			if(title!=null){
-				if(title.isEmpty()){
-					log("Chat title is empty");
+				log("ChatRoom title: "+title);
+				log("chat timestamp: "+chat.getLastTimestamp());
+				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				log("date timestamp: "+date);
+				holder.textViewContactName.setText(title);
+
+				if(!chat.isGroup()){
+					holder.fullName = title;
 				}
 				else{
-					if(title.trim().length()<=0){
-						log("Chat title is length < 0");
+					if (title.length() > 0){
+						String chatTitle = title.trim();
+						String firstLetter = chatTitle.charAt(0) + "";
+						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						holder.contactInitialLetter.setText(firstLetter);
 					}
-					else{
-						log("Chat TITLE: "+title);
-					}
+
+					createGroupChatAvatar(holder);
 				}
 			}
-			else{
-				log("Chat title is NULL");
-			}
 
-			holder.textViewContactName.setText(title);
-			if(!chat.isGroup()){
-				holder.fullName = title;
+		}
+	}
+
+	public void setTs(int position, ViewHolderChatList holder) {
+		log("setTs");
+
+		if (holder == null) {
+			holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
+		}
+
+		if(holder!=null){
+			MegaChatListItem chat = chats.get(position);
+
+			int messageType = chat.getLastMessageType();
+
+			if(messageType==MegaChatMessage.TYPE_INVALID) {
+				holder.textViewDate.setVisibility(View.GONE);
 			}
 			else{
-				if (title.length() > 0){
-					String chatTitle = title.trim();
-					String firstLetter = chatTitle.charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					holder.contactInitialLetter.setText(firstLetter);
-				}
-
-				createGroupChatAvatar(holder);
+				log("ChatRoom title: "+chat.getTitle());
+				log("chat timestamp: "+chat.getLastTimestamp());
+				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				log("date timestamp: "+date);
+				holder.textViewDate.setText(date);
+				holder.textViewDate.setVisibility(View.VISIBLE);
 			}
+		}
+		else{
+			log("holder is NULL");
 		}
 	}
 
@@ -1063,102 +1064,63 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-			MegaChatMessage lastMessage =chat.getLastMessage();
-			if(lastMessage!=null){
-				String date = TimeChatUtils.formatDateAndTime(lastMessage, TimeChatUtils.DATE_LONG_FORMAT);
-				holder.textViewDate.setText(date);
-				holder.textViewDate.setVisibility(View.VISIBLE);
 
-				if(lastMessage.isManagementMessage()){
-					if(lastMessage.getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
-						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-					}
-					else{
-						holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-					}
-					holder.textViewContent.setText("Management message");
+			int messageType = chat.getLastMessageType();
+			String lastMessageString = chat.getLastMessage();
+
+			switch(messageType){
+				case MegaChatMessage.TYPE_INVALID:{
+					holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
+					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+					holder.textViewDate.setVisibility(View.GONE);
+					break;
 				}
-				else{
-					log("The last message is text!");
+				case MegaChatMessage.TYPE_NORMAL:{
 
-					//Set margin contentTextView - more margin bottom duration
-//					RelativeLayout.LayoutParams contentTextViewParams = (RelativeLayout.LayoutParams)holder.textViewContent.getLayoutParams();
-//					contentTextViewParams.setMargins(Util.scaleWidthPx(13, outMetrics), 0, Util.scaleWidthPx(65, outMetrics), 2);
-//					holder.textViewContent.setLayoutParams(contentTextViewParams);
+					if(lastMessageString==null){
+						lastMessageString = context.getString(R.string.error_message_unrecognizable);
+					}
 
-					if(lastMessage.getUserHandle()==megaChatApi.getMyUserHandle()){
+					log("MegaChatMessage.TYPE_NORMAL: "+lastMessageString);
+
+					if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+
 						log("The last message is mine");
 						Spannable me = new SpannableString("Me: ");
 						me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						holder.textViewContent.setText(me);
-						if(lastMessage.isDeleted()){
-							Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
-							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						if(lastMessageString!=null) {
+							Spannable myMessage = new SpannableString(lastMessageString);
+							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							holder.textViewContent.append(myMessage);
-						}else{
-							if(lastMessage.getContent()!=null) {
-								Spannable myMessage = new SpannableString(lastMessage.getContent());
-								myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								holder.textViewContent.append(myMessage);
-							}
 						}
 					}
 					else{
 						log("The last message NOT mine");
-						String fullNameAction = getParticipantFullName(lastMessage.getUserHandle());
-
-						if(fullNameAction.trim().length()<=0){
-							log("No name!");
-							NonContactInfo nonContact = dbH.findNonContactByHandle(lastMessage.getUserHandle()+"");
-							if(nonContact!=null){
-								fullNameAction = nonContact.getFullName();
-							}
-							else{
-								log("Ask for name non-contact");
-								fullNameAction = "Non-contact";
-//							log("1-Call for nonContactName: "+ lastMessage.getUserHandle());
-//							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMessage.getUserHandle());
-//							megaChatApi.getUserFirstname(lastMessage.getUserHandle(), listener);
-//							megaChatApi.getUserLastname(lastMessage.getUserHandle(), listener);
-							}
-						}
+						String fullNameAction = getParticipantShortName(chat.getLastMessageSender());
 
 						if(chat.isGroup()){
 							Spannable name = new SpannableString(fullNameAction+": ");
 							name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							holder.textViewContent.setText(name);
 
-							if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
+							if(chat.getUnreadCount()==0){
 								log("Message READ");
-								if(lastMessage.isDeleted()){
-									Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									log("My message: "+myMessage);
-									holder.textViewContent.append(myMessage);
-								}
-								else{
-									Spannable myMessage = new SpannableString(lastMessage.getContent());
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									holder.textViewContent.append(myMessage);
-								}
+
+								Spannable myMessage = new SpannableString(lastMessageString);
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								holder.textViewContent.append(myMessage);
 							}
 							else{
 								log("Message NOt read");
-
-								if(lastMessage.isDeleted()){
-									Spannable myMessage = new SpannableString(context.getString(R.string.list_message_deleted));
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									holder.textViewContent.append(myMessage);
-								}
-								else{
-									Spannable myMessage = new SpannableString(lastMessage.getContent());
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									holder.textViewContent.append(myMessage);
-								}
+								Spannable myMessage = new SpannableString(lastMessageString);
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								holder.textViewContent.append(myMessage);
 							}
 						}
 						else{
-							if(lastMessage.getStatus()==MegaChatMessage.STATUS_SEEN){
+							if(chat.getUnreadCount()==0){
 								log("Message READ");
 								holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 							}
@@ -1166,21 +1128,30 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								log("Message NOt read");
 								holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 							}
-							if(lastMessage.isDeleted()){
-								holder.textViewContent.setText(context.getString(R.string.list_message_deleted));
-							}
-							else{
-								holder.textViewContent.setText(lastMessage.getContent());
-							}
+
+							holder.textViewContent.setText(lastMessageString);
 						}
 
 					}
+
+					break;
 				}
-			}
-			else{
-				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
-				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-				holder.textViewDate.setVisibility(View.GONE);
+				case MegaChatMessage.TYPE_ATTACHMENT:{
+					log("Message type attached!!");
+					holder.textViewContent.setText("Attached: "+lastMessageString);
+					break;
+				}
+				case MegaChatMessage.TYPE_CONTACT:{
+					log("Mesasge type contact!!");
+					holder.textViewContent.setText("Contact: "+lastMessageString);
+					break;
+				}
+				default:{
+					holder.textViewContent.setText("Loading...");
+					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+					holder.textViewDate.setVisibility(View.GONE);
+				}
+
 			}
 		}
 		else{

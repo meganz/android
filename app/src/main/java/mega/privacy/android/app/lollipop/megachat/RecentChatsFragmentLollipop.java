@@ -54,7 +54,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
 public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
@@ -297,17 +296,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 Collections.sort(chats, new Comparator<MegaChatListItem> (){
 
                     public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                        MegaChatMessage message1 = c1.getLastMessage();
-                        long timestamp1 = -1;
-                        if(message1!=null){
-                            timestamp1 = message1.getTimestamp();
-                        }
-
-                        MegaChatMessage message2 = c2.getLastMessage();
-                        long timestamp2 = -1;
-                        if(message2!=null){
-                            timestamp2 = message2.getTimestamp();
-                        }
+                        long timestamp1 = c1.getLastTimestamp();
+                        long timestamp2 = c2.getLastTimestamp();
 
                         long result = timestamp2 - timestamp1;
                         return (int)result;
@@ -727,6 +717,36 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                 }
             }
         }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)){
+            log("Change last ts: "+item.getChanges());
+
+            long chatHandleToUpdate = item.getChatId();
+            int indexToReplace = -1;
+            ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+            while (itrReplace.hasNext()) {
+                MegaChatListItem chat = itrReplace.next();
+                if(chat!=null){
+                    if(chat.getChatId()==chatHandleToUpdate){
+                        indexToReplace = itrReplace.nextIndex()-1;
+                        break;
+                    }
+                }
+                else{
+                    break;
+                }
+            }
+            if(indexToReplace!=-1){
+                log("Index to replace: "+indexToReplace);
+                chats.set(indexToReplace, item);
+                if(indexToReplace==0){
+                    onLastTsChange(indexToReplace, false);
+                }
+                else{
+                    onLastTsChange(indexToReplace, true);
+                }
+            }
+
+        }
         else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
             log("listItemUpdate: Change title: "+item.getTitle());
 
@@ -760,7 +780,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                     }
                 }
             }
-
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
             log("listItemUpdate: Change last message: "+item.getChanges());
@@ -788,11 +807,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
                     }
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
+                        log("New title: "+item.getTitle());
+
                         chats.set(indexToReplace, item);
                         onLastMessageChange(indexToReplace);
                     }
                 }
             }
+
 
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
@@ -901,15 +923,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         adapterList.setStatus(position, null);
     }
 
-    public void onLastMessageChange(int position){
-
-        log("onLastMessageChange: "+position);
-
-        adapterList.setLastMessage(position, null);
-
-        interactionUpdate(position);
-    }
-
     public void onTitleChange(int position){
         log("onTitleChange");
 
@@ -926,6 +939,26 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         if(updateOrder){
             interactionUpdate(position);
         }
+    }
+
+    public void onLastTsChange(int position, boolean updateOrder){
+        log("onLastTsChange");
+
+        adapterList.setTs(position, null);
+
+        if(updateOrder){
+            interactionUpdate(position);
+        }
+    }
+
+    public void onLastMessageChange(int position){
+        log("onLastMessageChange");
+
+        adapterList.setLastMessage(position, null);
+
+//        if(updateOrder){
+//            interactionUpdate(position);
+//        }
     }
 
     public void showMuteIcon(MegaChatListItem item){
