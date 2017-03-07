@@ -122,31 +122,16 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//		@Override
-//	    public boolean onSingleTapConfirmed(MotionEvent e) {
-//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//	        int position = listView.getChildPosition(view);
-//
-//	        // handle single tap
-//	        itemClick(view, position);
-//
-//	        return super.onSingleTapConfirmed(e);
-//	    }
-
-	    public void onLongPress(MotionEvent e) {
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
-
-	        // handle long press
+		public void onLongPress(MotionEvent e) {
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
 
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
-	    }
+			}
+			super.onLongPress(e);
+		}
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -208,8 +193,9 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
+			log("onDestroyActionMode");
 			clearSelections();
+			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
 		}
 
@@ -293,15 +279,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
-	}
-	
-	public int getStatusBarHeight() { 
-	      int result = 0;
-	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-	      if (resourceId > 0) {
-	          result = getResources().getDimensionPixelSize(resourceId);
-	      } 
-	      return result;
 	}
 
 	@Override
@@ -410,7 +387,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 				adapter.setParentHandle(-1);
 			}
 
-			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 
 			listView.setAdapter(adapter);
@@ -639,10 +615,13 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 	
 	public void itemClick(int position) {
 		if (adapter.isMultipleSelect()){
+			log("multiselect ON");
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
-//			adapterList.notifyDataSetChanged();
+
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0){
+				updateActionModeTitle();
+			}
 		}
 		else{
 			if (contactNodes.get(position).isFolder()) {
@@ -710,14 +689,12 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 			  		}
 			  		else{
 						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
-			  			adapter.setPositionClicked(-1);
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(contactNodes.get(position).getHandle());
 						((ContactFileListActivityLollipop)context).onFileClick(handleList);
 			  		}
 				} else {
-					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(contactNodes.get(position).getHandle());
@@ -733,48 +710,41 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 		parentHandle = adapter.getParentHandle();
 		((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 
-		if (adapter.getPositionClicked() != -1) {
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			log("return 1");
-			return 1;
+		if (parentHandleStack.isEmpty()) {
+			log("return 0");
+			fab.setVisibility(View.GONE);
+			return 0;
 		} else {
-			if (parentHandleStack.isEmpty()) {
-				log("return 0");
+			parentHandle = parentHandleStack.pop();
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			if (parentHandle == -1) {
 				fab.setVisibility(View.GONE);
-				return 0;
-			} else {
-				parentHandle = parentHandleStack.pop();
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				if (parentHandle == -1) {
-					fab.setVisibility(View.GONE);
-					contactNodes = megaApi.getInShares(contact);
-					if (aB != null){
-						aB.setTitle(R.string.contact_shared_files);
-					}
-					((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
-					adapter.setNodes(contactNodes);
-					listView.scrollToPosition(0);
-					((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-					adapter.setParentHandle(parentHandle);
-					log("return 2");
-					return 2;
-				} else {
-					contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
-					if (aB != null){
-						aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-					}
-					((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
-					adapter.setNodes(contactNodes);
-					listView.scrollToPosition(0);
-					((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-					adapter.setParentHandle(parentHandle);
-					showFabButton(megaApi.getNodeByHandle(parentHandle));
-					log("return 3");
-					return 3;
+				contactNodes = megaApi.getInShares(contact);
+				if (aB != null){
+					aB.setTitle(R.string.contact_shared_files);
 				}
+				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
+				adapter.setNodes(contactNodes);
+				listView.scrollToPosition(0);
+				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
+				adapter.setParentHandle(parentHandle);
+				log("return 2");
+				return 2;
+			} else {
+				contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
+				if (aB != null){
+					aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				}
+				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
+				adapter.setNodes(contactNodes);
+				listView.scrollToPosition(0);
+				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
+				adapter.setParentHandle(parentHandle);
+				showFabButton(megaApi.getNodeByHandle(parentHandle));
+				log("return 3");
+				return 3;
 			}
 		}
 	}
@@ -808,16 +778,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-//		adapterList.startMultiselection();
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				int checkedPosition = checkedItems.keyAt(i);
-//				listView.setItemChecked(checkedPosition, false);
-//			}
-//		}
-		updateActionModeTitle();
-	}	
+	}
 
 	private void updateActionModeTitle() {
 		if (actionMode == null) {
@@ -869,13 +830,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 			actionMode.finish();
 		}
 	}
-	
-	public void setPositionClicked(int positionClicked){
-		if (adapter != null){
-			adapter.setPositionClicked(positionClicked);
-		}	
-	}
-	
+
 	public void notifyDataSetChanged(){		
 		if (adapter != null){
 			adapter.notifyDataSetChanged();

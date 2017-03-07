@@ -8150,7 +8150,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showClearRubbishBinDialog");
 
 		if (rbFLol.isVisible()){
-			rbFLol.setPositionClicked(-1);
 			rbFLol.notifyDataSetChanged();
 		}
 

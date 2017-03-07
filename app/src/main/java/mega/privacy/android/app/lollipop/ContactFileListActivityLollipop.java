@@ -355,6 +355,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if (extras != null){
 			userEmail = extras.getString("name");
 
+
+
 			setContentView(R.layout.activity_main_contact_properties);
 
 			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);

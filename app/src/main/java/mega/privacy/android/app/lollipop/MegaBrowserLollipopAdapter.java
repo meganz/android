@@ -1504,12 +1504,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 	}
 
-	public void setPositionClicked(int position){}
-
-	public int getPositionClicked(){
-		return 0;
-	}
-
 	private static void log(String log) {
 		Util.log("MegaBrowserLollipopAdapter", log);
 	}

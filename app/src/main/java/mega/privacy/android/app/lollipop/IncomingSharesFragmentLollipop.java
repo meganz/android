@@ -412,8 +412,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //				contentText.setText(getInfoFolder(infoNode));
 //				aB.setTitle(infoNode.getName());
 //			}
-			
-			adapter.setPositionClicked(-1);
+
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
@@ -529,7 +528,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				aB.setTitle(infoNode.getName());
 			}						
 			
-			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);		
@@ -599,7 +597,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		adapter.setPositionClicked(-1);
 
 		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 			showProgressBar();
@@ -741,7 +738,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
-				setPositionClicked(-1);
 				
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
@@ -810,7 +806,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			  		}
 			  		else{
 			  			Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-			  			adapter.setPositionClicked(-1);
 			  			adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
@@ -819,7 +814,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					}
 				}
 				else{
-					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
@@ -1039,7 +1033,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				//TODO
 				adapter.setNodes(nodes);
-				setPositionClicked(-1);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
@@ -1130,13 +1123,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //			}
 //		}
 //	}
-	
-	public void setPositionClicked(int positionClicked){
-		if (adapter != null){
-			adapter.setPositionClicked(positionClicked);
-		}	
-	}
-	
+
 	public void notifyDataSetChanged(){
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
@@ -1299,12 +1286,4 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		log("setDeepBrowserTree:" + deepBrowserTree);
 		this.deepBrowserTree = deepBrowserTree;
 	}
-
-	public void resetAdapter(){
-		log("resetAdapter");
-		if(adapter!=null){
-			adapter.setPositionClicked(-1);
-		}
-	}
-
 }
