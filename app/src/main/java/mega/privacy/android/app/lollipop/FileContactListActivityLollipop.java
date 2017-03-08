@@ -120,30 +120,15 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//		@Override
-//	    public boolean onSingleTapConfirmed(MotionEvent e) {
-//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//	        int position = listView.getChildPosition(view);
-//
-//	        // handle single tap
-//	        itemClick(view, position);
-//
-//	        return super.onSingleTapConfirmed(e);
-//	    }
-
 	    public void onLongPress(MotionEvent e) {
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
-
-	        // handle long press
+			log("onLongPress -- RecyclerViewOnGestureListener");
+			// handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
+				actionMode = startSupportActionMode(new ActionBarCallBack());
+			}
+			super.onLongPress(e);
 	    }
 	}
 	
@@ -234,14 +219,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					
 					permissionsDialog = dialogBuilder.create();
 					permissionsDialog.show();
-					
-					adapter.setMultipleSelect(false);
-	
+
 					log("Cambio permisos");
-					
-					adapter.clearSelections();
-					hideMultipleSelect();
-					
+
 					break;
 				}
 				case R.id.action_file_contact_list_delete:{
@@ -263,9 +243,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 							}
 						}
 					}				
-					adapter.setMultipleSelect(false);
-					adapter.clearSelections();
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -294,8 +271,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			log("onDestroyActionMode");
-			adapter.setMultipleSelect(false);
 			adapter.clearSelections();
+			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
 		}
 
@@ -548,8 +525,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-//
-		updateActionModeTitle();
 	}
 	
 	public void selectAll(){
@@ -667,8 +642,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
-//			adapterList.notifyDataSetChanged();
 		}
 	}
 
