@@ -209,6 +209,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 		else{
 			log("adapter type is GRID");
+			if (selectedItems.size() <= 0){
+				((OfflineFragmentLollipop) fragment).hideMultipleSelect();
+			}
 		}
 	}
 
@@ -265,6 +268,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 		else{
 			log("adapter type is GRID");
+			if (selectedItems.size() <= 0){
+				((OfflineFragmentLollipop) fragment).hideMultipleSelect();
+			}
+			notifyItemChanged(positionToflip);
 		}
 	}
 	

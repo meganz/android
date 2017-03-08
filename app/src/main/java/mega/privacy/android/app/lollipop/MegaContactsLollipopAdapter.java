@@ -982,6 +982,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 		else {
 			log("adapter type is GRID");
+			if (selectedItems.size() <= 0){
+				((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+			}
+			notifyItemChanged(positionToflip);
 		}
 	}
 	
@@ -1027,6 +1031,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 		else{
 			log("adapter type is GRID");
+			if (selectedItems.size() <= 0){
+				((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+			}
 		}
 	}
 	
