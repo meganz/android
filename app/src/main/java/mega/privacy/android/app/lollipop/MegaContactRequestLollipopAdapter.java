@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -83,7 +85,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
-        int currentPosition;
         String contactMail;
     	boolean name = false;
     	boolean firstName = false;
@@ -95,32 +96,16 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	@Override
 	public void onBindViewHolder(ViewHolderContactsRequestList holder, int position) {		
 
-		holder.currentPosition = position;
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
 		
 		log("Get the MegaContactRequest");
 		MegaContactRequest contact = (MegaContactRequest) getItem(position);
-		
-		if (!multipleSelect) {
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-		} else {
-			log("Multiselect ON");
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
 
-			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
-			}
-			else{
-				log("NOT selected");
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			}
-		}
 						
 		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
 		{
 			holder.contactMail = contact.getTargetEmail();
-			createDefaultAvatar(holder);
 			holder.textViewContactName.setText(contact.getTargetEmail());
 			log("--------------user target: "+contact.getTargetEmail());
 		}
@@ -128,11 +113,28 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			//Incoming request
 						
 			holder.contactMail = contact.getSourceEmail();
-			createDefaultAvatar(holder);
 			holder.textViewContactName.setText(contact.getSourceEmail());
 			log("--------------user source: "+contact.getSourceEmail());	
 			
-		}		
+		}
+
+		if (!multipleSelect) {
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
+			createDefaultAvatar(holder);
+		} else {
+			log("Multiselect ON");
+
+			if(this.isItemChecked(position)){
+				holder.imageView.setImageResource(R.drawable.ic_multiselect);
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+			}
+			else{
+				log("NOT selected");
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+				createDefaultAvatar(holder);
+			}
+		}
 
 //		holder.name=false;
 //		holder.firstName=false;
@@ -312,7 +314,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		log("setMultipleSelect");
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
@@ -331,6 +332,83 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList view = (MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						if(type==Constants.OUTGOING_REQUEST_ADAPTER)
+						{
+							((SentRequestsFragmentLollipop) fragment).hideMultipleSelect();
+						}
+						else{
+							((ReceivedRequestsFragmentLollipop) fragment).hideMultipleSelect();
+						}
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
+	}
+
+	public void toggleAllSelection(int pos) {
+		log("toggleSelection: "+pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+
+		MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList view = (MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						if(type==Constants.OUTGOING_REQUEST_ADAPTER)
+						{
+							((SentRequestsFragmentLollipop) fragment).hideMultipleSelect();
+						}
+						else{
+							((ReceivedRequestsFragmentLollipop) fragment).hideMultipleSelect();
+						}
+					}
+					notifyItemChanged(positionToflip);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
 	}
 	
 	public void selectAll(){
@@ -342,10 +420,12 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-		notifyDataSetChanged();
 	}
 	
 	private boolean isItemChecked(int position) {
@@ -416,7 +496,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	@Override
 	public void onClick(View v) {
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) v.getTag();
-		int currentPosition = holder.currentPosition;
+		int currentPosition = holder.getAdapterPosition();
 		MegaContactRequest c = (MegaContactRequest) getItem(currentPosition);
 		
 		switch (v.getId()){	

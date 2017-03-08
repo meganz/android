@@ -36,14 +36,11 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 
 public class ReceivedRequestsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 
-	public static final String ARG_OBJECT = "object";
-	
-	MegaApiAndroid megaApi;	
+	MegaApiAndroid megaApi;
 	
 	Context context;
 	ActionBar aB;
@@ -67,24 +64,17 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	
 	ArrayList<MegaContactRequest> contacts;
 
-	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
-
 	private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
 		public void onLongPress(MotionEvent e) {
-			log("onLongPress");
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildPosition(view);
+            log("onLongPress -- RecyclerViewOnGestureListener");
+            // handle long press
+            if (!adapterList.isMultipleSelect()){
+                adapterList.setMultipleSelect(true);
 
-			// handle long press
-			if (!adapterList.isMultipleSelect()){
-				adapterList.setMultipleSelect(true);
-
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-
-				itemClick(position);
-			}
-			super.onLongPress(e);
+                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+            }
+            super.onLongPress(e);
 		}
 
 		private void log(String log) {
@@ -146,8 +136,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
+            clearSelections();
 			adapterList.setMultipleSelect(false);
-			clearSelections();
 			((ManagerActivityLollipop)context).showFabButton();
 		}
 
@@ -203,7 +193,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 		if(adapterList.isMultipleSelect()){
 			adapterList.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 
 	private void updateActionModeTitle() {
@@ -258,10 +247,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 			List<MegaContactRequest> users = adapterList.getSelectedRequest();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
-			}
-			else{
-				hideMultipleSelect();
 			}
 		}
 		else{
@@ -476,33 +461,13 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 			}
 		}
 	}
-	
-	public int onBackPressed(){
-		log("onBackPressed");
 
-		if (adapterList.getPositionClicked() != -1){
-			adapterList.setPositionClicked(-1);
-			adapterList.notifyDataSetChanged();
-			return 1;
-		}
-		else{
-			return 0;
-		}
-	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-
-	public void resetAdapter(){
-		log("resetAdapter");
-		if(adapterList!=null){
-			adapterList.setPositionClicked(-1);
-		}
-	}
 
 	@Override
 	public boolean onDown(MotionEvent e) {

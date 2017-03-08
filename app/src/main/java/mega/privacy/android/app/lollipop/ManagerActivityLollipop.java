@@ -6880,18 +6880,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
 					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		    		if (sRFLol != null){
-		    			if (sRFLol.onBackPressed() == 0){
-		    				drawerItem = DrawerItem.CLOUD_DRIVE;
-		    				if (nV != null){
-								Menu nVMenu = nV.getMenu();
-								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-								resetNavigationViewMenu(nVMenu);
-								cloudDrive.setChecked(true);
-								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-							}
-							selectDrawerItemLollipop(drawerItem);
-		    				return;
-		    			}
+                        drawerItem = DrawerItem.CLOUD_DRIVE;
+                        if (nV != null){
+                            Menu nVMenu = nV.getMenu();
+                            MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+                            resetNavigationViewMenu(nVMenu);
+                            cloudDrive.setChecked(true);
+                            cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+                        }
+                        selectDrawerItemLollipop(drawerItem);
+                        return;
 		    		}
 					break;
 				}
@@ -6899,18 +6897,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
 					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		    		if (rRFLol != null){
-		    			if (rRFLol.onBackPressed() == 0){
-		    				drawerItem = DrawerItem.CLOUD_DRIVE;
-		    				if (nV != null){
-								Menu nVMenu = nV.getMenu();
-								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-								resetNavigationViewMenu(nVMenu);
-								cloudDrive.setChecked(true);
-								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-							}
-							selectDrawerItemLollipop(drawerItem);
-		    				return;
-		    			}
+
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						if (nV != null){
+							Menu nVMenu = nV.getMenu();
+							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
+							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+						}
+						selectDrawerItemLollipop(drawerItem);
+						return;
 		    		}
 					break;
 				}
