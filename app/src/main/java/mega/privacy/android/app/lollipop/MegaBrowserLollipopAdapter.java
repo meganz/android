@@ -932,18 +932,26 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}				
 				}
 
-				int accessLevel = megaApi.getAccess(node);
+				int dBT = ((IncomingSharesFragmentLollipop) fragment).getDeepBrowserTree();
 
-				if(accessLevel== MegaShare.ACCESS_FULL){
-					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
-				}
-				else if(accessLevel== MegaShare.ACCESS_READWRITE){
-					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+				if(dBT == 0){
+					int accessLevel = megaApi.getAccess(node);
+
+					if(accessLevel== MegaShare.ACCESS_FULL){
+						holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+					}
+					else if(accessLevel== MegaShare.ACCESS_READWRITE){
+						holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+					}
+					else{
+						holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+					}
+					holder.permissionsIcon.setVisibility(View.VISIBLE);
 				}
 				else{
-					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+					holder.permissionsIcon.setVisibility(View.GONE);
 				}
-				holder.permissionsIcon.setVisibility(View.VISIBLE);
+
 			}
 			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
 				if (!multipleSelect) {
