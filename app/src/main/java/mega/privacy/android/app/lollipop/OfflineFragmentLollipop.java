@@ -130,15 +130,13 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						}
 						handleList.add(n.getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
-					clearSelections();
-					hideMultipleSelect();
+
 					if (documents.size()==1){
 						String path = documents.get(0).getPath() + documents.get(0).getName();
 						MegaNode n = megaApi.getNodeByPath(path);
@@ -151,9 +149,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 					break;
 				}
 				case R.id.cab_menu_share_link:{
-				
-					clearSelections();
-					hideMultipleSelect();
+
 					if (documents.size()==1){
 						String path = documents.get(0).getPath() + documents.get(0).getName();
 						MegaNode n = megaApi.getNodeByPath(path);	
@@ -179,8 +175,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						}
 						handleList.add(n.getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
 					break;
@@ -196,8 +191,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						}
 						handleList.add(n.getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
 					break;
@@ -213,8 +207,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 						}
 						handleList.add(n.getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
 					break;
@@ -224,8 +217,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 					for (int i=0;i<documents.size();i++){
 						nC.deleteOffline(documents.get(i), pathNavigation);
 					}					
-					clearSelections();
-					hideMultipleSelect();
+
 					refreshPaths(documents.get(0));
 					break;
 				}

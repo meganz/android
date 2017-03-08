@@ -104,17 +104,11 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 					break;
 				}
 				case R.id.cab_menu_reinvite:{
-					clearSelections();
-					hideMultipleSelect();
 					ContactController cC = new ContactController(context);
 					cC.reinviteMultipleContacts(requests);
 					break;
 				}
 				case R.id.cab_menu_delete:{
-					clearSelections();
-					hideMultipleSelect();
-					clearSelections();
-					hideMultipleSelect();
 					((ManagerActivityLollipop)context).showConfirmationRemoveContactRequests(requests);
 					break;
 				}
