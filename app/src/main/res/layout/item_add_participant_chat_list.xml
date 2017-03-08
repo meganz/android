@@ -30,6 +30,7 @@
         android:text="@string/add_participants_menu_item"
         android:textColor="@color/accentColor"
         android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
         android:textSize="14sp"
         android:maxLines="1"/>
 

@@ -975,6 +975,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else{
+
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					if(node.isShared()||node.isInShare()){
@@ -1075,22 +1076,15 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
-						if(!multipleSelect){
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							holder.imageView.setImageBitmap(thumb);
-						}
+
+						holder.imageView.setImageBitmap(thumb);
+
 					} else {
 						thumb = ThumbnailUtils
 								.getThumbnailFromFolder(node, context);
 						if (thumb != null) {
-							if(!multipleSelect){
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								holder.imageView.setImageBitmap(thumb);
-							}
+							holder.imageView.setImageBitmap(thumb);
+
 						} else {
 							try {
 								thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
@@ -1098,12 +1092,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							} // Too many AsyncTasks
 
 							if (thumb != null) {
-								if(!multipleSelect){
-									holder.imageView.setImageBitmap(thumb);
-								}
-								else{
-									holder.imageView.setImageBitmap(thumb);
-								}
+								holder.imageView.setImageBitmap(thumb);
 							}
 						}
 					}
@@ -1117,12 +1106,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						params1.setMargins(20, 0, 12, 0);
 						holder.imageView.setLayoutParams(params1);
 
-						if(!multipleSelect){
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							holder.imageView.setImageBitmap(thumb);
-						}
+						holder.imageView.setImageBitmap(thumb);
+
 
 					} else {
 						thumb = ThumbnailUtils
@@ -1134,13 +1119,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							params1.setMargins(20, 0, 12, 0);
 
 							holder.imageView.setLayoutParams(params1);
+							holder.imageView.setImageBitmap(thumb);
 
-							if(!multipleSelect){
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								holder.imageView.setImageBitmap(thumb);
-							}
 						} else {
 							try {
 								ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
@@ -1176,22 +1156,15 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 						thumb = ThumbnailUtils.getThumbnailFromCache(node);
 						if (thumb != null) {
-							if(!multipleSelect){
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								holder.imageView.setImageBitmap(thumb);
-							}
+
+							holder.imageView.setImageBitmap(thumb);
+
 						} else {
 							thumb = ThumbnailUtils
 									.getThumbnailFromFolder(node, context);
 							if (thumb != null) {
-								if(!multipleSelect){
-									holder.imageView.setImageBitmap(thumb);
-								}
-								else{
-									holder.imageView.setImageBitmap(thumb);
-								}
+								holder.imageView.setImageBitmap(thumb);
+
 							} else {
 								try {
 									thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
@@ -1199,12 +1172,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 								} // Too many AsyncTasks
 
 								if (thumb != null) {
-									if(!multipleSelect){
-										holder.imageView.setImageBitmap(thumb);
-									}
-									else{
-										holder.imageView.setImageBitmap(thumb);
-									}
+									holder.imageView.setImageBitmap(thumb);
 								}
 							}
 						}
@@ -1219,12 +1187,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							params1.setMargins(20, 0, 12, 0);
 							holder.imageView.setLayoutParams(params1);
 
-							if(!multipleSelect){
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								holder.imageView.setImageBitmap(thumb);
-							}
+							holder.imageView.setImageBitmap(thumb);
+
 
 						} else {
 							thumb = ThumbnailUtils
@@ -1236,13 +1200,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 								params1.setMargins(20, 0, 12, 0);
 
 								holder.imageView.setLayoutParams(params1);
+								holder.imageView.setImageBitmap(thumb);
 
-								if(!multipleSelect){
-									holder.imageView.setImageBitmap(thumb);
-								}
-								else{
-									holder.imageView.setImageBitmap(thumb);
-								}
 							} else {
 								log("NOT thumbnail");
 								holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
