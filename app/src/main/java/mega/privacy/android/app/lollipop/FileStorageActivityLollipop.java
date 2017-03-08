@@ -140,34 +140,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//		@Override
-//	    public boolean onSingleTapConfirmed(MotionEvent e) {
-//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//	        int position = listView.getChildPosition(view);
-//
-//	        // handle single tap
-//	        itemClick(view, position);
-//
-//	        return super.onSingleTapConfirmed(e);
-//	    }
-
 	    public void onLongPress(MotionEvent e) {
 	    	log("onLongPress");
 	    	
 			if (mode == Mode.PICK_FILE) {
-				log("mode PICK_FILE");
-		        View view = listView.findChildViewUnder(e.getX(), e.getY());
-		        int position = listView.getChildPosition(view);
-
+				log("Mode.PICK_FILE");
 				// handle long press
 				if (!adapter.isMultipleSelect()){
 					adapter.setMultipleSelect(true);
 
 					actionMode = startSupportActionMode(new ActionBarCallBack());
-
-					itemClick(position);
 				}
-		        super.onLongPress(e);
+				super.onLongPress(e);
 			}
 	    }
 	}
@@ -226,8 +210,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
 			clearSelections();
+			adapter.setMultipleSelect(false);
 		}
 
 		@Override
@@ -257,7 +241,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			
 			return false;
 		}
-		
 	}
 	
 	public void selectAll(){
@@ -616,7 +599,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-
 	}
 
 	/*
@@ -627,15 +609,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-//		adapterList.startMultiselection();
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				int checkedPosition = checkedItems.keyAt(i);
-//				listView.setItemChecked(checkedPosition, false);
-//			}
-//		}
-		updateActionModeTitle();
 	}
 	
 	/*
@@ -837,8 +810,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if (adapter.isMultipleSelect()){
 			log("MULTISELECT ON");
 			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
+			List<FileDocument> selected = adapter.getSelectedDocuments();
+			if (selected.size() > 0){
+				updateActionModeTitle();
+			}
 //			adapterList.notifyDataSetChanged();
 		}
 		else{
@@ -889,7 +864,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 */
 	void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapter.clearSelections();
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -899,12 +873,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		// If some items are selected, clear selection
-		if (mode == Mode.PICK_FILE && adapter.isMultipleSelect()) {
-			log("mode == Mode.PICK_FILE && getItemCount() > 0");
-			hideMultipleSelect();
-			return;
-		}
 
 		// Finish activity if at the root
 		if (path.equals(root)) {
