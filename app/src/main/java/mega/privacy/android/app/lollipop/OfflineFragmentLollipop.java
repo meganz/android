@@ -55,8 +55,6 @@ import nz.mega.sdk.MegaNode;
 
 public class OfflineFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 	
-	static int FROM_OFFLINE= 15;
-
 	MegaPreferences prefs;
 	
 	Context context;
@@ -103,15 +101,12 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 				}
 	        }
 
-	        // handle long press
 			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(position);
-			}  
-	        super.onLongPress(e);
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
+			super.onLongPress(e);
 	    }
 	}
 	
@@ -257,8 +252,8 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapter.setMultipleSelect(false);
 			clearSelections();
+			adapter.setMultipleSelect(false);
 		}
 
 		@Override
@@ -883,10 +878,6 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-			else{
-				hideMultipleSelect();
 			}
 		}
 		else{
@@ -1056,7 +1047,6 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1140,12 +1130,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 		if (adapter == null){
 			return 0;
 		}
-		
-		if (adapter.isMultipleSelect()){
-			hideMultipleSelect();
-			return 2;
-		}
-		
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
