@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
@@ -34,7 +33,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 
 public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -48,6 +46,8 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
     ImageView nodeThumb;
     TextView nodeName;
     TextView nodeInfo;
+    RelativeLayout nodeIconLayout;
+    ImageView nodeIcon;
     LinearLayout optionDownload;
     LinearLayout optionInfo;
     TextView optionInfoText;
@@ -108,6 +108,8 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         nodeThumb = (ImageView) contentView.findViewById(R.id.contact_file_list_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.contact_file_list_name_text);
         nodeInfo  = (TextView) contentView.findViewById(R.id.contact_file_list_info_text);
+        nodeIconLayout = (RelativeLayout) contentView.findViewById(R.id.contact_file_list_relative_layout_icon);
+        nodeIcon = (ImageView) contentView.findViewById(R.id.contact_file_list_icon);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
         optionInfo = (LinearLayout) contentView.findViewById(R.id.option_properties_layout);
         optionInfoText = (TextView) contentView.findViewById(R.id.option_properties_text);
@@ -139,50 +141,46 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
             long parentHandle = -1;
             parentHandle = ((ContactFileListActivityLollipop) context).getParentHandle();
             log("Parent handle is: "+parentHandle);
+            int accessLevel = megaApi.getAccess(node);
 
             if (node.isFolder()) {
 
                 nodeThumb.setImageResource(R.drawable.ic_folder_shared_list);
                 optionInfoText.setText(R.string.general_folder_info);
+                nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
 
                 if(firstLevel||parentHandle == -1){
                     log("Fist level!!");
                     optionLeave.setVisibility(View.VISIBLE);
-                    ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                    for(int j=0; j<sharesIncoming.size();j++){
-                        MegaShare mS = sharesIncoming.get(j);
-                        if(mS.getNodeHandle()==node.getHandle()){
-                            MegaUser user= megaApi.getContact(mS.getUser());
-                            if(user!=null){
-                                MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                                if(contactDB!=null){
-                                    if(!contactDB.getName().equals("")){
-                                        nodeInfo.setText(contactDB.getName()+" "+contactDB.getLastName());
-                                    }
-                                    else{
-                                        nodeInfo.setText(user.getEmail());
-                                    }
-                                }
-                                else{
-                                    log("The contactDB is null: ");
-                                    nodeInfo.setText(user.getEmail());
-                                }
-                            }
-                            else{
-                                nodeInfo.setText(mS.getUser());
-                            }
+
+                    switch (accessLevel) {
+                        case MegaShare.ACCESS_FULL: {
+                            log("LEVEL 0 - access FULL");
+                            nodeIcon.setImageResource(R.drawable.ic_permissions_full_access);
+                            break;
+                        }
+                        case MegaShare.ACCESS_READ: {
+                            log("LEVEL 0 - access read");
+                            nodeIcon.setImageResource(R.drawable.ic_permissions_read_only);
+                            break;
+                        }
+                        case MegaShare.ACCESS_READWRITE: {
+                            log("LEVEL 0 - readwrite");
+                            nodeIcon.setImageResource(R.drawable.ic_permissions_read_write);
                         }
                     }
+                    nodeIconLayout.setVisibility(View.VISIBLE);
                 }
                 else{
-                    nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
                     optionLeave.setVisibility(View.GONE);
+                    nodeIconLayout.setVisibility(View.GONE);
                 }
 
             } else {
                 optionInfoText.setText(R.string.general_file_info);
                 long nodeSize = node.getSize();
                 nodeInfo.setText(Util.getSizeString(nodeSize));
+                nodeIconLayout.setVisibility(View.GONE);
 
                 if (node.hasThumbnail()) {
                     log("Node has thumbnail");
@@ -208,8 +206,6 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 }
                 optionLeave.setVisibility(View.GONE);
             }
-
-            int accessLevel = megaApi.getAccess(node);
 
             switch (accessLevel) {
                 case MegaShare.ACCESS_FULL: {

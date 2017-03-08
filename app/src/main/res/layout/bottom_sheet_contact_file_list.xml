@@ -7,18 +7,18 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/contact_file_list_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:layout_gravity="center_vertical" >
 
         <RelativeLayout
             android:id="@+id/contact_file_list_relative_layout_thumb"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="12dp">
 
             <ImageView
@@ -28,19 +28,14 @@
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter" />
 
-            <TextView
-                android:id="@+id/contact_file_list_initial_letter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp" />
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="match_parent"
+            android:id="@+id/contact_file_list_relative_layout_info"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/contact_file_list_relative_layout_thumb"
             android:layout_marginLeft="12dp">
 
             <TextView
@@ -68,8 +63,25 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/contact_file_list_relative_layout_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="47dp"
+            android:gravity="right"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/contact_file_list_relative_layout_info">
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/contact_file_list_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
