@@ -156,9 +156,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 								handleListM.add(documents.get(i).getHandle());
 							}
 							
-							clearSelections();
-							hideMultipleSelect();
-							
 							return false;
 						}
 					}
@@ -167,8 +164,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					onFileClick(handleList);
 					break;
 				}

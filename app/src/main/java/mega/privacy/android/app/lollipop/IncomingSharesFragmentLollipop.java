@@ -130,15 +130,13 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
-					clearSelections();
-					hideMultipleSelect();
+
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
@@ -149,8 +147,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
 					break;
@@ -160,15 +157,13 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{
-					clearSelections();
-					hideMultipleSelect();
+
 					if (documents.size()==1){
 						NodeController nC = new NodeController(context);
 						nC.exportLink(documents.get(0));
@@ -189,8 +184,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					((ManagerActivityLollipop) context).showConfirmationLeaveMultipleShares(handleList);
 				}
 			}

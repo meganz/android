@@ -120,8 +120,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
 					break;
@@ -131,8 +130,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}

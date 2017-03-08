@@ -131,8 +131,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 					for (int i = 0; i < documents.size(); i++) {
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					((ContactFileListActivityLollipop)context).onFileClick(handleList);
 					break;
 				}
@@ -141,9 +140,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 					for (int i = 0; i < documents.size(); i++) {
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
-	
+
 					((ContactFileListActivityLollipop)context).showCopyLollipop(handleList);
 					break;
 				}
@@ -160,8 +157,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					clearSelections();
-					hideMultipleSelect();
+
 					((ContactFileListActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
 				}
 			}

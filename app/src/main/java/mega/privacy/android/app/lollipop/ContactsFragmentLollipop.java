@@ -103,8 +103,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 
 			switch(item.getItemId()){
 				case R.id.cab_menu_share_folder:{
-					clearSelections();
-					hideMultipleSelect();
+
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFolderToShare(users);
@@ -112,8 +111,7 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 					break;
 				}
 				case R.id.cab_menu_send_file:{
-					clearSelections();
-					hideMultipleSelect();
+
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFileToSend(users);
@@ -122,9 +120,6 @@ public class ContactsFragmentLollipop extends Fragment implements RecyclerView.O
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
-					clearSelections();
-					hideMultipleSelect();
-
 					break;
 				}
 				case R.id.cab_menu_select_all:{

@@ -102,22 +102,16 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 					break;
 				}
 				case R.id.cab_menu_accept:{
-					clearSelections();
-					hideMultipleSelect();
 					ContactController cC = new ContactController(context);
 					cC.acceptMultipleReceivedRequest(requests);
 					break;
 				}
 				case R.id.cab_menu_ignore:{
-					clearSelections();
-					hideMultipleSelect();
 					ContactController cC = new ContactController(context);
 					cC.ignoreMultipleReceivedRequest(requests);
 					break;
 				}
 				case R.id.cab_menu_decline:{
-					clearSelections();
-					hideMultipleSelect();
 					ContactController cC = new ContactController(context);
 					cC.declineMultipleReceivedRequest(requests);
 					break;
