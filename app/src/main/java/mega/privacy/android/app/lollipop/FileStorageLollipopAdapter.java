@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -52,7 +54,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
     	public TextView textViewFileName;
     	public TextView textViewFileSize;
     	public RelativeLayout itemLayout;
-    	public int currentPosition;
     	public FileDocument document;    	
     	
     	public ViewHolderFileStorage(View itemView) {
@@ -72,8 +73,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	public ViewHolderFileStorage onCreateViewHolder(ViewGroup parent, int viewType) {
 		
 		listFragment = (RecyclerView) parent;
-		//		final int _position = position;
-				
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -98,8 +97,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	
 	@Override
 	public void onBindViewHolder(ViewHolderFileStorage holder, int position){
-	
-		holder.currentPosition = position;
+
 		FileDocument document = currentFiles.get(position);
 
 		holder.textViewFileName.setText(document.getName());
@@ -118,34 +116,62 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			if(document.getFile().canRead() == false){
 				Util.setViewAlpha(holder.imageView, .4f);
 				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params1.setMargins(36, 0, 0, 0);
+				holder.imageView.setLayoutParams(params1);
+
+				if (document.isFolder()){
+					holder.imageView.setImageResource(R.drawable.ic_folder_list);
+				}
+				else{
+					//Document is FILE
+					holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+				}
 			}	
 			else{
 				Util.setViewAlpha(holder.imageView, 1);
 				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
-				
-				if (multipleSelect) {
-					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
+
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params1.setMargins(36, 0, 0, 0);
+				holder.imageView.setLayoutParams(params1);
+
+				if (document.isFolder()){
+
+					if (multipleSelect) {
+						if(this.isItemChecked(position)){
+							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+							holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						}
+						else{
+							holder.imageView.setImageResource(R.drawable.ic_folder_list);
+							holder.itemLayout.setBackgroundColor(Color.WHITE);
+						}
 					}
 					else{
+						holder.imageView.setImageResource(R.drawable.ic_folder_list);
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-					}		
+					}
 				}
 				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					//Document is FILE
+
+					if (multipleSelect) {
+						if(this.isItemChecked(position)){
+							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+							holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						}
+						else{
+							holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+							holder.itemLayout.setBackgroundColor(Color.WHITE);
+						}
+					}
+					else{
+						holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+						holder.itemLayout.setBackgroundColor(Color.WHITE);
+					}
 				}
-			}
-			
-			RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params1.setMargins(36, 0, 0, 0);
-			holder.imageView.setLayoutParams(params1);
-			
-			if (document.isFolder()){	
-				holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			}
-			else{
-				//Document is FILE
-				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());			
 			}
 		}
 		else 
@@ -247,6 +273,70 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		FileStorageLollipopAdapter.ViewHolderFileStorage view = (FileStorageLollipopAdapter.ViewHolderFileStorage) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						((FileStorageActivityLollipop) context).hideMultipleSelect();
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
+	}
+
+	public void toggleAllSelection(int pos) {
+		log("toggleSelection: "+pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+
+		FileStorageLollipopAdapter.ViewHolderFileStorage view = (FileStorageLollipopAdapter.ViewHolderFileStorage) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						((FileStorageActivityLollipop) context).hideMultipleSelect();
+
+					}
+					notifyItemChanged(positionToflip);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
 	}
 	
 	public void selectAll(){
@@ -258,10 +348,12 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}
 
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-		notifyDataSetChanged();
 	}
 	
 	private boolean isItemChecked(int position) {
@@ -316,7 +408,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	public void setMultipleSelect(boolean multipleSelect) {
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
@@ -334,9 +425,9 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		
 		ViewHolderFileStorage holder = (ViewHolderFileStorage) v.getTag();
 
-		int currentPosition = holder.currentPosition;
+		int currentPosition = holder.getAdapterPosition();
 		final FileDocument doc = (FileDocument) getItem(currentPosition);
-		log(" in position: "+holder.currentPosition+" document: "+doc.getName());
+		log(" in position: "+currentPosition+" document: "+doc.getName());
 
 		switch (v.getId()) {		
 			case R.id.file_explorer_item_layout:{
