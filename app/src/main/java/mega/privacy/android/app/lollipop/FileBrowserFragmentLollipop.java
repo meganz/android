@@ -861,7 +861,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;
 			}
 		}
-
 	}
 
     public void itemClick(int position) {

@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -240,18 +242,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	@Override
 	public void onBindViewHolder(ViewHolderShareList holder, int position) {
 		log("onBindViewHolder");
-		
-		if (!multipleSelect) {
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-		} else {
-
-			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
-			}
-			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			}
-		}	
 
 		holder.currentPosition = position;
 		
@@ -280,7 +270,130 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 			MegaUser user = megaApi.getContact(holder.contactMail);
 
-			createDefaultAvatar(holder, user);
+
+			if (!multipleSelect) {
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+				createDefaultAvatar(holder, user);
+
+				UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+				holder.name=false;
+				holder.firstName=false;
+				megaApi.getUserAttribute(contact, 1, listener);
+				megaApi.getUserAttribute(contact, 2, listener);
+
+				File avatar = null;
+				if (context.getExternalCacheDir() != null){
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+				}
+				else{
+					avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+				}
+				Bitmap bitmap = null;
+				if (avatar.exists()){
+					if (avatar.length() > 0){
+						BitmapFactory.Options bOpts = new BitmapFactory.Options();
+						bOpts.inPurgeable = true;
+						bOpts.inInputShareable = true;
+						bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						if (bitmap == null) {
+							avatar.delete();
+							if (context.getExternalCacheDir() != null){
+								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+							else{
+								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+						}
+						else{
+							holder.imageView.setImageBitmap(bitmap);
+							holder.initialLetter.setVisibility(View.GONE);
+						}
+					}
+					else{
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+						}
+					}
+				}
+				else{
+					if (!pendingAvatars.contains(holder.contactMail)){
+						pendingAvatars.add(holder.contactMail);
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+						}
+					}
+				}
+			} else {
+
+				if(this.isItemChecked(position)){
+					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+				}
+				else{
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+					createDefaultAvatar(holder, user);
+
+					UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+					File avatar = null;
+					if (context.getExternalCacheDir() != null){
+						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					}
+					else{
+						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					}
+					Bitmap bitmap = null;
+					if (avatar.exists()){
+						if (avatar.length() > 0){
+							BitmapFactory.Options bOpts = new BitmapFactory.Options();
+							bOpts.inPurgeable = true;
+							bOpts.inInputShareable = true;
+							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+							if (bitmap == null) {
+								avatar.delete();
+								if (context.getExternalCacheDir() != null){
+									megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+								}
+								else{
+									megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+								}
+							}
+							else{
+								holder.imageView.setImageBitmap(bitmap);
+								holder.initialLetter.setVisibility(View.GONE);
+							}
+						}
+						else{
+							if (context.getExternalCacheDir() != null){
+								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+							else{
+								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+						}
+					}
+					else{
+						if (!pendingAvatars.contains(holder.contactMail)){
+							pendingAvatars.add(holder.contactMail);
+							if (context.getExternalCacheDir() != null){
+								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+							else{
+								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+						}
+					}
+				}
+			}
 			
 			int accessLevel = share.getAccess();
 			switch(accessLevel){
@@ -296,62 +409,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				case MegaShare.ACCESS_READWRITE:{
 					holder.textViewPermissions.setText(context.getString(R.string.file_properties_shared_folder_read_write));
 					break;	
-				}
-			}
-			
-			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
-			
-			holder.name=false;
-			holder.firstName=false;
-			megaApi.getUserAttribute(contact, 1, listener);
-			megaApi.getUserAttribute(contact, 2, listener);
-			
-			File avatar = null;
-			if (context.getExternalCacheDir() != null){
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-			}
-			else{
-				avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-			}
-			Bitmap bitmap = null;
-			if (avatar.exists()){
-				if (avatar.length() > 0){
-					BitmapFactory.Options bOpts = new BitmapFactory.Options();
-					bOpts.inPurgeable = true;
-					bOpts.inInputShareable = true;
-					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-					if (bitmap == null) {
-						avatar.delete();
-						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-						}
-						else{
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-						}
-					}
-					else{
-						holder.imageView.setImageBitmap(bitmap);
-						holder.initialLetter.setVisibility(View.GONE);
-					}
-				}
-				else{
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);	
-					}
-					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);	
-					}			
-				}
-			}	
-			else{
-				if (!pendingAvatars.contains(holder.contactMail)){
-					pendingAvatars.add(holder.contactMail);
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-					}
-					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-					}
 				}
 			}
 		}
@@ -503,7 +560,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	public void setMultipleSelect(boolean multipleSelect) {
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-			notifyDataSetChanged();
 		}
 		if(this.multipleSelect)
 		{
@@ -522,13 +578,79 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		MegaSharedFolderLollipopAdapter.ViewHolderShareList view = (MegaSharedFolderLollipopAdapter.ViewHolderShareList) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						((FileContactListActivityLollipop) context).hideMultipleSelect();
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
 	}
-	
+
+	public void toggleAllSelection(int pos) {
+		log("toggleSelection: "+pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+
+		log("adapter type is LIST");
+		MegaSharedFolderLollipopAdapter.ViewHolderShareList view = (MegaSharedFolderLollipopAdapter.ViewHolderShareList) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						((FileContactListActivityLollipop) context).hideMultipleSelect();
+					}
+					notifyItemChanged(positionToflip);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
+	}
 
 	public void selectAll(){
+		log("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
-			if(!isItemChecked(i)){
-				toggleSelection(i);
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
 			}
 		}
 	}
@@ -555,10 +677,12 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	}
 	
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-		notifyDataSetChanged();
 	}
 	
 	private boolean isItemChecked(int position) {
