@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -54,7 +55,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     ImageView nodeThumb;
     TextView nodeName;
     TextView nodeInfo;
-    RelativeLayout nodePublicLink;
+    RelativeLayout nodeIconLayout;
+    ImageView nodeIcon;
     LinearLayout optionDownload;
     LinearLayout optionInfo;
     TextView optionInfoText;
@@ -130,7 +132,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_name_text);
         nodeInfo  = (TextView) contentView.findViewById(R.id.node_info_text);
-        nodePublicLink = (RelativeLayout) contentView.findViewById(R.id.node_relative_layout_public_link);
+        nodeIconLayout = (RelativeLayout) contentView.findViewById(R.id.node_relative_layout_icon);
+        nodeIcon = (ImageView) contentView.findViewById(R.id.node_icon);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
         optionInfo = (LinearLayout) contentView.findViewById(R.id.option_properties_layout);
         optionInfoText = (TextView) contentView.findViewById(R.id.option_properties_text);
@@ -166,6 +169,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionRubbishBin.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
+
+        nodeIconLayout.setVisibility(View.GONE);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             log("onCreate: Landscape configuration");
@@ -236,16 +241,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         if(node.isExported()){
                             //Node has public link
-                            nodePublicLink.setVisibility(View.VISIBLE);
+                            nodeIconLayout.setVisibility(View.VISIBLE);
+                            nodeIcon.setImageResource(R.drawable.link_ic);
+                            nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
+
                             optionLinkText.setText(R.string.edit_link_option);
                             optionRemoveLink.setVisibility(View.VISIBLE);
                             if(node.isExpired()){
                                 log("Node exported but expired!!");
-                                nodePublicLink.setVisibility(View.GONE);
+                                nodeIconLayout.setVisibility(View.GONE);
                             }
                         }
                         else{
-                            nodePublicLink.setVisibility(View.GONE);
+                            nodeIconLayout.setVisibility(View.GONE);
                             optionLinkText.setText(R.string.context_get_link_menu);
                             optionRemoveLink.setVisibility(View.GONE);
                         }
@@ -287,7 +295,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionInfoText.setText(R.string.general_file_info);
                         }
 
-                        nodePublicLink.setVisibility(View.GONE);
+                        nodeIconLayout.setVisibility(View.GONE);
 
                         optionMove.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.VISIBLE);
@@ -323,16 +331,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     if(node.isExported()){
                         //Node has public link
-                        nodePublicLink.setVisibility(View.VISIBLE);
+                        nodeIconLayout.setVisibility(View.VISIBLE);
+                        nodeIcon.setImageResource(R.drawable.link_ic);
+                        nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if(node.isExpired()){
                             log("Node exported but expired!!");
-                            nodePublicLink.setVisibility(View.GONE);
+                            nodeIconLayout.setVisibility(View.GONE);
                         }
                     }
                     else{
-                        nodePublicLink.setVisibility(View.GONE);
+                        nodeIconLayout.setVisibility(View.GONE);
                         optionLinkText.setText(R.string.context_get_link_menu);
                         optionRemoveLink.setVisibility(View.GONE);
                     }
@@ -369,7 +379,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionInfoText.setText(R.string.general_file_info);
                         }
 
-                        nodePublicLink.setVisibility(View.GONE);
+                        nodeIconLayout.setVisibility(View.VISIBLE);
 
                         int accessLevel = megaApi.getAccess(node);
                         log("Node: " + node.getName() + " " + accessLevel);
@@ -385,6 +395,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         log("DeepTree value:" + dBT);
                         if (dBT > 0) {
                             optionLeaveShares.setVisibility(View.GONE);
+                            nodeIconLayout.setVisibility(View.GONE);
                         } else {
                             //Show the owner of the shared folder
                             ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -410,6 +421,23 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                 }
                             }
                             optionLeaveShares.setVisibility(View.VISIBLE);
+
+                            switch (accessLevel) {
+                                case MegaShare.ACCESS_FULL: {
+                                    log("LEVEL 0 - access FULL");
+                                    nodeIcon.setImageResource(R.drawable.ic_permissions_full_access);
+                                    break;
+                                }
+                                case MegaShare.ACCESS_READ: {
+                                    log("LEVEL 0 - access read");
+                                    nodeIcon.setImageResource(R.drawable.ic_permissions_read_only);
+                                    break;
+                                }
+                                case MegaShare.ACCESS_READWRITE: {
+                                    log("LEVEL 0 - readwrite");
+                                    nodeIcon.setImageResource(R.drawable.ic_permissions_read_write);
+                                }
+                            }
                         }
 
                         switch (accessLevel) {
@@ -465,14 +493,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         if(node.isExported()){
                             //Node has public link
-                            nodePublicLink.setVisibility(View.VISIBLE);
+                            nodeIconLayout.setVisibility(View.VISIBLE);
+                            nodeIcon.setImageResource(R.drawable.link_ic);
+                            nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
                             if(node.isExpired()){
                                 log("Node exported but expired!!");
-                                nodePublicLink.setVisibility(View.GONE);
+                                nodeIconLayout.setVisibility(View.GONE);
                             }
                         }
                         else{
-                            nodePublicLink.setVisibility(View.GONE);
+                            nodeIconLayout.setVisibility(View.GONE);
                         }
 
                         if (((ManagerActivityLollipop) context).getDeepBrowserTreeOutgoing() == 0) {
@@ -521,16 +551,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     if(node.isExported()){
                         //Node has public link
-                        nodePublicLink.setVisibility(View.VISIBLE);
+                        nodeIconLayout.setVisibility(View.VISIBLE);
+                        nodeIcon.setImageResource(R.drawable.link_ic);
+                        nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if(node.isExpired()){
                             log("Node exported but expired!!");
-                            nodePublicLink.setVisibility(View.GONE);
+                            nodeIconLayout.setVisibility(View.GONE);
                         }
                     }
                     else{
-                        nodePublicLink.setVisibility(View.GONE);
+                        nodeIconLayout.setVisibility(View.GONE);
                         optionLinkText.setText(R.string.context_get_link_menu);
                         optionRemoveLink.setVisibility(View.GONE);
                     }

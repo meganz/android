@@ -61,7 +61,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/node_relative_layout_public_link"
+            android:id="@+id/node_relative_layout_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="47dp"
@@ -71,15 +71,12 @@
             android:layout_toRightOf="@id/node_relative_layout_info">
 
             <ImageView
-                android:id="@+id/node_public_link"
+                android:id="@+id/node_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/link_ic"
-                android:background="@null"
-                android:tint="@color/transparency_white"/>
+                android:background="@null"/>
 
         </RelativeLayout>
-
 
     </RelativeLayout>
 
