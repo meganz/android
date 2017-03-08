@@ -60,7 +60,7 @@
     <item
         android:id="@+id/cab_menu_share_link"
         android:orderInCategory="125"
-        android:icon="@drawable/link_ic"
+        android:icon="@drawable/ic_link_white"
         android:tint="@color/white"
         android:title="@string/context_get_link_menu"
         MEGA:showAsAction="never" />
