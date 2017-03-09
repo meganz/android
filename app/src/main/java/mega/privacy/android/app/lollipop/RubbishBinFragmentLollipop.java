@@ -586,6 +586,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				}
 				else{
 					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					if(lastFirstVisiblePosition==-1){
+						log("Completely -1 then find just visible position");
+						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+					}
 				}
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
