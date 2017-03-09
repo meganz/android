@@ -17,13 +17,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -61,7 +58,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
 
-public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
 
 	public static int GRID_WIDTH =400;
 
@@ -82,8 +79,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ProgressBar progressBar;
 
 	Stack<Integer> lastPositionStack;
-
-	boolean multiselectActivation = false;
 
 	MegaApiAndroid megaApi;
 
@@ -109,25 +104,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-	    public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-
-			View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-			int position = recyclerView.getChildAdapterPosition(view);
-	        // handle long press
-	        activateActionMode();
-			itemClick(position);
-	        super.onLongPress(e);
-	    }
-	}
-
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
-			multiselectActivation = true;
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
@@ -475,9 +455,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (isList){
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
+
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
@@ -485,7 +463,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
-			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
@@ -569,8 +546,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
@@ -583,9 +558,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //					return 1;
 //				}
 //			});
-
-			recyclerView.addOnItemTouchListener(this);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
@@ -877,11 +850,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
     public void itemClick(int position) {
 		log("item click position: " + position);
-
-		if(multiselectActivation){
-			multiselectActivation = false;
-			return;
-		}
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1438,77 +1406,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		log("onDown");
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		log("onSingleTapUp");
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		log("onScroll");
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		log("onLongPress");
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		log("onInterceptTouchEvent: "+e.getAction());
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public int getItemCount(){
 		if(adapter!=null){
 			return adapter.getItemCount();
 		}
 		return 0;
-	}
-
-	public boolean isMultiselectActivation() {
-		log("isMultiselectActivation: "+multiselectActivation);
-		return multiselectActivation;
-	}
-
-	public void setMultiselectActivation(boolean multiselectActivation) {
-		log("setMultiselectActivation: "+multiselectActivation);
-		this.multiselectActivation = multiselectActivation;
 	}
 }
