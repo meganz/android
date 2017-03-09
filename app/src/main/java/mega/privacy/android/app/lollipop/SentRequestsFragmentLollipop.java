@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -13,12 +12,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -38,7 +35,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
-public class SentRequestsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class SentRequestsFragmentLollipop extends Fragment {
 	
 	public static int GRID_WIDTH =400;
 
@@ -48,7 +45,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 	ActionBar aB;
 	RecyclerView listView;
 	MegaContactRequestLollipopAdapter adapterList;
-	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
@@ -68,19 +64,12 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 	SentRequestsFragmentLollipop sentRequestsFragment = this;
 	
 	ArrayList<MegaContactRequest> contacts;
-//	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
-	
-	private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-		public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapterList.isMultipleSelect()){
-				adapterList.setMultipleSelect(true);
-
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
+//
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapterList.isMultipleSelect()){
+			adapterList.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 
@@ -291,8 +280,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
     	log("onCreateView");
 
-		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -322,8 +309,6 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
-			//Just onClick implemented
-			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator());		        
 	        
 	        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
@@ -394,45 +379,12 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 		}
 	}
 
-//	public int onBackPressed(){
-//		log("onBackPressed");
-//
-//		if (adapterList.getPositionClicked() != -1){
-//			adapterList.setPositionClicked(-1);
-//			adapterList.notifyDataSetChanged();
-//			return 1;
-//		}
-//		else{
-//			return 0;
-//		}
-//	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-		return false;
-	}
 
 	public void itemClick(int position) {
 		log("itemClick");
@@ -447,31 +399,5 @@ public class SentRequestsFragmentLollipop extends Fragment implements RecyclerVi
 		else{
 			log("nothing, not multiple select");
 		}
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
 	}
 }

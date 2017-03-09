@@ -56,7 +56,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener {
+public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener {
 
 	static public int ADAPTER_RECENT_CHATS = 0;
 	static public int ADAPTER_ARCHIVED_CHATS = ADAPTER_RECENT_CHATS+1;
@@ -486,6 +486,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
 
 		holder.itemLayout.setOnClickListener(this);
+		holder.itemLayout.setOnLongClickListener(this);
 
 		v.setTag(holder);
 
@@ -782,16 +783,49 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			selectedItems = new SparseBooleanArray();
 		}
 	}
-	
-	public void toggleSelection(int pos) {
+
+	public void toggleAllSelection(int pos) {
 		log("toggleSelection");
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
 
 		ViewHolderChatList view = (ViewHolderChatList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
 			log("Start animation: "+pos);
 			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+						((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					notifyItemChanged(positionToflip);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
 			view.imageView.startAnimation(flipAnimation);
 		}
+	}
+	
+	public void toggleSelection(int pos) {
+		log("toggleSelection");
 
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
@@ -802,6 +836,31 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		ViewHolderChatList view = (ViewHolderChatList) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
 	}
 
 	public void selectAll(){
@@ -813,10 +872,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-//		notifyDataSetChanged();
 	}
 	
 	private boolean isItemChecked(int position) {
@@ -908,6 +969,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				break;
 			}
 		}
+	}
+
+	@Override
+	public boolean onLongClick(View view) {
+		log("OnLongCLick");
+		ViewHolderChatList holder = (ViewHolderChatList) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+
+		((RecentChatsFragmentLollipop) fragment).activateActionMode();
+		((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+
+		return true;
 	}
 
 	public void setStatus(int position, ViewHolderChatList holder){

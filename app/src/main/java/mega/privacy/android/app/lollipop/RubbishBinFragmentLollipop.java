@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -15,13 +14,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -51,7 +47,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
-public class RubbishBinFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class RubbishBinFragmentLollipop extends Fragment implements OnClickListener{
 
 	public static int GRID_WIDTH =400;
 	
@@ -60,7 +56,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
-	GestureDetectorCompat detector;
 	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
 		
@@ -92,18 +87,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 	////
-		
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-		public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 	
@@ -339,14 +328,11 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
 			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.addOnItemTouchListener(this);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
@@ -423,9 +409,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		else{
 			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
-			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
+
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
@@ -436,8 +420,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 //				}
 //			});
 			
-			recyclerView.addOnItemTouchListener(this);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
@@ -858,62 +841,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void setOrder(int orderGetChildren){
 		log("setOrder:Rubbish");
 		this.orderGetChildren = orderGetChildren;
-	}
-	
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public int getItemCount(){

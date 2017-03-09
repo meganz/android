@@ -520,6 +520,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			
 			holderGrid.itemLayout.setTag(holderGrid);
 			holderGrid.itemLayout.setOnClickListener(this);
+			holderGrid.itemLayout.setOnLongClickListener(this);
 			
 			holderGrid.imageButtonThreeDots.setTag(holderGrid);
 			holderGrid.imageButtonThreeDots.setOnClickListener(this);
@@ -1450,8 +1451,41 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		log("OnLongCLick");
 		ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
-		((FileBrowserFragmentLollipop) fragment).activateActionMode();
-		((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+
+		if(type==Constants.RUBBISH_BIN_ADAPTER){
+			((RubbishBinFragmentLollipop) fragment).activateActionMode();
+			((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else if(type==Constants.INBOX_ADAPTER){
+			((InboxFragmentLollipop) fragment).activateActionMode();
+			((InboxFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else if(type==Constants.INCOMING_SHARES_ADAPTER){
+			((IncomingSharesFragmentLollipop) fragment).activateActionMode();
+			((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else if(type==Constants.OUTGOING_SHARES_ADAPTER){
+			((OutgoingSharesFragmentLollipop) fragment).activateActionMode();
+			((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else if(type==Constants.CONTACT_FILE_ADAPTER){
+			((ContactFileListFragmentLollipop) fragment).activateActionMode();
+			((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else if(type==Constants.FOLDER_LINK_ADAPTER){
+			((FolderLinkActivityLollipop) fragment).activateActionMode();
+			((FolderLinkActivityLollipop) fragment).itemClick(currentPosition);
+		}
+		else if(type==Constants.SEARCH_ADAPTER){
+			((SearchFragmentLollipop) fragment).activateActionMode();
+			((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else{
+			log("click layout FileBrowserFragmentLollipop!");
+			((FileBrowserFragmentLollipop) fragment).activateActionMode();
+			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+
 		return true;
 	}
 

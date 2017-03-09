@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -18,12 +17,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -56,7 +53,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
-public class RecentChatsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener {
+public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -70,7 +67,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     ActionBar aB;
     RecyclerView listView;
     MegaListChatLollipopAdapter adapterList;
-    GestureDetectorCompat detector;
 
     RelativeLayout chatStatusLayout;
     TextView chatStatusText;
@@ -98,19 +94,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
     private ActionMode actionMode;
 
-    private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        public void onLongPress(MotionEvent e) {
-            log("onLongPress -- RecyclerViewOnGestureListener");
-
-            // handle long press
-            if (!adapterList.isMultipleSelect()){
-                adapterList.setMultipleSelect(true);
-
-                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-            }
-
-            super.onLongPress(e);
+    public void activateActionMode(){
+        log("activateActionMode");
+        if (!adapterList.isMultipleSelect()){
+            adapterList.setMultipleSelect(true);
+            actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
         }
     }
 
@@ -147,8 +135,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             ((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
         }
 
-        detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -162,8 +148,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         mLayoutManager = new MegaLinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
-        //Just onClick implemented
-        listView.addOnItemTouchListener(this);
         listView.setItemAnimator(new DefaultItemAnimator());
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
@@ -358,52 +342,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     }
 
     @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-        log("onLongPress");
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-        detector.onTouchEvent(e);
-        return false;
-    }
-
-    @Override
-    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-    }
-
-    @Override
-    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         log("onClick");
         switch (v.getId()) {
@@ -481,9 +419,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
 
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
-            adapterList.setMultipleSelect(false);
             clearSelections();
-            adapterList.notifyDataSetChanged();
+            adapterList.setMultipleSelect(false);
             ((ManagerActivityLollipop)context).showFabButton();
         }
 
@@ -539,7 +476,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
         if(adapterList.isMultipleSelect()){
             adapterList.clearSelections();
         }
-        updateActionModeTitle();
     }
 
     private void updateActionModeTitle() {
@@ -561,7 +497,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
     /*
      * Disable selection
      */
-    void hideMultipleSelect() {
+    public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
         if (actionMode != null) {
@@ -591,9 +527,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements RecyclerVie
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
-            }
-            else{
-                hideMultipleSelect();
             }
         }
         else{

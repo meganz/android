@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -13,12 +12,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -38,7 +35,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
-public class ReceivedRequestsFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class ReceivedRequestsFragmentLollipop extends Fragment {
 
 	MegaApiAndroid megaApi;
 	
@@ -59,26 +56,15 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 	Display display;
 	
 	boolean isList = true;
-	GestureDetectorCompat detector;
 	ReceivedRequestsFragmentLollipop receivedRequestsFragment = this;
 	
 	ArrayList<MegaContactRequest> contacts;
 
-	private class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-		public void onLongPress(MotionEvent e) {
-            log("onLongPress -- RecyclerViewOnGestureListener");
-            // handle long press
-            if (!adapterList.isMultipleSelect()){
-                adapterList.setMultipleSelect(true);
-
-                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-            }
-            super.onLongPress(e);
-		}
-
-		private void log(String log) {
-			Util.log("RecyclerViewOnGestureListener", log);
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapterList.isMultipleSelect()){
+			adapterList.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 
@@ -270,8 +256,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {                
         log("onCreateView");
 
-		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -300,9 +284,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
-			//Just onClick implemented
-			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator());		        
+			listView.setItemAnimator(new DefaultItemAnimator());
 	        
 	        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);
@@ -462,52 +444,4 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements Recycl
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-		log("onInterceptTouchEvent");
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-	}
-
 }
