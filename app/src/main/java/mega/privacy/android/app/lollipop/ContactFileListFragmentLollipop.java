@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -20,13 +19,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -59,7 +55,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class ContactFileListFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class ContactFileListFragmentLollipop extends Fragment{
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
@@ -72,7 +68,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 
 	RecyclerView listView;
 	RecyclerView.LayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 
@@ -105,17 +100,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 	ArrayList<MegaTransfer> tL;
 	HashMap<Long, MegaTransfer> mTHash = null;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-		public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 
@@ -297,14 +286,11 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 			}
 
 			contactNodes = megaApi.getInShares(contact);
-
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.contact_file_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
-			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator());
 
 			Resources res = getResources();
@@ -740,62 +726,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements Recycle
 		if (adapter != null){
 			adapter.setCurrentTransfer(mT);
 		}
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public long getParentHandle() {

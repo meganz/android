@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -17,13 +16,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -53,14 +49,13 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-public class OfflineFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class OfflineFragmentLollipop extends Fragment{
 	
 	MegaPreferences prefs;
 	
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	GestureDetectorCompat detector;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 
@@ -86,28 +81,13 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 	Display display;
 
 	private ActionMode actionMode;
-	
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-	    public void onLongPress(MotionEvent e) {
-	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
-	        int position = recyclerView.getChildPosition(view);
-	        MegaOffline currentNode = (MegaOffline) adapter.getItem(position);
-	        if(currentNode.getHandle().equals("0")){
-	        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-				File file= new File(path);
-				if(file.exists()){
-					return;
-				}
-	        }
-
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
-	    }
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		}
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -429,14 +409,10 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 		if (isList){
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
-			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
@@ -484,19 +460,10 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 			log("onCreateGRID");
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//				@Override
-//			      public int getSpanSize(int position) {
-//					return 1;
-//				}
-//			});
-			
-			recyclerView.addOnItemTouchListener(this);
+
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
@@ -1481,71 +1448,7 @@ public class OfflineFragmentLollipop extends Fragment implements RecyclerView.On
 		Util.log("OfflineFragmentLollipop", log);
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public String getPathNavigation() {
 		return pathNavigation;
-	}
-
-
-	public void resetAdapter(){
-		log("resetAdapter");
-		if(adapter!=null){
-			adapter.setPositionClicked(-1);
-		}
 	}
 }

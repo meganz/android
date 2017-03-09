@@ -38,7 +38,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 
 
-public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener {
+public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -416,6 +416,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 		
 			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setOnLongClickListener(this);
 			holder.itemLayout.setTag(holder);
 			
 			v.setTag(holder);
@@ -874,6 +875,18 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				break;
 			}
 		}		
+	}
+
+	@Override
+	public boolean onLongClick(View view) {
+		log("OnLongCLick");
+		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+
+		fragment.activateActionMode();
+		fragment.itemClick(currentPosition);
+
+		return true;
 	}
 	
 	/*

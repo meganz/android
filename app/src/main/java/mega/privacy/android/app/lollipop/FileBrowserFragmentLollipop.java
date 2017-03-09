@@ -8,7 +8,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -67,7 +66,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	GestureDetectorCompat detector;
 	ImageView transferArrow;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -111,7 +109,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
-
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 

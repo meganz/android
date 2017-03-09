@@ -17,7 +17,6 @@ import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -25,13 +24,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -76,7 +72,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
 	
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -89,7 +85,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	Handler handler;
 	String url;
 	RecyclerView listView;
-	GestureDetectorCompat detector;
 	private RecyclerView.LayoutManager mLayoutManager;
 	MegaNode selectedNode;
 	ImageView emptyImageView;
@@ -117,24 +112,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	private ActionMode actionMode;
 	
 	boolean downloadCompleteFolder = false;
-	
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-
-	    public void onLongPress(MotionEvent e) {
-
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapterList.isMultipleSelect()){
-				adapterList.setMultipleSelect(true);
-
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
-	    }
-	}
-	
 	FolderLinkActivityLollipop folderLinkActivityLollipop = this;
+
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapterList.isMultipleSelect()){
+			adapterList.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+		}
+	}
+
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -281,13 +268,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		emptyImageView = (ImageView) findViewById(R.id.folder_link_list_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.folder_link_list_empty_text);
 		
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-		
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new MegaLinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
@@ -1373,62 +1357,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		super.onBackPressed();
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void importNode(){
 		log("importNode");
 //		if (megaApi.getRootNode() == null){

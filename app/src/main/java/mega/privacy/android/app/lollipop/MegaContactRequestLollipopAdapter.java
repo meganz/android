@@ -33,10 +33,9 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaNode;
 
 
-public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList> implements OnClickListener {
+public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList> implements OnClickListener, View.OnLongClickListener {
 	
 	Context context;
 	int positionClicked;
@@ -87,9 +86,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 //        ImageView arrowSelection;
         String contactMail;
     	boolean name = false;
-    	boolean firstName = false;
-    	String nameText;
-    	String firstNameText;
+
     }
     ViewHolderContactsRequestList holder;
     
@@ -175,7 +172,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 				break;
 			}
 		}		
-		
+		holder.itemLayout.setOnLongClickListener(this);
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);		
 	}
@@ -536,6 +533,24 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			}
 		}
 	}
+
+	@Override
+	public boolean onLongClick(View view) {
+		log("OnLongCLick");
+		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+
+		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
+		{
+			((SentRequestsFragmentLollipop) fragment).activateActionMode();
+			((SentRequestsFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		else{
+			((ReceivedRequestsFragmentLollipop) fragment).activateActionMode();
+			((ReceivedRequestsFragmentLollipop) fragment).itemClick(currentPosition);
+		}
+		return true;
+	}
 	
 	public void setContacts (ArrayList<MegaContactRequest> contacts){
 		log("SETCONTACTS!!!!");
@@ -549,38 +564,38 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		notifyDataSetChanged();
 	}
 	
-	public String getDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-		
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		
-		return info;
-	}
+//	public String getDescription(ArrayList<MegaNode> nodes){
+//		int numFolders = 0;
+//		int numFiles = 0;
+//
+//		for (int i=0;i<nodes.size();i++){
+//			MegaNode c = nodes.get(i);
+//			if (c.isFolder()){
+//				numFolders++;
+//			}
+//			else{
+//				numFiles++;
+//			}
+//		}
+//
+//		String info = "";
+//		if (numFolders > 0){
+//			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+//			if (numFiles > 0){
+//				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+//			}
+//		}
+//		else {
+//			if (numFiles == 0){
+//				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+//			}
+//			else{
+//				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+//			}
+//		}
+//
+//		return info;
+//	}
 	
 	private static void log(String log) {
 		Util.log("MegaContactRequestLollipopAdapter", log);

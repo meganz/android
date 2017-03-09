@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -16,13 +15,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -59,14 +55,13 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
 
-public class IncomingSharesFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class IncomingSharesFragmentLollipop extends Fragment implements OnClickListener{
 
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
-	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
@@ -98,18 +93,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	private ActionMode actionMode;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-	    public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
-	    }
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		}
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -335,15 +324,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 	        
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
@@ -395,18 +381,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-//			if (deepBrowserTree == 0){
-//				contentText.setText(getInfoNode());
-//				aB.setTitle(getString(R.string.section_shared_items));
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-//			}
-//			else{
-//				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-//				contentText.setText(getInfoFolder(infoNode));
-//				aB.setTitle(infoNode.getName());
-//			}
-
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
@@ -439,21 +413,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//				@Override
-//			      public int getSpanSize(int position) {
-//					return 1;
-//				}
-//			});
-			
-			recyclerView.addOnItemTouchListener(this);
+
 			recyclerView.setItemAnimator(new DefaultItemAnimator());         
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
@@ -1217,62 +1182,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	private static void log(String log) {
 		Util.log("IncomingSharesFragmentLollipop", log);
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public int getDeepBrowserTree() {
