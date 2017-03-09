@@ -111,10 +111,14 @@ public class MegaApiUtils {
                         R.plurals.general_num_files, numFiles);
             }
         } else {
-            info = numFiles
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_files, numFiles);
+            if(numFiles>0) {
+                info = numFiles + " " + context.getResources().getQuantityString(
+                        R.plurals.general_num_files, numFiles);
+            }
+            else{
+                //Empty folder
+                info = context.getResources().getString(R.string.file_browser_empty_folder);
+            }
         }
 
         return info;
@@ -144,10 +148,15 @@ public class MegaApiUtils {
                         R.plurals.general_num_files, numFiles);
             }
         } else {
-            info = numFiles
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_files, numFiles);
+
+            if(numFiles>0) {
+                info = numFiles + " " + context.getResources().getQuantityString(
+                        R.plurals.general_num_files, numFiles);
+            }
+            else{
+                //Empty folder
+                info = context.getResources().getString(R.string.file_browser_empty_folder);
+            }
         }
 
         return info;
