@@ -46,7 +46,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener {
+public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -483,6 +483,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			
 			holderList.itemLayout.setTag(holderList);
 			holderList.itemLayout.setOnClickListener(this);
+			holderList.itemLayout.setOnLongClickListener(this);
 			
 			holderList.imageButtonThreeDots.setTag(holderList);
 			holderList.imageButtonThreeDots.setOnClickListener(this);
@@ -1394,11 +1395,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
-		switch (v.getId()) {		
+		switch (v.getId()) {
 			case R.id.file_list_three_dots:
-			case R.id.file_grid_three_dots:{	
-				
-				log("onClick: file_list_three_dots: "+currentPosition);			
+			case R.id.file_grid_three_dots:{
+
+				log("onClick: file_list_three_dots: "+currentPosition);
 
 				if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
@@ -1408,8 +1409,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else{
 					((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
-				}				
-				
+				}
+
 				break;
 			}
 			case R.id.file_list_item_layout:
@@ -1438,10 +1439,20 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
-				}				
+				}
 				break;
 			}
 		}
+	}
+
+	@Override
+	public boolean onLongClick(View view) {
+		log("OnLongCLick");
+		ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+		((FileBrowserFragmentLollipop) fragment).activateActionMode();
+		((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+		return true;
 	}
 
 	/*
