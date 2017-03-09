@@ -64,6 +64,10 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 		return getLayoutManager().findFirstCompletelyVisibleItemPosition();
 	}
 
+	public int findFirstVisibleItemPosition() {
+		return getLayoutManager().findFirstVisibleItemPosition();
+	}
+
 	@Override
 	public CustomizedGridLayoutManager getLayoutManager() {
 		return manager;

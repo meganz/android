@@ -83,6 +83,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	Stack<Integer> lastPositionStack;
 
+	boolean multiselectActivation = false;
+
 	MegaApiAndroid megaApi;
 
 	long parentHandle = -1;
@@ -111,15 +113,25 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	    public void onLongPress(MotionEvent e) {
 			log("onLongPress -- RecyclerViewOnGestureListener");
-	        // handle long press
-	        if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
 
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
+			View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
+			int position = recyclerView.getChildAdapterPosition(view);
+	        // handle long press
+	        activateActionMode();
+			itemClick(position);
 	        super.onLongPress(e);
 	    }
 	}
+
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			multiselectActivation = true;
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		}
+	}
+
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -866,6 +878,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     public void itemClick(int position) {
 		log("item click position: " + position);
 
+		if(multiselectActivation){
+			multiselectActivation = false;
+			return;
+		}
+
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
@@ -888,6 +905,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else{
 					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					if(lastFirstVisiblePosition==-1){
+						log("Completely -1 then find just visible position");
+						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+					}
 				}
 
 				log("Push to stack "+lastFirstVisiblePosition+" position");
@@ -1419,7 +1440,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
+		log("onDown");
 		return false;
 	}
 
@@ -1431,20 +1452,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
+		log("onSingleTapUp");
 		return false;
 	}
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
+		log("onScroll");
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
+		log("onLongPress");
 		
 	}
 
@@ -1457,6 +1478,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
+		log("onInterceptTouchEvent: "+e.getAction());
 		detector.onTouchEvent(e);
 		return false;
 	}
@@ -1478,5 +1500,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			return adapter.getItemCount();
 		}
 		return 0;
+	}
+
+	public boolean isMultiselectActivation() {
+		log("isMultiselectActivation: "+multiselectActivation);
+		return multiselectActivation;
+	}
+
+	public void setMultiselectActivation(boolean multiselectActivation) {
+		log("setMultiselectActivation: "+multiselectActivation);
+		this.multiselectActivation = multiselectActivation;
 	}
 }
