@@ -116,7 +116,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleSelection: "+pos);
+		log("toggleAllSelection: "+pos);
 		final int positionToflip = pos;
 
 		if (selectedItems.get(pos, false)) {
@@ -142,8 +142,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 					@Override
 					public void onAnimationEnd(Animation animation) {
+						log("onAnimationEnd");
 						if (selectedItems.size() <= 0){
-
+							log("toggleAllSelection: hideMultipleSelect");
 							if(type==Constants.RUBBISH_BIN_ADAPTER){
 								((RubbishBinFragmentLollipop) fragment).hideMultipleSelect();
 							}
@@ -169,6 +170,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 								((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
 							}
 						}
+						log("toggleAllSelection: notified item changed");
 						notifyItemChanged(positionToflip);
 					}
 
@@ -178,6 +180,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				});
 				view.imageView.startAnimation(flipAnimation);
+			}
+			else{
+				log("NULL view pos: "+positionToflip);
+				notifyItemChanged(pos);
 			}
 		}
 		else {
@@ -274,6 +280,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				});
 				view.imageView.startAnimation(flipAnimation);
+			}
+			else{
+				log("view is null");
 			}
 		}
 		else{
@@ -1389,7 +1398,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		
+
 		ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
 		log("onClick -> Current position: "+currentPosition);

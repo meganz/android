@@ -977,6 +977,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				});
 				view.imageView.startAnimation(flipAnimation);
 			}
+			else{
+				log("NULL view pos: "+positionToflip);
+				notifyItemChanged(pos);
+			}
 		}
 		else {
 			log("adapter type is GRID");
