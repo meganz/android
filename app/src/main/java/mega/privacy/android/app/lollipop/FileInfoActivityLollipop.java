@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -28,6 +27,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
@@ -126,7 +126,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	int accountType;
 
-	private android.support.v7.app.AlertDialog getLinkDialog;
+	private AlertDialog getLinkDialog;
 	Button expiryDateButton;
 	SwitchCompat switchGetLink;
 	private boolean isExpiredDateLink = false;
@@ -1676,7 +1676,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 		});
 
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
+//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -2277,7 +2281,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if (megaContacts){
 				if (node.isFolder()){
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
