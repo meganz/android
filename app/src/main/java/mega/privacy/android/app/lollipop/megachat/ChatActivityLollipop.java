@@ -99,6 +99,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     Handler handlerReceive;
     Handler handlerSend;
 
+    AndroidMegaChatMessage selectedMessage;
+    int selectedPosition;
+
     MegaChatRoom chatRoom;
     long idChat;
 
@@ -1596,7 +1599,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(!(m.getMessage().isManagementMessage())){
                         log("selected message: "+m.getMessage().getContent());
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                            showMsgNotSentPanel(m);
+                            showMsgNotSentPanel(m, selectedPosition);
                         }
                     }
                 }
@@ -2358,16 +2361,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return chatRoom.isGroup();
     }
 
-    public void showMsgNotSentPanel(AndroidMegaChatMessage message){
+    public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
 //        showSnackbar("Not yet implemented!");
 
         log("showMessagePanel");
+        this.selectedMessage = message;
+        this.selectedPosition = position;
 
         if(message!=null){
 //            this.selectedChatItem = chat;
             MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         }
+    }
+
+    public void removeMsgNotSent(){
+        log("removeMsgNotSent");
+        messages.remove(selectedPosition);
+        adapter.notifyItemRemoved(selectedPosition);
     }
 
     public void showSnackbar(String s){
@@ -2498,7 +2509,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return chatRoom.getPeerFullnameByHandle(userHandle);
     }
 
-//    @Override
+    public AndroidMegaChatMessage getSelectedMessage() {
+        return selectedMessage;
+    }
+
+    public void setSelectedMessage(AndroidMegaChatMessage selectedMessage) {
+        this.selectedMessage = selectedMessage;
+    }
+
+    public MegaChatRoom getChatRoom() {
+        return chatRoom;
+    }
+
+    public void setChatRoom(MegaChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
+
+    public int getSelectedPosition() {
+        return selectedPosition;
+    }
+
+    public void setSelectedPosition(int selectedPosition) {
+        this.selectedPosition = selectedPosition;
+    }
+
+    //    @Override
 //    protected void onResume() {
 //        log("onResume");
 //        super.onResume();
