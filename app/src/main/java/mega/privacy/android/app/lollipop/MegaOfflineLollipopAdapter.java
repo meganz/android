@@ -265,6 +265,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				});
 				view.imageView.startAnimation(flipAnimation);
 			}
+			else{
+				log("NULL view pos: "+positionToflip);
+				notifyItemChanged(pos);
+			}
 		}
 		else{
 			log("adapter type is GRID");

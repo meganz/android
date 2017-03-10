@@ -337,6 +337,10 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			});
 			view.imageView.startAnimation(flipAnimation);
 		}
+		else{
+			log("NULL view pos: "+positionToflip);
+			notifyItemChanged(pos);
+		}
 	}
 	
 	public void selectAll(){

@@ -406,6 +406,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			});
 			view.imageView.startAnimation(flipAnimation);
 		}
+		else{
+			log("NULL view pos: "+positionToflip);
+			notifyItemChanged(pos);
+		}
 	}
 	
 	public void selectAll(){

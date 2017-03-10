@@ -644,6 +644,10 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			});
 			view.imageView.startAnimation(flipAnimation);
 		}
+		else{
+			log("NULL view pos: "+positionToflip);
+			notifyItemChanged(pos);
+		}
 	}
 
 	public void selectAll(){

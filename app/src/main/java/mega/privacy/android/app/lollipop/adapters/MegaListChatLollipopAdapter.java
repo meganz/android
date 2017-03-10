@@ -822,6 +822,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			});
 			view.imageView.startAnimation(flipAnimation);
 		}
+		else{
+			log("NULL view pos: "+positionToflip);
+			notifyItemChanged(pos);
+		}
 	}
 	
 	public void toggleSelection(int pos) {
