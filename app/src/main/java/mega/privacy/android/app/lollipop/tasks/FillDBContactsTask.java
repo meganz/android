@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -40,8 +40,8 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
         ContactNameListener listener = new ContactNameListener(context);
 
         for(int i=0; i<contacts.size(); i++){
-            MegaContact megaContact = new MegaContact(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
-            dbH.setContact(megaContact);
+            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
+            dbH.setContact(megaContactDB);
             megaApi.getUserAttribute(contacts.get(i), 1, listener);
             megaApi.getUserAttribute(contacts.get(i), 2, listener);
         }

@@ -28,7 +28,8 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactAdapter;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -45,7 +46,7 @@ import nz.mega.sdk.MegaUser;
 public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
-    MegaUser contact = null;
+    MegaContactAdapter contact = null;
     ContactController cC;
 
     private BottomSheetBehavior mBehavior;
@@ -77,13 +78,26 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
+        cC = new ContactController(context);
+
+        dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if(savedInstanceState!=null) {
             log("Bundle is NOT NULL");
             String email = savedInstanceState.getString("email");
             log("Email of the contact: "+email);
             if(email!=null){
-                contact = megaApi.getContact(email);
+                MegaUser megaUser = megaApi.getContact(email);
+                MegaContactDB contactDB = dbH.findContactByHandle(megaUser.getHandle()+"");
+                String fullName = "";
+                if(contactDB!=null){
+                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), megaUser.getEmail());
+                }
+                else{
+                    fullName = megaUser.getEmail();
+                }
+
+                contact = new MegaContactAdapter(contactDB, megaUser, fullName);
             }
         }
         else{
@@ -93,9 +107,6 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             }
         }
 
-        cC = new ContactController(context);
-
-        dbH = DatabaseHandler.getDbHandler(getActivity());
     }
     @Override
     public void setupDialog(final Dialog dialog, int style) {
@@ -134,10 +145,10 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionShareFolder.setOnClickListener(this);
 
         if(contact!=null){
-            fullName = getFullName(contact);
+            fullName = contact.getFullName();
             titleNameContactPanel.setText(fullName);
 
-            ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact);
+            ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
             String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
             titleMailContactPanel.setText(sharedNodesDescription);
 
@@ -154,7 +165,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
                 contactStateIcon.setVisibility(View.VISIBLE);
                 if (megaChatApi != null){
-                    int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
+                    int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
                     if(userStatus == MegaChatApi.STATUS_ONLINE){
                         log("This user is connected");
                         contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
@@ -179,43 +190,43 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         }
     }
 
-    public String getFullName(MegaUser contact){
-        String firstNameText ="";
-        String lastNameText ="";
-        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-        if(contactDB!=null){
-            firstNameText = contactDB.getName();
-            lastNameText = contactDB.getLastName();
+//    public String getFullName(MegaUser contact){
+//        String firstNameText ="";
+//        String lastNameText ="";
+//        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+//        if(contactDB!=null){
+//            firstNameText = contactDB.getName();
+//            lastNameText = contactDB.getLastName();
+//
+//            String fullName;
+//
+//            if (firstNameText.trim().length() <= 0){
+//                fullName = lastNameText;
+//            }
+//            else{
+//                fullName = firstNameText + " " + lastNameText;
+//            }
+//
+//            if (fullName.trim().length() <= 0){
+//                log("Put email as fullname");
+//                String email = contact.getEmail();
+//                String[] splitEmail = email.split("[@._]");
+//                fullName = splitEmail[0];
+//            }
+//
+//            return fullName;
+//        }
+//        else{
+//            String email = contact.getEmail();
+//            String[] splitEmail = email.split("[@._]");
+//            String fullName = splitEmail[0];
+//            return fullName;
+//        }
+//    }
 
-            String fullName;
+    public void addAvatarContactPanel(MegaContactAdapter contact){
 
-            if (firstNameText.trim().length() <= 0){
-                fullName = lastNameText;
-            }
-            else{
-                fullName = firstNameText + " " + lastNameText;
-            }
-
-            if (fullName.trim().length() <= 0){
-                log("Put email as fullname");
-                String email = contact.getEmail();
-                String[] splitEmail = email.split("[@._]");
-                fullName = splitEmail[0];
-            }
-
-            return fullName;
-        }
-        else{
-            String email = contact.getEmail();
-            String[] splitEmail = email.split("[@._]");
-            String fullName = splitEmail[0];
-            return fullName;
-        }
-    }
-
-    public void addAvatarContactPanel(MegaUser contact){
-
-        String contactMail = contact.getEmail();
+        String contactMail = contact.getMegaUser().getEmail();
         File avatar = null;
         if (getActivity().getExternalCacheDir() != null){
             avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
@@ -248,7 +259,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         p.setAntiAlias(true);
 
         if (contact != null) {
-            String color = megaApi.getUserAvatarColor(contact);
+            String color = megaApi.getUserAvatarColor(contact.getMegaUser());
             if (color != null) {
                 log("The color to set the avatar is " + color);
                 p.setColor(Color.parseColor(color));
@@ -274,26 +285,14 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        if (fullName != null) {
-            if (fullName.length() > 0) {
-                if (fullName.trim().length() > 0) {
-                    String firstLetter = fullName.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    avatarInitialLetter.setText(firstLetter);
-                    avatarInitialLetter.setTextColor(Color.WHITE);
-                    avatarInitialLetter.setVisibility(View.VISIBLE);
-                    avatarInitialLetter.setTextSize(22);
-                } else {
-                    avatarInitialLetter.setVisibility(View.INVISIBLE);
-                }
-            }
-            else{
-                avatarInitialLetter.setVisibility(View.INVISIBLE);
-            }
+        fullName = contact.getFullName();
+        String firstLetter = fullName.charAt(0) + "";
+        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+        avatarInitialLetter.setText(firstLetter);
+        avatarInitialLetter.setTextColor(Color.WHITE);
+        avatarInitialLetter.setVisibility(View.VISIBLE);
+        avatarInitialLetter.setTextSize(22);
 
-        } else {
-            avatarInitialLetter.setVisibility(View.INVISIBLE);
-        }
         ////
     }
 
@@ -310,7 +309,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                 }
 
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra("name", contact.getEmail());
+                i.putExtra("name", contact.getMegaUser().getEmail());
                 context.startActivity(i);
 
                 dismissAllowingStateLoss();
@@ -321,7 +320,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     log("Selected contact NULL");
                     return;
                 }
-                ((ManagerActivityLollipop) context).startOneToOneChat(contact);
+                ((ManagerActivityLollipop) context).startOneToOneChat(contact.getMegaUser());
                 break;
             }
             case R.id.contact_list_option_send_file_layout:{
@@ -331,7 +330,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     return;
                 }
                 List<MegaUser> user = new ArrayList<MegaUser>();
-                user.add(contact);
+                user.add(contact.getMegaUser());
                 ContactController cC = new ContactController(context);
                 cC.pickFileToSend(user);
                 dismissAllowingStateLoss();
@@ -344,7 +343,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     return;
                 }
                 List<MegaUser> user = new ArrayList<MegaUser>();
-                user.add(contact);
+                user.add(contact.getMegaUser());
                 ContactController cC = new ContactController(context);
                 cC.pickFolderToShare(user);
                 dismissAllowingStateLoss();
@@ -356,7 +355,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     log("Selected contact NULL");
                     return;
                 }
-                ((ManagerActivityLollipop) context).showConfirmationRemoveContact(contact);
+                ((ManagerActivityLollipop) context).showConfirmationRemoveContact(contact.getMegaUser());
                 break;
             }
         }
@@ -384,7 +383,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public void onSaveInstanceState(Bundle outState){
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        String email = contact.getEmail();
+        String email = contact.getMegaUser().getEmail();
         log("Email of the contact: "+email);
         outState.putString("email", email);
     }

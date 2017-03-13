@@ -101,7 +101,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactAdapter;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -205,7 +206,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	MegaNode selectedNode;
 	MegaOffline selectedOfflineNode;
-	MegaUser selectedUser;
+	MegaContactAdapter selectedUser;
 	MegaContactRequest selectedRequest;
 	MegaChatListItem selectedChatItem;
 //	String fullNameChat;
@@ -6016,13 +6017,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
 		        			ascendingCheck.setChecked(true);
 		        			descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
 		        			break;
 		        		}
 		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
 		        			ascendingCheck.setChecked(false);
 		        			descendingCheck.setChecked(true);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(false);
 		        			break;
 		        		}
+						case MegaApiJava.ORDER_CREATION_ASC:{
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(true);
+							oldestCheck.setChecked(false);
+							break;
+						}
+						case MegaApiJava.ORDER_CREATION_DESC:{
+							ascendingCheck.setChecked(false);
+							descendingCheck.setChecked(false);
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(true);
+							break;
+						}
 	        		}
         		}
         		else if(drawerItem==DrawerItem.SAVED_FOR_OFFLINE||drawerItem==DrawerItem.SHARED_ITEMS){
@@ -6139,10 +6158,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		final AlertDialog dialog = sortByDialog;
 	        	switch(drawerItem){
 		        	case CONTACTS:{
-						sortByNameTV.setText(getString(R.string.email_text));
-		        		sortByDateTV.setVisibility(View.GONE);
-		        		newestCheck.setVisibility(View.GONE);
-		        		oldestCheck.setVisibility(View.GONE);
+						sortByDateTV.setText(getString(R.string.sortby_date));
+						sortByDateTV.setVisibility(View.VISIBLE);
+		        		newestCheck.setVisibility(View.VISIBLE);
+		        		oldestCheck.setVisibility(View.VISIBLE);
 						sortByModificationDateTV.setVisibility(View.GONE);
 						newestModificationCheck.setVisibility(View.GONE);
 						oldestModificationCheck.setVisibility(View.GONE);
@@ -6156,6 +6175,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(true);
 			        			descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
 								log("order contacts value _ "+orderContacts);
 								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_ASC){
 									log("call to selectSortByContacts ASC _ "+orderContacts);
@@ -6173,6 +6194,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 			        			descendingCheck.setChecked(true);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(false);
 								log("order contacts value _ "+orderContacts);
 								if(orderContacts!=MegaApiJava.ORDER_DEFAULT_DESC) {
 									log("call to selectSortByContacts DESC _ "+orderContacts);
@@ -6181,6 +6204,44 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			        			if (dialog != null){
 			        				dialog.dismiss();
 			        			}
+							}
+						});
+
+						newestCheck.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(true);
+								oldestCheck.setChecked(false);
+								log("order contacts value _ "+orderContacts);
+								if(orderContacts!=MegaApiJava.ORDER_CREATION_ASC){
+									log("call to selectSortByContacts ASC _ "+orderContacts);
+									selectSortByContacts(MegaApiJava.ORDER_CREATION_ASC);
+								}
+								if (dialog != null){
+									dialog.dismiss();
+								}
+							}
+						});
+
+						oldestCheck.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);
+								newestCheck.setChecked(false);
+								oldestCheck.setChecked(true);
+								log("order contacts value _ "+orderContacts);
+								if(orderContacts!=MegaApiJava.ORDER_CREATION_DESC) {
+									log("call to selectSortByContacts DESC _ "+orderContacts);
+									selectSortByContacts(MegaApiJava.ORDER_CREATION_DESC);
+								}
+								if (dialog != null){
+									dialog.dismiss();
+								}
 							}
 						});
 
@@ -8918,7 +8979,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showContactOptionsPanel(MegaUser user){
+	public void showContactOptionsPanel(MegaContactAdapter user){
 		log("showContactOptionsPanel");
 		if(user!=null){
 			this.selectedUser = user;
@@ -9093,12 +9154,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cFLol != null){
 			cFLol.setOrder(orderContacts);
-			if (orderContacts == MegaApiJava.ORDER_DEFAULT_ASC){
-				cFLol.sortByNameAscending();
-			}
-			else{
-				cFLol.sortByNameDescending();
-			}
+			cFLol.sortBy(orderContacts);
+			cFLol.updateOrder();
 		}
 	}
 
@@ -10982,7 +11039,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(contactRequest!=null){
 						log("Source: "+contactRequest.getSourceEmail());
 						//Get the data of the user (avatar and name)
-						MegaContact contactDB = dbH.findContactByEmail(contactRequest.getSourceEmail());
+						MegaContactDB contactDB = dbH.findContactByEmail(contactRequest.getSourceEmail());
 						if(contactDB==null){
 							log("The contact: "+contactRequest.getSourceEmail()+" not found! Will be added to DB!");
 							cC.addContactDB(contactRequest.getSourceEmail());
@@ -12845,11 +12902,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.sttFLol = sttFLol;
 	}
 
-	public MegaUser getSelectedUser() {
+	public MegaContactAdapter getSelectedUser() {
 		return selectedUser;
 	}
 
-	public void setSelectedUser(MegaUser selectedUser) {
+	public void setSelectedUser(MegaContactAdapter selectedUser) {
 		this.selectedUser = selectedUser;
 	}
 

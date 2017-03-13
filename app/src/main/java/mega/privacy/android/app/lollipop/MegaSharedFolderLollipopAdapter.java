@@ -30,7 +30,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Constants;
@@ -254,7 +254,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			holder.contactMail = share.getUser();
 			MegaUser contact = megaApi.getContact(holder.contactMail);	
 		
-			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+			MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
 			if(contactDB!=null){
 				if(!contactDB.getName().equals("")){
 					holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());

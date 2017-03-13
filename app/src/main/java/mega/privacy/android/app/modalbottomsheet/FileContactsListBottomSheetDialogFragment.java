@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
@@ -124,7 +124,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
     public String getFullName(MegaUser contact){
         String firstNameText ="";
         String lastNameText ="";
-        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
         if(contactDB!=null){
             firstNameText = contactDB.getName();
             lastNameText = contactDB.getLastName();

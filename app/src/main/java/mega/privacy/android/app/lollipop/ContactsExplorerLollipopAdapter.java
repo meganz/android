@@ -24,7 +24,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.utils.Constants;
@@ -263,7 +263,7 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 //		}
 
 
-		MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+		MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
 		if(contactDB!=null){
 
 			holder.firstNameText = contactDB.getName();
