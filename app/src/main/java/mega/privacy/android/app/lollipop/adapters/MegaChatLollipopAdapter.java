@@ -1080,35 +1080,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     else{
 
                         int status = message.getStatus();
-                        if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                            log("Show triangle retry!");
-                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                            //Margins
-                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-                            ownMessageParams.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-                            holder.triangleIcon.setVisibility(View.VISIBLE);
-                            holder.retryAlert.setVisibility(View.VISIBLE);
-                        }
-                        else if((status==MegaChatMessage.STATUS_SENDING)){
-                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                        }
-                        else{
-                            log("Status: "+message.getStatus());
-                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-                        }
                         holder.contentOwnMessageText.setText(messageContent);
                         holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
                         holder.ownManagementMessageLayout.setVisibility(View.GONE);
 
+                        //Margins
+                        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                        ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
                         if (!multipleSelect) {
-                            //Margins
-                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-                            ownMessageParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
+                            if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                                log("Show triangle retry!");
+                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+
+                                holder.triangleIcon.setVisibility(View.VISIBLE);
+                                holder.retryAlert.setVisibility(View.VISIBLE);
+                            }
+                            else if((status==MegaChatMessage.STATUS_SENDING)){
+                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                            }
+                            else{
+                                log("Status: "+message.getStatus());
+                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                            }
+
                             holder.ownMultiselectionLayout.setVisibility(View.GONE);
-//            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+
                             if (positionClicked != -1){
                                 if (positionClicked == position){
                                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
@@ -1123,12 +1123,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             }
                         } else {
                             log("Multiselect ON");
-//            holder.imageButtonThreeDots.setVisibility(View.GONE);
-                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-                            ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-                            holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-                            holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
+                            if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                                log("Show triangle retry!");
+                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+
+                                holder.triangleIcon.setVisibility(View.VISIBLE);
+                                holder.retryAlert.setVisibility(View.VISIBLE);
+                                holder.ownMultiselectionLayout.setVisibility(View.GONE);
+                            }
+                            else if((status==MegaChatMessage.STATUS_SENDING)){
+                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                                holder.ownMultiselectionLayout.setVisibility(View.GONE);
+                            }
+                            else{
+                                log("Status: "+message.getStatus());
+                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                                holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
+                            }
+
                             if(this.isItemChecked(position)){
                                 log("Selected: "+message.getContent());
                                 holder.ownMultiselectionImageView.setImageDrawable(context.getDrawable(R.drawable.message_multiselection_filled));

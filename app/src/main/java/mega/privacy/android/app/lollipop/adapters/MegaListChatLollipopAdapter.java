@@ -1143,10 +1143,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			MegaChatListItem chat = chats.get(position);
 
 			int messageType = chat.getLastMessageType();
+			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
 
 			switch(messageType){
 				case MegaChatMessage.TYPE_INVALID:{
+					log("Message Type -> INVALID");
 					holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
 					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 					holder.textViewDate.setVisibility(View.GONE);
@@ -1224,6 +1226,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					break;
 				}
 				default:{
+					log("Message Type -> DEFAULT");
 					holder.textViewContent.setText("Loading...");
 					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 					holder.textViewDate.setVisibility(View.GONE);
