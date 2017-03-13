@@ -2097,14 +2097,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		}
 				case ACCOUNT:{
 					log("onPostResume: case ACCOUNT");
-					aB.setTitle(getString(R.string.section_account));
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
-						resetNavigationViewMenu(nVMenu);
-						hidden.setChecked(true);
-					}
+//					aB.setTitle(getString(R.string.section_account));
+//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//					if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+//						resetNavigationViewMenu(nVMenu);
+//						hidden.setChecked(true);
+//					}
 					break;
 				}
 	    		case SHARED_ITEMS:{
@@ -3189,11 +3189,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		tabLayoutCloud.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
 
-		fragmentContainer.setVisibility(View.GONE);
-
 		switch(accountFragment){
 			case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 				log("Show upgrade FRAGMENT");
+				fragmentContainer.setVisibility(View.VISIBLE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
 				showUpAF();
@@ -3201,6 +3200,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case Constants.MONTHLY_YEARLY_FRAGMENT:{
 				log("Show monthly yearly FRAGMENT");
+				fragmentContainer.setVisibility(View.VISIBLE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
 				showmyF(selectedPaymentMethod, selectedAccountType);
@@ -3209,6 +3209,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			default:{
 				log("Show myAccount Fragment");
+				fragmentContainer.setVisibility(View.GONE);
 				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 
 				if(aB!=null){
@@ -3843,6 +3844,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+		fragmentContainer.setVisibility(View.VISIBLE);
 	}
 
 	public void updateInfoNumberOfSubscriptions(){
@@ -3880,6 +3882,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, fFL, "fF");
 			ft.commitNow();
 		}
+		fragmentContainer.setVisibility(View.VISIBLE);
 	}
 
 	public void showCentili(){
@@ -3902,10 +3905,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, ctFL, "ctF");
 			ft.commitNow();
 		}
+		fragmentContainer.setVisibility(View.VISIBLE);
 	}
 
 	public void showmyF(int paymentMethod, int type){
 		log("showmyF");
+
+		aB.setTitle(R.string.action_upgrade_account);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		setFirstNavigationLevel(false);
 
 		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
 
@@ -3930,10 +3938,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, myFL, "myF");
 			ft.commitNow();
 		}
+		fragmentContainer.setVisibility(View.VISIBLE);
 	}
 
 	public void showUpAF(){
 		log("showUpAF");
+
+		aB.setTitle(R.string.action_upgrade_account);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		setFirstNavigationLevel(false);
 
 		accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 
@@ -3958,6 +3971,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commitNowAllowingStateLoss();
 		}
+		fragmentContainer.setVisibility(View.VISIBLE);
 
 		invalidateOptionsMenu();
 		showFabButton();
