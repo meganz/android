@@ -970,7 +970,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return null;
 	}
 	
-	public void setContact (MegaContact contact){
+	public void setContact (MegaContactDB contact){
 		log("setContacts: "+contact.getMail());
         ContentValues values = new ContentValues();
         values.put(KEY_CONTACT_HANDLE, encrypt(contact.getHandle()));
@@ -1018,9 +1018,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return db.update(TABLE_CONTACTS, values, KEY_CONTACT_HANDLE + " = '" + encrypt(String.valueOf(handle)) + "'", null);
 	}
 	
-	public MegaContact findContactByHandle(String handle){
+	public MegaContactDB findContactByHandle(String handle){
 		log("findContactByHandle: "+handle);
-		MegaContact contacts = null;
+		MegaContactDB contacts = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + encrypt(handle) + "'";
 		log("QUERY: "+selectQuery);
@@ -1041,7 +1041,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_name = decrypt(cursor.getString(3));
 				_lastName = decrypt(cursor.getString(4));
 
-				contacts = new MegaContact(handle, _mail, _name, _lastName);
+				contacts = new MegaContactDB(handle, _mail, _name, _lastName);
 				cursor.close();
 				return contacts;
 			}
@@ -1050,9 +1050,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return null;		
 	}
 
-	public MegaContact findContactByEmail(String mail){
+	public MegaContactDB findContactByEmail(String mail){
 		log("findContactByEmail: "+mail);
-		MegaContact contacts = null;
+		MegaContactDB contacts = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'";
 		log("QUERY: "+selectQuery);
@@ -1073,7 +1073,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_name = decrypt(cursor.getString(3));
 				_lastName = decrypt(cursor.getString(4));
 
-				contacts = new MegaContact(_handle, mail, _name, _lastName);
+				contacts = new MegaContactDB(_handle, mail, _name, _lastName);
 				cursor.close();
 				return contacts;
 			}

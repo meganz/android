@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -607,7 +607,7 @@ public class ChatController {
     }
 
     public String getContactFullName(long userHandle){
-        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
         if(contactDB!=null){
 
             String name = contactDB.getName();

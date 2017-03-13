@@ -52,7 +52,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -223,7 +223,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				String fullName = "";
 				if(user!=null){
-					MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+					MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 					if(contactDB!=null){
 
 						String firstNameText = "";

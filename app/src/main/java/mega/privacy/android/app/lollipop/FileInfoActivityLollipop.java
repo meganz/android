@@ -73,7 +73,7 @@ import java.util.TimeZone;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -837,7 +837,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					if(mS.getNodeHandle()==node.getHandle()){
 						MegaUser user= megaApi.getContact(mS.getUser());
 						if(user!=null){
-							MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 							if(contactDB!=null){
 								if(!contactDB.getName().equals("")){
 									ownerInfo.setText(contactDB.getName()+" "+contactDB.getLastName());

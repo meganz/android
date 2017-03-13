@@ -9,7 +9,7 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -283,8 +283,8 @@ public class ContactController {
             //Check the user is not previously in the DB
             if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
                 log("The contact NOT exists -> add to DB");
-                MegaContact megaContact = new MegaContact(String.valueOf(user.getHandle()), user.getEmail(), "", "");
-                dbH.setContact(megaContact);
+                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
+                dbH.setContact(megaContactDB);
                 megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
                 megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
             }
@@ -323,7 +323,7 @@ public class ContactController {
     }
 
     public String getContactFullName(long userHandle){
-        MegaContact contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
         if(contactDB!=null){
 
             String name = contactDB.getName();
@@ -362,6 +362,40 @@ public class ContactController {
             return fullName;
         }
         return "";
+    }
+
+    public String getFullName(String name, String lastName, String mail){
+
+        if(name==null){
+            name="";
+        }
+        if(lastName==null){
+            lastName="";
+        }
+        String fullName = "";
+
+        if (name.trim().length() <= 0){
+            fullName = lastName;
+        }
+        else{
+            fullName = name + " " + lastName;
+        }
+
+        if (fullName.trim().length() <= 0){
+            log("1- Full name empty");
+            log("2-Put email as fullname");
+             if(mail==null){
+                mail="";
+            }
+            if (mail.trim().length() <= 0){
+                return "";
+            }
+            else{
+                return mail;
+            }
+        }
+
+        return fullName;
     }
 
     public static void log(String message) {

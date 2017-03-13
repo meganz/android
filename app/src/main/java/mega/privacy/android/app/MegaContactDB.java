@@ -1,12 +1,12 @@
 package mega.privacy.android.app;
 
-public class MegaContact {
+public class MegaContactDB {
 	String handle;
 	String name;
 	String lastName;
 	String mail;
 	
-	public MegaContact(String handle, String mail, String name, String lastName) {
+	public MegaContactDB(String handle, String mail, String name, String lastName) {
 		super();
 		this.handle = handle;
 		this.name = name;
@@ -14,7 +14,7 @@ public class MegaContact {
 		this.mail = mail;
 	}
 
-	public MegaContact() {
+	public MegaContactDB() {
 		super();
 	}
 
@@ -43,5 +43,5 @@ public class MegaContact {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}	
+	}
 }

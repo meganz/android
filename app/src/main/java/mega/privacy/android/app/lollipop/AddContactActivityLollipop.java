@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -11,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -35,9 +33,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import mega.privacy.android.app.components.tokenautocomplete.TokenCompleteTextView;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -46,16 +41,18 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactAdapter;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.tokenautocomplete.ContactInfo;
-import mega.privacy.android.app.components.tokenautocomplete.ContactsCompletionView;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.tokenautocomplete.ContactInfo;
+import mega.privacy.android.app.components.tokenautocomplete.ContactsCompletionView;
+import mega.privacy.android.app.components.tokenautocomplete.TokenCompleteTextView;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaUser;
 
 public class AddContactActivityLollipop extends PinActivityLollipop implements TokenCompleteTextView.TokenListener<ContactInfo>, View.OnClickListener, RecyclerView.OnItemTouchListener {
@@ -101,7 +98,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     ArrayList<PhoneContactInfo> filteredContactsPhone = new ArrayList<PhoneContactInfo>();
 
     ArrayList<MegaUser> contactsMEGA;
-    ArrayList<MegaUser> visibleContactsMEGA = new ArrayList<MegaUser>();
+    ArrayList<MegaContactAdapter> visibleContactsMEGA = new ArrayList<MegaContactAdapter>();
 
     boolean itemClickPressed = false;
 
@@ -444,11 +441,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 log("text: _" + text + "_");
 
                 if (contactType == Constants.CONTACT_TYPE_MEGA){
-                    ArrayList<MegaUser> filteredContactsAfterText = new ArrayList<MegaUser>();
+                    ArrayList<MegaContactAdapter> filteredContactsAfterText = new ArrayList<MegaContactAdapter>();
                     if (visibleContactsMEGA != null) {
                         for (int i = 0; i < visibleContactsMEGA.size(); i++) {
                             try {
-                                String email = visibleContactsMEGA.get(i).getEmail();
+                                String email = visibleContactsMEGA.get(i).getMegaUser().getEmail();
                                 String emailPart = "";
 
                                 if (email != null){
@@ -464,7 +461,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                                     filteredContactsAfterText.add(visibleContactsMEGA.get(i));
                                 }
                                 else {
-                                    MegaContact contactDB = dbH.findContactByHandle(String.valueOf(visibleContactsMEGA.get(i).getHandle()));
+                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(visibleContactsMEGA.get(i).getMegaUser().getHandle()));
                                     if (contactDB != null) {
                                         String name = contactDB.getName();
                                         String lastName = contactDB.getLastName();
@@ -647,11 +644,23 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             contactsMEGA = megaApi.getContacts();
             visibleContactsMEGA.clear();
 
-            for (int i = 0; i < contactsMEGA.size(); i++) {
-
+            for (int i=0;i<contactsMEGA.size();i++){
                 log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
-                if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                    visibleContactsMEGA.add(contactsMEGA.get(i));
+                if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+
+                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
+                    String fullName = "";
+                    if(contactDB!=null){
+                        ContactController cC = new ContactController(this);
+                        fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                    }
+                    else{
+                        //No name, ask for it and later refresh!!
+                        fullName = contactsMEGA.get(i).getEmail();
+                    }
+
+                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                    visibleContactsMEGA.add(megaContactAdapter);
                 }
             }
 
@@ -978,9 +987,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             ContactInfo c = new ContactInfo();
 
             for (int i = 0; i < visibleContactsMEGA.size(); i++) {
-                if (visibleContactsMEGA.get(i).getEmail().compareTo(email) == 0) {
-                    c.setEmail(visibleContactsMEGA.get(i).getEmail());
-                    MegaContact contactDB = dbH.findContactByHandle(String.valueOf(visibleContactsMEGA.get(i).getHandle()));
+                if (visibleContactsMEGA.get(i).getMegaUser().getEmail().compareTo(email) == 0) {
+                    c.setEmail(visibleContactsMEGA.get(i).getMegaUser().getEmail());
+                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(visibleContactsMEGA.get(i).getMegaUser().getHandle()));
                     if (contactDB != null) {
                         String name = contactDB.getName();
                         String lastName = contactDB.getLastName();

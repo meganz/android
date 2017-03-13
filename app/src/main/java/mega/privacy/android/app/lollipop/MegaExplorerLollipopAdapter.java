@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContact;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -225,7 +225,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					if(mS.getNodeHandle()==node.getHandle()){
 						MegaUser user= megaApi.getContact(mS.getUser());
 						if(user!=null){
-							MegaContact contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 							if(contactDB!=null){
 								if(!contactDB.getName().equals("")){
 									holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
