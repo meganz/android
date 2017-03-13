@@ -41,7 +41,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	static int HEIGHT_PAYMENT_METHODS_LAYOUT=50;
 
-	View v = null;
+//	View v = null;
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	public MyAccountInfo myAccountInfo;
@@ -179,6 +179,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		log("onCreateView");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -188,10 +189,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
-		aB.setTitle(R.string.action_upgrade_account);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -200,7 +197,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
 
-		v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
+		View v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
 		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
@@ -568,6 +565,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 			}
 		}
+		log("END onCreateView");
 		return v;
 	}
 
