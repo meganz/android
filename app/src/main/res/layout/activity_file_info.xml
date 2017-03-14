@@ -29,7 +29,7 @@
                     android:id="@+id/file_info_icon_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="60dp"
+                    android:layout_marginLeft="62dp"
                     android:layout_gravity="center_vertical|left"
                     android:background="@color/content_text_background"
                     app:layout_collapseMode="parallax"

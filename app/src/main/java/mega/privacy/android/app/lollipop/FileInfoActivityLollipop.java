@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -25,7 +24,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
@@ -114,6 +112,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	RelativeLayout iconToolbarLayout;
 	ImageView iconToolbarView;
+
+	Drawable upArrow;
+	Drawable drawableRemoveLink;
+	Drawable drawableLink;
+	Drawable drawableShare;
+	Drawable drawableDots;
 
 	RelativeLayout imageToolbarLayout;
 	ImageView imageToolbarView;
@@ -298,70 +302,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			aB = getSupportActionBar();
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
 
-			if(node.hasPreview()||node.hasThumbnail()){
-
-				Drawable upArrow = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_back_white, null);
-
-				upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-				getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-				Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
-				drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-				toolbar.setOverflowIcon(drawable);
-
-				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-
-				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-//				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
-			}
-			else{
-
-				AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
-				appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-					@Override
-					public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-						Drawable upArrow = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_back_white, null);
-						if (offset < -200) {
-							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-							if(getLinkMenuItem!=null){
-								shareMenuItem.setIcon(getDrawable(R.drawable.ic_share_white));
-								getLinkMenuItem.setIcon(getDrawable(R.drawable.ic_link_white));
-							}
-
-							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
-							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							toolbar.setOverflowIcon(drawable);
-						} else {
-
-							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
-							getSupportActionBar().setHomeAsUpIndicator(upArrow);
-							getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-							if(getLinkMenuItem!=null){
-								Drawable drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
-								drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
-								getLinkMenuItem.setIcon(drawableLink);
-
-								Drawable drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
-								drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
-								shareMenuItem.setIcon(drawableShare);
-							}
-
-							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
-							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
-							toolbar.setOverflowIcon(drawable);
-						}
-					}
-				});
-
-				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
-			}
-
-			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
+			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(33, outMetrics));
 			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -464,6 +405,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
+
+		drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+		drawableDots = drawableDots.mutate();
+		upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+		upArrow = upArrow.mutate();
+		drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link);
+		drawableRemoveLink = drawableRemoveLink.mutate();
+		drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
+		drawableLink = drawableLink.mutate();
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+		drawableShare = drawableShare.mutate();
 
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
@@ -577,6 +529,85 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				moveMenuItem.setVisible(true);
 				copyMenuItem.setVisible(true);
 			}
+		}
+
+		if(node.hasPreview()||node.hasThumbnail()){
+
+			upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+			drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			toolbar.setOverflowIcon(drawableDots);
+
+			if(removeLinkMenuItem!=null){
+				drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+				removeLinkMenuItem.setIcon(drawableRemoveLink);
+			}
+
+			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+
+			collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+//				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
+		}
+		else{
+
+			AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+			appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+				@Override
+				public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+					if (offset < -200) {
+						upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+						getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+						if(getLinkMenuItem!=null){
+
+							drawableLink.setColorFilter(null);
+							getLinkMenuItem.setIcon(drawableLink);
+
+							drawableShare.setColorFilter(null);
+							shareMenuItem.setIcon(drawableShare);
+						}
+
+						if(removeLinkMenuItem!=null){
+							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+							removeLinkMenuItem.setIcon(drawableRemoveLink);
+						}
+
+						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+						toolbar.setOverflowIcon(drawableDots);
+					} else {
+
+						upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+						getSupportActionBar().setHomeAsUpIndicator(upArrow);
+						getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+						if(getLinkMenuItem!=null){
+
+							drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+							getLinkMenuItem.setIcon(drawableLink);
+
+							drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+							shareMenuItem.setIcon(drawableShare);
+						}
+
+
+
+
+
+						if(removeLinkMenuItem!=null){
+							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.chat_background), PorterDuff.Mode.SRC_ATOP);
+							removeLinkMenuItem.setIcon(drawableRemoveLink);
+						}
+
+						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+						toolbar.setOverflowIcon(drawableDots);
+					}
+				}
+			});
+
+			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -2354,10 +2385,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					});
 					permissionsDialog = dialogBuilder.create();
 					permissionsDialog.show();
-					Resources resources = permissionsDialog.getContext().getResources();
-					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-			        alertTitle.setTextColor(resources.getColor(R.color.mega));
 					/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
@@ -2589,6 +2616,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     		megaApi.removeGlobalListener(this);
     		megaApi.removeRequestListener(this);
     	}
+
+		upArrow.setColorFilter(null);
+		drawableRemoveLink.setColorFilter(null);
+		drawableLink.setColorFilter(null);
+		drawableShare.setColorFilter(null);
+		drawableDots.setColorFilter(null);
     }
 
 	public static void log(String message) {

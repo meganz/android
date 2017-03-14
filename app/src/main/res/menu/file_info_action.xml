@@ -34,7 +34,8 @@
         android:id="@+id/cab_menu_file_info_remove_link"
         android:orderInCategory="100"
         android:title="@string/context_remove_link_menu"
-        MEGA:showAsAction="never" />
+        android:icon="@drawable/ic_remove_link"
+        MEGA:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/cab_menu_file_info_rename"
