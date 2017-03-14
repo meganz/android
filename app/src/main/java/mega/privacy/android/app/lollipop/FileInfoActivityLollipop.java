@@ -299,35 +299,65 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
 
 			if(node.hasPreview()||node.hasThumbnail()){
+
+				Drawable upArrow = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_back_white, null);
+
+				upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+				getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+				Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+				drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+				toolbar.setOverflowIcon(drawable);
+
+				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+
+				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+//				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
+			}
+			else{
+
 				AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 				appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
 					@Override
 					public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
 						Drawable upArrow = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_back_white, null);
 						if (offset < -200) {
-							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.name_my_account), PorterDuff.Mode.SRC_ATOP);
-							getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
-							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.name_my_account), PorterDuff.Mode.SRC_ATOP);
-							toolbar.setOverflowIcon(drawable);
-						} else {
-
 							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 							getSupportActionBar().setHomeAsUpIndicator(upArrow);
-							getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+							if(getLinkMenuItem!=null){
+								shareMenuItem.setIcon(getDrawable(R.drawable.ic_share_white));
+								getLinkMenuItem.setIcon(getDrawable(R.drawable.ic_link_white));
+							}
 
 							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
 							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 							toolbar.setOverflowIcon(drawable);
+						} else {
+
+							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+							getSupportActionBar().setHomeAsUpIndicator(upArrow);
+							getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+							if(getLinkMenuItem!=null){
+								Drawable drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
+								drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+								getLinkMenuItem.setIcon(drawableLink);
+
+								Drawable drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+								drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+								shareMenuItem.setIcon(drawableShare);
+							}
+
+							Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+							drawable.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+							toolbar.setOverflowIcon(drawable);
 						}
 					}
 				});
-				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-			}
-			else{
-				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+
+				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
 			}
 
@@ -335,7 +365,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-			collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
 			collapsingToolbar.setTitle(name);
 
 			aB.setHomeButtonEnabled(true);
@@ -921,7 +950,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						}
 						else{
 							//It is just public
-							iconToolbarView.setImageResource(R.drawable.folder_mime);
+							iconToolbarView.setImageResource(R.drawable.ic_folder_list);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);
 //							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
@@ -2453,7 +2482,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					log("sl.size==0");
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
-					iconToolbarView.setImageResource(R.drawable.folder_mime);
+					iconToolbarView.setImageResource(R.drawable.ic_folder_list);
 
 //					If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
@@ -2508,7 +2537,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						}
 						else{
 							//It is just public
-							iconToolbarView.setImageResource(R.drawable.folder_mime);
+							iconToolbarView.setImageResource(R.drawable.ic_folder_list);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);
 							usersSharedWithTextButton.setText(R.string.file_properties_shared_folder_public_link);

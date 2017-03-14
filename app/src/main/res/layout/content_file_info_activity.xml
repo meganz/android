@@ -17,11 +17,6 @@
 
         <!-- AVAILABLE OFFLINE LAYOUT -->
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="@color/separator_grey" />
-
         <LinearLayout
             android:id="@+id/available_offline_layout"
             android:layout_width="fill_parent"
