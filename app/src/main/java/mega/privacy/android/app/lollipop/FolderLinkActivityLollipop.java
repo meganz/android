@@ -84,6 +84,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	Toolbar tB;
 	Handler handler;
 	String url;
+	String folderHandle;
+	String folderKey;
+	String folderSubHandle;
 	RecyclerView listView;
 	private RecyclerView.LayoutManager mLayoutManager;
 	MegaNode selectedNode;
@@ -305,6 +308,28 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     			if (parentHandle == -1){
     				url = intent.getDataString();
 					if(url!=null){
+						log("URL: " + url);
+						String [] s = url.split("!");
+						log("URL parts: "  + s.length);
+						for (int i=0;i<s.length;i++){
+							switch (i){
+								case 1:{
+									folderHandle = s[1];
+									log("URL_handle: " + folderHandle);
+									break;
+								}
+								case 2:{
+									folderKey = s[2];
+									log("URL_key: " + folderKey);
+									break;
+								}
+								case 3:{
+									folderSubHandle = s[3];
+									log("URL_subhandle: " + folderSubHandle);
+									break;
+								}
+							}
+						}
 						megaApiFolder.loginToFolder(url, this);
 					}
 					else{
@@ -994,10 +1019,27 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						}
 					}
 					else{
-						parentHandle = rootNode.getHandle();
-						nodes = megaApiFolder.getChildren(rootNode);
-						aB.setTitle(megaApiFolder.getRootNode().getName());
-						supportInvalidateOptionsMenu();
+						if (folderSubHandle != null){
+							MegaNode pN = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(folderSubHandle));
+							if (pN != null){
+								parentHandle = MegaApiAndroid.base64ToHandle(folderSubHandle);
+								nodes = megaApiFolder.getChildren(pN);
+								aB.setTitle(pN.getName());
+								supportInvalidateOptionsMenu();
+							}
+							else{
+								parentHandle = rootNode.getHandle();
+								nodes = megaApiFolder.getChildren(rootNode);
+								aB.setTitle(megaApiFolder.getRootNode().getName());
+								supportInvalidateOptionsMenu();
+							}
+						}
+						else {
+							parentHandle = rootNode.getHandle();
+							nodes = megaApiFolder.getChildren(rootNode);
+							aB.setTitle(megaApiFolder.getRootNode().getName());
+							supportInvalidateOptionsMenu();
+						}
 
 						if (adapterList == null){
 							adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
