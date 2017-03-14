@@ -8,11 +8,11 @@ public class Product implements Parcelable{
 	long handle;
 	int level;
 	int months;
-	int storage;
+	long storage;
 	int amount;
-	int transfer;
+	long transfer;
 
-	public Product (long _handle, int _level, int _months, int _storage, int _amount, int _transfer){
+	public Product (long _handle, int _level, int _months, long _storage, int _amount, long _transfer){
 		this.handle=_handle;
 		this.level = _level;
 		this.months = _months;
@@ -45,11 +45,11 @@ public class Product implements Parcelable{
 		this.months = months;
 	}
 
-	public int getStorage() {
+	public long getStorage() {
 		return storage;
 	}
 
-	public void setStorage(int storage) {
+	public void setStorage(long storage) {
 		this.storage = storage;
 	}
 
@@ -61,11 +61,11 @@ public class Product implements Parcelable{
 		this.amount = amount;
 	}
 
-	public int getTransfer() {
+	public long getTransfer() {
 		return transfer;
 	}
 
-	public void setTransfer(int transfer) {
+	public void setTransfer(long transfer) {
 		this.transfer = transfer;
 	}
 
@@ -81,9 +81,9 @@ public class Product implements Parcelable{
 		out.writeLong(handle);
 		out.writeInt(level);
 		out.writeInt(months);
-		out.writeInt(storage);
+		out.writeLong(storage);
 		out.writeInt(amount);
-		out.writeInt(transfer);
+		out.writeLong(transfer);
 	}
 
 
