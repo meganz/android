@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -16,7 +15,6 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -471,10 +469,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
-		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
 		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
-		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
@@ -521,113 +519,33 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 			case 1:{
 				log("drawing circle for one digit");
-
-				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
-				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
-
-				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
-
-				Canvas c = new Canvas(image);
-				Paint p = new Paint();
-				p.setAntiAlias(true);
-				p.setColor(context.getResources().getColor(R.color.accentColor));
-
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
-				params.width=heightPendingMessageIcon;
-				holder.layoutPendingMessages.setLayoutParams(params);
-
-				int radius;
-				if (image.getWidth() < image.getHeight())
-					radius = image.getWidth()/2;
-				else
-					radius = image.getHeight()/2;
-
-				c.drawCircle(image.getWidth()/2, image.getHeight()/2, radius, p);
+				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_1);
+				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 			case 2:{
 				log("drawing oval for two digits");
-				int widthPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_two_digits);
-
-				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthPendingMessageIcon, outMetrics);
-				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
-
-				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
-
-				Canvas c = new Canvas(image);
-				Paint p = new Paint();
-				p.setAntiAlias(true);
-				p.setColor(context.getResources().getColor(R.color.accentColor));
-
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
-				params.width=widthPendingMessageIcon;
-				holder.layoutPendingMessages.setLayoutParams(params);
-
-				final RectF rect = new RectF(0, 0, image.getWidth(), image.getHeight());
-
-				c.drawOval(rect, p);
+				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_2);
+				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case 3:{
 				log("drawing oval for three digits");
-				int widthPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_three_digits);
-
-				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthPendingMessageIcon, outMetrics);
-				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
-
-				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
-
-				Canvas c = new Canvas(image);
-				Paint p = new Paint();
-				p.setAntiAlias(true);
-				p.setColor(context.getResources().getColor(R.color.accentColor));
-
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
-				params.width=widthPendingMessageIcon;
-				holder.layoutPendingMessages.setLayoutParams(params);
-
-				final RectF rect = new RectF(0, 0, image.getWidth(), image.getHeight());
-
-				c.drawOval(rect, p);
+				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_3);
+				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 			default:{
 				log("drawing oval for DEFAULT");
-				int widthPendingMessageIcon = (int) context.getResources().getDimension(R.dimen.width_image_pending_message_four_digits);
-
-				float imageWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthPendingMessageIcon, outMetrics);
-				float imageHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightPendingMessageIcon, outMetrics);
-
-				image = Bitmap.createBitmap( (int) Math.round(imageWidth), (int) Math.round(imageHeight), Bitmap.Config.ARGB_8888);
-
-				Canvas c = new Canvas(image);
-				Paint p = new Paint();
-				p.setAntiAlias(true);
-				p.setColor(context.getResources().getColor(R.color.accentColor));
-
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
-				params.width=widthPendingMessageIcon;
-				holder.layoutPendingMessages.setLayoutParams(params);
-
-				final RectF rect = new RectF(0, 0, image.getWidth(), image.getHeight());
-
-				c.drawOval(rect, p);
+				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_4);
+				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 		}
 
-		if(image!=null){
-			holder.circlePendingMessages.setImageBitmap(image);
+		holder.numberPendingMessages.setText(numberString);
 
-			holder.layoutPendingMessages.setVisibility(View.VISIBLE);
-
-			holder.numberPendingMessages.setText(numberString);
-		}
-		else{
-			log("image is NULL -- hide layout for pending messages");
-			holder.layoutPendingMessages.setVisibility(View.GONE);
-		}
 	}
 
 	public void createGroupChatAvatar(ViewHolderChatList holder){

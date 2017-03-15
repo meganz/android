@@ -54,7 +54,7 @@
         android:layout_alignTop="@id/recent_chat_list_name"
         android:layout_toRightOf="@id/recent_chat_list_name"
         android:layout_marginTop="3dp"
-        android:layout_marginLeft="6dp"
+        android:layout_marginLeft="4dp"
         android:background="@null"
         android:src="@drawable/circle_status_contact_not_connected" />
 
@@ -67,33 +67,7 @@
         android:background="@null"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/recent_chat_list_contact_state"
-        android:layout_marginLeft="6dp"/>
-
-    <RelativeLayout
-        android:id="@+id/recent_chat_list_unread_layout"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="32dp"
-        android:layout_centerVertical="true">
-
-        <ImageView
-            android:id="@+id/recent_chat_list_unread_circle"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_centerInParent="true"
-            android:scaleType="fitCenter"/>
-
-        <TextView
-            android:id="@+id/recent_chat_list_unread_number"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_centerInParent="true"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            android:gravity="center_horizontal|center_vertical"
-            android:paddingBottom="1dp" />
-    </RelativeLayout>
+        android:layout_marginLeft="4dp"/>
 
     <TextView
         android:id="@+id/recent_chat_list_content"
@@ -130,5 +104,29 @@
         android:background="@null"
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
+
+    <RelativeLayout
+        android:id="@+id/recent_chat_list_unread_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="18dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/recent_chat_list_three_dots">
+
+        <ImageView
+            android:id="@+id/recent_chat_list_unread_circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"/>
+
+        <TextView
+            android:id="@+id/recent_chat_list_unread_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:paddingBottom="1dp" />
+    </RelativeLayout>
 
 </RelativeLayout>
