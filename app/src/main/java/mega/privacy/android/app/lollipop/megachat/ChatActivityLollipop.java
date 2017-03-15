@@ -105,6 +105,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MegaChatRoom chatRoom;
     long idChat;
 
+    boolean noMoreNoSentMessages = false;
+
     boolean scrollingUp = false;
 
     long myUserHandle;
@@ -188,6 +190,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ArrayList<AndroidMegaChatMessage> messages;
     ArrayList<AndroidMegaChatMessage> bufferMessages;
+    ArrayList<AndroidMegaChatMessage> bufferManualSending;
+    ArrayList<AndroidMegaChatMessage> bufferSending;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -646,6 +650,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         messages = new ArrayList<AndroidMegaChatMessage>();
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
+                        bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
+                        bufferSending = new ArrayList<AndroidMegaChatMessage>();
 
                         log("Result of open chat: " + result);
 
@@ -1869,66 +1875,91 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
+        log("------------------------------------------");
         log("onMessageLoaded!------------------------");
 
         if(msg!=null){
+            log("------------------------------------------");
+            log("STATUS: "+msg.getStatus());
+            log("TEMP ID: "+msg.getTempId());
+            log("FINAL ID: "+msg.getMsgId());
+            log("TIMESTAMP: "+msg.getTimestamp());
+            log("TYPE: "+msg.getType());
+            if(msg.getContent()!=null){
+                log("CONTENT: "+msg.getContent());
+            }
 
-            log("Temporal id: "+msg.getTempId());
-            log("Final id: "+msg.getMsgId());
+            if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+                log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+            }
 
-            if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+            if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+
                 log("onMessageLoaded: Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
-                int returnValue = modifyMessageReceived(androidMsg, false);
+                //Find also in buffer of Messages
+
+                int returnValue = modifyMessageReceived(androidMsg, true);
                 if(returnValue!=-1){
                     log("onMessageLoaded: Message " + returnValue + " modified!");
                     return;
                 }
-            }
 
-            AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
-            if (lastMessageSeen != null) {
-                if(lastMessageSeen.getMsgId()==msg.getMsgId()){
-                    log("onMessageLoaded: Last message seen received!");
-                    lastSeenReceived=true;
-                    positionToScroll = 0;
-                }
-            }
-//
-            if(firstMessageReceived){
-                //TODO Only do this if the message is not ours and it's not already seen
-                megaChatApi.setMessageSeen(idChat, msg.getMsgId());
-                log("onMessageLoaded: set Message Seen: "+msg.getMsgIndex());
-                firstMessageReceived = false;
-            }
-//
-            if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                log("onMessageLoaded: No rise position to scroll: "+msg.getStatus());
+                bufferSending.add(0,androidMsg);
             }
             else{
+                if(!noMoreNoSentMessages){
+                    log("First meessage with NORMAL status");
+                    noMoreNoSentMessages=true;
+                    //Copy to bufferMessages
+                    for(int i=0;i<bufferSending.size();i++){
+                        bufferMessages.add(bufferSending.get(i));
+                    }
+                }
+
+                AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
+                if (lastMessageSeen != null) {
+                    if(lastMessageSeen.getMsgId()==msg.getMsgId()){
+                        log("onMessageLoaded: Last message seen received!");
+                        lastSeenReceived=true;
+                        positionToScroll = 0;
+                    }
+                }
+//
+                if(firstMessageReceived){
+                    //TODO Only do this if the message is not ours and it's not already seen
+                    megaChatApi.setMessageSeen(idChat, msg.getMsgId());
+                    log("onMessageLoaded: set Message Seen: "+msg.getMsgIndex());
+                    firstMessageReceived = false;
+                }
+
                 if(positionToScroll>=0){
                     log("onMessageLoaded: Position to scroll up!");
                     positionToScroll++;
                 }
-            }
 
-            bufferMessages.add(androidMsg);
-            log("onMessageLoaded: Counter: "+bufferMessages.size());
-            if(msg.getContent()!=null){
-                log("onMessageLoaded: Content: "+msg.getContent());
-            }
-            else{
-                log("onMessageLoaded: content NULL");
-            }
-            log("onMessageLoaded: Get type of message: "+msg.getType());
+                bufferMessages.add(androidMsg);
+                log("onMessageLoaded: Counter: "+bufferMessages.size());
+                if(msg.getContent()!=null){
+                    log("onMessageLoaded: Content: "+msg.getContent());
+                }
+                else{
+                    log("onMessageLoaded: content NULL");
+                }
+                log("onMessageLoaded: Get type of message: "+msg.getType());
 
-            log("onMessageLoaded: Size of messages: "+messages.size());
-            if(bufferMessages.size()==NUMBER_MESSAGES_TO_UPDATE_UI){
-                log("onMessageLoaded: Show messages screen");
-                chatRelativeLayout.setVisibility(View.VISIBLE);
-                emptyScrollView.setVisibility(View.GONE);
-                loadMessages();
+                log("onMessageLoaded: Size of messages: "+messages.size());
+                if(bufferMessages.size()>=NUMBER_MESSAGES_TO_UPDATE_UI){
+                    log("onMessageLoaded: Show messages screen");
+                    chatRelativeLayout.setVisibility(View.VISIBLE);
+                    emptyScrollView.setVisibility(View.GONE);
+                    loadMessages();
+                }
+
             }
+//
+
+
         }
         else{
             log("onMessageLoaded: The message is null");
@@ -1959,11 +1990,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             getMoreHistory = true;
         }
+        log("END onMessageLoaded------------------------------------------");
     }
 
     @Override
     public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageReceived!");
+        log("------------------------------------------");
+        log("STATUS: "+msg.getStatus());
+        log("TEMP ID: "+msg.getTempId());
+        log("FINAL ID: "+msg.getMsgId());
+        log("TIMESTAMP: "+msg.getTimestamp());
+        log("TYPE: "+msg.getType());
+        if(msg.getContent()!=null){
+            log("CONTENT: "+msg.getContent());
+        }
+
+        if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+            log("onMessageReceived: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+        }
 
         megaChatApi.setMessageSeen(idChat, msg.getMsgId());
 
@@ -1983,6 +2028,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         mLayoutManager.scrollToPosition(messages.size()-1);
 //        mLayoutManager.setStackFromEnd(true);
 //        mLayoutManager.scrollToPosition(0);
+        log("------------------------------------------");
     }
 
     @Override
@@ -2030,14 +2076,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
-    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean markAsSent){
+    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean checkTempId){
         log("modifyMessageReceived");
+        log("Msg ID: "+msg.getMessage().getMsgId());
+        log("Msg TEMP ID: "+msg.getMessage().getTempId());
         int indexToChange = -1;
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator();
 
         while (itr.hasNext()) {
             AndroidMegaChatMessage messageToCheck = itr.next();
-            if(markAsSent){
+            log("Check wth Msg ID: "+messageToCheck.getMessage().getMsgId());
+            log("Check wth Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
+            if(checkTempId){
+                log("Check temporal IDS");
                 if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
                     log("modifyMessageReceived: Mark as sent: " + messageToCheck.getMessage().getContent());
                     indexToChange = itr.nextIndex()-1;
@@ -2052,7 +2103,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
-
+        log("Index to change = "+indexToChange);
         if(indexToChange!=-1){
             AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
             if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
