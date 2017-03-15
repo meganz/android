@@ -599,6 +599,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.chat_background), PorterDuff.Mode.SRC_ATOP);
 							removeLinkMenuItem.setIcon(drawableRemoveLink);
 						}
+						else{
+							log("removeLinkMenuItem is NULL");
+						}
 
 						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
 						toolbar.setOverflowIcon(drawableDots);
