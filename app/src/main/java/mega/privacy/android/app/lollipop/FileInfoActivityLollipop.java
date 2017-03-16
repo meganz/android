@@ -591,16 +591,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							shareMenuItem.setIcon(drawableShare);
 						}
 
-
-
-
-
 						if(removeLinkMenuItem!=null){
-							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.chat_background), PorterDuff.Mode.SRC_ATOP);
+							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.filter_icon), PorterDuff.Mode.SRC_ATOP);
 							removeLinkMenuItem.setIcon(drawableRemoveLink);
-						}
-						else{
-							log("removeLinkMenuItem is NULL");
 						}
 
 						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
