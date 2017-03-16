@@ -58,6 +58,7 @@
     <color name="blue">#FF33B5E5</color>
     <color name="upgrade_orange">#ffa500</color>
     <color name="upgrade_grey">#8d8d8d</color>
+    <color name="filter_icon">#8d8d94</color>
     <color name="upgrade_white">#b9ffffff</color>
     <color name="delete_account">#ff333a</color>
 
