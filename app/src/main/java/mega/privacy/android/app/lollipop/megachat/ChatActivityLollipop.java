@@ -1283,6 +1283,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Error al enviar mensaje!");
+            //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
+
         }
     }
 
@@ -1297,6 +1299,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Message cannot be edited!");
+            //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
         }
     }
 
@@ -1898,11 +1901,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("onMessageLoaded: Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
                 //Find also in buffer of Messages
-
-                int returnValue = modifyMessageReceived(androidMsg, true);
-                if(returnValue!=-1){
-                    log("onMessageLoaded: Message " + returnValue + " modified!");
-                    return;
+                if(bufferSending.size()!=0){
+                    int returnValue = modifyMessageReceived(androidMsg, true);
+                    if(returnValue!=-1){
+                        log("onMessageLoaded: Message " + returnValue + " modified!");
+                        return;
+                    }
                 }
 
                 bufferSending.add(0,androidMsg);
@@ -2049,6 +2053,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Temporal id: "+msg.getTempId());
             log("Final id: "+msg.getMsgId());
 
+
             if(msg.getStatus()==MegaChatMessage.STATUS_SEEN){
                 log("STATUS_SEEN");
             }
@@ -2060,6 +2065,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("-----------Status : "+msg.getStatus());
                 log("-----------Timestamp: "+msg.getTimestamp());
                 log("-----------Content: "+msg.getContent());
+
+                if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+                    log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+                    //Buscar en la de sending por temporal id.
+
+                }
 
                 modifyMessageReceived(androidMsg, false);
             }
@@ -2075,6 +2086,73 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
     }
+
+//    public int modifyMessageReceivedOnLoad(AndroidMegaChatMessage msg){
+//        log("modifyMessageReceivedOnLoad");
+//        log("Msg ID: "+msg.getMessage().getMsgId());
+//        log("Msg TEMP ID: "+msg.getMessage().getTempId());
+//        int indexToChange = -1;
+//        ListIterator<AndroidMegaChatMessage> itr = bufferSending.listIterator();
+//
+//        while (itr.hasNext()) {
+//            AndroidMegaChatMessage messageToCheck = itr.next();
+//            log("Check wth Msg ID: "+messageToCheck.getMessage().getMsgId());
+//            log("Check wth Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
+//
+//            if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+//                log("modifyMessageReceived: Mark as sent: " + messageToCheck.getMessage().getContent());
+//                indexToChange = itr.nextIndex()-1;
+//                break;
+//            }
+//
+//        }
+//        log("Index to change = "+indexToChange);
+//        if(indexToChange!=-1){
+//            AndroidMegaChatMessage messageToUpdate = bufferSending.get(indexToChange);
+//
+//            bufferSending.set(indexToChange, msg);
+//
+//            //Update infoToShow also
+//            if (indexToChange == 0) {
+//                bufferSending.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+//            }
+//            else{
+//                //Not first element
+//                AndroidMegaChatMessage previousMessage = bufferSending.get(indexToChange - 1);
+//                log("modifyMessageReceived: previous message: " + previousMessage.getMessage().getContent());
+//                if (previousMessage.getMessage().getUserHandle() == myUserHandle) {
+//                    //The last two messages are mine
+//                    if (compareDate(msg, previousMessage) == 0) {
+//                        //Same date
+//                        if (compareTime(msg, previousMessage) == 0) {
+//                            bufferSending.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+//                        } else {
+//                            //Different minute
+//                            bufferSending.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+//                        }
+//                    } else {
+//                        //Different date
+//                        bufferSending.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+//                    }
+//                } else {
+//                    //The last message is mine, the previous not
+//                    if (compareDate(msg, previousMessage) == 0) {
+//                        bufferSending.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+//                    } else {
+//                        //Different date
+//                        bufferSending.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+//                    }
+//                }
+//            }
+//
+//
+//
+//        }
+//        else{
+//            log("Error, id temp message not found!!");
+//        }
+//        return indexToChange;
+//    }
 
     public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean checkTempId){
         log("modifyMessageReceived");
