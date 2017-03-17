@@ -8266,7 +8266,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("setAutoAwayValue: "+ value);
 		int timeout = Integer.parseInt(value);
 		megaChatApi.setPresenceAutoaway(true, timeout*60);
-		megaChatApi.setPresenceAutoaway(false, 0);
+		megaChatApi.setPresencePersist(false);
 		if(sttFLol!=null){
 			if(sttFLol.isAdded()){
 				sttFLol.updateAutoawayValueChat(timeout);
