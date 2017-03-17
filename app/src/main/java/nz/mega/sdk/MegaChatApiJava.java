@@ -312,30 +312,7 @@ public class MegaChatApiJava {
     }
 
     /**
-     * Get the online status of a user.
-     *
-     * It can be one of the following values:
-     * - MegaChatApi::STATUS_OFFLINE = 1
-     * The user appears as being offline
-     *
-     * - MegaChatApi::STATUS_BUSY = 2
-     * The user is busy and don't want to be disturbed.
-     *
-     * - MegaChatApi::STATUS_AWAY = 3
-     * The user is away and might not answer.
-     *
-     * - MegaChatApi::STATUS_ONLINE = 4
-     * The user is connected and online.
-     *
-     * @param userhandle of the peer whose name is requested.
-     * @return Online status of the user
-     */
-    public int getUserOnlineStatus(long userhandle){
-        return megaChatApi.getUserOnlineStatus(userhandle);
-    }
-
-    /**
-     * @brief Set your online status.
+     * Set your online status.
      *
      * The associated request type with this request is MegaChatRequest::TYPE_SET_CHAT_STATUS
      * Valid data in the MegaChatRequest object received on callbacks:
@@ -368,6 +345,48 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Enable/disable the autoaway option, with one specific timeout
+     *
+     * When autoaway is enabled and persist is false, the app should call to
+     * \c signalPresenceActivity regularly in order to keep the current online status.
+     * Otherwise, after \c timeout seconds, the online status will be changed to away.
+     *
+     * @param enable True to enable the autoaway feature
+     * @param timeout Seconds to wait before turning away (if no activity has been signalled)
+     */
+    public void setPresenceAutoaway(boolean enable, int timeout){
+        megaChatApi.setPresenceAutoaway(enable, timeout);
+    }
+
+    /**
+     * Enable/disable the persist option
+     *
+     * When this option is enable, the online status shown to other users will be the
+     * one specified by the user, even when you are disconnected.
+     *
+     * @param enable True to enable the persist feature
+     */
+    public void setPresencePersist(boolean enable){
+        megaChatApi.setPresencePersist(enable);
+    }
+
+    /**
+     * Signal there is some user activity
+     *
+     * When the presence configuration is set to autoaway (and persist is false), this
+     * function should be called regularly to not turn into away status automatically.
+     *
+     * A good approach is to call this function with every mouse move or keypress on desktop
+     * platforms; or at any finger tap or gesture and any keypress on mobile platforms.
+     *
+     * Failing to call this function, you risk a user going "Away" while typing a lengthy message,
+     * which would be awkward.
+     */
+    public void signalPresenceActivity(){
+        megaChatApi.signalPresenceActivity();
+    }
+
+    /**
      * Get your online status.
      *
      * It can be one of the following values:
@@ -387,6 +406,40 @@ public class MegaChatApiJava {
         return megaChatApi.getOnlineStatus();
     }
 
+    /**
+     * Get the current presence configuration
+     *
+     * @see \c MegaChatPresenceConfig for further details.
+     *
+     * @return The current presence configuration
+     */
+    public MegaChatPresenceConfig getPresenceConfig(){
+        return megaChatApi.getPresenceConfig();
+    }
+
+    /**
+     * Get the online status of a user.
+     *
+     * It can be one of the following values:
+     *
+     * - MegaChatApi::STATUS_OFFLINE = 1
+     * The user appears as being offline
+     *
+     * - MegaChatApi::STATUS_AWAY = 2
+     * The user is away and might not answer.
+     *
+     * - MegaChatApi::STATUS_ONLINE = 3
+     * The user is connected and online.
+     *
+     * - MegaChatApi::STATUS_BUSY = 4
+     * The user is busy and don't want to be disturbed.
+     *
+     * @param userhandle Handle of the peer whose name is requested.
+     * @return Online status of the user
+     */
+    public int getUserOnlineStatus(long userhandle){
+        return megaChatApi.getUserOnlineStatus(userhandle);
+    }
 
     /**
      * Returns the current firstname of the user

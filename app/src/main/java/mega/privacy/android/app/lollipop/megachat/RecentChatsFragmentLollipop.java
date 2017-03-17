@@ -3,11 +3,9 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -15,7 +13,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -61,16 +58,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     MegaChatApiAndroid megaChatApi;
 
     DatabaseHandler dbH;
-    ChatSettings chatSettings;
 
     Context context;
     ActionBar aB;
     RecyclerView listView;
     MegaListChatLollipopAdapter adapterList;
-
-    RelativeLayout chatStatusLayout;
-    TextView chatStatusText;
-
     RelativeLayout mainRelativeLayout;
 
     RecyclerView.LayoutManager mLayoutManager;
@@ -149,6 +141,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
+        listView.setClipToPadding(false);
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
@@ -169,8 +162,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         inviteButton.setOnClickListener(this);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
-        chatStatusLayout= (RelativeLayout)  v.findViewById(R.id.status_text_layout);
-        chatStatusText = (TextView)  v.findViewById(R.id.status_text);
 
         if(chatEnabled){
             log("Chat ENABLED");
@@ -178,46 +169,31 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             chatStatus = megaChatApi.getOnlineStatus();
             log("chatStatus: "+chatStatus);
 
-            chatSettings = dbH.getChatSettings();
-            if(chatSettings!=null){
-                String state = chatSettings.getChatStatus();
-                log("in DB status is: "+state);
-            }
+            if(aB!=null){
+                log("My own status is: "+chatStatus);
+                switch(chatStatus){
+                    case MegaChatApi.STATUS_ONLINE:{
+                        aB.setSubtitle(getString(R.string.online_status));
+                        break;
+                    }
+                    case MegaChatApi.STATUS_AWAY:{
+                        aB.setSubtitle(getString(R.string.away_status));
+                        break;
+                    }
+                    case MegaChatApi.STATUS_BUSY:{
+                        aB.setSubtitle(getString(R.string.busy_status));
+                        break;
+                    }
+                    case MegaChatApi.STATUS_OFFLINE:{
+                        aB.setSubtitle(getString(R.string.offline_status));
+                        break;
+                    }
+                    default:{
+                        aB.setSubtitle(getString(R.string.recovering_info));
+                        break;
+                    }
 
-            if(chatStatus== MegaChatApi.STATUS_ONLINE){
-                chatStatusLayout.setVisibility(View.GONE);
-
-                Resources res = getResources();
-                int valuePaddingTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, res.getDisplayMetrics());
-                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
-
-                listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
-                listView.setClipToPadding(false);
-                listView.setPadding(0, valuePaddingTop, 0, valuePaddingBottom);
-            }
-            else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
-                chatStatusLayout.setVisibility(View.VISIBLE);
-                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
-                chatStatusText.setText(getString(R.string.settings_chat_status_offline));
-
-                Resources res = getResources();
-                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
-
-                listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
-                listView.setClipToPadding(false);
-                listView.setPadding(0, 0, 0, valuePaddingBottom);
-            }
-            else{
-                chatStatusLayout.setVisibility(View.VISIBLE);
-                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_invisible_layout));
-                chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
-
-                Resources res = getResources();
-                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
-
-                listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
-                listView.setClipToPadding(false);
-                listView.setPadding(0, 0, 0, valuePaddingBottom);
+                }
             }
 
             this.setChats();
@@ -322,7 +298,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void showDisableChatScreen(){
 
         listView.setVisibility(View.GONE);
-        chatStatusLayout.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
         emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_enable_chat));
         inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
@@ -333,7 +308,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void showNoConnectionScreen(){
 
         listView.setVisibility(View.GONE);
-        chatStatusLayout.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
         emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_no_connection_title));
         inviteButton.setVisibility(View.GONE);
@@ -812,41 +786,27 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("onlineStatusUpdate: "+status);
 
         if (isAdded()) {
-            chatStatus = megaChatApi.getOnlineStatus();
-            log("chatStatus: "+chatStatus);
-            if(chatStatus== MegaChatApi.STATUS_ONLINE){
-                chatStatusLayout.setVisibility(View.GONE);
+            if(aB!=null){
 
-                Resources res = getResources();
-                int valuePaddingTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, res.getDisplayMetrics());
-                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
-
-                listView.setClipToPadding(false);
-                listView.setPadding(0, valuePaddingTop, 0, valuePaddingBottom);
+                switch(status){
+                    case MegaChatApi.STATUS_ONLINE:{
+                        aB.setSubtitle(getString(R.string.online_status));
+                        break;
+                    }
+                    case MegaChatApi.STATUS_AWAY:{
+                        aB.setSubtitle(getString(R.string.away_status));
+                        break;
+                    }
+                    case MegaChatApi.STATUS_BUSY:{
+                        aB.setSubtitle(getString(R.string.busy_status));
+                        break;
+                    }
+                    case MegaChatApi.STATUS_OFFLINE:{
+                        aB.setSubtitle(getString(R.string.offline_status));
+                        break;
+                    }
+                }
             }
-            else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
-                chatStatusLayout.setVisibility(View.VISIBLE);
-                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
-                chatStatusText.setText(getString(R.string.settings_chat_status_offline));
-
-                Resources res = getResources();
-                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
-
-                listView.setClipToPadding(false);
-                listView.setPadding(0, 0, 0, valuePaddingBottom);
-            }
-            else{
-                chatStatusLayout.setVisibility(View.VISIBLE);
-                chatStatusLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.status_invisible_layout));
-                chatStatusText.setText(getString(R.string.settings_chat_status_invisible));
-
-                Resources res = getResources();
-                int valuePaddingBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, res.getDisplayMetrics());
-
-                listView.setClipToPadding(false);
-                listView.setPadding(0, 0, 0, valuePaddingBottom);
-            }
-
         }
     }
 
@@ -949,6 +909,31 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         else{
             log("Participant2: "+participantLastName);
             return participantFirstName + " " + participantLastName;
+        }
+    }
+
+    public void updateStatus (int status){
+        if(aB!=null){
+
+            switch(status){
+                case MegaChatApi.STATUS_ONLINE:{
+                    aB.setSubtitle(getString(R.string.online_status));
+                    break;
+                }
+                case MegaChatApi.STATUS_AWAY:{
+                    aB.setSubtitle(getString(R.string.away_status));
+                    break;
+                }
+                case MegaChatApi.STATUS_BUSY:{
+                    aB.setSubtitle(getString(R.string.busy_status));
+                    break;
+                }
+                case MegaChatApi.STATUS_OFFLINE:{
+                    aB.setSubtitle(getString(R.string.offline_status));
+                    break;
+                }
+            }
+
         }
     }
 

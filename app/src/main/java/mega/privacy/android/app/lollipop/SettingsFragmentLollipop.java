@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
 //import android.support.v4.preference.PreferenceFragment;
@@ -85,8 +86,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_CHAT_ENABLE = "settings_chat_enable";
 
 	public static String KEY_CHAT_ONLINE_STATUS = "settings_status_chat_online";
-	public static String KEY_CHAT_INVISIBLE_STATUS = "settings_status_chat_invisible";
+	public static String KEY_CHAT_AWAY_STATUS = "settings_status_chat_away";
 	public static String KEY_CHAT_OFFLINE_STATUS = "settings_status_chat_offline";
+
+	public static String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
+	public static String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_checkpreference";
+
+	public static String CATEGORY_PERSISTENCE_CHAT = "settings_persistence_chat";
+	public static String KEY_CHAT_PERSISTENCE = "settings_persistence_chat_checkpreference";
 
 	public static String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
@@ -136,14 +143,19 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
 	PreferenceCategory advancedFeaturesCategory;
+	PreferenceCategory autoawayChatCategory;
+	PreferenceCategory persistenceChatCategory;
 
 	SwitchPreference pinLockEnableSwitch;
 	TwoLineCheckPreference pinLockEnableCheck;
 	SwitchPreference chatEnableSwitch;
 	TwoLineCheckPreference chatEnableCheck;
 	TwoLineCheckPreference chatStatusOnlineCheck;
-	TwoLineCheckPreference chatStatusInvisibleCheck;
+	TwoLineCheckPreference chatStatusAwayCheck;
 	TwoLineCheckPreference chatStatusOfflineCheck;
+	TwoLineCheckPreference chatAutoAwayCheck;
+	TwoLineCheckPreference chatPersistenceCheck;
+
 	Preference nestedNotificationsChat;
 	Preference pinLockCode;
 	Preference downloadLocation;
@@ -170,6 +182,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	TwoLineCheckPreference storageAskMeAlways;
 	TwoLineCheckPreference storageAdvancedDevices;
+
+	MegaChatPresenceConfig statusConfig;
 	
 	boolean cameraUpload = false;
 	boolean secondaryUpload = false;
@@ -233,6 +247,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		chatStatusCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_STATUS);
 		chatNotificationsCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_NOTIFICATIONS);
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
+		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
+		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -253,12 +269,19 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		chatStatusOnlineCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ONLINE_STATUS);
 		chatStatusOnlineCheck.setSummary(getString(R.string.settings_chat_summary_online));
 		chatStatusOnlineCheck.setOnPreferenceClickListener(this);
-		chatStatusInvisibleCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_INVISIBLE_STATUS);
-		chatStatusInvisibleCheck.setSummary(getString(R.string.settings_chat_summary_invisible));
-		chatStatusInvisibleCheck.setOnPreferenceClickListener(this);
+		chatStatusAwayCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_AWAY_STATUS);
+		chatStatusAwayCheck.setSummary(getString(R.string.settings_chat_summary_invisible));
+		chatStatusAwayCheck.setOnPreferenceClickListener(this);
 		chatStatusOfflineCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_OFFLINE_STATUS);
 		chatStatusOfflineCheck.setSummary(getString(R.string.settings_chat_summary_offline));
 		chatStatusOfflineCheck.setOnPreferenceClickListener(this);
+
+		chatAutoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_AUTOAWAY);
+		chatAutoAwayCheck.setSummary("Inactive");
+		chatAutoAwayCheck.setOnPreferenceClickListener(this);
+
+		chatPersistenceCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_PERSISTENCE);
+		chatPersistenceCheck.setOnPreferenceClickListener(this);
 
 		nestedNotificationsChat = findPreference(KEY_CHAT_NESTED_NOTIFICATIONS);
 		nestedNotificationsChat.setOnPreferenceClickListener(this);
@@ -698,30 +721,53 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		if(chatEnabled){
 			//Get chat status
-			chatStatus = megaChatApi.getOnlineStatus();
+			statusConfig = megaChatApi.getPresenceConfig();
+			chatStatus = statusConfig.getOnlineStatus();
 			log("SETTINGS chatStatus: "+chatStatus);
 			if(chatStatus== MegaChatApi.STATUS_ONLINE){
 				chatStatusOnlineCheck.setChecked(true);
-				chatStatusInvisibleCheck.setChecked(false);
+				chatStatusAwayCheck.setChecked(false);
 				chatStatusOfflineCheck.setChecked(false);
 			}
 			else if(chatStatus== MegaChatApi.STATUS_OFFLINE){
 				chatStatusOnlineCheck.setChecked(false);
-				chatStatusInvisibleCheck.setChecked(false);
+				chatStatusAwayCheck.setChecked(false);
 				chatStatusOfflineCheck.setChecked(true);
+			}
+			else if(chatStatus== MegaChatApi.STATUS_AWAY){
+				chatStatusOnlineCheck.setChecked(false);
+				chatStatusAwayCheck.setChecked(true);
+				chatStatusOfflineCheck.setChecked(false);
 			}
 			else{
 				chatStatusOnlineCheck.setChecked(false);
-				chatStatusInvisibleCheck.setChecked(true);
+				chatStatusAwayCheck.setChecked(false);
 				chatStatusOfflineCheck.setChecked(false);
+			}
+
+			if(statusConfig.isAutoawayEnabled()){
+				chatAutoAwayCheck.setChecked(true);
+				chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, statusConfig.getAutoawayTimeout()));
+			}
+			else{
+				chatAutoAwayCheck.setChecked(false);
+			}
+
+			if(statusConfig.isPersist()){
+				chatPersistenceCheck.setChecked(true);
+			}
+			else{
+				chatPersistenceCheck.setChecked(false);
 			}
 		}
 		else{
 			chatStatusOnlineCheck.setChecked(false);
-			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusAwayCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(false);
 			preferenceScreen.removePreference(chatStatusCategory);
 			preferenceScreen.removePreference(chatNotificationsCategory);
+			preferenceScreen.removePreference(autoawayChatCategory);
+			preferenceScreen.removePreference(persistenceChatCategory);
 		}
 
 
@@ -1530,35 +1576,23 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
 			}
-			int status = megaChatApi.getOnlineStatus();
-			if(status==MegaChatApi.STATUS_OFFLINE){
-				//Do connect
-				((ManagerActivityLollipop)context).connectChat(MegaChatApi.STATUS_ONLINE);
-			}
-			else{
-				megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
-			}
+
+			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
 
 			chatStatusOnlineCheck.setChecked(true);
-			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusAwayCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(false);
 		}
-		else if(preference.getKey().compareTo(KEY_CHAT_INVISIBLE_STATUS) == 0){
+		else if(preference.getKey().compareTo(KEY_CHAT_AWAY_STATUS) == 0){
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
 			}
-			int status = megaChatApi.getOnlineStatus();
-			if(status==MegaChatApi.STATUS_OFFLINE){
-				//Do connect()
-				((ManagerActivityLollipop)context).connectChat(MegaChatApi.STATUS_AWAY);
-			}
-			else{
-				megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
-			}
+
+			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
 
 			chatStatusOnlineCheck.setChecked(false);
-			chatStatusInvisibleCheck.setChecked(true);
+			chatStatusAwayCheck.setChecked(true);
 			chatStatusOfflineCheck.setChecked(false);
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_OFFLINE_STATUS) == 0){
@@ -1568,8 +1602,40 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 			megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, (ManagerActivityLollipop) context);
 			chatStatusOnlineCheck.setChecked(false);
-			chatStatusInvisibleCheck.setChecked(false);
+			chatStatusAwayCheck.setChecked(false);
 			chatStatusOfflineCheck.setChecked(true);
+		}
+		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+			statusConfig = megaChatApi.getPresenceConfig();
+			if(statusConfig.isAutoawayEnabled()){
+				log("Change AUTOAWAY chat to false");
+				megaChatApi.setPresenceAutoaway(false, 0);
+				chatAutoAwayCheck.setSummary("Disabled");
+			}
+			else{
+				log("Change AUTOAWAY chat to true");
+				((ManagerActivityLollipop)context).showAutoAwayValueDialog();
+			}
+		}
+		else if(preference.getKey().compareTo(KEY_CHAT_PERSISTENCE) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if(statusConfig.isPersist()){
+				log("Change persistence chat to false");
+				megaChatApi.setPresencePersist(false);
+			}
+			else{
+				log("Change persistence chat to true");
+				megaChatApi.setPresencePersist(true);
+				chatAutoAwayCheck.setChecked(false);
+			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
 			//Intent to new activity Chat Settings
@@ -1998,23 +2064,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		this.startActivity(intent);
 	}
 
+	public void updateAutoawayValueChat(int value){
+		log("updateAutowayValueChat");
+		chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, value));
+		chatPersistenceCheck.setChecked(false);
+	}
+
 	public void verifyStatusChat(int status){
 		switch(status){
 			case MegaChatApi.STATUS_ONLINE:{
 				chatStatusOnlineCheck.setChecked(true);
-				chatStatusInvisibleCheck.setChecked(false);
+				chatStatusAwayCheck.setChecked(false);
 				chatStatusOfflineCheck.setChecked(false);
 				break;
 			}
 			case MegaChatApi.STATUS_AWAY:{
 				chatStatusOnlineCheck.setChecked(false);
-				chatStatusInvisibleCheck.setChecked(true);
+				chatStatusAwayCheck.setChecked(true);
 				chatStatusOfflineCheck.setChecked(false);
 				break;
 			}
 			case MegaChatApi.STATUS_OFFLINE:{
 				chatStatusOnlineCheck.setChecked(false);
-				chatStatusInvisibleCheck.setChecked(false);
+				chatStatusAwayCheck.setChecked(false);
 				chatStatusOfflineCheck.setChecked(true);
 				break;
 			}

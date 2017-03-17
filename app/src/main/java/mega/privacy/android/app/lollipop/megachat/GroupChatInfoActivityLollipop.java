@@ -69,6 +69,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -1477,7 +1478,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status, boolean inProgress) {
         log("onChatOnlineStatusUpdate");
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+        log("onChatPresenceConfigUpdate");
     }
 }

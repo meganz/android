@@ -154,6 +154,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -396,6 +397,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog addContactDialog;
 	private AlertDialog overquotaDialog;
 	private AlertDialog permissionsDialog;
+	private AlertDialog presenceStatusDialog;
 	private AlertDialog openLinkDialog;
 	private AlertDialog alertNotPermissionsUpload;
 	private AlertDialog clearRubbishBinDialog;
@@ -3368,7 +3370,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
-
+		aB.setSubtitle(null);
     	switch (item){
     		case CLOUD_DRIVE:{
 				selectDrawerItemCloudDrive();
@@ -5248,22 +5250,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_menu_set_status:{
 				if (drawerItem == DrawerItem.CHAT){
 					log("Action set status");
-					drawerItem = DrawerItem.SETTINGS;
-					if (nV != null){
-						Menu nVMenu = nV.getMenu();
-//						MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-//						chat.setTitle(getString(R.string.section_chat));
-						MenuItem mi = nVMenu.findItem(R.id.navigation_item_chat);
-						if (mi != null){
-							mi.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat));
-							mi.setChecked(false);
-						}
-						MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
-						settings.setChecked(true);
-						settings.setIcon(getResources().getDrawable(R.drawable.settings_red));
-					}
-					scrollToChat = true;
-					selectDrawerItemLollipop(drawerItem);
+					showPresenceStatusDialog();
+//					drawerItem = DrawerItem.SETTINGS;
+//					if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+////						MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+////						chat.setTitle(getString(R.string.section_chat));
+//						MenuItem mi = nVMenu.findItem(R.id.navigation_item_chat);
+//						if (mi != null){
+//							mi.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat));
+//							mi.setChecked(false);
+//						}
+//						MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
+//						settings.setChecked(true);
+//						settings.setIcon(getResources().getDrawable(R.drawable.settings_red));
+//					}
+//					scrollToChat = true;
+//					selectDrawerItemLollipop(drawerItem);
 				}
 
 				return true;
@@ -8060,6 +8063,58 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		Util.brandAlertDialog(cancelDialog);
 	}
 
+	public void showPresenceStatusDialog(){
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		final CharSequence[] items = {getString(R.string.online_status), getString(R.string.away_status), getString(R.string.busy_status), getString(R.string.offline_status)};
+		int statusToShow = megaChatApi.getOnlineStatus();
+		switch(statusToShow){
+			case MegaChatApi.STATUS_ONLINE:{
+				statusToShow = 0;
+				break;
+			}
+			case MegaChatApi.STATUS_AWAY:{
+				statusToShow = 1;
+				break;
+			}
+			case MegaChatApi.STATUS_BUSY:{
+				statusToShow = 2;
+				break;
+			}
+			case MegaChatApi.STATUS_OFFLINE:{
+				statusToShow = 4;
+				break;
+			}
+		}
+		dialogBuilder.setSingleChoiceItems(items, statusToShow, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+
+				presenceStatusDialog.dismiss();
+				switch(item) {
+					case 0:{
+						megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, managerActivity);
+						break;
+					}
+					case 1:{
+						megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, managerActivity);
+						break;
+					}
+					case 2:{
+						megaChatApi.setOnlineStatus(MegaChatApi.STATUS_BUSY, managerActivity);
+						break;
+					}
+					case 3:{
+						megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, managerActivity);
+						break;
+					}
+				}
+			}
+		});
+		dialogBuilder.setTitle(getString(R.string.chat_status_title));
+		presenceStatusDialog = dialogBuilder.create();
+//		presenceStatusDialog.se
+		presenceStatusDialog.show();
+	}
+
 	public void showCancelConfirmation(final String feedback){
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 		    @Override
@@ -8146,6 +8201,78 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 	}
+
+	public void showAutoAwayValueDialog(){
+		log("showAutoAwayValueDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.hint_minutes));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					setAutoAwayValue(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
+		builder.setPositiveButton(getString(R.string.button_set),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						setAutoAwayValue(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+
+	public void setAutoAwayValue(String value){
+		log("setAutoAwayValue: "+ value);
+		int timeout = Integer.parseInt(value);
+		megaChatApi.setPresenceAutoaway(true, timeout);
+		if(sttFLol!=null){
+			if(sttFLol.isAdded()){
+				sttFLol.updateAutoawayValueChat(timeout);
+			}
+		}
+	}
+
 
 	private void createFolder(String title) {
 		log("createFolder");
@@ -10754,19 +10881,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch(status){
 					case MegaChatApi.STATUS_ONLINE:{
 						showSnackbar(getString(R.string.changing_status_to_online_success));
-						dbH.setStatusChat(MegaChatApi.STATUS_ONLINE+"");
 						break;
 					}
 					case MegaChatApi.STATUS_AWAY:{
 						showSnackbar(getString(R.string.changing_status_to_invisible_success));
-						dbH.setStatusChat(MegaChatApi.STATUS_AWAY+"");
 						break;
 					}
 					case MegaChatApi.STATUS_OFFLINE:{
 						showSnackbar(getString(R.string.changing_status_to_offline_success));
-						dbH.setStatusChat(MegaChatApi.STATUS_OFFLINE+"");
-						megaChatApi.disconnect(this);
 						break;
+					}
+				}
+				if(rChatFL!=null){
+					if(rChatFL.isAdded()){
+						rChatFL.updateStatus(status);
 					}
 				}
 				if(sttFLol!=null){
@@ -13096,12 +13224,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status) {
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status, boolean inProgress) {
+		log("onChatOnlineStatusUpdate: "+status+"___"+inProgress);
+		if(inProgress){
+			status = -1;
+		}
 		if(rChatFL!=null){
 			if(rChatFL.isAdded()){
 				rChatFL.onlineStatusUpdate(status);
 			}
 		}
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
 	}
 
 	public boolean isScrollToChat() {

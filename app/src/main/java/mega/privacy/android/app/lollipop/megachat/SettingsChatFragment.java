@@ -20,7 +20,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 public class SettingsChatFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener
@@ -226,7 +225,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
 
         String chosenSound = uri.toString();
         if(chatSettings==null){
-            chatSettings = new ChatSettings(Boolean.toString(true), Boolean.toString(true), chosenSound, Boolean.toString(true), MegaChatApi.STATUS_ONLINE+"");
+            chatSettings = new ChatSettings(Boolean.toString(true), Boolean.toString(true), chosenSound, Boolean.toString(true));
             dbH.setChatSettings(chatSettings);
         }
         else{
