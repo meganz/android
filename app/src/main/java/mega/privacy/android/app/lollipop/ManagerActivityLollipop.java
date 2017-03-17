@@ -8265,7 +8265,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setAutoAwayValue(String value){
 		log("setAutoAwayValue: "+ value);
 		int timeout = Integer.parseInt(value);
-		megaChatApi.setPresenceAutoaway(true, timeout);
+		megaChatApi.setPresenceAutoaway(true, timeout*60);
+		megaChatApi.setPresenceAutoaway(false, 0);
 		if(sttFLol!=null){
 			if(sttFLol.isAdded()){
 				sttFLol.updateAutoawayValueChat(timeout);
@@ -10889,6 +10890,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					case MegaChatApi.STATUS_OFFLINE:{
 						showSnackbar(getString(R.string.changing_status_to_offline_success));
+						break;
+					}
+					case MegaChatApi.STATUS_BUSY:{
+						showSnackbar(getString(R.string.changing_status_to_busy_success));
 						break;
 					}
 				}

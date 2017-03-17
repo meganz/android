@@ -50,7 +50,6 @@ import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
@@ -712,32 +711,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			statusConfig = megaChatApi.getPresenceConfig();
 			chatStatus = statusConfig.getOnlineStatus();
 			log("SETTINGS chatStatus: "+chatStatus);
-			switch(chatStatus) {
-				case MegaChatApi.STATUS_ONLINE: {
-					statusChatListPreference.setSummary(getString(R.string.online_status));
-					statusChatListPreference.setValueIndex(0);
-					break;
-				}
-				case MegaChatApi.STATUS_AWAY: {
-					statusChatListPreference.setSummary(getString(R.string.away_status));
-					statusChatListPreference.setValueIndex(1);
-					break;
-				}
-				case MegaChatApi.STATUS_BUSY: {
-					statusChatListPreference.setSummary(getString(R.string.busy_status));
-					statusChatListPreference.setValueIndex(2);
-					break;
-				}
-				case MegaChatApi.STATUS_OFFLINE: {
-					statusChatListPreference.setSummary(getString(R.string.offline_status));
-					statusChatListPreference.setValueIndex(3);
-					break;
-				}
-			}
+			statusChatListPreference.setValue(chatStatus+"");
+			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 
 			if(statusConfig.isAutoawayEnabled()){
 				chatAutoAwayCheck.setChecked(true);
-				chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, statusConfig.getAutoawayTimeout()));
+				int minutes = (int)statusConfig.getAutoawayTimeout()/60;
+				chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, minutes));
 			}
 			else{
 				chatAutoAwayCheck.setChecked(false);
@@ -1087,46 +1067,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("Object: " + newValue);
 		}
 		else if (preference.getKey().compareTo("settings_chat_list_status") == 0){
+			log("onPreferenceChage: change status chat");
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
 			}
-			switch(Integer.parseInt((String)newValue)){
-				case MegaChatApi.STATUS_ONLINE:{
-					log("change status to ONLINE");
-					statusChatListPreference.setValueIndex(0);
-					statusChatListPreference.setSummary(getString(R.string.online_status));
-
-					megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, (ManagerActivityLollipop) context);
-
-					break;
-				}
-				case MegaChatApi.STATUS_AWAY:{
-					log("change status to AWAY");
-					statusChatListPreference.setValueIndex(1);
-					statusChatListPreference.setSummary(getString(R.string.away_status));
-
-					megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, (ManagerActivityLollipop) context);
-					break;
-				}
-				case MegaChatApi.STATUS_BUSY:{
-					log("change status to BUSY");
-					statusChatListPreference.setValueIndex(2);
-					statusChatListPreference.setSummary(getString(R.string.busy_status));
-
-					megaChatApi.setOnlineStatus(MegaChatApi.STATUS_BUSY, (ManagerActivityLollipop) context);
-
-					break;
-				}
-				case MegaChatApi.STATUS_OFFLINE:{
-					log("change status to OFFLINE");
-					statusChatListPreference.setValueIndex(3);
-					statusChatListPreference.setSummary(getString(R.string.offline_status));
-
-					megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, (ManagerActivityLollipop) context);
-					break;
-				}
-			}
+			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+			int newStatus= Integer.parseInt((String)newValue);
+			megaChatApi.setOnlineStatus(newStatus, (ManagerActivityLollipop) context);
 		}
 		return true;
 	}
@@ -1629,7 +1577,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				log("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
+				megaChatApi.setPresenceAutoaway(false, 0);
 				chatAutoAwayCheck.setChecked(false);
+				chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
@@ -2067,28 +2017,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void verifyStatusChat(int status){
 		log("verifyStatusChat: "+status);
-		switch(status){
-			case MegaChatApi.STATUS_ONLINE:{
-				statusChatListPreference.setValueIndex(0);
-				statusChatListPreference.setSummary(getString(R.string.online_status));
-				break;
-			}
-			case MegaChatApi.STATUS_AWAY:{
-				statusChatListPreference.setValueIndex(1);
-				statusChatListPreference.setSummary(getString(R.string.away_status));
-				break;
-			}
-			case MegaChatApi.STATUS_BUSY:{
-				statusChatListPreference.setValueIndex(2);
-				statusChatListPreference.setSummary(getString(R.string.busy_status));
-				break;
-			}
-			case MegaChatApi.STATUS_OFFLINE:{
-				statusChatListPreference.setValueIndex(3);
-				statusChatListPreference.setSummary(getString(R.string.offline_status));
-				break;
-			}
-		}
+
+		statusChatListPreference.setValue(status+"");
+		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 	}
 
 	private static void log(String log) {
