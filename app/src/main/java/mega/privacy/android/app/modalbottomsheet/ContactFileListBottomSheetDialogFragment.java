@@ -145,7 +145,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
             if (node.isFolder()) {
 
-                nodeThumb.setImageResource(R.drawable.ic_folder_shared_list);
+                nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                 optionInfoText.setText(R.string.general_folder_info);
                 nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
 
