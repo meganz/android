@@ -1910,6 +1910,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 bufferSending.add(0,androidMsg);
+
+                //Como funciona el cambio de estado? No es lo mismo entrar por aqui cuando cargar historia que cuando te llega la actualizacion de un mensaje ya existente...
+
             }
             else{
                 if(!noMoreNoSentMessages){

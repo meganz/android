@@ -643,7 +643,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String notificationSound = decrypt(cursor.getString(3));
 			String vibrationEnabled = decrypt(cursor.getString(4));
 			String chatStatus = decrypt(cursor.getString(5));
-			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled, chatStatus);
+			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled);
 		}
 		cursor.close();
 
@@ -674,23 +674,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
-			db.insert(TABLE_CHAT_SETTINGS, null, values);
-		}
-		cursor.close();
-	}
-
-	public void setStatusChat(String status){
-
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_STATUS + "= '" + encrypt(status) + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-			values.put(KEY_CHAT_STATUS, encrypt(status));
 			db.insert(TABLE_CHAT_SETTINGS, null, values);
 		}
 		cursor.close();

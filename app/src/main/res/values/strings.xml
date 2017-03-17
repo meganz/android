@@ -924,6 +924,8 @@
 
     <string name="offline_status" context="Info label about the status of the user">Offline</string>
     <string name="online_status" context="Info label about the status of the user">Online</string>
+    <string name="away_status" context="Info label about the status of the user">Away</string>
+    <string name="busy_status" context="Info label about the status of the user">Busy</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
@@ -978,16 +980,13 @@
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 
-    <string name="settings_chat_status" context="settings of the chat to choose the status">Status</string>
-    <string name="settings_chat_status_online" context="settings of the chat to choose the status online">Online</string>
+    <string name="chat_status_title" context="settings of the chat to choose the status">Status</string>
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
-    <string name="settings_chat_status_invisible" context="settings of the chat to choose the status invisible">Invisible</string>
     <string name="settings_chat_summary_invisible" context="summary of the status invisible in settings">You can interact with your contacts but you will appear offline for them.</string>
-    <string name="settings_chat_status_offline" context="settings of the chat to choose the status offline">Offline</string>
     <string name="settings_chat_summary_offline" context="summary of the status invisible in settings">You will appear offline to your contacts and you will not be able to chat with them.</string>
 
     <string name="changing_status_to_online_success" context="message shown when the status of the user successfully changed to online">You\'re now online</string>
-    <string name="changing_status_to_invisible_success" context="message shown when the status of the user successfully changed to invisible">You\'re now invisible</string>
+    <string name="changing_status_to_invisible_success" context="message shown when the status of the user successfully changed to invisible">You\'re now away</string>
     <string name="changing_status_to_offline_success" context="message shown when the status of the user successfully changed to offline">You\'re now offline</string>
     <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">Error. You status has not been changed</string>
     <string name="leave_chat_error" context="message shown when a user couldn't leave chat">Error when leaving the chat</string>
@@ -1077,4 +1076,15 @@
     <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">Invitation ignored</string>
 
     <string name="error_message_unrecognizable" context="Content of a normal message that cannot be recognized">Message unrecognizable</string>
+
+    <string name="settings_autoaway_title" context="Title of the settings section to configure the autoaway of chat presence">Auto-away</string>
+    <string name="settings_autoaway_subtitle" context="Subtitle of the settings section to configure the autoaway of chat presence">Show me away after an inactivity of</string>
+    <string name="settings_autoaway_value" context="Value in the settings section of the autoaway chat presence">%1d minutes</string>
+
+    <string name="settings_persistence_title" context="Title of the settings section to configure the status persistence of chat presence">Status persistence</string>
+    <string name="settings_persistence_subtitle" context="Subtitle of the settings section to configure the status persistence of chat presence">Maintain my chosen status appearance even when I have no connected devices</string>
+
+    <string name="title_dialog_set_autoaway_value" context="Title of the dialog to set the value of the auto away preference">Set auto-away minutes</string>
+    <string name="button_set" context="Button to set a value">Set</string>
+    <string name="hint_minutes" context="Button to set a value">Minutes</string>
 </resources>
