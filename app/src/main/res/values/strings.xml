@@ -988,6 +988,7 @@
     <string name="changing_status_to_online_success" context="message shown when the status of the user successfully changed to online">You\'re now online</string>
     <string name="changing_status_to_invisible_success" context="message shown when the status of the user successfully changed to invisible">You\'re now away</string>
     <string name="changing_status_to_offline_success" context="message shown when the status of the user successfully changed to offline">You\'re now offline</string>
+    <string name="changing_status_to_busy_success" context="message shown when the status of the user successfully changed to offline">You\'re now busy</string>
     <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">Error. You status has not been changed</string>
     <string name="leave_chat_error" context="message shown when a user couldn't leave chat">Error when leaving the chat</string>
     <string name="create_chat_error" context="message shown when a chat has not been created">Error when creating the chat</string>
