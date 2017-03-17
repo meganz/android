@@ -1087,4 +1087,13 @@
     <string name="title_dialog_set_autoaway_value" context="Title of the dialog to set the value of the auto away preference">Set auto-away minutes</string>
     <string name="button_set" context="Button to set a value">Set</string>
     <string name="hint_minutes" context="Button to set a value">Minutes</string>
+
+    <string name="autoaway_disabled" context="Word to indicated the autoaway is disabled">Disabled</string>
+
+    <string-array name="settings_status_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">Online</item>
+        <item context="the options of what to upload.">Away</item>
+        <item context="the options of what to upload.">Busy</item>
+        <item context="the options of what to upload.">Offline</item>
+    </string-array>
 </resources>
