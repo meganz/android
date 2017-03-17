@@ -190,7 +190,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 if (node.isFolder()) {
                     nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
                     if (node.isShared()) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_shared_list);
+                        nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                     } else {
                         nodeThumb.setImageResource(R.drawable.ic_folder_list);
                     }
