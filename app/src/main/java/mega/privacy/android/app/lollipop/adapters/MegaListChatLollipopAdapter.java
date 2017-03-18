@@ -917,11 +917,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				int state = chat.getOnlineStatus();
 				if(state == MegaChatApi.STATUS_ONLINE){
 					log("This user is connected: "+chat.getTitle());
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
 				}
 				else{
 					log("This user status is: "+state+  " " + chat.getTitle());
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
 				}
 			}
 			else{
