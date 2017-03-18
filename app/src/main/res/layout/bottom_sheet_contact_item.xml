@@ -67,7 +67,7 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginLeft="6dp"
                 android:background="@null"
-                android:src="@drawable/circle_status_contact_not_connected" />
+                android:src="@drawable/circle_status_contact_offline" />
 
             <TextView
                 android:id="@+id/contact_list_contact_mail_text"

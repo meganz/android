@@ -168,11 +168,11 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
                     if(userStatus == MegaChatApi.STATUS_ONLINE){
                         log("This user is connected");
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                     }
                     else{
                         log("This user status is: "+userStatus);
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
                     }
                 }
             }

@@ -56,7 +56,7 @@
         android:layout_marginTop="3dp"
         android:layout_marginLeft="4dp"
         android:background="@null"
-        android:src="@drawable/circle_status_contact_not_connected" />
+        android:src="@drawable/circle_status_contact_offline" />
 
 
     <ImageView

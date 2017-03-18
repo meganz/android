@@ -139,11 +139,11 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			int state = chat.getOnlineStatus();
 			if(state == MegaChatApi.STATUS_ONLINE){
 				log("This user is connected: "+chat.getTitle());
-				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
 			}
 			else{
 				log("This user status is: "+state+  " " + chat.getTitle());
-				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
 			}
 
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);

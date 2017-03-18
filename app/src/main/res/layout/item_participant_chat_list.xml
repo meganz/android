@@ -75,7 +75,7 @@
         android:layout_marginLeft="6dp"
         android:layout_marginTop="3dp"
         android:background="@null"
-        android:src="@drawable/circle_status_contact_not_connected" />
+        android:src="@drawable/circle_status_contact_offline" />
 
     <TextView
         android:id="@+id/participant_list_content"

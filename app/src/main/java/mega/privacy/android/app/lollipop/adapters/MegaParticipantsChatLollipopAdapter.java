@@ -195,11 +195,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			int userStatus = participant.getStatus();
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				log("This user is connected");
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_connected));
+				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
 			}
 			else{
 				log("This user status is: "+userStatus);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_not_connected));
+				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
 			}
 
 			if (!multipleSelect) {
