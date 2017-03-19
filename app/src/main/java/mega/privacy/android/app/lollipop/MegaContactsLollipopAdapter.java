@@ -506,11 +506,11 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					log("This user is connected");
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
 				}
-				if(userStatus == MegaChatApi.STATUS_AWAY){
+				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
 				}
-				if(userStatus == MegaChatApi.STATUS_BUSY){
+				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
 				}
