@@ -137,15 +137,23 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
 			iconStateChatPanel.setVisibility(View.VISIBLE);
 			int state = chat.getOnlineStatus();
-			if(state == MegaChatApi.STATUS_ONLINE){
-				log("This user is connected: "+chat.getTitle());
-				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-			}
-			else{
-				log("This user status is: "+state+  " " + chat.getTitle());
-				iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-			}
 
+            if(state == MegaChatApi.STATUS_ONLINE){
+                log("This user is connected");
+                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+            }
+            else if(state == MegaChatApi.STATUS_AWAY){
+                log("This user is away");
+                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+            }
+            else if(state == MegaChatApi.STATUS_BUSY){
+                log("This user is busy");
+                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+            }
+            else{
+                log("This user status is: "+state);
+                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+            }
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 			MegaUser user = megaApi.getContact(userHandleEncoded);
 			if(user!=null){

@@ -915,14 +915,22 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			MegaChatListItem chat = chats.get(position);
 			if(chat!=null){
 				int state = chat.getOnlineStatus();
-				if(state == MegaChatApi.STATUS_ONLINE){
-					log("This user is connected: "+chat.getTitle());
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				}
-				else{
-					log("This user status is: "+state+  " " + chat.getTitle());
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-				}
+                if(state == MegaChatApi.STATUS_ONLINE){
+                    log("This user is connected");
+                    holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+                }
+                else if(state == MegaChatApi.STATUS_AWAY){
+                    log("This user is away");
+                    holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+                }
+                else if(state == MegaChatApi.STATUS_BUSY){
+                    log("This user is busy");
+                    holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                }
+                else{
+                    log("This user status is: "+state);
+                    holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                }
 			}
 			else{
 				log("Chat is NULL");

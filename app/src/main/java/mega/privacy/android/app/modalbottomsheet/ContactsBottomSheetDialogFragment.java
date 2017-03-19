@@ -170,6 +170,14 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                         log("This user is connected");
                         contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                     }
+                    else if(userStatus == MegaChatApi.STATUS_AWAY){
+                        log("This user is away");
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+                    }
+                    else if(userStatus == MegaChatApi.STATUS_BUSY){
+                        log("This user is busy");
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                    }
                     else{
                         log("This user status is: "+userStatus);
                         contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
