@@ -1963,11 +1963,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     emptyScrollView.setVisibility(View.GONE);
                     loadMessages();
                 }
-
             }
-//
-
-
         }
         else{
             log("onMessageLoaded: The message is null");

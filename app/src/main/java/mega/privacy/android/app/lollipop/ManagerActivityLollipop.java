@@ -8211,6 +8211,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
 		layout.addView(input, params);
 
 //		input.setId(EDIT_TEXT_ID);
