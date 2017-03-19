@@ -1922,6 +1922,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     for(int i=0;i<bufferSending.size();i++){
                         bufferMessages.add(bufferSending.get(i));
                     }
+                    bufferSending.clear();
                 }
 
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
@@ -1970,6 +1971,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("onMessageLoaded: The message is null");
+
+            if(bufferSending.size()!=0){
+                for(int i=0;i<bufferSending.size();i++){
+                    bufferMessages.add(bufferSending.get(i));
+                }
+                bufferSending.clear();
+            }
+
             if(bufferMessages.size()!=0){
                 chatRelativeLayout.setVisibility(View.VISIBLE);
                 emptyScrollView.setVisibility(View.GONE);
