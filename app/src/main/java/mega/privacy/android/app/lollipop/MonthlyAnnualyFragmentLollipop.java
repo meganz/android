@@ -253,6 +253,8 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		refreshAccountInfo();
 
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+
 		return v;
 	}
 
@@ -751,6 +753,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public int onBackPressed(){
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		((ManagerActivityLollipop)context).showUpAF();
 		return 3;
 	}
@@ -768,6 +771,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 	@Override
 	public void onClick(View v) {
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		switch (v.getId()){
 			case R.id.monthly_annualy_subscribe_layout: {
 				log("Button Subscribe pressed");

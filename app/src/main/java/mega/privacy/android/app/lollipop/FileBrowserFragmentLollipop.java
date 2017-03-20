@@ -1170,8 +1170,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public int onBackPressed(){
-		
 		log("onBackPressed");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		if (adapter != null){
 			parentHandle = adapter.getParentHandle();

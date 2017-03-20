@@ -565,6 +565,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 			}
 		}
+
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		log("END onCreateView");
 		return v;
 	}
@@ -1036,6 +1038,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	@Override
 	public void onClick(View v) {
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		switch (v.getId()){
 			case R.id.upgrade_prolite_layout:{
 				if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){

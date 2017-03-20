@@ -324,6 +324,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+
 		if (isList){
 			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
@@ -534,6 +536,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	
 	@Override
 	public void onClick(View v) {
+		log("onCLick");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		switch(v.getId()){
 		
@@ -549,7 +553,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}	
 
     public void itemClick(int position) {
-		
+		log("itemClick: "+position);
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
@@ -702,6 +707,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public int onBackPressed(){
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
