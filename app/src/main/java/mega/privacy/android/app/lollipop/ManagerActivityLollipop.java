@@ -2156,23 +2156,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (rChatFL != null){
 						if(rChatFL.isAdded()){
 							rChatFL.setChats();
+							rChatFL.setStatus();
 						}
 					}
 					break;
 				}
     		}
     	}
-	}
-
-	public void setChats(){
-		if(drawerItem==DrawerItem.CHAT){
-			if (rChatFL != null) {
-				if (rChatFL.isAdded()) {
-					rChatFL.setChats();
-				}
-
-			}
-		}
 	}
 
 	public void showMuteIcon(MegaChatListItem item){
@@ -3353,6 +3343,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, rChatFL, "rChat");
 			ft.commitNow();
 			rChatFL.setChats();
+			rChatFL.setStatus();
 //			rChatFL.setMyEmail(megaApi.getMyUser().getEmail());
 //			if(myAccountInfo==null){
 //				log("Not possibleeeeeee!!");
