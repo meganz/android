@@ -718,6 +718,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			showPresenceChatConfig();
 
+			if(megaChatApi.isSignalActivityRequired()){
+				megaChatApi.signalPresenceActivity();
+			}
 		}
 		else{
 			preferenceScreen.removePreference(chatStatusCategory);
@@ -925,35 +928,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.setEnabled(false);
 		}
 
-
-		if(((ManagerActivityLollipop)context).isScrollToChat()){
-			Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				public void run() {
-					try {
-						log("Running!");
-						if(lv==null){
-							log("lv is NULL");
-						}
-						int scroll = 4;
-						if(pinLock){
-							scroll = scroll + 1;
-						}
-						if (secondaryUpload){
-							scroll = scroll + 9;
-						}
-						else if(cameraUpload){
-							scroll = scroll + 7;
-						}
-
-						lv.setSelection(scroll);
-
-					} catch (Exception e) {}
-				}
-			}, 50);
-			((ManagerActivityLollipop)context).setScrollToChat(false);
-		}
-
 		return v;
 	}
 
@@ -972,7 +946,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		log("onPreferenceChange");
-		
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_HOW_TO) == 0){
 			switch (Integer.parseInt((String)newValue)){
@@ -1079,6 +1053,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
 		log("onPreferenceClick");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+
 		prefs = dbH.getPreferences();
 		log("KEY = " + preference.getKey());
 		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){

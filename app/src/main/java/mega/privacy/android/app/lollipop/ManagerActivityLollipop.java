@@ -241,8 +241,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     Toolbar tB;
     ActionBar aB;
 
-	boolean scrollToChat = false;
-
 	int selectedPaymentMethod;
 	int selectedAccountType;
 	int displayedAccountType;
@@ -1814,6 +1812,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	protected void onPostResume() {
 		log("onPostResume");
     	super.onPostResume();
+
+		sendSignalPresenceActivity();
 
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
@@ -3629,14 +3629,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
     			}
 
-    			if(scrollToChat){
-					log("scrollToChat true -> create new Fragment");
+				if(sttFLol==null){
 					sttFLol = new SettingsFragmentLollipop();
-				}
-				else{
-					if(sttFLol==null){
-						sttFLol = new SettingsFragmentLollipop();
-					}
 				}
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -4963,6 +4957,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
 		}
+
+		sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch(id){
@@ -9536,6 +9532,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onClick(View v) {
 		log("onClick");
+		sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.custom_search:{
 				if (searchMenuItem != null) {
@@ -13262,14 +13260,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public boolean isScrollToChat() {
-		return scrollToChat;
+	public void sendSignalPresenceActivity(){
+		log("sendSignalPresenceActivity");
+		if(Util.isChatEnabled()){
+			if (megaChatApi != null){
+				if(megaChatApi.isSignalActivityRequired()){
+					megaChatApi.signalPresenceActivity();
+				}
+			}
+		}
 	}
-
-	public void setScrollToChat(boolean scrollToChat) {
-		this.scrollToChat = scrollToChat;
-	}
-
 	public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}

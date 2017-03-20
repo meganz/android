@@ -1398,7 +1398,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
 		log("onClick -> Current position: "+currentPosition);
@@ -1458,6 +1458,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+
 		ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
