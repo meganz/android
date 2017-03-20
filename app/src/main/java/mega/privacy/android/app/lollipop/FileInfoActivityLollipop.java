@@ -2319,7 +2319,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for(int i=0; i<copyHandles.length;i++){
-				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
+				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+				if (cN != null){
+					log("cN != null, i = " + i + " of " + copyHandles.length);
+					megaApi.copyNode(cN, parent, this);
+				}
+				else{
+					log("cN == null, i = " + i + " of " + copyHandles.length);
+					try {
+						statusDialog.dismiss();
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					}
+					catch (Exception ex) {}
+				}
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
