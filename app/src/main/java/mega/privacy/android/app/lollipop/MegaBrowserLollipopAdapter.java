@@ -621,7 +621,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
-				holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+				holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 				//Show the owner of the shared folder
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
@@ -650,7 +650,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
-				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
+				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 				if (sl != null) {
@@ -661,10 +661,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			else{
 				if (node.isOutShare()){
-					holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
+					holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 				}
 				else if(node.isInShare()){
-					holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+					holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 				}
 				else{
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
@@ -926,7 +926,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			else if(type==Constants.CONTACT_FILE_ADAPTER){
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+					holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 				}
 				else {
 
@@ -941,7 +941,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 					}
 				}
 
@@ -969,7 +969,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+					holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 				}
 				else {
 
@@ -984,7 +984,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 					}
 				}
 
@@ -1039,7 +1039,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
+					holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 				}
 				else {
 
@@ -1054,7 +1054,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
+						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 					}
 				}
 				//Show the number of contacts who shared the folder
@@ -1070,10 +1070,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					if (node.isOutShare()){
-						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
+						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 					}
 					else if(node.isInShare()){
-						holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 					}
 					else{
 						holder.imageView.setImageResource(R.drawable.ic_folder_list);
@@ -1093,10 +1093,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
 						if (node.isOutShare()){
-							holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
+							holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 						}
 						else if(node.isInShare()){
-							holder.imageView.setImageResource(R.drawable.ic_folder_incoming);
+							holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 						}
 						else{
 							holder.imageView.setImageResource(R.drawable.ic_folder_list);
