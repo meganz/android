@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat;
 
 
 import android.content.Intent;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -16,8 +15,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import mega.privacy.android.app.R;
 
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
@@ -59,12 +58,6 @@ public class ChatPreferencesActivity extends AppCompatActivity {
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-
-
-//        getFragmentManager().beginTransaction().replace(android.R.id.fragmentContainer, new MyPreferenceFragment()).commit();
-
-//        FragmentManager fm = getSupportFragmentManager();
-//        fm.beginTransaction().replace(R.id.fragment_container, new SettingsChatFragment()).commit();
 
         android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
         sttChat = new SettingsChatFragment();

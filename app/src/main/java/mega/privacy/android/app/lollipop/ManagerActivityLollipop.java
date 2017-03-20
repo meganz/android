@@ -8273,14 +8273,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(cancelled){
 			if(sttFLol!=null){
 				if(sttFLol.isAdded()){
-					sttFLol.updateAutoawayValueChat(true, null);
+					sttFLol.updatePresenceConfigChat(true, null);
 				}
 			}
 		}
 		else{
 			int timeout = Integer.parseInt(value);
 			megaChatApi.setPresenceAutoaway(true, timeout*60);
-			megaChatApi.setPresencePersist(false);
 		}
 	}
 
@@ -13256,8 +13255,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onPresenceConfigUpdate");
 		if(sttFLol!=null){
 			if(sttFLol.isAdded()){
-				sttFLol.updateAutoawayValueChat(false, config);
-				sttFLol.updatePersistValueChat(config);
+				if(config!=null){
+					sttFLol.updatePresenceConfigChat(false, config);
+				}
 			}
 		}
 	}

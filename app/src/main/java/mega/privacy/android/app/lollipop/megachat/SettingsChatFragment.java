@@ -165,10 +165,17 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
                 }
             }
         }
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
     }
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
 
         if (preference.getKey().compareTo(KEY_CHAT_NOTIFICATIONS) == 0){
             log("KEY_CHAT_NOTIFICATIONS");

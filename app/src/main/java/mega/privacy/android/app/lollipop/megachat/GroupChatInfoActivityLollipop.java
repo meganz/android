@@ -404,6 +404,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 notificationsSwitch.setChecked(true);
             }
 
+            if(megaChatApi.isSignalActivityRequired()){
+                megaChatApi.signalPresenceActivity();
+            }
 
             //Set participants
             participants = new ArrayList<>();
@@ -565,6 +568,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
 
     public boolean onOptionsItemSelected(MenuItem item) {
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
@@ -587,6 +594,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void chooseAddParticipantDialog(){
         log("chooseAddContactDialog");
 
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         Intent in = new Intent(this, AddContactActivityLollipop.class);
 //		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
         in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
@@ -596,6 +607,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void showRemoveParticipantConfirmation (MegaChatParticipant participant, MegaChatRoom chatToChange){
         log("showRemoveParticipantConfirmation");
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -652,6 +668,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void showChangePermissionsDialog(MegaChatParticipant participant, MegaChatRoom chatToChange){
         //Change permissions
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
 
         final MegaChatParticipant participantToChange = participant;
 
@@ -837,8 +857,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onClick(View view) {
-
         log("onClick");
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         switch (view.getId()) {
 
             case R.id.chat_group_contact_properties_edit_icon: {
@@ -1163,6 +1187,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         log("onCheckedChanged");
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
 
         notificationsSwitch.setChecked(isChecked);
 

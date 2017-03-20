@@ -418,6 +418,18 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Returns whether the autoaway option is enabled.
+     *
+     * @note This function returns true even when the Presence Config
+     * is pending to be confirmed by the server.
+     *
+     * @return True if autoaway is enabled.
+     */
+    public boolean isSignalActivityRequired(){
+        return megaChatApi.isSignalActivityRequired();
+    }
+
+    /**
      * Get the online status of a user.
      *
      * It can be one of the following values:

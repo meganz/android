@@ -247,6 +247,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         public void onLongPress(MotionEvent e) {
             log("onLongPress");
+            if(megaChatApi.isSignalActivityRequired()){
+                megaChatApi.signalPresenceActivity();
+            }
+
             View view = listView.findChildViewUnder(e.getX(), e.getY());
             int position = listView.getChildLayoutPosition(view);
 
@@ -264,6 +268,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             log("onSingleTapUp");
+
+            if(megaChatApi.isSignalActivityRequired()){
+                megaChatApi.signalPresenceActivity();
+            }
 
             View view = listView.findChildViewUnder(e.getX(), e.getY());
             int position = listView.getChildLayoutPosition(view);
@@ -450,6 +458,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     handlerSend = new Handler();
                     handlerSend.postDelayed(runnable, interval);
                 }
+
+                if(megaChatApi.isSignalActivityRequired()){
+                    megaChatApi.signalPresenceActivity();
+                }
             }
         });
 
@@ -522,6 +534,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                }
 
                         if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
+                            if(megaChatApi.isSignalActivityRequired()){
+                                megaChatApi.signalPresenceActivity();
+                            }
                             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                             getMoreHistory = false;
                             log("Get more history------------------------");
@@ -559,6 +574,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         uploadContactOption.setOnClickListener(this);
 
         emojiKeyboardLayout = (FrameLayout) findViewById(R.id.chat_emoji_keyboard);
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
 
         ViewTreeObserver viewTreeObserver = fragmentContainer.getViewTreeObserver();
         if (viewTreeObserver.isAlive()) {
@@ -923,6 +942,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
@@ -975,6 +999,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void chooseAddParticipantDialog(){
         log("chooseAddContactDialog");
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
 
         Intent in = new Intent(this, AddContactActivityLollipop.class);
         in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
@@ -1082,6 +1110,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onBackPressed() {
         log("onBackPressedLollipop");
 
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         if(uploadPanel.getVisibility()==View.VISIBLE){
             hideUploadPanel();
             return;
@@ -1101,6 +1133,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onClick(View v) {
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         switch (v.getId()) {
             case R.id.home:{
                 break;
@@ -1325,6 +1362,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
+
+            if(megaChatApi.isSignalActivityRequired()){
+                megaChatApi.signalPresenceActivity();
+            }
 
             switch(item.getItemId()){
 //                case R.id.cab_menu_select_all:{
@@ -1587,6 +1628,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void itemClick(int position) {
         log("itemClick: "+position);
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
 
