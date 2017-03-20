@@ -970,14 +970,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						if(sl.size()>1){
 							//It is public and shared
-							iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);
 							usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
 						else{
 							//It is just public
-							iconToolbarView.setImageResource(R.drawable.ic_folder_list);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);
 //							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
@@ -987,7 +985,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					else{
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 						//It is private and shared
-						iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 						sharedLayout.setVisibility(View.VISIBLE);
 						dividerSharedLayout.setVisibility(View.VISIBLE);
 						usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
@@ -2497,6 +2494,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}
 
 		if (node.isFolder()){
+			if (node.isInShare()){
+				imageId = R.drawable.ic_folder_incoming;
+			}
+			else if (node.isOutShare()){
+				imageId = R.drawable.ic_folder_outgoing;
+			}
+			else{
+				imageId = R.drawable.ic_folder;
+			}
 			iconToolbarView.setImageResource(imageId);
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
@@ -2505,7 +2511,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					log("sl.size==0");
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
-					iconToolbarView.setImageResource(R.drawable.ic_folder_list);
 
 //					If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
@@ -2553,14 +2558,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						if(sl.size()>1){
 							//It is public and shared
-							iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);
 							usersSharedWithTextButton.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
 							//It is just public
-							iconToolbarView.setImageResource(R.drawable.ic_folder_list);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);
 							usersSharedWithTextButton.setText(R.string.file_properties_shared_folder_public_link);
@@ -2570,7 +2573,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					else{
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 						//It is private and shared
-						iconToolbarView.setImageResource(R.drawable.folder_shared_mime);
 						sharedLayout.setVisibility(View.VISIBLE);
 						dividerSharedLayout.setVisibility(View.VISIBLE);
 						usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
