@@ -790,8 +790,20 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    public void setStatus() {
+        log("setStatus");
+        if(chatEnabled) {
+            chatStatus = megaChatApi.getOnlineStatus();
+            log("chatStatus: " + chatStatus);
+
+            onlineStatusUpdate(chatStatus);
+        }
+    }
+
     public void onlineStatusUpdate(int status) {
         log("onlineStatusUpdate: "+status);
+
+        chatStatus = status;
 
         if (isAdded()) {
             if(aB!=null){
