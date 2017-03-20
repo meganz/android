@@ -8228,7 +8228,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (value.length() == 0) {
 						return true;
 					}
-					setAutoAwayValue(value);
+					setAutoAwayValue(value, false);
 					newFolderDialog.dismiss();
 					return true;
 				}
@@ -8254,24 +8254,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (value.length() == 0) {
 							return;
 						}
-						setAutoAwayValue(value);
+						setAutoAwayValue(value, false);
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						setAutoAwayValue("-1", true);
+					}
+				});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 	}
 
-	public void setAutoAwayValue(String value){
+	public void setAutoAwayValue(String value, boolean cancelled){
 		log("setAutoAwayValue: "+ value);
-		int timeout = Integer.parseInt(value);
-		megaChatApi.setPresenceAutoaway(true, timeout*60);
-		megaChatApi.setPresencePersist(false);
-		if(sttFLol!=null){
-			if(sttFLol.isAdded()){
-				sttFLol.updateAutoawayValueChat(timeout);
+		if(cancelled){
+			if(sttFLol!=null){
+				if(sttFLol.isAdded()){
+					sttFLol.updateAutoawayValueChat(true, null);
+				}
 			}
+		}
+		else{
+			int timeout = Integer.parseInt(value);
+			megaChatApi.setPresenceAutoaway(true, timeout*60);
+			megaChatApi.setPresencePersist(false);
 		}
 	}
 
@@ -13244,7 +13253,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
+		log("onPresenceConfigUpdate");
+		if(sttFLol!=null){
+			if(sttFLol.isAdded()){
+				sttFLol.updateAutoawayValueChat(false, config);
+				sttFLol.updatePersistValueChat(config);
+			}
+		}
 	}
 
 	public boolean isScrollToChat() {
