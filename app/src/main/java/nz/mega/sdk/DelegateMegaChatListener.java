@@ -70,9 +70,10 @@ class DelegateMegaChatListener extends MegaChatListener {
     public void onChatPresenceConfigUpdate(MegaChatApi api, final MegaChatPresenceConfig config)
     {
         if (listener != null) {
+            final MegaChatPresenceConfig megaChatPresenceConfig = config.copy();
             megaChatApi.runCallback(new Runnable() {
                 public void run() {
-                    listener.onChatPresenceConfigUpdate(megaChatApi, config);
+                    listener.onChatPresenceConfigUpdate(megaChatApi, megaChatPresenceConfig);
                 }
             });
         }

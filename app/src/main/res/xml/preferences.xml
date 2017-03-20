@@ -89,17 +89,31 @@
 		android:title="@string/chat_status_title">
 		<!--        android:textColor="@color/pressed_mega">  -->
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
-			android:key="settings_status_chat_online"
-			android:title="@string/online_status" />
+		<ListPreference
+			android:key="settings_chat_list_status"
+			android:title="@string/chat_status_title"
+			android:entries="@array/settings_status_entries"
+			android:entryValues="@array/settings_chat_status_values" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_autoaway_chat"
+		android:title="@string/settings_autoaway_title">
 
 		<mega.privacy.android.app.components.TwoLineCheckPreference
-			android:key="settings_status_chat_away"
-			android:title="@string/away_status" />
+			android:key="settings_autoaway_chat_checkpreference"
+			android:title="@string/settings_autoaway_subtitle" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_persistence_chat"
+		android:title="@string/settings_persistence_title">
 
 		<mega.privacy.android.app.components.TwoLineCheckPreference
-			android:key="settings_status_chat_offline"
-			android:title="@string/offline_status" />
+			android:key="settings_persistence_chat_checkpreference"
+			android:title="@string/settings_persistence_subtitle" />
 
 	</PreferenceCategory>
 

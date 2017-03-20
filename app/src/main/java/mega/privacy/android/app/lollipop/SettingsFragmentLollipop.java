@@ -2009,10 +2009,37 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		this.startActivity(intent);
 	}
 
-	public void updateAutoawayValueChat(int value){
-		log("updateAutowayValueChat");
-		chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, value));
-		chatPersistenceCheck.setChecked(false);
+	public void updateAutoawayValueChat(boolean cancelled, MegaChatPresenceConfig config){
+		log("updateAutowayValueChat: "+config.isAutoawayEnabled());
+
+		if(cancelled){
+			chatAutoAwayCheck.setChecked(false);
+		}
+		else{
+			statusConfig = config;
+			if(config.isAutoawayEnabled()){
+				int timeout = (int)config.getAutoawayTimeout()/60;
+				chatAutoAwayCheck.setChecked(true);
+				chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, timeout));
+			}
+			else{
+				chatAutoAwayCheck.setChecked(false);
+			}
+		}
+	}
+
+	public void updatePersistValueChat(MegaChatPresenceConfig config){
+		log("updatePersistValueChat: "+config.isPersist());
+
+		statusConfig = config;
+		if(config.isPersist()){
+			chatPersistenceCheck.setChecked(true);
+			chatAutoAwayCheck.setChecked(false);
+			chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
+		}
+		else{
+			chatPersistenceCheck.setChecked(false);
+		}
 	}
 
 	public void verifyStatusChat(int status){
@@ -2021,6 +2048,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		statusChatListPreference.setValue(status+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 	}
+
 
 	private static void log(String log) {
 		Util.log("SettingsFragmentLollipop", log);
