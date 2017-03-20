@@ -116,6 +116,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
+			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 			switch(item.getItemId()){
 				case R.id.action_mode_close_button:{
@@ -448,6 +449,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
+
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		if (isList){
 			log("isList");
@@ -832,6 +835,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	@Override
 	public void onClick(View v) {
 		log("onClick");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		switch(v.getId()) {
 
 			case R.id.content_text_layout:
@@ -847,7 +851,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
     public void itemClick(int position) {
 		log("item click position: " + position);
-
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
