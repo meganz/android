@@ -839,7 +839,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				if (target != null){
 					log("Target node: "+target.getName());
 					selectedNode = megaApiFolder.authorizeNode(selectedNode);
-					megaApi.copyNode(selectedNode, target, this);
+					if (selectedNode != null){
+						megaApi.copyNode(selectedNode, target, this);
+					}
+					else{
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					}
 				}
 				else{
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
