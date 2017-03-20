@@ -1945,23 +1945,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 log("onMessageLoaded: Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
-                //Find also in buffer of Messages
-                if(bufferSending.size()!=0){
-                    int returnValue = modifyMessageReceived(androidMsg, true);
-                    if(returnValue!=-1){
-                        log("onMessageLoaded: Message " + returnValue + " modified!");
-                        return;
-                    }
+
+                int returnValue = modifyMessageReceived(androidMsg, true);
+                if(returnValue!=-1){
+                    log("onMessageLoaded: Message " + returnValue + " modified!");
+                    return;
                 }
 
                 bufferSending.add(0,androidMsg);
 
-                //Como funciona el cambio de estado? No es lo mismo entrar por aqui cuando cargar historia que cuando te llega la actualizacion de un mensaje ya existente...
-
+                if(!noMoreNoSentMessages){
+                    log("onMessageLoaded: NOT noMoreNoSentMessages");
+                }
             }
             else{
                 if(!noMoreNoSentMessages){
-                    log("First meessage with NORMAL status");
+                    log("First message with NORMAL status");
                     noMoreNoSentMessages=true;
                     //Copy to bufferMessages
                     for(int i=0;i<bufferSending.size();i++){
@@ -1978,13 +1977,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         positionToScroll = 0;
                     }
                 }
-//
-                if(firstMessageReceived){
-                    //TODO Only do this if the message is not ours and it's not already seen
-                    megaChatApi.setMessageSeen(idChat, msg.getMsgId());
-                    log("onMessageLoaded: set Message Seen: "+msg.getMsgIndex());
-                    firstMessageReceived = false;
-                }
+
+                megaChatApi.setMessageSeen(idChat, msg.getMsgId());
 
                 if(positionToScroll>=0){
                     log("onMessageLoaded: Position to scroll up!");

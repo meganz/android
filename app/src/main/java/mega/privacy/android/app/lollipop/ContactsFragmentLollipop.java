@@ -517,7 +517,8 @@ public class ContactsFragmentLollipop extends Fragment{
     }
 	
 	public int onBackPressed(){
-		log("onBackPressed");	
+		log("onBackPressed");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			hideMultipleSelect();

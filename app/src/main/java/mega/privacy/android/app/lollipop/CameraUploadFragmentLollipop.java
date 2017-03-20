@@ -184,6 +184,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 			
 			List<PhotoSyncHolder> documentsList = null;
 			List<MegaNode> documentsGrid = null;
@@ -507,6 +508,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		if(type==TYPE_CAMERA){
 			if (firstTimeCam){
@@ -1239,6 +1242,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 
 		switch(v.getId()){
 			case R.id.file_grid_browser_camera_upload_on_off:
@@ -1303,6 +1307,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public void itemClick(int position) {
 		log("itemClick");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
 		
@@ -1501,6 +1506,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public int onBackPressed(){
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		if (isList){
 			if (adapterList != null){
 				if (adapterList.isMultipleSelect()){

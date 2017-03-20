@@ -78,6 +78,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 			List<MegaContactRequest> requests = adapterList.getSelectedRequest();
 
 			switch(item.getItemId()){
@@ -299,6 +300,8 @@ public class SentRequestsFragmentLollipop extends Fragment {
     	else{
     		log("Number of requests: NULL");
     	}
+
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
     	
     	if (isList){
 	        View v = inflater.inflate(R.layout.contacts_sent_requests_tab, container, false);			
@@ -388,6 +391,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 	public void itemClick(int position) {
 		log("itemClick");
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		if (adapterList.isMultipleSelect()){
 			adapterList.toggleSelection(position);
 
