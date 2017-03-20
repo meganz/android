@@ -97,6 +97,8 @@ public class ContactsFragmentLollipop extends Fragment{
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			ArrayList<MegaUser> users = adapter.getSelectedUsers();
 
+			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+
 			switch(item.getItemId()){
 				case R.id.cab_menu_share_folder:{
 
@@ -266,6 +268,8 @@ public class ContactsFragmentLollipop extends Fragment{
 		log("onCreateView");
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
+
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
 		
 //		for (int i=0;i<contacts.size();i++){
 //
@@ -493,7 +497,8 @@ public class ContactsFragmentLollipop extends Fragment{
 
     public void itemClick(int position) {
 		log("itemClick");
-					
+		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
