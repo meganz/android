@@ -196,6 +196,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
             }
 
+            if(megaChatApi.isSignalActivityRequired()){
+                megaChatApi.signalPresenceActivity();
+            }
+
             this.setChats();
         }
         else{
@@ -318,10 +322,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     @Override
     public void onClick(View v) {
         log("onClick");
+
         switch (v.getId()) {
             case R.id.invite_button:{
                 if(chatEnabled){
                     ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                    if(megaChatApi.isSignalActivityRequired()){
+                        megaChatApi.signalPresenceActivity();
+                    }
                 }
                 else{
                     ChatController chatController = new ChatController(context);
@@ -344,6 +352,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<MegaChatListItem> chats = adapterList.getSelectedChats();
+
+            if(megaChatApi.isSignalActivityRequired()){
+                megaChatApi.signalPresenceActivity();
+            }
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
@@ -496,6 +508,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void itemClick(int position) {
         log("itemClick");
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
         if (adapterList.isMultipleSelect()){
             adapterList.toggleSelection(position);
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
@@ -526,13 +541,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
-    }
-
-    public void resetAdapter(){
-        log("resetAdapter");
-        if(adapterList!=null){
-            adapterList.setPositionClicked(-1);
-        }
     }
 
     public void listItemUpdate(MegaChatListItem item) {

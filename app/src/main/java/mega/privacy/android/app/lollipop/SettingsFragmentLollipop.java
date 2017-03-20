@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
@@ -711,25 +712,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			statusConfig = megaChatApi.getPresenceConfig();
 			chatStatus = statusConfig.getOnlineStatus();
 			log("SETTINGS chatStatus: "+chatStatus);
+
 			statusChatListPreference.setValue(chatStatus+"");
 			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 
-			if(statusConfig.isAutoawayEnabled()){
-				chatAutoAwayCheck.setChecked(true);
-				int minutes = (int)statusConfig.getAutoawayTimeout()/60;
-				chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, minutes));
-			}
-			else{
-				chatAutoAwayCheck.setChecked(false);
-				chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
-			}
+			showPresenceChatConfig();
 
-			if(statusConfig.isPersist()){
-				chatPersistenceCheck.setChecked(true);
-			}
-			else{
-				chatPersistenceCheck.setChecked(false);
-			}
 		}
 		else{
 			preferenceScreen.removePreference(chatStatusCategory);
@@ -1577,9 +1565,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				log("Change persistence chat to true");
 				megaChatApi.setPresencePersist(true);
-				megaChatApi.setPresenceAutoaway(false, 0);
-				chatAutoAwayCheck.setChecked(false);
-				chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
@@ -2009,36 +1994,58 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		this.startActivity(intent);
 	}
 
-	public void updateAutoawayValueChat(boolean cancelled, MegaChatPresenceConfig config){
+	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
 		log("updateAutowayValueChat: "+config.isAutoawayEnabled());
 
-		if(cancelled){
-			chatAutoAwayCheck.setChecked(false);
-		}
-		else{
+		if(!cancelled){
 			statusConfig = config;
-			if(config.isAutoawayEnabled()){
-				int timeout = (int)config.getAutoawayTimeout()/60;
-				chatAutoAwayCheck.setChecked(true);
-				chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, timeout));
-			}
-			else{
-				chatAutoAwayCheck.setChecked(false);
-			}
+			chatStatus = config.getOnlineStatus();
 		}
+
+		showPresenceChatConfig();
 	}
 
-	public void updatePersistValueChat(MegaChatPresenceConfig config){
-		log("updatePersistValueChat: "+config.isPersist());
-
-		statusConfig = config;
-		if(config.isPersist()){
-			chatPersistenceCheck.setChecked(true);
-			chatAutoAwayCheck.setChecked(false);
-			chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
+	public void showPresenceChatConfig(){
+		if(chatStatus!= MegaChatApi.STATUS_ONLINE){
+			preferenceScreen.removePreference(autoawayChatCategory);
+			if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+				preferenceScreen.removePreference(persistenceChatCategory);
+			}
+			else{
+				preferenceScreen.addPreference(persistenceChatCategory);
+				if(statusConfig.isPersist()){
+					chatPersistenceCheck.setChecked(true);
+				}
+				else{
+					chatPersistenceCheck.setChecked(false);
+				}
+			}
 		}
 		else{
-			chatPersistenceCheck.setChecked(false);
+			//I'm online
+			preferenceScreen.addPreference(persistenceChatCategory);
+			if(statusConfig.isPersist()){
+				chatPersistenceCheck.setChecked(true);
+			}
+			else{
+				chatPersistenceCheck.setChecked(false);
+			}
+
+			if(statusConfig.isPersist()){
+				preferenceScreen.removePreference(autoawayChatCategory);
+			}
+			else{
+				preferenceScreen.addPreference(autoawayChatCategory);
+				if(statusConfig.isAutoawayEnabled()){
+					int timeout = (int)statusConfig.getAutoawayTimeout()/60;
+					chatAutoAwayCheck.setChecked(true);
+					chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, timeout));
+				}
+				else{
+					chatAutoAwayCheck.setChecked(false);
+					chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
+				}
+			}
 		}
 	}
 
@@ -2047,6 +2054,28 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		statusChatListPreference.setValue(status+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+
+		chatStatus = status;
+
+		if(chatStatus!= MegaChatApi.STATUS_ONLINE){
+			preferenceScreen.removePreference(autoawayChatCategory);
+			if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+				preferenceScreen.removePreference(persistenceChatCategory);
+			}
+			else{
+				preferenceScreen.addPreference(persistenceChatCategory);
+			}
+		}
+		else{
+			//I'm online
+			preferenceScreen.addPreference(autoawayChatCategory);
+			if(statusConfig.isPersist()){
+				preferenceScreen.removePreference(autoawayChatCategory);
+			}
+			else{
+				preferenceScreen.addPreference(autoawayChatCategory);
+			}
+		}
 	}
 
 
