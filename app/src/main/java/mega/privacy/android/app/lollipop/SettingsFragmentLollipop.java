@@ -1971,7 +1971,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	}
 
 	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
-		log("updateAutowayValueChat: "+config.isAutoawayEnabled());
+		log("updatePresenceConfigChat: "+cancelled);
 
 		if(!cancelled){
 			statusConfig = config;

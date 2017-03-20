@@ -123,6 +123,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:tint="@color/white"
                         android:src="@drawable/ic_upload_image"/>
 
                 </RelativeLayout>
@@ -137,6 +138,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:tint="@color/white"
                         android:src="@drawable/ic_upload_audio"/>
 
                 </RelativeLayout>
@@ -151,6 +153,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:tint="@color/white"
                         android:src="@drawable/ic_cloud_drive"/>
 
                 </RelativeLayout>
@@ -165,6 +168,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:tint="@color/white"
                         android:src="@drawable/ic_upload_pick_file"/>
 
                 </RelativeLayout>
@@ -179,6 +183,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:tint="@color/white"
                         android:src="@drawable/ic_contacts"/>
 
                 </RelativeLayout>
