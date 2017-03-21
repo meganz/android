@@ -711,10 +711,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Get chat status
 			statusConfig = megaChatApi.getPresenceConfig();
 			chatStatus = statusConfig.getOnlineStatus();
-			log("SETTINGS chatStatus: "+chatStatus);
+			log("SETTINGS chatStatus pending: "+statusConfig.isPending());
+			log("---------------status: "+chatStatus);
 
 			statusChatListPreference.setValue(chatStatus+"");
-			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+			if(chatStatus==MegaChatApi.STATUS_INVALID){
+				statusChatListPreference.setSummary(getString(R.string.recovering_info));
+			}
+			else{
+				statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+			}
 
 			showPresenceChatConfig();
 
@@ -925,6 +931,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		if(!Util.isOnline(context)){
 			chatEnabledCategory.setEnabled(false);
 			chatStatusCategory.setEnabled(false);
+			autoawayChatCategory.setEnabled(false);
+			persistenceChatCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
 
@@ -1976,12 +1984,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		if(!cancelled){
 			statusConfig = config;
 			chatStatus = config.getOnlineStatus();
+			log("updatePresenceConfigChat status: "+chatStatus);
 		}
 
 		showPresenceChatConfig();
 	}
 
 	public void showPresenceChatConfig(){
+		log("showPresenceChatConfig: "+chatStatus);
 		if(chatStatus!= MegaChatApi.STATUS_ONLINE){
 			preferenceScreen.removePreference(autoawayChatCategory);
 			if(chatStatus== MegaChatApi.STATUS_OFFLINE){
