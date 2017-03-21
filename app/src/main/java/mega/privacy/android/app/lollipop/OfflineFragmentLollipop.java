@@ -362,7 +362,6 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		if (context instanceof ManagerActivityLollipop){
 
-
 			String pathNavigationOffline = ((ManagerActivityLollipop)context).getPathNavigationOffline();
 			if(pathNavigationOffline!=null){
 				pathNavigation = pathNavigationOffline;
@@ -440,7 +439,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyTextView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextView.setText(R.string.offline_empty_folder);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -491,7 +490,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyTextView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextView.setText(R.string.offline_empty_folder);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -586,7 +585,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+				emptyTextView.setText(R.string.offline_empty_folder);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -942,7 +941,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyTextView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextView.setText(R.string.offline_empty_folder);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -1230,7 +1229,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+				emptyTextView.setText(R.string.offline_empty_folder);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -1283,7 +1282,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyTextView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyTextView.setText(R.string.offline_empty_folder);
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);
