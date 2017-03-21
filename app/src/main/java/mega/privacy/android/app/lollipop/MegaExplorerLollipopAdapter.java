@@ -218,7 +218,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 
 			if(node.isInShare()){
-				holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
+				holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
 					MegaShare mS = sharesIncoming.get(j);

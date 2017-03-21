@@ -1159,7 +1159,27 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				log("NODO A COPIAR: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
 				log("DONDE: " + parent.getName());
 				log("NODOS: " + copyHandles[i] + "_" + parent.getHandle());
-				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
+				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+				if (cN != null){
+					log("cN != null");
+					megaApi.copyNode(cN, parent, this);
+				}
+				else{
+					log("cN == null");
+					try {
+						statusDialog.dismiss();
+						CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+						if(cflF!=null && cflF.isVisible()){
+							if(coordinatorFragment!=null){
+								showSnackbar(getString(R.string.context_no_sent_node), coordinatorFragment);
+							}
+							else{
+								showSnackbar(getString(R.string.context_no_sent_node), fragmentContainer);
+							}
+						}
+					} catch (Exception ex) {
+					}
+				}
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {

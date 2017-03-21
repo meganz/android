@@ -145,7 +145,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
             if (node.isFolder()) {
 
-                nodeThumb.setImageResource(R.drawable.ic_folder_shared_list);
+                nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                 optionInfoText.setText(R.string.general_folder_info);
                 nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
 
@@ -276,11 +276,14 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 i.putExtra("firstLevel", firstLevel);
 
                 if (node.isFolder()) {
-                    if (megaApi.isShared(node)){
-                        i.putExtra("imageId", R.drawable.folder_shared_mime);
+                    if(node.isInShare()){
+                        i.putExtra("imageId", R.drawable.ic_folder_incoming);
+                    }
+                    else if (node.isOutShare()){
+                        i.putExtra("imageId", R.drawable.ic_folder_outgoing);
                     }
                     else{
-                        i.putExtra("imageId", R.drawable.folder_mime);
+                        i.putExtra("imageId", R.drawable.ic_folder);
                     }
                 }
                 else {

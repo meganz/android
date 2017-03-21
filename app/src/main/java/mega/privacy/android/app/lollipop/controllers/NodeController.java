@@ -95,11 +95,28 @@ public class NodeController {
                 log("Copy multiple files");
                 copyMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_COPY, context);
                 for (int i = 0; i < copyHandles.length; i++) {
-                    megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, copyMultipleListener);
+                    MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+                    if (cN != null){
+                        log("cN != null, i = " + i + " of " + copyHandles.length);
+                        megaApi.copyNode(cN, parent, copyMultipleListener);
+                    }
+                    else{
+                        log("cN == null, i = " + i + " of " + copyHandles.length);
+                    }
                 }
             } else {
                 log("Copy one file");
-                megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[0]), parent, (ManagerActivityLollipop) context);
+                MegaNode cN = megaApi.getNodeByHandle(copyHandles[0]);
+                if (cN != null){
+                    log("cN != null");
+                    megaApi.copyNode(cN, parent, (ManagerActivityLollipop) context);
+                }
+                else{
+                    log("cN == null");
+                    if(context instanceof ManagerActivityLollipop){
+                        ((ManagerActivityLollipop)context).copyError();
+                    }
+                }
             }
         }
 
