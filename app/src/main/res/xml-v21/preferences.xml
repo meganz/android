@@ -94,7 +94,7 @@
 
 		<ListPreference
 			android:key="settings_chat_list_status"
-			android:title="@string/chat_status_title"
+			android:title="@string/set_status_option_label"
 			android:entries="@array/settings_status_entries"
 			android:entryValues="@array/settings_chat_status_values" />
 
