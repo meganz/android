@@ -896,4 +896,6 @@
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitación aceptada</string>
     <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitación rechazada</string>
     <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">Invitación ignorada</string>
+
+    <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">No hay archivos disponibles</string>
 </resources>
