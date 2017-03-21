@@ -16,9 +16,9 @@
         
         <ImageView
 	        android:id="@+id/offline_grid_thumbnail"
-	        android:layout_width="172dp"
-	        android:layout_height="172dp"
-	        android:layout_margin="5dp"
+	        android:layout_width="56dp"
+	        android:layout_height="56dp"
+	        android:layout_margin="58dp"
 	        android:layout_centerHorizontal="true"
 	        android:scaleType="fitCenter"
 	        android:background="@null" />

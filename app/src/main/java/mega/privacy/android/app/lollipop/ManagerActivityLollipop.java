@@ -13268,4 +13268,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setMkLayoutVisible(boolean mkLayoutVisible) {
 		this.mkLayoutVisible = mkLayoutVisible;
 	}
+
+	public void copyError(){
+		try {
+			statusDialog.dismiss();
+			showSnackbar(getString(R.string.context_no_copied));
+		}
+		catch (Exception ex) {}
+	}
 }

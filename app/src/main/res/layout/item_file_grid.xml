@@ -17,10 +17,10 @@
 
     <ImageView
         android:id="@+id/file_grid_thumbnail"
-        android:layout_width="172dp"
-        android:layout_height="172dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_centerHorizontal="true"
-        android:layout_margin="5dp"
+        android:layout_margin="58dp"
         android:background="@null"
         android:scaleType="fitCenter" />
 
