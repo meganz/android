@@ -13242,12 +13242,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
 		log("onPresenceConfigUpdate");
-		if(sttFLol!=null){
-			if(sttFLol.isAdded()){
-				if(config!=null){
-					sttFLol.updatePresenceConfigChat(false, config);
+		if(config!=null){
+			log("Config status: "+config.getOnlineStatus());
+			log("Config autoway: "+config.isAutoawayEnabled());
+			log("Config persist: "+config.isPersist());
+			if(sttFLol!=null){
+				if(sttFLol.isAdded()){
+					if(config!=null){
+						sttFLol.updatePresenceConfigChat(false, config);
+					}
 				}
 			}
+		}
+		else{
+			log("Config is null");
 		}
 	}
 
