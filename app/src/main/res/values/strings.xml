@@ -1097,4 +1097,6 @@
         <item context="the options of what to upload.">Busy</item>
         <item context="the options of what to upload.">Offline</item>
     </string-array>
+
+    <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">No files Saved for Offline</string>
 </resources>
