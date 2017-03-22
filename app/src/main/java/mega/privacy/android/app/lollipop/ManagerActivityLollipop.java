@@ -403,6 +403,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
 	private AlertDialog getLinkDialog;
+	private AlertDialog setPinDialog;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -8426,87 +8427,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showPanelSetPinLock(){
 		log("showPanelSetPinLock");
 
-		AlertDialog setPinDialog;
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.choose_pin_type_dialog, null);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
 
-		final CheckedTextView pin4Check = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_4_check);
-		pin4Check.setText(getString(R.string.four_pin_lock));
-		pin4Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		pin4Check.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams pin4MLP = (ViewGroup.MarginLayoutParams) pin4Check.getLayoutParams();
-		pin4MLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-		pin4Check.setChecked(true);
+		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
 
+				setPinDialog.dismiss();
+				switch(item) {
+					case 0:{
+						dbH.setPinLockType(Constants.PIN_4);
+						if(sttFLol!=null){
+							sttFLol.intentToPinLock();
+						}
+						break;
+					}
+					case 1:{
+						dbH.setPinLockType(Constants.PIN_6);
+						if(sttFLol!=null){
+							sttFLol.intentToPinLock();
+						}
+						break;
+					}
+					case 2:{
+						dbH.setPinLockType(Constants.PIN_ALPHANUMERIC);
+						if(sttFLol!=null){
+							sttFLol.intentToPinLock();
+						}
+						break;
+					}
+				}
+			}
+		});
+		dialogBuilder.setTitle(getString(R.string.pin_lock_type));
 
-		final CheckedTextView pin6Check = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_6_check);
-		pin6Check.setText(getString(R.string.six_pin_lock));
-		pin6Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		pin6Check.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams pin6MLP = (ViewGroup.MarginLayoutParams) pin6Check.getLayoutParams();
-		pin6MLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+		dialogBuilder.setOnKeyListener(new Dialog.OnKeyListener() {
 
-		final CheckedTextView pinANCheck = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_alphaN_check);
-		pinANCheck.setText(getString(R.string.AN_pin_lock));
-		pinANCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		pinANCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams pinANMLP = (ViewGroup.MarginLayoutParams) pinANCheck.getLayoutParams();
-		pinANMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+			@Override
+			public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
+				log("onKeyListener: "+keyCode);
+				if (keyCode == KeyEvent.KEYCODE_BACK) {
+					log("Cancel set pin action");
+					setPinDialog.dismiss();
+					if(sttFLol!=null){
+						if(sttFLol.isAdded()){
+							sttFLol.cancelSetPinLock();
+						}
+					}
+				}
+				return true;
+			}
+		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setView(dialoglayout);
-		builder.setTitle(getString(R.string.pin_lock_type));
-
-		setPinDialog = builder.create();
+		setPinDialog = dialogBuilder.create();
+//		presenceStatusDialog.se
 		setPinDialog.show();
-
-		final AlertDialog dialog = setPinDialog;
-
-		pin4Check.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				dbH.setPinLockType(Constants.PIN_4);
-    			if (dialog != null){
-    				dialog.dismiss();
-    			}
-				if(sttFLol!=null){
-					sttFLol.intentToPinLock();
-				}
-			}
-		});
-
-		pin6Check.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				pin6Check.setChecked(true);
-				pin4Check.setChecked(false);
-				dbH.setPinLockType(Constants.PIN_6);
-    			if (dialog != null){
-    				dialog.dismiss();
-    			}
-				if(sttFLol!=null){
-					sttFLol.intentToPinLock();
-				}
-			}
-		});
-
-		pinANCheck.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				pinANCheck.setChecked(true);
-				pin4Check.setChecked(false);
-				dbH.setPinLockType(Constants.PIN_ALPHANUMERIC);
-    			if (dialog != null){
-    				dialog.dismiss();
-    			}
-				if(sttFLol!=null){
-					sttFLol.intentToPinLock();
-				}
-			}
-		});
 	}
 
 	public void chooseAddContactDialog(boolean isMegaContact){
