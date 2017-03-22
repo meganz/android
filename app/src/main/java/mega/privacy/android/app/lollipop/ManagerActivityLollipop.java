@@ -8213,7 +8213,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
+					if (value.length() != 0) {
 						return true;
 					}
 					setAutoAwayValue(value, false);

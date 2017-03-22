@@ -105,8 +105,12 @@
 		android:layout="@layout/my_category_preference"
 		android:title="@string/settings_autoaway_title">
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
-			android:key="settings_autoaway_chat_checkpreference"
+		<SwitchPreference
+			android:key="settings_autoaway_chat_switch"
+			android:title="@string/settings_autoaway_title"/>
+
+		<Preference
+			android:key="settings_autoaway_chat_preference"
 			android:title="@string/settings_autoaway_subtitle" />
 
 	</PreferenceCategory>
