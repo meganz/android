@@ -1335,7 +1335,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
-                if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT){
 
                     if(((ChatActivityLollipop) context).isGroup()){
                         Spannable name = new SpannableString(holder.fullNameTitle+"\n");
@@ -1483,10 +1483,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     else{
                         holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
                         holder.contactManagementMessageLayout.setVisibility(View.GONE);
-                        holder.contactManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+
                         String messageContent = "";
-                        if(message.getContent()!=null){
-                            messageContent = message.getContent();
+                        if(message.getType()==MegaChatMessage.TYPE_NORMAL){
+                            holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                            if(message.getContent()!=null){
+                                messageContent = message.getContent();
+                            }
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_ATTACHMENT){
+                            holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                            messageContent = "An attachment was received";
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT){
+                            holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                            messageContent = "Attachment revoked";
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT){
+                            holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                            messageContent = "A contact was received";
                         }
                         holder.contentContactMessageText.append(messageContent);
 

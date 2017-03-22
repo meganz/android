@@ -10873,7 +10873,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				if(rChatFL!=null){
 					if(rChatFL.isAdded()){
-						rChatFL.updateStatus(status);
+						rChatFL.onlineStatusUpdate(status);
 					}
 				}
 				if(sttFLol!=null){

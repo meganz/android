@@ -165,36 +165,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         if(chatEnabled){
             log("Chat ENABLED");
-            //Get chat status
-            chatStatus = megaChatApi.getOnlineStatus();
-            log("chatStatus: "+chatStatus);
 
-            if(aB!=null){
-                log("My own status is: "+chatStatus);
-                switch(chatStatus){
-                    case MegaChatApi.STATUS_ONLINE:{
-                        aB.setSubtitle(getString(R.string.online_status));
-                        break;
-                    }
-                    case MegaChatApi.STATUS_AWAY:{
-                        aB.setSubtitle(getString(R.string.away_status));
-                        break;
-                    }
-                    case MegaChatApi.STATUS_BUSY:{
-                        aB.setSubtitle(getString(R.string.busy_status));
-                        break;
-                    }
-                    case MegaChatApi.STATUS_OFFLINE:{
-                        aB.setSubtitle(getString(R.string.offline_status));
-                        break;
-                    }
-                    default:{
-                        aB.setSubtitle(getString(R.string.recovering_info));
-                        break;
-                    }
-
-                }
-            }
+            setStatus();
 
             if(megaChatApi.isSignalActivityRequired()){
                 megaChatApi.signalPresenceActivity();
@@ -223,23 +195,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void setChats(){
         log("setChats");
-//        ArrayList<MegaChatRoom> temporalChats = megaChatApi.getChatRooms();
-//        chats.clear();
-//
-//        for(int i=0;i<chats.size();i++){
-//            MegaChatRoom chat = chats.get(i);
-//            int privilege = chat.getOwnPrivilege();
-//            if(privilege==MegaChatRoom.PRIV_RM){
-//                log("Borradooooo");
-//            }
-//            else if(privilege==MegaChatRoom.PRIV_UNKNOWN){
-//                log("Unknow");
-//            }
-//            else{
-//                log("otro privilegio");
-//                chats.add(chat);
-//            }
-//        }
 
         if(isAdded()){
             if(chatEnabled){
@@ -794,7 +749,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("setStatus");
         if(chatEnabled) {
             chatStatus = megaChatApi.getOnlineStatus();
-            log("chatStatus: " + chatStatus);
+            log("chatStatus --> getOnlineStatus with megaChatApi: "+chatStatus);
 
             onlineStatusUpdate(chatStatus);
         }
@@ -807,7 +762,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         if (isAdded()) {
             if(aB!=null){
-
                 switch(status){
                     case MegaChatApi.STATUS_ONLINE:{
                         aB.setSubtitle(getString(R.string.online_status));
@@ -825,8 +779,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         aB.setSubtitle(getString(R.string.offline_status));
                         break;
                     }
+                    default:{
+                        aB.setSubtitle(getString(R.string.recovering_info));
+                        break;
+                    }
                 }
             }
+            else{
+                log("aB is NULL");
+            }
+        }
+        else{
+            log("RecentChats not added");
         }
     }
 
@@ -929,31 +893,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         else{
             log("Participant2: "+participantLastName);
             return participantFirstName + " " + participantLastName;
-        }
-    }
-
-    public void updateStatus (int status){
-        if(aB!=null){
-
-            switch(status){
-                case MegaChatApi.STATUS_ONLINE:{
-                    aB.setSubtitle(getString(R.string.online_status));
-                    break;
-                }
-                case MegaChatApi.STATUS_AWAY:{
-                    aB.setSubtitle(getString(R.string.away_status));
-                    break;
-                }
-                case MegaChatApi.STATUS_BUSY:{
-                    aB.setSubtitle(getString(R.string.busy_status));
-                    break;
-                }
-                case MegaChatApi.STATUS_OFFLINE:{
-                    aB.setSubtitle(getString(R.string.offline_status));
-                    break;
-                }
-            }
-
         }
     }
 
