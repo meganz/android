@@ -403,7 +403,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		refreshAccountInfo();
 
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
 	}
@@ -563,7 +563,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
 			case R.id.logout_button:{
@@ -641,7 +641,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if(exportMKLayout.getVisibility()==View.VISIBLE){
 			log("Master Key layout is VISIBLE");

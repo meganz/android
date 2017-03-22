@@ -746,6 +746,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		    
 		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+
+			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -977,7 +979,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onClick(View v) {
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
@@ -1011,6 +1014,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		else if (adapterType == Constants.ZIP_ADAPTER){
+
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
 					finish();
@@ -1954,7 +1958,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		overflowMenuList.setVisibility(View.GONE);
 		overflowVisible = false;
 		adapterMega.setMenuVisible(overflowVisible);
@@ -2222,6 +2227,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	@Override
 	public void onBackPressed() {
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (overflowMenuList != null){
 			if (overflowMenuList.getVisibility() == View.VISIBLE){
 				overflowMenuList.setVisibility(View.GONE);

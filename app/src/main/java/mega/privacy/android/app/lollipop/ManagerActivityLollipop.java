@@ -1813,7 +1813,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onPostResume");
     	super.onPostResume();
 
-		sendSignalPresenceActivity();
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
@@ -4949,7 +4949,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaApi.retryPendingConnections();
 		}
 
-		sendSignalPresenceActivity();
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch(id){
@@ -9523,7 +9523,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		sendSignalPresenceActivity();
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
 			case R.id.custom_search:{
@@ -13259,16 +13260,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void sendSignalPresenceActivity(){
-		log("sendSignalPresenceActivity");
-		if(Util.isChatEnabled()){
-			if (megaChatApi != null){
-				if(megaChatApi.isSignalActivityRequired()){
-					megaChatApi.signalPresenceActivity();
-				}
-			}
-		}
-	}
 	public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}

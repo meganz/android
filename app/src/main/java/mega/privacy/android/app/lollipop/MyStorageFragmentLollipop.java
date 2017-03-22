@@ -13,7 +13,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -34,7 +33,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MyStorageFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface{
+public class MyStorageFragmentLollipop extends Fragment implements MegaRequestListenerInterface{
 
 	Context context;
 	MyAccountInfo myAccountInfo;
@@ -137,6 +136,8 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 			log("MyAccountInfo is NULL");
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
+
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		setAccountDetails();
 //
@@ -327,14 +328,6 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 		aB = ((AppCompatActivity)context).getSupportActionBar();
 	}
 
-	@Override
-	public void onClick(View v) {
-		log("onClick");
-		switch (v.getId()) {
-
-		}
-	}
-
 	public int onBackPressed(){
 		log("onBackPressed");
 
@@ -343,7 +336,7 @@ public class MyStorageFragmentLollipop extends Fragment implements OnClickListen
 //			hideMKLayout();
 //			return 1;
 //		}
-
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		return 0;
 	}
 

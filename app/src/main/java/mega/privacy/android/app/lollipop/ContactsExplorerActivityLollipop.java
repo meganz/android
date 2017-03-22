@@ -1,38 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.Data;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -44,19 +18,34 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
+import java.util.ArrayList;
 
-public class ContactsExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, ContactsExplorerLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
+
+
+public class ContactsExplorerActivityLollipop extends PinActivityLollipop implements ContactsExplorerLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
 	public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
 	public static String ACTION_PICK_CONTACT_SEND_FILE = "ACTION_PICK_CONTACT_SEND_FILE";
@@ -210,7 +199,9 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			log("onCreate multiselect YES!");
 			nodeHandles=intent.getLongArrayExtra(EXTRA_NODE_HANDLE);
 		}
-		sendToInbox= intent.getIntExtra("SEND_FILE", -1);	
+		sendToInbox= intent.getIntExtra("SEND_FILE", -1);
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	@Override
@@ -236,6 +227,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (item.getItemId()) {
 		// Respond to the action bar's Up/Home button
 			case android.R.id.home: {
@@ -399,68 +391,16 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 
 		super.onSaveInstanceState(state);
 	}
-	
 
-	@Override
-	public void onClick(View v) {
-//		switch (v.getId()) {
-//			case R.id.home:{
-//				finish();
-//			}
-//		}		
-	}
 
 	@Override
 	public void onItemCheckClick(int position) {
-//		boolean isChecked = listView.isItemChecked(position);
-//		listView.setItemChecked(position, !isChecked);
-		updateButton();
-	}
-	
-	// Update bottom button text and state
-	private void updateButton() {
-//		int folders = 0;
-//		int files = 0;
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		FileDocument document;
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) != true) {
-//				continue;
-//			}
-//			int position = checkedItems.keyAt(i);
-//			document = adapter.getDocumentAt(position);
-//			if (document.getFile().isDirectory()) {
-//				log(document.getFile().getAbsolutePath() + " of file");
-//				folders++;
-//			} else {
-//				files++;
-//			}
-//		}
-//		
-//		if (files > 0 || folders > 0) {
-//			String filesString = files + " " + getResources().getQuantityString(R.plurals.general_num_files, files);
-//
-//			String foldersString = folders + " " + getResources().getQuantityString(R.plurals.general_num_folders, folders);
-//
-//			String buttonText = getString(R.string.general_upload) + " ";
-//
-//			if (files == 0) {
-//				buttonText += foldersString;
-//			} else if (folders == 0) {
-//				buttonText += filesString;
-//			} else {
-//				buttonText += foldersString + ", " + filesString;
-//			}
-//			button.setText(buttonText);
-//			showButton();
-//		} 
-//		else {
-//			hideButton();
-//		}
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void itemClick(View view, int position) {
-		log("on item click");		
+		log("on item click");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		MegaUser contact = (MegaUser) adapter.getDocumentAt(position);
 		if(contact == null)

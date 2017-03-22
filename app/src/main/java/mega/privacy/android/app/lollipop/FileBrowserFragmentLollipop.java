@@ -116,7 +116,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			switch(item.getItemId()){
 				case R.id.action_mode_close_button:{
@@ -450,7 +450,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (isList){
 			log("isList");
@@ -835,7 +835,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()) {
 
 			case R.id.content_text_layout:
@@ -851,7 +851,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
     public void itemClick(int position) {
 		log("item click position: " + position);
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
@@ -1171,7 +1171,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter != null){
 			parentHandle = adapter.getParentHandle();

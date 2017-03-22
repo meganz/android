@@ -16,7 +16,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -37,7 +36,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class PhoneContactsActivityLollipop extends PinActivityLollipop implements OnClickListener, PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
+public class PhoneContactsActivityLollipop extends PinActivityLollipop implements PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
 
 	ActionBar aB;
 	Toolbar tB;
@@ -157,6 +156,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 //	@Override
@@ -182,6 +182,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (item.getItemId()) {
 		// Respond to the action bar's Up/Home button
 			case android.R.id.home: {
@@ -211,21 +212,14 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
-	public void onClick(View v) {
-//		switch (v.getId()) {
-//			case R.id.home:{
-//				finish();
-//			}
-//		}		
-	}
-
-	@Override
 	public void onItemCheckClick(int position) {
 
 	}
 
 	public void itemClick(View view, int position) {
 		log("on item click");
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		final PhoneContactInfo contact = (PhoneContactInfo) adapter.getDocumentAt(position);
 		if(contact == null)

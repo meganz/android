@@ -111,7 +111,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
@@ -322,7 +322,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		((ManagerActivityLollipop)context).showFabButton();
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -636,7 +636,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	@Override
 	public void onClick(View v) {
 		log("onclick");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 
 			case R.id.content_text_layout:
@@ -652,7 +652,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
     public void itemClick(int position) {
     	log("itemClick");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -922,7 +922,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	public int onBackPressed(){
 		log("onBackPressed deepBrowserTree:"+deepBrowserTree);
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;

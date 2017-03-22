@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
@@ -14,9 +13,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -46,7 +42,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 
 
-public class ZipBrowserActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
+public class ZipBrowserActivityLollipop extends PinActivityLollipop implements OnItemClickListener, OnItemLongClickListener{
 	
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP ="HANDLE_ZIP";
@@ -346,6 +342,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		}		
 
 		listView.setAdapter(adapterList);
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	@Override
@@ -456,8 +454,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		log("onItemClick");			
-	
+		log("onItemClick");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		ZipEntry currentNode = zipNodes.get(position);
 		
 		currentPath=currentNode.getName();
@@ -571,6 +570,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		log("Depth: "+depth);
 		
 		log("onBackPressed, currentPath: "+currentPath);
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		
 		if(depth<3){
 			super.onBackPressed();
@@ -618,11 +619,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		}	
 	}
 
-	@Override
-	public void onClick(View v) {
-		
-	}
-	
 	private void setFolder(String folder){
 		
 		String[] parts = folder.split("/");

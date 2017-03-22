@@ -954,7 +954,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		log("onPreferenceChange");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_HOW_TO) == 0){
 			switch (Integer.parseInt((String)newValue)){
@@ -1061,7 +1061,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
 		log("onPreferenceClick");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		prefs = dbH.getPreferences();
 		log("KEY = " + preference.getKey());

@@ -92,7 +92,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
 			switch(item.getItemId()){
@@ -306,7 +306,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			nodes = megaApi.getChildren(n, orderGetChildren);
 		}
 
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (isList){
 			
@@ -432,7 +432,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	
     public void itemClick(int position) {
 		log("itemClick: "+position);
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -635,7 +635,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		parentHandle = adapter.getParentHandle();
 		((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);

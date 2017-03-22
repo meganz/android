@@ -403,7 +403,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
 		}
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void showUploadPanel() {
@@ -458,7 +458,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 			intent.setAction(null);
 			setIntent(null);
-		}    	
+		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -656,6 +658,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			//			dbH = new DatabaseHandler(getApplicationContext());
 		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		boolean askMe = true;
 		String downloadLocationDefaultPath = "";

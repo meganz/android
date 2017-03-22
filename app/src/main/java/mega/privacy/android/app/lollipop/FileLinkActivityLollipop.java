@@ -254,6 +254,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				log("url NULL");
 			}
 		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void askForDecryptionKeyDialog(){
@@ -354,6 +356,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	@Override
 	protected void onResume() {
     	super.onResume();
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     	
     	Intent intent = getIntent();
     	
@@ -366,6 +370,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
     		}
     	}
     	setIntent(null);
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}	
 	
 	private void importLink(String url) {
@@ -548,7 +554,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	@Override
 	public void onClick(View v) {
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.file_link_button_download:{
 				downloadNode();

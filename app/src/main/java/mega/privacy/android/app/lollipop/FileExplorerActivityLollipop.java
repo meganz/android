@@ -421,6 +421,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else{
 			afterLoginAndFetch();
+			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
@@ -855,6 +856,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 		}
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	@Override
@@ -946,7 +948,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	public void buttonClick(long handle){
 		log("buttonClick");
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (tabShown == INCOMING_TAB){
 			if (iSharesExplorer.getDeepBrowserTree()==0){
 				Intent intent = new Intent();
@@ -1505,6 +1508,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{

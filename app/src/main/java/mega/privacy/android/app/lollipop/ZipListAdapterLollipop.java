@@ -8,7 +8,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
@@ -26,7 +25,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
 
-public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListener {
+public class ZipListAdapterLollipop  extends BaseAdapter{
 	
 	Context context;
 	int positionClicked;
@@ -179,13 +178,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter implements OnClickListe
 		return position;
 	}
 
-
-	@Override
-	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	private static void log(String log) {
 		Util.log("ZipListAdapter", log);
 	}
