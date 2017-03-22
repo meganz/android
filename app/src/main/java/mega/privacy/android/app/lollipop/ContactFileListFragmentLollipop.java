@@ -265,8 +265,8 @@ public class ContactFileListFragmentLollipop extends Fragment{
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		View v = null;
 
@@ -480,6 +480,8 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	}
 	
 	public void itemClick(int position) {
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
@@ -570,6 +572,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 	public int onBackPressed() {
 		log("onBackPressed");
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		parentHandle = adapter.getParentHandle();
 		((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);

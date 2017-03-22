@@ -160,12 +160,15 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 				secureSelfieImage.setImageBitmap(preview);
 			}		    
 		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
 	public void onClick(View v) {		
 		log("onClick");
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch (v.getId()){
 //			case R.id.secure_selfie_viewer_icon:{
 //				//Delete image
@@ -309,7 +312,10 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 		
 		if(imgFile.exists()){
 			imgFile.delete();
-		}			
+		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		super.onBackPressed();
 	}
 

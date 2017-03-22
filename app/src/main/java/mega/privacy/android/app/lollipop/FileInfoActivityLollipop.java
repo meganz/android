@@ -400,6 +400,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("Extras is NULL");
 		}
 		refreshProperties();
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -612,6 +613,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		int id = item.getItemId();
 		switch (id) {
 			case android.R.id.home: {
@@ -1118,6 +1121,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 //	}
 	@Override
 	public void onClick(View v) {
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
 			case R.id.file_properties_link_button:{
@@ -2651,6 +2655,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		super.onResume();
 
 		refreshProperties();
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){

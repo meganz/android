@@ -130,6 +130,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 			List<MegaNode> documents = adapterList.getSelectedNodes();
 			
 			switch(item.getItemId()){
@@ -356,6 +357,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
 	
 	public void askForDecryptionKeyDialog(){
@@ -474,7 +477,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	protected void onResume() {
     	super.onResume();
     	folderLinkActivity = this;
-    	
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     	log("onResume");
 	}
 	
@@ -1217,6 +1220,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 
 	public void itemClick(int position) {
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (adapterList.isMultipleSelect()){
 			log("multiselect ON");
 			adapterList.toggleSelection(position);
@@ -1440,7 +1445,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.folder_link_button_download:{
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

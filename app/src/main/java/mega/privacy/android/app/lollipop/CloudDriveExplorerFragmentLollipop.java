@@ -295,6 +295,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
+
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		return v;
 	}
@@ -322,6 +324,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 	@Override
 	public void onClick(View v) {
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.action_text:{				
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
@@ -337,7 +340,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
     public void itemClick(View view, int position) {
 		log("itemClick");
-		
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		if (nodes.get(position).isFolder()){
 					
 			MegaNode n = nodes.get(position);			

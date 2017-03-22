@@ -9,7 +9,6 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -31,7 +30,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements OnClickListener{
+public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> {
 	
 	final public static int CLOUD_EXPLORER = 0;
 	final public static int INCOMING_SHARES_EXPLORER = 1;
@@ -396,12 +395,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	public void setSelectFile(boolean selectFile) {
 		this.selectFile = selectFile;
-	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private static void log(String log) {

@@ -26,11 +26,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -272,6 +270,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				}
 			}
 		}
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	private void addAlphanumericPin(){
@@ -1414,6 +1413,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	@Override
 	public void onClick(View v) {
 		log("onClick");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.button_logout:{
 				AccountController aC = new AccountController(this);
@@ -1430,6 +1430,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	public void checkPasswordText() {
 		log("checkPasswordText");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
     	if(passwordText.length()!=0){
     		passwordText.setCursorVisible(false);

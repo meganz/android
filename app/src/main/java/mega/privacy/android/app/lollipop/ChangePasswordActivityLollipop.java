@@ -25,7 +25,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -215,11 +214,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 		}
-
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	    switch (item.getItemId()) {
 	    // Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
@@ -233,6 +233,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.change_password_password:{
 				if(changePassword){
@@ -263,11 +264,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	public void onResetPasswordClick(boolean hasMk){
 		log("onResetPasswordClick");
+
 		if(!Util.isOnline(this))
 		{
 			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (!validateForm(false)) {
 			return;

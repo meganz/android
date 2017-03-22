@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
@@ -216,7 +216,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 		}
-		
+
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		return v;
 	}
 	
@@ -271,6 +273,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	@Override
 	public void onClick(View v) {
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.action_text:{
 				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
@@ -284,8 +288,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
     public void itemClick(View view, int position) {
-		log("------------------itemClick: "+deepBrowserTree);		
-		
+		log("------------------itemClick: "+deepBrowserTree);
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		if (nodes.get(position).isFolder()){
 					
 			deepBrowserTree = deepBrowserTree+1;
@@ -359,9 +364,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}	
 
 	public int onBackPressed(){
+
 		log("deepBrowserTree "+deepBrowserTree);
 		deepBrowserTree = deepBrowserTree-1;
-		
+
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		if(deepBrowserTree==0){
 			parentHandle=-1;
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));

@@ -224,6 +224,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
         int id = item.getItemId();
         switch(id) {
             case android.R.id.home: {
@@ -249,6 +251,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", Constants.CONTACT_TYPE_MEGA);
@@ -982,6 +986,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     public void itemClick(String email, int position){
 
         log("itemClick");
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             ContactInfo c = new ContactInfo();
@@ -1230,6 +1235,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 
     @Override
     public void onClick(View v) {
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
         switch (v.getId()){
             case R.id.add_contact_back:{
                 onBackPressed();

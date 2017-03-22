@@ -426,4 +426,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 	}
+
+	public void sendSignalPresenceActivity(){
+		log("sendSignalPresenceActivity");
+		if(Util.isChatEnabled()){
+			if (megaChatApi != null){
+				if(megaChatApi.isSignalActivityRequired()){
+					megaChatApi.signalPresenceActivity();
+				}
+			}
+		}
+	}
 }

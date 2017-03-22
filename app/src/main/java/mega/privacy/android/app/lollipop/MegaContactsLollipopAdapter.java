@@ -972,9 +972,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	@Override
 	public void onClick(View v) {
 		log("onClick _ adapterType: " + adapterType);
-		if (context instanceof ManagerActivityLollipop){
-			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
-		}
+
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (!(adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT)){
 			ViewHolderContacts holder = (ViewHolderContacts) v.getTag();
@@ -1018,9 +1017,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
-		if (context instanceof ManagerActivityLollipop){
-			((ManagerActivityLollipop)context).sendSignalPresenceActivity();
-		}
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		ViewHolderContacts holder = (ViewHolderContacts) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 

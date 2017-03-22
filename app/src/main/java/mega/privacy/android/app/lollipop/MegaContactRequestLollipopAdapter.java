@@ -497,7 +497,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	@Override
 	public void onClick(View v) {
 
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -545,7 +545,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
 
-		((ManagerActivityLollipop)context).sendSignalPresenceActivity();
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

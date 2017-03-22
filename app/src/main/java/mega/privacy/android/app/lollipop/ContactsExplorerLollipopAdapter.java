@@ -12,7 +12,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,7 +39,7 @@ import nz.mega.sdk.MegaUser;
 /*
  * Adapter for FilestorageActivity list
  */
-public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<ContactsExplorerLollipopAdapter.ViewHolderContactsExplorerLollipop> implements OnClickListener {
+public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<ContactsExplorerLollipopAdapter.ViewHolderContactsExplorerLollipop>{
 	
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	DatabaseHandler dbH = null;
@@ -480,11 +479,6 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 		
 		return (int)textSize;
 	}
-	
-	@Override
-	public void onClick(View v) {
-		log("click!");
-	}	
 
 	private static void log(String message) {
 		Util.log("ContactsExplorerLollipopAdapter", message);
