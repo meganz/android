@@ -86,7 +86,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_CHAT_ENABLE = "settings_chat_enable";
 
 	public static String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
-	public static String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_checkpreference";
+	public static String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_preference";
+	public static String KEY_AUTOAWAY_ENABLE = "settings_autoaway_chat_switch";
 
 	public static String CATEGORY_PERSISTENCE_CHAT = "settings_persistence_chat";
 	public static String KEY_CHAT_PERSISTENCE = "settings_persistence_chat_checkpreference";
@@ -146,7 +147,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference pinLockEnableCheck;
 	SwitchPreference chatEnableSwitch;
 	TwoLineCheckPreference chatEnableCheck;
-	TwoLineCheckPreference chatAutoAwayCheck;
+	//New autoaway
+	SwitchPreference autoAwaySwitch;
+	Preference chatAutoAwayPreference;
 	TwoLineCheckPreference chatPersistenceCheck;
 
 	Preference nestedNotificationsChat;
@@ -252,6 +255,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatEnableSwitch = (SwitchPreference) findPreference(KEY_CHAT_ENABLE);
 			chatEnableSwitch.setOnPreferenceClickListener(this);
 
+			autoAwaySwitch = (SwitchPreference) findPreference(KEY_AUTOAWAY_ENABLE);
+			autoAwaySwitch.setOnPreferenceClickListener(this);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -264,9 +269,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
 		statusChatListPreference.setOnPreferenceChangeListener(this);
 
-		chatAutoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_AUTOAWAY);
-		chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
-		chatAutoAwayCheck.setOnPreferenceClickListener(this);
+		chatAutoAwayPreference = findPreference(KEY_CHAT_AUTOAWAY);
+		chatAutoAwayPreference.setOnPreferenceClickListener(this);
 
 		chatPersistenceCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_PERSISTENCE);
 		chatPersistenceCheck.setOnPreferenceClickListener(this);
@@ -1531,7 +1535,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
-		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
+		else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0){
+			log("KEY_AUTOAWAY_ENABLE");
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
@@ -1540,12 +1545,21 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if(statusConfig.isAutoawayEnabled()){
 				log("Change AUTOAWAY chat to false");
 				megaChatApi.setPresenceAutoaway(false, 0);
-				chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
+				autoawayChatCategory.removePreference(chatAutoAwayPreference);
 			}
 			else{
 				log("Change AUTOAWAY chat to true");
-				((ManagerActivityLollipop)context).showAutoAwayValueDialog();
+				megaChatApi.setPresenceAutoaway(true, 300);
+				autoawayChatCategory.addPreference(chatAutoAwayPreference);
+				chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
 			}
+		}
+		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+			((ManagerActivityLollipop)context).showAutoAwayValueDialog();
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_PERSISTENCE) == 0){
 			if (!Util.isOnline(context)){
@@ -2035,12 +2049,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(autoawayChatCategory);
 				if(statusConfig.isAutoawayEnabled()){
 					int timeout = (int)statusConfig.getAutoawayTimeout()/60;
-					chatAutoAwayCheck.setChecked(true);
-					chatAutoAwayCheck.setSummary(getString(R.string.settings_autoaway_value, timeout));
+					autoAwaySwitch.setChecked(true);
+					autoawayChatCategory.addPreference(chatAutoAwayPreference);
+					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, timeout));
 				}
 				else{
-					chatAutoAwayCheck.setChecked(false);
-					chatAutoAwayCheck.setSummary(getString(R.string.autoaway_disabled));
+					autoAwaySwitch.setChecked(false);
+					autoawayChatCategory.removePreference(chatAutoAwayPreference);
 				}
 			}
 		}
