@@ -149,6 +149,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference chatEnableCheck;
 	//New autoaway
 	SwitchPreference autoAwaySwitch;
+	TwoLineCheckPreference autoAwayCheck;
 	Preference chatAutoAwayPreference;
 	TwoLineCheckPreference chatPersistenceCheck;
 
@@ -264,6 +265,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			chatEnableCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ENABLE);
 			chatEnableCheck.setOnPreferenceClickListener(this);
+
+			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
+			autoAwayCheck.setOnPreferenceClickListener(this);
 		}
 
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
@@ -2049,12 +2053,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(autoawayChatCategory);
 				if(statusConfig.isAutoawayEnabled()){
 					int timeout = (int)statusConfig.getAutoawayTimeout()/60;
-					autoAwaySwitch.setChecked(true);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						autoAwaySwitch.setChecked(true);
+					}
+					else{
+						autoAwayCheck.setChecked(true);
+					}
 					autoawayChatCategory.addPreference(chatAutoAwayPreference);
 					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, timeout));
 				}
 				else{
-					autoAwaySwitch.setChecked(false);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						autoAwaySwitch.setChecked(false);
+					}
+					else{
+						autoAwayCheck.setChecked(false);
+					}
 					autoawayChatCategory.removePreference(chatAutoAwayPreference);
 				}
 			}
