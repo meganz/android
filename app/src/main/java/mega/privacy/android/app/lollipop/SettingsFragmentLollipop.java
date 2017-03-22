@@ -682,7 +682,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setNotificationEnabledChat(true+"");
 			dbH.setVibrationEnabledChat(true+"");
 			chatEnabled=true;
-			chatEnableSwitch.setChecked(chatEnabled);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				chatEnableSwitch.setChecked(chatEnabled);
+			}
+			else{
+				chatEnableCheck.setChecked(chatEnabled);
+			}
 
 		}
 		else{
@@ -931,6 +936,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		if(!Util.isOnline(context)){
 			chatEnabledCategory.setEnabled(false);
 			chatStatusCategory.setEnabled(false);
+			chatNotificationsCategory.setEnabled(false);
 			autoawayChatCategory.setEnabled(false);
 			persistenceChatCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
@@ -1484,7 +1490,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
-				chatEnableSwitch.setChecked(chatEnabled);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					chatEnableSwitch.setChecked(chatEnabled);
+				}
+				else{
+					chatEnableCheck.setChecked(chatEnabled);
+				}
 				return false;
 			}
 
@@ -2062,6 +2073,20 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(autoawayChatCategory);
 			}
 		}
+	}
+
+	public void cancelSetPinLock(){
+		log("cancelSetPinkLock");
+		pinLock = false;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			pinLockEnableSwitch.setChecked(pinLock);
+		}
+		else{
+			pinLockEnableCheck.setChecked(pinLock);
+		}
+
+		dbH.setPinLockEnabled(false);
+		dbH.setPinLockCode("");
 	}
 
 
