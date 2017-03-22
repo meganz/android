@@ -402,7 +402,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;	    
+	    density  = getResources().getDisplayMetrics().density;
+
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		//Check pathNAvigation
 		if (isList){
@@ -830,6 +832,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
     public void itemClick(int position) {
 		log("onItemClick");
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
 			adapter.toggleSelection(position);
@@ -1088,6 +1092,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		log("onBackPressed");
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;
