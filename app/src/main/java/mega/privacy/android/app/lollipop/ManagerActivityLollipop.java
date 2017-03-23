@@ -13235,6 +13235,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rChatFL.onlineStatusUpdate(status);
 				}
 			}
+
+			if(sttFLol!=null){
+				if(sttFLol.isAdded()){
+					sttFLol.verifyStatusChat(status);
+				}
+			}
 		}
 		else{
 			log("Status update for the user: "+userHandle);
@@ -13243,8 +13249,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rChatFL.contactStatusUpdate(userHandle, status);
 				}
 			}
-		}
 
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if(cFLol!=null){
+				if(cFLol.isAdded()){
+					cFLol.contactStatusUpdate(userHandle, status);
+				}
+			}
+		}
 	}
 
 	@Override

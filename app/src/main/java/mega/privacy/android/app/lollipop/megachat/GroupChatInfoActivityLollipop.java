@@ -44,6 +44,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -1484,9 +1485,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {
             log("CHANGE_TYPE_VISIBILITY");
         }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {
-            log("CHANGE_TYPE_VISIBILITY");
-        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
             log("CHANGE_TYPE_CLOSED");
         }
@@ -1506,8 +1504,37 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
         log("onChatOnlineStatusUpdate");
+
+        if(inProgress){
+            status = -1;
+        }
+        if(userHandle == megaChatApi.getMyUserHandle()){
+            log("My own status update");
+            adapter.updateContactStatus(0, userHandle, status);
+        }
+        else{
+            log("Status update for the user: "+userHandle);
+            int indexToReplace = -1;
+            ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
+            while (itrReplace.hasNext()) {
+                MegaChatParticipant participant = itrReplace.next();
+                if (participant != null) {
+                    if (participant.getHandle() == userHandle) {
+                        participant.setStatus(status);
+                        indexToReplace = itrReplace.nextIndex() - 1;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (indexToReplace != -1) {
+                log("Index to replace: " + indexToReplace);
+                adapter.updateContactStatus(indexToReplace, userHandle, status);
+            }
+        }
     }
 
     @Override

@@ -1056,6 +1056,41 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		notifyDataSetChanged();
 	}
 
+	public void updateContactStatus(int position, long userHandle, int state){
+		log("updateContactStatus: "+position);
+
+		if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			holderList = (ViewHolderContactsList) listFragment.findViewHolderForAdapterPosition(position);
+			if(holderList!=null){
+
+				if(state == MegaChatApi.STATUS_ONLINE){
+					log("This user is connected");
+					holderList.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+				}
+				else if(state == MegaChatApi.STATUS_AWAY){
+					log("This user is away");
+					holderList.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+				}
+				else if(state == MegaChatApi.STATUS_BUSY){
+					log("This user is busy");
+					holderList.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+				}
+				else{
+					log("This user status is: "+state);
+					holderList.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+				}
+
+			}
+			else{
+				log("Holder is NULL");
+				notifyItemChanged(position);
+			}
+		}
+//		else if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+//			holderGrid = (ViewHolderContactsGrid) listFragment.findViewHolderForAdapterPosition(position);
+//		}
+	}
+
 	private static void log(String log) {
 		Util.log("MegaContactsLollipopAdapter", log);
 	}
