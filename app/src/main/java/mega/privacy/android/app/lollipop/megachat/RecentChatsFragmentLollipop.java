@@ -513,32 +513,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
-
-            if(item!=null) {
-
-                if(!(item.isGroup())){
-                    long chatHandleToUpdate = item.getChatId();
-                    int indexToReplace = -1;
-                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                    while (itrReplace.hasNext()) {
-                        MegaChatListItem chat = itrReplace.next();
-                        if (chat != null) {
-                            if (chat.getChatId() == chatHandleToUpdate) {
-                                indexToReplace = itrReplace.nextIndex() - 1;
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                    if (indexToReplace != -1) {
-                        log("Index to replace: " + indexToReplace);
-                        log("Item status: "+item.getOnlineStatus());
-                        chats.set(indexToReplace, item);
-                        onStatusChange(indexToReplace);
-                    }
-                }
-            }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("listItemUpdate: Change participants");
@@ -794,10 +768,42 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    public void onStatusChange(int position){
-        log("onStatusChange: "+position);
+    public void contactStatusUpdate(long userHandle, int status) {
+        log("contactStatusUpdate: "+userHandle);
 
-        adapterList.setStatus(position, null);
+        long chatHandleToUpdate = -1;
+        MegaChatRoom chatToUpdate = megaChatApi.getChatRoomByUser(userHandle);
+        if(chatToUpdate!=null){
+            chatHandleToUpdate = chatToUpdate.getChatId();
+            log("Update chat: "+chatHandleToUpdate);
+            if(chatHandleToUpdate !=-1){
+                log("The user has a one to one chat: "+chatHandleToUpdate);
+
+                int indexToReplace = -1;
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if (chat != null) {
+                        if (chat.getChatId() == chatHandleToUpdate) {
+                            indexToReplace = itrReplace.nextIndex() - 1;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (indexToReplace != -1) {
+                    log("Index to replace: " + indexToReplace);
+                    onStatusChange(indexToReplace, userHandle, status);
+                }
+            }
+        }
+    }
+
+    public void onStatusChange(int position, long userHandle, int status){
+        log("onStatusChange: "+position+" for the user: "+userHandle+" with new presence: "+status);
+
+        adapterList.updateContactStatus(position, userHandle, status);
     }
 
     public void onTitleChange(int position){
