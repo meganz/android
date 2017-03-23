@@ -24,6 +24,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -178,11 +179,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		if (parentHandle == -1){			
 			findNodes();	
-			adapter.parentHandle=-1;
+			adapter.setParentHandle(-1);
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 		}
 		else{
-			adapter.parentHandle=parentHandle;
+			adapter.setParentHandle(parentHandle);
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
 		}

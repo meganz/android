@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,9 +23,10 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.FileDocument;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.lollipop.MegaSharedFolderLollipopAdapter.OnItemClickListener;
+import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter.OnItemClickListener;
 import mega.privacy.android.app.utils.Util;
 
 /*

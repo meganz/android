@@ -65,6 +65,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridAdapterLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -126,17 +128,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	long photosyncHandle = -1;
 	
 	public class PhotoSyncHolder{
-		boolean isNode;
-		long handle;
-		String monthYear;
+		public boolean isNode;
+		public long handle;
+		public String monthYear;
 	}
 	
 	public class PhotoSyncGridHolder{
-		boolean isNode;
-		String monthYear;
-		long handle1;
-		long handle2;
-		long handle3;
+		public boolean isNode;
+		public String monthYear;
+		public long handle1;
+		public long handle2;
+		public long handle3;
 	}
 	
 //	private TourImageAdapter adapter;

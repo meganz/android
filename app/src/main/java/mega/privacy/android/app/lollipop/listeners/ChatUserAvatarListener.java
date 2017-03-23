@@ -7,7 +7,7 @@ import android.graphics.BitmapFactory;
 
 import java.io.File;
 
-import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;

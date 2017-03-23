@@ -3,12 +3,10 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.view.View;
 
 import java.io.File;
 
-import mega.privacy.android.app.lollipop.adapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaParticipantsChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
