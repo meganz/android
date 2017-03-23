@@ -20,6 +20,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -58,7 +60,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
@@ -89,7 +90,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	String folderKey;
 	String folderSubHandle;
 	RecyclerView listView;
-	private RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	MegaNode selectedNode;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -103,6 +104,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
 	MegaBrowserLollipopAdapter adapterList;
+
+	Stack<Integer> lastPositionStack;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -257,6 +260,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 		}
+
+		lastPositionStack = new Stack<>();
 		
 		setContentView(R.layout.activity_folder_link);	
 		
@@ -275,7 +280,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
-		mLayoutManager = new MegaLinearLayoutManager(this);
+		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
 		
@@ -1235,7 +1240,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		else{
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
-				
+
+				int lastFirstVisiblePosition = 0;
+
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
+
 				aB.setTitle(n.getName());
 				supportInvalidateOptionsMenu();
 //				((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
@@ -1247,7 +1259,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				nodes = megaApiFolder.getChildren(nodes.get(position), orderGetChildren);
 				adapterList.setNodes(nodes);
 				listView.scrollToPosition(0);
-				
+
 				//If folder has no files
 				if (adapterList.getItemCount() == 0){
 					listView.setVisibility(View.GONE);
@@ -1385,19 +1397,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				parentHandle = parentNode.getHandle();
 				nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
 				adapterList.setNodes(nodes);
-				listView.post(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						listView.scrollToPosition(0);
-						View v = listView.getChildAt(0);
-						if (v != null)
-						{
-							v.requestFocus();
-						}
-					}
-				});
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+
+				}
 				adapterList.setParentHandle(parentHandle);
 				return;
 			}

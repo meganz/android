@@ -68,7 +68,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	CoordinatorLayout mainLayout;
 
 	RecyclerView listView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 
@@ -82,6 +82,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	long parentHandle = -1;
 
 	Stack<Long> parentHandleStack = new Stack<Long>();
+	Stack<Integer> lastPositionStack;
 
 	private ActionMode actionMode;
 
@@ -247,7 +248,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-
+		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -496,6 +497,13 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			if (contactNodes.get(position).isFolder()) {
 				MegaNode n = contactNodes.get(position);
 
+				int lastFirstVisiblePosition = 0;
+
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
+
 				((ContactFileListActivityLollipop)context).setTitleActionBar(n.getName());
 				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
 
@@ -593,7 +601,16 @@ public class ContactFileListFragmentLollipop extends Fragment{
 				((ContactFileListActivityLollipop)context).setTitleActionBar(null);
 				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
 				adapter.setNodes(contactNodes);
-				listView.scrollToPosition(0);
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
 				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				log("return 2");
@@ -603,7 +620,16 @@ public class ContactFileListFragmentLollipop extends Fragment{
 				((ContactFileListActivityLollipop)context).setTitleActionBar(megaApi.getNodeByHandle(parentHandle).getName());
 				((ContactFileListActivityLollipop)context).supportInvalidateOptionsMenu();
 				adapter.setNodes(contactNodes);
-				listView.scrollToPosition(0);
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
 				((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				showFabButton(megaApi.getNodeByHandle(parentHandle));
