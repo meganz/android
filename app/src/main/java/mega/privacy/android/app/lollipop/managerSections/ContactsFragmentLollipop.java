@@ -168,11 +168,6 @@ public class ContactsFragmentLollipop extends Fragment{
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 				}
-				else if(selected.size()==1){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_one));
-					unselect.setVisible(true);
-				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));

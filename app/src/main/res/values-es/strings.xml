@@ -81,7 +81,7 @@
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Ampliar cuenta</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Realizando pago</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar todo</string>
-    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar todo</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista miniaturas</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Ver como lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar clave de recuperación</string>
@@ -809,8 +809,6 @@
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Enlace de fichero no disponible</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">El fichero ha sido eliminado por una violación de los TdS/PUA.</string>
-
-    <string name="action_unselect_one" context="Menu item to unselect all the elements of a list">Deseleccionar</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Esperando la confirmación del email</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Por favor, comprueba tu correo electrónico y haz click en el enlace enviado para confirmar tu cuenta.</string>

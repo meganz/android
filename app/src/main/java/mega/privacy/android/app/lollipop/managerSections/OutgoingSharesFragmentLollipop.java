@@ -243,7 +243,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					showLink=true;
 					showRename=true;
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 				}
 				else{
