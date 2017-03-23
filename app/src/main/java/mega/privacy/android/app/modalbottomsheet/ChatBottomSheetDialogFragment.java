@@ -19,7 +19,6 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -100,10 +99,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
         iconStateChatPanel.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
         iconStateChatPanel.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
-
-        RelativeLayout.LayoutParams stateIconParams = (RelativeLayout.LayoutParams)iconStateChatPanel.getLayoutParams();
-        stateIconParams.setMargins(Util.scaleWidthPx(6, outMetrics), Util.scaleHeightPx(4, outMetrics), 0, 0);
-        iconStateChatPanel.setLayoutParams(stateIconParams);
 
         titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_name_text);
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_mail_text);
