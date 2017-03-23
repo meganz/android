@@ -1,25 +1,22 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+
 import java.io.File;
 import java.util.HashMap;
 
-import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.ThumbnailCache;
-import mega.privacy.android.app.lollipop.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
+import mega.privacy.android.app.ThumbnailCache;
+import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUtilsAndroid;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 
 /*

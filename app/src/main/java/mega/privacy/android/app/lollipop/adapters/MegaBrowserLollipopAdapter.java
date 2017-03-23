@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,6 +35,16 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
+import mega.privacy.android.app.lollipop.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.InboxFragmentLollipop;
+import mega.privacy.android.app.lollipop.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.RubbishBinFragmentLollipop;
+import mega.privacy.android.app.lollipop.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -391,7 +401,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		switch (type) {
 			case Constants.FILE_BROWSER_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);			
+				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
 				break;
 			}
 			case Constants.CONTACT_FILE_ADAPTER: {

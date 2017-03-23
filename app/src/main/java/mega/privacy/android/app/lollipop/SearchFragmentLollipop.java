@@ -39,6 +39,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -599,7 +600,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();

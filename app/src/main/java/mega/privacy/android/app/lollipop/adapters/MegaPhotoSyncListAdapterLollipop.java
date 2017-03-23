@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,6 +23,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;

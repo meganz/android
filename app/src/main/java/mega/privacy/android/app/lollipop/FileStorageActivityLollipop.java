@@ -58,6 +58,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
@@ -869,7 +870,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {

@@ -2,13 +2,11 @@ package mega.privacy.android.app.lollipop;
 
 import java.util.ArrayList;
 
-import nz.mega.sdk.MegaNode;
-
 
 public class MegaMonthPicLollipop {
-	
-	String monthYearString;
-	ArrayList<Long> nodeHandles;
+
+	public String monthYearString;
+	public ArrayList<Long> nodeHandles;
 	int numRows;
 
 	MegaMonthPicLollipop(String monthYearString, ArrayList<Long> nodeHandles){

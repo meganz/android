@@ -42,6 +42,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -686,7 +687,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {

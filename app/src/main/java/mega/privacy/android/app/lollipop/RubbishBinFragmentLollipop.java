@@ -39,6 +39,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -700,7 +701,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();

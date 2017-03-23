@@ -61,6 +61,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -1143,7 +1144,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		adapterList.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();

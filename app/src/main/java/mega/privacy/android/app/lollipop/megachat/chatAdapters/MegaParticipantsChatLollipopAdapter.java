@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.adapters;
+package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;

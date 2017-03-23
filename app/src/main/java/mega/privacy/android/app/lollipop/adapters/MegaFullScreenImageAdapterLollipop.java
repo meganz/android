@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;

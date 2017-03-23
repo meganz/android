@@ -1,14 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaTransfer;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -23,16 +14,23 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaTransfer;
 
 
 public class TransfersFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener{

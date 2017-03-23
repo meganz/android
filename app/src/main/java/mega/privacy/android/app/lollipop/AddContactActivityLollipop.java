@@ -49,6 +49,8 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.tokenautocomplete.ContactInfo;
 import mega.privacy.android.app.components.tokenautocomplete.ContactsCompletionView;
 import mega.privacy.android.app.components.tokenautocomplete.TokenCompleteTextView;
+import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.PhoneContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
