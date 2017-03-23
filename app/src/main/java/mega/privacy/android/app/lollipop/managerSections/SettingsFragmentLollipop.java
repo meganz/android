@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.managerSections;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -41,6 +41,10 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;

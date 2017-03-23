@@ -123,6 +123,26 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
+import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MonthlyAnnualyFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -445,21 +465,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	IabHelper mHelper;
 	// SKU for our subscription PRO_I monthly
-    static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
+    public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
     // SKU for our subscription PRO_I yearly
-    static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
+	public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
     // SKU for our subscription PRO_II monthly
-    static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+	public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
     // SKU for our subscription PRO_II yearly
-    static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
+	public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
     // SKU for our subscription PRO_III monthly
-    static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+	public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
     // SKU for our subscription PRO_III yearly
-    static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
+	public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
     // SKU for our subscription PRO_LITE monthly
-    static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
+	public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
     // SKU for our subscription PRO_LITE yearly
-    static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
+	public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
 
     Purchase proLiteMonthly;
     Purchase proLiteYearly;
@@ -732,7 +752,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	};
 
-    void launchPayment(String productId){
+    public void launchPayment(String productId){
     	/* TODO: for security, generate your payload here for verification. See the comments on
          *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
          *        an empty string, but on a production app you should carefully generate this. */

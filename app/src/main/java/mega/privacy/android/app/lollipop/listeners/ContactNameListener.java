@@ -3,8 +3,8 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.lollipop.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;

@@ -25,7 +25,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;

@@ -7,10 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class FileExplorerPagerAdapter extends FragmentPagerAdapter {

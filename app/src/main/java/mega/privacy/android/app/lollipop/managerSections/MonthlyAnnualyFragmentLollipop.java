@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,6 +27,8 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
