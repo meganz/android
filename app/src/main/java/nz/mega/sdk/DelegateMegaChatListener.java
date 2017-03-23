@@ -55,12 +55,12 @@ class DelegateMegaChatListener extends MegaChatListener {
     }
 
     @Override
-    public void onChatOnlineStatusUpdate(MegaChatApi api, final int status, final boolean inProgress)
+    public void onChatOnlineStatusUpdate(MegaChatApi api, final long userhandle, final int status, final boolean inProgress)
     {
         if (listener != null) {
             megaChatApi.runCallback(new Runnable() {
                 public void run() {
-                    listener.onChatOnlineStatusUpdate(megaChatApi, status, inProgress);
+                    listener.onChatOnlineStatusUpdate(megaChatApi, userhandle, status, inProgress);
                 }
             });
         }

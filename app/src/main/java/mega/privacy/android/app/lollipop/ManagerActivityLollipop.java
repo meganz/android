@@ -13223,16 +13223,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, int status, boolean inProgress) {
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
 		log("onChatOnlineStatusUpdate: "+status+"___"+inProgress);
 		if(inProgress){
 			status = -1;
 		}
-		if(rChatFL!=null){
-			if(rChatFL.isAdded()){
-				rChatFL.onlineStatusUpdate(status);
+		if(userHandle == megaChatApi.getMyUserHandle()){
+			log("My own status update");
+			if(rChatFL!=null){
+				if(rChatFL.isAdded()){
+					rChatFL.onlineStatusUpdate(status);
+				}
 			}
 		}
+		else{
+			log("Status update for the user: "+userHandle);
+			if(rChatFL!=null){
+				if(rChatFL.isAdded()){
+					rChatFL.contactStatusUpdate(userHandle, status);
+				}
+			}
+		}
+
 	}
 
 	@Override
