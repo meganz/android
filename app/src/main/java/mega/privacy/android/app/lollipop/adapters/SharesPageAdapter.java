@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class SharesPageAdapter extends FragmentPagerAdapter {

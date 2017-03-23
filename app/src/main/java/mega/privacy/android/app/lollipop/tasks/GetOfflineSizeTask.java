@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.SettingsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
 /*

@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.MyAccountFragmentLollipop;
-import mega.privacy.android.app.lollipop.MyStorageFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class MyAccountPageAdapter extends FragmentPagerAdapter {

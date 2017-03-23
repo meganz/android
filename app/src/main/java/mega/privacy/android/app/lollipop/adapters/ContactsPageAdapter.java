@@ -6,9 +6,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.ReceivedRequestsFragmentLollipop;
-import mega.privacy.android.app.lollipop.SentRequestsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class ContactsPageAdapter extends FragmentPagerAdapter {
