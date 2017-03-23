@@ -11,7 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -32,12 +32,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -58,7 +60,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
@@ -68,6 +71,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	ProgressBar progressBar;
 	MegaApiAndroid megaApi;	
 	ImageView transferArrow;
+
+	Stack<Integer> lastPositionStack;
 		
 	long parentHandle = -1;
 	boolean isList = true;
@@ -259,7 +264,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
+		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -318,7 +323,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
@@ -366,14 +371,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-				@Override
-			      public int getSpanSize(int position) {
-					return 1;
-				}
-			});
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
@@ -450,6 +449,21 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		else{
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
+
+				int lastFirstVisiblePosition = 0;
+				if(isList){
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				}
+				else{
+					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					if(lastFirstVisiblePosition==-1){
+						log("Completely -1 then find just visible position");
+						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+					}
+				}
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
 				
 				contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 				
@@ -687,7 +701,24 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}
 				}
 				adapter.setNodes(nodes);
-				recyclerView.scrollToPosition(0);
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					if(isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
+
 				adapter.setParentHandle(parentHandle);
 				levels--;
 				return 2;
@@ -701,7 +732,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			return 0;
 		}
 		else{
-			log("levels searchQuery");
+			log("levels searchQuery: "+levels);
 			parentHandle = -1;
 			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 			nodes = megaApi.search(searchQuery);
@@ -723,7 +754,22 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					emptyTextView.setVisibility(View.VISIBLE);
 				}
 			}
-			recyclerView.scrollToPosition(0);
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+
+				if(isList){
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else{
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+			}
 			adapter.setParentHandle(parentHandle);
 			levels--;
 			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
