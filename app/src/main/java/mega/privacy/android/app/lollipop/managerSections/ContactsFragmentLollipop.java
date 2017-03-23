@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -590,6 +591,29 @@ public class ContactsFragmentLollipop extends Fragment{
 	public void updateShares(){
 		log("updateShares");
 		adapter.notifyDataSetChanged();
+	}
+
+	public void contactStatusUpdate(long userHandle, int status) {
+		log("contactStatusUpdate: "+userHandle);
+
+		int indexToReplace = -1;
+		ListIterator<MegaContactAdapter> itrReplace = visibleContacts.listIterator();
+		while (itrReplace.hasNext()) {
+			MegaContactAdapter contact = itrReplace.next();
+			if (contact != null) {
+				if (contact.getMegaUser().getHandle() == userHandle) {
+					indexToReplace = itrReplace.nextIndex() - 1;
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+		if (indexToReplace != -1) {
+			log("Index to replace: " + indexToReplace);
+			adapter.updateContactStatus(indexToReplace, userHandle, status);
+		}
+
 	}
 
 	public void sortBy(int orderContacts){
