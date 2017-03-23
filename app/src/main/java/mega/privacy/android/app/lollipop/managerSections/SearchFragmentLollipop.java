@@ -229,7 +229,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				}
 				else if(selected.size()==1){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_one));
+					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 
 					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
