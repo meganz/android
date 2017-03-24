@@ -292,7 +292,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				view.imageView.startAnimation(flipAnimation);
 			}
 			else{
-				log("view is null");
+				log("view is null - not animation");
 			}
 		}
 		else{

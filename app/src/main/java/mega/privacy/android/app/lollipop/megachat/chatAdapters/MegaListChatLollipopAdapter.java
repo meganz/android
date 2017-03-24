@@ -937,7 +937,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 		}
 		else{
-			log("HOLDER is NULL");
+			log("Holder is NULL: "+position);
+			notifyItemChanged(position);
 		}
 	}
 
@@ -1007,6 +1008,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 
 		}
+		else{
+			log("Holder is NULL: "+position);
+			notifyItemChanged(position);
+		}
 	}
 
 	public void setTs(int position, ViewHolderChatList holder) {
@@ -1034,7 +1039,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 		}
 		else{
-			log("holder is NULL");
+			log("Holder is NULL: "+position);
+			notifyItemChanged(position);
 		}
 	}
 
@@ -1056,7 +1062,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 		}
 		else{
-			log("Holder is NULL");
+			log("Holder is NULL: "+position);
+			notifyItemChanged(position);
 		}
 	}
 
@@ -1090,6 +1097,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("Chat prefs is NULL");
 				holder.muteIcon.setVisibility(View.GONE);
 			}
+			notifyItemChanged(position);
+		}
+		else{
+			log("Holder is NULL: "+position);
 			notifyItemChanged(position);
 		}
 	}
@@ -1192,11 +1203,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 					holder.textViewDate.setVisibility(View.GONE);
 				}
-
 			}
 		}
 		else{
-			log("Holder is NULL");
+			log("Holder is NULL: "+position);
+			notifyItemChanged(position);
 		}
 	}
 	
