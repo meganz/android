@@ -19,6 +19,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -50,13 +51,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
@@ -114,7 +115,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private Button button;
 	private TextView contentText;
 	private RecyclerView listView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	private Button cancelButton;
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
@@ -122,6 +123,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private Boolean fromSettings;
 	private Boolean cameraFolderSettings;
+
+	Stack<Integer> lastPositionStack;
 	
 	private String url;
 	private long size;
@@ -409,7 +412,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
-		mLayoutManager = new MegaLinearLayoutManager(this);
+		mLayoutManager = new LinearLayoutManager(this);
 		listView.addOnItemTouchListener(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -433,7 +436,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			root = new File("/");
 		}
 
-				
+		lastPositionStack = new Stack<>();
+
 		prefs = dbH.getPreferences();
 		if (prefs == null){
 			path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
@@ -826,6 +830,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		else{
 			if (document.isFolder()) {
+
+				int lastFirstVisiblePosition = 0;
+
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+				log("Push to stack "+lastFirstVisiblePosition+" position");
+				lastPositionStack.push(lastFirstVisiblePosition);
+
 				changeFolder(document.getFile());
 			}
 			else if (mode == Mode.PICK_FILE) {
@@ -890,6 +902,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		// Go one level higher otherwise
 		} else {
 			changeFolder(path.getParentFile());
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+			}
 		}
 	}
 	

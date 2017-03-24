@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -18,12 +19,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -51,13 +52,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //	private boolean folderSelected = false;
 	LinearLayout optionsBar;
 	RecyclerView listView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
 	Button optionButton;
 	Button cancelButton;
 	View separator;
+
+	Stack<Integer> lastPositionStack;
 
 	public static CloudDriveExplorerFragmentLollipop newInstance() {
 		log("newInstance");
@@ -79,6 +82,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		parentHandle = -1;
 		dbH = DatabaseHandler.getDbHandler(context);
+		lastPositionStack = new Stack<>();
 	}
 
 	@Override
@@ -115,7 +119,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
-		mLayoutManager = new MegaLinearLayoutManager(context);
+		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
@@ -345,7 +349,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		if (nodes.get(position).isFolder()){
 					
-			MegaNode n = nodes.get(position);			
+			MegaNode n = nodes.get(position);
+
+			int lastFirstVisiblePosition = 0;
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+			log("Push to stack "+lastFirstVisiblePosition+" position");
+			lastPositionStack.push(lastFirstVisiblePosition);
 			
 			String path=n.getName();	
 			String[] temp;
@@ -473,7 +483,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			
 			nodes = megaApi.getChildren(parentNode);
 			adapter.setNodes(nodes);
-			listView.scrollToPosition(0);
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+			}
 			adapter.setParentHandle(parentHandle);
 			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
