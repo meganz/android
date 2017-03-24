@@ -737,7 +737,7 @@
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; bandwidth with a Pro account!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %1s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
 
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
 
