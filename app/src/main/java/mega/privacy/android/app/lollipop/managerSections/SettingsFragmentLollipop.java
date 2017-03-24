@@ -727,22 +727,27 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		if(chatEnabled){
 			//Get chat status
 			statusConfig = megaChatApi.getPresenceConfig();
-			chatStatus = statusConfig.getOnlineStatus();
-			log("SETTINGS chatStatus pending: "+statusConfig.isPending());
-			log("---------------status: "+chatStatus);
+			if(statusConfig!=null){
+				chatStatus = statusConfig.getOnlineStatus();
+				log("SETTINGS chatStatus pending: "+statusConfig.isPending());
+				log("---------------status: "+chatStatus);
 
-			statusChatListPreference.setValue(chatStatus+"");
-			if(chatStatus==MegaChatApi.STATUS_INVALID){
-				statusChatListPreference.setSummary(getString(R.string.recovering_info));
+				statusChatListPreference.setValue(chatStatus+"");
+				if(chatStatus==MegaChatApi.STATUS_INVALID){
+					statusChatListPreference.setSummary(getString(R.string.recovering_info));
+				}
+				else{
+					statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+				}
+
+				showPresenceChatConfig();
+
+				if(megaChatApi.isSignalActivityRequired()){
+					megaChatApi.signalPresenceActivity();
+				}
 			}
 			else{
-				statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-			}
-
-			showPresenceChatConfig();
-
-			if(megaChatApi.isSignalActivityRequired()){
-				megaChatApi.signalPresenceActivity();
+				waitPresenceConfig();
 			}
 		}
 		else{
@@ -1550,16 +1555,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				return false;
 			}
 			statusConfig = megaChatApi.getPresenceConfig();
-			if(statusConfig.isAutoawayEnabled()){
-				log("Change AUTOAWAY chat to false");
-				megaChatApi.setPresenceAutoaway(false, 0);
-				autoawayChatCategory.removePreference(chatAutoAwayPreference);
-			}
-			else{
-				log("Change AUTOAWAY chat to true");
-				megaChatApi.setPresenceAutoaway(true, 300);
-				autoawayChatCategory.addPreference(chatAutoAwayPreference);
-				chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
+			if(statusConfig!=null){
+				if(statusConfig.isAutoawayEnabled()){
+					log("Change AUTOAWAY chat to false");
+					megaChatApi.setPresenceAutoaway(false, 0);
+					autoawayChatCategory.removePreference(chatAutoAwayPreference);
+				}
+				else{
+					log("Change AUTOAWAY chat to true");
+					megaChatApi.setPresenceAutoaway(true, 300);
+					autoawayChatCategory.addPreference(chatAutoAwayPreference);
+					chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
+				}
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
@@ -2021,6 +2028,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 
 		showPresenceChatConfig();
+	}
+
+	public void waitPresenceConfig(){
+		log("waitPresenceConfig: ");
+
+		preferenceScreen.removePreference(autoawayChatCategory);
+		preferenceScreen.removePreference(persistenceChatCategory);
+
+		statusChatListPreference.setValue(MegaChatApi.STATUS_OFFLINE+"");
+		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 	}
 
 	public void showPresenceChatConfig(){

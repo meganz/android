@@ -13146,7 +13146,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		megaChatApi.connect(this);
 	}
 
-
 	public void disableChat(){
 		log("disableChat");
 
