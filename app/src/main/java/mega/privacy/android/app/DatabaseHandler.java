@@ -2246,15 +2246,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void clearNonContacts(){
-		db.execSQL("DELETE FROM " + TABLE_NON_CONTACTS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NON_CONTACTS);
+		onCreate(db);
 	}
 
-	public void clearOffline(SQLiteDatabase db){		
-		db.execSQL("DELETE FROM " + TABLE_OFFLINE);   
+	public void clearChatItems(){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_ITEMS);
+		onCreate(db);
+	}
+
+	public void clearChatSettings(){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+		onCreate(db);
+	}
+
+	public void clearOffline(SQLiteDatabase db){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
+		onCreate(db);
 	}
 	
 	public void clearOffline(){		
-		db.execSQL("DELETE FROM " + TABLE_OFFLINE);   
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
+		onCreate(db);
 	}
 	
 	private static void log(String log) {

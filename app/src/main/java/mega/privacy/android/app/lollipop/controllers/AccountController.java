@@ -380,8 +380,9 @@ public class AccountController {
 
         dbH.clearNonContacts();
 
-        log("logout: switch OFF chat");
-        dbH.setEnabledChat(false+"");
+        dbH.clearChatSettings();
+
+        dbH.clearChatItems();
 
         if (!isManagerActivityLollipop){
             Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
