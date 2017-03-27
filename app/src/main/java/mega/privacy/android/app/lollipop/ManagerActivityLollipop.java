@@ -9685,6 +9685,48 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationEnableLogs(){
+		log("showConfirmationEnableLogs");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						enableLogs();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void enableLogs(){
+		log("enableLogs");
+
+		if(sttFLol!=null){
+			sttFLol.numberOfClicksSDK = 0;
+		}
+		dbH.setFileLogger(true);
+		Util.setFileLogger(true);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		showSnackbar(getString(R.string.settings_enable_logs));
+		log("App Version: " + Util.getVersion(this));
+	}
+
 	public void showConfirmationDeleteAvatar(){
 		log("showConfirmationDeleteAvatar");
 

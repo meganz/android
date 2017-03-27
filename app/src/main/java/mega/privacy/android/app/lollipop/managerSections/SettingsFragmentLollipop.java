@@ -219,7 +219,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	MegaNode megaNodeSecondaryMediaFolder = null;
 	String megaPathSecMediaFolder = "";
 
-	int numberOfClicksSDK = 0;
+	public int numberOfClicksSDK = 0;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1096,37 +1096,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				if (attrs.getFileLogger() != null){
 					try {
 						if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
-							dbH.setFileLogger(true);
-							Util.setFileLogger(true);
-							numberOfClicksSDK = 0;
-							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-							Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
-							log("App Version: " + Util.getVersion(context));
+							((ManagerActivityLollipop)context).showConfirmationEnableLogs();
 						}
 						else{
 							dbH.setFileLogger(false);
 							Util.setFileLogger(false);
 							numberOfClicksSDK = 0;
 							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-							Toast.makeText(context, getString(R.string.settings_disable_logs), Toast.LENGTH_LONG).show();
+                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
 						}
 					}
 					catch(Exception e){
-						dbH.setFileLogger(true);
-						Util.setFileLogger(true);
-						numberOfClicksSDK = 0;
-						MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-						Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
-						log("App Version: " + Util.getVersion(context));
+						((ManagerActivityLollipop)context).showConfirmationEnableLogs();
 					}
 				}
 				else{
-					dbH.setFileLogger(true);
-					Util.setFileLogger(true);
-					numberOfClicksSDK = 0;
-					MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-					Toast.makeText(context, getString(R.string.settings_enable_logs), Toast.LENGTH_LONG).show();
-					log("App Version: " + Util.getVersion(context));
+					((ManagerActivityLollipop)context).showConfirmationEnableLogs();
 				}
 			}
 		}
