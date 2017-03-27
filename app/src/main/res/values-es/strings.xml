@@ -446,7 +446,7 @@
     <string name="my_account_change_password_OK" context="Success text">Contraseña modificada con éxito</string>
     <string name="my_account_change_password_dont_match" context="title of the screen to change the password">Las nuevas contraseñas no coinciden</string> 
     
-    <string name="upgrade_activity" context="title of the Upgrade screen">Cuenta Pro</string>
+    <string name="upgrade_activity" context="title of the Upgrade screen">Cuenta PRO</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Seleccione plan</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Pago Anual o Mensual</string>
     <string name="select_membership_2" context="button to go to Google Play">Subscripción Google Play</string>
@@ -663,9 +663,9 @@
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Cuenta gratis</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Cuenta Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta Pro I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta Pro II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta PRO I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta PRO II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta PRO III</string>
 
     <string name="backup_title" context="Title of the screen to backup the master key">Haz copia de tu clave principal de cifrado</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Tu contraseña desbloquea tu clave de recuperación</string>
@@ -734,7 +734,7 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta Pro!</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta PRO!</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Disponible Sin Conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string>
