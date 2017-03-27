@@ -696,15 +696,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                             }
                             else{
-                                int state = chatRoom.getOnlineStatus();
-                                if(state == MegaChatApi.STATUS_ONLINE){
-                                    log("This user is connected: "+chatRoom.getTitle());
-                                    aB.setSubtitle(getString(R.string.online_status));
-                                }
-                                else{
-                                    log("This user status is: "+state+  " " + chatRoom.getTitle());
-                                    aB.setSubtitle(getString(R.string.offline_status));
-                                }
+                                long userHandle = chatRoom.getPeerHandle(0);
+                                setStatus(userHandle);
                             }
                         }
 
@@ -772,18 +765,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-//    public void setStatus(){
-//
-//        int state = chatRoom.getOnlineStatus();
-//        if(state == MegaChatApi.STATUS_ONLINE){
-//            log("This user is connected: "+chatRoom.getTitle());
-//            aB.setSubtitle(getString(R.string.online_status));
-//        }
-//        else{
-//            log("This user status is: "+state+  " " + chatRoom.getTitle());
-//            aB.setSubtitle(getString(R.string.offline_status));
-//        }
-//    }
+    public void setStatus(long userHandle){
+
+        int state = megaChatApi.getUserOnlineStatus(userHandle);
+
+        if(state == MegaChatApi.STATUS_ONLINE){
+            log("This user is connected");
+            aB.setSubtitle(getString(R.string.online_status));
+        }
+        else if(state == MegaChatApi.STATUS_AWAY){
+            log("This user is away");
+            aB.setSubtitle(getString(R.string.away_status));
+        }
+        else if(state == MegaChatApi.STATUS_BUSY){
+            log("This user is busy");
+            aB.setSubtitle(getString(R.string.busy_status));
+        }
+        else{
+            log("This user status is: "+state);
+            aB.setSubtitle(getString(R.string.offline_status));
+        }
+    }
 
     public int compareTime(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
 
@@ -1727,15 +1729,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
             log("chat online status: "+chat.getOnlineStatus());
             if(!(chatRoom.isGroup())){
-                int state = chat.getOnlineStatus();
-                if(state == MegaChatApi.STATUS_ONLINE){
-                    log("This user is connected: "+chatRoom.getTitle());
-                    aB.setSubtitle(getString(R.string.online_status));
-                }
-                else{
-                    log("This user status is: "+state+  " " + chatRoom.getTitle());
-                    aB.setSubtitle(getString(R.string.offline_status));
-                }
+                long userHandle = chatRoom.getPeerHandle(0);
+                setStatus(userHandle);
             }
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
@@ -1914,11 +1909,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
-    }
-
-    public void onLoadMessageNotSent(){
-        log("onLoadMessageNotSent");
-
     }
 
     @Override
