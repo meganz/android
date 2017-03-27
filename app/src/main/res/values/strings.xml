@@ -6,7 +6,7 @@
     <string name="sdk_version" context="Not translate">9640761</string>
     <string name="karere_version" context="Not translate">f71ee05</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
@@ -37,7 +37,7 @@
     <string name="general_importing" context="state while importing the file">Importing</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Import</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
-    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandwidth</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Transfer quota</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
     <string name="general_error_word" context="It will be followed by the error message">Error</string>
@@ -448,7 +448,7 @@
     <string name="my_account_change_password_OK" context="Success text">Password changed successfully</string>
     <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">Password doesn\'t match</string>
 
-    <string name="upgrade_activity" context="title of the Upgrade screen">Pro Membership</string>
+    <string name="upgrade_activity" context="title of the Upgrade screen">PRO Membership</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Select membership</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Monthly or annually recurring</string>
     <string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>
@@ -599,9 +599,9 @@
     <string name="expires_on" context="title of the Expiration Date">Renews on </string>
     <string name="free_account">FREE</string>
     <string name="prolite_account" context="Not translate">Lite</string>
-    <string name="pro1_account" context="Not translate">Pro I</string>
-    <string name="pro2_account" context="Not translate">Pro II</string>
-    <string name="pro3_account" context="Not translate">Pro III</string>
+    <string name="pro1_account" context="Not translate">PRO I</string>
+    <string name="pro2_account" context="Not translate">PRO II</string>
+    <string name="pro3_account" context="Not translate">PRO III</string>
 
     <string name="free_storage" context="Not translate">50 GB</string>
     <string name="free_bandwidth" context="Free bandwich account details">Limited</string>
@@ -665,9 +665,9 @@
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I Account</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II Account</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III Account</string>
 
     <string name="backup_title" context="Title of the screen to backup the master key">Backup your recovery key</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Your password unlocks your recovery key</string>
@@ -736,7 +736,7 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; bandwidth with a Pro account!</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; transfer quota with a PRO account!</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %1s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
 
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
