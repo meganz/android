@@ -45,7 +45,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.tokenautocomplete.ContactInfo;
 import mega.privacy.android.app.components.tokenautocomplete.ContactsCompletionView;

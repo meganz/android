@@ -10,6 +10,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.PhoneContactsLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -50,7 +50,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	private RecyclerView listView;
-	private RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 
 	PhoneContactsLollipopAdapter adapter;
 	RelativeLayout fragmentContainer;
@@ -122,7 +122,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		fragmentContainer = (RelativeLayout)  findViewById(R.id.fragment_container_contacts_explorer);
 		listView = (RecyclerView) findViewById(R.id.contacts_explorer_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
-		mLayoutManager = new MegaLinearLayoutManager(this);
+		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 
 		emptyImageView = (ImageView) findViewById(R.id.contact_explorer_list_empty_image);

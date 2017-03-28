@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
@@ -55,7 +55,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	Display display;
 	
 	boolean pause = false;
-	private RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	
 	TransfersFragmentLollipop transfersFragment = this;
 	
@@ -122,7 +122,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-		mLayoutManager = new MegaLinearLayoutManager(context);
+		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());		
