@@ -1486,7 +1486,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                         String messageContent = "";
                         if(message.getType()==MegaChatMessage.TYPE_NORMAL){
-                            holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                            holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                             if(message.getContent()!=null){
                                 messageContent = message.getContent();
                             }
