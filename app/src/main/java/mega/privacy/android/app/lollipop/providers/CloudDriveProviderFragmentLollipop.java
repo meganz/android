@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -19,11 +20,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
@@ -49,10 +52,12 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 //	boolean first = false;
 //	private boolean folderSelected = false;
 	RecyclerView listView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+
+	Stack<Integer> lastPositionStack;
 	
 	long [] hashes;
 	
@@ -88,6 +93,8 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		if (megaApi.getRootNode() == null){
 			return;
 		}
+
+		lastPositionStack = new Stack<>();
 		
 		parentHandle = -1;
 		dbH = DatabaseHandler.getDbHandler(context);		
@@ -108,7 +115,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
-		mLayoutManager = new MegaLinearLayoutManager(context);
+		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -204,7 +211,14 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		
 		if (nodes.get(position).isFolder()){
 					
-			MegaNode n = nodes.get(position);			
+			MegaNode n = nodes.get(position);
+
+			int lastFirstVisiblePosition = 0;
+
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+			log("Push to stack "+lastFirstVisiblePosition+" position");
+			lastPositionStack.push(lastFirstVisiblePosition);
 			
 			String path=n.getName();	
 			String[] temp;
@@ -259,7 +273,16 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 			
 			nodes = megaApi.getChildren(parentNode);
 			setNodes(nodes);
-			listView.scrollToPosition(0);
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+			}
 			adapter.setParentHandle(parentHandle);
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setParentHandle(parentHandle);

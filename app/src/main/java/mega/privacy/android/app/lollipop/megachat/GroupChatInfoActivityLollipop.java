@@ -17,6 +17,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -344,7 +345,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
             recyclerView.setHasFixedSize(true);
-            MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(this);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -15,6 +15,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
@@ -144,7 +145,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     FrameLayout emojiKeyboardLayout;
 
     RecyclerView listView;
-    MegaLinearLayoutManager mLayoutManager;
+    LinearLayoutManager mLayoutManager;
 
     ChatActivityLollipop chatActivity;
     String myMail;
@@ -507,7 +508,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         listView.setNestedScrollingEnabled(false);
         ((SimpleItemAnimator) listView.getItemAnimator()).setSupportsChangeAnimations(false);
 
-        mLayoutManager = new MegaLinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setStackFromEnd(true);
         listView.setLayoutManager(mLayoutManager);
         listView.addOnItemTouchListener(this);

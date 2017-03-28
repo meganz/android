@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -17,9 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
@@ -45,11 +48,14 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 //	boolean first = false;
 //	private boolean folderSelected = false;
 	RecyclerView listView;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
 	int deepBrowserTree = -1;
+
+	Stack<Integer> lastPositionStack;
+
 
 	public static IncomingSharesProviderFragmentLollipop newInstance() {
 		log("newInstance");
@@ -69,7 +75,9 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 		if (megaApi.getRootNode() == null){
 			return;
 		}
-		
+
+		lastPositionStack = new Stack<>();
+
 		nodes = new ArrayList<MegaNode>();
 	}
 
@@ -86,7 +94,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
-		mLayoutManager = new MegaLinearLayoutManager(context);
+		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 		
@@ -192,8 +200,15 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 				log("The browser tree change to: "+deepBrowserTree);
 			}
 
-			MegaNode n = nodes.get(position);			
-			
+			MegaNode n = nodes.get(position);
+
+			int lastFirstVisiblePosition = 0;
+
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+			log("Push to stack "+lastFirstVisiblePosition+" position");
+			lastPositionStack.push(lastFirstVisiblePosition);
+
 			String path=n.getName();	
 			String[] temp;
 			temp = path.split("/");
@@ -239,7 +254,16 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 			findNodes();
 			
 			setNodes(nodes);
-			listView.scrollToPosition(0);
+			int lastVisiblePosition = 0;
+			if(!lastPositionStack.empty()){
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack "+lastVisiblePosition+" position");
+			}
+			log("Scroll to "+lastVisiblePosition+" position");
+
+			if(lastVisiblePosition>=0){
+				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+			}
 			adapter.setParentHandle(parentHandle);
 
 			return 3;
@@ -268,7 +292,16 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 				nodes = megaApi.getChildren(parentNode);
 
 				setNodes(nodes);
-				listView.scrollToPosition(0);
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
 				adapter.setParentHandle(parentHandle);
 				return 2;
 			}	

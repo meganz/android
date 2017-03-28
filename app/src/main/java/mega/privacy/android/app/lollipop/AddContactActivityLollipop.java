@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -626,7 +627,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         recyclerView.setClipToPadding(false);
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
         recyclerView.setHasFixedSize(true);
-        MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addOnItemTouchListener(this);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
