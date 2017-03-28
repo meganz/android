@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -27,7 +28,6 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactRequestLollipopAdapter;
@@ -51,7 +51,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	TextView emptyTextView;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
-	RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	MegaContactRequest selectedRequest = null;
 	
 	float scaleH, scaleW;
@@ -307,7 +307,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	        listView.setClipToPadding(false);;
 			
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());		        
 	        

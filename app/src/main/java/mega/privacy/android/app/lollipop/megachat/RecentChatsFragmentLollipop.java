@@ -36,7 +36,6 @@ import java.util.ListIterator;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -65,7 +64,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     MegaListChatLollipopAdapter adapterList;
     RelativeLayout mainRelativeLayout;
 
-    RecyclerView.LayoutManager mLayoutManager;
+    LinearLayoutManager mLayoutManager;
 
     ArrayList<MegaChatListItem> chats;
 
@@ -137,7 +136,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
 
         listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-        mLayoutManager = new MegaLinearLayoutManager(context);
+        mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());

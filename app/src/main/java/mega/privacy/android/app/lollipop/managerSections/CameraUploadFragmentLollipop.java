@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -63,7 +64,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -99,7 +99,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	ActionBar aB;
 	RecyclerView listView;
 	GestureDetectorCompat detector;
-	private RecyclerView.LayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -564,7 +564,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -736,7 +736,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 //			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new MegaLinearLayoutManager(context);
+			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
