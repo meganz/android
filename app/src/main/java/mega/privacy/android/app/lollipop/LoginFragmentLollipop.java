@@ -1133,12 +1133,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (attrs.getFileLogger() != null){
                         try {
                             if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
-                                dbH.setFileLogger(true);
-                                Util.setFileLogger(true);
-                                numberOfClicks = 0;
-                                MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-                                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
-                                log("App Version: " + Util.getVersion(context));
+                                ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                             }
                             else{
                                 dbH.setFileLogger(false);
@@ -1149,21 +1144,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             }
                         }
                         catch(Exception e){
-                            dbH.setFileLogger(true);
-                            Util.setFileLogger(true);
-                            numberOfClicks = 0;
-                            MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-                            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
-                            log("App Version: " + Util.getVersion(context));
+                            ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                         }
                     }
                     else{
-                        dbH.setFileLogger(true);
-                        Util.setFileLogger(true);
-                        numberOfClicks = 0;
-                        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_enable_logs));
-                        log("App Version: " + Util.getVersion(context));
+                        ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                     }
                 }
             }

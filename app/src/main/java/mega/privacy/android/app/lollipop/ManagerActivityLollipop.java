@@ -9688,6 +9688,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showConfirmationEnableLogs(){
 		log("showConfirmationEnableLogs");
 
+		if(sttFLol!=null){
+			sttFLol.numberOfClicksSDK = 0;
+		}
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -9697,7 +9700,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
+
 						break;
 				}
 			}
@@ -9710,16 +9713,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			builder = new AlertDialog.Builder(this);
 		}
+
 		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 	}
 
 	public void enableLogs(){
 		log("enableLogs");
 
-		if(sttFLol!=null){
-			sttFLol.numberOfClicksSDK = 0;
-		}
 		dbH.setFileLogger(true);
 		Util.setFileLogger(true);
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
