@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -23,8 +24,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 
- 
+
 public class LoginActivityLollipop extends AppCompatActivity {
 
 	float scaleH, scaleW;
@@ -296,6 +298,50 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 		setIntent(null);
 	}
+
+	public void showConfirmationEnableLogs(){
+		log("showConfirmationEnableLogs");
+
+		if(loginFragment!=null){
+			loginFragment.numberOfClicks = 0;
+		}
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						enableLogs();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new android.support.v7.app.AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+	}
+
+	public void enableLogs(){
+		log("enableLogs");
+
+		dbH.setFileLogger(true);
+		Util.setFileLogger(true);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		showSnackbar(getString(R.string.settings_enable_logs));
+		log("App Version: " + Util.getVersion(this));
+	}
+
 
 //	public void onNewIntent(Intent intent){
 //		if (intent != null && Constants.ACTION_CONFIRM.equals(intent.getAction())) {
