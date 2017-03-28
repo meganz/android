@@ -1995,7 +1995,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else{
-            log("onMessageLoaded: The message is null");
+            log("onMessageLoaded: The message is null  --> reach final history");
 
             if(bufferSending.size()!=0){
                 for(int i=0;i<bufferSending.size();i++){
