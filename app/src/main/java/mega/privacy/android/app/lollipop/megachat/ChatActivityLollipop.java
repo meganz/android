@@ -1414,7 +1414,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     hideMultipleSelect();
                     //Delete
                     showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                    Toast.makeText(chatActivity, "Delete: "+messagesSelected.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
             }
