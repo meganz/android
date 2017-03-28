@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -321,7 +322,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			recyclerView.setHasFixedSize(true);
-			MegaLinearLayoutManager linearLayoutManager = new MegaLinearLayoutManager(context);
+			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);
 		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 			
 		
