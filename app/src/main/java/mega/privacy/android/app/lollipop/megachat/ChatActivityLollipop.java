@@ -891,13 +891,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         contactInfoMenuItem = menu.findItem(R.id.cab_menu_contact_info_chat);
         leaveMenuItem = menu.findItem(R.id.cab_menu_leave_chat);
 
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        log("onPrepareOptionsMenu");
         if(chatRoom!=null){
             int permission = chatRoom.getOwnPrivilege();
             if(chatRoom.isGroup()){
 
                 if(permission==MegaChatRoom.PRIV_MODERATOR) {
                     inviteMenuItem.setVisible(true);
-                    clearHistoryMenuItem.setVisible(true);
+
+                    int lastMessageIndex = messages.size()-1;
+                    AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
+                    if(lastMessage.getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
+                        log("Last message is TRUNCATE");
+                        clearHistoryMenuItem.setVisible(false);
+                    }
+                    else{
+                        log("Last message is NOT TRUNCATE");
+                        clearHistoryMenuItem.setVisible(true);
+                    }
                 }
                 else {
                     inviteMenuItem.setVisible(false);
@@ -935,10 +951,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("Chatroom NULL on create menu");
         }
-
-        return super.onCreateOptionsMenu(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -2058,6 +2072,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 aB.setTitle(newTitle);
             }
         }
+        else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+            invalidateOptionsMenu();
+        }
 
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
         appendMessage(androidMsg);
@@ -2599,6 +2616,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.clear();
                 messages.add(lastMessage);
                 adapter.setMessages(messages);
+                invalidateOptionsMenu();
             }
             else{
                 log("Error clearing history: "+e.getErrorString());

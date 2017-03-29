@@ -1439,6 +1439,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 				log("onClick: file_list_three_dots: "+currentPosition);
 
+				if(multipleSelect){
+					return;
+				}
+
 				if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
 				}
