@@ -652,52 +652,50 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                 }
             }
-
-
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
             log("listItemUpdate: Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
+            log("listItemUpdate: Visibility: "+item.getVisibility());
 
-            //Keep in the list of chats by now - then remove
-//            if(item!=null){
-//
-//                if (adapterList.getItemCount()!=0){
-//
-//                    long chatHandleToRemove = item.getChatId();
-//                    int indexToRemove = -1;
-//                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-//                    while (itrReplace.hasNext()) {
-//                        MegaChatListItem chat = itrReplace.next();
-//                        if(chat!=null){
-//                            if(chat.getChatId()==chatHandleToRemove){
-//                                indexToRemove = itrReplace.nextIndex()-1;
-//                                break;
-//                            }
-//                        }
-//                        else{
-//                            break;
-//                        }
-//                    }
-//                    if(indexToRemove!=-1){
-//                        log("Index to replace: "+indexToRemove);
-//                        chats.remove(indexToRemove);
-//
-//                        adapterList.removeChat(chats, indexToRemove);
-//                        adapterList.setPositionClicked(-1);
-//
-//                        if (adapterList.getItemCount() == 0){
-//                            log("adapterList.getItemCount() == 0");
-//                            listView.setVisibility(View.GONE);
-//                            emptyLayout.setVisibility(View.VISIBLE);
-//                        }
-//                        else{
-//                            log("adapterList.getItemCount() NOT = 0");
-//                            listView.setVisibility(View.VISIBLE);
-//                            emptyLayout.setVisibility(View.GONE);
-//                        }
-//                    }
-//                }
-//            }
+            if(item!=null){
+
+                if (adapterList.getItemCount()!=0){
+
+                    long chatHandleToRemove = item.getChatId();
+                    int indexToRemove = -1;
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatListItem chat = itrReplace.next();
+                        if(chat!=null){
+                            if(chat.getChatId()==chatHandleToRemove){
+                                indexToRemove = itrReplace.nextIndex()-1;
+                                break;
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if(indexToRemove!=-1){
+                        log("Index to replace: "+indexToRemove);
+                        chats.remove(indexToRemove);
+
+                        adapterList.removeChat(chats, indexToRemove);
+                        adapterList.setPositionClicked(-1);
+
+                        if (adapterList.getItemCount() == 0){
+                            log("adapterList.getItemCount() == 0");
+                            listView.setVisibility(View.GONE);
+                            emptyLayout.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            log("adapterList.getItemCount() NOT = 0");
+                            listView.setVisibility(View.VISIBLE);
+                            emptyLayout.setVisibility(View.GONE);
+                        }
+                    }
+                }
+            }
         }
         else{
             log("listItemUpdate: Other change: "+item.getChanges());

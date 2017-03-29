@@ -317,23 +317,26 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             paramsClearDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
             dividerClearLayout.setLayoutParams(paramsClearDivider);
 
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
-                editImageView.setVisibility(View.VISIBLE);
-                dividerClearLayout.setVisibility(View.VISIBLE);
-                clearChatLayout.setVisibility(View.VISIBLE);
-            }
-            else{
-                editImageView.setVisibility(View.GONE);
-                dividerClearLayout.setVisibility(View.GONE);
-                clearChatLayout.setVisibility(View.GONE);
-            }
-
             //Leave chat Layout
             leaveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_leave_layout);
             leaveChatLayout.setOnClickListener(this);
             LinearLayout.LayoutParams paramsLeaveChat = (LinearLayout.LayoutParams) leaveChatLayout.getLayoutParams();
             paramsLeaveChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
             leaveChatLayout.setLayoutParams(paramsLeaveChat);
+
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                editImageView.setVisibility(View.VISIBLE);
+                dividerClearLayout.setVisibility(View.VISIBLE);
+                clearChatLayout.setVisibility(View.VISIBLE);
+            }
+            else{
+                if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM){
+                    leaveChatLayout.setVisibility(View.GONE);
+                }
+                editImageView.setVisibility(View.GONE);
+                dividerClearLayout.setVisibility(View.GONE);
+                clearChatLayout.setVisibility(View.GONE);
+            }
 
             participantsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_title_text);
             RelativeLayout.LayoutParams paramsPartTitle = (RelativeLayout.LayoutParams) participantsTitle.getLayoutParams();
