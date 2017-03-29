@@ -138,7 +138,7 @@ if [ ! -d "${NDK_ROOT}" ]; then
 fi
 
 if (( $# != 1 )); then
-    echo "Usage: $0 <all | bindings | clean>";
+    echo "Usage: $0 <all | bindings | clean | clean_mega>";
     exit 0 
 fi
 
@@ -149,6 +149,22 @@ if [ "$1" == "bindings" ]; then
     echo "* Running ndk-build"
     ${NDK_BUILD} -j8
     echo "* ndk-build finished"
+    echo "* Task finished OK"
+    exit 0
+fi
+
+if [ "$1" == "clean_mega" ]; then
+    echo "* Deleting Java bindings"
+    make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &> ${LOG_FILE}
+    rm -rf megachat/megachat.cpp megachat/megachat.h
+    
+    echo "* Deleting source folders"
+    rm -rf megachat/karere-native
+
+    echo "* Deleting tarballs"
+	rm -rf ../obj/local/armeabi/
+	rm -rf ../obj/local/x86
+        
     echo "* Task finished OK"
     exit 0
 fi
@@ -199,7 +215,7 @@ if [ "$1" == "clean" ]; then
 fi
 
 if [ "$1" != "all" ]; then
-    echo "Usage: $0 <all | bindings | clean>";
+    echo "Usage: $0 <all | bindings | clean | clean_mega>";
     exit 1
 fi
 
