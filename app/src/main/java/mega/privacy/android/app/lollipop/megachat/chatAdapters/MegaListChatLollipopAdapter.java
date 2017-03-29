@@ -877,7 +877,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		switch (v.getId()){	
 			case R.id.recent_chat_list_three_dots:{
 				log("click three dots!: "+c.getTitle());
-				((ManagerActivityLollipop) context).showChatPanel(c);
+				if(multipleSelect){
+					((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else{
+					((ManagerActivityLollipop) context).showChatPanel(c);
+				}
+
 				break;
 			}
 			case R.id.recent_chat_list_item_layout:{

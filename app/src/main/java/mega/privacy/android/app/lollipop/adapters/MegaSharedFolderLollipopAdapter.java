@@ -535,7 +535,13 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				
 		switch (v.getId()){			
 			case R.id.shared_folder_contact_three_dots:{
-				((FileContactListActivityLollipop) context).showOptionsPanel(s);
+				if(multipleSelect){
+					((FileContactListActivityLollipop) context).itemClick(currentPosition);
+				}
+				else{
+					((FileContactListActivityLollipop) context).showOptionsPanel(s);
+				}
+
 				break;
 			}			
 			case R.id.shared_folder_item_layout:{
