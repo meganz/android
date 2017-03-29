@@ -745,6 +745,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
+                log("INIT STATE: "+megaChatApi.getInitState());
                 int ret = megaChatApi.init(gSession);
                 log("enableChat: result of init ---> "+ret);
                 chatSettings = dbH.getChatSettings();
@@ -854,7 +855,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
-                int ret = megaChatApi.init(gSession);
+                log("INIT STATE: "+megaChatApi.getInitState());
+                int ret = -3;
+                if(megaChatApi.getInitState()!=MegaChatApi.INIT_OFFLINE_SESSION){
+                    ret = megaChatApi.init(gSession);
+                }
+
                 log("startFastLogin: result of init ---> "+ret);
                 initizalizingChatText.setVisibility(View.VISIBLE);
                 initizalizingChatText.setText("Chat getting session...");

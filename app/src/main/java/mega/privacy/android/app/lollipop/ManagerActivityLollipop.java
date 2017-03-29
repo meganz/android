@@ -10,6 +10,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -157,6 +158,7 @@ import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialog
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -190,7 +192,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
 
 	public int accountFragment;
 
@@ -219,6 +221,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	boolean mkLayoutVisible = false;
 
 	int statusToConnect = -1;
+
+	private NetworkStateReceiver networkStateReceiver;
+	MegaNode rootNode = null;
 
 	NodeController nC;
 	ContactController cC;
@@ -1354,6 +1359,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		tabLayoutMyAccount =  (TabLayout) findViewById(R.id.sliding_tabs_my_account);
 		viewPagerMyAccount = (ViewPager) findViewById(R.id.my_account_tabs_pager);
 
+
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+
         if (!Util.isOnline(this)){
         	log("No network: intent to OfflineActivityLollipop");
 //        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
@@ -1385,7 +1395,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-        MegaNode rootNode = megaApi.getRootNode();
+        rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			log("Root node is NULL");
 			 if (getIntent() != null){
@@ -2587,6 +2597,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaChatApi.removeChatListener(this);
 		}
 
+		if(networkStateReceiver!=null){
+			this.unregisterReceiver(networkStateReceiver);
+		}
+
     	super.onDestroy();
 	}
 	public void selectDrawerItemCloudDrive(){
@@ -2824,6 +2838,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerContacts.setVisibility(View.GONE);
 	}
 
+	public void showOnlineMode(){
+		log("showOnlineMode");
+		if(rootNode!=null){
+			Menu nVMenu = nV.getMenu();
+			if(nVMenu!=null){
+				resetNavigationViewMenu(nVMenu);
+			}
+			clickDrawerItemLollipop(drawerItem);
+		}
+		else{
+			log("showOnlineMode - Root is NULL");
+			showConfirmationConnect();
+		}
+	}
+
+	public void showConfirmationConnect(){
+		log("showConfirmationConnect");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						finish();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+	}
+
 	public void showOfflineMode(){
 		log("showOfflineMode");
 
@@ -2832,14 +2895,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		usedSpaceLayout.setVisibility(View.GONE);
-
-		Menu nVMenu = nV.getMenu();
-		drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
-		if (drawerMenuItem != null){
-			disableNavigationViewMenu(nVMenu);
-			drawerMenuItem.setChecked(true);
-			drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_red));
-		}
 
 		UserCredentials credentials = dbH.getCredentials();
 		if(credentials!=null){
@@ -2891,8 +2946,117 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			setOfflineAvatar(emailCredentials, myHandle, firstLetter);
 		}
 
-		drawerItem=DrawerItem.SAVED_FOR_OFFLINE;
-		selectDrawerItemLollipop(drawerItem);
+		log("DrawerItem on start offline: "+drawerItem);
+		if(drawerItem==null){
+			log("On start OFFLINE MODE");
+			drawerItem=DrawerItem.SAVED_FOR_OFFLINE;
+			Menu nVMenu = nV.getMenu();
+			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
+			if (drawerMenuItem != null){
+				disableNavigationViewMenu(nVMenu);
+				drawerMenuItem.setChecked(true);
+				drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_red));
+			}
+
+			selectDrawerItemLollipop(drawerItem);
+		}
+		else{
+			log("Change to OFFLINE MODE");
+			Menu nVMenu = nV.getMenu();
+			if (nVMenu != null){
+				disableNavigationViewMenu(nVMenu);
+			}
+			if(drawerItem==DrawerItem.SETTINGS||drawerItem==DrawerItem.SAVED_FOR_OFFLINE||drawerItem==DrawerItem.CHAT){
+				clickDrawerItemLollipop(drawerItem);
+			}
+		}
+
+	}
+
+	public void clickDrawerItemLollipop(DrawerItem item){
+		log("clickDrawerItemLollipop: "+item);
+
+		Menu nVMenu = nV.getMenu();
+		if (nVMenu != null){
+			if(item==null){
+				drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+				onNavigationItemSelected(drawerMenuItem);
+				return;
+			}
+
+//			drawerLayout.closeDrawer(Gravity.LEFT);
+			switch (item){
+				case CLOUD_DRIVE:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+					break;
+				}
+				case SAVED_FOR_OFFLINE:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_red));
+					break;
+				}
+				case CAMERA_UPLOADS:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.camera_uploads_red));
+					break;
+				}
+				case MEDIA_UPLOADS:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.camera_uploads_red));
+					break;
+				}
+				case INBOX:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_inbox);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.inbox_red));
+					break;
+				}
+				case SHARED_ITEMS:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_shared_items);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.shared_items_red));
+					break;
+				}
+				case CONTACTS:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_contacts);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.contacts_red));
+					break;
+				}
+				case SETTINGS:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_settings);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.settings_red));
+					break;
+				}
+				case SEARCH:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_hidden);
+					drawerMenuItem.setChecked(true);
+					break;
+				}
+				case ACCOUNT:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_hidden);
+					drawerMenuItem.setChecked(true);
+					break;
+				}
+				case TRANSFERS:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_hidden);
+					drawerMenuItem.setChecked(true);
+					break;
+				}
+				case CHAT:{
+					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_chat);
+					drawerMenuItem.setChecked(true);
+					drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat_red));
+					break;
+				}
+			}
+		}
 	}
 
 	public void selectDrawerItemSharedItems(){
@@ -10434,6 +10598,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	void disableNavigationViewMenu(Menu menu){
+		log("disableNavigationViewMenu");
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.cloud_drive_grey));
@@ -10482,45 +10647,54 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	void resetNavigationViewMenu(Menu menu){
+		log("resetNavigationViewMenu");
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.cloud_drive_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_camera_uploads);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.camera_uploads_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_inbox);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.shared_items_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_chat);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.ic_menu_chat));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.contacts_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_settings);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.settings_grey));
 			mi.setChecked(false);
+			mi.setEnabled(true);
 		}
 	}
 
@@ -13336,5 +13510,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showSnackbar(getString(R.string.context_no_copied));
 		}
 		catch (Exception ex) {}
+	}
+
+	@Override
+	public void networkAvailable() {
+		log("networkAvailable");
+		showOnlineMode();
+	}
+
+	@Override
+	public void networkUnavailable() {
+		log("networkUnavailable: network NOT available");
+		showOfflineMode();
 	}
 }

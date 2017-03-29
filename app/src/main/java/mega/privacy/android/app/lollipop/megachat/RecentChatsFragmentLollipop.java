@@ -267,7 +267,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         listView.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
-        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_no_connection_title));
+        emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         inviteButton.setVisibility(View.GONE);
         emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
         emptyLayout.setVisibility(View.VISIBLE);
@@ -746,7 +746,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         break;
                     }
                     default:{
-                        aB.setSubtitle(getString(R.string.recovering_info));
+                        if(!Util.isOnline(context)){
+                            aB.setSubtitle(getString(R.string.error_server_connection_problem));
+                        }
+                        else{
+                            aB.setSubtitle(getString(R.string.loading_status));
+                        }
                         break;
                     }
                 }
