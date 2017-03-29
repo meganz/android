@@ -508,27 +508,25 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		
 		switch (v.getId()){	
 			case R.id.contact_request_list_three_dots:{
-//				if (positionClicked == -1){
-//					positionClicked = currentPosition;
-//					notifyDataSetChanged();
-//				}
-//				else{
-//					if (positionClicked == currentPosition){
-//						positionClicked = -1;
-//						notifyDataSetChanged();
-//					}
-//					else{
-//						positionClicked = currentPosition;
-//						notifyDataSetChanged();
-//					}
-//				}
-				if(type==Constants.OUTGOING_REQUEST_ADAPTER)
-				{
-					((ManagerActivityLollipop) context).showSentRequestOptionsPanel(c);
+				if(multipleSelect){
+					if(type==Constants.OUTGOING_REQUEST_ADAPTER)
+					{
+						((SentRequestsFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else{
+						((ReceivedRequestsFragmentLollipop) fragment).itemClick(currentPosition);
+					}
 				}
 				else{
-					((ManagerActivityLollipop) context).showReceivedRequestOptionsPanel(c);
+					if(type==Constants.OUTGOING_REQUEST_ADAPTER)
+					{
+						((ManagerActivityLollipop) context).showSentRequestOptionsPanel(c);
+					}
+					else{
+						((ManagerActivityLollipop) context).showReceivedRequestOptionsPanel(c);
+					}
 				}
+
 				break;
 			}
 			case R.id.contact_request_list_item_layout:{

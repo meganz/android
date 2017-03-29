@@ -591,7 +591,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		holder.textViewFileName.setText(node.getName());
 		holder.textViewFileSize.setText("");
-		
+
 		if (!multipleSelect) {
 			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 			holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
@@ -1440,17 +1440,42 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				log("onClick: file_list_three_dots: "+currentPosition);
 
 				if(multipleSelect){
-					return;
-				}
-
-				if(type==Constants.CONTACT_FILE_ADAPTER){
-					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
-				}
-				else if(type==Constants.FOLDER_LINK_ADAPTER){
-					((FolderLinkActivityLollipop) context).showOptionsPanel(n);
+					if(type==Constants.RUBBISH_BIN_ADAPTER){
+						((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else if(type==Constants.INBOX_ADAPTER){
+						((InboxFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else if(type==Constants.INCOMING_SHARES_ADAPTER){
+						((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else if(type==Constants.OUTGOING_SHARES_ADAPTER){
+						((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else if(type==Constants.CONTACT_FILE_ADAPTER){
+						((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else if(type==Constants.FOLDER_LINK_ADAPTER){
+						((FolderLinkActivityLollipop) context).itemClick(currentPosition);
+					}
+					else if(type==Constants.SEARCH_ADAPTER){
+						((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+					}
+					else{
+						log("click layout FileBrowserFragmentLollipop!");
+						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+					}
 				}
 				else{
-					((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
+					if(type==Constants.CONTACT_FILE_ADAPTER){
+						((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
+					}
+					else if(type==Constants.FOLDER_LINK_ADAPTER){
+						((FolderLinkActivityLollipop) context).showOptionsPanel(n);
+					}
+					else{
+						((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
+					}
 				}
 
 				break;

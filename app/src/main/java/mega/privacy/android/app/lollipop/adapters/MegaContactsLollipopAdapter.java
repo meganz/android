@@ -987,7 +987,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				case R.id.contact_list_three_dots:
 				case R.id.contact_grid_three_dots:{
 					log("click contact three dots!");
-					((ManagerActivityLollipop) context).showContactOptionsPanel(c);
+					if(multipleSelect){
+						if (fragment != null){
+							fragment.itemClick(currentPosition);
+						}
+					}
+					else{
+						((ManagerActivityLollipop) context).showContactOptionsPanel(c);
+					}
+
 					break;
 				}			
 				case R.id.contact_list_item_layout:
