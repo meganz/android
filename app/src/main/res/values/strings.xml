@@ -147,7 +147,7 @@
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Please enter your email address</string>
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
-    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Network connection problem, please try again later</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">No network connection</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
@@ -766,7 +766,7 @@
 
     <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
 
-    <string name="recovering_info" context="Message shown meanwhile the app is waiting for a request">Recovering info&#8230;</string>
+    <string name="recovering_info" context="Message shown meanwhile the app is waiting for a request">Getting info&#8230;</string>
 
     <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">Your new email address needs to be validated. Please check your email to proceed.</string>
 
@@ -1063,7 +1063,6 @@
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for Offline section">Remove from Save for Offline?</string>
 
-    <string name="recent_chat_empty_no_connection_title" context="Title of chat section when the app has no connection">No Internet connection</string>
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without connection.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
@@ -1100,4 +1099,7 @@
 
     <string name="general_enable" context="Positive confirmation to enable logs">Enable</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">Logs can contain information related to your account</string>
+
+    <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">Network connection recovered. Connect to MEGA?</string>
+    <string name="loading_status" context="Message shown meanwhile the app is waiting for a the chat status">Loading status&#8230;</string>
 </resources>
