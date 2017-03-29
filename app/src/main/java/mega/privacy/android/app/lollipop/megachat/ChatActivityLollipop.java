@@ -899,38 +899,60 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onPrepareOptionsMenu");
         if(chatRoom!=null){
             int permission = chatRoom.getOwnPrivilege();
+            log("Permission in the chat: "+permission);
             if(chatRoom.isGroup()){
 
                 if(permission==MegaChatRoom.PRIV_MODERATOR) {
                     inviteMenuItem.setVisible(true);
 
                     int lastMessageIndex = messages.size()-1;
-                    AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
-                    if(lastMessage.getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
-                        log("Last message is TRUNCATE");
-                        clearHistoryMenuItem.setVisible(false);
+                    if(lastMessageIndex>=0){
+                        AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
+                        if(lastMessage.getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
+                            log("Last message is TRUNCATE");
+                            clearHistoryMenuItem.setVisible(false);
+                        }
+                        else{
+                            log("Last message is NOT TRUNCATE");
+                            clearHistoryMenuItem.setVisible(true);
+                        }
                     }
                     else{
-                        log("Last message is NOT TRUNCATE");
-                        clearHistoryMenuItem.setVisible(true);
+                        clearHistoryMenuItem.setVisible(false);
                     }
-                }
-                else {
-                    inviteMenuItem.setVisible(false);
-                    clearHistoryMenuItem.setVisible(false);
-                }
 
-                contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
-                contactInfoMenuItem.setVisible(true);
+                    leaveMenuItem.setVisible(true);
+                    callMenuItem.setVisible(true);
+                    videoMenuItem.setVisible(true);
 
-                if(permission==MegaChatRoom.PRIV_RM) {
+                }
+                else if(permission==MegaChatRoom.PRIV_RM) {
                     log("Group chat PRIV_RM");
                     leaveMenuItem.setVisible(false);
+                    callMenuItem.setVisible(false);
+                    videoMenuItem.setVisible(false);
+                    clearHistoryMenuItem.setVisible(false);
+                    inviteMenuItem.setVisible(false);
+                }
+                else if(permission==MegaChatRoom.PRIV_RO) {
+                    log("Group chat PRIV_RM");
+                    leaveMenuItem.setVisible(true);
+                    callMenuItem.setVisible(false);
+                    videoMenuItem.setVisible(false);
+                    clearHistoryMenuItem.setVisible(false);
+                    inviteMenuItem.setVisible(false);
                 }
                 else{
                     log("Permission: "+permission);
                     leaveMenuItem.setVisible(true);
+                    callMenuItem.setVisible(true);
+                    videoMenuItem.setVisible(true);
+                    clearHistoryMenuItem.setVisible(false);
+                    inviteMenuItem.setVisible(false);
                 }
+
+                contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
+                contactInfoMenuItem.setVisible(true);
             }
             else{
                 inviteMenuItem.setVisible(false);
@@ -1733,9 +1755,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         log("onChatRoomUpdate!");
-
+        this.chatRoom = chat;
         if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CLOSED)){
             log("CHANGE_TYPE_CLOSED for the chat: "+chat.getChatId());
+            log("Permissions for the chat: "+chat.getOwnPrivilege());
+            //Hide field to write
+            writingContainerLayout.setVisibility(View.GONE);
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
@@ -1747,9 +1772,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
             log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+chat.getChatId());
-            chat = megaChatApi.getChatRoom(chat.getChatId());
-            int unreadCount = chat.getUnreadCount();
-            log("get unread count: "+unreadCount);
+//            chat = megaChatApi.getChatRoom(chat.getChatId());
+//            int unreadCount = chat.getUnreadCount();
+//            log("get unread count: "+unreadCount);
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_PARTICIPANTS)){
             log("CHANGE_TYPE_PARTICIPANTS for the chat: "+chat.getChatId());
