@@ -2125,21 +2125,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 	
-	public void setAttrOnline (boolean online){
-		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ONLINE + "='" + encrypt(online + "") + "' WHERE " + KEY_ID + " ='1'";
-			db.execSQL(UPDATE_ATTRIBUTES_TABLE);			
-		}
-		else{
-			values.put(KEY_ATTR_ONLINE, encrypt(online + ""));
-			db.insert(TABLE_ATTRIBUTES, null, values);
-		}
-		cursor.close();
-	}
-	
+//	public void setAttrOnline (boolean online){
+//		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+//		ContentValues values = new ContentValues();
+//		Cursor cursor = db.rawQuery(selectQuery, null);
+//		if (cursor.moveToFirst()){
+//			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ONLINE + "='" + encrypt(online + "") + "' WHERE " + KEY_ID + " ='1'";
+//			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+//		}
+//		else{
+//			values.put(KEY_ATTR_ONLINE, encrypt(online + ""));
+//			db.insert(TABLE_ATTRIBUTES, null, values);
+//		}
+//		cursor.close();
+//	}
+//
 	public void setAttrAskSizeDownload (String askSizeDownload){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();

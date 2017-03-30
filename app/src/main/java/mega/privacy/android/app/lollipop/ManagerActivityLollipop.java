@@ -1077,12 +1077,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		if (Util.isOnline(this)){
-			dbH.setAttrOnline(true);
-		}
-		else{
-			dbH.setAttrOnline(false);
-		}
+
 		managerActivity = this;
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
@@ -1380,8 +1375,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
         	return;
         }
-
-        dbH.setAttrOnline(true);
 
 		///Check the MK file
 		int versionApp = Util.getVersion(this);
@@ -7058,14 +7051,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 			if (oFLol != null){
 				if (oFLol.onBackPressed() == 0){
-					attr = dbH.getAttributes();
-					if (attr != null){
-						if (attr.getOnline() != null){
-							if (!Boolean.parseBoolean(attr.getOnline())){
-								super.onBackPressed();
-								return;
-							}
-						}
+
+					if (!Util.isOnline(this)){
+						super.onBackPressed();
+						return;
 					}
 
 					if (fbFLol != null){
