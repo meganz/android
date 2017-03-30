@@ -1967,6 +1967,18 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		snackbar.show();
 	}
 
+	public void showSnackbar(String s){
+		CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+		if(cflF!=null && cflF.isVisible()){
+			if(coordinatorFragment!=null){
+				showSnackbar(s, coordinatorFragment);
+			}
+			else{
+				showSnackbar(s, fragmentContainer);
+			}
+		}
+	}
+
 	public MegaNode getSelectedNode() {
 		return selectedNode;
 	}

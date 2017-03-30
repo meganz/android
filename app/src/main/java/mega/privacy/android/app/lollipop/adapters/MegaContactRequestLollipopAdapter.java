@@ -502,6 +502,13 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
+		if(!Util.isOnline(context)){
+			if(context instanceof ManagerActivityLollipop){
+				((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+			}
+			return;
+		}
+
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
 		MegaContactRequest c = (MegaContactRequest) getItem(currentPosition);

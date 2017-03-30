@@ -7,6 +7,7 @@ import android.view.View;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
@@ -33,10 +34,22 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                         case CLOUD_DRIVE:
                         case SHARED_ITEMS:{
                             log("Cloud Drive SECTION");
+                            if(!Util.isOnline(context)){
+                                if(context instanceof ManagerActivityLollipop){
+                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                                }
+                                return;
+                            }
                             ((ManagerActivityLollipop)context).showUploadPanel();
                             break;
                         }
                         case CONTACTS:{
+                            if(!Util.isOnline(context)){
+                                if(context instanceof ManagerActivityLollipop){
+                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                                }
+                                return;
+                            }
                             ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
                             break;
                         }
@@ -50,6 +63,12 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 break;
             }
             case R.id.floating_button_contact_file_list:{
+                if(!Util.isOnline(context)){
+                    if(context instanceof ContactFileListActivityLollipop){
+                        ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                    }
+                    return;
+                }
                 if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop)context).showUploadPanel();
                 }
