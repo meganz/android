@@ -196,6 +196,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				showLink = true;
 			}
+
+			if(showLink){
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			
 			if (selected.size() != 0) {
 				showDownload = true;
@@ -223,6 +227,14 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+
+			if(showCopy){
+				menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
+			if(showDownload){
+				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);

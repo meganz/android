@@ -15,7 +15,7 @@
     
     <item
         android:id="@+id/cab_menu_download"
-        android:icon="@drawable/ic_menu_download_dark"
+        android:icon="@drawable/ic_download_white"
         android:orderInCategory="105"
         android:title="@string/general_download"
         MEGA:showAsAction="never" />
@@ -46,7 +46,7 @@
     <item
         android:id="@+id/cab_menu_copy"
         android:orderInCategory="115"
-        android:icon="@drawable/ic_menu_copy_dark"
+        android:icon="@drawable/ic_copy_white"
         android:title="@string/general_copy_to"
         MEGA:showAsAction="never" />
     
@@ -64,7 +64,7 @@
         android:tint="@color/white"
         android:title="@string/context_get_link_menu"
         MEGA:showAsAction="never" />
-    
+
      <item
         android:id="@+id/cab_menu_leave_multiple_share"
         android:orderInCategory="130"
