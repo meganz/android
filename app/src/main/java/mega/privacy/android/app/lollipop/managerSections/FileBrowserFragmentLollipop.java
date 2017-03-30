@@ -222,6 +222,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
@@ -238,6 +239,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			log("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			boolean showDownload = false;
