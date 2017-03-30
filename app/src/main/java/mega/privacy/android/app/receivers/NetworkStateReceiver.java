@@ -5,14 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.utils.Util;
 
 public class NetworkStateReceiver extends BroadcastReceiver {
 
     protected List<NetworkStateReceiverListener> listeners;
     protected Boolean connected;
+
+    Handler handler = new Handler();
 
     public NetworkStateReceiver() {
         listeners = new ArrayList<NetworkStateReceiverListener>();
@@ -23,11 +29,21 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         if(intent == null || intent.getExtras() == null)
             return;
 
+        final Context c = context;
+
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = manager.getActiveNetworkInfo();
 
         if(ni != null && ni.getState() == NetworkInfo.State.CONNECTED) {
             connected = true;
+            handler.postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    log("Now I start the service");
+                    c.startService(new Intent(c, CameraSyncService.class));
+                }
+            }, 2 * 1000);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
             connected = false;
         }
@@ -62,5 +78,9 @@ public class NetworkStateReceiver extends BroadcastReceiver {
     public interface NetworkStateReceiverListener {
         public void networkAvailable();
         public void networkUnavailable();
+    }
+
+    public static void log(String message) {
+        Util.log("NetworkStateReceiver", message);
     }
 }

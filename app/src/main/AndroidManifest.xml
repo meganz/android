@@ -347,7 +347,7 @@
         </receiver>
 
         <receiver
-            android:name="mega.privacy.android.app.receivers.NetEventReceiver"
+            android:name="mega.privacy.android.app.receivers.NetworkStateReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
