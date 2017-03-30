@@ -1438,6 +1438,18 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			case R.id.file_grid_three_dots:{
 
 				log("onClick: file_list_three_dots: "+currentPosition);
+				if(!Util.isOnline(context)){
+					if(context instanceof ManagerActivityLollipop){
+						((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+					}
+					else if(context instanceof FolderLinkActivityLollipop){
+						((FolderLinkActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+					}
+					else if(context instanceof ContactFileListActivityLollipop){
+						((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+					}
+					return;
+				}
 
 				if(multipleSelect){
 					if(type==Constants.RUBBISH_BIN_ADAPTER){

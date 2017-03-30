@@ -565,6 +565,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
 											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;
@@ -1509,6 +1510,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			FolderLinkBottomSheetDialogFragment bottomSheetDialogFragment = new FolderLinkBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
+	}
+
+	public void showSnackbar(String s){
+		log("showSnackbar");
+		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+		snackbarTextView.setMaxLines(5);
+		snackbar.show();
 	}
 
 	public MegaNode getSelectedNode() {
