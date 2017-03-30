@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaUser;
@@ -68,6 +69,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     DisplayMetrics outMetrics;
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
 
     @Override
@@ -76,6 +78,10 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if (megaChatApi == null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
         if(context instanceof ManagerActivityLollipop){
@@ -129,10 +135,10 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			addAvatarChatPanel(null, chat);
 		}
 		else{
-			long userHandle = chat.getPeerHandle();
-
 			iconStateChatPanel.setVisibility(View.VISIBLE);
-			int state = chat.getOnlineStatus();
+
+            long userHandle = chat.getPeerHandle();
+            int state = megaChatApi.getUserOnlineStatus(userHandle);
 
             if(state == MegaChatApi.STATUS_ONLINE){
                 log("This user is connected");
@@ -150,6 +156,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 log("This user status is: "+state);
                 iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
             }
+
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 			MegaUser user = megaApi.getContact(userHandleEncoded);
 			if(user!=null){

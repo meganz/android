@@ -1764,7 +1764,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
-            log("chat online status: "+chat.getOnlineStatus());
             if(!(chatRoom.isGroup())){
                 long userHandle = chatRoom.getPeerHandle(0);
                 setStatus(userHandle);
