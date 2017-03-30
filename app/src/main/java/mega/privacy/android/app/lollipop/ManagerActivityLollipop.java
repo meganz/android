@@ -10648,6 +10648,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	void resetNavigationViewMenu(Menu menu){
 		log("resetNavigationViewMenu");
+
+		if(!Util.isOnline(this)){
+			disableNavigationViewMenu(menu);
+			return;
+		}
+
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.cloud_drive_grey));
