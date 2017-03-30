@@ -950,16 +950,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			lv.setPadding(0, 0, 0, 0);
 		}
 
-		if(!Util.isOnline(context)){
-			chatEnabledCategory.setEnabled(false);
-			chatStatusCategory.setEnabled(false);
-			chatNotificationsCategory.setEnabled(false);
-			autoawayChatCategory.setEnabled(false);
-			persistenceChatCategory.setEnabled(false);
-			cameraUploadCategory.setEnabled(false);
-		}
+		setOnlineOptions(Util.isOnline(context));
 
 		return v;
+	}
+
+	public void setOnlineOptions(boolean isOnline){
+		chatEnabledCategory.setEnabled(isOnline);
+		chatStatusCategory.setEnabled(isOnline);
+		chatNotificationsCategory.setEnabled(isOnline);
+		autoawayChatCategory.setEnabled(isOnline);
+		persistenceChatCategory.setEnabled(isOnline);
+		cameraUploadCategory.setEnabled(isOnline);
 	}
 
 	@Override

@@ -2802,7 +2802,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							firstNavigationLevel = false;
 						}
 					}
-
 				}
 				showFabButton();
 			}
@@ -2812,7 +2811,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Its NOT first time");
 			drawerLayout.closeDrawer(Gravity.LEFT);
 
-			if (dbH.getContactsSize() != megaApi.getContacts().size()){
+			int dbContactsSize = dbH.getContactsSize();
+			int sdkContactsSize = megaApi.getContacts().size();
+			if (dbContactsSize != sdkContactsSize){
+				log("Contacts TABLE != CONTACTS SDK "+ dbContactsSize + " vs " +sdkContactsSize);
 				dbH.clearContacts();
 				FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 				fillDBContactsTask.execute();
@@ -2839,6 +2841,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				resetNavigationViewMenu(nVMenu);
 			}
 			clickDrawerItemLollipop(drawerItem);
+
+			if(sttFLol!=null){
+				if(sttFLol.isAdded()){
+					sttFLol.setOnlineOptions(true);
+				}
+			}
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
@@ -2937,6 +2945,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 
 			setOfflineAvatar(emailCredentials, myHandle, firstLetter);
+		}
+
+		if(sttFLol!=null){
+			if(sttFLol.isAdded()){
+				sttFLol.setOnlineOptions(false);
+			}
 		}
 
 		log("DrawerItem on start offline: "+drawerItem);

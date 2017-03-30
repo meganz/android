@@ -384,9 +384,11 @@ public class ContactController {
         if (fullName.trim().length() <= 0){
             log("1- Full name empty");
             log("2-Put email as fullname");
-             if(mail==null){
+
+            if(mail==null){
                 mail="";
             }
+
             if (mail.trim().length() <= 0){
                 return "";
             }

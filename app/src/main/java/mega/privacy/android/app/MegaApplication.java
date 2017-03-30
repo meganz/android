@@ -96,10 +96,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if (e.getErrorCode() == MegaError.API_OK){
 
 					if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME||request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-						log("BackgroundRequestListener:onRequestFinish: Email: "+request.getEmail());
 						log("BackgroundRequestListener:onRequestFinish: Name: "+request.getText());
 						if (megaApi != null){
 							if(request.getEmail()!=null){
+								log("BackgroundRequestListener:onRequestFinish: Email: "+request.getEmail());
 								MegaUser user = megaApi.getContact(request.getEmail());
 								if (user != null) {
 									log("BackgroundRequestListener:onRequestFinish: User handle: "+user.getHandle());

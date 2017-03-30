@@ -294,9 +294,9 @@ public class ContactsFragmentLollipop extends Fragment{
 				}
 				else{
 					//No name, ask for it and later refresh!!
+					log("CONTACT DB is null");
 					fullName = contacts.get(i).getEmail();
 				}
-
 
 				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
 				visibleContacts.add(megaContactAdapter);
