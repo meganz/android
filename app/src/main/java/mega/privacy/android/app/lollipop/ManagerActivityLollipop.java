@@ -1003,6 +1003,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(myAccountInfo==null){
 			log("My AccountInfo is Null");
 		}
+		if(searchQuery!=null){
+			outState.putString("searchQuery", searchQuery);
+		}
 	}
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1040,6 +1043,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
+			searchQuery = savedInstanceState.getString("searchQuery");
 		}
 		else{
 			log("Bundle is NULL");
