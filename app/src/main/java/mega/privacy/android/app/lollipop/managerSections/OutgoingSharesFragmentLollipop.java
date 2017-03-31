@@ -94,7 +94,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
-	private ActionMode actionMode;
+	public ActionMode actionMode;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -1204,8 +1204,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (adapter != null){
 			adapter.setCurrentTransfer(mT);
 		}	
-	}	
-	
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
+	}
+
+
 	private static void log(String log) {
 		Util.log("OutgoingSharesFragmentLollipop", log);
 	}

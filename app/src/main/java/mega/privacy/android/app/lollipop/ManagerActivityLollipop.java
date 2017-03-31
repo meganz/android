@@ -2758,7 +2758,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onPageSelected(int position) {
 				log("onTabChanged TabId :"+ position);
 				supportInvalidateOptionsMenu();
+
 				if(position == 0){
+					if (rbFLol != null){
+						if(rbFLol.isMultipleselect()){
+							rbFLol.actionMode.finish();
+						}
+					}
 					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
 					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (fbFLol != null){
@@ -2782,6 +2788,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else if(position == 1){
+					if (fbFLol != null){
+						if(fbFLol.isMultipleselect()){
+							fbFLol.actionMode.finish();
+						}
+					}
 					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (rbFLol != null){
@@ -3190,6 +3201,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("selectDrawerItemSharedItems: TabId :"+ position);
 				supportInvalidateOptionsMenu();
 				if(position == 1){
+					if (inSFLol != null){
+						if(inSFLol.isMultipleselect()){
+							inSFLol.actionMode.finish();
+						}
+					}
 					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
 					outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 					if (outSFLol != null){
@@ -3214,6 +3230,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else if(position == 0){
+					if (outSFLol != null){
+						if(outSFLol.isMultipleselect()){
+							outSFLol.actionMode.finish();
+						}
+					}
 					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 					if (inSFLol != null){

@@ -99,7 +99,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	HashMap<Long, MegaTransfer> mTHash = null;
 
-	private ActionMode actionMode;
+	public ActionMode actionMode;
 
 //    FloatingActionButton fabButton;
 	LinearLayoutManager mLayoutManager;
@@ -1406,6 +1406,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			log("contentText: "+contentText.getText());
 		}
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
 	}
 
 	public int getItemCount(){
