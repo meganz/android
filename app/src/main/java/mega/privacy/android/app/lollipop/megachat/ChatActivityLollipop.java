@@ -1287,7 +1287,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             messages.add(androidMsgSent);
             int index = messages.size()-1;
-
+            log("sendMessage: add to index:" +index);
             if(index==0){
                 //First element
                 log("First element!");
@@ -1689,7 +1689,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(!(m.getMessage().isManagementMessage())){
                         log("selected message: "+m.getMessage().getContent());
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                            showMsgNotSentPanel(m, selectedPosition);
+                            showMsgNotSentPanel(m, position);
                         }
                     }
                 }
@@ -2239,19 +2239,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         while (itr.hasNext()) {
             AndroidMegaChatMessage messageToCheck = itr.next();
-            log("Check wth Msg ID: "+messageToCheck.getMessage().getMsgId());
-            log("Check wth Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
+            log("Index: "+itr.previousIndex());
+            log("Checking with Msg ID: "+messageToCheck.getMessage().getMsgId());
+            log("Checking with Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
+            log("Content: " + messageToCheck.getMessage().getContent());
             if(checkTempId){
-                log("Check temporal IDS");
+                log("Check temporal IDS----");
                 if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
-                    log("modifyMessageReceived: Mark as sent: " + messageToCheck.getMessage().getContent());
+                    log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
                     indexToChange = itr.nextIndex()-1;
                     break;
                 }
             }
             else{
                 if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                    log("modifyMessageReceived: Found message status !!: " + messageToCheck.getMessage().getContent());
+                    log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
                     indexToChange = itr.nextIndex()-1;
                     break;
                 }
@@ -2569,7 +2571,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
 //        showSnackbar("Not yet implemented!");
 
-        log("showMessagePanel");
+        log("showMsgNotSentPanel: "+position);
         this.selectedMessage = message;
         this.selectedPosition = position;
 
@@ -2581,7 +2583,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void removeMsgNotSent(){
-        log("removeMsgNotSent");
+        log("removeMsgNotSent: "+selectedPosition);
         messages.remove(selectedPosition);
         adapter.notifyItemRemoved(selectedPosition);
     }

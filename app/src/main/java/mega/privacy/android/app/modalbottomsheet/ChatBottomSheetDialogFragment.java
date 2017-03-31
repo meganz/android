@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -175,10 +176,30 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             log("visibility: "+visibility);
 
 			optionLeaveChat.setVisibility(View.VISIBLE);
+
+            if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
+                optionClearHistory.setVisibility(View.GONE);
+            }
+            else{
+                if(chat.getVisibility()!= MegaChatRoom.PRIV_MODERATOR){
+                    optionClearHistory.setVisibility(View.GONE);
+                }
+                else{
+                    optionClearHistory.setVisibility(View.VISIBLE);
+                }
+            }
+
 		}
 		else{
 			infoChatText.setText(getString(R.string.contact_properties_activity));
 			optionLeaveChat.setVisibility(View.GONE);
+
+            if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
+                optionClearHistory.setVisibility(View.GONE);
+            }
+            else{
+                optionClearHistory.setVisibility(View.VISIBLE);
+            }
 		}
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
@@ -205,13 +226,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			optionMuteChatText.setText(getString(R.string.general_mute));
 			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.mute_ic));
 		}
-
-		if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-            optionClearHistory.setVisibility(View.GONE);
-        }
-        else{
-            optionClearHistory.setVisibility(View.VISIBLE);
-        }
 
         dialog.setContentView(contentView);
     }
