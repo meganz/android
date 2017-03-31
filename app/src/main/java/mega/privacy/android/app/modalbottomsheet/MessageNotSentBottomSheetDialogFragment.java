@@ -68,7 +68,6 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         dialog.setContentView(contentView);
     }
 
-
     @Override
     public void onClick(View v) {
         log("onClick");
@@ -83,8 +82,15 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
 
             case R.id.msg_not_sent_retry_layout: {
                 log("retry option click");
-                ((ChatActivityLollipop) context).showSnackbar("Not yet implemented");
-//                dismissAllowingStateLoss();
+                if(selectedMessage!=null&&selectedChat!=null){
+                    ((ChatActivityLollipop) context).removeMsgNotSent();
+                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
+                    ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
+                }
+                else{
+                    log("onClick: Chat or message are NULL");
+                }
+
                 break;
             }
 
