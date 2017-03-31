@@ -80,7 +80,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	
 	MegaApiAndroid megaApi;
 	
-	private ActionMode actionMode;
+	public ActionMode actionMode;
 	
 	float density;
 	DisplayMetrics outMetrics;
@@ -847,6 +847,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void setOrder(int orderGetChildren){
 		log("setOrder:Rubbish");
 		this.orderGetChildren = orderGetChildren;
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
 	}
 
 	public int getItemCount(){

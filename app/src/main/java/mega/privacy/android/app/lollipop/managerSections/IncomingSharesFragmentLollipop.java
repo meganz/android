@@ -95,7 +95,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
-	private ActionMode actionMode;
+	public ActionMode actionMode;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -918,6 +918,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
+		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1187,6 +1188,10 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (adapter != null){
 			adapter.setCurrentTransfer(mT);
 		}		
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
 	}
 	
 	private static void log(String log) {
