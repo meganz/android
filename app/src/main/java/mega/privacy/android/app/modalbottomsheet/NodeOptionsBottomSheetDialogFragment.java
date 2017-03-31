@@ -389,7 +389,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionPermissions.setVisibility(View.GONE);
                         optionRemove.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
-                        optionSendInbox.setVisibility(View.VISIBLE);
+                        optionSendInbox.setVisibility(View.GONE);
 
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
                         log("DeepTree value:" + dBT);
