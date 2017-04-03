@@ -513,9 +513,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
             updateCacheForNonContacts(chatToCheck);
         }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)){
-            log("listItemUpdate: Change visibility");
-        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
             log("listItemUpdate: Change unread count: "+item.getTitle());
             if(item!=null){
@@ -655,7 +652,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
             log("listItemUpdate: Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
-            log("listItemUpdate: Visibility: "+item.getVisibility());
+            log("listItemUpdate: Own privilege: "+item.getOwnPrivilege());
 
             if(item!=null){
 
