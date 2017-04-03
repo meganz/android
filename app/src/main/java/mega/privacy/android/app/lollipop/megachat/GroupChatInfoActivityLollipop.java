@@ -1485,9 +1485,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 createGroupChatAvatar();
             }
         }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_VISIBILITY)) {
-            log("CHANGE_TYPE_VISIBILITY");
-        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
             log("CHANGE_TYPE_CLOSED");
         }
