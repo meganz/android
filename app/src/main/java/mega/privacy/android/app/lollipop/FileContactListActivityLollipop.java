@@ -368,7 +368,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 			nameView.setText(node.getName());		
 			
-			imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+			imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 			
 			tempListContacts = megaApi.getOutShares(node);		
 			for(int i=0; i<tempListContacts.size();i++){
