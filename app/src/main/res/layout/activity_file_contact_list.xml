@@ -36,8 +36,7 @@
             <RelativeLayout
                 android:id="@+id/file_contact_list_layout"
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:background="@color/file_list_selected_row" >
+                android:layout_height="72dp" >
 
                 <ImageView
                     android:id="@+id/file_properties_icon"
@@ -74,11 +73,19 @@
                     android:maxLines="1"/>
             </RelativeLayout>
 
+            <LinearLayout
+                android:id="@+id/separator_file_contact_list"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grid_item_separator"
+                android:layout_below="@id/file_contact_list_layout"
+                android:orientation="horizontal" />
+
             <RelativeLayout
                 android:id="@+id/file_contact_list_browser_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/file_contact_list_layout" >
+                android:layout_below="@id/separator_file_contact_list" >
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/file_contact_list_view_browser"
