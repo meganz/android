@@ -1177,5 +1177,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		String email = selectedShare.getUser();
 		return megaApi.getContact(email);
 	}
+
+	public MegaShare getSelectedShare() {
+		return selectedShare;
+	}
+
+	public void setSelectedShare(MegaShare selectedShare) {
+		this.selectedShare = selectedShare;
+	}
 }
 
