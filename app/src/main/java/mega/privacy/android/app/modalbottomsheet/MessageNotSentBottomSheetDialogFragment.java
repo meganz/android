@@ -84,7 +84,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                 log("retry option click");
                 if(selectedMessage!=null&&selectedChat!=null){
                     ((ChatActivityLollipop) context).removeMsgNotSent();
-                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
+                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
                     ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
                 }
                 else{
@@ -97,8 +97,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.msg_not_sent_delete_layout: {
                 log("delete option click");
                 if(selectedMessage!=null&&selectedChat!=null){
-                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
-                    ((ChatActivityLollipop) context).removeMsgNotSent();
+                    ((ChatActivityLollipop) context).removeMsgNotSentAndUpdate();
+                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
                 }
                 else{
                     log("onClick: Chat or message are NULL");
