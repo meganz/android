@@ -138,7 +138,7 @@
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
             android:layout_marginLeft="18dp"
-            android:text="@string/context_delete"
+            android:text="@string/context_remove"
             android:textColor="@color/name_my_account"
             android:textSize="16sp"/>
     </LinearLayout>

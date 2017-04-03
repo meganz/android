@@ -30,12 +30,16 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
     MegaUser contact = null;
+    MegaNode node = null;
+    MegaShare share = null;
     ContactController cC;
 
     private BottomSheetBehavior mBehavior;
@@ -70,11 +74,21 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
             if(email!=null){
                 contact = megaApi.getContact(email);
             }
+
+            long handle = savedInstanceState.getLong("handle", -1);
+            log("Handle node: "+handle);
+            if(handle!=-1){
+                node=megaApi.getNodeByHandle(handle);
+            }
         }
         else{
             log("Bundle NULL");
             if(context instanceof FileContactListActivityLollipop){
                 contact = ((FileContactListActivityLollipop) context).getSelectedContact();
+            }
+
+            if(context instanceof FileContactListActivityLollipop){
+                share = ((FileContactListActivityLollipop) context).getSelectedShare();
             }
         }
         dbH = DatabaseHandler.getDbHandler(getActivity());
@@ -108,7 +122,27 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         if(contact!=null){
             fullName = getFullName(contact);
             titleNameContactPanel.setText(fullName);
-            titleMailContactPanel.setText(contact.getEmail());
+            if(share!=null){
+                int accessLevel = share.getAccess();
+                switch(accessLevel){
+                    case MegaShare.ACCESS_OWNER:
+                    case MegaShare.ACCESS_FULL:{
+                        titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_full_access));
+                        break;
+                    }
+                    case MegaShare.ACCESS_READ:{
+                        titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_only));
+                        break;
+                    }
+                    case MegaShare.ACCESS_READWRITE:{
+                        titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_write));
+                        break;
+                    }
+                }
+            }
+            else{
+                titleMailContactPanel.setText(contact.getEmail());
+            }
 
             addAvatarContactPanel(contact);
 
