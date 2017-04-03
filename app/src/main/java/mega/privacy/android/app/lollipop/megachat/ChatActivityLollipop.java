@@ -1370,11 +1370,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void editMessage(String text){
         log("editMessage: "+text);
+        MegaChatMessage msgEdited = null;
 
-        MegaChatMessage msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getMsgId(), text);
-        AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
+        if(messageToEdit.getMsgId()!=-1){
+            msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getMsgId(), text);
+        }
+        else{
+            msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getTempId(), text);
+        }
+
         if(msgEdited!=null){
             log("Edited message");
+            AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
             modifyMessageReceived(androidMsgEdited, false);
         }
         else{
@@ -2130,6 +2137,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onMessageUpdate!: "+ msg.getMsgId());
 
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
+
+        if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+            log("Processing SERVER_REJECTED message");
+            MegaChatMessage oldMessage = megaChatApi.getMessage(idChat, msg.getMsgId());
+            if(oldMessage!=null){
+                log("content of the rejected message: "+oldMessage.getContent());
+            }
+        }
 
         if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
             log("Change content of the message");
