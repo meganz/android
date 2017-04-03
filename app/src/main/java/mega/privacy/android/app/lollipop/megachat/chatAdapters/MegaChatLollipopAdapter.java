@@ -1872,6 +1872,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         notifyItemInserted(messages.size() - 1);
     }
 
+    public void addMessage(ArrayList<AndroidMegaChatMessage> messages, int position){
+        this.messages = messages;
+        notifyItemInserted(position);
+    }
+
+    public void removeMesage(int position, ArrayList<AndroidMegaChatMessage> messages){
+        this.messages = messages;
+        notifyItemRemoved(position);
+    }
+
     public void loadPreviousMessage(ArrayList<AndroidMegaChatMessage> messages){
         this.messages = messages;
         notifyItemInserted(0);
