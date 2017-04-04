@@ -1379,6 +1379,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getTempId(), text);
         }
 
+
+
         if(msgEdited!=null){
             log("Edited message: status: "+msgEdited.getStatus());
             AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
@@ -1386,7 +1388,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Message cannot be edited!");
-            //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
+            showSnackbar(getString(R.string.error_editing_message));
         }
     }
 
@@ -1988,11 +1990,50 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
             }
 
-            if((msg.getStatus()==MegaChatMessage.STATUS_SENDING)||(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+            if(msg.getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
 
-                log("onMessageLoaded: Getting messages not sent yet!!!-------------------------------------------------: "+msg.getStatus());
+                log("MANUAL_S: onMessageLoaded: Getting messages not sent !!!-------------------------------------------------: "+msg.getStatus());
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
+                if(msg.isEdited()){
+                    log("MESSAGE EDITED");
+
+                    if(!noMoreNoSentMessages){
+                        log("onMessageLoaded: NOT noMoreNoSentMessages");
+                        bufferSending.add(0,androidMsg);
+                    }
+                    else{
+                        log("Try to recover the initial msg");
+                        if(msg.getMsgId()!=-1){
+                            MegaChatMessage notEdited = megaChatApi.getMessage(idChat, msg.getMsgId());
+                            log("Content not edited: "+notEdited.getContent());
+                            AndroidMegaChatMessage androidMsgNotEdited = new AndroidMegaChatMessage(notEdited);
+                            int returnValue = modifyMessageReceived(androidMsgNotEdited, false);
+                            if(returnValue!=-1){
+                                log("onMessageLoaded: Message " + returnValue + " modified!");
+                            }
+                        }
+
+                        appendMessageAnotherMS(androidMsg);
+                    }
+                }
+                else{
+                    int returnValue = modifyMessageReceived(androidMsg, true);
+                    if(returnValue!=-1){
+                        log("onMessageLoaded: Message " + returnValue + " modified!");
+                        return;
+                    }
+
+                    bufferSending.add(0,androidMsg);
+
+                    if(!noMoreNoSentMessages){
+                        log("onMessageLoaded: NOT noMoreNoSentMessages");
+                    }
+                }
+            }
+            else if(msg.getStatus()==MegaChatMessage.STATUS_SENDING){
+                log("SENDING: onMessageLoaded: Getting messages not sent !!!-------------------------------------------------: "+msg.getStatus());
+                AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
                 int returnValue = modifyMessageReceived(androidMsg, true);
                 if(returnValue!=-1){
                     log("onMessageLoaded: Message " + returnValue + " modified!");
@@ -2545,6 +2586,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
             }
         }
+
+        //Create adapter
+        if(adapter==null){
+            log("Create adapter");
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter.setHasStableIds(true);
+            listView.setLayoutManager(mLayoutManager);
+            listView.setAdapter(adapter);
+            adapter.setMessages(messages);
+            listView.setVisibility(View.VISIBLE);
+            chatRelativeLayout.setVisibility(View.VISIBLE);
+            emptyScrollView.setVisibility(View.GONE);
+        }
+        else{
+            log("Update apapter with last index: "+lastIndex);
+            if(lastIndex==0){
+                log("Arrives the first message of the chat");
+                adapter.setMessages(messages);
+                listView.setVisibility(View.VISIBLE);
+                chatRelativeLayout.setVisibility(View.VISIBLE);
+                emptyScrollView.setVisibility(View.GONE);
+            }
+            else{
+                adapter.addMessage(messages, lastIndex);
+            }
+        }
     }
 
     public int appendMessagePosition(AndroidMegaChatMessage msg){
@@ -2555,7 +2622,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             messages.add(msg);
         }
         else{
-
+            log("Finding where to append the message");
             while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
                 lastIndex--;
             }
@@ -2653,16 +2720,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Create adapter
         if(adapter==null){
+            log("Create adapter");
             adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
-//            adapter.setPositionClicked(-1);
+            listView.setVisibility(View.VISIBLE);
+            chatRelativeLayout.setVisibility(View.VISIBLE);
+            emptyScrollView.setVisibility(View.GONE);
         }
         else{
-//            adapter.setPositionClicked(-1);
-            adapter.addMessage(messages, lastIndex);
+            log("Update apapter with last index: "+lastIndex);
+            if(lastIndex==0){
+                log("Arrives the first message of the chat");
+                adapter.setMessages(messages);
+                listView.setVisibility(View.VISIBLE);
+                chatRelativeLayout.setVisibility(View.VISIBLE);
+                emptyScrollView.setVisibility(View.GONE);
+            }
+            else{
+                adapter.addMessage(messages, lastIndex);
+            }
         }
         return lastIndex;
     }
