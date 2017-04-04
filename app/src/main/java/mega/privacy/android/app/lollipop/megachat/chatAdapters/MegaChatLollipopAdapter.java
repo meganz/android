@@ -964,8 +964,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.VISIBLE);
                 holder.contactMessageLayout.setVisibility(View.GONE);
 
-                if(message.getType()==MegaChatMessage.TYPE_NORMAL){
-                    log("Message type NORMAL: "+message.getMsgId());
+                if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT){
+
+                    log("Message type: "+message.getMsgId());
 
                     String messageContent = "";
                     if(message.getContent()!=null){
@@ -1079,23 +1080,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                     else{
 
-                        int status = message.getStatus();
+                        if(message.getType()==MegaChatMessage.TYPE_NORMAL){
 
-                        holder.contentOwnMessageText.setText(messageContent);
-                        holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
-                        holder.ownManagementMessageLayout.setVisibility(View.GONE);
+                            if(message.getContent()!=null){
+                                messageContent = message.getContent();
+                            }
 
-                        //Margins
-                        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
-                        ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-                        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
-
-                        if (!multipleSelect) {
+                            int status = message.getStatus();
 
                             if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
                                 log("Show triangle retry!");
                                 holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-
                                 holder.triangleIcon.setVisibility(View.VISIBLE);
                                 holder.retryAlert.setVisibility(View.VISIBLE);
                             }
@@ -1106,6 +1101,30 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                                 log("Status: "+message.getStatus());
                                 holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                             }
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_ATTACHMENT){
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                            messageContent = "An attachment was received";
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT){
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                            messageContent = "Attachment revoked";
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT){
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                            messageContent = "A contact was received";
+                        }
+                        holder.contentOwnMessageText.setText(messageContent);
+
+                        holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+                        holder.ownManagementMessageLayout.setVisibility(View.GONE);
+
+                        //Margins
+                        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)holder.contentOwnMessageText.getLayoutParams();
+                        ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                        holder.contentOwnMessageText.setLayoutParams(ownMessageParams);
+
+                        if (!multipleSelect) {
 
                             holder.ownMultiselectionLayout.setVisibility(View.GONE);
 
@@ -1123,24 +1142,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             }
                         } else {
                             log("Multiselect ON");
-
-                            if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                                log("Show triangle retry!");
-                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-
-                                holder.triangleIcon.setVisibility(View.VISIBLE);
-                                holder.retryAlert.setVisibility(View.VISIBLE);
-                                holder.ownMultiselectionLayout.setVisibility(View.GONE);
-                            }
-                            else if((status==MegaChatMessage.STATUS_SENDING)){
-                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                                holder.ownMultiselectionLayout.setVisibility(View.GONE);
-                            }
-                            else{
-                                log("Status: "+message.getStatus());
-                                holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-                                holder.ownMultiselectionLayout.setVisibility(View.VISIBLE);
-                            }
 
                             if(this.isItemChecked(position)){
                                 log("Selected: "+message.getContent());
