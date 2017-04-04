@@ -1104,7 +1104,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_ATTACHMENT){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-                            messageContent = "An attachment was received";
+                            messageContent = "An attachment was sent";
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -1112,7 +1112,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_CONTACT){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-                            messageContent = "A contact was received";
+                            messageContent = "A contact was sent";
                         }
                         holder.contentOwnMessageText.setText(messageContent);
 
