@@ -3,6 +3,7 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -25,6 +26,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
@@ -51,6 +53,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
     public TextView avatarInitialLetter;
     public LinearLayout optionChangePermissions;
     public LinearLayout optionDelete;
+    public LinearLayout optionInfo;
 
     String fullName="";
 
@@ -73,12 +76,6 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
             log("Email of the contact: "+email);
             if(email!=null){
                 contact = megaApi.getContact(email);
-            }
-
-            long handle = savedInstanceState.getLong("handle", -1);
-            log("Handle node: "+handle);
-            if(handle!=-1){
-                node=megaApi.getNodeByHandle(handle);
             }
         }
         else{
@@ -112,6 +109,9 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
         optionChangePermissions = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
         optionDelete = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_delete_layout);
+
+        optionInfo = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_info_layout);
+        optionInfo.setOnClickListener(this);
 
         titleNameContactPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
@@ -295,6 +295,20 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
                     return;
                 }
                 ((FileContactListActivityLollipop)context).removeFileContactShare();
+                break;
+            }
+            case R.id.file_contact_list_option_info_layout:{
+                log("optionSendFile");
+                if(contact==null){
+                    log("Selected contact NULL");
+                    return;
+                }
+
+                log("contact info participants panel");
+                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+                i.putExtra("name", share.getUser());
+                context.startActivity(i);
+                dismissAllowingStateLoss();
                 break;
             }
         }
