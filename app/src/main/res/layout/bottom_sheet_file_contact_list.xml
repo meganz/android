@@ -71,15 +71,46 @@
                 android:ellipsize="middle"/>
 
         </RelativeLayout>
-
-
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
+
+    <!--Contact info-->
+    <LinearLayout
+        android:id="@+id/file_contact_list_option_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/file_contact_list_option_info_image"
+            style="@style/dialogActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.54"
+            android:paddingBottom="2dp"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="2dp"
+            android:src="@drawable/info_ic"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/file_contact_list_option_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:layout_marginLeft="18dp"
+            android:text="@string/contact_properties_activity"
+            android:textColor="@color/name_my_account"
+            android:textSize="16sp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/file_contact_list_option_permissions_layout"
