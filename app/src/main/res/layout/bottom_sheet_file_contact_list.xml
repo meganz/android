@@ -128,7 +128,7 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_shared_with"
+            android:src="@drawable/ic_change_permissions"
             android:visibility="visible" />
 
         <TextView
@@ -159,7 +159,7 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_remove_share"
+            android:src="@drawable/ic_remove"
             android:visibility="visible" />
 
         <TextView
